@@ -1,0 +1,36 @@
+body {
+    background-color: var(--lightBlue);
+}
+
+.sidebar {
+    background-color: var(--white);
+    border-radius: 20px;
+    height: 95vh;
+}
+
+.main-container {
+    background-color: var(--white);
+    border-radius: 20px;
+    height: 95vh;
+}
+
+.nav-item {
+    font-family: var(--Bold);
+    text-decoration: none;
+    letter-spacing: -1px;
+    font-size: 17px;
+}
+
+.text-dark{
+    color: var(--black)!important;
+    opacity: 60%;
+}
+
+.selected{
+    color: var(--white)!important;
+    opacity: 100%!important;
+}
+
+.selected-box{
+    background-color: var(--blue);
+}
