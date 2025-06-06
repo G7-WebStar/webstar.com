@@ -8,81 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="shared/assets/css/global-styles.css">
-    <style>
-        body {
-            background-color: var(--lightBlue);
-        }
-
-        .login-container {
-            height: 628px;
-            width: 595px;
-            background-color: var(--white);
-        }
-
-        /*Border Color*/
-        .border-blue {
-            border-style: solid;
-            border-width: 0.5px;
-            border-color: var(--blue);
-        }
-
-        /*Font Color*/
-        .text-blue {
-            color: var(--blue);
-        }
-
-        .btn-login {
-            background-color: var(--blue);
-            color: var(--white);
-            font-size: 22px;
-        }
-
-        /*Resopnsiveness*/
-        @media screen and (max-width: 767px) {
-            .login-container {
-                height: 544px;
-                width: 506px;
-            }
-        }
-
-        @media screen and (max-width: 575px) {
-            .login-container {
-                height: 474px;
-                width: 430px;
-            }
-
-            .btn-login {
-                font-size: 18px;
-            }
-        }
-
-        @media screen and (max-width: 496px) {
-            .login-container {
-                height: 435px;
-                width: 400px;
-            }
-
-            .logo {
-                width: 235px;
-            }
-        }
-
-        @media screen and (max-width: 430px) {
-            .login-container {
-                width: 360px;
-            }
-        }
-
-         @media screen and (max-width: 380px) {
-            .login-container {
-                width: 300px;
-            }
-
-            .logo {
-                width: 220px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="shared/assets/css/login.css">
 </head>
 
 <body>
@@ -111,7 +37,7 @@
                 </div>
                 <!--Login Button-->
                 <div class="container d-flex justify-content center mt-3">
-                    <button class="btn btn-login rounded-5 px-5 my-md-4 my-sm-3 my-3 mx-auto w-sm-50 w-75" type="submit">Log in</button>
+                    <button class="btn btn-primary btn-login rounded-5 px-5 my-md-4 my-3 mx-auto w-sm-50 w-75" type="submit">Log in</button>
                 </div>
 
                 <!--Registration Redirect-->
