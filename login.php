@@ -20,7 +20,7 @@
                     <img src="shared/assets/img/webstar-logo-blue.png" class="img-fluid px-3 my-4 logo" width="275px">
                 </div>
                 <!--Login Form-->
-                <div class="container w-75 py-md-4">
+                <div class="container login-form py-md-4">
                     <div class="form-floating">
                         <input type="email" class="form-control rounded-5 border-blue" id="floatingInput" placeholder="name@example.com">
                         <label for="floatingInput">Email</label>
