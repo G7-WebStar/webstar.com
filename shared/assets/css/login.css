@@ -1,6 +1,6 @@
         body {
             background-color: var(--lightBlue);
-            font-family: DM Sans;
+            font-family: var(--Regular);
         }
 
         .login-container {
