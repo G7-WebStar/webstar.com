@@ -1,5 +1,6 @@
         body {
             background-color: var(--lightBlue);
+            font-family: DM Sans;
         }
 
         .login-container {
@@ -26,7 +27,7 @@
             font-size: 22px;
         }
 
-        /*Resopnsiveness*/
+        /*Responsiveness*/
         @media screen and (max-width: 767px) {
             .login-container {
                 height: 544px;

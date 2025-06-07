@@ -13,7 +13,7 @@
 
 <body>
     <div class="container min-vh-100 d-flex justify-content-center align-items-center">
-        <div class="row h-100">
+        <div class="row">
             <div class="col-4 p-3 rounded-4 login-container border-blue">
                 <!--Logo-->
                 <div class="container d-flex justify-content-center py-sm-4 py-3">
@@ -25,10 +25,10 @@
                         <input type="email" class="form-control rounded-5 border-blue" id="floatingInput" placeholder="name@example.com">
                         <label for="floatingInput">Email</label>
                     </div>
-                    <div class="form-floating pt-4 pb-md-4 pb-3">
+                    <div class="form-floating pt-2 pt-md-4 pb-md-4 pb-3">
                         <input type="password" class="form-control rounded-5 border-blue" id="floatingPassword" placeholder="Password">
                         <label for="floatingPassword">
-                            <div class="pt-4">Password</div>
+                            <div class="pt-2 pt-md-4">Password</div>
                         </label>
                     </div>
                     <div class="forgot-password float-end">
@@ -36,7 +36,7 @@
                     </div>
                 </div>
                 <!--Login Button-->
-                <div class="container d-flex justify-content center mt-3">
+                <div class="container d-flex justify-content-center mt-3">
                     <button class="btn btn-primary btn-login rounded-5 px-5 my-md-4 my-3 mx-auto w-sm-50 w-75" type="submit">Log in</button>
                 </div>
 
