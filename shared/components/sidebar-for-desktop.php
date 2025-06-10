@@ -1,7 +1,7 @@
 <div class="col-auto d-none d-md-block">
     <div class="row">
         <!-- Sidebar -->
-        <div class="sidebar mx-2 p-2" style="width: 220px;">
+        <div class="card border-0 sidebar mx-2 p-2" style="width: 220px;">
             <!-- Logo -->
             <div class="d-flex justify-content-center">
                 <img src="shared/assets/img/webstar-logo-blue.png" class="img-fluid pt-5 pb-5 px-3" width="180px;">
