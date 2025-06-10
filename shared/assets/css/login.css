@@ -27,6 +27,10 @@
             font-size: 22px;
         }
 
+        .login-form {
+            max-width: 75% !important;
+        }
+
         /*Responsiveness*/
         @media screen and (max-width: 767px) {
             .login-container {
@@ -60,6 +64,10 @@
         @media screen and (max-width: 430px) {
             .login-container {
                 width: 360px;
+            }
+
+            .login-form {
+                max-width: 100% !important;
             }
         }
 
