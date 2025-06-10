@@ -32,6 +32,12 @@
         }
 
         /*Responsiveness*/
+        @media screen and (max-height: 900px) {
+            .login-container {
+                height: 590px;
+            }
+        }
+
         @media screen and (max-width: 767px) {
             .login-container {
                 height: 544px;
