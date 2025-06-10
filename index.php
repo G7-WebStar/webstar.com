@@ -27,17 +27,19 @@
                 <div class="row">
                     <!-- Main Container -->
                     <div class="col main-container mx-2 p-2 ">
-                        <!-- Navbar for mobile -->
-                        <?php include 'shared/components/navbar-for-mobile.php'; ?>
+                        <div class="card border-0 p-4">
+                            <!-- Navbar for mobile -->
+                            <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
+                            <!-- PUT CONTENT HERE -->
+                        </div>
                     </div>
                 </div>
             </div>
-
         </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 
 
