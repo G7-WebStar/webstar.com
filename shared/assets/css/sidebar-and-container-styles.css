@@ -24,7 +24,6 @@ body {
 
 .text-dark{
     color: var(--black)!important;
-    opacity: 60%;
 }
 
 .selected{
