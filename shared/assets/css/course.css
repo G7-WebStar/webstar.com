@@ -1,0 +1,54 @@
+body {
+    font-family: var(--Regular);
+}
+
+.box {
+    background-color: var(--blue);
+    color: white;
+    border-radius: 20px;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 31.25% 31.25% 35.5%;
+    grid-template-rows: auto auto;
+    gap: 1em;
+    justify-content: center;
+    grid-template-areas:
+        "box-1 box-1 box-3"
+        "box-2 box-2 box-3"
+        "box-2 box-2 box-3"
+        "box-2 box-2 box-3";
+}
+
+.course-container {
+    border-radius: 20px;
+}
+
+.course-title,
+.continue-text {
+    font-size: 18px;
+}
+
+.lesson-title {
+    font-size: 24px;
+}
+
+@media screen and (max-width: 1199px) {
+    .course-title,
+    .continue-text {
+        font-size: 16px;
+    }
+
+    .lesson-title {
+        font-size: 22px;
+    }
+
+    .arrow {
+        width: 90px;
+    }
+
+    .logo {
+        width: 70px;
+    }
+}
