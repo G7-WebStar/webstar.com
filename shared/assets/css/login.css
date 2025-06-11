@@ -86,3 +86,7 @@
                 width: 220px;
             }
         }
+
+        .input-style{
+            padding-left: 20px !important;
+        }

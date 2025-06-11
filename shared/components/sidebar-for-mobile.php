@@ -31,22 +31,17 @@
                     <img src="shared/assets/img/games.png" style="width: 30px; height: 30px;">
                     <a class="nav-link text-dark p-0" href="#">Mini-games</a>
                 </li>
-                <li class="nav-item d-flex align-items-center gap-2 my-1 p-2">
-                    <img src="shared/assets/img/settings.png" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0" href="#">Settings</a>
-                </li>
             </ul>
 
             <!-- Profile -->
             <hr>
-            <div class="dropdown mt-auto p-2">
-                <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle"
+            <div class="dropdown mt-auto p-2" style="font-family: var(--Medium);">
+                <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle"
                     data-bs-toggle="dropdown" aria-expanded="false">
                     <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
-                    <strong>mdo</strong>
+                    <strong>james</strong>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end text-small shadow">
-                    <li><a class="dropdown-item" href="#">New project...</a></li>
                     <li><a class="dropdown-item" href="#">Settings</a></li>
                     <li><a class="dropdown-item" href="#">Profile</a></li>
                     <li>

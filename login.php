@@ -22,13 +22,15 @@
                 <!--Login Form-->
                 <div class="container login-form py-md-4">
                     <div class="form-floating">
-                        <input type="email" class="form-control rounded-5 border-blue" id="floatingInput" placeholder="name@example.com">
-                        <label for="floatingInput">Email</label>
+                        <input type="email" class="input-style form-control rounded-5 border-blue" id="floatingInput" placeholder="name@example.com">
+                        <label for="floatingInput">
+                            <div class="px-2">Email</div>
+                        </label>
                     </div>
                     <div class="form-floating pt-2 pt-md-4 pb-md-4 pb-3">
-                        <input type="password" class="form-control rounded-5 border-blue" id="floatingPassword" placeholder="Password">
+                        <input type="password" class="input-style form-control rounded-5 border-blue" id="floatingPassword" placeholder="Password">
                         <label for="floatingPassword">
-                            <div class="pt-2 pt-md-4">Password</div>
+                            <div class="pt-2 pt-md-4 px-2">Password</div>
                         </label>
                     </div>
                     <div class="forgot-password float-end">
