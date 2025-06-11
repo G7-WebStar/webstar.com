@@ -36,11 +36,11 @@
 
             </ul>
 
-            <div class="dropdown mt-auto p-4" style="font-family: var(--Medium);">
-                <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-black"
+            <div class="dropdown mt-auto p-4" style="font-family: var(--Bold); letter-spacing: -1px;">
+                <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
                     data-bs-toggle="dropdown" aria-expanded="false">
                     <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
-                    <strong class="text-black">james</strong>
+                    <strong class="text-dark">james</strong>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end text-small shadow">
                     <li><a class="dropdown-item" href="#">Settings</a></li>
