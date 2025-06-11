@@ -11,7 +11,7 @@
             <ul class="nav flex-column">
                 <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3 selected-box">
                     <img src="shared/assets/img/dashboard-w.png" class="img-fluid" style="width: 30px; height: 30px; ">
-                    <a class="nav-link text-dark p-0 selected" href="#">Dashboard</a>
+                    <a class="nav-link text-dark p-0 selected" href="#">Home</a>
                 </li>
 
                 <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2">
@@ -39,7 +39,7 @@
             <div class="dropdown mt-auto p-4" style="font-family: var(--Bold); letter-spacing: -1px;">
                 <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
                     data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+                    <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="32" height="32" class="rounded-circle me-2">
                     <strong class="text-dark">james</strong>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end text-small shadow">

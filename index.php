@@ -23,17 +23,15 @@
             <?php include 'shared/components/sidebar-for-desktop.php'; ?>
 
             <!-- Main Container Column-->
-            <div class="col">
-                <div class="row">
-                    <!-- Main Container -->
-                    <div class="col main-container mx-2 p-2 ">
-                        <div class="card border-0 p-4">
-                            <!-- Navbar for mobile -->
-                            <?php include 'shared/components/navbar-for-mobile.php'; ?>
+            <div class="col main-container m-0 p-0 mx-2 p-4 ">
+                <div class="card border-0 p-3 h-100 w-100 rounded-0 shadow-none">
 
-                            <!-- PUT CONTENT HERE -->
-                        </div>
-                    </div>
+                    <!-- Navbar for mobile -->
+                    <?php include 'shared/components/navbar-for-mobile.php'; ?>
+
+                    <!-- PUT CONTENT HERE -->
+
+
                 </div>
             </div>
         </div>
