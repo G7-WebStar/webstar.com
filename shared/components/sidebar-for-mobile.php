@@ -13,7 +13,7 @@
             <ul class="nav nav-pills flex-column mb-auto">
                 <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3 selected-box">
                     <img src="shared/assets/img/dashboard-w.png" style="width: 30px; height: 30px;">
-                    <a class="nav-link selected p-0" href="#">Dashboard</a>
+                    <a class="nav-link selected p-0" href="#">Home</a>
                 </li>
                 <li class="nav-item d-flex align-items-center gap-2 my-1 p-2">
                     <img src="shared/assets/img/courses.png" style="width: 30px; height: 30px;">
@@ -31,22 +31,17 @@
                     <img src="shared/assets/img/games.png" style="width: 30px; height: 30px;">
                     <a class="nav-link text-dark p-0" href="#">Mini-games</a>
                 </li>
-                <li class="nav-item d-flex align-items-center gap-2 my-1 p-2">
-                    <img src="shared/assets/img/settings.png" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0" href="#">Settings</a>
-                </li>
             </ul>
 
             <!-- Profile -->
             <hr>
-            <div class="dropdown mt-auto p-2">
-                <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle"
+            <div class="dropdown mt-auto p-2" style="font-family: var(--Bold); letter-spacing: -1px;">
+                <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
                     data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
-                    <strong>mdo</strong>
+                    <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="32" height="32" class="rounded-circle me-2">
+                    <strong class="text-dark">james</strong>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end text-small shadow">
-                    <li><a class="dropdown-item" href="#">New project...</a></li>
                     <li><a class="dropdown-item" href="#">Settings</a></li>
                     <li><a class="dropdown-item" href="#">Profile</a></li>
                     <li>
