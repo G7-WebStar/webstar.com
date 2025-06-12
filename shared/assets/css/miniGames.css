@@ -1,69 +1,66 @@
-.borderBlue {
-        border: 2px solid var(--blue);
+.cardTitle {
+    font-family: var(--Bold);
+    font-size: 2em;
+    color: var(--blue)
+}
+
+.gameTitle {
+    font-family: var(--Regular);
+    color: var(--white);
+    font-size: 1.2em;
+}
+
+@media (max-width: 768px) {
+    .cardTitle {
+        font-size: 1.2em;
+        text-align: center;
     }
 
-    .cardTitle {
-        font-family: var(--Bold);
-        font-size: 2em;
-        color: var(--blue)
+    .border {
+        padding-top: 50px;
+    }
+
+
+    .gameContainer {
+        padding: 2.5em;
     }
 
     .gameTitle {
-        font-family: var(--Regular);
-        color: var(--white);
-        font-size: 1em;
+        font-size: 1.2em;
+        text-align: center;
+        margin-bottom: 20px;
     }
 
-    @media (max-width: 768px) {
-        .cardTitle {
-            font-size: 1.2em;
-            text-align: center;
-        }
-
-        .borderBlue{
-            margin-top: 18px;
-        }
-
-        .gameContainer {
-            padding: 2.5em;
-        }
-
-        .gameTitle {
-            font-size: 1.2em;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .card.p-4.mx-5 {
-            margin-left: 0 !important;
-            margin-right: 0 !important;
-            padding: 1em !important;
-        }
-
-        .smallImg{
-            margin-top: 30px;
-        }
-    }
-
-
-    .description {
-        font-family: var(--Bold);
-        font-size: 1.50em;
-    }
-
-    .gameContainer {
-        background-color: var(--blue);
-        height: 180px;
-        justify-content: center;
-        align-items: center;
+    .card.p-4.mx-5 {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding: 1em !important;
     }
 
     .smallImg {
-        width: 120px;
-        height: auto;
+        margin-top: 30px;
     }
+}
 
-    .smallImgArrow {
-        width: 25px;
-        height: auto;
-    }
+
+.description {
+    font-family: var(--Bold);
+    font-size: 1.5em;
+}
+
+.gameContainer {
+    background-color: var(--blue);
+    height: 180px;
+    justify-content: center;
+    align-items: center;
+}
+
+.smallImg {
+    width: 120px;
+    height: auto;
+}
+
+.smallImgArrow {
+    width: 25px;
+    height: auto;
+}
