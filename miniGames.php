@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Mini Games</title>
+    <title>Webstar | Mini Games</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="shared/assets/css/global-styles.css">
@@ -34,14 +34,14 @@
                     <div class="col">
                         <!-- GAME ONE -->
                         <div class="row m-0 mb-2 w-100">
-                            <div class="card border-1 p-3 w-100 rounded-4 borderBlue">
+                            <div class="card border-0 w-100 rounded-4 border">
                                 <div class="cardBody">
-                                    <div class="cardTitle mx-5 d-none d-md-block">
+                                    <div class="cardTitle mx-1 d-none d-md-block">
                                         Mini Game 1
                                     </div>
                                     <div class="d-flex justify-content-center">
                                         <!-- Game Card -->
-                                        <div class="card p-4 mx-5 w-100 rounded-4 gameContainer">
+                                        <div class="card p-4 mx-1 w-100 rounded-4 gameContainer">
                                             <a href="#" class="stretched-link d-md-none position-static"></a>
                                             <div class="row w-100">
                                                 <div class="col-12 col-md-3 d-flex justify-content-center">
@@ -70,13 +70,13 @@
 
                         <!-- GAME TWO -->
                         <div class="row m-0 mb-2 w-100">
-                            <div class="card border-1 p-3 w-100 rounded-4 borderBlue">
+                            <div class="card border-0 p-3 my-3 w-100 rounded-4 border">
                                 <div class="cardBody">
-                                    <div class="cardTitle mx-5 d-none d-md-block">
+                                    <div class="cardTitle mx-1 d-none d-md-block">
                                         Mini Game 2
                                     </div>
                                     <div class="d-flex justify-content-center">
-                                        <div class="card p-4 mx-5 w-100 rounded-4 gameContainer">
+                                        <div class="card p-4 mx-1 w-100 rounded-4 gameContainer">
                                             <a href="#" class="stretched-link d-md-none position-static"></a>
                                             <div class="row w-100">
                                                 <div class="col-12 col-md-3 d-flex justify-content-center">
