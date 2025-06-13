@@ -1,0 +1,95 @@
+/* Home Dashboard */
+
+/* Scrollable */
+#scrollable {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+#scrollable-order-list1 {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+#scrollable-order-list1::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* Card */
+.containerCard {
+    border-radius: 25px;
+    border-color: var(--blue);
+}
+
+.containerCard1 {
+    border-radius: 25px;
+    background-color: var(--blue);
+}
+
+.achievementCard {
+    border-radius: 25px;
+    border-color: var(--blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-right: 400px;
+}
+
+.blueColorText {
+    color: var(--blue);
+}
+
+.blueColorText1 {
+    color: var(--blue);
+    border-color: var(--blue);
+}
+
+.blueColorText2 {
+    color: var(--blue);
+    font-size: 0.9em;
+    font-family: var(--Bold);
+    line-height: 2;
+    padding-left: 4px;
+}
+
+.blueColorText3 {
+    color: var(--blue);
+    font-size: 0.9em;
+    font-family: var(--Bold);
+    line-height: 2;
+}
+
+.calenderCard {
+    color: var(--blue);
+    border-color: var(--blue);
+    border-radius: 25px;
+    height: 112px;
+}
+
+.blueCard {
+    background-color: var(--blue);
+}
+
+.blueCard1 {
+    background-color: var(--blue);
+    border-radius: 25px;
+    height: 112px;
+    color: #ffffff;
+}
+
+@media (max-width: 767.98px) {
+
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .main-container {
+        height: 100vh;
+        overflow-y: auto;
+    }
+}

@@ -1,0 +1,66 @@
+.cardTitle {
+    font-family: var(--Bold);
+    font-size: 2em;
+    color: var(--blue)
+}
+
+.gameTitle {
+    font-family: var(--Regular);
+    color: var(--white);
+    font-size: 1.2em;
+}
+
+@media (max-width: 768px) {
+    .cardTitle {
+        font-size: 1.2em;
+        text-align: center;
+    }
+
+    .border {
+        padding-top: 50px;
+    }
+
+
+    .gameContainer {
+        padding: 2.5em;
+    }
+
+    .gameTitle {
+        font-size: 1.2em;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .card.p-4.mx-5 {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding: 1em !important;
+    }
+
+    .smallImg {
+        margin-top: 30px;
+    }
+}
+
+
+.description {
+    font-family: var(--Bold);
+    font-size: 1.5em;
+}
+
+.gameContainer {
+    background-color: var(--blue);
+    height: 180px;
+    justify-content: center;
+    align-items: center;
+}
+
+.smallImg {
+    width: 120px;
+    height: auto;
+}
+
+.smallImgArrow {
+    width: 25px;
+    height: auto;
+}

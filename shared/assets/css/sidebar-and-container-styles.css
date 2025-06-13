@@ -26,12 +26,12 @@ body {
     color: var(--black)!important;
 }
 
-.selected{
-    color: var(--white)!important;
-    opacity: 100%!important;
+.selected {
+    color: var(--white) !important;
+    opacity: 100% !important;
 }
 
-.selected-box{
+.selected-box {
     background-color: var(--blue);
 }
 
