@@ -96,9 +96,9 @@
                             </div>
                             <!-- Right Column -->
                             <div class="col-lg-6 col-12 px-lg-4 px-2 d-flex flex-column">
-                                <div class="px-lg-3 px-0 mt-lg-0 mt-lg-2 mt-3 d-flex flex-column flex-grow-1 text-center">
+                                <div class="px-lg-3 px-0 mt-lg-0 mt-lg-2 mt-3 d-flex flex-column flex-grow-1">
                                     <div class="lesson-available mb-3">Lessons Available</div>
-                                    <div class="lessons-container px-4 p-3 py-md-5 lesson-available overflow-y-auto flex-grow-1">
+                                    <div class="lessons-container px-4 p-3 py-md-5 lesson-available overflow-y-auto flex-grow-1 text-center">
                                         <div class="h5 mb-3 fw-bold">HTML Lessons</div>
                                         <div class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center">
                                             <div class="me-auto ms-1 lesson-text">01</div>
