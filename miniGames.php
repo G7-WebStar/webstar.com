@@ -31,35 +31,72 @@
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
                     <!-- PUT CONTENT HERE -->
-                    <div class="col">
-                        <!-- GAME ONE -->
-                        <div class="row m-0 mb-2 w-100">
-                            <div class="card border-0 w-100 rounded-4 border">
-                                <div class="cardBody">
-                                    <div class="cardTitle mx-1 d-none d-md-block">
-                                        Mini Game 1
+                    <div class="container-fluid">
+                        <div class="col">
+                            <!-- GAME ONE -->
+                            <div class="row m-0 mb-2 w-100">
+                                <div class="card border-0 w-100 rounded-4 border">
+                                    <div class="cardBody">
+                                        <div class="cardTitle mx-1 d-none d-md-block">
+                                            Mini Game 1
+                                        </div>
+                                        <div class="d-flex justify-content-center">
+                                            <!-- Game Card -->
+                                            <div class="card p-4 mx-1 w-100 rounded-4 gameContainer">
+                                                <a href="#" class="stretched-link d-md-none position-static"></a>
+                                                <div class="row w-100">
+                                                    <div class="col-12 col-md-3 d-flex justify-content-center">
+                                                        <img src="shared/assets/img/miniGamesImg/typing.svg"
+                                                            class="img-fluid smallImg" alt="Game Image">
+                                                    </div>
+                                                    <div
+                                                        class="gameTitle col-md-5 d-flex flex-column justify-content-center text-center text-md-start">
+                                                        <p class="mb-0">Typing Game</p>
+                                                        <p class="description mb-0 d-none d-md-block">Challenge your
+                                                            typing skills</p>
+                                                    </div>
+                                                    <div
+                                                        class="col-md-4 d-none d-md-flex align-items-center justify-content-end">
+                                                        <a href="#">
+                                                            <img src="shared/assets/img/miniGamesImg/arrow.svg"
+                                                                class="img-fluid smallImgArrow" alt="Arrow">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="d-flex justify-content-center">
-                                        <!-- Game Card -->
-                                        <div class="card p-4 mx-1 w-100 rounded-4 gameContainer">
-                                            <a href="#" class="stretched-link d-md-none position-static"></a>
-                                            <div class="row w-100">
-                                                <div class="col-12 col-md-3 d-flex justify-content-center">
-                                                    <img src="shared/assets/img/miniGamesImg/typing.svg"
-                                                        class="img-fluid smallImg" alt="Game Image">
-                                                </div>
-                                                <div
-                                                    class="gameTitle col-md-5 d-flex flex-column justify-content-center text-center text-md-start">
-                                                    <p class="mb-0">Typing Game</p>
-                                                    <p class="description mb-0 d-none d-md-block">Challenge your
-                                                        typing skills</p>
-                                                </div>
-                                                <div
-                                                    class="col-md-4 d-none d-md-flex align-items-center justify-content-end">
-                                                    <a href="#">
-                                                        <img src="shared/assets/img/miniGamesImg/arrow.svg"
-                                                            class="img-fluid smallImgArrow" alt="Arrow">
-                                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- GAME TWO -->
+                            <div class="row m-0 mb-2 w-100">
+                                <div class="card border-0 p-3 my-3 w-100 rounded-4 border">
+                                    <div class="cardBody">
+                                        <div class="cardTitle mx-1 d-none d-md-block">
+                                            Mini Game 2
+                                        </div>
+                                        <div class="d-flex justify-content-center">
+                                            <div class="card p-4 mx-1 w-100 rounded-4 gameContainer">
+                                                <a href="#" class="stretched-link d-md-none position-static"></a>
+                                                <div class="row w-100">
+                                                    <div class="col-12 col-md-3 d-flex justify-content-center">
+                                                        <img src="shared/assets/img/miniGamesImg/empty.svg"
+                                                            class="img-fluid smallImg" alt="Game Image">
+                                                    </div>
+                                                    <div
+                                                        class="gameTitle col-md-5 d-flex flex-column justify-content-center">
+                                                        <p class="mb-0">Game Name</p>
+                                                        <p class="description mb-0 d-none d-md-block">Game Description
+                                                        </p>
+                                                    </div>
+                                                    <div
+                                                        class="col-md-4 d-none d-md-flex align-items-center justify-content-end">
+                                                        <a href="#">
+                                                            <img src="shared/assets/img/miniGamesImg/arrow.svg"
+                                                                class="img-fluid smallImgArrow" alt="Arrow">
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -67,42 +104,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- GAME TWO -->
-                        <div class="row m-0 mb-2 w-100">
-                            <div class="card border-0 p-3 my-3 w-100 rounded-4 border">
-                                <div class="cardBody">
-                                    <div class="cardTitle mx-1 d-none d-md-block">
-                                        Mini Game 2
-                                    </div>
-                                    <div class="d-flex justify-content-center">
-                                        <div class="card p-4 mx-1 w-100 rounded-4 gameContainer">
-                                            <a href="#" class="stretched-link d-md-none position-static"></a>
-                                            <div class="row w-100">
-                                                <div class="col-12 col-md-3 d-flex justify-content-center">
-                                                    <img src="shared/assets/img/miniGamesImg/empty.svg"
-                                                        class="img-fluid smallImg" alt="Game Image">
-                                                </div>
-                                                <div
-                                                    class="gameTitle col-md-5 d-flex flex-column justify-content-center">
-                                                    <p class="mb-0">Game Name</p>
-                                                    <p class="description mb-0 d-none d-md-block">Game Description
-                                                    </p>
-                                                </div>
-                                                <div
-                                                    class="col-md-4 d-none d-md-flex align-items-center justify-content-end">
-                                                    <a href="#">
-                                                        <img src="shared/assets/img/miniGamesImg/arrow.svg"
-                                                            class="img-fluid smallImgArrow" alt="Arrow">
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
             </div>
