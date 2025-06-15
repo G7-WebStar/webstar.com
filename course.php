@@ -28,10 +28,10 @@
                 <?php include 'shared/components/navbar-for-mobile.php'; ?>
                 <div class="row">
                     <!-- Main Container -->
-                    <div class="col main-container mx-lg-2 p-2 overflow-y-auto">
-                        <div class="card border-0 p-4 d-flex flex-lg-row flex-column justify-content-center">
+                    <div class="col main-container mx-lg-2 p-2 overflow-y-auto d-flex flex-column">
+                        <div class="card border-0 p-2 d-flex flex-lg-row flex-column justify-content-center">
                             <!-- Left Column -->
-                            <div class="col-lg-6 col-12 px-4">
+                            <div class="col-lg-6 col-12 px-4 d-flex flex-column">
                                 <div class="col-12">
                                     <div class="row">
                                         <div class="col-12 p-4 box">
@@ -61,12 +61,12 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-12">
+                                <div class="col-12 d-flex flex-column">
                                     <div class="row d-flex align-items-center">
                                         <div class="col-12 mt-3 p-0">
                                             <div class="webdev-courses">Web Development Courses</div>
                                             <div class="container-fluid py-3 mt-3 mx-auto courses-container">
-                                                <div class="grid-container">
+                                                <div class="grid-container d-flex flex-column ">
                                                     <div class="box d-flex flex-column align-items-center p-2 p-sm-4" style="grid-area: box-1;">
                                                         <div class="d-flex flex-row align-items-center">
                                                             <div class="fw-bold course-text">HTML Course</div>
@@ -86,8 +86,7 @@
                                                             <div class="done-text me-auto">Finish HTML Course to unlock</div>
                                                         </div>
                                                     </div>
-                                                    <div class="box-locked more-text fw-bold p-2 p-sm-4 text-center d-flex align-items-center" style="grid-area: box-3;">More Courses Coming Soon!</div>
-                                                    <div class="box-locked more-text fw-bold p-2 p-sm-4 text-center d-flex align-items-center" style="grid-area: box-4;">More Courses Coming Soon!</div>
+                                                    <div class="box-locked more-text fw-bold p-2 p-sm-4 text-center d-flex justify-content-center align-items-center" style="grid-area: box-3;">More Courses Coming Soon!</div>
                                                 </div>
                                             </div>
                                         </div>
