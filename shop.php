@@ -1,3 +1,6 @@
+<?php $activePage = 'shop'; ?>
+
+
 <!doctype html>
 <html lang="en">
 

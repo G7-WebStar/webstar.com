@@ -1,3 +1,5 @@
+<?php $activePage = 'profile'; ?>
+
 <!doctype html>
 <html lang="en">
 
