@@ -11,27 +11,27 @@
             <ul class="nav flex-column">
                 <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3 selected-box">
                     <img src="shared/assets/img/dashboard-w.png" class="img-fluid" style="width: 30px; height: 30px; ">
-                    <a class="nav-link text-dark p-0 selected" href="#">Home</a>
+                    <a class="nav-link text-dark p-0 selected" href="index.php">Home</a>
                 </li>
 
                 <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2">
                     <img src="shared/assets/img/courses.png" class="img-fluid" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0" href="#">Courses</a>
+                    <a class="nav-link text-dark p-0" href="course.php">Courses</a>
                 </li>
 
                 <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2">
                     <img src="shared/assets/img/explore.png" class="img-fluid" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0" href="#">Explore</a>
+                    <a class="nav-link text-dark p-0" href="explore.php">Explore</a>
                 </li>
 
                 <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2">
                     <img src="shared/assets/img/shop.png" class="img-fluid" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0" href="#">Shop</a>
+                    <a class="nav-link text-dark p-0" href="shop.php">Shop</a>
                 </li>
 
                 <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2">
                     <img src="shared/assets/img/games.png" class="img-fluid" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0" href="#">Mini-games</a>
+                    <a class="nav-link text-dark p-0" href="miniGames.php">Mini-games</a>
                 </li>
 
             </ul>
@@ -44,11 +44,11 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end text-small shadow">
                     <li><a class="dropdown-item" href="#">Settings</a></li>
-                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item" href="#">Sign out</a></li>
+                    <li><a class="dropdown-item" href="login.php">Sign out</a></li>
                 </ul>
             </div>
 
