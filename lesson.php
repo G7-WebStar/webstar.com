@@ -1,3 +1,5 @@
+<?php $activePage = 'course'; ?>
+
 <!doctype html>
 <html lang="en">
 
@@ -66,7 +68,7 @@
               <div class="flex-grow-1">
                 <p>Replace "Arial" with any font that’s installed on your computer—for example, Verdana, Times New
                   Roman, Comic Sans MS, or another font you like! </p>
-                <p>font-family: Arial; font-size: 30px; color: red;</p>
+                
 
                 <div class="d-flex flex-column flex-md-row align-items-center gap-3">
                   <div class="code-block">
@@ -285,7 +287,7 @@
                 title.textContent = "Oops!";
                 title.classList.remove("text-primary");
                 title.classList.add("text-danger");
-                message.innerHTML = `Something went wrong.<br />Please try again.`;
+                message.innerHTML = `Something is wrong.<br />Please try again.`;
               }
 
               const modal = new bootstrap.Modal(document.getElementById('cardModal'));

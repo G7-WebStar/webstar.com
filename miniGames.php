@@ -1,3 +1,6 @@
+<?php $activePage = 'minigames'; ?>
+
+
 <!doctype html>
 <html lang="en">
 

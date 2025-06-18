@@ -22,6 +22,19 @@
     cursor: pointer;
 }
 
+.shopCardImage {
+    width: 130px !important;
+    height: 130px !important;
+    object-fit: cover;
+    border-radius: 1rem !important;
+    border: 1px solid var(--blue);
+    background-color: var(--white);
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
 .buttonGroup {
     display: flex;
     flex-wrap: wrap;
@@ -78,9 +91,9 @@
 .custom-modal {
     border: none;
     background-color: #fff;
-    max-width: 400px;
+    max-width: 420px;
     width: 100%;
-    min-height: 300px;
+    min-height: 250px;
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
     position: relative;
     padding: 0;
@@ -109,14 +122,6 @@
     width: 100%;
 }
 
-.modal-img {
-    width: 360px;
-    height: 200px;
-    background-color: var(--blue);
-    border-radius: 1rem;
-}
-
-
 .modalTitle {
     font-family: var(--Bold);
     color: var(--blue);
@@ -135,6 +140,16 @@
     border: none;
 }
 
+.modalButton:hover,
+.modalButton:focus,
+.modalButton:active {
+    background-color: var(--blue) !important;
+    color: white !important;
+    opacity: 1 !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
 @media (max-width: 576px) {
     .modal-img {
         width: 75%;
@@ -145,7 +160,7 @@
         top: 1rem;
     }
 
-    .description{
+    .description {
         font-family: var(--Regular);
         font-size: 1.20em;
     }

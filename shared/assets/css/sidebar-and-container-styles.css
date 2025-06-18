@@ -32,6 +32,10 @@ body {
 }
 
 .selected-box {
-    background-color: var(--blue);
+    background-color: var(--blue) !important;
+}
+
+.selected-box-course {
+    background-color: var(--blue) !important;
 }
 
