@@ -80,7 +80,7 @@
                             </div>
                         </div>
                         <!-- Area where shop cards are shown -->
-                        <div class="container mt-4" id="cardDisplay">
+                        <div class="container mt-3" id="cardDisplay">
                             <div class="row g-3 px-4" id="cardGrid">
                                 <!-- JavaScript dynamically injects card items here -->
                             </div>
@@ -107,7 +107,7 @@
                     <hr class="modal-divider mb-3">
 
                     <!-- Modal Body -->
-                    <div class="container mb-2 mt-2 px-4">
+                    <div class="container mb-2 px-5">
                         <div class="d-flex flex-column flex-md-row align-items-center gap-4">
                             <!-- Left Box (Image) -->
                             <div class="modal-img"></div>
@@ -138,7 +138,39 @@
     <script>
         const cardGrid = document.getElementById('cardGrid');
 
-        // Dynamically generate card items based on selected filter
+        const fontNames = [
+            "Helvetica", "Arial", "Montserrat", "Roboto",
+            "Serif", "Gotham", "Poppins Bold", "Courier New"
+        ];
+
+        const fontMap = {
+            "Helvetica": "Helvetica, sans-serif",
+            "Arial": "Arial, sans-serif",
+            "Montserrat": "'Montserrat', sans-serif",
+            "Roboto": "'Roboto', sans-serif",
+            "Serif": "serif",
+            "Gotham": "'Gotham', sans-serif",
+            "Poppins Bold": "'Poppins', sans-serif",
+            "Courier New": "'Courier New', monospace"
+        };
+
+        const colorNames = [
+            "Rose Red", "Orange", "Green", "Gray",
+            "Brown", "Cyan", "Amber", "Purple"
+        ];
+
+        const badgeNames = [
+            "Code Cadet", "HTML Hero", "CSS Styler", "Webstar Scholar",
+            "Syntax Star", "Frontend Explorer", "Tag Master", "Pixel Pro"
+        ];
+
+        function getCardTitle(label, i) {
+            if (label === 'Fonts') return fontNames[i - 1];
+            if (label === 'Color Theme') return colorNames[i - 1];
+            if (label === 'Logo Badge') return badgeNames[i - 1];
+            return `${label} ${i}`;
+        }
+
         function generateCards(label) {
             cardGrid.innerHTML = '';
 
@@ -150,14 +182,24 @@
                 card.className = 'cardItem h-100 p-3 text-center rounded-4';
 
                 const img = document.createElement('img');
-                img.src = 'shared/assets/img/shop/empty.svg';
+                img.src = `shared/assets/img/shop/${label.toLowerCase().replace(/\s/g, '-')}-${i}.png`;
                 img.alt = `${label} ${i}`;
-                img.className = 'img-fluid mb-1';
+                img.className = 'shopCardImage mb-1 rounded-4';
                 img.style.maxHeight = '125px';
 
+                const imgWrapper = document.createElement('div');
+                imgWrapper.className = 'overflow-hidden rounded-4 mb-2';
+                imgWrapper.appendChild(img);
+                card.appendChild(imgWrapper);
+
                 const title = document.createElement('div');
-                title.textContent = `${label} ${i}`;
+                const name = getCardTitle(label, i);
+                title.textContent = name;
                 title.className = 'fw-bold mb-1 title';
+
+                if (label === 'Fonts') {
+                    title.style.fontFamily = fontMap[name] || 'sans-serif';
+                }
 
                 const priceRow = document.createElement('div');
                 priceRow.className = 'd-flex justify-content-center align-items-center gap-1';
@@ -171,100 +213,82 @@
                 price.textContent = '250';
                 price.className = 'title';
 
-                priceRow.appendChild(coinIcon);
-                priceRow.appendChild(price);
+                priceRow.append(coinIcon, price);
 
-                card.appendChild(img);
-                card.appendChild(title);
-                card.appendChild(priceRow);
-
-                card.addEventListener('click', () => {
-                    document.getElementById('modalTitle').textContent = title.textContent;
-                    document.getElementById('modalPrice').textContent = price.textContent;
-                    const modal = new bootstrap.Modal(document.getElementById('cardModal'));
-                    modal.show();
-                });
-
+                card.append(title, priceRow);
                 col.appendChild(card);
                 cardGrid.appendChild(col);
+
+                card.addEventListener('click', () => {
+                    document.getElementById('modalTitle').textContent = name;
+                    document.getElementById('modalPrice').textContent = price.textContent;
+
+                    const modalImg = document.querySelector('.modal-img');
+                    modalImg.innerHTML = '';
+                    const modalImage = document.createElement('img');
+                    modalImage.src = img.src;
+                    modalImage.alt = img.alt;
+                    modalImage.className = 'img-fluid rounded-4';
+                    modalImage.style.maxHeight = '200px';
+                    modalImg.appendChild(modalImage);
+
+                    new bootstrap.Modal(document.getElementById('cardModal')).show();
+                });
             }
         }
 
-        // Fix for "aria-hidden on focused element" warning
-        document.addEventListener('DOMContentLoaded', function () {
-            const closeBtn = document.querySelector('#cardModal .custom-close');
-            const cardModal = document.getElementById('cardModal');
-
-            closeBtn?.addEventListener('click', function () {
+        document.addEventListener('DOMContentLoaded', () => {
+            // Modal accessibility
+            const modal = document.getElementById('cardModal');
+            modal?.addEventListener('hidden.bs.modal', () => document.body.focus());
+            document.querySelector('#cardModal .custom-close')?.addEventListener('click', function () {
                 this.blur();
             });
 
-            cardModal.addEventListener('hidden.bs.modal', function () {
-                document.body.focus();
-            });
-        });
-
-        // Setup event listeners on page load
-        window.addEventListener('DOMContentLoaded', () => {
+            // Initial load
             generateCards('Frame');
+            setActiveButton('Frame');
 
-            // Set initial active for "Frame"
-            document.querySelectorAll('.plainButton').forEach(btn => {
-                if ((btn.getAttribute('data-label') || btn.textContent.trim()) === 'Frame') {
-                    btn.classList.add('active');
-                }
-            });
-
-            // Setup desktop button click behavior
+            // Desktop buttons
             document.querySelectorAll('.plainButton').forEach(btn => {
                 btn.addEventListener('click', function () {
-                    const value = this.getAttribute('data-label') || this.textContent.trim();
-                    generateCards(value);
-
-                    // Update active button
-                    document.querySelectorAll('.plainButton').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
+                    const label = this.getAttribute('data-label') || this.textContent.trim();
+                    generateCards(label);
+                    setActiveButton(label);
                 });
             });
 
-            // Setup mobile dropdown behavior
+            // Mobile dropdown
             const dropdownButton = document.getElementById('shopDropdownButton');
-            const dropdownItems = document.querySelectorAll('.dropdown-menu .dropdown-item');
-
-            dropdownItems.forEach(item => {
+            document.querySelectorAll('.dropdown-menu .dropdown-item').forEach(item => {
                 item.addEventListener('click', function () {
                     const value = this.getAttribute('data-value');
                     dropdownButton.textContent = value;
                     generateCards(value);
-
-                    // Update active buttons
-                    document.querySelectorAll('.plainButton').forEach(b => {
-                        if ((b.getAttribute('data-label') || b.textContent.trim()) === value) {
-                            b.classList.add('active');
-                        } else {
-                            b.classList.remove('active');
-                        }
-                    });
+                    setActiveButton(value);
                 });
             });
+
+            // Scroll adjustment
+            handleScrollStyle();
+            window.addEventListener("resize", handleScrollStyle);
         });
 
-        // Adjust scroll behavior for mobile
-        function handleScrollStyle() {
-            const scrollable = document.getElementById("scrollableContent");
-            if (window.innerWidth < 768) {
-                scrollable.style.maxHeight = "calc(100vh - 100px)";
-                scrollable.style.overflowY = "auto";
-                scrollable.style.paddingRight = "10px";
-            } else {
-                scrollable.style.maxHeight = "none";
-                scrollable.style.overflowY = "visible";
-                scrollable.style.paddingRight = "0";
-            }
+        function setActiveButton(label) {
+            document.querySelectorAll('.plainButton').forEach(btn => {
+                const btnLabel = btn.getAttribute('data-label') || btn.textContent.trim();
+                btn.classList.toggle('active', btnLabel === label);
+            });
         }
 
-        window.addEventListener("resize", handleScrollStyle);
-        window.addEventListener("load", handleScrollStyle);
+        function handleScrollStyle() {
+            const scrollable = document.getElementById("scrollableContent");
+            if (!scrollable) return;
+            const isMobile = window.innerWidth < 768;
+            scrollable.style.maxHeight = isMobile ? "calc(100vh - 100px)" : "none";
+            scrollable.style.overflowY = isMobile ? "auto" : "visible";
+            scrollable.style.paddingRight = isMobile ? "10px" : "0";
+        }
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
