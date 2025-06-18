@@ -13,23 +13,23 @@
             <ul class="nav nav-pills flex-column mb-auto">
                 <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3 selected-box">
                     <img src="shared/assets/img/dashboard-w.png" style="width: 30px; height: 30px;">
-                    <a class="nav-link selected p-0" href="#">Home</a>
+                    <a class="nav-link selected p-0" href="index.php">Home</a>
                 </li>
                 <li class="nav-item d-flex align-items-center gap-2 my-1 p-2">
                     <img src="shared/assets/img/courses.png" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0" href="#">Courses</a>
+                    <a class="nav-link text-dark p-0" href="course.php">Courses</a>
                 </li>
                 <li class="nav-item d-flex align-items-center gap-2 my-1 p-2">
                     <img src="shared/assets/img/explore.png" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0" href="#">Explore</a>
+                    <a class="nav-link text-dark p-0" href="explore.php">Explore</a>
                 </li>
                 <li class="nav-item d-flex align-items-center gap-2 my-1 p-2">
                     <img src="shared/assets/img/shop.png" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0" href="#">Shop</a>
+                    <a class="nav-link text-dark p-0" href="shop.php">Shop</a>
                 </li>
                 <li class="nav-item d-flex align-items-center gap-2 my-1 p-2">
                     <img src="shared/assets/img/games.png" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0" href="#">Mini-games</a>
+                    <a class="nav-link text-dark p-0" href="miniGames.php">Mini-games</a>
                 </li>
             </ul>
 
@@ -43,11 +43,11 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end text-small shadow">
                     <li><a class="dropdown-item" href="#">Settings</a></li>
-                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item" href="#">Sign out</a></li>
+                    <li><a class="dropdown-item" href="login.php">Sign out</a></li>
                 </ul>
             </div>
         </div>

@@ -26,7 +26,7 @@
             </div>
 
             <!-- Main Container Column-->
-            <div class="col main-container m-0 p-0 mx-2 p-2 ">
+            <div class="col main-container m-0 p-0 mx-2 p-2">
                 <div class="card border-0 p-2 h-100 w-100 rounded-0 shadow-none">
 
                     <!-- Navbar for mobile -->
@@ -321,7 +321,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

@@ -44,7 +44,7 @@
 
                 <!--Registration Redirect-->
                 <div class="container mt-md-4 mt-sm-3 text-center">
-                    <a href="#" class="text-decoration-none"><span class="text-blue">Don't have an account? </span><span class="fw-bold text-blue">Sign up</span></a>
+                    <a href="registration.php" class="text-decoration-none"><span class="text-blue">Don't have an account? </span><span class="fw-bold text-blue">Sign up</span></a>
                 </div>
             </div>
         </div>
