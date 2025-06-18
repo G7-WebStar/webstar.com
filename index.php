@@ -1,3 +1,5 @@
+<?php $activePage = 'home'; ?>
+
 <!doctype html>
 <html lang="en">
 
@@ -48,15 +50,15 @@
                                                 <div class="mt-3 d-flex align-items-center justify-content-center w-100 pe-3">
                                                     <div class="text-start" style="color: var(--white);">
                                                         <div class="mb-1" style="font-size: 0.95em;">
-                                                            HTML Course
+                                                            CSS Course
                                                         </div>
                                                         <div class="mb-2" style="font-size: 1.5em; font-family: var(--Bold);">
-                                                            Adding Images to Your Website
+                                                            Fonts and Formatting
                                                         </div>
                                                     </div>
 
                                                     <!-- papaltan na lang ng link-->
-                                                    <a href="course.php">
+                                                    <a href="lesson.php">
                                                         <img src="shared/assets/img/arrowRight.png" alt="Arrow" style="height: 3em; width: 2em; margin-left: 15px;">
                                                     </a>
                                                 </div>

@@ -1,3 +1,6 @@
+<?php $activePage = 'course'; ?>
+
+
 <!doctype html>
 <html lang="en">
 

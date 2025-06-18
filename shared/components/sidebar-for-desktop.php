@@ -9,37 +9,50 @@
 
             <!-- Navigation -->
             <ul class="nav flex-column">
-                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3 selected-box">
-                    <img src="shared/assets/img/dashboard-w.png" class="img-fluid" style="width: 30px; height: 30px; ">
-                    <a class="nav-link text-dark p-0 selected" href="index.php">Home</a>
+
+                <li
+                    class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3 <?php echo ($activePage == 'home') ? 'selected-box' : ''; ?>">
+                  <img src="shared/assets/img/dashboard<?php echo ($activePage == 'home') ? '-w' : ''; ?>.png" class="img-fluid" style="width: 30px; height: 30px;">
+                    <a class="nav-link text-dark p-0 <?php echo ($activePage == 'home') ? 'selected' : ''; ?>"
+                        href="index.php">Home</a>
                 </li>
 
-                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2">
-                    <img src="shared/assets/img/courses.png" class="img-fluid" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0" href="course.php">Courses</a>
+                <li
+                    class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3 <?php echo ($activePage == 'course') ? 'selected-box-course' : ''; ?>">
+                   <img src="shared/assets/img/courses<?php echo ($activePage == 'course') ? '-w' : ''; ?>.png"class="img-fluid" style="width: 30px; height: 30px;">
+                    <a class="nav-link text-dark p-0 <?php echo ($activePage == 'course') ? 'selected' : ''; ?>"
+                        href="course.php">Courses</a>
                 </li>
 
-                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2">
-                    <img src="shared/assets/img/explore.png" class="img-fluid" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0" href="explore.php">Explore</a>
+                <li
+                    class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3 <?php echo ($activePage == 'explore') ? 'selected-box' : ''; ?>">
+                   <img src="shared/assets/img/explore<?php echo ($activePage == 'explore') ? '-w' : ''; ?>.png" class="img-fluid" style="width: 30px; height: 30px;">
+                    <a class="nav-link text-dark p-0 <?php echo ($activePage == 'explore') ? 'selected' : ''; ?>"
+                        href="explore.php">Explore</a>
                 </li>
 
-                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2">
-                    <img src="shared/assets/img/shop.png" class="img-fluid" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0" href="shop.php">Shop</a>
+                <li
+                    class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3 <?php echo ($activePage == 'shop') ? 'selected-box' : ''; ?>">
+                    <img src="shared/assets/img/shop<?php echo ($activePage == 'shop') ? '-w' : ''; ?>.png"class="img-fluid" style="width: 30px; height: 30px;">
+                    <a class="nav-link text-dark p-0 <?php echo ($activePage == 'shop') ? 'selected' : ''; ?>"
+                        href="shop.php">Shop</a>
                 </li>
 
-                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2">
-                    <img src="shared/assets/img/games.png" class="img-fluid" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0" href="miniGames.php">Mini-games</a>
+                <li
+                    class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3 <?php echo ($activePage == 'minigames') ? 'selected-box' : ''; ?>">
+                    <img src="shared/assets/img/games<?php echo ($activePage == 'minigames') ? '-w' : ''; ?>.png" class="img-fluid" style="width: 30px; height: 30px;">
+                    <a class="nav-link text-dark p-0 <?php echo ($activePage == 'minigames') ? 'selected' : ''; ?>"
+                        href="miniGames.php">Mini-games</a>
                 </li>
 
             </ul>
 
+
             <div class="dropdown mt-auto p-4" style="font-family: var(--Bold); letter-spacing: -1px;">
                 <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
                     data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="32" height="32" class="rounded-circle me-2">
+                    <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="32" height="32"
+                        class="rounded-circle me-2">
                     <strong class="text-dark">james</strong>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end text-small shadow">

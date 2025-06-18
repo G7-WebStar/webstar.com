@@ -1,3 +1,6 @@
+<?php $activePage = 'explore'; ?>
+
+
 <!doctype html>
 <html lang="en">
 
