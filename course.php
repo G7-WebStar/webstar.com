@@ -69,7 +69,7 @@
                                         <div class="col-12 mt-3 p-0">
                                             <div class="webdev-courses">Web Development Courses</div>
                                             <div class="container-fluid py-3 mt-3 mx-auto courses-container">
-                                                <div class="grid-container d-flex flex-column ">
+                                                <div class="grid-container">
                                                     <div class="box d-flex flex-column align-items-center p-2 p-sm-4" style="grid-area: box-1;">
                                                         <div class="d-flex flex-row align-items-center">
                                                             <div class="fw-bold course-text">HTML Course</div>
@@ -89,7 +89,9 @@
                                                             <div class="done-text me-auto">Finish HTML Course to unlock</div>
                                                         </div>
                                                     </div>
-                                                    <div class="box-locked more-text fw-bold p-2 p-sm-4 text-center d-flex justify-content-center align-items-center" style="grid-area: box-3;">More Courses Coming Soon!</div>
+                                                    <div class="box-locked more-text fw-bold p-md-5 p-2 p-sm-4 text-center d-flex justify-content-center align-items-center" style="grid-area: box-3;">
+                                                        <div class="m-md-5 m-3">More Courses Coming Soon!</div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
