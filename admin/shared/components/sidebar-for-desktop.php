@@ -14,7 +14,7 @@
                     class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3 <?php echo ($activePage == 'home') ? 'selected-box' : ''; ?>">
                     <img src="shared/assets/img/dashboard<?php echo ($activePage == 'home') ? '-w' : ''; ?>.png" class="img-fluid" style="width: 30px; height: 30px;">
                     <a class="nav-link text-dark p-0 <?php echo ($activePage == 'home') ? 'selected' : ''; ?>"
-                        href="index.php">Home</a>
+                        href="index.php">Dashboard</a>
                 </li>
 
                 <li
@@ -28,23 +28,15 @@
                     class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3 <?php echo ($activePage == 'explore') ? 'selected-box' : ''; ?>">
                     <img src="shared/assets/img/explore<?php echo ($activePage == 'explore') ? '-w' : ''; ?>.png" class="img-fluid" style="width: 30px; height: 30px;">
                     <a class="nav-link text-dark p-0 <?php echo ($activePage == 'explore') ? 'selected' : ''; ?>"
-                        href="explore.php">Explore</a>
+                        href="feedback.php">Feedback</a>
                 </li>
 
                 <li
                     class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3 <?php echo ($activePage == 'shop') ? 'selected-box' : ''; ?>">
-                    <img src="shared/assets/img/shop<?php echo ($activePage == 'shop') ? '-w' : ''; ?>.png" class="img-fluid" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0 <?php echo ($activePage == 'shop') ? 'selected' : ''; ?>"
-                        href="shop.php">Shop</a>
+                    <img src="shared/assets/img/view_list<?php echo ($activePage == 'list') ? '-w' : ''; ?>.png" class="img-fluid" style="width: 30px; height: 30px;">
+                    <a class="nav-link text-dark p-0 <?php echo ($activePage == 'list') ? 'selected' : ''; ?>"
+                        href="userslist.php">Users List</a>
                 </li>
-
-                <li
-                    class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3 <?php echo ($activePage == 'minigames') ? 'selected-box' : ''; ?>">
-                    <img src="shared/assets/img/games<?php echo ($activePage == 'minigames') ? '-w' : ''; ?>.png" class="img-fluid" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0 <?php echo ($activePage == 'minigames') ? 'selected' : ''; ?>"
-                        href="miniGames.php">Mini-games</a>
-                </li>
-
             </ul>
 
 
