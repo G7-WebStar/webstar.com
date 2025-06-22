@@ -9,23 +9,34 @@
                 <img src="shared/assets/img/webstar-logo-blue.png" class="img-fluid w-100 py-3 px-2" />
             </a>
 
-             <hr>
+            <hr>
             <ul class="nav nav-pills flex-column mb-auto">
-                <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3 selected-box">
-                    <img src="shared/assets/img/dashboard-w.png" style="width: 30px; height: 30px;">
-                    <a class="nav-link selected p-0" href="index.php">Dashboard</a>
+                <li
+                    class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3 <?php echo ($activePage == 'dashboard') ? 'selected-box' : ''; ?>">
+                    <img src="shared/assets/img/dashboard<?php echo ($activePage == 'dashboard') ? '-w' : ''; ?>.png" class="img-fluid" style="width: 30px; height: 30px;">
+                    <a class="nav-link text-dark p-0 <?php echo ($activePage == 'dashboard') ? 'selected' : ''; ?>"
+                        href="index.php">Dashboard</a>
                 </li>
-                <li class="nav-item d-flex align-items-center gap-2 my-1 p-2">
-                    <img src="shared/assets/img/courses.png" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0" href="course.php">Courses</a>
+
+                <li
+                    class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3 <?php echo ($activePage == 'course') ? 'selected-box' : ''; ?>">
+                    <img src="shared/assets/img/courses<?php echo ($activePage == 'course') ? '-w' : ''; ?>.png" class="img-fluid" style="width: 30px; height: 30px;">
+                    <a class="nav-link text-dark p-0 <?php echo ($activePage == 'course') ? 'selected' : ''; ?>"
+                        href="course.php">Courses</a>
                 </li>
-                <li class="nav-item d-flex align-items-center gap-2 my-1 p-2">
-                    <img src="shared/assets/img/explore.png" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0" href="feedback.php">Feedback</a>
+
+                <li
+                    class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3 <?php echo ($activePage == 'feedback') ? 'selected-box' : ''; ?>">
+                    <img src="shared/assets/img/explore<?php echo ($activePage == 'feedback') ? '-w' : ''; ?>.png" class="img-fluid" style="width: 30px; height: 30px;">
+                    <a class="nav-link text-dark p-0 <?php echo ($activePage == 'feedback') ? 'selected' : ''; ?>"
+                        href="feedback.php">Feedback</a>
                 </li>
-                <li class="nav-item d-flex align-items-center gap-2 my-1 p-2">
-                    <img src="shared/assets/img/view_list.png" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0" href="userslist.php">Users List</a>
+
+                <li
+                    class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3 <?php echo ($activePage == 'list') ? 'selected-box' : ''; ?>">
+                    <img src="shared/assets/img/view_list<?php echo ($activePage == 'list') ? '-w' : ''; ?>.png" class="img-fluid" style="width: 30px; height: 30px;">
+                    <a class="nav-link text-dark p-0 <?php echo ($activePage == 'list') ? 'selected' : ''; ?>"
+                        href="userslist.php">Users List</a>
                 </li>
             </ul>
 
