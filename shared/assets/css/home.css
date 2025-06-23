@@ -57,6 +57,10 @@
     line-height: 2;
 }
 
+.whiteColorText {
+    color: var(--white);
+}
+
 .calenderCard {
     color: var(--blue);
     border-color: var(--blue);
@@ -75,6 +79,12 @@
     color: #ffffff;
 }
 
+/* Course Card */
+.continue-course-container {
+    background-color: transparent;
+    border: 1px solid var(--white);
+    border-radius: 25px;
+}
 
 @media (max-width: 576px) {
     .course-text {
@@ -92,6 +102,7 @@
 
     .achievementCard {
         font-size: 0.8em;
+        height: 90px !important;
     }
 
     .achievementCard .progress {
@@ -100,6 +111,11 @@
     }
 
     .achievementCard .blueColorText {
+        font-size: 1em !important;
+        line-height: 1 !important;
+    }
+
+    .achievementCard .whiteColorText {
         font-size: 1em !important;
         line-height: 1 !important;
     }
@@ -116,12 +132,13 @@
 
     #scrollable-order-list1 .blueColorText,
     #scrollable-order-list1 .blueColorText2,
-    #scrollable-order-list1 .blueColorText3 {
-        font-size: 0.70em !important;
+    #scrollable-order-list1 .blueColorText3,
+    #scrollable-order-list1 .whiteColorText {
+        font-size: 0.62em !important;
     }
 
     #scrollable-order-list1 span {
-        font-size: 0.70em !important;
+        font-size: 0.65em !important;
     }
 
     #scrollable-order-list1 .card img {
@@ -137,7 +154,8 @@
 
     .blueColorText2,
     .blueColorText,
-    .blueColorText3 {
+    .blueColorText3,
+    .whiteColorText {
         padding-top: 20px;
     }
 
