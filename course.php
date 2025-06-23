@@ -31,7 +31,7 @@
                 <div class="row">
 
                     <!-- Main Container -->
-                    <div class="col main-container mx-lg-2 p-2 overflow-y-auto d-flex flex-column">
+                    <div class="col main-container mx-lg-2 p-4 overflow-y-auto d-flex flex-column">
                         <!-- Navbar for mobile -->
                         <?php include 'shared/components/navbar-for-mobile.php'; ?>
                         <div class="card border-0 p-2 d-flex flex-lg-row flex-column justify-content-center">
