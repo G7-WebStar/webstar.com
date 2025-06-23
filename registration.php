@@ -13,17 +13,17 @@
 
 <body>
     <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center" style="background: #dbe8fd;">
-        <div class="row w-100 h-100" style="max-width: 860px; margin: auto; background: #fff; min-height: 80vh; box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15); border-radius: 1.5rem; overflow: hidden;">
+        <div class="row w-100 h-100 registration-container" style="max-width: 860px; margin: auto; background: #fff; min-height: 80vh; box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15); border-radius: 1.5rem; overflow: hidden;">
             <!-- Logo -->
-            <div class="col-md-6 d-flex flex-column justify-content-center align-items-center p-0" style="background: #2866e4; max-width: 350px;">
+            <div class="col-md-6 d-flex flex-column justify-content-center align-items-center p-0 registration-logo-col" style="background: #2866e4; max-width: 350px;">
                 <div class="w-100 d-flex justify-content-center align-items-center" style="height: 100%;">
                     <img src="shared/assets/img/webstar-logo-blue.png" class="img-fluid" style="max-width: 275px; filter: brightness(0) invert(1);">
                 </div>
             </div>
             <!-- Registration Form -->
-            <div class="col-md-7 d-flex flex-column justify-content-center align-items-center p-4 h-100" style="background: #fff;">
+            <div class="col-md-7 d-flex flex-column justify-content-center align-items-center p-4 h-100 registration-form-col" style="background: #fff;">
                 <div class="w-100" style="max-width: 400px;">
-                    <h2 class="text-center mb-5 mt-4" style="color: #2866e4; font-family: 'DM Sans SemiBold', sans-serif; font-weight: 600;">Create an account</h2>
+                    <h2 class="text-center mb-3 mt-2 registration-title" style="color: #2866e4; font-family: 'DM Sans SemiBold', sans-serif; font-weight: 600;">Create an account</h2>
                     <form>
                         <input type="text" class="form-control rounded-pill mb-3 border-primary" placeholder="First name">
                         <input type="text" class="form-control rounded-pill mb-3 border-primary" placeholder="Last name">

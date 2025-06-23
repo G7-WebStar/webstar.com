@@ -82,25 +82,30 @@
                                 </div>
                             </div>
                             <hr>
+                            <hr>
                             <div class="user-row">
                                 <div class="avatar rounded-circle bg-primary"></div>
                                 <div>
-                                    <div class="fw-bold">John Doe</div>
-                                    <div class="text-secondary">@johndoe</div>
+                                    <div class="fw-bold">Bill Gates</div>
+                                    <div class="text-secondary">@billgates</div>
                                 </div>
                             </div>
+                            <hr>
+                            <hr>
                             <div class="user-row">
                                 <div class="avatar rounded-circle bg-primary"></div>
                                 <div>
-                                    <div class="fw-bold">John Doe</div>
-                                    <div class="text-secondary">@johndoe</div>
+                                    <div class="fw-bold">Bill Gates</div>
+                                    <div class="text-secondary">@billgates</div>
                                 </div>
                             </div>
+                            <hr>
+                            <hr>
                             <div class="user-row">
                                 <div class="avatar rounded-circle bg-primary"></div>
                                 <div>
-                                    <div class="fw-bold">John Doe</div>
-                                    <div class="text-secondary">@johndoe</div>
+                                    <div class="fw-bold">Bill Gates</div>
+                                    <div class="text-secondary">@billgates</div>
                                 </div>
                             </div>
                             <hr>
