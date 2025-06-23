@@ -2,19 +2,12 @@
       max-width: 500px;
       margin: auto;
       padding-top: 2rem;
-      font-family: 'Inter', sans-serif;
-    }
-
-    .modal-underline {
-      border-bottom: 2px solid rgba(44, 44, 44, 0.6);
-      width: 100%;
-      margin-top: 2rem;
-      margin-bottom: 1rem;
+      font-family: var(--Regular);
     }
 
     #modalResultTitle {
       font-size: 2.5rem;
-      color: black !important;
+      color: var(--blue);
       font-weight: 700;
     }
 
@@ -46,4 +39,35 @@
         width: 60%;
         font-size: 0.9rem;
     }
+}
+
+.custom-modal {
+  border: none;
+  background-color: #fff;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.custom-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--blue); /* Replace with your theme variable */
+  line-height: 1;
+  cursor: pointer;
+}
+
+.modal-divider {
+  border: none;
+  border-top: 2px solid var(--blue);
+  width: 100vw; /* full viewport width */
+  margin: 0; /* remove spacing */
+  position: relative;
+  left: -50vw;
+  right: -50vw;
+  margin-left: 50%;
 }

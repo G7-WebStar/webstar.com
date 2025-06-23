@@ -1,9 +1,17 @@
 body {
     color: white;
-    font-family: 'Arial', sans-serif;
+    font-family: var(--Regular);
     margin: 0;
     padding: 0;
-    font-size: 24px; /* 20px + 6px */
+    font-size: 16px; /* 20px + 6px */
+}
+
+.descriptiongame{
+   color: black;
+    font-family: var(--Regular);
+    margin: 0;
+    padding: 0;
+    font-size: 24px;
 }
 
 .main {
@@ -22,7 +30,7 @@ body {
     padding: 0;
     border-radius: 10px;
     color: #FAFAE6;
-    font-family: monospace;
+    font-family: var(--Regular);
     overflow-x: auto;
     height: 100px;
     display: flex;
@@ -177,7 +185,7 @@ body {
     border: 1px solid #444;
     padding: 10px;
     border-radius: 8px;
-    font-family: monospace;
+    font-family: var(--Regular);
     cursor: move;
     text-align: center;
     font-size: 19px; /* 15px + 6px */
@@ -196,4 +204,9 @@ body {
     border-radius: 8px;
     font-weight: bold;
     font-size: 19px; /* 15px + 6px */
+}
+
+.font-btn {
+  width: 260px;
+  text-align: center;
 }
