@@ -1,6 +1,14 @@
 body {
-    background-color: var(--lightBlue);
+  background-color: red;
 }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+
 
 .sidebar {
     background-color: var(--white);
@@ -11,8 +19,20 @@ body {
 
 .main-container {
     background-color: var(--white);
+    border-radius: 0px;
+    height: 100vh;
+}
+
+
+@media (min-width: 768px) {
+  body {
+    background-color: var(--lightBlue); 
+  }
+
+  .main-container{
     border-radius: 20px;
     height: 95vh;
+  }
 }
 
 .nav-item {
