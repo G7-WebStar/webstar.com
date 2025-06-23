@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="shared/assets/css/global-styles.css">
     <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
     <link rel="stylesheet" href="shared/assets/css/home.css">
-    <link rel="stylesheet" href="shared/assets/css/course.css">
 </head>
 
 <body>
@@ -41,8 +40,7 @@
                             <div class="col-12 col-sm-12 col-md-6">
                                 <div class="row" style="font-family: var(--Regular);">
                                     <div class="col-12 pt-2">
-                                        <div class="card mb-3 d-flex align-items-center justify-content-center text-center"
-                                            style="height: 190px; border-radius: 25px; background-color: transparent; padding: 1rem; color: var(--blue); border-color: var(--blue);">
+                                        <div class="card welcomeCard mb-3 d-flex align-items-center justify-content-center text-center">
                                             <div>
                                                 <div style="font-size: 1.6em; font-family: var(--Bold);">Welcome back, James!</div>
                                                 <div style="font-size: 1em;">Pick up where you left off and keep building you skills.</div>
@@ -53,50 +51,42 @@
                                 </div>
                                 <div class="row pt-1" style="font-family: var(--Regular);">
                                     <div class="col pt-2">
-                                        <div class="card p-4" style="background-color: var(--blue); color: var(--white); border-radius: 20px;">
-                                            <div class="mb-3">Continue Your Course</div>
-
-                                            <div class="card px-4 py-3 border continue-course-container">
-                                                <div class="d-flex flex-column flex-sm-row flex-lg-column flex-xl-row gap-3">
-                                                    <div class="img-placeholder flex-shrink-0 d-none d-md-block">
-                                                    </div>
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <div class="course-title text-white">HTML Course</div>
-                                                        <div class="fw-bold lesson-title text-white">Adding Images to Your Website</div>
-                                                    </div>
-                                                    <div class="d-none d-sm-flex d-lg-none d-xl-flex ms-auto align-items-center" style="width: 120px;">
-                                                        <a href="lesson.php" class="w-100 d-flex align-items-center">
-                                                            <img src="shared/assets/img/courses/keyboard_arrow_right.png" alt="arrow" style="width: 100%;">
-                                                        </a>
-                                                    </div>
+                                        <div class="mb-2">Continue Your Course</div>
+                                        <div class="card cycContainerCard p-4 flex justify-content-center align-items-center">
+                                            <div class="d-flex flex-column flex-sm-row flex-lg-column flex-xl-row gap-3">
+                                                <div class="img-placeholder imageProfile flex-shrink-0 d-none d-md-block"></div>
+                                                <div class="d-flex flex-column justify-content-center">
+                                                    <div class="text-white htmlText">HTML Course</div>
+                                                    <div class="fw-bold text-white addImageText">Adding Images to Your Website</div>
                                                 </div>
-                                                <div class="mt-sm-3">
-                                                    <div class="w-100 mx-auto mt-2 border progress-bar">
-                                                        <div class="w-50 progress"></div>
-                                                    </div>
-
-                                                    <div class="d-flex justify-content-between">
-                                                        <p class="ms-3 mt-2 mb-0 progress-text text-white">Course Progress</p>
-                                                        <p class="me-3 mt-2 mb-0 progress-text text-white">50%</p>
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex d-lg-flex justify-content-center d-sm-none d-lg-block d-xl-none mt-2">
-                                                    <a href="lesson.php" class="w-75">
-                                                        <div class="btn text-center border continue-btn fw-bold">
-                                                            Continue
-                                                        </div>
+                                                <div class="justify-content-end d-none d-sm-flex d-lg-none d-xl-flex ms-auto align-items-center" style="width: 120px;">
+                                                    <a href="lesson.php" class="w-100 d-flex align-items-center">
+                                                        <img src="shared/assets/img/courses/keyboard_arrow_right.png" alt="arrow" style="width: 100%;">
                                                     </a>
-
                                                 </div>
+                                            </div>
+                                            <div class="mt-sm-3 w-100">
+                                                <div class="w-100 mx-auto mt-2 border progress-bar"
+                                                    style="background-color: transparent; height: 10px; border-radius: 20px;">
+                                                    <div class="w-50 progress" style="background-color: var(--white);"></div>
+                                                </div>
+                                                <div class="d-flex justify-content-between">
+                                                    <p class="mb-0 text-white cProgress-text">Course Progress</p>
+                                                    <p class="mb-0 text-white cProgress-text">50%</p>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex d-lg-flex justify-content-center d-sm-none d-lg-block d-xl-none mt-2 w-100">
+                                                <a href="lesson.php" class="d-flex justify-content-center" style="width: 100%; text-decoration: none;">
+                                                    <div class="btn continueButton text-center border fw-bold" style="width: 100%;">Continue</div>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
-
+                                
                                 <div class="row py-2 mt-1 flex-grow-1" style="font-family: var(--Regular);">
                                     <div class="col">
-                                        <div class="p-0 pb-2" style="font-size: 1em;">Your Next Achievements</div>
+                                        <div class="p-0 mt-5 pb-2" style="font-size: 1em;">Your Next Achievements</div>
                                         <!-- Reach 2 week streak -->
                                         <div class="card" style="border: none; background-color: transparent;">
                                             <div class="card achievementCard d-flex align-items-center justify-content-center my-1 px-3" style="height: 107px;">
@@ -105,15 +95,15 @@
                                                     <div class="d-flex align-items-center w-100">
                                                         <div class="w-100">
                                                             <div class="d-flex align-items-center">
-                                                                <div class="blueColorText" style="font-size: 1.1em;">Reach 2 week</div>
-                                                                <div class="blueColorText" style="font-size: 0.9em; margin-left: 20px; font-family: var(--Bold);">+120 XPs</div>
+                                                                <div class="p-0 blueColorText" style="font-size: 1.1em;">Reach 2 week</div>
+                                                                <div class="p-0 blueColorText" style="font-size: 0.9em; margin-left: 20px; font-family: var(--Bold);">+120 XPs</div>
                                                             </div>
                                                             <!-- Progress bar-->
                                                             <div class="d-flex align-items-center mt-1">
                                                                 <div class="progress flex-grow-1" style="height: 10px; background-color: transparent; border: 1px solid var(--blue); max-width: 85%;">
                                                                     <div class="progress-bar" role="progressbar" style="width: 64%; background-color: var(--blue);" aria-valuenow="64" aria-valuemin="0" aria-valuemax="100"></div>
                                                                 </div>
-                                                                <div class="blueColorText" style="font-size: 0.8em; margin-left: 10px;">64%</div>
+                                                                <div class="blueColorText d-none d-sm-block" style="font-size: 0.8em; margin-left: 10px;">64%</div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -127,15 +117,15 @@
                                                     <div class="d-flex align-items-center w-100">
                                                         <div class="w-100">
                                                             <div class="d-flex align-items-center">
-                                                                <div class="blueColorText" style="font-size: 1.1em;">Add 10 friends</div>
-                                                                <div class="blueColorText" style="font-size: 0.9em; margin-left: 20px; font-family: var(--Bold);">+90 XPs</div>
+                                                                <div class="p-0 blueColorText" style="font-size: 1.1em;">Add 10 friends</div>
+                                                                <div class="p-0 blueColorText" style="font-size: 0.9em; margin-left: 20px; font-family: var(--Bold);">+90 XPs</div>
                                                             </div>
                                                             <!-- Progress bar-->
                                                             <div class="d-flex align-items-center mt-1">
                                                                 <div class="progress flex-grow-1" style="height: 10px; background-color: transparent; border: 1px solid var(--blue); max-width: 85%;">
                                                                     <div class="progress-bar" role="progressbar" style="width: 80%; background-color: var(--blue);" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
                                                                 </div>
-                                                                <div class="blueColorText" style="font-size: 0.8em; margin-left: 10px;">80%</div>
+                                                                <div class="blueColorText d-none d-sm-block" style="font-size: 0.8em; margin-left: 10px;">80%</div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -149,15 +139,15 @@
                                                     <div class="d-flex align-items-center w-100">
                                                         <div class="w-100">
                                                             <div class="d-flex align-items-center">
-                                                                <div class="blueColorText" style="font-size: 1.1em;">Finish HTML Course</div>
-                                                                <div class="blueColorText" style="font-size: 0.9em; margin-left: 20px; font-family: var(--Bold);">+300 XPs</div>
+                                                                <div class="p-0 blueColorText" style="font-size: 1.1em;">Finish HTML Course</div>
+                                                                <div class="p-0 blueColorText" style="font-size: 0.9em; margin-left: 20px; font-family: var(--Bold);">+300 XPs</div>
                                                             </div>
                                                             <!-- Progress bar-->
                                                             <div class="d-flex align-items-center mt-1">
                                                                 <div class="progress flex-grow-1" style="height: 10px; background-color: transparent; border: 1px solid var(--blue); max-width: 85%;">
                                                                     <div class="progress-bar" role="progressbar" style="width: 50%; background-color: var(--blue);" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                                                                 </div>
-                                                                <div class="blueColorText" style="font-size: 0.8em; margin-left: 10px;">50%</div>
+                                                                <div class="blueColorText d-none d-sm-block" style="font-size: 0.8em; margin-left: 10px;">50%</div>
                                                             </div>
                                                         </div>
                                                     </div>
