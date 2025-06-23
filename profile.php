@@ -120,7 +120,7 @@
 
             <!-- Main Container Column-->
             <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-0 p-md-4 overflow-y-auto">
-                <div class="card border-0 p-3 m-0 h-100 w-100 rounded-0 shadow-none">
+                <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none">
 
                     <!-- Navbar for mobile -->
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
@@ -154,13 +154,78 @@
                                                             class="px-3 rounded-5 bg-light text-primary fw-bold d-flex align-items-center"><i
                                                                 class="fa-solid fa-trophy me-1"></i> Rank
                                                             5</span>
-                                                        <span
-                                                            class="px-3 rounded-5 bg-light text-primary fw-bold d-flex align-items-center"><i
-                                                                class="fa-solid fa-pen me-2"></i>Edit</span>
+                                                        <button type="button"
+                                                            class="btn bg-light text-primary fw-bold px-3 p-0 rounded-5 d-flex align-items-center"
+                                                            data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                                            <i class="fa-solid fa-pen me-2"></i>Edit
+                                                        </button>
+
                                                     </div>
                                                 </div>
                                             </div>
-                                            
+
+                                            <!-- Edit Profile Modal -->
+                                            <div class="modal fade" id="exampleModal" tabindex="-1"
+                                                aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Edit
+                                                                Profile</h1>
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="container-fluid">
+                                                                <div class="row g-3">
+
+                                                                    <!-- Left Side: Image + Upload -->
+                                                                    <div class="col-md-4 text-center">
+                                                                        <img src="https://avatars.githubusercontent.com/u/181800261?v=4"
+                                                                            alt="Profile"
+                                                                            class="img-fluid rounded mb-2">
+                                                                        <button
+                                                                            class="btn btn-secondary btn-sm w-100">Upload
+                                                                            Photo</button>
+                                                                    </div>
+
+                                                                    <!-- Right Side: Display Name + Bio -->
+                                                                    <div class="col-md-8">
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Display
+                                                                                Name</label>
+                                                                            <input type="text" class="form-control"
+                                                                                placeholder="Enter your name">
+                                                                        </div>
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Bio</label>
+                                                                            <textarea class="form-control" rows="4"
+                                                                                placeholder="Write a short bio..."></textarea>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+
+                                                                <!-- Section: My Logo Badges -->
+                                                                <div class="row">
+                                                                    <h6><strong>My Logo Badges</strong></h6>
+                                                                    <div class="col-12 bg-light p-5 text-center">
+                                                                        <button class="btn btn-dark">Applied</button>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Close</button>
+                                                            <button type="button" class="btn btn-primary">Save
+                                                                changes</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                             <!-- Bio -->
                                             <div class="row">
                                                 <div class="col py-1 px-5 text-white bio-text"
@@ -170,16 +235,20 @@
                                                     building! ⭐
                                                 </div>
                                             </div>
-                                            <div class="row rank-edit-button-sm ms-1 mb-2 mt-2">
+                                            <div class="row rank-edit-button-sm mb-2 mt-2 gx-0 ">
                                                 <!-- Rank and Edit button (for smaller screens) -->
-                                                <div class="d-flex flex-row gap-2 profile-pills mt-2 d-flex justify-content-center">
+                                                <div
+                                                    class="d-flex flex-row gap-2 profile-pills m-0 mt-2 d-flex justify-content-center">
                                                     <span
                                                         class="px-3 rounded-5 bg-light text-primary fw-bold d-flex align-items-center"><i
                                                             class="fa-solid fa-trophy me-2"></i> Rank
                                                         5</span>
-                                                    <span
-                                                        class="px-3 rounded-5 bg-light text-primary fw-bold d-flex align-items-center"><i
-                                                            class="fa-solid fa-pen me-2"></i>Edit</span>
+                                                    <button type="button"
+                                                        class="btn bg-light text-primary fw-bold p-0 px-3 rounded-5 d-flex align-items-center"
+                                                        data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                                        <i class="fa-solid fa-pen me-2"></i>Edit
+                                                    </button>
+
                                                 </div>
                                             </div>
                                             <!-- Stats -->
@@ -192,13 +261,15 @@
                                                         <small>webstars</small>
                                                     </div>
                                                     <div class="vr mx-3"></div>
-                                                    <div class="flex-fill">
+                                                    <div class="flex-fill" role="button" data-bs-toggle="modal"
+                                                        data-bs-target="#followersModal">
                                                         <div style="font-family: var(--Black); font-size: 1.25rem;">50
                                                         </div>
                                                         <small>followers</small>
                                                     </div>
                                                     <div class="vr mx-3"></div>
-                                                    <div class="flex-fill">
+                                                    <div class="flex-fill" role="button" data-bs-toggle="modal"
+                                                        data-bs-target="#followingsModal">
                                                         <div style="font-family: var(--Black); font-size: 1.25rem;">50
                                                         </div>
                                                         <small>following</small>
@@ -215,17 +286,176 @@
                                                     </div>
                                                     <small>webstars</small>
                                                 </div>
-                                                <div class="col-4 stats-text">
+                                                <div class="col-4 stats-text" role="button" data-bs-toggle="modal"
+                                                    data-bs-target="#followersModal">
                                                     <div style="font-family: var(--Black); font-size: 1.25rem;">50
                                                     </div>
                                                     <small>followers</small>
                                                 </div>
-                                                <div class="col-4 stats-text">
+                                                <div class="col-4 stats-text" role="button" data-bs-toggle="modal"
+                                                    data-bs-target="#followingsModal">
                                                     <div style="font-family: var(--Black); font-size: 1.25rem;">50
                                                     </div>
                                                     <small>following</small>
                                                 </div>
 
+                                            </div>
+
+                                            <!-- Following Modal -->
+
+                                            <div class="modal fade" id="followingsModal" tabindex="-1"
+                                                aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h1 class="modal-title fs-5" id="exampleModalLabel">
+                                                                Followings · 50</h1>
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body"
+                                                            style="max-height: 500px; overflow-y: auto;">
+                                                            <ul class="list-group">
+                                                                <li class="list-group-item px-4 py-3">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item px-4 py-3">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item px-4 py-3">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                        <span
+                                                                            class="badge bg-primary text-white fw-semibold px-3 py-2 rounded-pill ms-4"
+                                                                            style="font-size: 0.75rem;">
+                                                                            Follows you
+                                                                        </span>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item px-4 py-3">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item px-4 py-3">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item px-4 py-3">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item px-4 py-3">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Follower Modal -->
+
+                                            <div class="modal fade" id="followersModal" tabindex="-1"
+                                                aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h1 class="modal-title fs-5" id="exampleModalLabel">
+                                                                Followers · 50</h1>
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body"
+                                                            style="max-height: 500px; overflow-y: auto;">
+                                                            <ul class="list-group">
+                                                                <li class="list-group-item px-4 py-3">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item px-4 py-3">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item px-4 py-3">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item px-4 py-3">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
 
                                         </div>
