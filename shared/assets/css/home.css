@@ -24,6 +24,15 @@
     background-color: var(--blue);
 }
 
+.welcomeCard {
+    height: 190px;
+    border-radius: 25px;
+    background-color: transparent;
+    padding: 1rem;
+    color: var(--blue);
+    border-color: var(--blue);
+}
+
 .achievementCard {
     border-radius: 25px;
     border-color: var(--blue);
@@ -57,6 +66,10 @@
     line-height: 2;
 }
 
+.whiteColorText {
+    color: var(--white);
+}
+
 .calenderCard {
     color: var(--blue);
     border-color: var(--blue);
@@ -73,6 +86,56 @@
     border-radius: 25px;
     height: 112px;
     color: #ffffff;
+}
+
+.cycContainerCard {
+    background-color: var(--blue);
+    color: var(--white);
+    border-radius: 20px;
+    height: 100%;
+    padding-left: 35px !important;
+    padding-right: 35px !important;
+}
+
+.imageProfile {
+    width: 80px;
+    height: 80px;
+    background-color: var(--white);
+    border-radius: 30px;
+    align-self: center;
+}
+
+.htmlText {
+    font-size: 18px;
+}
+
+.addImageText {
+    font-size: 24px;
+}
+
+.continueButton {
+    background-color: var(--white);
+    border-radius: 25px;
+    text-decoration: none;
+    color: var(--black) !important;
+    transition: none !important;
+}
+
+.continueButton {
+    background-color: var(--white) !important;
+    color: var(--black) !important;
+    border: 1px solid var(--blue) !important;
+    border-radius: 25px;
+    transition: none !important;
+    text-decoration: none !important;
+}
+
+.continueButton:hover {
+    background-color: var(--white) !important;
+    color: var(--black) !important;
+    box-shadow: none !important;
+    outline: none !important;
+    text-decoration: none !important;
 }
 
 
@@ -92,21 +155,22 @@
 
     .achievementCard {
         font-size: 0.8em;
-    }
-
-    .achievementCard .progress {
-        height: 8px;
-        max-width: 100% !important;
+        height: 90px !important;
     }
 
     .achievementCard .blueColorText {
-        font-size: 1em !important;
-        line-height: 1 !important;
+        font-size: 1.1em !important;
     }
 
     .achievementCard .progress+.blueColorText {
         margin-left: 8px;
         align-self: center;
+    }
+
+    .progress-bar {
+        background-color: transparent;
+        height: 6px;
+        border-radius: 20px;
     }
 
 
@@ -116,12 +180,13 @@
 
     #scrollable-order-list1 .blueColorText,
     #scrollable-order-list1 .blueColorText2,
-    #scrollable-order-list1 .blueColorText3 {
-        font-size: 0.70em !important;
+    #scrollable-order-list1 .blueColorText3,
+    #scrollable-order-list1 .whiteColorText {
+        font-size: 0.62em !important;
     }
 
     #scrollable-order-list1 span {
-        font-size: 0.70em !important;
+        font-size: 0.65em !important;
     }
 
     #scrollable-order-list1 .card img {
@@ -137,7 +202,8 @@
 
     .blueColorText2,
     .blueColorText,
-    .blueColorText3 {
+    .blueColorText3,
+    .whiteColorText {
         padding-top: 20px;
     }
 
@@ -178,4 +244,19 @@
     .d-flex.align-items-center span {
         font-size: 1em !important;
     }
+
+    /* course */
+    .htmlText {
+        font-size: 12px;
+    }
+
+    .addImageText {
+        font-size: 18px;
+    }
+
+    .cProgress-text {
+        font-size: 13px;
+    }
+
+
 }
