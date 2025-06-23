@@ -69,6 +69,10 @@ body {
     font-size: 24px;
 }
 
+.text-blue {
+    color: var(--blue) !important;
+}
+
 /*Progress Bar*/
 .progress-bar {
     background-color: transparent;
@@ -91,6 +95,15 @@ body {
     background-color: var(--white);
     border-radius: 30px;
     align-self: center;
+}
+
+.course-arrow {
+    width: 25px;
+}
+
+.course-lock {
+    width: 40px;
+    height: 40px;
 }
 
 /*Buttons*/
@@ -118,6 +131,10 @@ body {
     .logo {
         width: 70px;
     }
+
+    .course-text {
+        font-size: 28px;
+    }
 }
 
 @media screen and (max-width: 1400px) {
@@ -127,6 +144,11 @@ body {
 
     .lesson-image {
         width: 20px;
+    }
+
+    .course-lock {
+        width: 30px;
+        height: 30px;
     }
 }
 
@@ -150,11 +172,12 @@ body {
     }
 
     .course-lock {
-        width: 40px;
+        width: 25px;
+        height: 25px;
     }
 
     .course-text {
-        font-size: 30px;
+        font-size: 24px;
     }
 
     .more-text {
@@ -162,7 +185,7 @@ body {
     }
 
     .done-text {
-        font-size: 14px;
+        font-size: 12px;
     }
 }
 
@@ -173,7 +196,7 @@ body {
     }
 
     .done-text {
-        font-size: 16px;
+        font-size: 14px;
     }
 }
 
@@ -183,7 +206,7 @@ body {
     }
 
     .course-arrow {
-        width: 70px;
+        width: 20px;
     }
 }
 
@@ -212,7 +235,7 @@ body {
 
 @media screen and (max-width: 1072px) {
     .course-text {
-        font-size: 24px;
+        font-size: 22px;
     }
 
     .more-text {
