@@ -1,0 +1,262 @@
+#scrollable {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+#scrollable-order-list1 {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+#scrollable-order-list1::-webkit-scrollbar {
+    display: none;
+}
+
+
+.containerCard {
+    border-radius: 25px;
+    border-color: var(--blue);
+}
+
+
+.containerCard1 {
+    border-radius: 25px;
+    background-color: var(--blue);
+}
+
+.welcomeCard {
+    height: 190px;
+    border-radius: 25px;
+    background-color: transparent;
+    padding: 1rem;
+    color: var(--blue);
+    border-color: var(--blue);
+}
+
+.achievementCard {
+    border-radius: 25px;
+    border-color: var(--blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-right: 400px;
+}
+
+.blueColorText {
+    color: var(--blue);
+}
+
+.blueColorText1 {
+    color: var(--blue);
+    border-color: var(--blue);
+}
+
+.blueColorText2 {
+    color: var(--blue);
+    font-size: 0.9em;
+    font-family: var(--Bold);
+    line-height: 2;
+    padding-left: 4px;
+}
+
+.blueColorText3 {
+    color: var(--blue);
+    font-size: 0.9em;
+    font-family: var(--Bold);
+    line-height: 2;
+}
+
+.whiteColorText {
+    color: var(--white);
+}
+
+.calenderCard {
+    color: var(--blue);
+    border-color: var(--blue);
+    border-radius: 25px;
+    height: 135px;
+}
+
+.blueCard {
+    background-color: var(--blue);
+}
+
+.blueCard1 {
+    background-color: var(--blue);
+    border-radius: 25px;
+    height: 112px;
+    color: #ffffff;
+}
+
+.cycContainerCard {
+    background-color: var(--blue);
+    color: var(--white);
+    border-radius: 20px;
+    height: 100%;
+    padding-left: 35px !important;
+    padding-right: 35px !important;
+}
+
+.imageProfile {
+    width: 80px;
+    height: 80px;
+    background-color: var(--white);
+    border-radius: 30px;
+    align-self: center;
+}
+
+.htmlText {
+    font-size: 18px;
+}
+
+.addImageText {
+    font-size: 24px;
+}
+
+.continueButton {
+    background-color: var(--white);
+    border-radius: 25px;
+    text-decoration: none;
+    color: var(--black) !important;
+    transition: none !important;
+}
+
+.continueButton {
+    background-color: var(--white) !important;
+    color: var(--black) !important;
+    border: 1px solid var(--blue) !important;
+    border-radius: 25px;
+    transition: none !important;
+    text-decoration: none !important;
+}
+
+.continueButton:hover {
+    background-color: var(--white) !important;
+    color: var(--black) !important;
+    box-shadow: none !important;
+    outline: none !important;
+    text-decoration: none !important;
+}
+
+
+@media (max-width: 576px) {
+    .course-text {
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        width: 100px !important;
+        flex-shrink: 1 !important;
+    }
+
+    /* achievement */
+    .achievementCard img {
+        display: none !important;
+    }
+
+    .achievementCard {
+        font-size: 0.8em;
+        height: 90px !important;
+    }
+
+    .achievementCard .blueColorText {
+        font-size: 1.1em !important;
+    }
+
+    .achievementCard .progress+.blueColorText {
+        margin-left: 8px;
+        align-self: center;
+    }
+
+    .progress-bar {
+        background-color: transparent;
+        height: 6px;
+        border-radius: 20px;
+    }
+
+
+    #scrollable-order-list1 {
+        max-height: 400px !important;
+    }
+
+    #scrollable-order-list1 .blueColorText,
+    #scrollable-order-list1 .blueColorText2,
+    #scrollable-order-list1 .blueColorText3,
+    #scrollable-order-list1 .whiteColorText {
+        font-size: 0.62em !important;
+    }
+
+    #scrollable-order-list1 span {
+        font-size: 0.65em !important;
+    }
+
+    #scrollable-order-list1 .card img {
+        width: 24px !important;
+        height: 24px !important;
+    }
+
+    #scrollable-order-list1 .card .card {
+        width: 24px !important;
+        height: 24px !important;
+        margin-top: 20px;
+    }
+
+    .blueColorText2,
+    .blueColorText,
+    .blueColorText3,
+    .whiteColorText {
+        padding-top: 20px;
+    }
+
+    /* Calendar Card */
+    .containerCard {
+        height: auto !important;
+        padding-bottom: 1rem;
+    }
+
+    .calenderCard {
+        width: 50px !important;
+        height: 110px !important;
+        font-size: 0.85em !important;
+    }
+
+
+    .blueColorText {
+        font-size: 1em !important;
+    }
+
+    .row.gx-3.flex-nowrap.overflow-auto {
+        margin-left: 10px !important;
+        margin-right: 10px !important;
+    }
+
+    .dailyStreak {
+        padding-left: 3rem !important;
+        padding-top: 1rem !important;
+        padding-bottom: 0.5rem !important;
+    }
+
+    .card.calenderCard+div {
+        width: 10px !important;
+        height: 10px !important;
+        margin-top: 5px !important;
+    }
+
+    .d-flex.align-items-center span {
+        font-size: 1em !important;
+    }
+
+    /* course */
+    .htmlText {
+        font-size: 12px;
+    }
+
+    .addImageText {
+        font-size: 18px;
+    }
+
+    .cProgress-text {
+        font-size: 13px;
+    }
+
+
+}

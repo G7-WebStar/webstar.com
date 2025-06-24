@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="shared/assets/css/global-styles.css">
     <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
     <link rel="stylesheet" href="shared/assets/css/shop.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -27,7 +28,7 @@
             <?php include 'shared/components/sidebar-for-desktop.php'; ?>
 
             <!-- Main Container Column-->
-            <div class="col main-container m-0 p-0 mx-2 p-4 ">
+            <div class="col main-container m-0 p-0 mx-2 p-4 overflow-y-auto">
                 <div class="card border-0 p-3 h-100 w-100 rounded-0 shadow-none">
 
                     <!-- Navbar for mobile -->
@@ -35,61 +36,56 @@
 
                     <!-- PUT CONTENT HERE -->
                     <!-- Main scrollable content area -->
-                    <div class="scrollable-content" id="scrollableContent">
-                        <div class="container-fluid">
-                            <div class="row align-items-center g-0">
-                                <!-- Shop icon and name (desktop only) -->
-                                <div class="col-auto d-none d-md-block">
-                                    <img src="shared/assets/img/shop/shop.svg" alt="Shop" class="shopIcon">
-                                </div>
-                                <div class="col-auto px-3 d-none d-md-block">
-                                    <div class="shopName">Shop</div>
-                                </div>
+                    <div class="container-fluid py-3 overflow-y-auto">
+                        <div class="row align-items-center g-0">
+                            <!-- Shop icon and name (desktop only) -->
+                            <div class="col-auto d-none d-md-block">
+                                <img src="shared/assets/img/shop/shop.svg" alt="Shop" class="shopIcon">
+                            </div>
+                            <div class="col-auto px-3 d-none d-md-block">
+                                <div class="shopName">Shop</div>
+                            </div>
 
-                                <!-- Dropdown for filter buttons (mobile only) -->
-                                <div class="col-auto mt-2">
-                                    <!-- Horizontal filter buttons (desktop only) -->
-                                    <div class="customCard p-1 d-none d-md-flex">
-                                        <div class="buttonGroup">
-                                            <button type="button" class="plainButton" data-label="Frame">Frame</button>
-                                            <button type="button" class="plainButton" data-label="Color Theme">Color
-                                                Theme</button>
-                                            <button type="button" class="plainButton" data-label="Fonts">Fonts</button>
-                                            <button type="button" class="plainButton" data-label="Logo Badge">Logo
-                                                Badge</button>
-                                        </div>
+                            <!-- Filter buttons (desktop only) -->
+                            <div class="col-auto mt-2">
+                                <div class="customCard p-1 d-none d-md-flex">
+                                    <div class="buttonGroup">
+                                        <button type="button" class="plainButton" data-label="Frame">Frame</button>
+                                        <button type="button" class="plainButton" data-label="Color Theme">Color
+                                            Theme</button>
+                                        <button type="button" class="plainButton" data-label="Fonts">Fonts</button>
+                                        <button type="button" class="plainButton" data-label="Logo Badge">Logo
+                                            Badge</button>
                                     </div>
                                 </div>
-                                <!-- Dropdown for small devices only -->
-                                <div class="col-12 mt-2 d-flex justify-content-center d-md-none mt-3">
-                                    <div class="dropdown fixed-dropdown">
-                                        <button class="btn btn-outline-primary dropdown-toggle w-100" type="button"
-                                            id="shopDropdownButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Frame
-                                        </button>
-                                        <ul class="dropdown-menu w-100" aria-labelledby="shopDropdownButton">
-                                            <li><button class="dropdown-item" type="button"
-                                                    data-value="Frame">Frame</button></li>
-                                            <li><button class="dropdown-item" type="button"
-                                                    data-value="Color Theme">Color Theme</button></li>
-                                            <li><button class="dropdown-item" type="button"
-                                                    data-value="Fonts">Fonts</button></li>
-                                            <li><button class="dropdown-item" type="button" data-value="Logo Badge">Logo
-                                                    Badge</button></li>
-                                        </ul>
-                                    </div>
-                                </div>
+                            </div>
 
+                            <!-- Dropdown (mobile only) -->
+                            <div class="col-12 mt-2 d-flex justify-content-center d-md-none mt-3">
+                                <div class="dropdown fixed-dropdown w-100 px-3">
+                                    <button class="btn btn-outline-primary dropdown-toggle w-100" type="button"
+                                        id="shopDropdownButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Frame
+                                    </button>
+                                    <ul class="dropdown-menu w-100" aria-labelledby="shopDropdownButton">
+                                        <li><button class="dropdown-item" type="button"
+                                                data-value="Frame">Frame</button></li>
+                                        <li><button class="dropdown-item" type="button" data-value="Color Theme">Color
+                                                Theme</button></li>
+                                        <li><button class="dropdown-item" type="button"
+                                                data-value="Fonts">Fonts</button></li>
+                                        <li><button class="dropdown-item" type="button" data-value="Logo Badge">Logo
+                                                Badge</button></li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                        <!-- Area where shop cards are shown -->
-                        <div class="container mt-3" id="cardDisplay">
-                            <div class="row g-3 px-4" id="cardGrid">
-                                <!-- JavaScript dynamically injects card items here -->
-                            </div>
+
+                        <!-- Shop cards display area -->
+                        <div class="row g-3 px-4 mt-3" id="cardGrid">
+                            <!-- JavaScript dynamically injects card items here -->
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -272,9 +268,6 @@
                 });
             });
 
-            // Scroll adjustment
-            handleScrollStyle();
-            window.addEventListener("resize", handleScrollStyle);
         });
 
         function setActiveButton(label) {
@@ -284,14 +277,14 @@
             });
         }
 
-        function handleScrollStyle() {
-            const scrollable = document.getElementById("scrollableContent");
-            if (!scrollable) return;
-            const isMobile = window.innerWidth < 768;
-            scrollable.style.maxHeight = isMobile ? "calc(100vh - 100px)" : "none";
-            scrollable.style.overflowY = isMobile ? "auto" : "visible";
-            scrollable.style.paddingRight = isMobile ? "10px" : "0";
-        }
+        const buttons = document.querySelectorAll('.plainButton');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                buttons.forEach(btn => btn.classList.remove('active')); // Remove from all
+                button.classList.add('active'); // Add to clicked
+            });
+        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>

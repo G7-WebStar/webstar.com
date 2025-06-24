@@ -9,6 +9,7 @@
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="shared/assets/css/global-styles.css">
     <link rel="stylesheet" href="shared/assets/css/login.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -22,13 +23,15 @@
                 <!--Login Form-->
                 <div class="container login-form py-md-4">
                     <div class="form-floating">
-                        <input type="email" class="input-style form-control rounded-5 border-blue" id="floatingInput" placeholder="name@example.com">
+                        <input type="email" class="input-style form-control rounded-5 border-blue" id="floatingInput"
+                            placeholder="name@example.com">
                         <label for="floatingInput">
                             <div class="px-2">Email</div>
                         </label>
                     </div>
                     <div class="form-floating pt-2 pt-md-4 pb-md-4 pb-3">
-                        <input type="password" class="input-style form-control rounded-5 border-blue" id="floatingPassword" placeholder="Password">
+                        <input type="password" class="input-style form-control rounded-5 border-blue"
+                            id="floatingPassword" placeholder="Password">
                         <label for="floatingPassword">
                             <div class="pt-2 pt-md-4 px-2">Password</div>
                         </label>
@@ -39,12 +42,14 @@
                 </div>
                 <!--Login Button-->
                 <div class="container d-flex justify-content-center mt-3">
-                    <button class="btn btn-primary btn-login rounded-5 px-5 my-md-4 my-3 mx-auto w-sm-50 w-75" type="submit">Log in</button>
+                    <button class="btn btn-primary btn-login rounded-5 px-5 my-md-4 my-3 mx-auto w-sm-50 w-75"
+                        type="submit">Log in</button>
                 </div>
 
                 <!--Registration Redirect-->
                 <div class="container mt-md-4 mt-sm-3 text-center">
-                    <a href="registration.php" class="text-decoration-none"><span class="text-blue">Don't have an account? </span><span class="fw-bold text-blue">Sign up</span></a>
+                    <a href="registration.php" class="text-decoration-none"><span class="text-blue">Don't have an
+                            account? </span><span class="fw-bold text-blue">Sign up</span></a>
                 </div>
             </div>
         </div>
