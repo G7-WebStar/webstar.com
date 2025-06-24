@@ -48,20 +48,25 @@
             </ul>
 
 
-            <div class="dropdown mt-auto p-4" style="font-family: var(--Bold); letter-spacing: -1px;">
+            <div class="dropdown mt-auto p-4" style="letter-spacing: -1px;">
                 <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
                     data-bs-toggle="dropdown" aria-expanded="false">
                     <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="32" height="32"
                         class="rounded-circle me-2">
-                    <strong class="text-dark">james</strong>
+                    <strong class="text-dark"  style="font-family: var(--Bold);" >james</strong>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end text-small shadow">
-                    <li><a class="dropdown-item" href="#">Settings</a></li>
-                    <li><a class="dropdown-item" href="profile.php">Profile</a></li>
+                    <li class="ms-3 my-1"style="font-family: var(--Bold);" ><i class="fa-solid fa-gear me-2"></i>Settings</li>
+                    <li><a class="dropdown-item" style="font-family: var(--Regular);" href="#">Terms & Conditions</a></li>
+                    <li><a class="dropdown-item" style="font-family: var(--Regular);" href="#">Change Password</a></li>
+                    <li><a class="dropdown-item" style="font-family: var(--Regular);" href="#">FAQs</a></li>
+                    <li><a class="dropdown-item" style="font-family: var(--Regular);" href="#">Send Feedback</a></li>
+                     <hr class="dropdown-divider">
+                    <li><a class="dropdown-item" style="font-family: var(--Bold);" href="profile.php"><i class="fa-solid fa-user me-2"></i>My Profile</a></li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item" href="login.php">Sign out</a></li>
+                    <li><a class="dropdown-item" style="font-family: var(--Bold);" href="login.php"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign out</a></li>
                 </ul>
             </div>
 
