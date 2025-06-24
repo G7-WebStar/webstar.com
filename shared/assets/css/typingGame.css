@@ -1,0 +1,98 @@
+.cardGame {
+    background-color: var(--white);
+    border: 2px solid var(--blue);
+    border-radius: 1.5rem;
+}
+
+.highlight {
+    background-color: #fff3cd;
+    border-radius: 4px;
+}
+
+.incorrect {
+    background-color: var(--lightBlue);
+    border-radius: 4px;
+}
+
+#inputText {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#textDisplay span.current {
+    text-decoration: underline;
+    font-weight: bold;
+    color: var(--blue);
+}
+
+.header {
+    color: var(--blue);
+    font-family: var(--Bold);
+    font-size: 2.5em;
+}
+
+.progress {
+    height: 10px;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    border: 1px solid var(--black);
+}
+
+.progressBar {
+    background-color: var(--blue);
+}
+
+#textDisplay {
+    font-family: var(--SemiBold);
+    font-size: 1.5rem;
+    min-height: 100px;
+    background-color: var(--white);
+    border: 2px solid var(--blue);
+}
+
+.statusBar {
+    font-size: 1.50rem;
+    font-family: var(--Regular);
+    color: var(--black);
+}
+
+#countdownOverlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.9);
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#countdownNumber {
+    font-size: 5rem;
+    color: var(--blue);
+    background-color: var(--white);
+    padding: 1rem 2rem;
+    border: 5px solid var(--blue);
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.result {
+    color: var(--blue);
+    font-family: var(--Bold);
+}
+
+@media (max-width: 767.98px) {
+    .statusBar {
+        font-size: .90em;
+        justify-content: start;
+    }
+    .cardGame {
+    padding: 1rem !important;
+  }
+}
+

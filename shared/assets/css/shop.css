@@ -51,11 +51,13 @@
     color: var(--blue);
     border-radius: 2em;
     position: relative;
+    transition: color 0.3s ease;
 }
 
 .plainButton.active {
-    background-color: #e0e0e0;
+    background-color: var(--blue);
     font-weight: bold;
+    color: var(--white);
 }
 
 .plainButton.active::after {
