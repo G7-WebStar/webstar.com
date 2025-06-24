@@ -61,7 +61,7 @@
                                                     </div>
                                                     <div
                                                         class="col-md-4 d-none d-md-flex align-items-center justify-content-end">
-                                                        <a href="#">
+                                                        <a href="typingGame.php">
                                                             <img src="shared/assets/img/miniGamesImg/arrow.svg"
                                                                 class="img-fluid smallImgArrow" alt="Arrow">
                                                         </a>
