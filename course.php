@@ -43,19 +43,12 @@
                                         <div class="col-12 p-4 box">
                                             <div class="mb-3 continue-text">Continue Your Course</div>
                                             <div class="px-5 py-4 border continue-course-container">
-<<<<<<< Updated upstream
                                                 <div
                                                     class="d-flex flex-column flex-sm-row flex-lg-column flex-xl-row gap-3 align-items-center">
                                                     <div class="card d-flex align-items-center justify-content-center flex-shrink-0 d-none d-sm-block d-lg-none d-xl-block"
                                                         style="width: 109px; height: 109px; border-radius: 25px;">
                                                         <img src="shared/assets/img/html.png" class="" alt="Left"
                                                             style="width: 100%; height: 100%; object-fit: contain;">
-=======
-                                                <div class="d-flex flex-column flex-sm-row flex-lg-column flex-xl-row gap-3 align-items-center">
-                                                    <div class="card d-flex align-items-center justify-content-center flex-shrink-0 d-none d-sm-block d-lg-none d-xl-block"
-                                                        style="width: 109px; height: 109px; border-radius: 25px;">
-                                                        <img src="shared/assets/img/html.png" class="" alt="Left" style="width: 100%; height: 100%; object-fit: contain;">
->>>>>>> Stashed changes
                                                     </div>
                                                     <div class="m-auto">
                                                         <div class="course-title">HTML Course</div>
@@ -97,7 +90,6 @@
                                                         <!-- Courses row -->
                                                         <div class="row p-0">
                                                             <!-- HTML Course -->
-<<<<<<< Updated upstream
                                                             <div
                                                                 class="col-12 col-md-6 col-lg-12 col-xl-6 mb-2 mb-md-0 mb-lg-2">
                                                                 <div class="box p-4 h-100">
@@ -109,19 +101,10 @@
                                                                             <img class="course-arrow"
                                                                                 src="shared/assets/img/arrowRight.png"
                                                                                 alt="Go to HTML course">
-=======
-                                                            <div class="col-12 col-md-6 col-lg-12 col-xl-6 mb-2 mb-md-0 mb-lg-2">
-                                                                <div class="box p-4 h-100">
-                                                                    <div class="row">
-                                                                        <div class="col-12 d-flex flex-row justify-content-between">
-                                                                            <div class="course-text fw-bold lh-1">HTML</div>
-                                                                            <img class="course-arrow" src="shared/assets/img/arrowRight.png" alt="Go to HTML course">
->>>>>>> Stashed changes
                                                                         </div>
                                                                     </div>
                                                                     <div class="row mb-2">
                                                                         <div class="col-12">
-<<<<<<< Updated upstream
                                                                             <div class="course-text fw-bold lh-1">Course
                                                                             </div>
                                                                         </div>
@@ -134,17 +117,6 @@
                                                                         <div class="d-flex justify-content-between">
                                                                             <p class="mt-2 mb-0 done-text">Course
                                                                                 Progress</p>
-=======
-                                                                            <div class="course-text fw-bold lh-1">Course</div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="mt-sm-3">
-                                                                        <div class="w-100 mx-auto mt-2 border progress-bar">
-                                                                            <div class="w-50 progress"></div>
-                                                                        </div>
-                                                                        <div class="d-flex justify-content-between">
-                                                                            <p class="mt-2 mb-0 done-text">Course Progress</p>
->>>>>>> Stashed changes
                                                                             <p class="mt-2 mb-0 done-text">50%</p>
                                                                         </div>
                                                                     </div>
@@ -152,7 +124,6 @@
                                                             </div>
 
                                                             <!-- CSS Course -->
-<<<<<<< Updated upstream
                                                             <div
                                                                 class="col-12 col-md-6 col-lg-12 col-xl-6 mb-2 mb-md-0 mb-lg-2 opacity-25">
                                                                 <div
@@ -166,25 +137,12 @@
                                                                                 <img class="course-lock"
                                                                                     src="shared/assets/img/courses/locked.png"
                                                                                     alt="Go to HTML course">
-=======
-                                                            <div class="col-12 col-md-6 col-lg-12 col-xl-6 mb-2 mb-md-0 mb-lg-2 opacity-25">
-                                                                <div class="box-locked p-4 h-100 d-flex align-items-center">
-                                                                    <div class="container p-0">
-                                                                        <div class="row">
-                                                                            <div class="col-12 d-flex flex-row justify-content-between">
-                                                                                <div class="course-text fw-bold lh-1">CSS</div>
-                                                                                <img class="course-lock" src="shared/assets/img/courses/locked.png" alt="Go to HTML course">
->>>>>>> Stashed changes
                                                                             </div>
                                                                         </div>
                                                                         <div class="row mb-2">
                                                                             <div class="col-12">
-<<<<<<< Updated upstream
                                                                                 <div class="course-text fw-bold lh-1">
                                                                                     Course</div>
-=======
-                                                                                <div class="course-text fw-bold lh-1">Course</div>
->>>>>>> Stashed changes
                                                                             </div>
                                                                         </div>
                                                                         <div class="row">
@@ -204,13 +162,9 @@
 
                                                         <!-- More Courses -->
                                                         <div class="col-12">
-<<<<<<< Updated upstream
                                                             <div
                                                                 class="text-center p-2 p-xxl-3 fw-bold course-text opacity-25 text-blue">
                                                                 More Courses Coming Soon!</div>
-=======
-                                                            <div class="text-center p-2 p-xxl-3 fw-bold course-text opacity-25 text-blue">More Courses Coming Soon!</div>
->>>>>>> Stashed changes
                                                         </div>
                                                     </div>
 

@@ -58,69 +58,6 @@
                                 <div class="fw-bold">Jane Smith</div>
                                 <div class="text-secondary">@janesmith</div>
                             </div>
-<<<<<<< Updated upstream
-=======
-                            <hr>
-                            <div class="user-row">
-                                <div class="avatar rounded-circle bg-primary"></div>
-                                <div>
-                                    <div class="fw-bold">Jane Smith</div>
-                                    <div class="text-secondary">@janesmith</div>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="user-row">
-                                <div class="avatar rounded-circle bg-primary"></div>
-                                <div>
-                                    <div class="fw-bold">John Smith</div>
-                                    <div class="text-secondary">@johnsmith</div>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="user-row">
-                                <div class="avatar rounded-circle bg-primary"></div>
-                                <div>
-                                    <div class="fw-bold">Jane Doe</div>
-                                    <div class="text-secondary">@janedoe</div>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="user-row">
-                                <div class="avatar rounded-circle bg-primary"></div>
-                                <div>
-                                    <div class="fw-bold">Bill Gates</div>
-                                    <div class="text-secondary">@billgates</div>
-                                </div>
-                            </div>
-                            <hr>
-                            <hr>
-                            <div class="user-row">
-                                <div class="avatar rounded-circle bg-primary"></div>
-                                <div>
-                                    <div class="fw-bold">Bill Gates</div>
-                                    <div class="text-secondary">@billgates</div>
-                                </div>
-                            </div>
-                            <hr>
-                            <hr>
-                            <div class="user-row">
-                                <div class="avatar rounded-circle bg-primary"></div>
-                                <div>
-                                    <div class="fw-bold">Bill Gates</div>
-                                    <div class="text-secondary">@billgates</div>
-                                </div>
-                            </div>
-                            <hr>
-                            <hr>
-                            <div class="user-row">
-                                <div class="avatar rounded-circle bg-primary"></div>
-                                <div>
-                                    <div class="fw-bold">Bill Gates</div>
-                                    <div class="text-secondary">@billgates</div>
-                                </div>
-                            </div>
-                            <hr>
->>>>>>> Stashed changes
                         </div>
                         <hr>
                         <div class="user-row">
