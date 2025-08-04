@@ -1,0 +1,24 @@
+.header{
+    font-family: var(--Bold);
+    color: var(--highlight);
+    font-size: 2.5em;
+}
+
+.description{
+    font-family: var(--Regular);
+    color: var(--black);
+    font-size: 1.2em;
+}
+
+.btn-start-coding{
+    border: 1px solid var(--black);
+    background-color: var(--highlight);
+    font-family: var(--Bold);
+    color: var(--white);
+}
+
+.btn-start-coding:hover {
+    border: 1px solid var(--black);
+    background-color: var(--primaryColor);
+    color: var(--black);
+}

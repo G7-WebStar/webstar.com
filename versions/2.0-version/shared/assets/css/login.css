@@ -1,0 +1,123 @@
+        body {
+            background-color: var(--black);
+            font-family: var(--Regular);
+        }
+
+        .login-container {
+            height: 628px;
+            width: 595px;
+            background-color: var(--white);
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .password-toggle-btn:hover {
+            color: var(--primaryColor);
+        }
+
+        /*Border Color*/
+        .border-blue {
+            border-style: solid;
+            border-width: 0.5px;
+            border-color: var(--black);
+        }
+
+        /*Font Color*/
+        .text-blue {
+            color: var(--primaryColor);
+        }
+
+        .btn-login {
+            background-color: var(--primaryColor);
+            color: var(--white);
+            font-size: 22px;
+        }
+
+        .btn-login:hover {
+            background-color: var(--primaryColor) !important;
+            color: var(--black) !important;
+            border: 1px solid var(--black) !important;
+        }
+
+        .login-form {
+            max-width: 75% !important;
+        }
+
+        .highlight:hover {
+            transition: ease-in 0.2s;
+            color: var(--highlight) !important;
+        }
+
+        /*Responsiveness*/
+        @media screen and (max-height: 900px) {
+            .login-container {
+                height: 590px;
+            }
+        }
+
+        @media screen and (max-width: 767px) {
+            .login-container {
+                height: 544px;
+                width: 506px;
+            }
+        }
+
+        @media screen and (max-width: 575px) {
+            .login-container {
+                height: 474px;
+                width: 430px;
+            }
+
+            .btn-login {
+                font-size: 18px;
+            }
+        }
+
+        @media screen and (max-width: 496px) {
+            .login-container {
+                height: 435px;
+                width: 400px;
+            }
+
+            .logo {
+                width: 235px;
+            }
+            
+            .text-small {
+                font-size: 14px;
+            }
+        }
+
+        @media screen and (max-width: 430px) {
+            .login-container {
+                width: 360px;
+            }
+
+            .login-form {
+                max-width: 100% !important;
+            }
+        }
+
+        @media screen and (max-width: 380px) {
+            .login-container {
+                width: 300px;
+            }
+
+            .logo {
+                width: 220px;
+            }
+        }
+
+        .input-style {
+            padding-left: 20px !important;
+        }

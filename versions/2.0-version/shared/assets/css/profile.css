@@ -1,0 +1,114 @@
+body {
+    font-family: var(--Regular);
+}
+
+.profile {
+    background-color: var(--primaryColor);
+}
+
+.logo-badge {
+    background-color: var(--white1);
+    border: 1px solid var(--black) !important;
+}
+
+.progress {
+    background-color: var(--black);
+}
+
+.rank-edit-button-md {
+    display: block;
+}
+
+.rank-edit-button-sm {
+    display: none;
+}
+
+.text-white {
+    color: var(--black) !important;
+}
+
+.btn-primary {
+    background-color: var(--primaryColor);
+    color: var(--black);
+    border: 1px solid var(--black);
+}
+
+.btn-primary:hover {
+    background-color: var(--primaryColor);
+    color: var(--black);
+    border: 1px solid var(--black);
+}
+
+.btn-secondary {
+    background-color: var(--black);
+    color: var(--white1);
+    border: 1px solid var(--black);
+}
+
+
+@media (max-width: 1300px) {
+    .first-column {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .second-column {
+        width: 100%;
+    }
+
+    .course-name-col {
+        width: 100%;
+    }
+
+    .course-name-text {
+        text-align: center;
+    }
+
+    .progress-bar-col {
+        width: 100%;
+    }
+
+}
+
+@media (max-width: 480px) {
+    .course-progress-text {
+        display: none !important;
+    }
+
+    .course-info-col {
+        padding: 30px !important;
+    }
+}
+
+@media (max-width: 350px) {
+    .stats-text {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .course-progress-text {
+        display: none !important;
+    }
+
+    .course-info-col {
+        padding: 30px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .bio-text {
+        padding-left: 28px !important;
+        padding-right: 28px !important;
+    }
+}
+
+@media (max-width: 800px) {
+    .rank-edit-button-md {
+        display: none !important;
+    }
+
+    .rank-edit-button-sm {
+        display: block !important;
+    }
+}

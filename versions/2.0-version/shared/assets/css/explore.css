@@ -1,0 +1,99 @@
+.container {
+        background: #FFF9F0;
+        border-radius: 20px;
+        position: relative;
+    }
+
+    .card {
+        background: #FFF9F0 !important;
+    }
+
+    .searchbar-container {
+        min-height: 56px;
+        position: sticky;
+        background: var(--white);
+        margin-bottom: 15px;
+    }
+
+    .searchbar {
+        display: flex;
+        align-items: center;
+        border-radius: 15px;
+        overflow: hidden;
+        border: 1.5px solid #2C2C2C;
+        background: var(--white);
+    }
+
+    .searchbar-icon {
+        padding: 0 12px;
+        display: flex;
+        align-items: center;
+        background: transparent;
+    }
+
+    .searchbar-icon .bi {
+        color: #FF6B6B;
+        font-size: 1.2rem;
+    }
+
+    .explore-search-input {
+        font-size: 1.2rem;
+        background: transparent;
+        flex: 1;
+        color: #2C2C2C;
+        font-family: 'DM Sans SemiBold';
+        font-weight: 700;
+    }
+
+    .explore-search-input::placeholder {
+        color: #2C2C2C;
+        opacity: 1; 
+        font-family: 'DM Sans SemiBold';
+        font-weight: 700;
+    }
+
+    .explore-search-input:focus {
+        outline: none;
+        box-shadow: none;
+        border: none;
+        background: transparent;
+    }
+
+    .user-list {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .user-list .user-row {
+        display: flex;
+        align-items: center;
+        padding: 1.2rem;
+    }
+
+    .user-list .avatar {
+        width: 48px;
+        height: 48px;
+        background: #FDE29C;
+        border-radius: 50%;
+        margin-right: 1rem;
+    }
+
+    .user-list .fw-bold {
+        font-size: 1.2rem;
+        font-family: 'DM Sans SemiBold';
+        font-weight: 700;
+        color: var(--black);
+    }
+
+    .user-list .text-secondary {
+        color: var(--black);
+         font-family: 'DM Sans Regular';
+        font-weight: 400;
+    }
+
+    .user-list hr {
+        margin: 0;
+        border: none;
+        border-top: 1.5px solid #2C2C2C;
+    }
+
