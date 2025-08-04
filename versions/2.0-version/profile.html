@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WebStar | Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <link rel="stylesheet" href="shared/assets/css/global-styles.css">
+     <link rel="stylesheet" href="shared/assets/css/profile.css">
+    <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
+
+
+</head>
+
+<body>
+    <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center p-0 p-md-3">
+
+        <div class="row w-100">
+
+            <!-- Sidebar (only shows on mobile) -->
+            <div class="offcanvas offcanvas-start d-md-none" tabindex="-1" id="sidebarOffcanvas"
+                aria-labelledby="sidebarOffcanvasLabel" style="background-color:var(--white); width: 250px;">
+                <div class="offcanvas-header">
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                        aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body d-flex flex-column p-0">
+                    <div class="d-flex flex-column flex-shrink-0 p-3" style="width: 100%;">
+                        <a class="d-flex align-items-center  text-decoration-none">
+                            <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid w-100 py-3 px-2" />
+                        </a>
+
+                        <hr>
+                        <ul class="nav nav-pills flex-column mb-auto">
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3"
+                                data-page="home">
+                                <img src="shared/assets/img/dashboard.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="index.html">Home</a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3" data-page="course">
+                                <img src="shared/assets/img/courses.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="course.html">Courses</a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3" data-page="explore">
+                                <img src="shared/assets/img/explore.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="explore.html">Explore</a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3" data-page="shop">
+                                <img src="shared/assets/img/shop.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="shop.html">Shop</a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3"
+                                data-page="minigames">
+                                <img src="shared/assets/img/games.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="miniGames.html">Mini-games</a>
+                            </li>
+                        </ul>
+                        <hr>
+                        <!-- WebStars for Mobile-->
+                        <div class="btn btn-webstars mx-3 my-3 py-2">
+                            <div class="row">
+                                <div class="col-auto d-flex justify-content-center align-items-center ms-2">
+                                    <img src="shared/assets/img/stars.png" alt="" width="32" height="32">
+                                </div>
+                                <div class="col">
+                                    <div class="text-dark text-start webstar-points"
+                                        style=" font-size:20px; margin-left: -10px;">
+                                        3160
+                                    </div>
+                                    <div class="p text-muted  text-start"
+                                        style="font-size:15px; margin-top:-5px; margin-left: -10px;">
+                                        webstars
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Profile -->
+                        <hr>
+                        <div class="dropdown mt-auto p-2" style="letter-spacing: -1px;">
+                            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="32"
+                                    height="32" class="rounded-circle me-2">
+                                <strong class="text-dark" style="font-family: var(--Bold);">james</strong>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end text-small shadow">
+                                <li class="ms-3 my-1" style="font-family: var(--Bold);"><i
+                                        class="fa-solid fa-gear me-2"></i>Settings</li>
+                                <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                        href="termsAndConditions.html">Terms &
+                                        Conditions</a></li>
+                                <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                        href="changepassword.html">Change
+                                        Password</a></li>
+                                <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                        href="faqs.html">FAQs</a></li>
+                                <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                        href="feedback.html">Send
+                                        Feedback</a></li>
+                                <hr class="dropdown-divider">
+                                <li><a class="dropdown-item" style="font-family: var(--Bold);" href="profile.html"><i
+                                            class="fa-solid fa-user me-2"></i>My Profile</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" style="font-family: var(--Bold); color:var(--highlight)"
+                                        href="login.html"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign
+                                        out</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+           <!-- Sidebar Column (fixed on desktop) -->
+            <div class="col-auto d-none d-md-block">
+                <div class="col-auto d-none d-md-block">
+                    <div class="row">
+                        <!-- Sidebar -->
+                        <div class="card border-0 sidebar mx-2 p-2 overflow-y-auto" style="width: 220px;">
+                            <!-- Logo -->
+                            <div class="d-flex justify-content-center">
+                                <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid pt-5 pb-5 px-3"
+                                    width="180px;">
+                            </div>
+
+                            <!-- Navigation -->
+                            <ul class="nav flex-column">
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="home">
+                                    <img src="shared/assets/img/dashboard.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="index.html">Home</a>
+                                </li>
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="course">
+                                    <img src="shared/assets/img/courses.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="course.html">Courses</a>
+                                </li>
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="explore">
+                                    <img src="shared/assets/img/explore.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="explore.html">Explore</a>
+                                </li>
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="shop">
+                                    <img src="shared/assets/img/shop.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="shop.html">Shop</a>
+                                </li>
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="minigames">
+                                    <img src="shared/assets/img/games.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="miniGames.html">Mini-games</a>
+                                </li>
+
+                            </ul>
+
+                            <!-- WebStars for Desktop -->
+                            <div class="btn btn-webstars mx-3 mt-4 py-2">
+                                <div class="row">
+                                    <div class="col-auto d-flex justify-content-center align-items-center ms-2">
+                                        <img src="shared/assets/img/stars.png" alt="" width="32" height="32">
+                                    </div>
+                                    <div class="col">
+                                        <div class="text-dark text-start webstar-points"
+                                            style=" font-size:20px; margin-left: -10px;">
+                                            3160
+                                        </div>
+                                        <div class="p text-muted  text-start"
+                                            style="font-size:15px; margin-top:-5px; margin-left: -10px;">
+                                            webstars
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="dropdown mt-auto p-4" style="letter-spacing: -1px;">
+                                <a href="#"
+                                    class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt=""
+                                        width="32" height="32" class="rounded-circle me-2">
+                                    <strong class="text-dark" style="font-family: var(--Bold);">james</strong>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end text-small shadow">
+                                    <li class="ms-3 my-1" style="font-family: var(--Bold);"><i
+                                            class="fa-solid fa-gear me-2"></i>Settings</li>
+                                    <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                            href="termsAndConditions.html">Terms &
+                                            Conditions</a></li>
+                                    <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                            href="changepassword.html">Change
+                                            Password</a></li>
+                                    <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                            href="faqs.html">FAQs</a>
+                                    </li>
+                                    <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                            href="feedback.html">Send
+                                            Feedback</a></li>
+                                    <hr class="dropdown-divider">
+                                    <li><a class="dropdown-item" style="font-family: var(--Bold);"
+                                            href="profile.html"><i class="fa-solid fa-user me-2"></i>My Profile</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item"
+                                            style="font-family: var(--Bold); color:var(--highlight)"
+                                            href="login.html"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign
+                                            out</a></li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Main Container Column-->
+            <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-0 p-md-4 overflow-y-auto">
+                <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
+                    style="background-color: transparent;">
+
+                    <!-- Navbar for mobile -->
+                    <nav class="navbar navbar-light px-3 d-md-none">
+                        <div class="container-fluid position-relative">
+
+                            <!-- Toggler -->
+                            <button class="navbar-toggler position-absolute start-0 p-1" type="button"
+                                data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">
+                                <span class="navbar-toggler-icon"></span>
+                            </button>
+
+                            <!-- Logo -->
+                            <a class="navbar-brand mx-auto" href="#">
+                                <img src="shared/assets/img/webstar-logo-black.png" alt="Webstar"
+                                    style="height: 40px; padding-left: 30px">
+                            </a>
+
+                        </div>
+                    </nav>
+
+                    <div class="container-fluid py-3 overflow-y-auto">
+                        <div class="row g-0 w-100">
+
+                            <!-- First Column -->
+                            <div class="col-12 col-md-6 first-column d-flex flex-column">
+                                <!-- Profile -->
+                                <div class="row m-0 w-100">
+                                    <div class="col m-0 p-0 ">
+                                        <div class="card profile rounded-4 p-2 me-md-2"
+                                            style="border: 1px solid var(--black);">
+                                            <!-- General Info -->
+                                            <div class="row m-0 px-3 pt-3 pb-1 pb-md-3 d-flex align-items-center">
+                                                <div class="col-auto m-0 p-0">
+                                                    <img src="https://avatars.githubusercontent.com/u/181800261?v=4"
+                                                        width="100" height="100" class="rounded-4 m-0">
+                                                </div>
+                                                <div class="col mt-1">
+                                                    <h5 class="mb-0 text-white"
+                                                        style="font-family: var(--Bold); letter-spacing: -1px; font-size:25px;">
+                                                        Marielle Alyssa</h5>
+                                                    <p class="mb-1 text-white"
+                                                        style="font-family: var(--Medium); letter-spacing: -1px; font-size:20px;">
+                                                        @jamesdoe</p>
+                                                    <!-- Rank and Edit button (only visible on md and up) -->
+                                                    <div
+                                                        class="d-flex flex-column flex-sm-row gap-2 profile-pills mt-2 rank-edit-button-md">
+                                                        <span class="px-3 rounded-5 fw-bold d-flex align-items-center"
+                                                            style="background-color: var(--white); color: var(--black); border: 1px solid var(--black);"><i
+                                                                class="fa-solid fa-trophy me-1"></i> Rank
+                                                            5</span>
+                                                        <button type="button"
+                                                            class="btn fw-bold px-3 p-0 rounded-5 d-flex align-items-center"
+                                                            data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                                            style="background-color: var(--white); color: var(--black); border: 1px solid var(--black);">
+                                                            <i class="fa-solid fa-pen me-2"></i>Edit
+                                                        </button>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Edit Profile Modal -->
+                                            <div class="modal fade" id="exampleModal" tabindex="-1"
+                                                aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content"
+                                                        style="border: 1px solid var(--black); background-color: var(--white);">
+                                                        <div class="modal-header">
+                                                            <h1 class="modal-title fs-5" id="exampleModalLabel">
+                                                                <strong>Edit
+                                                                    Profile</strong>
+                                                            </h1>
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="container-fluid">
+                                                                <div class="row g-3">
+
+                                                                    <!-- Left Side: Image + Upload -->
+                                                                    <div class="col-md-4 text-center">
+                                                                        <img src="https://avatars.githubusercontent.com/u/181800261?v=4"
+                                                                            alt="Profile"
+                                                                            class="img-fluid rounded mb-2">
+                                                                        <button
+                                                                            class="btn btn-secondary btn-sm w-100">Upload
+                                                                            Photo</button>
+                                                                    </div>
+
+                                                                    <!-- Right Side: Display Name + Bio -->
+                                                                    <div class="col-md-8">
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Display
+                                                                                Name</label>
+                                                                            <input type="text" class="form-control"
+                                                                                placeholder="Enter your name"
+                                                                                style="border: 1px solid var(--black);">
+                                                                        </div>
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Bio</label>
+                                                                            <textarea class="form-control" rows="4"
+                                                                                placeholder="Write a short bio..."
+                                                                                style="border: 1px solid var(--black);"></textarea>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+
+                                                                <!-- Section: My Logo Badges -->
+                                                                <div class="row">
+                                                                    <h6><strong>My Logo Badges</strong></h6>
+                                                                    <div class="col-12 bg-white p-5 text-center rounded-3"
+                                                                        style="border: 1px solid var(--black);">
+                                                                        <button class="btn btn-dark">Applied</button>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Close</button>
+                                                            <button type="button" class="btn btn-primary">Save
+                                                                changes</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Bio -->
+                                            <div class="row">
+                                                <div class="col py-1 px-5 text-white bio-text"
+                                                    style=" font-family: var(--Medium);">
+                                                    Hi! I’m a web development student passionate about building clean,
+                                                    functional, and user-friendly websites. Always learning, always
+                                                    building! ⭐
+                                                </div>
+                                            </div>
+                                            <div class="row rank-edit-button-sm mb-2 mt-2 gx-0 ">
+                                                <!-- Rank and Edit button (for smaller screens) -->
+                                                <div
+                                                    class="d-flex flex-row gap-2 profile-pills m-0 mt-2 d-flex justify-content-center">
+                                                    <span class="px-3 rounded-5 fw-bold d-flex align-items-center"
+                                                        style="background-color: var(--white); color: var(--black); border: 1px solid var(--black);"><i
+                                                            class="fa-solid fa-trophy me-2"></i> Rank
+                                                        5</span>
+                                                    <button type="button"
+                                                        class="btn fw-bold p-0 px-3 rounded-5 d-flex align-items-center"
+                                                        data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                                        style="background-color: var(--white); color: var(--black); border: 1px solid var(--black);">
+                                                        <i class="fa-solid fa-pen me-2"></i>Edit
+                                                    </button>
+
+                                                </div>
+                                            </div>
+                                            <!-- Stats -->
+                                            <div class="row px-4 mt-3 mb-2 d-none d-md-block">
+                                                <div class="rounded-3 p-3 px-5 d-flex justify-content-between align-items-center text-center"
+                                                    style="background-color: var(--white); color: var(--black); border: 1px solid var(--black);">
+                                                    <div class="flex-fill">
+                                                        <div style="font-family: var(--Black); font-size: 1.25rem;">340
+                                                        </div>
+                                                        <small>webstars</small>
+                                                    </div>
+                                                    <div class="vr mx-3"></div>
+                                                    <div class="flex-fill" role="button" data-bs-toggle="modal"
+                                                        data-bs-target="#followersModal">
+                                                        <div style="font-family: var(--Black); font-size: 1.25rem;">50
+                                                        </div>
+                                                        <small>followers</small>
+                                                    </div>
+                                                    <div class="vr mx-3"></div>
+                                                    <div class="flex-fill" role="button" data-bs-toggle="modal"
+                                                        data-bs-target="#followingsModal">
+                                                        <div style="font-family: var(--Black); font-size: 1.25rem;">50
+                                                        </div>
+                                                        <small>following</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Stats for Small Screen -->
+                                            <div class="row px-4 mt-3 mb-3 d-md-none d-flex justify-content-between align-items-center text-center"
+                                                style="color: var(--black);">
+
+                                                <div class="col-4 stats-text">
+                                                    <div style="font-family: var(--Black); font-size: 1.25rem;">340
+                                                    </div>
+                                                    <small>webstars</small>
+                                                </div>
+                                                <div class="col-4 stats-text" role="button" data-bs-toggle="modal"
+                                                    data-bs-target="#followersModal">
+                                                    <div style="font-family: var(--Black); font-size: 1.25rem;">50
+                                                    </div>
+                                                    <small>followers</small>
+                                                </div>
+                                                <div class="col-4 stats-text" role="button" data-bs-toggle="modal"
+                                                    data-bs-target="#followingsModal">
+                                                    <div style="font-family: var(--Black); font-size: 1.25rem;">50
+                                                    </div>
+                                                    <small>following</small>
+                                                </div>
+
+                                            </div>
+
+                                            <!-- Following Modal -->
+
+                                            <div class="modal fade" id="followingsModal" tabindex="-1"
+                                                aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content"
+                                                        style="border: 1px solid var(--black); background-color: var(--white);">
+                                                        <div class="modal-header">
+                                                            <h1 class="modal-title fs-5" id="exampleModalLabel">
+                                                                <strong>Followings · 50</strong>
+                                                            </h1>
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body"
+                                                            style="max-height: 500px; overflow-y: auto;">
+                                                            <ul class="list-group">
+                                                                <li class="list-group-item px-4 py-3"
+                                                                    style=" background-color: var(--white);">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item px-4 py-3"
+                                                                    style=" background-color: var(--white);">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item px-4 py-3"
+                                                                    style=" background-color: var(--white);">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                        <span
+                                                                            class="badge fw-semibold px-3 py-2 rounded-pill ms-4"
+                                                                            style="font-size: 0.75rem; background-color: var(--primaryColor); color: var(--black);">
+                                                                            Follows you
+                                                                        </span>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item px-4 py-3"
+                                                                    style=" background-color: var(--white);">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item px-4 py-3"
+                                                                    style=" background-color: var(--white);">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item px-4 py-3"
+                                                                    style=" background-color: var(--white);">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item px-4 py-3"
+                                                                    style=" background-color: var(--white);">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Follower Modal -->
+
+                                            <div class="modal fade" id="followersModal" tabindex="-1"
+                                                aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content"
+                                                        style="border: 1px solid var(--black); background-color: var(--white);">
+                                                        <div class="modal-header">
+                                                            <h1 class="modal-title fs-5" id="exampleModalLabel">
+                                                                <strong>Followers · 50</strong>
+                                                            </h1>
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body"
+                                                            style="max-height: 500px; overflow-y: auto;">
+                                                            <ul class="list-group">
+                                                                <li class="list-group-item px-4 py-3"
+                                                                    style="background-color: var(--white);">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item px-4 py-3"
+                                                                    style="background-color: var(--white);">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item px-4 py-3"
+                                                                    style="background-color: var(--white);">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item px-4 py-3"
+                                                                    style="background-color: var(--white);">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="rounded-circle bg-primary me-3"
+                                                                            style="width: 40px; height: 40px;"></div>
+                                                                        <div>
+                                                                            <div class="fw-semibold">John Doe</div>
+                                                                            <small class="text-muted">@johndoe</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!-- Logo Badge -->
+                                <div class="row m-0 w-100 mt-2 flex-grow-1">
+                                    <div class="col m-0 p-0">
+                                        <div
+                                            class="card logo-badge rounded-4 border-0 p-2 me-md-2 h-100 d-flex justify-content-center align-items-center">
+                                            <img src="shared/assets/img/badge.png" class="h-auto w-100"
+                                                style="max-height: 100%;">
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Second Column -->
+                            <div class="col-12 col-md-6 m-0 second-column">
+                                <div class="card logo-badge rounded-4">
+                                    <!-- Currently Learning -->
+                                    <div class="row m-0 w-100 px-4 py-3">
+                                        <h5 class="text-white m-0 p-0 mt-2 mb-2">
+                                            Currently learning
+                                        </h5>
+                                        <div
+                                            class="card px-5 py-4 rounded-4 text-white mt-2 course-info-col" style="border: 1px solid var(--black) !important; background-color: var(--white);">
+                                            <div class="row d-flex align-items-center">
+                                                <!-- Course Name -->
+                                                <div class="col-md-3 col-12 m-0 p-0 text-center text-md-start course-name-col"
+                                                    style="font-family: var(--Bold); ">
+                                                    <h4 class="m-0 p-0 course-name-text">HTML Course</h4>
+                                                </div>
+                                                <!-- Course Progress -->
+                                                <div class="col-md-9 col-12 progress-bar-col">
+                                                    <div class="progress rounded-3 mt-2"
+                                                        role="progressbar" aria-label="Basic example" aria-valuenow="25"
+                                                        aria-valuemin="0" aria-valuemax="100"
+                                                        style="height: 15px; background-color: transparent; border: 1px solid var(--black)">
+
+                                                        <div class="progress-bar"
+                                                            style="width: 60%; background-color: var(--highlight)">
+                                                        </div>
+                                                    </div>
+                                                    <div
+                                                        class="d-flex justify-content-between align-items-center mt-1 text-white course-progress-text">
+                                                        <span>Course Progress</span>
+                                                        <span>60%</span>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <!-- My Badges -->
+                                    <div class="row m-0 w-100 px-4 py-3">
+                                        <div class="col m-0 p-0">
+                                            <h5 class="text-white m-0 p-0 mt-2 mb-2">
+                                                My Badges
+                                            </h5>
+
+                                            <div class="d-flex justify-content-center align-items-center"
+                                                style="height:400px;">
+                                                <h5 class="text-white m-0">
+                                                    No badges yet.
+                                                </h5>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const currentPath = window.location.pathname.split("/").pop();
+            const pageMap = {
+                "index.html": "home",
+                "course.html": "course",
+                "explore.html": "explore",
+                "shop.html": "shop",
+                "miniGames.html": "minigames"
+            };
+
+            const activePage = pageMap[currentPath];
+            const navItems = document.querySelectorAll('[data-page]');
+
+            navItems.forEach(item => {
+                const page = item.getAttribute('data-page');
+                const link = item.querySelector('a');
+                const img = item.querySelector('img');
+
+                if (page === activePage) {
+                    item.classList.add("selected-box");
+                    link.classList.add("selected");
+                    const src = img.getAttribute("src").replace(".png", ".png");
+                    img.setAttribute("src", src);
+                } else {
+                    item.classList.remove("selected-box");
+                    link.classList.remove("selected");
+                    const src = img.getAttribute("src").replace(".png", ".png");
+                    img.setAttribute("src", src);
+                }
+            });
+        });
+    </script>
+</body>
+
+
+</html>

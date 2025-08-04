@@ -1,0 +1,74 @@
+.modal-content {
+      max-width: 500px;
+      margin: auto;
+      padding-top: 2rem;
+      font-family: var(--Regular);
+    }
+
+    #modalResultTitle {
+      font-size: 2.5rem;
+      color: var(--black);
+      font-weight: 700;
+    }
+
+    #modalResultMessage {
+      font-size: 1rem;
+      color: var(--black);
+    }
+
+    .highlight {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    .badge-unlocked {
+      font-weight: normal;
+      font-size: 1.3rem;
+    }
+    .continue-btn {
+  width: 45%;
+  border-radius: 10px;
+  margin: 0 auto;
+  display: block;
+  font-size: 25px;
+}
+
+/* Responsive adjustment for small screens */
+@media (max-width: 576px) {
+    .continue-btn {
+        width: 60%;
+        font-size: 0.9rem;
+    }
+}
+
+.custom-modal {
+  border: none;
+  background-color: var(--white);
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.custom-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--black); /* Replace with your theme variable */
+  line-height: 1;
+  cursor: pointer;
+}
+
+.modal-divider {
+  border: none;
+  border-top: 2px solid var(--black);
+  width: 100vw; /* full viewport width */
+  margin: 0; /* remove spacing */
+  position: relative;
+  left: -50vw;
+  right: -50vw;
+  margin-left: 50%;
+  margin-top: 10px;
+}

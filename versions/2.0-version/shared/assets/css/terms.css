@@ -1,0 +1,9 @@
+body {
+    font-family: var(--Regular);
+}
+
+.text-blue {
+    color: var(--blue);
+    font-family: var(--Bold) !important;
+}
+

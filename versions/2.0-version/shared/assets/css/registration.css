@@ -1,0 +1,229 @@
+body {
+    background-color: var(--lightBlue);
+    font-family: var(--Regular);
+}
+
+.border-blue {
+    border-style: solid;
+    border-width: 0.5px;
+    border-color: #2C2C2C;
+}
+
+.text-blue {
+    color: #2C2C2C;
+    font-weight: bold;
+}
+
+.btn-register {
+    color:  #2C2C2C;
+    font-size: 22px;
+}
+
+.registration-form {
+    max-width: 75%;
+}
+
+.password-toggle-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.password-toggle-btn:hover {
+    color: #FDE29C;
+}
+
+.password-field-container .form-control {
+    padding-right: 40px;
+}
+
+@media (max-width: 767.98px) {
+    .container-fluid > .row {
+        background: #FFF9F0;
+        border-radius: 1.5rem !important;
+        min-height: 100vh;
+        box-shadow: none !important;
+        overflow: hidden !important;
+    }
+    .col-md-6 {
+        max-width: 100% !important;
+        flex: 0 0 100%;
+        background: #FFF9F0 !important;
+        border-radius: 1.5rem 1.5rem 0 0 !important;
+    }
+    .col-md-7 {
+        max-width: 100% !important;
+        flex: 0 0 100%;
+        background: #FFF9F0 !important;
+        border-radius: 1.5rem !important;
+        box-shadow: none !important;
+    }
+}
+
+@media (max-width: 576px) {
+  html, body {
+    overflow: hidden !important;
+    background: #2C2C2C !important;
+    height: 100vh !important;
+    box-sizing: border-box !important;
+  }
+  .container-fluid {
+    padding: 24px !important;
+    min-height: 100vh !important;
+    background: #2C2C2C !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+  .registration-container {
+    width: 100% !important;
+    max-width: 370px !important;
+    margin: 0 auto !important;
+    border-radius: 1.5rem !important;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,.10);
+    overflow: hidden !important;
+    background: #FFF9F0 !important;
+    min-height: unset !important;
+    height: auto !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+  }
+  .registration-logo-col {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 28px 0 20px 0 !important;
+    background: #FDE29C !important;
+    border-radius: 1.5rem 1.5rem 0 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .registration-logo-col img {
+    max-width: 80% !important;
+    height: auto !important;
+    max-height: 70px !important;
+    margin: 0 auto !important;
+    display: block !important;
+    object-fit: contain !important;
+  }
+  .registration-form-col {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0 0 1.5rem 1.5rem !important;
+    padding: 24px 18px 18px 18px !important;
+    min-height: unset !important;
+    box-sizing: border-box !important;
+  }
+  .registration-title {
+    margin-top: 8px !important;
+    margin-bottom: 10px !important;
+    padding: 0 !important;
+    font-size: 1.3rem !important;
+  }
+  .registration-form-col input,
+  .registration-form-col button {
+    font-size: 0.9rem !important;
+    padding: 0.4rem 0.8rem !important;
+    height: 32px !important;
+  }
+  .registration-form-col form {
+    margin-bottom: 6px !important;
+  }
+  .registration-form-col .text-center {
+    font-size: 1.8 rem !important;
+  }
+}
+ 
+/*For Ipad Size*/
+@media (max-width: 991.98px) and (min-width: 577px) {
+  .container-fluid {
+    padding: 40px 0 !important;
+    min-height: 100vh !important;
+    background: #2C2C2C!important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+  .registration-container {
+    width: 100% !important;
+    max-width: 540px !important; 
+    margin: 0 auto !important;
+    border-radius: 1.5rem !important;
+    overflow: hidden !important;
+    background: #FFF9F0 !important;
+    min-height: unset !important;
+    height: auto !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+  }
+  .registration-logo-col {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 36px 0 28px 0 !important;
+    background: #FDE29C !important;
+    border-radius: 1.5rem 1.5rem 0 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .registration-logo-col img {
+    max-width: 70% !important;
+    height: auto !important;
+    max-height: 90px !important;
+    margin: 0 auto !important;
+    display: block !important;
+    object-fit: contain !important;
+  }
+  .registration-form-col {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0 0 1.5rem 1.5rem !important;
+    padding: 36px 32px 28px 32px !important;
+    min-height: unset !important;
+    box-sizing: border-box !important;
+  }
+  .registration-title {
+    margin-top: 16px !important;
+    margin-bottom: 18px !important;
+    padding: 0 !important;
+    font-size: 1.7rem !important;
+  }
+  .registration-form-col input,
+  .registration-form-col button {
+    font-size: 1.1rem !important;
+    padding: 0.6rem 1.2rem !important;
+    height: 40px !important;
+  }
+  .registration-form-col form {
+    margin-bottom: 12px !important;
+  }
+  .registration-form-col .text-center {
+    font-size: 1.1rem !important;
+  }
+}
+
+.registration-form-col input {
+    border: 1px solid var(--black) !important;
+    color: var(--black);
+}
+
+.btn.btn-primary {
+    background-color: #FDE29C !important;
+    color: #2C2C2C !important; /* (optional) for dark text */
+    border: none; /* (optional) removes border */
+}
+
+.registration-form-col input:focus,
+.btn.btn-primary:focus {
+    box-shadow: none !important;
+    outline: none !important;
+}

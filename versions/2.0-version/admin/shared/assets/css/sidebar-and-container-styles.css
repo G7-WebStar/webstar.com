@@ -1,0 +1,61 @@
+body {
+  background-color: white;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+
+
+.sidebar {
+    background-color: var(--white);
+    border-radius: 20px;
+    height: 95vh;
+}
+
+
+.main-container {
+    background-color: var(--white);
+    border-radius: 0px;
+    height: 100vh;
+}
+
+
+@media (min-width: 768px) {
+  body {
+    background-color: var(--lightBlue); 
+  }
+
+  .main-container{
+    border-radius: 20px;
+    height: 95vh;
+  }
+}
+
+.nav-item {
+    font-family: var(--Bold);
+    text-decoration: none;
+    letter-spacing: -1px;
+    font-size: 17px;
+}
+
+.text-dark{
+    color: var(--black)!important;
+}
+
+.selected {
+    color: var(--white) !important;
+    opacity: 100% !important;
+}
+
+.selected-box {
+    background-color: var(--blue) !important;
+}
+
+.selected-box-course {
+    background-color: var(--blue) !important;
+}
+

@@ -1,0 +1,84 @@
+body {
+  background-color: white;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+
+
+.sidebar {
+  background-color: var(--white);
+  border-radius: 20px;
+  height: 95vh;
+}
+
+
+.main-container {
+  background-color: var(--white);
+  border-radius: 0px;
+  height: 100vh;
+}
+
+
+@media (min-width: 768px) {
+  body {
+    background-color: var(--black);
+  }
+
+  .main-container {
+    border-radius: 20px;
+    height: 95vh;
+  }
+}
+
+.nav-item {
+  font-family: var(--SemiBold);
+  text-decoration: none;
+  letter-spacing: -1px;
+  font-size: 17px;
+}
+
+.text-dark {
+  color: var(--black) !important;
+}
+
+.selected {
+  color: var(--black) !important;
+  opacity: 100% !important;
+
+}
+
+.selected-box {
+  background-color: var(--primaryColor) !important;
+  border: 1px solid var(--black) !important;
+}
+
+.selected-box-course {
+  background-color: var(--primaryColor) !important;
+  border: 1px solid var(--black) !important;
+}
+
+.btn-webstars {
+  background-color: var(--white1);
+  color: var(--black);
+  border: 1px solid var(--black);
+  font-family: var(--SemiBold);
+}
+
+.btn-webstars:hover {
+
+  background-color: var(--white1);
+  color: var(--black);
+  border: 1px solid var(--black);
+  font-family: var(--SemiBold);
+
+}
+
+.webstar-points {
+  font-family: var(--Black) !important;
+}

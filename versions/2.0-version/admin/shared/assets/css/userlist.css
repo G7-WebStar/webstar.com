@@ -1,0 +1,25 @@
+ .custom-thead th {
+     background-color: var(--primaryColor);
+     color: var(--black);
+ }
+
+ .table tbody td {
+     border-color: #2C2C2C;
+ }
+
+ .selected-box {
+    background-color: #FDE29C !important;
+    border: 1px solid #2C2C2C !important;
+ }
+
+ .selected-box a,
+ .selected-box strong,
+ .selected-box i {
+     color: #000000 !important;
+ }
+
+ .nav-item a,
+ .nav-item strong,
+ .nav-item i {
+     color: #1F2937 !important;
+ }

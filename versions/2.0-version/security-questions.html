@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WebStar | Set up</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <link rel="stylesheet" href="shared/assets/css/global-styles.css">
+    <link rel="stylesheet" href="shared/assets/css/profile.css">
+    <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
+
+    <style>
+        .input-group-text {
+            background-color: transparent;
+            color: white;
+        }
+
+        .form-control {
+            background-color: var(--white);
+            color: var(--black);
+        }
+
+        .form-select {
+            background-color: var(--primaryColor);
+            color: var(--black);
+        }
+
+        .btn {
+            background-color: var(--primaryColor);
+            color: var(--black);
+            border: 1px solid var(--black);
+            width: 200px;
+            justify-content: center;
+        }
+
+        .btn:hover {
+            background-color: var(--primaryColor);
+            color: var(--black);
+            border: 1px solid var(--black);
+            width: 200px;
+            justify-content: center;
+        }
+
+        select.form-select option {
+            background-color: var(--white1);
+            color: var(--black);
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center p-0 p-md-3">
+
+        <div class="row w-100">
+
+           <!-- Sidebar (only shows on mobile) -->
+            <div class="offcanvas offcanvas-start d-md-none" tabindex="-1" id="sidebarOffcanvas"
+                aria-labelledby="sidebarOffcanvasLabel" style="background-color:var(--white); width: 250px;">
+                <div class="offcanvas-header">
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                        aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body d-flex flex-column p-0">
+                    <div class="d-flex flex-column flex-shrink-0 p-3" style="width: 100%;">
+                        <a class="d-flex align-items-center  text-decoration-none">
+                            <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid w-100 py-3 px-2" />
+                        </a>
+
+                        <hr>
+                        <ul class="nav nav-pills flex-column mb-auto">
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3"
+                                data-page="home">
+                                <img src="shared/assets/img/dashboard.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="index.html">Home</a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3" data-page="course">
+                                <img src="shared/assets/img/courses.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="course.html">Courses</a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3" data-page="explore">
+                                <img src="shared/assets/img/explore.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="explore.html">Explore</a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3" data-page="shop">
+                                <img src="shared/assets/img/shop.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="shop.html">Shop</a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3"
+                                data-page="minigames">
+                                <img src="shared/assets/img/games.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="miniGames.html">Mini-games</a>
+                            </li>
+                        </ul>
+                        <hr>
+                        <!-- WebStars for Mobile-->
+                        <div class="btn btn-webstars mx-3 my-3 py-2">
+                            <div class="row">
+                                <div class="col-auto d-flex justify-content-center align-items-center ms-2">
+                                    <img src="shared/assets/img/stars.png" alt="" width="32" height="32">
+                                </div>
+                                <div class="col">
+                                    <div class="text-dark text-start webstar-points"
+                                        style=" font-size:20px; margin-left: -10px;">
+                                        3160
+                                    </div>
+                                    <div class="p text-muted  text-start"
+                                        style="font-size:15px; margin-top:-5px; margin-left: -10px;">
+                                        webstars
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Profile -->
+                        <hr>
+                        <div class="dropdown mt-auto p-2" style="letter-spacing: -1px;">
+                            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="32"
+                                    height="32" class="rounded-circle me-2">
+                                <strong class="text-dark" style="font-family: var(--Bold);">james</strong>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end text-small shadow">
+                                <li class="ms-3 my-1" style="font-family: var(--Bold);"><i
+                                        class="fa-solid fa-gear me-2"></i>Settings</li>
+                                <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                        href="termsAndConditions.html">Terms &
+                                        Conditions</a></li>
+                                <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                        href="changepassword.html">Change
+                                        Password</a></li>
+                                <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                        href="faqs.html">FAQs</a></li>
+                                <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                        href="feedback.html">Send
+                                        Feedback</a></li>
+                                <hr class="dropdown-divider">
+                                <li><a class="dropdown-item" style="font-family: var(--Bold);" href="profile.html"><i
+                                            class="fa-solid fa-user me-2"></i>My Profile</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" style="font-family: var(--Bold); color:var(--highlight)"
+                                        href="login.html"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign
+                                        out</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Column (fixed on desktop) -->
+            <div class="col-auto d-none d-md-block">
+                <div class="col-auto d-none d-md-block">
+                    <div class="row">
+                        <!-- Sidebar -->
+                        <div class="card border-0 sidebar mx-2 p-2 overflow-y-auto" style="width: 220px;">
+                            <!-- Logo -->
+                            <div class="d-flex justify-content-center">
+                                <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid pt-5 pb-5 px-3"
+                                    width="180px;">
+                            </div>
+
+                            <!-- Navigation -->
+                            <ul class="nav flex-column">
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="home">
+                                    <img src="shared/assets/img/dashboard.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="index.html">Home</a>
+                                </li>
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="course">
+                                    <img src="shared/assets/img/courses.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="course.html">Courses</a>
+                                </li>
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="explore">
+                                    <img src="shared/assets/img/explore.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="explore.html">Explore</a>
+                                </li>
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="shop">
+                                    <img src="shared/assets/img/shop.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="shop.html">Shop</a>
+                                </li>
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="minigames">
+                                    <img src="shared/assets/img/games.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="miniGames.html">Mini-games</a>
+                                </li>
+
+                            </ul>
+
+                            <!-- WebStars for Desktop -->
+                            <div class="btn btn-webstars mx-3 mt-4 py-2">
+                                <div class="row">
+                                    <div class="col-auto d-flex justify-content-center align-items-center ms-2">
+                                        <img src="shared/assets/img/stars.png" alt="" width="32" height="32">
+                                    </div>
+                                    <div class="col">
+                                        <div class="text-dark text-start webstar-points"
+                                            style=" font-size:20px; margin-left: -10px;">
+                                            3160
+                                        </div>
+                                        <div class="p text-muted  text-start"
+                                            style="font-size:15px; margin-top:-5px; margin-left: -10px;">
+                                            webstars
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="dropdown mt-auto p-4" style="letter-spacing: -1px;">
+                                <a href="#"
+                                    class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt=""
+                                        width="32" height="32" class="rounded-circle me-2">
+                                    <strong class="text-dark" style="font-family: var(--Bold);">james</strong>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end text-small shadow">
+                                    <li class="ms-3 my-1" style="font-family: var(--Bold);"><i
+                                            class="fa-solid fa-gear me-2"></i>Settings</li>
+                                    <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                            href="termsAndConditions.html">Terms &
+                                            Conditions</a></li>
+                                    <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                            href="changepassword.html">Change
+                                            Password</a></li>
+                                    <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                            href="faqs.html">FAQs</a>
+                                    </li>
+                                    <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                            href="feedback.html">Send
+                                            Feedback</a></li>
+                                    <hr class="dropdown-divider">
+                                    <li><a class="dropdown-item" style="font-family: var(--Bold);"
+                                            href="profile.html"><i class="fa-solid fa-user me-2"></i>My Profile</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item"
+                                            style="font-family: var(--Bold); color:var(--highlight)"
+                                            href="login.html"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign
+                                            out</a></li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Main Container Column-->
+            <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-0 p-md-4 overflow-y-auto">
+                <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
+                    style="background-color: transparent;">
+
+                    <!-- Navbar for mobile -->
+                    <nav class="navbar navbar-light px-3 d-md-none">
+                        <div class="container-fluid position-relative">
+
+                            <!-- Toggler -->
+                            <button class="navbar-toggler position-absolute start-0 p-1" type="button"
+                                data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">
+                                <span class="navbar-toggler-icon"></span>
+                            </button>
+
+                            <!-- Logo -->
+                            <a class="navbar-brand mx-auto" href="#">
+                                <img src="shared/assets/img/webstar-logo-black.png" alt="Webstar"
+                                    style="height: 40px; padding-left: 30px">
+                            </a>
+
+                        </div>
+                    </nav>
+
+                    <div class="container-fluid py-3 overflow-y-auto">
+                        <div class="row g-0 w-100">
+
+                            <div class="container px-2">
+                                <h1 class="text-start mt-3 mt-md-0"><b>Set up security questions</b></h1>
+
+                                <p class="mb-5 mt-2 text-start ">Please select and answer a few security questions to help you recover
+                                    your account in case you
+                                    forget your password. These answers will be securely stored and used only for
+                                    account recovery purposes.</p>
+
+                                <div class="col">
+                                    <div class="form-group mb-3">
+                                        <label for="exampleFormControlSelect1">Security Question #1</label>
+                                        <select class="form-select mt-2" id="securityQuestionSelect">
+                                            <option selected disabled>- Select a security question -</option>
+                                            <option value="1">What was the name of your first pet?</option>
+                                            <option value="2">What is your mother's maiden name?</option>
+                                            <option value="3">What was the name of your elementary school?</option>
+                                            <option value="4">What is the name of the street you grew up on?</option>
+                                            <option value="5">What was your childhood nickname?</option>
+                                            <option value="6">What is your favorite childhood movie?</option>
+                                            <option value="7">What is the name of your best friend from high school?
+                                            </option>
+                                            <option value="8">What is your favorite teacher's name?</option>
+                                        </select>
+
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label for="exampleFormControlInput1">Answer</label>
+                                        <input type="email" class="form-control mt-2" id="exampleFormControlInput1">
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label for="exampleFormControlSelect2">Security Question #2</label>
+                                        <select class="form-select mt-2" id="securityQuestionSelect">
+                                            <option selected disabled>- Select a security question -</option>
+                                            <option value="1">What was the name of your first pet?</option>
+                                            <option value="2">What is your mother's maiden name?</option>
+                                            <option value="3">What was the name of your elementary school?</option>
+                                            <option value="4">What is the name of the street you grew up on?</option>
+                                            <option value="5">What was your childhood nickname?</option>
+                                            <option value="6">What is your favorite childhood movie?</option>
+                                            <option value="7">What is the name of your best friend from high school?
+                                            </option>
+                                            <option value="8">What is your favorite teacher's name?</option>
+                                        </select>
+
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label for="exampleFormControlInput2">Answer</label>
+                                        <input type="email" class="form-control mt-2" id="exampleFormControlInput2">
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label for="exampleFormControlSelect3">Security Question #3</label>
+                                        <select class="form-select mt-2" id="securityQuestionSelect">
+                                            <option selected disabled>- Select a security question -</option>
+                                            <option value="1">What was the name of your first pet?</option>
+                                            <option value="2">What is your mother's maiden name?</option>
+                                            <option value="3">What was the name of your elementary school?</option>
+                                            <option value="4">What is the name of the street you grew up on?</option>
+                                            <option value="5">What was your childhood nickname?</option>
+                                            <option value="6">What is your favorite childhood movie?</option>
+                                            <option value="7">What is the name of your best friend from high school?
+                                            </option>
+                                            <option value="8">What is your favorite teacher's name?</option>
+                                        </select>
+
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label for="exampleFormControlInput3">Answer</label>
+                                        <input type="email" class="form-control mt-2" id="exampleFormControlInput3">
+                                    </div>
+
+                                    <div class="d-flex justify-content-center my-5">
+                                        <button type="submit" class="btn">Confirm</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const currentPath = window.location.pathname.split("/").pop();
+                const pageMap = {
+                    "index.html": "home",
+                    "course.html": "course",
+                    "explore.html": "explore",
+                    "shop.html": "shop",
+                    "miniGames.html": "minigames"
+                };
+
+                const activePage = pageMap[currentPath];
+                const navItems = document.querySelectorAll('[data-page]');
+
+                navItems.forEach(item => {
+                    const page = item.getAttribute('data-page');
+                    const link = item.querySelector('a');
+                    const img = item.querySelector('img');
+
+                    if (page === activePage) {
+                        item.classList.add("selected-box");
+                        link.classList.add("selected");
+                        const src = img.getAttribute("src").replace(".png", ".png");
+                        img.setAttribute("src", src);
+                    } else {
+                        item.classList.remove("selected-box");
+                        link.classList.remove("selected");
+                        const src = img.getAttribute("src").replace(".png", ".png");
+                        img.setAttribute("src", src);
+                    }
+                });
+            });
+        </script>
+</body>
+
+
+</html>

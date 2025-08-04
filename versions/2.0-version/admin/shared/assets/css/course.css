@@ -1,0 +1,91 @@
+.header {
+    font-family: var(--Bold);
+    color: var(--black);
+    font-size: 2.5em;
+}
+
+.btn {
+    font-family: var(--Regular);
+    color: var(--black);
+    background-color: var(--primaryColor);
+    border: 1px solid var(--black);
+}
+
+.btn:hover,
+.btn:focus {
+    background-color: var(--primaryColor);
+    color: var(--black);
+    border: 1px solid var(--black);
+}
+
+.addIcon{
+    width: 10px;
+    margin-right: 5px;
+}
+
+.courseTitle {
+    font-family: var(--Bold);
+    font-size: 2.5em;
+    color: var(--black);
+}
+
+.custom-thead {
+    background-color: var(--white);
+    color: var(--white);
+    border-bottom: 5px solid var(--black);
+}
+
+.custom-thead th {
+    background-color: var(--primaryColor);
+    color: var(--black);
+    height: 50px;
+    border: 1px solid var(--black);
+}
+
+.custom-body td {
+    background-color: var(--white);
+    color: var(--black);
+    height: 50px;
+    border: 1px solid var(--black);
+}
+
+/* modal styling */
+
+.add-lesson-modal {
+    background-color: var(--primaryColor);
+}
+
+.cancel-btn {
+    background-color: var(--highlight);
+    margin-right: 15px;
+    color: var(--white);
+}
+
+.cancel-btn:hover {
+    background-color: var(--highlight);
+    color: var(--white);
+}
+
+.save-btn {
+    background-color: var(--white);
+    border: 1px solid var(--black);
+    color: var(--black);
+}
+
+.save-btn:hover {
+    background-color: var(--white);
+    color: var(--black);
+}
+
+.modal-title{
+    font-family: var(--Bold);
+    font-size: 1.5em;
+}
+
+.form-label{
+    font-family: var(--Bold);
+}
+
+.create-course-modal {
+    background-color: var(--primaryColor);
+}
