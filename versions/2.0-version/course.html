@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WebStar | Courses</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <link rel="stylesheet" href="shared/assets/css/course.css">
+    <link rel="stylesheet" href="shared/assets/css/global-styles.css">
+    <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
+</head>
+
+<body>
+    <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center p-0 p-md-3"
+        style="background-color: var(--black);">
+
+        <div class="row w-100">
+
+            <!-- Sidebar (only shows on mobile) -->
+            <div class="offcanvas offcanvas-start d-md-none" tabindex="-1" id="sidebarOffcanvas"
+                aria-labelledby="sidebarOffcanvasLabel" style="background-color:var(--white); width: 250px;">
+                <div class="offcanvas-header">
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                        aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body d-flex flex-column p-0">
+                    <div class="d-flex flex-column flex-shrink-0 p-3" style="width: 100%;">
+                        <a class="d-flex align-items-center  text-decoration-none">
+                            <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid w-100 py-3 px-2" />
+                        </a>
+
+                        <hr>
+                        <ul class="nav nav-pills flex-column mb-auto">
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3"
+                                data-page="home">
+                                <img src="shared/assets/img/dashboard.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="index.html">Home</a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3" data-page="course">
+                                <img src="shared/assets/img/courses.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="course.html">Courses</a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3" data-page="explore">
+                                <img src="shared/assets/img/explore.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="explore.html">Explore</a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3" data-page="shop">
+                                <img src="shared/assets/img/shop.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="shop.html">Shop</a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3"
+                                data-page="minigames">
+                                <img src="shared/assets/img/games.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="miniGames.html">Mini-games</a>
+                            </li>
+                        </ul>
+                        <hr>
+                        <!-- WebStars for Mobile-->
+                        <div class="btn btn-webstars mx-3 my-3 py-2">
+                            <div class="row">
+                                <div class="col-auto d-flex justify-content-center align-items-center ms-2">
+                                    <img src="shared/assets/img/stars.png" alt="" width="32" height="32">
+                                </div>
+                                <div class="col">
+                                    <div class="text-dark text-start webstar-points"
+                                        style=" font-size:20px; margin-left: -10px;">
+                                        3160
+                                    </div>
+                                    <div class="p text-muted  text-start"
+                                        style="font-size:15px; margin-top:-5px; margin-left: -10px;">
+                                        webstars
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Profile -->
+                        <hr>
+                        <div class="dropdown mt-auto p-2" style="letter-spacing: -1px;">
+                            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="32"
+                                    height="32" class="rounded-circle me-2">
+                                <strong class="text-dark" style="font-family: var(--Bold);">james</strong>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end text-small shadow">
+                                <li class="ms-3 my-1" style="font-family: var(--Bold);"><i
+                                        class="fa-solid fa-gear me-2"></i>Settings</li>
+                                <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                        href="termsAndConditions.html">Terms &
+                                        Conditions</a></li>
+                                <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                        href="changepassword.html">Change
+                                        Password</a></li>
+                                <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                        href="faqs.html">FAQs</a></li>
+                                <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                        href="feedback.html">Send
+                                        Feedback</a></li>
+                                <hr class="dropdown-divider">
+                                <li><a class="dropdown-item" style="font-family: var(--Bold);" href="profile.html"><i
+                                            class="fa-solid fa-user me-2"></i>My Profile</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" style="font-family: var(--Bold); color:var(--highlight)"
+                                        href="login.html"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign
+                                        out</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Column (fixed on desktop) -->
+            <div class="col-auto d-none d-md-block">
+                <div class="col-auto d-none d-md-block">
+                    <div class="row">
+                        <!-- Sidebar -->
+                        <div class="card border-0 sidebar mx-2 p-2 overflow-y-auto" style="width: 220px;">
+                            <!-- Logo -->
+                            <div class="d-flex justify-content-center">
+                                <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid pt-5 pb-5 px-3"
+                                    width="180px;">
+                            </div>
+
+                            <!-- Navigation -->
+                            <ul class="nav flex-column">
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="home">
+                                    <img src="shared/assets/img/dashboard.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="index.html">Home</a>
+                                </li>
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="course">
+                                    <img src="shared/assets/img/courses.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="course.html">Courses</a>
+                                </li>
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="explore">
+                                    <img src="shared/assets/img/explore.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="explore.html">Explore</a>
+                                </li>
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="shop">
+                                    <img src="shared/assets/img/shop.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="shop.html">Shop</a>
+                                </li>
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="minigames">
+                                    <img src="shared/assets/img/games.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="miniGames.html">Mini-games</a>
+                                </li>
+
+                            </ul>
+
+                            <!-- WebStars for Desktop -->
+                            <div class="btn btn-webstars mx-3 mt-4 py-2">
+                                <div class="row">
+                                    <div class="col-auto d-flex justify-content-center align-items-center ms-2">
+                                        <img src="shared/assets/img/stars.png" alt="" width="32" height="32">
+                                    </div>
+                                    <div class="col">
+                                        <div class="text-dark text-start webstar-points"
+                                            style=" font-size:20px; margin-left: -10px;">
+                                            3160
+                                        </div>
+                                        <div class="p text-muted  text-start"
+                                            style="font-size:15px; margin-top:-5px; margin-left: -10px;">
+                                            webstars
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="dropdown mt-auto p-4" style="letter-spacing: -1px;">
+                                <a href="#"
+                                    class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt=""
+                                        width="32" height="32" class="rounded-circle me-2">
+                                    <strong class="text-dark" style="font-family: var(--Bold);">james</strong>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end text-small shadow">
+                                    <li class="ms-3 my-1" style="font-family: var(--Bold);"><i
+                                            class="fa-solid fa-gear me-2"></i>Settings</li>
+                                    <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                            href="termsAndConditions.html">Terms &
+                                            Conditions</a></li>
+                                    <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                            href="changepassword.html">Change
+                                            Password</a></li>
+                                    <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                            href="faqs.html">FAQs</a>
+                                    </li>
+                                    <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                            href="feedback.html">Send
+                                            Feedback</a></li>
+                                    <hr class="dropdown-divider">
+                                    <li><a class="dropdown-item" style="font-family: var(--Bold);"
+                                            href="profile.html"><i class="fa-solid fa-user me-2"></i>My Profile</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item"
+                                            style="font-family: var(--Bold); color:var(--highlight)"
+                                            href="login.html"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign
+                                            out</a></li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Container Column-->
+            <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-0 p-md-4 overflow-y-auto">
+                <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
+                    style="background-color: var(--white);">
+                    <!-- Navbar for mobile -->
+                    <nav class="navbar navbar-light px-3 d-md-none">
+                        <div class="container-fluid position-relative">
+
+                            <!-- Toggler -->
+                            <button class="navbar-toggler position-absolute start-0 p-1" type="button"
+                                data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">
+                                <span class="navbar-toggler-icon"></span>
+                            </button>
+
+                            <!-- Logo -->
+                            <a class="navbar-brand mx-auto" href="#">
+                                <img src="shared/assets/img/webstar-logo-black.png" alt="Webstar"
+                                    style="height: 40px; padding-left: 30px">
+                            </a>
+
+                        </div>
+                    </nav>
+                    <div class="container-fluid py-3 overflow-y-auto">
+                        <div class="row">
+                            <!-- Left Column -->
+                            <div class="col-lg-6 col-12 px-4 mb-4 left-column">
+                                <div class="col-12">
+                                    <div class="row">
+                                        <div class="col-12 p-4 box">
+                                            <div class="mb-3 continue-text">Continue Your Course</div>
+                                            <div class="px-4 py-4 border continue-course-container">
+                                                <div
+                                                    class="d-flex flex-column flex-sm-row flex-lg-column flex-xl-row gap-3 align-items-center">
+                                                    <div class="card d-flex align-items-center justify-content-center flex-shrink-0 d-none d-sm-block d-lg-none d-xl-block"
+                                                        style="width: 109px; height: 109px; border-radius: 25px; background-color: var(--primaryColor);">
+                                                        <img src="shared/assets/img/courses/css.png" class="" alt="Left"
+                                                            style="width: 100%; height: 100%; object-fit: contain;">
+                                                    </div>
+                                                    <div class="d-flex flex-column justify-content-center"
+                                                        style="font-size: 20px;">
+                                                        <div class="htmlText">CSS Course</div>
+                                                        <div class="fw-bold addImageText">Fonts and Formatting</div>
+                                                    </div>
+                                                    <a href="lesson.html"><img
+                                                            src="shared/assets/img/courses/keyboard_arrow_right.png"
+                                                            alt="arrow"
+                                                            class="d-none d-sm-block d-lg-none d-xl-block img-fluid ms-auto arrow"
+                                                            width="120px"></a>
+                                                </div>
+                                                <div class="mt-sm-3">
+                                                    <div class="w-100 mx-auto border progress-bar"
+                                                        style="height: 10px;">
+                                                        <div class="progress"></div>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between">
+                                                        <p class="mt-2 mb-0 progress-text">Course Progress</p>
+                                                        <p class="mt-2 mb-0 progress-text">37.5%</p>
+                                                    </div>
+                                                </div>
+                                                <div
+                                                    class="d-flex d-lg-flex justify-content-center d-sm-none d-lg-block d-xl-none mt-2">
+                                                    <div class="btn text-center w-75 border continue-btn fw-bold">
+                                                        <a href="lesson.html"
+                                                            class="text-decoration-none text-white">Continue</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 d-flex flex-column">
+                                    <div class="row d-flex align-items-center">
+                                        <div class="col-12 mt-3 p-0">
+                                            <div class="webdev-courses">Web Development Courses</div>
+                                            <!-- Courses Container -->
+                                            <div class="container-fluid p-2 p-xxl-3 mt-3 mx-auto courses-container">
+                                                <div class="px-2">
+                                                    <div class="row justify-content-center">
+
+                                                        <!-- Courses row -->
+                                                        <div class="row p-0 mt-2">
+                                                            <!-- HTML Course -->
+                                                            <div
+                                                                class="col-12 col-md-6 col-lg-12 col-xl-6 mb-2 mb-md-0 mb-lg-2">
+                                                                <div class="box cursor-point p-4 h-100"
+                                                                    onclick="showLessons('html');">
+                                                                    <div class="row">
+                                                                        <div
+                                                                            class="col-12 d-flex flex-row justify-content-between">
+                                                                            <div class="course-text fw-bold lh-1">HTML
+                                                                            </div>
+                                                                            <img class="course-arrow"
+                                                                                src="shared/assets/img/courses/arrowRight.png"
+                                                                                alt="Go to HTML course">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mb-2">
+                                                                        <div class="col-12">
+                                                                            <div class="course-text fw-bold lh-1">Course
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="mt-sm-3">
+                                                                        <div
+                                                                            class="w-100 mx-auto mt-2 border progress-bar">
+                                                                            <div class="w-100 progress"></div>
+                                                                        </div>
+                                                                        <div class="d-flex justify-content-between">
+                                                                            <p class="mt-2 mb-0 done-text">Course
+                                                                                Progress</p>
+                                                                            <p class="mt-2 mb-0 done-text">100%</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- CSS Course -->
+                                                            <div
+                                                                class="col-12 col-md-6 col-lg-12 col-xl-6 mb-2 mb-md-0 mb-lg-2">
+                                                                <div class="box cursor-point p-4 h-100 d-flex align-items-center"
+                                                                    onclick="showLessons('css');">
+                                                                    <div class="container p-0">
+                                                                        <div class="row">
+                                                                            <div
+                                                                                class="col-12 d-flex flex-row justify-content-between">
+                                                                                <div class="course-text fw-bold lh-1">
+                                                                                    CSS</div>
+                                                                                <img class="course-arrow"
+                                                                                    src="shared/assets/img/courses/arrowRight.png"
+                                                                                    alt="Go to HTML course">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row mb-2">
+                                                                            <div class="col-12">
+                                                                                <div class="course-text fw-bold lh-1">
+                                                                                    Course</div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="mt-sm-3">
+                                                                            <div
+                                                                                class="w-100 mx-auto mt-2 border progress-bar">
+                                                                                <div class="progress"></div>
+                                                                            </div>
+                                                                            <div class="d-flex justify-content-between">
+                                                                                <p class="mt-2 mb-0 done-text">Course
+                                                                                    Progress</p>
+                                                                                <p class="mt-2 mb-0 done-text">37.5%</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <!--<div class="row">
+                                                                            <div class="col-12 done-text">
+                                                                                Finish HTML Course
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row">
+                                                                            <div class="col-12 done-text">
+                                                                                to unlock.
+                                                                            </div>
+                                                                        </div>-->
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- More Courses -->
+                                                        <div class="col-12">
+                                                            <div class="text-center p-2 p-xxl-3 fw-bold course-text opacity-75"
+                                                                style="color: var(--black); font-size: 20px;">
+                                                                More Courses Coming Soon!</div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Right Column -->
+                            <div class="col-lg-6 col-12 px-lg-4 px-2 d-flex flex-column right-column">
+                                <div class="px-lg-3 px-0 mt-lg-0 mt-lg-2 mt-3 d-flex flex-column flex-grow-1">
+                                    <div class="lesson-available mb-3">Lessons Available</div>
+                                    <div id="lessonContainer"
+                                        class="lessons-container px-4 p-3 py-md-5 lesson-available overflow-y-auto flex-grow-1 text-center">
+                                        <div class="h5 mb-3 fw-bold">CSS Lessons</div>
+                                        <div
+                                            class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+                                            <div class="me-auto ms-1 lesson-text">01</div>
+                                            <div class="mx-auto lesson-text">Introduction to CSS</div>
+                                            <img src="shared/assets/img/courses/check_circle.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <div
+                                            class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+                                            <div class="me-auto ms-1 lesson-text">02</div>
+                                            <div class="mx-auto lesson-text">Ways to Apply CSS</div>
+                                            <img src="shared/assets/img/courses/check_circle.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <div
+                                            class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+                                            <div class="me-auto ms-1 lesson-text">03</div>
+                                            <div class="mx-auto lesson-text">CSS Syntax & Selectors</div>
+                                            <img src="shared/assets/img/courses/check_circle.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <a href="lesson.html" class="text-decoration-none">
+                                            <div
+                                                class="box lessons-container fw-bold mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+                                                <div class="me-auto ms-1 lesson-text">04</div>
+                                                <div class="mx-auto lesson-text">Fonts and Formatting</div>
+                                                <img src="shared/assets/img/courses/keyboard_arrow_right.png"
+                                                    alt="arrow" class="img-fluid ms-auto me-1 lesson-image"
+                                                    width="28px">
+                                            </div>
+                                        </a>
+                                        <div
+                                            class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center opacity-25">
+                                            <div class="me-auto ms-1 lesson-text">05</div>
+                                            <div class="mx-auto lesson-text">Colors and Backgrounds</div>
+                                            <img src="shared/assets/img/courses/locked.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <div
+                                            class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center opacity-25">
+                                            <div class="me-auto ms-1 lesson-text">06</div>
+                                            <div class="mx-auto lesson-text">Box Model</div>
+                                            <img src="shared/assets/img/courses/locked.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <div
+                                            class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center opacity-25">
+                                            <div class="me-auto ms-1 lesson-text">07</div>
+                                            <div class="mx-auto lesson-text">Borders and Outlines</div>
+                                            <img src="shared/assets/img/courses/locked.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <div
+                                            class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center opacity-25">
+                                            <div class="me-auto ms-1 lesson-text">08</div>
+                                            <div class="mx-auto lesson-text">CSS Units and Measurements</div>
+                                            <img src="shared/assets/img/courses/locked.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--</div>-->
+                            </div>
+                        </div>
+
+                        <!-- PUT CONTENT HERE -->
+                    </div>
+
+                </div>
+
+
+
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const currentPath = window.location.pathname.split("/").pop();
+            const pageMap = {
+                "index.html": "home",
+                "course.html": "course",
+                "explore.html": "explore",
+                "shop.html": "shop",
+                "miniGames.html": "minigames"
+            };
+
+            const activePage = pageMap[currentPath];
+            const navItems = document.querySelectorAll('[data-page]');
+
+            navItems.forEach(item => {
+                const page = item.getAttribute('data-page');
+                const link = item.querySelector('a');
+                const img = item.querySelector('img');
+
+                if (page === activePage) {
+                    item.classList.add("selected-box");
+                    link.classList.add("selected");
+                    const src = img.getAttribute("src").replace(".png", ".png");
+                    img.setAttribute("src", src);
+                } else {
+                    item.classList.remove("selected-box");
+                    link.classList.remove("selected");
+                    const src = img.getAttribute("src").replace(".png", ".png");
+                    img.setAttribute("src", src);
+                }
+            });
+        });
+
+    </script>
+    <script>
+        function showLessons(courseType) {
+            var courseContainer = document.getElementById("lessonContainer");
+
+            if (courseType == "html") {
+                courseContainer.innerHTML = `<div class="h5 mb-3 fw-bold">HTML Lessons</div>
+                                        <div class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+                                            <div class="me-auto ms-1 lesson-text">01</div>
+                                            <div class="mx-auto lesson-text">Introduction to HTML</div>
+                                            <img src="shared/assets/img/courses/check_circle.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <a href="lesson-html.html" class="text-decoration-none text-dark">
+    <div class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+        <div class="me-auto ms-1 lesson-text">02</div>
+        <div class="mx-auto lesson-text">Text Formatting and Headings</div>
+        <img src="shared/assets/img/courses/check_circle.png" alt="arrow"
+            class="img-fluid ms-auto me-1 lesson-image" width="28px">
+    </div>
+</a>
+
+                                        <div class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+                                            <div class="me-auto ms-1 lesson-text">03</div>
+                                            <div class="mx-auto lesson-text">Adding Images to Your Website</div>
+                                            <img src="shared/assets/img/courses/check_circle.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <div
+                                            class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+                                            <div class="me-auto ms-1 lesson-text">04</div>
+                                            <div class="mx-auto lesson-text">Lists and Tables</div>
+                                            <img src="shared/assets/img/courses/check_circle.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <div
+                                            class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+                                            <div class="me-auto ms-1 lesson-text">05</div>
+                                            <div class="mx-auto lesson-text">Forms and Inputs</div>
+                                            <img src="shared/assets/img/courses/check_circle.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <div
+                                            class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+                                            <div class="me-auto ms-1 lesson-text">06</div>
+                                            <div class="mx-auto lesson-text">HTML Entities</div>
+                                            <img src="shared/assets/img/courses/check_circle.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <div
+                                            class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+                                            <div class="me-auto ms-1 lesson-text">07</div>
+                                            <div class="mx-auto lesson-text">Semantic HTML</div>
+                                            <img src="shared/assets/img/courses/check_circle.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <div
+                                            class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+                                            <div class="me-auto ms-1 lesson-text">08</div>
+                                            <div class="mx-auto lesson-text">Block vs Inline Elements</div>
+                                            <img src="shared/assets/img/courses/check_circle.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <div
+                                            class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+                                            <div class="me-auto ms-1 lesson-text">09</div>
+                                            <div class="mx-auto lesson-text">HTML Attributes</div>
+                                            <img src="shared/assets/img/courses/check_circle.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <div
+                                            class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+                                            <div class="me-auto ms-1 lesson-text">10</div>
+                                            <div class="mx-auto lesson-text">Iframe and Embedding</div>
+                                            <img src="shared/assets/img/courses/check_circle.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <div
+                                            class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+                                            <div class="me-auto ms-1 lesson-text">11</div>
+                                            <div class="mx-auto lesson-text">Iframe and Embedding</div>
+                                            <img src="shared/assets/img/courses/check_circle.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <div
+                                            class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+                                            <div class="me-auto ms-1 lesson-text">12</div>
+                                            <div class="mx-auto lesson-text">Form Validation</div>
+                                            <img src="shared/assets/img/courses/check_circle.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>`
+                    ;
+            } else if (courseType == "css") {
+                courseContainer.innerHTML = `<div class="h5 mb-3 fw-bold">CSS Lessons</div>
+                                        <div class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+                                            <div class="me-auto ms-1 lesson-text">01</div>
+                                            <div class="mx-auto lesson-text">Introduction to CSS</div>
+                                            <img src="shared/assets/img/courses/check_circle.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <div class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+                                            <div class="me-auto ms-1 lesson-text">02</div>
+                                            <div class="mx-auto lesson-text">Ways to Apply CSS</div>
+                                            <img src="shared/assets/img/courses/check_circle.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <div class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+                                            <div class="me-auto ms-1 lesson-text">03</div>
+                                            <div class="mx-auto lesson-text">CSS Syntax & Selectors</div>
+                                            <img src="shared/assets/img/courses/check_circle.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <a href="lesson.html" class="text-decoration-none"><div class="box lessons-container fw-bold mb-2 p-1 p-sm-3 d-flex align-items-center highlight">
+                                            <div class="me-auto ms-1 lesson-text">04</div>
+                                            <div class="mx-auto lesson-text">Fonts and Formatting</div>
+                                            <img src="shared/assets/img/courses/keyboard_arrow_right.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div></a>
+                                        <div class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center opacity-25">
+                                            <div class="me-auto ms-1 lesson-text">05</div>
+                                            <div class="mx-auto lesson-text">Colors and Backgrounds</div>
+                                            <img src="shared/assets/img/courses/locked.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <div
+                                            class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center opacity-25">
+                                            <div class="me-auto ms-1 lesson-text">06</div>
+                                            <div class="mx-auto lesson-text">Box Model</div>
+                                            <img src="shared/assets/img/courses/locked.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <div
+                                            class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center opacity-25">
+                                            <div class="me-auto ms-1 lesson-text">07</div>
+                                            <div class="mx-auto lesson-text">Borders and Outlines</div>
+                                            <img src="shared/assets/img/courses/locked.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>
+                                        <div
+                                            class="lessons-container mb-2 p-1 p-sm-3 d-flex align-items-center opacity-25">
+                                            <div class="me-auto ms-1 lesson-text">08</div>
+                                            <div class="mx-auto lesson-text">CSS Units and Measurements</div>
+                                            <img src="shared/assets/img/courses/locked.png" alt="arrow"
+                                                class="img-fluid ms-auto me-1 lesson-image" width="28px">
+                                        </div>`;
+            }
+        }
+    </script>
+    <script>
+        function syncHeights() {
+            var left = document.querySelector('.left-column');
+            var right = document.querySelector('.right-column');
+
+            if (left && right) {
+                var leftHeight = left.offsetHeight;
+                right.style.maxHeight = leftHeight + 'px';
+                right.style.overflowY = 'auto';
+            }
+        }
+
+        window.addEventListener('load', syncHeights);
+        window.addEventListener('resize', syncHeights);
+    </script>
+
+</body>
+
+
+</html>

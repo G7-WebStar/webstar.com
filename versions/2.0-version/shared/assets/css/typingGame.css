@@ -1,0 +1,131 @@
+.cardGame {
+    background-color: var(--white1);
+    border: 2px solid var(--black);
+    border-radius: 1.5rem;
+}
+
+.highlight {
+    background-color: #fff3cd;
+    border-radius: 4px;
+}
+
+.incorrect {
+    background-color: var(--primaryColor);
+    border-radius: 4px;
+}
+
+#inputText {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#textDisplay span.current {
+    text-decoration: underline;
+    font-weight: bold;
+    color: var(--highlight);
+}
+
+.header {
+    color: var(--black);
+    font-family: var(--Bold);
+    font-size: 2.5em;
+}
+
+.progress {
+    height: 10px;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    border: 1px solid var(--black);
+}
+
+.progressBar {
+    background-color: var(--highlight);
+}
+
+#textDisplay {
+    font-family: var(--SemiBold);
+    font-size: 1.5rem;
+    min-height: 100px;
+    background-color: var(--white1);
+    border: 2px solid var(--black);
+}
+
+.statusBar {
+    font-size: 1.50rem;
+    font-family: var(--Regular);
+    color: var(--black);
+}
+
+#countdownOverlay {
+    position: absolute;
+    inset: 0;
+    background-color: transparent;
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#countdownNumber {
+    font-family: var(--Bold);
+    font-size: 5rem;
+    color: var(--black);
+    background-color: var(--white);
+    padding: 1rem 2rem;
+    border: 5px solid var(--highlight);
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.result {
+    color: var(--black);
+    font-family: var(--Bold);
+}
+
+#countdownOverlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-items: center;
+}
+
+#countdownOverlay.hidden {
+    display: none !important;
+}
+
+.btn-exit{
+    border: 1px solid var(--black);
+    background-color: var(--primaryColor);
+    border-radius: 20px;
+    font-family: var(--Bold);
+    color: var(--black);
+}
+
+.btn-exit:hover {
+    background-color: var(--highlight);
+    border: 1px solid var(--black);
+    color: var(--white);
+}
+@media (max-width: 767.98px) {
+    .statusBar {
+        font-size: .90em;
+        justify-content: start;
+    }
+
+    .cardGame {
+        padding: 1rem !important;
+    }
+
+    .btn {
+        padding: 0.25rem 2rem !important;
+    }
+}

@@ -1,61 +1,65 @@
 body {
-  background-color: red;
+  background-color: white;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
 }
 
-
-
 .sidebar {
-    background-color: var(--white);
-    border-radius: 20px;
-    height: 95vh;
+  background-color: var(--dirtyWhite);
+  border-radius: 20px;
+  height: 95vh;
 }
 
 
 .main-container {
-    background-color: var(--white);
-    border-radius: 0px;
-    height: 100vh;
+  background-color: var(--dirtyWhite);
+  border-radius: 0px;
+  height: 100vh;
 }
 
 
 @media (min-width: 768px) {
   body {
-    background-color: var(--lightBlue); 
+    background-color: var(--black);
   }
 
-  .main-container{
+  .main-container {
     border-radius: 20px;
     height: 95vh;
   }
 }
 
 .nav-item {
-    font-family: var(--Bold);
-    text-decoration: none;
-    letter-spacing: -1px;
-    font-size: 17px;
+  font-family: var(--SemiBold);
+  text-decoration: none;
+  letter-spacing: -0.03em;
+  font-size: 17px;
 }
 
-.text-dark{
-    color: var(--black)!important;
-}
-
-.selected {
-    color: var(--white) !important;
-    opacity: 100% !important;
+.text-dark {
+  color: var(--black) !important;
 }
 
 .selected-box {
-    background-color: var(--blue) !important;
+  background-color: var(--primaryColor) !important;
+  border: 1px solid var(--black) !important;
 }
 
-.selected-box-course {
-    background-color: var(--blue) !important;
+
+/* Make toggler button and icon smaller */
+.custom-toggler {
+  width: 40px !important;
+  height: 40px !important;
+  border: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
 }
 
+.custom-toggler .navbar-toggler-icon {
+  background-size: 20px 20px !important;
+}

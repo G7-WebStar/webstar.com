@@ -1,0 +1,83 @@
+.feedback-heading {
+  color: var(--black);
+  font-weight: 700;
+  font-size: 1.5em;
+  font-family: var(--Bold);
+}
+
+.feedback-description {
+    max-width: 80%;
+    font-family: var(--SemiBold);
+    font-size: 1em;
+    color: var(--black);
+    text-align: left;
+}
+
+.feedback-form {
+    width: 100%;
+    max-width: 100%;
+}
+
+.feedback-label {
+    font-family: var(--Regular);
+    font-weight: 600;
+    color: var(--black);
+    text-align: left;
+}
+
+.feedback-box {
+    font-family: var(--Regular);
+    font-size: 20px;
+    border-radius: 0.5rem;
+    border: 1px solid var(--black);
+    background-color: var(--primaryColor);
+    color: var(--black);
+    height: 50%;
+    width: 70%;
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, 0.075);
+}
+
+
+.feedback-btn {
+    font-family: var(--Regular);
+    font-weight: 600;
+    padding: 0.5rem 1.5rem;
+    width: auto;
+    max-width: 200px;
+    color: var(--black);
+    background-color: var(--primaryColor);
+    border: 1px solid var(--black);;
+}
+
+.modal-content {
+    background-color: var(--white);
+    color: var(--black);
+    font-weight: 700;
+    font-size: 30px;
+    font-family: var(--Bold);
+}
+
+/* Medium Devices (Tablets) */
+@media (max-width: 768px) {
+    .feedback-box {
+        width: 100%;
+        height: 150px;
+        font-size: 18px;
+    }
+
+    .feedback-heading {
+        font-size: 36px;
+        text-align: center;
+    }
+
+    .feedback-description {
+        font-size: 1em;
+        text-align: left;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .submit-btn {
+        text-align: right;
+    }
+}
