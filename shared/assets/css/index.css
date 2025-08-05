@@ -1,0 +1,32 @@
+ .hide-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+/* Scroll */
+/* .no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+} */
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.custom-course-card {
+    width: 200px;
+    height: 190px;
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid var(--black);
+}
+
+.custom-course-card .card-img-top {
+    height: 125px;
+    object-fit: cover;
+}
+
+.left-card {
+    border-radius: 25px; 
+    border: 1px solid var(--black);
+}
+
