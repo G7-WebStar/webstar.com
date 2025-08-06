@@ -97,3 +97,21 @@
     background-color: var(--highlight50);
     color: var(--black);
 }
+
+/* Dropdown*/
+.dropdown-custom {
+    min-width: 80px;
+    height: 25px;
+    border: 1px solid var(--black);
+    border-radius: 25px;
+    background-color: var(--pureWhite);
+    color: var(--black);
+}
+
+/* Dropdown Toggle */
+.dropdown-toggle::after {
+    margin-left: 8px;
+    border-top: 4px solid var(--black);
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+}
