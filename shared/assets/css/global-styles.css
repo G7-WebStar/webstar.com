@@ -82,6 +82,7 @@
 
 /* Font sizes */
 .text-12{ font-size: 12px; }
+.text-14{ font-size: 14px; }
 .text-16{ font-size: 16px; }
 .text-18{ font-size: 18px; }
 .text-20{ font-size: 20px; }
@@ -90,3 +91,9 @@
 .text-30{ font-size: 30px; }
 
 /* Input other stylings that can be used globally */
+
+/* Course Pill */
+.course-badge {
+    background-color: var(--highlight50);
+    color: var(--black);
+}
