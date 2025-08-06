@@ -55,8 +55,8 @@
                                                 <span class="text-reg me-2 fs-6 fs-lg-5"
                                                     style="color: var(--black); white-space: nowrap;">Sort by:</span>
                                                 <button
-                                                    class="btn text-reg dropdown-toggle d-flex justify-content-between align-items-center fs-6 fs-lg-5"
-                                                    style="min-width: 80px; height: 25px; border: 1px solid var(--black); border-radius: 25px; background-color: var(--pureWhite); color: var(--black); opacity: 1;"
+                                                    class="btn text-reg dropdown-toggle d-flex justify-content-between align-items-center fs-6 fs-lg-5 dropdown-custom"
+                                                    style="opacity: 1;"
                                                     type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                     <span class="me-2">Newest</span>
                                                 </button>
@@ -72,8 +72,8 @@
                                                 <span class="text-reg me-2 fs-6 fs-lg-5"
                                                     style="color: var(--black); white-space: nowrap;">Course:</span>
                                                 <button
-                                                    class="btn text-reg dropdown-toggle d-flex justify-content-between align-items-center fs-6 fs-lg-5"
-                                                    style="min-width: 80px; height: 25px; border: 1px solid var(--black); border-radius: 25px; background-color: var(--pureWhite); color: var(--black); opacity: 1;"
+                                                    class="btn text-reg dropdown-toggle d-flex justify-content-between align-items-center fs-6 fs-lg-5 dropdown-custom"
+                                                    style="opacity: 1;"
                                                     type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                     <span>All</span>
                                                 </button>
