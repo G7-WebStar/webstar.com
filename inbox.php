@@ -52,11 +52,9 @@
 
                                             <!-- Sort by dropdown -->
                                             <div class="d-flex align-items-center flex-nowrap">
-                                                <span class="text-reg me-2"
-                                                    style="white-space: nowrap;">Sort by:</span>
-                                                <button
-                                                    class="btn dropdown-toggle dropdown-custom"
-                                                    type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <span class="text-reg me-2" style="white-space: nowrap;">Sort by:</span>
+                                                <button class="btn dropdown-toggle dropdown-custom" type="button"
+                                                    data-bs-toggle="dropdown" aria-expanded="false">
                                                     <span>Newest</span>
                                                 </button>
                                                 <ul class="dropdown-menu">
@@ -68,11 +66,9 @@
 
                                             <!-- Course dropdown -->
                                             <div class="d-flex align-items-center flex-nowrap">
-                                                <span class="text-reg me-2"
-                                                    style="white-space: nowrap;">Course:</span>
-                                                <button
-                                                    class="btn dropdown-toggle dropdown-custom"
-                                                    type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <span class="text-reg me-2" style="white-space: nowrap;">Course:</span>
+                                                <button class="btn dropdown-toggle dropdown-custom" type="button"
+                                                    data-bs-toggle="dropdown" aria-expanded="false">
                                                     <span>All Courses</span>
                                                 </button>
                                                 <ul class="dropdown-menu">
@@ -91,11 +87,12 @@
                                             style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
                                             <div class="card-body p-3">
                                                 <div class="row align-items-start">
-                                                    <!-- Circle -->
+                                                    <!-- Profile Image -->
                                                     <div
-                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start">
-                                                        <div class="rounded-circle responsive-circle"
-                                                            style="width: 40px; height: 40px; background-color: var(--highlight75); opacity: 1;">
+                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-2">
+                                                        <div class="avatar-image">
+                                                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
+                                                        class="rounded-circle responsive-circle ">
                                                         </div>
                                                     </div>
 
@@ -139,11 +136,12 @@
                                             style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
                                             <div class="card-body p-3">
                                                 <div class="row align-items-start">
-                                                    <!-- Circle -->
+                                                    <!-- Profile Image -->
                                                     <div
-                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2d-flex justify-content-center justify-content-lg-start">
-                                                        <div class="rounded-circle responsive-circle"
-                                                            style="width: 40px; height: 40px; background-color: var(--highlight75); opacity: 1;">
+                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
+                                                        <div class="avatar-image">
+                                                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
+                                                        class="rounded-circle responsive-circle ">
                                                         </div>
                                                     </div>
 
@@ -151,7 +149,8 @@
                                                     <div class="col d-flex flex-column text-start mt-3 mt-lg-2 mb-2">
                                                         <p class="mb-2 text-sbold text-17"
                                                             style="color: var(--black); line-height: 140%;">
-                                                            Prof. Sarah Johnson has posted a new announcement 'Midterm Schedule'.
+                                                            Prof. Sarah Johnson has posted a new announcement 'Midterm
+                                                            Schedule'.
                                                         </p>
                                                         <small class="text-reg text-12"
                                                             style="color: var(--black); opacity: 0.7;">January 11, 2024
@@ -186,11 +185,12 @@
                                             style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
                                             <div class="card-body p-3">
                                                 <div class="row align-items-start">
-                                                    <!-- Circle -->
+                                                    <!-- Profile Image -->
                                                     <div
-                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start">
-                                                        <div class="rounded-circle responsive-circle"
-                                                            style="width: 40px; height: 40px; background-color: var(--highlight75); opacity: 1;">
+                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
+                                                        <div class="avatar-image">
+                                                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
+                                                        class="rounded-circle responsive-circle ">
                                                         </div>
                                                     </div>
 
@@ -198,7 +198,8 @@
                                                     <div class="col d-flex flex-column text-start mt-3 mt-lg-2 mb-2">
                                                         <p class="mb-2 text-sbold text-17"
                                                             style="color: var(--black); line-height: 140%;">
-                                                            Prof. Michael Chen has updated the course materials for 'Database Design'.
+                                                            Prof. Michael Chen has updated the course materials for
+                                                            'Database Design'.
                                                         </p>
                                                         <small class="text-reg text-12"
                                                             style="color: var(--black); opacity: 0.7;">January 10, 2024
@@ -233,11 +234,12 @@
                                             style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
                                             <div class="card-body p-3">
                                                 <div class="row align-items-start">
-                                                    <!-- Circle -->
-                                                    <div
-                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start">
-                                                        <div class="rounded-circle responsive-circle"
-                                                            style="width: 40px; height: 40px; background-color: var(--highlight75); opacity: 1;">
+                                                     <!-- Profile Image -->
+                                                     <div
+                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
+                                                        <div class="avatar-image">
+                                                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
+                                                        class="rounded-circle responsive-circle ">
                                                         </div>
                                                     </div>
 
@@ -245,54 +247,8 @@
                                                     <div class="col d-flex flex-column text-start mt-3 mt-lg-2 mb-2">
                                                         <p class="mb-2 text-sbold text-17"
                                                             style="color: var(--black); line-height: 140%;">
-                                                            Prof. Lisa Rodriguez has posted grades for 'Final Project Submission'.
-                                                        </p>
-                                                        <small class="text-reg text-12"
-                                                            style="color: var(--black); opacity: 0.7;">January 9, 2024
-                                                            4:45PM</small>
-
-                                                        <!-- Course tag on small screen below message text -->
-                                                        <div class="d-block d-lg-none mt-2">
-                                                            <span
-                                                                class="text-reg text-12 badge rounded-pill course-badge"
-                                                                style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                                COMP-009
-                                                            </span>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Course tag on large screen right side, vertically centered -->
-                                                    <div
-                                                        class="col-auto d-none d-lg-flex justify-content-end align-items-center mt-4">
-                                                        <span class="text-reg text-12 badge rounded-pill course-badge"
-                                                            style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                            COMP-009
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-                                        
-                                           <!-- Fifth Message -->
-                                           <div class="card mb-3 me-3 w-100 mt-3"
-                                            style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
-                                            <div class="card-body p-3">
-                                                <div class="row align-items-start">
-                                                    <!-- Circle -->
-                                                    <div
-                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start">
-                                                        <div class="rounded-circle responsive-circle"
-                                                            style="width: 40px; height: 40px; background-color: var(--highlight75); opacity: 1;">
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Message Text -->
-                                                    <div class="col d-flex flex-column text-start mt-3 mt-lg-2 mb-2">
-                                                        <p class="mb-2 text-sbold text-17"
-                                                            style="color: var(--black); line-height: 140%;">
-                                                            Prof. Lisa Rodriguez has posted grades for 'Final Project Submission'.
+                                                            Prof. Lisa Rodriguez has posted grades for 'Final Project
+                                                            Submission'.
                                                         </p>
                                                         <small class="text-reg text-12"
                                                             style="color: var(--black); opacity: 0.7;">January 9, 2024
@@ -322,16 +278,17 @@
 
                                         </div>
 
-                                           <!-- Sixth Message -->
-                                           <div class="card mb-3 me-3 w-100 mt-3"
+                                        <!-- Fifth Message -->
+                                        <div class="card mb-3 me-3 w-100 mt-3"
                                             style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
                                             <div class="card-body p-3">
                                                 <div class="row align-items-start">
-                                                    <!-- Circle -->
+                                                    <!-- Profile Image -->
                                                     <div
-                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start">
-                                                        <div class="rounded-circle responsive-circle"
-                                                            style="width: 40px; height: 40px; background-color: var(--highlight75); opacity: 1;">
+                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
+                                                        <div class="avatar-image">
+                                                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
+                                                        class="rounded-circle responsive-circle ">
                                                         </div>
                                                     </div>
 
@@ -339,7 +296,8 @@
                                                     <div class="col d-flex flex-column text-start mt-3 mt-lg-2 mb-2">
                                                         <p class="mb-2 text-sbold text-17"
                                                             style="color: var(--black); line-height: 140%;">
-                                                            Prof. Lisa Rodriguez has posted grades for 'Final Project Submission'.
+                                                            Prof. Lisa Rodriguez has posted grades for 'Final Project
+                                                            Submission'.
                                                         </p>
                                                         <small class="text-reg text-12"
                                                             style="color: var(--black); opacity: 0.7;">January 9, 2024
@@ -369,16 +327,17 @@
 
                                         </div>
 
-                                           <!-- Seventh Message -->
-                                           <div class="card mb-3 me-3 w-100 mt-3"
+                                        <!-- Sixth Message -->
+                                        <div class="card mb-3 me-3 w-100 mt-3"
                                             style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
                                             <div class="card-body p-3">
                                                 <div class="row align-items-start">
-                                                    <!-- Circle -->
+                                                    <!-- Profile Image -->
                                                     <div
-                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start">
-                                                        <div class="rounded-circle responsive-circle"
-                                                            style="width: 40px; height: 40px; background-color: var(--highlight75); opacity: 1;">
+                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
+                                                        <div class="avatar-image">
+                                                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
+                                                        class="rounded-circle responsive-circle ">
                                                         </div>
                                                     </div>
 
@@ -386,7 +345,57 @@
                                                     <div class="col d-flex flex-column text-start mt-3 mt-lg-2 mb-2">
                                                         <p class="mb-2 text-sbold text-17"
                                                             style="color: var(--black); line-height: 140%;">
-                                                            Prof. Lisa Rodriguez has posted grades for 'Final Project Submission'.
+                                                            Prof. Lisa Rodriguez has posted grades for 'Final Project
+                                                            Submission'.
+                                                        </p>
+                                                        <small class="text-reg text-12"
+                                                            style="color: var(--black); opacity: 0.7;">January 9, 2024
+                                                            4:45PM</small>
+
+                                                        <!-- Course tag on small screen below message text -->
+                                                        <div class="d-block d-lg-none mt-2">
+                                                            <span
+                                                                class="text-reg text-12 badge rounded-pill course-badge"
+                                                                style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
+                                                                COMP-009
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Course tag on large screen right side, vertically centered -->
+                                                    <div
+                                                        class="col-auto d-none d-lg-flex justify-content-end align-items-center mt-4">
+                                                        <span class="text-reg text-12 badge rounded-pill course-badge"
+                                                            style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
+                                                            COMP-009
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Seventh Message -->
+                                        <div class="card mb-3 me-3 w-100 mt-3"
+                                            style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
+                                            <div class="card-body p-3">
+                                                <div class="row align-items-start">
+                                                    <!-- Profile Image -->
+                                                    <div
+                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
+                                                        <div class="avatar-image">
+                                                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
+                                                        class="rounded-circle responsive-circle ">
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Message Text -->
+                                                    <div class="col d-flex flex-column text-start mt-3 mt-lg-2 mb-2">
+                                                        <p class="mb-2 text-sbold text-17"
+                                                            style="color: var(--black); line-height: 140%;">
+                                                            Prof. Lisa Rodriguez has posted grades for 'Final Project
+                                                            Submission'.
                                                         </p>
                                                         <small class="text-reg text-12"
                                                             style="color: var(--black); opacity: 0.7;">January 9, 2024
