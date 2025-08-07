@@ -52,13 +52,12 @@
 
                                             <!-- Sort by dropdown -->
                                             <div class="d-flex align-items-center flex-nowrap">
-                                                <span class="text-reg me-2 fs-6 fs-lg-5"
-                                                    style="color: var(--black); white-space: nowrap;">Sort by:</span>
+                                                <span class="text-reg me-2"
+                                                    style="white-space: nowrap;">Sort by:</span>
                                                 <button
-                                                    class="btn text-reg dropdown-toggle d-flex justify-content-between align-items-center fs-6 fs-lg-5 dropdown-custom"
-                                                    style="opacity: 1;"
+                                                    class="btn dropdown-toggle dropdown-custom"
                                                     type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <span class="me-2">Newest</span>
+                                                    <span>Newest</span>
                                                 </button>
                                                 <ul class="dropdown-menu">
                                                     <li><a class="dropdown-item text-reg" href="#">Newest</a></li>
@@ -69,13 +68,12 @@
 
                                             <!-- Course dropdown -->
                                             <div class="d-flex align-items-center flex-nowrap">
-                                                <span class="text-reg me-2 fs-6 fs-lg-5"
-                                                    style="color: var(--black); white-space: nowrap;">Course:</span>
+                                                <span class="text-reg me-2"
+                                                    style="white-space: nowrap;">Course:</span>
                                                 <button
-                                                    class="btn text-reg dropdown-toggle d-flex justify-content-between align-items-center fs-6 fs-lg-5 dropdown-custom"
-                                                    style="opacity: 1;"
+                                                    class="btn dropdown-toggle dropdown-custom"
                                                     type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <span>All</span>
+                                                    <span>All Courses</span>
                                                 </button>
                                                 <ul class="dropdown-menu">
                                                     <li><a class="dropdown-item text-reg" href="#">All</a></li>

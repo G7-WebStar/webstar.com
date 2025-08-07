@@ -100,12 +100,27 @@
 
 /* Dropdown*/
 .dropdown-custom {
-    min-width: 80px;
+    min-width: auto;
     height: 25px;
     border: 1px solid var(--black);
     border-radius: 25px;
     background-color: var(--pureWhite);
     color: var(--black);
+    padding: 0 12px;
+    font-size: 14px;
+    font-family: 'Regular', sans-serif;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Responsive dropdown font sizes */
+@media (min-width: 992px) {
+    .dropdown-custom {
+        font-size: 14px;
+        height: 27px;
+    }
 }
 
 /* Dropdown Toggle */
