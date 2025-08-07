@@ -89,7 +89,7 @@
                                                 <div class="row align-items-start">
                                                     <!-- Profile Image -->
                                                     <div
-                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-2">
+                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
                                                         <div class="avatar-image">
                                                         <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
                                                         class="rounded-circle responsive-circle ">
