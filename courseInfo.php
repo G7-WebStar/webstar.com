@@ -1,0 +1,464 @@
+<?php $activePage = 'courseInfo'; ?>
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Webstar | My Course Info</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <link rel="stylesheet" href="shared/assets/css/global-styles.css">
+    <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
+    <link rel="stylesheet" href="shared/assets/css/courseInfo.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center p-0 p-md-3"
+        style="background-color: var(--black);">
+
+        <div class="row w-100">
+
+            <?php include 'shared/components/sidebar-for-mobile.php'; ?>
+            <?php include 'shared/components/sidebar-for-desktop.php'; ?>
+
+            <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-0 p-md-4 overflow-y-auto">
+                <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
+                    style="background-color: transparent;">
+
+                    <?php include 'shared/components/navbar-for-mobile.php'; ?>
+
+                    <div class="container-fluid py-3 ms-2 overflow-y-auto">
+                        <div class="row">
+                            <div class="row mt-0">
+
+                                <!-- LEFT: Course Card -->
+                                <div class="col-md-4">
+
+                                    <!-- Mobile Dropdown Course Card -->
+                                    <div class="d-md-none mb-3">
+                                        <div class="course-card p-0"
+                                            style="outline: 1px solid var(--black); border-radius: 10px; overflow: hidden;">
+                                            <!-- Yellow header section -->
+                                            <div class="d-flex justify-content-between align-items-center px-3 py-2"
+                                                style="background-color: var(--primaryColor); border-bottom: 1px solid var(--black);">
+                                                <div class="flex-grow-1 text-center">
+                                                    <h5 class="fw-bold mb-1">COMP-006</h5>
+                                                    <p class="text-reg mb-0">Web Development</p>
+                                                </div>
+                                                <button class="btn p-0 d-md-none" type="button"
+                                                    data-bs-toggle="collapse" data-bs-target="#mobileCourseCard"
+                                                    aria-expanded="false" aria-controls="mobileCourseCard">
+                                                    <i class="fa fa-chevron-down text-dark"></i>
+                                                </button>
+                                            </div>
+
+                                            <!-- White dropdown section -->
+                                            <div class="collapse d-md-block px-3 pt-2 pb-3 bg-white"
+                                                id="mobileCourseCard">
+                                                <div class="course-image w-100 mb-3"
+                                                    style="height: 200px; overflow: hidden; border-radius: 10px;">
+                                                    <img src="shared/assets/img/home/webdev.jpg" alt="Course Image"
+                                                        class="img-fluid w-100 h-100" style="object-fit: cover;">
+                                                </div>
+
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <div class="avatar-image">
+                                                        <img src="shared/assets/img/courseInfo/prof.png"
+                                                            alt="Instructor Image" class="img-fluid">
+                                                    </div>
+                                                    <div class="ms-2">
+                                                        <strong class="d-block" style="font-size: 12px;">Christian James
+                                                            Torrillo</strong>
+                                                        <small class="text-reg">Professor</small>
+                                                    </div>
+                                                </div>
+
+                                                <div class="mb-2">
+                                                    <div class="d-flex align-items-start">
+                                                        <img src="shared/assets/img/courseInfo/calendar.png"
+                                                            alt="Calendar" width="20" class="me-2 mt-2">
+                                                        <div>
+                                                            <small class="d-block">Thursdays 8:00AM – 10:00AM</small>
+                                                            <small class="d-block">Fridays 9:00AM – 12:00PM</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="mb-2">
+                                                    <label class="text-reg small mb-1">Class Standing</label>
+                                                    <div
+                                                        class="class-standing d-flex justify-content-between align-items-center">
+                                                        <span><img src="shared/assets/img/courseInfo/star.png"
+                                                                alt="Star" width="14" class="me-2">1ST</span>
+                                                        <span class="fw-medium">3160 WBSTRS</span>
+                                                        <span><i class="fas fa-arrow-right"></i></span>
+                                                    </div>
+                                                </div>
+                                                <label class="text-reg small mb-1 ">To-do</label>
+                                                <div class="todo-card d-flex align-items-stretch rounded-4 mt-2">
+                                                    <div class="date-section text-sbold text-12">SEP 9</div>
+                                                    <div
+                                                        class="d-flex align-items-center flex-wrap flex-grow-1 p-2 gap-3">
+                                                        <div class="flex-grow-1 px-2">
+                                                            <div class="text-sbold text-12">Activity #1</div>
+                                                        </div>
+                                                        <div class="course-badge rounded-pill px-3 text-reg text-12">
+                                                            Task</div>
+
+                                                        <!-- Arrow icon that always shows and aligns to the right -->
+                                                        <div class="ms-auto">
+                                                            <i class="fa-solid fa-arrow-right text-reg text-12"
+                                                                style="color: var(--black);"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Desktop Course Card (unchanged) -->
+                                    <div class="d-none d-md-block">
+                                        <div class="course-card" style="outline: 1px solid var(--black);">
+                                            <div class="mb-3">
+                                                <a href="course.php" class="text-dark fs-5">
+                                                    <i class="fas fa-arrow-left"></i>
+                                                </a>
+                                            </div>
+
+                                            <div class="course-image w-100 mb-3"
+                                                style="height: 200px; overflow: hidden; border-radius: 10px;">
+                                                <img src="shared/assets/img/home/webdev.jpg" alt="Course Image"
+                                                    class="img-fluid w-100 h-100" style="object-fit: cover;">
+                                            </div>
+
+                                            <h5 class="fw-bold text-center mb-1">COMP-006</h5>
+                                            <p class="text-center text-reg mb-3">Web Development</p>
+
+                                            <div class="row mb-2">
+                                                <div class="col">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar-image">
+                                                            <img src="shared/assets/img/courseInfo/prof.png"
+                                                                alt="Instructor Image" class="img-fluid">
+                                                        </div>
+                                                        <div class="ms-2">
+                                                            <strong class="d-block" style="text-12">Christian James
+                                                                Torrillo</strong>
+                                                            <small class="text-reg">Professor</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col">
+                                                    <div class="d-flex align-items-start">
+                                                        <img src="shared/assets/img/courseInfo/calendar.png"
+                                                            alt="Calendar" width="20" class="me-2 mt-2">
+                                                        <div>
+                                                            <small class="d-block">Thursdays 8:00AM – 10:00AM</small>
+                                                            <small class="d-block">Fridays 9:00AM – 12:00PM</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col">
+                                                    <label class="text-reg small mb-1">Class Standing</label>
+                                                    <div
+                                                        class="class-standing d-flex justify-content-between align-items-center">
+                                                        <span><img src="shared/assets/img/courseInfo/star.png"
+                                                                alt="Star" width="14" class="me-2">1ST</span>
+                                                        <span class="fw-medium">3160 WBSTRS</span>
+                                                        <span><i class="fas fa-arrow-right"></i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <label class="text-reg small mb-1 ">To-do</label>
+                                                    <div class="todo-card d-flex align-items-stretch rounded-4">
+                                                        <div class="date-section text-sbold text-12">SEP 9</div>
+                                                        <div
+                                                            class="d-flex align-items-center flex-wrap flex-grow-1 p-2 gap-3">
+                                                            <div class="flex-grow-1 px-2">
+                                                                <div class="text-sbold text-12">Activity #1</div>
+                                                            </div>
+                                                            <div
+                                                                class="course-badge rounded-pill px-3 text-reg text-12">
+                                                                Task
+                                                            </div>
+                                                            <div class="d-none d-lg-block"
+                                                                style="margin-left: auto; margin-right: 10px;">
+                                                                <i class="fa-solid fa-arrow-right text-reg text-12"
+                                                                    style="color: var(--black);"></i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- RIGHT: Tabs and Content -->
+                                <div class="col-md-8">
+                                    <div class="tab-section">
+
+                                        <div class="tab-carousel-wrapper position-relative d-md-none">
+                                            <!-- Left Arrow -->
+                                            <button id="scrollLeftBtn" class="scroll-arrow-btn start-0 d-none"
+                                                aria-label="Scroll Left">
+                                                <i class="fa-solid fa-chevron-left"></i>
+                                            </button>
+
+                                            <!-- Right Arrow -->
+                                            <button id="scrollRightBtn" class="scroll-arrow-btn end-0"
+                                                aria-label="Scroll Right">
+                                                <i class="fa-solid fa-chevron-right"></i>
+                                            </button>
+
+                                            <ul class="nav nav-tabs custom-nav-tabs mb-3" id="mobileTabScroll">
+                                                <li class="nav-item me-3">
+                                                    <a class="nav-link" href="#"
+                                                        data-label="Announcements">Announcements</a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" href="#" data-label="Lessons">Lessons</a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" href="#" data-label="To-do">To-do</a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" href="#" data-label="Files">Files</a>
+                                                </li>
+                                                <li class="nav-item2">
+                                                    <a class="nav-link" href="#"
+                                                        data-label="Leaderboard">Leaderboard</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <!-- Desktop Tabs -->
+                                        <div class="tab-carousel-wrapper d-none d-md-block">
+                                            <ul class="nav nav-tabs custom-nav-tabs mb-3">
+                                                <li class="nav-item">
+                                                    <a class="nav-link" href="#"
+                                                        data-label="Announcements">Announcements</a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" href="#" data-label="Lessons">Lessons</a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" href="#" data-label="To-do">To-do</a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" href="#" data-label="Files">Files</a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" href="#"
+                                                        data-label="Leaderboard">Leaderboard</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <!-- Drop down -->
+                                        <div class="d-flex align-items-center flex-nowrap">
+                                            <span class="text-reg me-2 fs-6 fs-lg-5"
+                                                style="color: var(--black); white-space: nowrap;">Sort by:</span>
+                                            <button
+                                                class="btn text-reg dropdown-toggle d-flex justify-content-between align-items-center fs-6 fs-lg-5"
+                                                style="min-width: 80px; height: 25px; border: 1px solid var(--black); border-radius: 25px; background-color: var(--pureWhite); color: var(--black); opacity: 1;"
+                                                type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <span class="me-2">Newest</span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item text-reg" href="#">Newest</a></li>
+                                                <li><a class="dropdown-item text-reg" href="#">Oldest</a></li>
+                                                <li><a class="dropdown-item text-reg" href="#">Unread first</a></li>
+                                            </ul>
+                                        </div>
+
+                                        <div class="tab-content-area" id="tabContentArea">
+                                            <!-- JIT content will be injected here -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const navLinks = document.querySelectorAll('.custom-nav-tabs .nav-link');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function () {
+                navLinks.forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const tabs = document.querySelectorAll('.custom-nav-tabs .nav-link, #desktopTabs .nav-link');
+            const contentArea = document.getElementById('tabContentArea');
+
+
+            const jitContent = {
+                "Announcements": `
+                    <div class="announcement-card d-flex align-items-start mb-3">
+                        <!-- Instructor Image -->
+                        <div class="flex-shrink-0 me-3">
+                            <img src="shared/assets/img/courseInfo/prof.png" alt="Instructor Image"
+                                style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
+                        </div>
+
+                        <!-- Text Content -->
+                        <div class="text-start">
+                            <div class="text-reg text-12" style="color: var(--black); line-height: 140%;">
+                                <strong>Prof. Christian James</strong><br>
+                                <span style="font-weight: normal;">January 12, 2024 8:00AM</span>
+                            </div>
+
+
+                            <p class="mb-0 mt-3 text-reg text-12" style="color: var(--black); line-height: 140%;">
+                                Welcome to our course! Please make sure to check the Course Overview
+                                under the “Lessons” tab before our first face-to-face session this week.
+                            </p>
+                        </div>
+                    </div>
+
+                `,
+                "Lessons": `
+                    <div class="customCard text-sbold p-3">
+                        <p>Course Overview</p>
+                        <p>Here you will find all the lessons and learning materials.</p>
+                    </div>
+                `,
+                "To-do": `
+                <div class="row mb-0 mt-3">
+                    <div class="col-12 col-md-10">
+                        <div class="todo-card d-flex align-items-stretch">
+                            <div class="date d-flex align-items-center justify-content-center text-sbold text-20">
+                                SEP 9
+                            </div>
+                            <div class="d-flex align-items-center flex-wrap flex-grow-1 p-2 gap-3">
+                                <div class="flex-grow-1 px-3 py-0">
+                                        <div class="text-sbold text-16">Activity #1</div>
+                                </div>
+                                <div class="course-badge rounded-pill px-3 text-reg text-12">Task</div>
+                                <div style="margin-left: auto; margin-right: 10px;">
+                                    <i class="fa-solid fa-arrow-right text-reg text-12"
+                                        style="color: var(--black);"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `,
+                "Files": `
+                <div class="row mb-0 mt-3">
+                    <div class="col">
+                        <div class="todo-card d-flex align-items-stretch p-2">
+                            <div class="d-flex w-100 align-items-center justify-content-between">
+
+                                <!-- Left side: File icon + Text -->
+                                <div class="d-flex align-items-center flex-grow-1">
+                                    <!-- File icon -->
+                                    <div class="mx-4">
+                                        <img src="shared/assets/img/doc.png" alt="File Icon"
+                                            style="width: 16px; height: 20px;">
+                                    </div>
+
+                                    <!-- Text content -->
+                                    <div>
+                                        <div class="text-sbold text-18">Web Development Course Material
+                                        </div>
+                                        <div class="text-reg text-12">Uploaded January 12, 2024</div>
+                                    </div>
+                                </div>
+
+                                <!-- Download icon aligned to far right -->
+                                <div class="ms-auto me-2">
+                                    <img src="shared/assets/img/dl.png" alt="Download Icon"
+                                        style="width: 16px; height: 20px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                `,
+                "Leaderboard": `
+                    <div class="customCard text-sbold p-3">
+                        <p>Top Students</p>
+                        <ol class="mb-0">
+                            <li>No students yet</li>
+                        </ol>
+                    </div>
+                `
+            };
+
+            function loadContent(label) {
+                contentArea.innerHTML = jitContent[label] || `<p>No content available for ${label}</p>`;
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    loadContent(this.getAttribute('data-label'));
+                });
+            });
+
+            tabs[0].classList.add('active');
+            loadContent(tabs[0].getAttribute('data-label'));
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const tabContainer = document.getElementById('mobileTabScroll');
+            const scrollLeftBtn = document.getElementById('scrollLeftBtn');
+            const scrollRightBtn = document.getElementById('scrollRightBtn');
+
+            function updateArrowVisibility() {
+                if (!tabContainer) return;
+
+                scrollLeftBtn.classList.toggle('d-none', tabContainer.scrollLeft === 0);
+                scrollRightBtn.classList.toggle('d-none', tabContainer.scrollLeft + tabContainer.clientWidth >= tabContainer.scrollWidth);
+            }
+
+            scrollLeftBtn.addEventListener('click', () => {
+                tabContainer.scrollBy({ left: -100, behavior: 'smooth' });
+            });
+
+            scrollRightBtn.addEventListener('click', () => {
+                tabContainer.scrollBy({ left: 100, behavior: 'smooth' });
+            });
+
+            tabContainer.addEventListener('scroll', updateArrowVisibility);
+
+            updateArrowVisibility(); // Initial check
+        });
+
+    </script>
+</body>
+
+</html>
