@@ -1,49 +1,122 @@
+/* Fonts */
+
 @font-face {
-    font-family: 'DM Sans Medium';
-    src: url('../font/DMSans_18pt-Medium.ttf') format('truetype'); 
+    font-family: 'Regular';
+    src: url('../font/Poppins-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
-    font-family: 'DM Sans Black';
-    src: url('../font/DMSans_18pt-Black.ttf') format('truetype'); 
+    font-family: 'Medium';
+    src: url('../font/Poppins-Medium.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
-    font-family: 'DM Sans Regular';
-    src: url('../font/DMSans_18pt-Regular.ttf') format('truetype'); 
+    font-family: 'SemiBold';
+    src: url('../font/Poppins-SemiBold.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
-    font-family: 'DM Sans SemiBold';
-    src: url('../font/DMSans_18pt-SemiBold.ttf') format('truetype'); 
+    font-family: 'Bold';
+    src: url('../font/Poppins-Bold.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
-    font-family: 'DM Sans Bold';
-    src: url('../font/DMSans_24pt-Bold.ttf') format('truetype'); 
+    font-family: 'Black';
+    src: url('../font/Poppins-Black.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
+
 
 :root {
     /* Color Branding */
-    --lightBlue: #D4E0F9;
-    --white: #ffffff;
-    --blue: #2A63E2;
+    --primaryColor: #FDDF94;
+    --highlight75: #6EBEFF;
+    --highlight50: #9ED3FF;
+    --highlight25: #CFE9FF;
+    --dirtyWhite: #FFF9F0;
+    --pureWhite: #FFFFFF;
     --black: #2C2C2C;
 
     /* Typography */
-    --Black: 'DM Sans Black';
-    --Bold: 'DM Sans Bold';
-    --Medium: 'DM Sans Medium';
-    --Regular: 'DM Sans Regular';
-    --SemiBold: 'DM Sans SemiBold';
+    --Regular: 'Regular';
+    --Medium: 'Medium';
+    --Bold: 'Bold';
+    --SemiBold: 'SemiBold';
+    --Black: 'Black';
+}
+
+/* Font families */
+.text-reg {
+  font-family: 'Regular', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.text-med {
+  font-family: 'Medium', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.text-bold {
+  font-family: 'Bold', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.text-sbold {
+  font-family: 'SemiBold', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.text-black {
+  font-family: 'Black', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* Font sizes */
+.text-12{ font-size: 12px; }
+.text-14{ font-size: 14px; }
+.text-16{ font-size: 16px; }
+.text-18{ font-size: 18px; }
+.text-20{ font-size: 20px; }
+.text-22{ font-size: 22px; }
+.text-25{ font-size: 25px; }
+.text-30{ font-size: 30px; }
+
+/* Input other stylings that can be used globally */
+
+/* Course Pill */
+.course-badge {
+    background-color: var(--highlight50);
+    color: var(--black);
+}
+
+/* To-do */
+.todo-card {
+        background-color: var(--pureWhite);
+        border: 1px solid var(--black);
+        overflow: hidden;
+        max-width: 605px;
+}
+
+.date {
+        background-color: var(--dirtyWhite);
+        color: var(--black);
+        position: relative;
+}
+
+.date::after {
+        content: "";
+        border: 1px solid var(--black);
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
 }

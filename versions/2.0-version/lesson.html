@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WebStar | Fonts and Formatting</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared/assets/css/global-styles.css">
+  <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
+  <link rel="stylesheet" href="shared/assets/css/lesson.css">
+  <link rel="stylesheet" href="shared/assets/css/lessonmodal.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
+</head>
+
+<body>
+  <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center p-0 p-md-3"
+    style="background-color: var(--black);">
+    <div class="row w-100">
+
+
+     <!-- Sidebar (only shows on mobile) -->
+            <div class="offcanvas offcanvas-start d-md-none" tabindex="-1" id="sidebarOffcanvas"
+                aria-labelledby="sidebarOffcanvasLabel" style="background-color:var(--white); width: 250px;">
+                <div class="offcanvas-header">
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                        aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body d-flex flex-column p-0">
+                    <div class="d-flex flex-column flex-shrink-0 p-3" style="width: 100%;">
+                        <a class="d-flex align-items-center  text-decoration-none">
+                            <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid w-100 py-3 px-2" />
+                        </a>
+
+                        <hr>
+                        <ul class="nav nav-pills flex-column mb-auto">
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3"
+                                data-page="home">
+                                <img src="shared/assets/img/dashboard.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="index.html">Home</a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3" data-page="course">
+                                <img src="shared/assets/img/courses.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="course.html">Courses</a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3" data-page="explore">
+                                <img src="shared/assets/img/explore.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="explore.html">Explore</a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3" data-page="shop">
+                                <img src="shared/assets/img/shop.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="shop.html">Shop</a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3"
+                                data-page="minigames">
+                                <img src="shared/assets/img/games.png" style="width: 30px; height: 30px;">
+                                <a class="nav-link text-dark p-0" href="miniGames.html">Mini-games</a>
+                            </li>
+                        </ul>
+                        <hr>
+                        <!-- WebStars for Mobile-->
+                        <div class="btn btn-webstars mx-3 my-3 py-2">
+                            <div class="row">
+                                <div class="col-auto d-flex justify-content-center align-items-center ms-2">
+                                    <img src="shared/assets/img/stars.png" alt="" width="32" height="32">
+                                </div>
+                                <div class="col">
+                                    <div class="text-dark text-start webstar-points"
+                                        style=" font-size:20px; margin-left: -10px;">
+                                        3160
+                                    </div>
+                                    <div class="p text-muted  text-start"
+                                        style="font-size:15px; margin-top:-5px; margin-left: -10px;">
+                                        webstars
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Profile -->
+                        <hr>
+                        <div class="dropdown mt-auto p-2" style="letter-spacing: -1px;">
+                            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="32"
+                                    height="32" class="rounded-circle me-2">
+                                <strong class="text-dark" style="font-family: var(--Bold);">james</strong>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end text-small shadow">
+                                <li class="ms-3 my-1" style="font-family: var(--Bold);"><i
+                                        class="fa-solid fa-gear me-2"></i>Settings</li>
+                                <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                        href="termsAndConditions.html">Terms &
+                                        Conditions</a></li>
+                                <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                        href="changepassword.html">Change
+                                        Password</a></li>
+                                <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                        href="faqs.html">FAQs</a></li>
+                                <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                        href="feedback.html">Send
+                                        Feedback</a></li>
+                                <hr class="dropdown-divider">
+                                <li><a class="dropdown-item" style="font-family: var(--Bold);" href="profile.html"><i
+                                            class="fa-solid fa-user me-2"></i>My Profile</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" style="font-family: var(--Bold); color:var(--highlight)"
+                                        href="login.html"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign
+                                        out</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+      <!-- Sidebar Column (fixed on desktop) -->
+            <div class="col-auto d-none d-md-block">
+                <div class="col-auto d-none d-md-block">
+                    <div class="row">
+                        <!-- Sidebar -->
+                        <div class="card border-0 sidebar mx-2 p-2 overflow-y-auto" style="width: 220px;">
+                            <!-- Logo -->
+                            <div class="d-flex justify-content-center">
+                                <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid pt-5 pb-5 px-3"
+                                    width="180px;">
+                            </div>
+
+                            <!-- Navigation -->
+                            <ul class="nav flex-column">
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="home">
+                                    <img src="shared/assets/img/dashboard.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="index.html">Home</a>
+                                </li>
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="course">
+                                    <img src="shared/assets/img/courses.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="course.html">Courses</a>
+                                </li>
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="explore">
+                                    <img src="shared/assets/img/explore.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="explore.html">Explore</a>
+                                </li>
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="shop">
+                                    <img src="shared/assets/img/shop.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="shop.html">Shop</a>
+                                </li>
+
+                                <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 my-1 p-2 rounded-3"
+                                    data-page="minigames">
+                                    <img src="shared/assets/img/games.png" class="img-fluid"
+                                        style="width: 30px; height: 30px;">
+                                    <a class="nav-link text-dark p-0" href="miniGames.html">Mini-games</a>
+                                </li>
+
+                            </ul>
+
+                            <!-- WebStars for Desktop -->
+                            <div class="btn btn-webstars mx-3 mt-4 py-2">
+                                <div class="row">
+                                    <div class="col-auto d-flex justify-content-center align-items-center ms-2">
+                                        <img src="shared/assets/img/stars.png" alt="" width="32" height="32">
+                                    </div>
+                                    <div class="col">
+                                        <div class="text-dark text-start webstar-points"
+                                            style=" font-size:20px; margin-left: -10px;">
+                                            3160
+                                        </div>
+                                        <div class="p text-muted  text-start"
+                                            style="font-size:15px; margin-top:-5px; margin-left: -10px;">
+                                            webstars
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="dropdown mt-auto p-4" style="letter-spacing: -1px;">
+                                <a href="#"
+                                    class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt=""
+                                        width="32" height="32" class="rounded-circle me-2">
+                                    <strong class="text-dark" style="font-family: var(--Bold);">james</strong>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end text-small shadow">
+                                    <li class="ms-3 my-1" style="font-family: var(--Bold);"><i
+                                            class="fa-solid fa-gear me-2"></i>Settings</li>
+                                    <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                            href="termsAndConditions.html">Terms &
+                                            Conditions</a></li>
+                                    <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                            href="changepassword.html">Change
+                                            Password</a></li>
+                                    <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                            href="faqs.html">FAQs</a>
+                                    </li>
+                                    <li><a class="dropdown-item" style="font-family: var(--Regular);"
+                                            href="feedback.html">Send
+                                            Feedback</a></li>
+                                    <hr class="dropdown-divider">
+                                    <li><a class="dropdown-item" style="font-family: var(--Bold);"
+                                            href="profile.html"><i class="fa-solid fa-user me-2"></i>My Profile</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item"
+                                            style="font-family: var(--Bold); color:var(--highlight)"
+                                            href="login.html"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign
+                                            out</a></li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+      <!-- Main Container Column-->
+      <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-0 p-md-4 overflow-y-auto">
+        <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
+          style="background-color: var(--white);">
+
+          <!-- Navbar for mobile -->
+          <nav class="navbar navbar-light px-3 d-md-none">
+            <div class="container-fluid position-relative">
+
+              <!-- Toggler -->
+              <button class="navbar-toggler position-absolute start-0 p-1" type="button" data-bs-toggle="offcanvas"
+                data-bs-target="#sidebarOffcanvas">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+
+              <!-- Logo -->
+              <a class="navbar-brand mx-auto" href="#">
+                <img src="shared/assets/img/webstar-logo-black.png" alt="Webstar"
+                  style="height: 40px; padding-left: 30px">
+              </a>
+
+            </div>
+          </nav>
+
+          <!-- PUT CONTENT HERE -->
+
+
+          <div class="container-fluid overflow-y-auto" style="max-height: 100vh;">
+            <div class="col">
+              <!-- Main panel -->
+              <div class="main px-4 py-4">
+                <!-- Title Row -->
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+                  <p class="fs-5 m-0">CSS Course Lesson 3</p>
+
+                  <!-- Show this button only on medium and up -->
+                  <div class="d-none d-md-block">
+                    <button class="btn btn-delete">
+                      <i class="fa-solid fa-download me-2"></i> Download
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Fonts and Formatting Heading -->
+                <h1 class="fw-bold mb-3">Fonts and Formatting</h1>
+
+                <!-- Show this button only on small screens (below md) -->
+                <div class="d-block d-md-none mb-3">
+                  <button class="btn btn-delete btn-sm">
+                    <i class="fa-solid fa-download me-2"></i> Download
+                  </button>
+                </div>
+                <p>Fonts are the different styles or designs of text that appear on a webpage. Just like handwriting
+                  styles, fonts change the way letters and words look. Fonts can feel professional, fun, serious, or
+                  creative—depending on their design.</p>
+
+                <!-- Hoverrable button -->
+                <p class="mt-3">Click to reveal these fonts!</p>
+                <div class="d-flex flex-wrap gap-3 my-3 font-buttons">
+                  <button class="btn font-btn" data-font="Helvetica">Helvetica</button>
+                  <button class="btn font-btn" data-font="'Comic Neue', cursive">Comic Neue</button>
+                  <button class="btn font-btn" data-font="'Poppins', sans-serif">Poppins</button>
+                </div>
+
+                <p>The <span class="bold">font</span> shorthand property in CSS is used to define all the font-related
+                  settings of an element in one line. It can also be used to apply a system-defined font to the element.
+                </p>
+
+                <!-- Realtime code -->
+                <div class="title mt-5 mb-4">
+                  <img src="shared/assets/img/library_books.png" alt="Book Icon"
+                    style="width: 40px; height: 40px; vertical-align: middle; margin-right: 8px;">
+                  Interactive Activity: Try Your Own Fonts!
+                </div>
+
+                <div class="flex-grow-1">
+                  <p>Replace "Arial" with any font that’s installed on your computer—for example, Verdana, Times New
+                    Roman, Comic Sans MS, or another font you like! </p>
+                  <p><strong><code style="color: var(--highlight);">font-family: Arial; font-size: 30px; color: red;</code></strong></p>
+
+
+                  <div class="d-flex flex-column flex-md-row align-items-center gap-3">
+                    <div class="code-block">
+                      <input type="text" id="cssInput" class="form-control w-100"
+                        placeholder="font-family: Arial; font-size: 30px; color: red;">
+                    </div>
+                    <div class="output-box w-50" id="liveOutput">
+                      This is a text
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Observe section -->
+                <div class="mt-5">
+                  <p class="fs-5">
+                    <img src="shared/assets/img/lightbulb.png" alt="Observe Icon" style="width: 32px; height: 40px;">
+                    <span class="title bold">Observe</span>
+                  </p>
+                  <p>
+                    Does the text look different? Try a few different fonts and see how each one changes the style or
+                    feel
+                    of the text.</p>
+                </div>
+                <!-- Mini game drag and drop-->
+                <div class="mt-5">
+                  <div class="title mb-4">
+                    <img src="shared/assets/img/puzzle.png" alt="Mini Game Icon"
+                      style="width: 40px; height: 40px; vertical-align: middle; margin-right: 8px;">
+                    Mini Game: Match the Font Style!
+                  </div>
+                  <div class="descriptiongame">
+                    <p>In this game, your goal is to match text with its correct font style. This will help you become
+                      familiar with the different ways text can be styled in web design. Just drag and drop to arrange
+                      the
+                      code blocks on the right to match the output on the left!</p>
+                  </div>
+                  <div class="container" id="codePairs">
+                    <div class="row mb-3 mt-4 justify-content-center">
+                      <div class="col-12 col-md-3 pb-2 pb-md-0">
+                        <div class="game-output-text" style="font-weight: bold;">Hello, World!</div>
+                      </div>
+                      <div class="col-12 col-md-7">
+                        <div class="game-code-block" draggable="true">
+                          &lt;p style="font-style: italic;"&gt;Hello, World!&lt;/p&gt;
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3 justify-content-center">
+                      <div class="col-12 col-md-3 pb-2 pb-md-0">
+                        <div class="game-output-text" style="font-weight: 100; font-style: italic;">Hello, World!</div>
+                      </div>
+                      <div class="col-12 col-md-7">
+                        <div class="game-code-block" draggable="true">
+                          &lt;p&gt;Hello, World!&lt;/p&gt;
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3 justify-content-center">
+                      <div class="col-12 col-md-3 pb-2 pb-md-0">
+                        <div class="game-output-text" style="font-weight: 100;">Hello, World!</div>
+                      </div>
+                      <div class="col-12 col-md-7">
+                        <div class="game-code-block" draggable="true">
+                          &lt;p style="font-weight: bold;"&gt;Hello, World!&lt;/p&gt;
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3 justify-content-center">
+                      <div class="col-12 col-md-3 pb-2 pb-md-0">
+                        <div class="game-output-text" style="font-weight: 100; text-decoration: line-through;">Hello,
+                          World!</div>
+                      </div>
+                      <div class="col-12 col-md-7">
+                        <div class="game-code-block" draggable="true">
+                          &lt;p style="text-decoration: underline;"&gt;Hello, World!&lt;/p&gt;
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3 justify-content-center">
+                      <div class="col-12 col-md-3 pb-2 pb-md-0">
+                        <div class="game-output-text" style="font-weight: 100; text-decoration: underline;">Hello,
+                          World!
+                        </div>
+                      </div>
+                      <div class="col-12 col-md-7">
+                        <div class="game-code-block" draggable="true">
+                          &lt;p style="text-decoration: line-through;"&gt;Hello, World!&lt;/p&gt;
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="submit-container">
+                    <button class="submit-btn" onclick="checkAnswers()">Submit</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- MODAL -->
+            <div class="modal fade" id="cardModal" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content custom-modal text-center p-4 rounded-4 position-relative overflow-hidden">
+
+                  <!-- Custom Close Button (✕) -->
+                  <div class="d-flex justify-content-end px-4 pt-4">
+                    <button type="button" class="position-absolute top-0 end-0 m-3 p-0 bg-transparent border-0"
+                      data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.5rem; color: var(--highlight);">
+                      ✕
+                    </button>
+                  </div>
+
+                  <!-- Divider Line Under Close Button -->
+                  <hr class="modal-divider mb-3">
+
+                  <div id="modalResultTitle" class="mb-3">Good Job!</div>
+
+                  <div id="modalResultMessage" class="mb-3" style="color: var(--black);">
+                    <div><strong>Fonts and Formatting</strong></div>
+                    <div>You’ve completed the <strong>Fonts and Formatting</strong> lesson!</div>
+                    <div>You’ve learned how to use bold, italic, underline, and strikethrough styles in HTML and CSS.
+                    </div>
+                    <br />
+                    <div>Rewards:</div>
+                    <div class="highlight" style="color: var(--black);">+300 WebStars</div>
+                    <div class="badge-unlocked mb-2">Badge Unlocked: Font Master</div>
+                    <img src="shared/assets/img/done.png" alt="Done Icon" style="width: 50px; height: 50px;"
+                      class="mb-3">
+                  </div>
+
+                  <button class="btn continue-btn submit-btn" data-bs-dismiss="modal">Continue</button>
+                </div>
+              </div>
+            </div>
+
+
+            <script>
+              // Live css input
+              const cssInput = document.getElementById("cssInput");
+              const liveOutput = document.getElementById("liveOutput");
+
+              cssInput.addEventListener("input", () => {
+                liveOutput.style.cssText = cssInput.value;
+                if (!cssInput.value.includes("background-color")) {
+                  liveOutput.style.backgroundColor = "var(--primaryColor)";
+                }
+                if (!cssInput.value.includes("color")) {
+                  liveOutput.style.color = "var(--black)";
+                }
+              });
+
+              // hover button
+              const fontButtons = document.querySelectorAll(".font-btn");
+              const mainContent = document.querySelector(".main");
+
+              fontButtons.forEach(button => {
+                const font = button.getAttribute("data-font");
+                button.addEventListener("click", () => {
+                  mainContent.style.fontFamily = font;
+                });
+              });
+
+
+              // Drag and drop minigame
+              const correctOrder = [
+                '&lt;p style="font-weight: bold;"&gt;Hello, World!&lt;/p&gt;',
+                '&lt;p style="font-style: italic;"&gt;Hello, World!&lt;/p&gt;',
+                '&lt;p&gt;Hello, World!&lt;/p&gt;',
+                '&lt;p style="text-decoration: line-through;"&gt;Hello, World!&lt;/p&gt;',
+                '&lt;p style="text-decoration: underline;"&gt;Hello, World!&lt;/p&gt;'
+              ];
+
+              const blocks = document.querySelectorAll('.game-code-block');
+
+              blocks.forEach(block => {
+                block.addEventListener('dragstart', e => {
+                  e.dataTransfer.setData('text/plain', block.innerHTML);
+                  block.classList.add('dragging');
+                });
+
+                block.addEventListener('dragover', e => e.preventDefault());
+
+                block.addEventListener('drop', e => {
+                  e.preventDefault();
+                  const dragged = document.querySelector('.dragging');
+                  const temp = block.innerHTML;
+                  block.innerHTML = e.dataTransfer.getData('text/plain');
+                  dragged.innerHTML = temp;
+                  dragged.classList.remove('dragging');
+                });
+
+                block.addEventListener('dragend', () => {
+                  block.classList.remove('dragging');
+                });
+              });
+
+              // Check answer
+              function checkAnswers() {
+                const currentBlocks = document.querySelectorAll('.game-code-block');
+                let correct = true;
+                currentBlocks.forEach((block, index) => {
+                  if (block.innerHTML.trim() !== correctOrder[index].trim()) {
+                    correct = false;
+                  }
+                });
+
+                // Modal design
+                const title = document.getElementById('modalResultTitle');
+                const message = document.getElementById('modalResultMessage');
+
+                if (correct) {
+                  title.textContent = "Good Job!";
+                  title.classList.remove("var(--black)");
+                  title.classList.add("text");
+                  message.innerHTML = `<div>You’ve completed the <strong>Fonts and Formatting</strong> lesson!</div>
+                  <div>You’ve learned how to use bold, italic, underline, and strikethrough styles in HTML and CSS.</div>
+                  <br />
+                  <div>Rewards:</div>
+                  <div class="highlight" style="color: var(--black);">+300 WebStars</div>
+                  <div class="badge-unlocked mb-2">Badge Unlocked: Font Master</div>
+                  <img src="shared/assets/img/done.png" alt="Done Icon" style="width: 50px; height: 50px;" class="mb-3">
+                `;
+                } else {
+                  title.textContent = "Oops!";
+                  title.classList.remove("text-primary");
+                  title.classList.add("var(--black)");
+                  message.innerHTML = `Something is wrong.<br />Please try again.`;
+                }
+
+                const modal = new bootstrap.Modal(document.getElementById('cardModal'));
+                modal.show();
+              }
+            </script>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const currentPath = window.location.pathname.split("/").pop();
+        const pageMap = {
+          "index.html": "home",
+          "course.html": "course",
+          "explore.html": "explore",
+          "shop.html": "shop",
+          "miniGames.html": "minigames"
+        };
+
+        const activePage = pageMap[currentPath];
+        const navItems = document.querySelectorAll('[data-page]');
+
+        navItems.forEach(item => {
+          const page = item.getAttribute('data-page');
+          const link = item.querySelector('a');
+          const img = item.querySelector('img');
+
+          if (page === activePage) {
+            item.classList.add("selected-box");
+            link.classList.add("selected");
+            const src = img.getAttribute("src").replace(".png", "-w.png");
+            img.setAttribute("src", src);
+          } else {
+            item.classList.remove("selected-box");
+            link.classList.remove("selected");
+            const src = img.getAttribute("src").replace("-w.png", ".png");
+            img.setAttribute("src", src);
+          }
+        });
+      });
+    </script> -->
+</body>
+
+</html>

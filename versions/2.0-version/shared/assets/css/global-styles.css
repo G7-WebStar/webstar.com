@@ -1,0 +1,52 @@
+@font-face {
+    font-family: 'DM Sans Medium';
+    src: url('../font/Poppins-Medium.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'DM Sans Black';
+    src: url('../font/Poppins-Bold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'DM Sans Regular';
+    src: url('../font/Poppins-Medium.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'DM Sans SemiBold';
+    src: url('../font/Poppins-SemiBold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'DM Sans Bold';
+    src: url('../font/Poppins-Bold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+:root {
+    /* Color Branding */
+    --lightBlue: #D4E0F9;
+    --blue: #2A63E2;
+    --black: #2C2C2C;
+    --primaryColor: #FDE29C;
+    --highlight: #FF6B6B;
+    --white: #FFF9F0;
+    --white1: #FFFFFF;
+
+    /* Typography */
+    --Black: 'DM Sans Black';
+    --Bold: 'DM Sans Bold';
+    --Medium: 'DM Sans Medium';
+    --Regular: 'DM Sans Regular';
+    --SemiBold: 'DM Sans SemiBold';
+}

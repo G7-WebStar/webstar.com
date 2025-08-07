@@ -1,0 +1,49 @@
+@font-face {
+    font-family: 'DM Sans Medium';
+    src: url('../font/DMSans_18pt-Medium.ttf') format('truetype'); 
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'DM Sans Black';
+    src: url('../font/DMSans_18pt-Black.ttf') format('truetype'); 
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'DM Sans Regular';
+    src: url('../font/DMSans_18pt-Regular.ttf') format('truetype'); 
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'DM Sans SemiBold';
+    src: url('../font/DMSans_18pt-SemiBold.ttf') format('truetype'); 
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'DM Sans Bold';
+    src: url('../font/DMSans_24pt-Bold.ttf') format('truetype'); 
+    font-weight: normal;
+    font-style: normal;
+}
+
+:root {
+    /* Color Branding */
+    --lightBlue: #D4E0F9;
+    --white: #ffffff;
+    --blue: #2A63E2;
+    --black: #2C2C2C;
+
+    /* Typography */
+    --Black: 'DM Sans Black';
+    --Bold: 'DM Sans Bold';
+    --Medium: 'DM Sans Medium';
+    --Regular: 'DM Sans Regular';
+    --SemiBold: 'DM Sans SemiBold';
+}
