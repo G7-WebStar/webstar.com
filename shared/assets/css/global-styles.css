@@ -118,24 +118,37 @@
 
 /* To-do */
 .todo-card {
-        background-color: var(--pureWhite);
-        border-radius: 15px;
-        border: 1px solid var(--black);
-        overflow: hidden;
-        max-width: 500px;
+  background-color: var(--pureWhite);
+  border-radius: 15px;
+  border: 1px solid var(--black);
+  overflow: hidden;
+  max-width: 500px;
 }
 
 .date {
-        background-color: var(--dirtyWhite);
-        color: var(--black);
-        position: relative;
+  background-color: var(--dirtyWhite);
+  color: var(--black);
+  position: relative;
+  text-align: center;
+  min-width: 100px;        /* Default for large screens */
+  flex-shrink: 1;
+  font-size: 20px;
 }
 
 .date::after {
-        content: "";
-        border: 1px solid var(--black);
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        right: 0;
+  content: "";
+  border: 1px solid var(--black);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
 }
+
+/* ✅ On small screens, shrink the width and font */
+@media (max-width: 576px) {
+  .date {
+    min-width: 60px;
+    font-size: 14px;
+  }
+}
+

@@ -119,8 +119,7 @@
                                 <div class="row mb-0 mt-3">
                                     <div class="col-12 col-md-10">
                                         <div class="todo-card d-flex align-items-stretch">
-                                            <div class="date d-flex align-items-center justify-content-center text-sbold text-20"
-                                                style="min-width: 100px;">
+                                            <div class="date d-flex align-items-center justify-content-center text-sbold text-20">
                                                 SEP 9
                                             </div>
                                             <div class="d-flex align-items-center flex-wrap flex-grow-1 p-2 gap-3">
