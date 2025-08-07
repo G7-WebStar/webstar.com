@@ -1,0 +1,200 @@
+body {
+    background-color: #fdf7ed;
+}
+
+.course-card {
+    max-width: 350px;
+    background-color: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    border: 1px solid #ddd;
+}
+
+.course-image {
+    height: 120px;
+    background-color: #fcd993;
+    border: 1px solid var(--black);
+}
+
+.avatar-image {
+    width: 35px;
+    height: 35px;
+    overflow: hidden;
+    border-radius: 50%;
+    /* Keep round, or remove this for square */
+    flex-shrink: 0;
+}
+
+.avatar-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+.class-standing,
+.todo-box {
+    border: 1px solid var(--black);
+    border-radius: 15px;
+    padding: 0.75rem 1rem;
+}
+
+.announcement-card {
+    background-color: white;
+    border-radius: 10px;
+    padding: 1rem;
+    border: 1px solid var(--black);
+    margin-top: 1rem;
+}
+
+.task-badge {
+    background-color: #d5e6fa;
+    color: #0056b3;
+    font-size: 0.8rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+}
+
+.custom-nav-tabs .nav-link {
+    font-family: var(--SemiBold);
+    color: #2c2c2cbf;
+    border: none;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    font-weight: normal;
+    background-color: transparent !important;
+    /* ensure no background on default */
+}
+
+.custom-nav-tabs .nav-link:hover {
+    color: var(--black);
+    text-decoration: none;
+    background-color: transparent !important;
+    /* ensure no background on hover */
+}
+
+.custom-nav-tabs .nav-link.active {
+    border-bottom: 3px solid var(--black);
+    color: var(--black);
+    font-weight: bold;
+    background-color: transparent !important;
+    /* remove white background on active */
+}
+
+.d-block {
+    font-family: var(--regular);
+    /* font-weight: bold; */
+}
+
+/* .activity-card {
+    background-color: var(--pureWhite);
+    border: 1px solid var(--black);
+    overflow: hidden;
+    max-width: 605px;
+} */
+
+.date-section {
+    background-color: var(--dirtyWhite);
+    font-weight: bold;
+    color: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 55px;
+}
+
+/* AYI */
+.date-section::after {
+    content: "";
+    border: 1px solid var(--black);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.date-section {
+    position: relative;
+}
+
+.todo-card {
+    background-color: var(--pureWhite);
+    border: 1px solid var(--black);
+    overflow: hidden;
+    max-width: 605px;
+}
+
+.date {
+    background-color: var(--dirtyWhite);
+    color: var(--black);
+    position: relative;
+}
+
+.date::after {
+    content: "";
+    border: 1px solid var(--black);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+}
+/* neil again */
+@media (max-width: 767.98px) {
+    .custom-nav-tabs {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        scroll-snap-type: x mandatory;
+    }
+
+    .custom-nav-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .custom-nav-tabs .nav-item {
+        flex: 0 0 auto;
+        width: calc(100% / 3);
+        text-align: center;
+        scroll-snap-align: start;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .custom-nav-tabs .nav-link {
+        font-size: 12px !important;
+        padding: 10px 1px;
+        /* Tweak if needed */
+    }
+}
+
+@media (max-width: 767.98px) {
+    .tab-carousel-wrapper {
+        position: relative;
+    }
+
+    .scroll-arrow-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 2;
+        background: transparent;
+        border: none;
+        padding: 0;
+    }
+
+
+    .scroll-arrow-btn i {
+        font-size: 16px;
+        color: var(--black);
+    }
+
+    #scrollLeftBtn {
+        left: -10px;
+    }
+
+    #scrollRightBtn {
+        right: -10px;
+    }
+}
