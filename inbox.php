@@ -45,14 +45,14 @@
                                         </h1>
                                     </div>
 
-                                    <!-- Dropdowns side-by-side, centered on mobile and aligned on larger screens -->
+                                    <!-- Dropdowns-->
                                     <div class="col-12 col-lg-auto mt-4">
                                         <div
                                             class="d-flex flex-nowrap justify-content-center justify-content-lg-start gap-3">
 
                                             <!-- Sort by dropdown -->
                                             <div class="d-flex align-items-center flex-nowrap">
-                                                <span class="text-reg me-2" style="white-space: nowrap;">Sort by:</span>
+                                                <span class="dropdown-label me-2">Sort by:</span>
                                                 <button class="btn dropdown-toggle dropdown-custom" type="button"
                                                     data-bs-toggle="dropdown" aria-expanded="false">
                                                     <span>Newest</span>
@@ -66,10 +66,10 @@
 
                                             <!-- Course dropdown -->
                                             <div class="d-flex align-items-center flex-nowrap">
-                                                <span class="text-reg me-2" style="white-space: nowrap;">Course:</span>
+                                                <span class="dropdown-label me-2">Course:</span>
                                                 <button class="btn dropdown-toggle dropdown-custom" type="button"
                                                     data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <span>All Courses</span>
+                                                    <span>All</span>
                                                 </button>
                                                 <ul class="dropdown-menu">
                                                     <li><a class="dropdown-item text-reg" href="#">All</a></li>
