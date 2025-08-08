@@ -42,8 +42,10 @@
     --highlight75: #6EBEFF;
     --highlight50: #9ED3FF;
     --highlight25: #CFE9FF;
+    --highlight15: #c8ecc1;
     --dirtyWhite: #FFF9F0;
     --pureWhite: #FFFFFF;
+    --darkgreen: #5b6558;
     --black: #2C2C2C;
 
     /* Typography */
@@ -96,6 +98,11 @@
 .course-badge {
     background-color: var(--highlight50);
     color: var(--black);
+}
+
+.learderboard-badge {
+  background-color: var(--highlight15);
+  color: var(--darkgreen);
 }
 
 /* Dropdown*/
