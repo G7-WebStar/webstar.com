@@ -171,25 +171,17 @@
   color: var(--black);
   position: relative;
   text-align: center;
-  min-width: 100px;        /* Default for large screens */
+  min-width: 100px;
   flex-shrink: 1;
   font-size: 20px;
 }
 
 .date::after {
   content: "";
-  border: 1px solid var(--black);
+  border-right: 1px solid var(--black);
   position: absolute;
   top: 0;
   bottom: 0;
   right: 0;
-}
-
-/* ✅ On small screens, shrink the width and font */
-@media (max-width: 576px) {
-  .date {
-    min-width: 60px;
-    font-size: 14px;
-  }
 }
 
