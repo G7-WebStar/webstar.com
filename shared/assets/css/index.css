@@ -1,32 +1,157 @@
  .hide-scroll::-webkit-scrollbar {
-    display: none;
-  }
+   display: none;
+ }
 
-/* Scroll */
-/* .no-scrollbar {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-} */
+ .no-scrollbar::-webkit-scrollbar {
+   display: none;
+ }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
+ /* duplicate course badge */
+ .courses-badge {
+   background-color: var(--highlight50);
+   color: var(--black);
+ }
 
-.custom-course-card {
-    width: 200px;
-    height: 190px;
-    border-radius: 15px;
-    overflow: hidden;
-    border: 1px solid var(--black);
-}
+ /* Course card */
+ .custom-course-card {
+   width: 200px;
+   height: 190px;
+   border-radius: 15px;
+   overflow: hidden;
+   border: 1px solid var(--black);
+ }
 
-.custom-course-card .card-img-top {
-    height: 125px;
-    object-fit: cover;
-}
+ .custom-course-card .card-img-top {
+   height: 125px;
+   object-fit: cover;
+ }
 
-.left-card {
-    border-radius: 25px; 
-    border: 1px solid var(--black);
-}
+ .left-card {
+   border-radius: 25px;
+   border: 1px solid var(--black);
+ }
 
+ /* leaderboard */
+ .custom-leaderboard-card {
+   width: 162px;
+   height: 138px;
+   border-radius: 15px;
+   overflow: hidden;
+   border: 1px solid var(--black);
+ }
+
+ .info-block {
+   display: flex;
+   flex-wrap: wrap;
+   align-items: center;
+ }
+
+ .info-block .comp-code,
+ .info-block .subj-code {
+   flex-basis: 100%;
+ }
+
+ .xp-container {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   width: 100%;
+ }
+
+ .xp-block {
+   display: inline-flex;
+   align-items: center;
+ }
+
+ .xp-arrow {
+   display: inline-flex;
+   align-items: center;
+ }
+
+ .rank-number {
+   display: inline-block;
+   width: 20px;
+   text-align: center;
+
+ }
+
+ /* announcement */
+ .announcement-arrow {
+   position: static;
+   margin-left: 0;
+   transform: none;
+ }
+
+
+ @media (max-width: 576px) {
+   .custom-leaderboard-card {
+     width: 100% !important;
+     height: 95px !important;
+   }
+
+   .custom-leaderboard-card .card-body {
+     display: flex;
+     align-items: center;
+     gap: 10px !important;
+     position: relative;
+     padding-top: 2px;
+   }
+
+   .info-block {
+     display: flex;
+     flex-direction: column;
+     align-items: flex-start;
+     justify-content: center;
+     margin-top: -10px;
+   }
+
+   .xp-arrow {
+     position: absolute;
+     top: 50%;
+     transform: translateY(-70%);
+     right: 20px;
+   }
+
+   .rank-number {
+     width: 24px;
+     text-align: center;
+   }
+
+   .learderboard-badge {
+     margin-left: 4px !important;
+   }
+
+   /* Announcement */
+   /* course badge */
+   .prof-info {
+     position: relative;
+     padding-bottom: 18px;
+   }
+
+   .courses-badge {
+     position: absolute !important;
+     left: 0;
+     bottom: 0;
+     margin-left: 0 !important;
+     font-size: 10px !important;
+     padding: 2px 6px !important;
+   }
+
+   .announcement-text {
+     margin-top: 10px !important;
+   }
+
+   /* todo */
+   .date {
+     font-size: 20px;
+   }
+
+   .todo-card .course-badge {
+     margin-left: -20px !important;
+   }
+
+   .todo-card .fa-arrow-right {
+     margin-left: -8px !important;
+   }
+
+ }
