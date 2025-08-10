@@ -45,7 +45,7 @@
                                 <div class="col-12 col-xl-6 mb-3 mb-xl-0">
                                     <div class="row g-3">
                                         <div class="col-12 col-lg-4 px-0">
-                                            <p class="text-sbold mb-0 lh-md text-20" id="dynamic-text">My Courses</p>
+                                            <p class="text-sbold mb-0 lh-md text-25" id="dynamic-text">My Courses</p>
                                         </div>
                                         <div class="col-12 col-lg-8 px-0 px-xl-auto">
                                             <div class="search-container w-100 d-flex">
@@ -62,7 +62,7 @@
                                     <div class="row g-3">
                                         <div class="col-12 col-sm-6 d-flex align-items-center px-0 px-xl-auto">
                                             <span class="me-2 text-reg">Status</span>
-                                            <select class="form-select px-3 py-1 border-black rounded-4 w-auto w-25" id="selectTag">
+                                            <select class="form-select px-3 py-1 border-black rounded-4 w-50 text-reg" id="selectTag">
                                                 <option value="Active">Active</option>
                                                 <option value="Archived">Archived</option>
                                             </select>
@@ -175,7 +175,7 @@
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
-        <!-- Dynamic Text -->
+        <!-- Responsiveness -->
         <script>
             var screenSize = document.getElementById("dynamic-text");
             var selectTag = document.getElementById("selectTag");
@@ -191,12 +191,10 @@
 
                 if (window.matchMedia("(max-width: 575px)").matches) {
                     selectTag.classList.add("w-100");
-                    selectTag.classList.remove("w-25");
-                    selectTag.classList.remove("w-auto");
+                    selectTag.classList.remove("w-50");
                 } else {
                     selectTag.classList.remove("w-100");
-                    selectTag.classList.add("w-25");
-                    selectTag.classList.add("w-auto");
+                    selectTag.classList.add("w-50");
                 }
             }
             window.addEventListener('resize', checkScreenSize);
