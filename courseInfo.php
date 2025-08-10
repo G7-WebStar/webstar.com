@@ -41,14 +41,16 @@
                                 <div class="col-md-4">
 
                                     <!-- Mobile Dropdown Course Card -->
-                                    <div class="d-md-none mb-3">
+                                    <div class="course-card-mobile d-block d-md-none">
                                         <div class="course-card p-0"
-                                            style="outline: 1px solid var(--black); border-radius: 10px; overflow: hidden;">
+                                            style="width: 100%; margin: 0 auto; outline: 1px solid var(--black); border-radius: 10px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; overflow: hidden;">
                                             <!-- Yellow header section -->
-                                            <div class="d-flex justify-content-between align-items-center px-3 py-2"
-                                                style="background-color: var(--primaryColor); border-bottom: 1px solid var(--black);">
+                                            <div id="dropdownHeader"
+                                                class="d-flex justify-content-between align-items-center px-3 py-2"
+                                                style="background-color: var(--primaryColor);">
+
                                                 <div class="flex-grow-1 text-center">
-                                                    <h5 class="fw-bold mb-1">COMP-006</h5>
+                                                    <h5 class="text-bold mb-1">COMP-006</h5>
                                                     <p class="text-reg mb-0">Web Development</p>
                                                 </div>
                                                 <button class="btn p-0 d-md-none" type="button"
@@ -62,7 +64,7 @@
                                             <div class="collapse d-md-block px-3 pt-2 pb-3 bg-white"
                                                 id="mobileCourseCard">
                                                 <div class="course-image w-100 mb-3"
-                                                    style="height: 200px; overflow: hidden; border-radius: 10px;">
+                                                    style="height: 250px; overflow: hidden; border-radius: 10px;">
                                                     <img src="shared/assets/img/home/webdev.jpg" alt="Course Image"
                                                         class="img-fluid w-100 h-100" style="object-fit: cover;">
                                                 </div>
@@ -73,8 +75,10 @@
                                                             alt="Instructor Image" class="img-fluid">
                                                     </div>
                                                     <div class="ms-2">
-                                                        <strong class="d-block" style="font-size: 12px;">Christian James
+                                                        <strong class="text-sbold" style="font-size: 12px;">Christian
+                                                            James
                                                             Torrillo</strong>
+                                                             <br>
                                                         <small class="text-reg">Professor</small>
                                                     </div>
                                                 </div>
@@ -82,10 +86,11 @@
                                                 <div class="mb-2">
                                                     <div class="d-flex align-items-start">
                                                         <img src="shared/assets/img/courseInfo/calendar.png"
-                                                            alt="Calendar" width="20" class="me-2 mt-2">
+                                                            alt="Calendar" width="20" class="me-2 mt-3">
                                                         <div>
-                                                            <small class="d-block">Thursdays 8:00AM – 10:00AM</small>
-                                                            <small class="d-block">Fridays 9:00AM – 12:00PM</small>
+                                                            <small class="text-reg">Thursdays 8:00AM – 10:00AM</small>
+                                                            <br>
+                                                            <small class="text-reg">Fridays 9:00AM – 12:00PM</small>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -125,22 +130,26 @@
 
                                     </div>
 
-                                    <!-- Desktop Course Card (unchanged) -->
-                                    <div class="d-none d-md-block">
-                                        <div class="course-card" style="outline: 1px solid var(--black);">
+                                    <!-- Desktop Course Card -->
+                                    <div class="course-card-desktop d-none d-md-block">
+                                        <div class="course-card mx-auto"
+                                            style="outline: 1px solid var(--black); border-radius: 10px;">
+                                            <!-- Back Button -->
                                             <div class="mb-3">
                                                 <a href="course.php" class="text-dark fs-5">
                                                     <i class="fas fa-arrow-left"></i>
                                                 </a>
                                             </div>
 
+                                            <!-- Course Image -->
                                             <div class="course-image w-100 mb-3"
-                                                style="height: 200px; overflow: hidden; border-radius: 10px;">
+                                                style="height: 250px; overflow: hidden; border-radius: 10px;">
                                                 <img src="shared/assets/img/home/webdev.jpg" alt="Course Image"
                                                     class="img-fluid w-100 h-100" style="object-fit: cover;">
                                             </div>
 
-                                            <h5 class="fw-bold text-center mb-1">COMP-006</h5>
+                                            <!-- Course Info -->
+                                            <h5 class="text-bold text-center mb-1">COMP-006</h5>
                                             <p class="text-center text-reg mb-3">Web Development</p>
 
                                             <div class="row mb-2">
@@ -151,8 +160,8 @@
                                                                 alt="Instructor Image" class="img-fluid">
                                                         </div>
                                                         <div class="ms-2">
-                                                            <strong class="d-block" style="text-12">Christian James
-                                                                Torrillo</strong>
+                                                            <strong class="text-sbold" style="text-12">Christian James
+                                                                Torrillo</strong><br>
                                                             <small class="text-reg">Professor</small>
                                                         </div>
                                                     </div>
@@ -163,10 +172,11 @@
                                                 <div class="col">
                                                     <div class="d-flex align-items-start">
                                                         <img src="shared/assets/img/courseInfo/calendar.png"
-                                                            alt="Calendar" width="20" class="me-2 mt-2">
+                                                            alt="Calendar" width="20" class="me-2 mt-3">
                                                         <div>
-                                                            <small class="d-block">Thursdays 8:00AM – 10:00AM</small>
-                                                            <small class="d-block">Fridays 9:00AM – 12:00PM</small>
+                                                            <small class="text-reg">Thursdays 8:00AM –
+                                                                10:00AM</small><br>
+                                                            <small class="text-reg">Fridays 9:00AM – 12:00PM</small>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -176,10 +186,10 @@
                                                 <div class="col">
                                                     <label class="text-reg small mb-1">Class Standing</label>
                                                     <div
-                                                        class="class-standing d-flex justify-content-between align-items-center">
+                                                        class="text-reg class-standing d-flex justify-content-between align-items-center">
                                                         <span><img src="shared/assets/img/courseInfo/star.png"
                                                                 alt="Star" width="14" class="me-2">1ST</span>
-                                                        <span class="fw-medium">3160 WBSTRS</span>
+                                                        <span class="text-sbold">3160 WBSTRS</span>
                                                         <span><i class="fas fa-arrow-right"></i></span>
                                                     </div>
                                                 </div>
@@ -187,7 +197,7 @@
 
                                             <div class="row">
                                                 <div class="col-12">
-                                                    <label class="text-reg small mb-1 ">To-do</label>
+                                                    <label class="text-reg small mb-1">To-do</label>
                                                     <div class="todo-card d-flex align-items-stretch rounded-4">
                                                         <div class="date-section text-sbold text-12">SEP 9</div>
                                                         <div
@@ -273,15 +283,12 @@
                                             </ul>
                                         </div>
 
-                                        <!-- Drop down -->
+                                        <!-- Sort by dropdown -->
                                         <div class="d-flex align-items-center flex-nowrap">
-                                            <span class="text-reg me-2 fs-6 fs-lg-5"
-                                                style="color: var(--black); white-space: nowrap;">Sort by:</span>
-                                            <button
-                                                class="btn text-reg dropdown-toggle d-flex justify-content-between align-items-center fs-6 fs-lg-5"
-                                                style="min-width: 80px; height: 25px; border: 1px solid var(--black); border-radius: 25px; background-color: var(--pureWhite); color: var(--black); opacity: 1;"
-                                                type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <span class="me-2">Newest</span>
+                                            <span class="dropdown-label me-2">Sort by:</span>
+                                            <button class="btn dropdown-toggle dropdown-custom" type="button"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                <span>Newest</span>
                                             </button>
                                             <ul class="dropdown-menu">
                                                 <li><a class="dropdown-item text-reg" href="#">Newest</a></li>
@@ -338,7 +345,14 @@
                             </div>
 
 
-                            <p class="mb-0 mt-3 text-reg text-12" style="color: var(--black); line-height: 140%;">
+                            <p class="d-none d-md-block mb-0 mt-3 text-reg text-14" style="color: var(--black); line-height: 140%;">
+                                Welcome to our course! Please make sure to check the Course Overview
+                                under the “Lessons” tab before our first face-to-face session this week.
+                            </p>
+
+
+                            <!-- For mobile -->
+                            <p class="text-reg d-md-none mb-0 mt-3 text-reg text-12" style="color: var(--black); line-height: 140%;">
                                 Welcome to our course! Please make sure to check the Course Overview
                                 under the “Lessons” tab before our first face-to-face session this week.
                             </p>
@@ -457,6 +471,26 @@
 
             updateArrowVisibility(); // Initial check
         });
+
+
+        const dropdownHeader = document.getElementById('dropdownHeader');
+        const dropdownContent = document.getElementById('mobileCourseCard');
+        const courseCard = dropdownHeader.closest('.course-card'); // find the parent card
+
+        // Show dropdown
+        dropdownContent.addEventListener('show.bs.collapse', function () {
+            dropdownHeader.style.borderBottom = '1px solid var(--black)';
+            courseCard.style.borderBottomLeftRadius = '10px';
+            courseCard.style.borderBottomRightRadius = '10px';
+        });
+
+        // Hide dropdown
+        dropdownContent.addEventListener('hide.bs.collapse', function () {
+            dropdownHeader.style.borderBottom = 'none';
+            courseCard.style.borderBottomLeftRadius = '0';
+            courseCard.style.borderBottomRightRadius = '0';
+        });
+
 
     </script>
 </body>
