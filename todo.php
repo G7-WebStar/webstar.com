@@ -41,12 +41,11 @@
                             <div class="col-12">
 
                                 <!-- Header Section -->
-                                <div class="row align-items-center mb-3 text-center text-lg-start">
+                                <div class="row align-items-center mb-5 text-center text-lg-start">
                                     <!-- Title -->
                                     <div class="col-12 col-lg-auto mb-3 mb-lg-0">
-                                        <div class="text-bold text-25 mb-0 mt-4">
-                                            My To-do
-                                        </div>
+                                        <h1 class="text-bold text-25 mb-0 mt-4" style="color: var(--black);">My To-do
+                                        </h1>
                                     </div>
 
                                     <div class="col-12 col-lg-auto mt-4">
@@ -55,14 +54,10 @@
                                             <!-- Sort by dropdown -->
                                             <div class="col-6 col-md-auto">
                                                 <div class="d-flex align-items-center flex-nowrap">
-                                                    <span class="text-reg me-2 fs-6 fs-lg-5"
-                                                        style="color: var(--black); white-space: nowrap;">Sort
-                                                        by:</span>
-                                                    <button
-                                                        class="btn text-reg dropdown-toggle d-flex justify-content-between align-items-center fs-6 fs-lg-5 dropdown-custom"
-                                                        style="opacity: 1;" type="button" data-bs-toggle="dropdown"
-                                                        aria-expanded="false">
-                                                        <span class="me-2">Newest</span>
+                                                    <span class="dropdown-label me-2">Sort by:</span>
+                                                    <button class="btn dropdown-toggle dropdown-custom" type="button"
+                                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <span>Newest</span>
                                                     </button>
                                                     <ul class="dropdown-menu">
                                                         <li><a class="dropdown-item text-reg" href="#">Newest</a></li>
@@ -76,12 +71,9 @@
                                             <!-- Course dropdown -->
                                             <div class="col-6 col-md-auto">
                                                 <div class="d-flex align-items-center flex-nowrap">
-                                                    <span class="text-reg me-2 fs-6 fs-lg-5"
-                                                        style="color: var(--black); white-space: nowrap;">Course:</span>
-                                                    <button
-                                                        class="btn text-reg dropdown-toggle d-flex justify-content-between align-items-center fs-6 fs-lg-5 dropdown-custom"
-                                                        style="opacity: 1;" type="button" data-bs-toggle="dropdown"
-                                                        aria-expanded="false">
+                                                    <span class="dropdown-label me-2">Course:</span>
+                                                    <button class="btn dropdown-toggle dropdown-custom" type="button"
+                                                        data-bs-toggle="dropdown" aria-expanded="false">
                                                         <span>All</span>
                                                     </button>
                                                     <ul class="dropdown-menu">
@@ -96,19 +88,16 @@
                                             <!-- Status dropdown -->
                                             <div class="col-6 col-md-auto mx-auto">
                                                 <div class="d-flex align-items-center flex-nowrap">
-                                                    <span class="text-reg me-2 fs-6 fs-lg-5"
-                                                        style="color: var(--black); white-space: nowrap;">Status:</span>
-                                                    <button
-                                                        class="btn text-reg dropdown-toggle d-flex justify-content-between align-items-center fs-6 fs-lg-5 dropdown-custom"
-                                                        style="opacity: 1;" type="button" data-bs-toggle="dropdown"
-                                                        aria-expanded="false">
+                                                    <span class="dropdown-label me-2">Status:</span>
+                                                    <button class="btn dropdown-toggle dropdown-custom" type="button"
+                                                        data-bs-toggle="dropdown" aria-expanded="false">
                                                         <span>Assigned</span>
                                                     </button>
                                                     <ul class="dropdown-menu">
                                                         <li><a class="dropdown-item text-reg" href="#">Assigned</a></li>
-                                                        <li><a class="dropdown-item text-reg" href="#">Completed</a>
+                                                        <li><a class="dropdown-item text-reg" href="#">Completed</a></li>
+                                                        <li><a class="dropdown-item text-reg" href="#">Overdue</a>
                                                         </li>
-                                                        <li><a class="dropdown-item text-reg" href="#">Overdue</a></li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -116,20 +105,29 @@
                                     </div>
                                 </div>
 
+                                <!-- Task container -->
                                 <div class="row mb-0 mt-3">
                                     <div class="col-12 col-md-10">
                                         <div class="todo-card d-flex align-items-stretch">
-                                            <div class="date d-flex align-items-center justify-content-center text-sbold text-20">
+                                            <!-- Date -->
+                                            <div
+                                                class="date d-flex align-items-center justify-content-center text-sbold text-20">
                                                 SEP 9
                                             </div>
-                                            <div class="d-flex align-items-center flex-wrap flex-grow-1 p-2 gap-3">
-                                                <div class="flex-grow-1 px-3 py-0">
+                                            <!-- Main content -->
+                                            <div class="d-flex flex-grow-1 flex-wrap justify-content-between p-2 w-100">
+                                                <!-- For small screen of main content -->
+                                                <div class="px-3 py-0">
                                                     <div class="text-sbold text-16">Activity #1</div>
                                                     <div class="text-reg text-12">COMP-006</div>
+                                                    <span
+                                                        class="course-badge rounded-pill px-3 text-reg text-12 mt-2 d-inline d-md-none">Task</span>
                                                 </div>
-                                                <div class="course-badge rounded-pill px-3 text-reg text-12">Task</div>
-                                                <div style="margin-left: auto; margin-right: 10px;">
-                                                    <i class="fa-solid fa-arrow-right text-reg text-12"
+                                                <!-- Pill and Arrow on Large screen-->
+                                                <div class="d-flex align-items-center gap-2 ms-auto">
+                                                    <span
+                                                        class="course-badge rounded-pill px-3 text-reg text-12 d-none d-md-inline">Task</span>
+                                                    <i class="fa-solid fa-arrow-right text-reg text-12 pe-2"
                                                         style="color: var(--black);"></i>
                                                 </div>
                                             </div>
