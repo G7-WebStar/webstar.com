@@ -78,6 +78,7 @@
                                                         <strong class="text-sbold" style="font-size: 12px;">Christian
                                                             James
                                                             Torrillo</strong>
+                                                             <br>
                                                         <small class="text-reg">Professor</small>
                                                     </div>
                                                 </div>
