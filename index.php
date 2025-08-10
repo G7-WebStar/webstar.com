@@ -43,7 +43,7 @@
                             <!-- left side -->
                             <div class="col-12 col-sm-12 col-md-7">
                                 <div class="row ps-4">
-                                    <div class="col-12">
+                                    <div class="col-12 text-center text-sm-start">
                                         <div class="text-sbold text-22">Welcome back,
                                             James!
                                         </div>
@@ -240,57 +240,81 @@
                                                 <div>21</div>
                                             </div>
                                             <!-- Scrollable course -->
-                                            <div style="max-height: 230px; overflow-y: auto; padding-right: 5px; scroll-behavior: smooth; scrollbar-width: none; -ms-overflow-style: none;">
+                                            <div style="height: 100%; overflow-y: auto; padding-right: 5px; scroll-behavior: smooth; scrollbar-width: none; -ms-overflow-style: none;">
                                                 <!-- Card 1 -->
-                                                <div class="todo-card mb-2 d-flex align-items-stretch" style="min-height: 60px;">
-                                                    <div class="date d-flex align-items-center justify-content-center text-sbold text-20"
-                                                        style="min-width: 100px;">
+                                                <div class="todo-card d-flex align-items-stretch mb-2">
+                                                    <!-- Date -->
+                                                    <div
+                                                        class="date d-flex align-items-center justify-content-center text-sbold text-20">
                                                         SEP 9
                                                     </div>
-                                                    <div class="d-flex align-items-center gap-3">
-                                                        <div class="flex-grow-1 px-3 py-0">
+                                                    <!-- Main content -->
+                                                    <div class="d-flex flex-grow-1 flex-wrap justify-content-between p-2 w-100">
+                                                        <!-- For small screen of main content -->
+                                                        <div class="px-3 py-0">
                                                             <div class="text-sbold text-16">Activity #1</div>
                                                             <div class="text-reg text-12">COMP-006</div>
+                                                            <span
+                                                                class="course-badge rounded-pill px-3 text-reg text-12 mt-2 d-inline d-md-none">Task</span>
                                                         </div>
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="course-badge rounded-pill px-3 text-reg text-12" style="margin-left: auto; margin-right: 11px;">Task</div>
-                                                            <i class="fa-solid fa-arrow-right text-reg text-12" style="color: var(--black);"></i>
+                                                        <!-- Pill and Arrow on Large screen-->
+                                                        <div class="d-flex align-items-center gap-2 ms-auto">
+                                                            <span
+                                                                class="course-badge rounded-pill px-3 text-reg text-12 d-none d-md-inline">Task</span>
+                                                            <i class="fa-solid fa-arrow-right text-reg text-12 pe-2"
+                                                                style="color: var(--black);"></i>
                                                         </div>
                                                     </div>
                                                 </div>
 
                                                 <!-- Card 2 -->
-                                                <div class="todo-card mb-2 d-flex align-items-stretch" style="min-height: 60px;">
-                                                    <div class="date d-flex align-items-center justify-content-center text-sbold text-20"
-                                                        style="min-width: 100px;">
+                                                <div class="todo-card d-flex align-items-stretch mb-2">
+                                                    <!-- Date -->
+                                                    <div
+                                                        class="date d-flex align-items-center justify-content-center text-sbold text-20">
                                                         SEP 9
                                                     </div>
-                                                    <div class="d-flex align-items-center gap-3">
-                                                        <div class="flex-grow-1 px-3 py-0">
+                                                    <!-- Main content -->
+                                                    <div class="d-flex flex-grow-1 flex-wrap justify-content-between p-2 w-100">
+                                                        <!-- For small screen of main content -->
+                                                        <div class="px-3 py-0">
                                                             <div class="text-sbold text-16">Activity #1</div>
                                                             <div class="text-reg text-12">COMP-006</div>
+                                                            <span
+                                                                class="course-badge rounded-pill px-3 text-reg text-12 mt-2 d-inline d-md-none">Task</span>
                                                         </div>
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="course-badge rounded-pill px-3 text-reg text-12" style="margin-left: auto; margin-right: 11px;">Task</div>
-                                                            <i class="fa-solid fa-arrow-right text-reg text-12" style="color: var(--black);"></i>
+                                                        <!-- Pill and Arrow on Large screen-->
+                                                        <div class="d-flex align-items-center gap-2 ms-auto">
+                                                            <span
+                                                                class="course-badge rounded-pill px-3 text-reg text-12 d-none d-md-inline">Task</span>
+                                                            <i class="fa-solid fa-arrow-right text-reg text-12 pe-2"
+                                                                style="color: var(--black);"></i>
                                                         </div>
                                                     </div>
                                                 </div>
 
                                                 <!-- Card 3 -->
-                                                <div class="todo-card mb-3 d-flex align-items-stretch" style="min-height: 60px;">
-                                                    <div class="date d-flex align-items-center justify-content-center text-sbold text-20"
-                                                        style="min-width: 100px;">
+                                                <div class="todo-card d-flex align-items-stretch mb-2">
+                                                    <!-- Date -->
+                                                    <div
+                                                        class="date d-flex align-items-center justify-content-center text-sbold text-20">
                                                         SEP 9
                                                     </div>
-                                                    <div class="d-flex align-items-center gap-3">
-                                                        <div class="flex-grow-1 px-3 py-0">
+                                                    <!-- Main content -->
+                                                    <div class="d-flex flex-grow-1 flex-wrap justify-content-between p-2 w-100">
+                                                        <!-- For small screen of main content -->
+                                                        <div class="px-3 py-0">
                                                             <div class="text-sbold text-16">Activity #1</div>
                                                             <div class="text-reg text-12">COMP-006</div>
+                                                            <span
+                                                                class="course-badge rounded-pill px-3 text-reg text-12 mt-2 d-inline d-md-none">Task</span>
                                                         </div>
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="course-badge rounded-pill px-3 text-reg text-12" style="margin-left: auto; margin-right: 11px;">Task</div>
-                                                            <i class="fa-solid fa-arrow-right text-reg text-12" style="color: var(--black);"></i>
+                                                        <!-- Pill and Arrow on Large screen-->
+                                                        <div class="d-flex align-items-center gap-2 ms-auto">
+                                                            <span
+                                                                class="course-badge rounded-pill px-3 text-reg text-12 d-none d-md-inline">Task</span>
+                                                            <i class="fa-solid fa-arrow-right text-reg text-12 pe-2"
+                                                                style="color: var(--black);"></i>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -298,7 +322,6 @@
                                                     <span class="text-reg text-12" style="color: var(--black);">View More</span>
                                                     <i class="fa-solid fa-arrow-right text-reg text-12" style="color: var(--black);"></i>
                                                 </div>
-
                                             </div>
                                         </div>
                                     </div>
