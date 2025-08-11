@@ -1,0 +1,93 @@
+/* Search Container */
+.search-container {
+    position: relative;
+    width: 90%;
+}
+
+.search-container input {
+    padding: 10px 45px 10px 15px;
+    border: 1px solid black;
+    border-radius: 50px;
+    font-size: 16px;
+}
+
+.search-container button {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #333;
+}
+
+/* Add Course Button */
+.add-course-btn {
+    background-color: var(--primaryColor);
+    border: 1px solid #000;
+    color: #000;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.add-course-btn:hover {
+    background-color: #fcd86f;
+}
+
+/* Dynamic Text */
+.dynamic-text {
+    font-size: 25px;
+}
+
+/* Responsiveness */
+@media screen and (max-width: 1400px) {
+    .dynamic-text {
+        font-size: 22px;
+    }
+
+    .search-container input {
+        font-size: 14px;
+    }
+
+    .search-container button {
+        font-size: 16px;
+    }
+
+    .add-course-btn {
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 1348px) {
+    .dynamic-text {
+        font-size: 18px !important;
+    }
+}
+
+@media screen and (max-width: 991px) {
+    .search-container {
+        width: 100% !important;
+    }
+
+    .text-md-14 {
+        font-size: 14px;
+    }
+
+    .dynamic-text {
+        font-size: 25px !important;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .search-container {
+        width: 75% !important;
+    }
+}
+
+@media screen and (max-width: 575px) {
+    .search-container {
+        width: 100% !important;
+    }
+}
