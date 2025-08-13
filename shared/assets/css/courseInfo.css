@@ -21,7 +21,6 @@ body {
     height: 35px;
     overflow: hidden;
     border-radius: 50%;
-    /* Keep round, or remove this for square */
     flex-shrink: 0;
 }
 
