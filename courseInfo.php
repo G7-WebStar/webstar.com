@@ -531,7 +531,7 @@
                                                     <div class="d-flex align-items-center gap-3">
                                                         <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" 
                                                             alt="" width="40" height="40" 
-                                                            class="rounded-circle me-2">
+                                                            class="rounded-circle me-2 d-xxs-none">
                                                         <span class="text-xl-12">Christian James D. Torrillo</span>
                                                     </div>
                                                     <div class="text-reg text-xl-12 d-block d-md-none d-lg-block">
