@@ -16,6 +16,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 </head>
 
 <body>
@@ -78,7 +79,7 @@
                                                         <strong class="text-sbold" style="font-size: 12px;">Christian
                                                             James
                                                             Torrillo</strong>
-                                                             <br>
+                                                        <br>
                                                         <small class="text-reg">Professor</small>
                                                     </div>
                                                 </div>
@@ -253,7 +254,7 @@
                                                 <li class="nav-item">
                                                     <a class="nav-link" href="#" data-label="Files">Files</a>
                                                 </li>
-                                                <li class="nav-item2">
+                                                <li class="nav-item2 nav-leaderboard">
                                                     <a class="nav-link" href="#"
                                                         data-label="Leaderboard">Leaderboard</a>
                                                 </li>
@@ -276,7 +277,7 @@
                                                 <li class="nav-item">
                                                     <a class="nav-link" href="#" data-label="Files">Files</a>
                                                 </li>
-                                                <li class="nav-item">
+                                                <li class="nav-item nav-leaderboard">
                                                     <a class="nav-link" href="#"
                                                         data-label="Leaderboard">Leaderboard</a>
                                                 </li>
@@ -284,7 +285,7 @@
                                         </div>
 
                                         <!-- Sort by dropdown -->
-                                        <div class="d-flex align-items-center flex-nowrap">
+                                        <div class="d-flex align-items-center flex-nowrap" id="header">
                                             <span class="dropdown-label me-2">Sort by:</span>
                                             <button class="btn dropdown-toggle dropdown-custom" type="button"
                                                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -317,13 +318,13 @@
         const navLinks = document.querySelectorAll('.custom-nav-tabs .nav-link');
 
         navLinks.forEach(link => {
-            link.addEventListener('click', function () {
+            link.addEventListener('click', function() {
                 navLinks.forEach(el => el.classList.remove('active'));
                 this.classList.add('active');
             });
         });
 
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const tabs = document.querySelectorAll('.custom-nav-tabs .nav-link, #desktopTabs .nav-link');
             const contentArea = document.getElementById('tabContentArea');
 
@@ -432,20 +433,140 @@
                 `,
                 "Leaderboard": `
                     <div class="customCard text-sbold p-3">
-                        <p>Top Students</p>
-                        <ol class="mb-0">
-                            <li>No students yet</li>
-                        </ol>
+                            <div class="row">
+                                <div class="col-12 col-xl-4 mt-3 px-0 mx-auto mx-md-0 d-flex d-md-block justify-content-center justify-content-md-auto px-1">
+                                    <div class="card rounded-4 col-6 col-md-12">
+                                        <div class="card-body border border-black rounded-4">
+                                            <div class="row">
+                                                <div class="col-6 d-flex align-items-center">
+                                                    <img src="https://avatars.githubusercontent.com/u/181800261?s=96&amp;v=4" alt="" width="90" height="90" class="rounded-circle float-start leaderboard-img">
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <div class="float-end text-xl-36 text-xs-28 text-40">1</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="badge rounded-pill text-dark text-reg float-end d-flex flex-row d-xxs-none" style="background-color: #C8ECC1;">
+                                                        <i class="bi bi-caret-up-fill me-1"></i><div class="me-1">2</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 mt-3 text-xl-12 text-lg-16 text-xs-12">
+                                                    Christian James D. Torrillo
+                                                </div>
+                                                <div class="col-12 text-reg text-xl-12 text-lg-16 text-xs-12">
+                                                    3160 XPs
+                                                </div>
+                                            </div>                           
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-12 col-xl-4 mt-3 px-0 px-1">
+                                    <div class="card rounded-4">
+                                        <div class="card-body border border-black rounded-4">
+                                            <div class="row">
+                                                <div class="col-6 d-flex align-items-center">
+                                                    <img src="https://avatars.githubusercontent.com/u/181800261?s=96&amp;v=4" alt="" width="90" height="90" class="rounded-circle float-start leaderboard-img">
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <div class="float-end text-xl-36 text-xs-28 text-40">2</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="badge rounded-pill text-dark text-reg float-end d-flex flex-row d-xxs-none" style="background-color: #ECC1C1;">
+                                                        <i class="bi bi-caret-down-fill me-1"></i><div class="me-1">1</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 mt-3 text-xl-12 text-lg-16 text-xs-12">
+                                                    Christian James D. Torrillo
+                                                </div>
+                                                <div class="col-12 text-reg text-xl-12 text-lg-16 text-xs-12">
+                                                    3160 XPs
+                                                </div>
+                                            </div>                           
+                                        </div>
+                                    </div>
+                                </div>
+                                 <div class="col-6 col-md-12 col-xl-4 mt-3 px-0 px-1">
+                                    <div class="card rounded-4">
+                                        <div class="card-body border border-black rounded-4">
+                                            <div class="row">
+                                                <div class="col-6 d-flex align-items-center">
+                                                    <img src="https://avatars.githubusercontent.com/u/181800261?s=96&amp;v=4" alt="" width="90" height="90" class="rounded-circle float-start leaderboard-img">
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <div class="float-end text-xl-36 text-xs-28 text-40">3</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="badge rounded-pill text-dark text-reg float-end d-flex flex-row d-xxs-none" style="background-color: #DFDFDF;">
+                                                        =
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 mt-3 text-xl-12 text-lg-16 text-xs-12">
+                                                    Christian James D. Torrillo
+                                                </div>
+                                                <div class="col-12 text-reg text-xl-12 text-lg-16 text-xs-12">
+                                                    3160 XPs
+                                                </div>
+                                            </div>                           
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="container-fluid">
+                                    <div class="row px-1">
+                                        <div class="col-12 border border-black mx-auto mt-3 rounded-4 px-4 py-2 bg-white">
+                                            <div class="row">
+                                                <div class="col-3 d-flex align-items-center justify-content-around">
+                                                    <span class="text-xl-36 text-xs-28 text-30">
+                                                        4
+                                                    </span>
+                                                    <span class="badge rounded-pill text-dark text-reg float-end d-flex flex-row d-xs-none d-md-none d-lg-flex" style="background-color: #C8ECC1;">
+                                                        <i class="bi bi-caret-up-fill me-1"></i><div class="me-1">2</div>
+                                                    </span>
+                                                </div>
+                                                <div class="col-9 d-flex align-items-center justify-content-between">
+                                                    <div class="d-flex align-items-center gap-3">
+                                                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" 
+                                                            alt="" width="40" height="40" 
+                                                            class="rounded-circle me-2">
+                                                        <span class="text-xl-12">Christian James D. Torrillo</span>
+                                                    </div>
+                                                    <div class="text-reg text-xl-12 d-block d-md-none d-lg-block">
+                                                        3160 XPs
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                     </div>
                 `
             };
 
             function loadContent(label) {
                 contentArea.innerHTML = jitContent[label] || `<p>No content available for ${label}</p>`;
+
+                document.getElementById('header').innerHTML =
+                    `
+                     <span class="dropdown-label me-2">Sort by:</span>
+                     <button class="btn dropdown-toggle dropdown-custom" type="button"
+                         data-bs-toggle="dropdown" aria-expanded="false">
+                         <span>Newest</span>
+                     </button>
+                     <ul class="dropdown-menu">
+                         <li><a class="dropdown-item text-reg" href="#">Newest</a></li>
+                         <li><a class="dropdown-item text-reg" href="#">Oldest</a></li>
+                         <li><a class="dropdown-item text-reg" href="#">Unread first</a></li>
+                     </ul>
+                    `;
             }
 
             tabs.forEach(tab => {
-                tab.addEventListener('click', function (e) {
+                tab.addEventListener('click', function(e) {
                     e.preventDefault();
                     tabs.forEach(t => t.classList.remove('active'));
                     this.classList.add('active');
@@ -457,7 +578,7 @@
             loadContent(tabs[0].getAttribute('data-label'));
         });
 
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const tabContainer = document.getElementById('mobileTabScroll');
             const scrollLeftBtn = document.getElementById('scrollLeftBtn');
             const scrollRightBtn = document.getElementById('scrollRightBtn');
@@ -470,11 +591,17 @@
             }
 
             scrollLeftBtn.addEventListener('click', () => {
-                tabContainer.scrollBy({ left: -100, behavior: 'smooth' });
+                tabContainer.scrollBy({
+                    left: -100,
+                    behavior: 'smooth'
+                });
             });
 
             scrollRightBtn.addEventListener('click', () => {
-                tabContainer.scrollBy({ left: 100, behavior: 'smooth' });
+                tabContainer.scrollBy({
+                    left: 100,
+                    behavior: 'smooth'
+                });
             });
 
             tabContainer.addEventListener('scroll', updateArrowVisibility);
@@ -488,20 +615,50 @@
         const courseCard = dropdownHeader.closest('.course-card'); // find the parent card
 
         // Show dropdown
-        dropdownContent.addEventListener('show.bs.collapse', function () {
+        dropdownContent.addEventListener('show.bs.collapse', function() {
             dropdownHeader.style.borderBottom = '1px solid var(--black)';
             courseCard.style.borderBottomLeftRadius = '10px';
             courseCard.style.borderBottomRightRadius = '10px';
         });
 
         // Hide dropdown
-        dropdownContent.addEventListener('hide.bs.collapse', function () {
+        dropdownContent.addEventListener('hide.bs.collapse', function() {
             dropdownHeader.style.borderBottom = 'none';
             courseCard.style.borderBottomLeftRadius = '0';
             courseCard.style.borderBottomRightRadius = '0';
         });
 
+        var navLeaderboards = document.querySelectorAll('.nav-leaderboard');
+        var isActive = false;
 
+        navLeaderboards.forEach(function(navLeaderboard) {
+            navLeaderboard.addEventListener("click", function() {
+                document.getElementById('header').innerHTML =
+                    `
+                <div class="container-fluid">
+                    <div class="row align-items-center justify-content-center flex-column flex-md-row">
+                        <div class="col-8 col-sm-6 col-md-12 col-lg-6 d-flex search-container mb-2 mb-lg-0">
+                            <input type="text" placeholder="Search classmates" class="form-control py-1 text-reg text-lg-12 text-14">
+                            <button type="button" class="btn btn-outline-secondary ms-2">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                        <div class="col-6 d-flex justify-content-center justify-content-lg-start align-items-center">
+                            <span class="dropdown-label me-2">View by:</span>
+                            <button class="btn dropdown-toggle dropdown-custom" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span>Weekly</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item text-reg" href="#">Monthly</a></li>
+                                <li><a class="dropdown-item text-reg" href="#">Weekly</a></li>
+                                <li><a class="dropdown-item text-reg" href="#">Daily</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                    `;
+            });
+        });
     </script>
 </body>
 

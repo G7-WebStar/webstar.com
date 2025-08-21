@@ -137,6 +137,7 @@ body {
     bottom: 0;
     right: 0;
 }
+
 /* neil again */
 @media (max-width: 767.98px) {
     .custom-nav-tabs {
@@ -195,5 +196,104 @@ body {
 
     #scrollRightBtn {
         right: -10px;
+    }
+}
+
+/* Leaderboard Section */
+/* Search Container */
+.search-container {
+    position: relative;
+}
+
+.search-container input {
+    padding: 10px 45px 10px 15px;
+    border: 1px solid black;
+    border-radius: 50px;
+    font-size: 16px;
+}
+
+.search-container button {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #333;
+}
+
+/* Ranking Text Size */
+.text-40 {
+    font-size: 40px;
+}
+
+/* Responsiveness */
+@media screen and (max-width: 1399px) {
+    .leaderboard-img {
+        width: 70px !important;
+        height: 70px !important;
+    }
+
+    .text-xl-12 {
+        font-size: 12px !important;
+    }
+
+    .text-xl-36 {
+        font-size: 36px !important;
+    }
+}
+
+@media screen and (max-width: 1199px) {
+    .text-lg-16 {
+        font-size: 16px !important;
+    }
+
+    .leaderboard-img {
+        width: 90px !important;
+        height: 90px !important;
+    }
+
+    .text-lg-12 {
+        font-size: 12px !important;
+    }
+}
+
+@media screen and (max-width: 991px) {
+    .w-md-50 {
+        width: 50% !important;
+    }
+}
+
+@media screen and (max-width: 565px) {
+    .leaderboard-img {
+        width: 60px !important;
+        height: 60px !important;
+    }
+
+    .text-xs-12 {
+        font-size: 12px !important;
+    }
+
+    .text-xs-28 {
+        font-size: 28px !important;
+    }
+}
+
+@media screen and (max-width: 380px) {
+    .leaderboard-img {
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+     .d-xxs-none {
+        display: none !important;
+    }
+}
+
+@media screen and (max-width: 490px) {
+    .d-xs-none {
+        display: none !important;
     }
 }
