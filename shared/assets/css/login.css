@@ -134,42 +134,19 @@ body {
 .custom-alert {
     display: flex;
     align-items: center;
-    background-color: #f8d7da;
-    border: 1px solid #ea868f;
-    color: #58151c;
     padding: 12px 16px;
     border-radius: 8px;
     font-family: var(--Regular);
     font-size: 14px;
-    width: 70%;          /* exact match to what you want */
-    margin: 20px auto;   /* centers it */
+    width: 70%;
+    margin: 20px auto;   
     position: relative;
     animation: fadeIn 0.3s ease-in-out;
-}
-
-
-.alert-icon {
-    font-size: 18px;
-    margin-right: 10px;
 }
 
 .alert-message {
     flex: 1;
 }
-
-.alert-close {
-    background: none;
-    border: none;
-    font-size: 18px;
-    color: #842029;
-    cursor: pointer;
-}
-
-.btn-login.modal-shift {
-    margin-top: 0px !important;
-    /* 20px less than normal */
-}
-
 
 @keyframes fadeIn {
     from {
