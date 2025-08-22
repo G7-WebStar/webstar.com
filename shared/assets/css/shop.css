@@ -1,0 +1,247 @@
+.custom-nav-tabs .nav-link {
+    font-family: var(--SemiBold);
+    color: var(--black);
+    opacity: 0.75;
+    border: none;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    font-weight: normal;
+    background-color: transparent !important;
+    white-space: nowrap;
+}
+
+.custom-nav-tabs .nav-link:hover {
+    color: var(--black);
+    text-decoration: none;
+    background-color: transparent !important;
+}
+
+.custom-nav-tabs .nav-link.active {
+    border-bottom: 3px solid var(--black);
+    color: var(--black);
+    font-weight: bold;
+    background-color: transparent !important;
+    opacity: 1;
+}
+
+/* Tab container for horizontal scrolling */
+.tab-container {
+    position: relative;
+    overflow: hidden;
+    margin-left: 45px; 
+}
+
+.tab-scroll-container {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+}
+
+.tab-scroll-container::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--pureWhite);
+    border: 1px solid var(--black);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    font-size: 12px;
+    color: var(--black);
+}
+
+.tab-arrow.left {
+    left: 5px;
+}
+
+.tab-arrow.right {
+    right: 5px;
+}
+
+/* CourseInfo-style mobile responsiveness */
+@media (max-width: 767.98px) {
+    .custom-nav-tabs {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        scroll-snap-type: x mandatory;
+        justify-content: center;
+    }
+
+    .custom-nav-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .custom-nav-tabs .nav-item {
+        flex: 0 0 auto;
+        min-width: 80px;
+        text-align: center;
+        scroll-snap-align: start;
+    }
+
+    .custom-nav-tabs .nav-link {
+        font-size: 12px !important;
+        padding: 10px 8px;
+        white-space: nowrap;
+    }
+
+    .tab-container {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        margin-left:0%;
+    }
+
+    .tab-scroll-container {
+        justify-content: center;
+    }
+
+    .tab-arrow {
+        display: none;
+    }
+}
+
+@media (min-width: 768px) {
+    .tab-arrow {
+        display: none;
+    }
+}
+
+.shop-card-placeholder {
+    background-color: var(--dirtyWhite);
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--black);
+    font-size: 16px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.customCard {
+    width: 100%;
+    max-width: 220px;
+    height: 270px;
+    border: 1px solid var(--black);
+    border-radius: 15px;
+    display: inline-block;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    background-color: var(--primaryColor);
+    margin-top: 30px;
+}
+
+.cardItem {
+    cursor: pointer;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--primaryColor);
+    border: none;
+}
+
+.shopCardImage {
+    width: 100% !important;
+    height: 227px !important;
+    object-fit: cover;
+    border: none;
+    border-bottom: 1px solid var(--black);
+    background-color: var(--primaryColor);
+    display: block;
+    margin: 0;
+}
+
+.cardContent {
+    flex: 1;
+    padding: 15px;
+    background-color: var(--pureWhite);
+    display: flex;
+    flex-direction: column;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+.cardTitle {
+    font-family: var(--SemiBold);
+    font-size: 18px;
+    color: var(--black);
+    margin-bottom: 2px;
+    line-height: 1.3;
+}
+
+.cardPrice {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--Regular);
+    font-size: 18px;
+    font-weight: normal;
+    color: var(--black);
+    line-height: 1.3;
+}
+
+.cardPrice .fa-star {
+    color: var(--black) !important;
+}
+
+/* Mobile responsive layout */
+@media (max-width: 768px) {
+    .d-flex.align-items-center {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .tab-container {
+        max-width: 100%;
+    }
+
+    #tabContentArea {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0 20px;
+    }
+    
+    .card-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .customCard {
+        width: 237px;
+        height: 326px;
+        margin-top: 25px;
+    }
+    
+    .shopCardImage {
+        height: 227px !important;
+    }
+
+    /* Shop title mobile styling */
+    .shop-title {
+        font-size: 24px !important;
+        padding: 10px 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 15px;
+        margin-bottom: 20px;
+    }
+}
