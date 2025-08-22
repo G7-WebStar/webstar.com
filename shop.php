@@ -11,13 +11,13 @@
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="shared/assets/css/global-styles.css">
     <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
+    <link rel="stylesheet" href="shared/assets/css/shop.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
-
 </head>
 
 <body>
-    <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center p-0 p-md-3"
+<div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center p-0 p-md-3"
         style="background-color: var(--black);">
 
         <div class="row w-100">
@@ -38,16 +38,143 @@
 
                     <div class="container-fluid py-3 overflow-y-auto">
                         <div class="row">
-                             <!-- PUT CONTENT HERE -->
+                            <div class="col-12">
+
+                                <div class="d-flex align-items-center">
+                                    <h1 class="text-bold text-30 mb-0 mt-2 shop-title" style="color: var(--black);">Shop</h1>
+                                    <div class="tab-container">
+                                        <div class="tab-scroll-container">
+                                            <ul class="nav nav-tabs custom-nav-tabs" id="shopTabs">
+                                                <li class="nav-item">
+                                                    <a class="nav-link active" href="#" data-label="Frame">Frame</a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" href="#" data-label="Color Theme">Color Theme</a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" href="#" data-label="Fonts">Fonts</a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" href="#" data-label="Logo Badge">Logo Badge</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <button class="tab-arrow left" onclick="scrollTabs('left')">
+                                            <i class="fa-solid fa-chevron-left"></i>
+                                        </button>
+                                        <button class="tab-arrow right" onclick="scrollTabs('right')">
+                                            <i class="fa-solid fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab Content Area -->
+                        <div class="row" id="tabContentArea">
+                            <!-- JavaScript will inject content here -->
                         </div>
                     </div>
+
                 </div>
             </div>
+
         </div>
+    </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-       
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Shop Page Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const tabs = document.querySelectorAll('#shopTabs .nav-link');
+            const contentArea = document.getElementById('tabContentArea');
+
+            function createShopCard(title, points) {
+                return `
+                    <div class="col-lg-3 col-md-4 col-sm-6 col-12 card-wrapper">
+                        <div class="customCard">
+                            <div class="cardItem">
+                                <div class="shopCardImage"></div>
+                                <div class="cardContent">
+                                    <div class="cardTitle">${title}</div>
+                                    <div class="cardPrice">
+                                        <i class="fa-solid fa-star text-warning"></i>
+                                        <span>${points} WBSTRS</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const shopContent = {
+                "Frame": [
+                    createShopCard("Frame 1", 1200),
+                    createShopCard("Frame 2", 1500),
+                    createShopCard("Frame 3", 1800),
+                    createShopCard("Frame 4", 2000),
+                    createShopCard("Frame 5", 2500)
+                ].join(''),
+                "Color Theme": [
+                    createShopCard("Dark Theme", 800),
+                    createShopCard("Light Theme", 600),
+                    createShopCard("Blue Theme", 900),
+                    createShopCard("Green Theme", 750),
+                    createShopCard("Purple Theme", 1000)
+                ].join(''),
+                "Fonts": [
+                    createShopCard("Cursive Font", 500),
+                    createShopCard("Bold Font", 400),
+                    createShopCard("Italic Font", 450),
+                    createShopCard("Script Font", 600),
+                    createShopCard("Modern Font", 700)
+                ].join(''),
+                "Logo Badge": [
+                    createShopCard("Gold Badge", 1500),
+                    createShopCard("Silver Badge", 1200),
+                    createShopCard("Bronze Badge", 900),
+                    createShopCard("Diamond Badge", 2000),
+                    createShopCard("Platinum Badge", 1800)
+                ].join('')
+            };
+
+            contentArea.innerHTML = shopContent["Frame"];
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const label = this.getAttribute('data-label');
+                    contentArea.innerHTML = shopContent[label] || `<p>No items available.</p>`;
+                });
+            });
+
+            function scrollTabs(direction) {
+                const scrollContainer = document.querySelector('.tab-scroll-container');
+                const scrollAmount = 200;
+
+                if (direction === 'left') {
+                    scrollContainer.scrollBy({
+                        left: -scrollAmount,
+                        behavior: 'smooth'
+                    });
+                } else {
+                    scrollContainer.scrollBy({
+                        left: scrollAmount,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+
+            window.scrollTabs = scrollTabs;
+        });
+    </script>
+
 </body>
-
 
 </html>
