@@ -1,0 +1,193 @@
+/* Registartion Profile */
+.header-part {
+    background: var(--primaryColor);
+    height: 110px;
+    padding-left: 40px;
+    border-bottom: 1px solid var(--black);
+}
+
+.next-btn {
+    margin-left: auto;
+    margin-top: 25px;
+}
+
+.custom-forms {
+    max-width: 400px;
+    width: 100%;
+}
+
+.custom-forms .form-control,
+.custom-forms .form-select {
+    /* padding: 0.55rem 0.75rem; */
+    border-radius: 12px;
+    border: 1px solid var(--black);
+}
+
+.registration-container {
+    max-width: 780px;
+    width: 100%;
+    background: var(--dirtyWhite);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, .15);
+    border-radius: 1.5rem;
+    overflow: hidden;
+}
+
+.profile-pic {
+    border-radius: 12px;
+    border: 1px solid var(--black);
+    height: 200px;
+    width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    background-color: var(--primaryColor);
+    overflow: hidden;
+}
+
+.profile-pic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+.btn-upload {
+    width: 120px;
+    border-radius: 15px;
+    background-color: var(--primaryColor);
+    border: 1px solid var(--black);
+    color: var(--black);
+    transition: none !important;
+}
+
+.btn-upload:hover,
+.btn-upload:active {
+    background-color: var(--primaryColor) !important;
+    border: 1px solid var(--black) !important;
+}
+
+/* RegistrationNext */
+/* Forms */
+.custom-input {
+    padding: 0.65rem 0.75rem;
+    border-radius: 12px;
+    border: 1px solid var(--black);
+    width: 100%;
+}
+
+/* Modal buttons */
+.modal-footer .btn {
+    border-radius: 20px !important;
+    padding: 6px 18px !important;
+    cursor: pointer;
+    user-select: none;
+    outline: none !important;
+    box-shadow: none !important;
+    transition: none !important;
+}
+
+/* Let's go button */
+.modal-footer .btn-go-custom {
+    background-color: var(--primaryColor) !important;
+    border: 1px solid var(--black) !important;
+    color: var(--black) !important;
+}
+
+.btn-go-custom:hover,
+.btn-go-custom:focus,
+.btn-go-custom:active {
+    background-color: var(--primaryColor) !important;
+    color: var(--black) !important;
+    border: 1px solid var(--black) !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.btn-finish {
+    width: 100px;
+    border-radius: 15px;
+    background-color: var(--primaryColor);
+    border: 1px solid var(--black);
+    color: var(--black);
+}
+
+.btn-finish:hover,
+.btn-finish:active {
+    background-color: var(--primaryColor) !important;
+    border: 1px solid var(--black) !important;
+}
+
+/* forms alignment */
+
+
+@media (min-width: 1200px) {
+
+    /* Registration Next */
+    .form-col {
+        padding-left: 3.5rem !important;
+    }
+}
+
+
+@media (max-width: 767.98px) {
+
+    /* Registration Proile */
+    .container-fluid {
+        background: var(--dirtyWhite) !important;
+    }
+
+    .registration-container {
+        background: var(--dirtyWhite) !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+    }
+
+    /* Forms */
+    .container.p-4 {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    .registration-container form {
+        max-width: 100% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    .registration-container form .form-control,
+    .registration-container form .form-select {
+        width: 100% !important;
+    }
+
+
+    /* RegistrationNext */
+    .profile-setup-container {
+        align-items: flex-start !important;
+        padding-top: 38px;
+    }
+
+    .mobile-logo img {
+        margin-top: 10px;
+    }
+
+    /* .custom-forms .form-control,
+    .custom-forms .form-select {
+        padding: 0.65rem 0.8rem;
+    } */
+
+    .row.justify-content-center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn-finish {
+        width: 100% !important;
+        height: 35px !important;
+        font-size: 14px !important;
+        margin-left: 0 !important;
+    }
+
+
+}

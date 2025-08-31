@@ -1,0 +1,99 @@
+.btn-register {
+    background-color: var(--blue);
+    color: var(--white);
+    font-size: 22px;
+}
+
+.registration-form {
+    max-width: 65%;
+}
+
+/* .form-control::placeholder {
+    font-size: 13px;
+    line-height: 1.5;
+} */
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: var(--black);
+}
+
+.custom-form .form-floating .form-control,
+.custom-form .form-floating .form-select {
+    /* padding: 0.3rem 0.75rem; */
+    border-radius: 12px;
+    border: 1px solid var(--black);
+}
+
+.registration-container {
+    max-width: 780px;
+    margin: auto;
+    background: var(--dirtyWhite);
+    min-height: 80vh;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, .15);
+    border-radius: 1.5rem;
+    overflow: hidden;
+}
+
+.registration-logo-col {
+    background: var(--primaryColor);
+    max-width: 305px;
+}
+
+@media (max-width: 767.98px) {
+
+    .container-fluid {
+        background: var(--dirtyWhite) !important;
+    }
+
+    .registration-container {
+        background: var(--dirtyWhite) !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        min-height: 100vh;
+    }
+
+    .registration-logo-col,
+    .registration-form-col {
+        max-width: 100% !important;
+        background: var(--dirtyWhite) !important;
+        border-radius: 0 !important;
+    }
+
+    .registration-form-col {
+        padding: 2rem 1rem !important;
+    }
+
+
+    .logo {
+        max-width: 200px !important;
+        height: auto;
+        padding-top: 45px;
+    }
+
+
+    .registration-title {
+        margin-bottom: 30px !important;
+        margin-top: -30px !important;
+    }
+
+    .custom-form .form-control {
+        padding: 0.75rem 1rem;
+        /* increase top/bottom and left/right padding */
+    }
+
+    /* .custom-form .form-control,
+    .custom-form .form-select {
+        padding: 0.65rem 0.8rem;
+    } */
+
+}
