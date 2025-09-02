@@ -1,0 +1,163 @@
+/* Course Join Page Styles */
+body {
+    background-color: var(--black);
+    font-family: var(--Regular);
+}
+
+.course-join-image {
+    width: 295px;
+    height: 295px;
+    margin: 0 auto 10px;
+    display: block;
+    transform: rotate(-5deg);
+    opacity: 1;
+}
+
+.course-join-headline {
+    font-family: var(--SemiBold);
+    font-size: 24px;
+    color: var(--black);
+    margin-bottom: 5px;
+    letter-spacing: -0.03em;
+    text-align: center;
+    font-weight: 300;
+}
+
+.course-join-subheadline {
+    font-family: var(--Regular);
+    font-size: 16px;
+    color: var(--black);
+    margin-bottom: 40px;
+    letter-spacing: -0.03em;
+    text-align: center;
+}
+
+.course-join-input {
+    width: 299px;
+    height: 55px;
+    border: 1px solid var(--black);
+    border-radius: 15px;
+    padding: 0 20px;
+    font-family: var(--Regular);
+    font-size: 16px;
+    background-color: var(--pureWhite);
+    color: var(--black);
+    margin-bottom: 25px;
+    transition: border-color 0.2s ease;
+    opacity: 1;
+}
+
+.course-join-input:focus {
+    outline: none;
+    border-color: var(--black);
+    box-shadow: 0 0 0 2px rgba(44, 44, 44, 0.1);
+}
+
+.course-join-input::placeholder {
+    color: #999;
+    font-family: var(--Regular);
+}
+
+.course-join-button {
+    background-color: var(--primaryColor);
+    color: var(--black);
+    font-family: var(--SemiBold);
+    font-size: 18px;
+    border: 1px solid var(--black);
+    border-radius: 50px;
+    width: 135px;
+    height: 47px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: -0.01em;
+    padding: 0;
+    display: block;
+    margin: 0 auto;
+    opacity: 1;
+    align-items: center;
+}
+
+.course-join-button:hover {
+    background-color: var(--primaryColor);
+    border-color: var(--black);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.course-join-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#alertContainer {
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#alertContainer .alert {
+    width: 320px;
+    height: 45px;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 6px;
+    color: #721c24;
+    padding: 3px 15px;
+    margin: 0 auto;
+    font-size: 12px;
+    opacity: 1;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+#alertContainer .alert svg {
+    width: 16px;
+    height: 16px;
+    fill: #721c24;
+}
+
+#alertContainer .alert div {
+    padding: 0 15px 0 0px;
+}
+
+.form-floating {
+    width: 299px;
+    margin: 0 auto 13px;
+}
+
+.form-floating .form-control {
+    width: 100%;
+    height: 55px;
+    border: 1px solid var(--black);
+    border-radius: 15px;
+    padding: 0 20px;
+    font-family: var(--Regular);
+    font-size: 16px;
+    background-color: var(--pureWhite);
+    color: var(--black);
+    transition: border-color 0.2s ease;
+    opacity: 1;
+}
+
+.form-floating .form-control:focus {
+    outline: none;
+    border-color: var(--black);
+    box-shadow: 0 0 0 2px rgba(44, 44, 44, 0.1);
+}
+
+.form-floating .form-control::placeholder {
+    color: #999;
+    font-family: var(--Regular);
+}
+
+.form-floating label {
+    font-family: var(--Regular);
+    font-size: 16px;
+    color: var(--black);
+    padding: 0 20px;
+    margin-top: 15px;
+}
