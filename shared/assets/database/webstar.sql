@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 29, 2025 at 07:42 AM
+-- Generation Time: Sep 02, 2025 at 12:50 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -33,6 +33,13 @@ CREATE TABLE `admin` (
   `password` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `admin`
+--
+
+INSERT INTO `admin` (`adminID`, `email`, `password`) VALUES
+(1, 'john.doe@gmail.com', 'Pass@123');
+
 -- --------------------------------------------------------
 
 --
@@ -48,6 +55,13 @@ CREATE TABLE `announcements` (
   `announcementTime` time NOT NULL,
   `isRequired` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `announcements`
+--
+
+INSERT INTO `announcements` (`announcementID`, `courseID`, `announcementTitle`, `announcementContent`, `announcementDate`, `announcementTime`, `isRequired`) VALUES
+(1, 1, 'Project Deadline Reminder', 'Final project is due next week. Submit via LMS.', '2025-08-30', '09:00:00', 1);
 
 -- --------------------------------------------------------
 
@@ -66,6 +80,13 @@ CREATE TABLE `courses` (
   `code` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `courses`
+--
+
+INSERT INTO `courses` (`courseID`, `userID`, `courseCode`, `courseTitle`, `courseImage`, `yearSection`, `schedule`, `code`) VALUES
+(1, 1, 'WEBDEV101', 'Web Development', 'webdev101.jpg', '2', 'MWF 10:00–11:30AM', 'WD-2A-2025');
+
 -- --------------------------------------------------------
 
 --
@@ -80,6 +101,13 @@ CREATE TABLE `files` (
   `uploadedBy` int(11) NOT NULL,
   `uploadedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `files`
+--
+
+INSERT INTO `files` (`fileID`, `courseID`, `fileName`, `filePath`, `uploadedBy`, `uploadedAt`) VALUES
+(1, 1, 'css-grid-cheatsheet.pdf', 'uploads/course110/css-grid-cheatsheet.pdf', 1, '2025-08-30 10:30:00');
 
 -- --------------------------------------------------------
 
@@ -127,6 +155,13 @@ CREATE TABLE `leaderboard` (
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `leaderboard`
+--
+
+INSERT INTO `leaderboard` (`leaderboardID`, `courseID`, `userID`, `timeRange`, `periodStart`, `xpPoints`, `rank`, `previousRank`, `updatedAt`) VALUES
+(1, 1, 2, 'Weekly', '2025-08-25', 450, 3, 5, '2025-08-30 12:00:00');
+
 -- --------------------------------------------------------
 
 --
@@ -145,6 +180,13 @@ CREATE TABLE `lessons` (
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `lessons`
+--
+
+INSERT INTO `lessons` (`lessonID`, `courseID`, `userID`, `lessonTitle`, `lessonDescription`, `lessonContent`, `attachment`, `lessonType`, `createdAt`, `updatedAt`) VALUES
+(1, 1, 2, 'Introduction to CSS Grid', 'Basics of layout with CSS Grid', 'Learn how to create grid layouts', 'css-grid.pdf', 'Lecture', '2025-08-30 09:00:00', '2025-08-30 09:00:00');
 
 -- --------------------------------------------------------
 
@@ -173,6 +215,31 @@ CREATE TABLE `points` (
   `dateEarned` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `points`
+--
+
+INSERT INTO `points` (`pointsID`, `userID`, `sourceType`, `pointsEarned`, `dateEarned`) VALUES
+(1, 2, 'Exam', 50, '2025-08-30 08:28:27');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `program`
+--
+
+CREATE TABLE `program` (
+  `programID` int(11) NOT NULL,
+  `programName` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `program`
+--
+
+INSERT INTO `program` (`programID`, `programName`) VALUES
+(1, 'BSIT');
+
 -- --------------------------------------------------------
 
 --
@@ -180,6 +247,7 @@ CREATE TABLE `points` (
 --
 
 CREATE TABLE `report` (
+  `reportID` int(11) NOT NULL,
   `courseID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
   `totalXP` int(11) NOT NULL,
@@ -188,6 +256,13 @@ CREATE TABLE `report` (
   `assesmentScorePercent` decimal(10,0) NOT NULL,
   `generatedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `report`
+--
+
+INSERT INTO `report` (`reportID`, `courseID`, `userID`, `totalXP`, `allTimeRank`, `assignmentScorePercent`, `assesmentScorePercent`, `generatedAt`) VALUES
+(1, 1, 2, 4500, 10, 89, 92, '2025-08-30 14:26:32');
 
 -- --------------------------------------------------------
 
@@ -207,6 +282,13 @@ CREATE TABLE `todo` (
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `todo`
+--
+
+INSERT INTO `todo` (`todoID`, `userID`, `courseID`, `title`, `type`, `status`, `dueDate`, `createdAt`, `updatedAt`) VALUES
+(1, 4, 1, 'Review CSS Grid and Flexbox', 'Study', 'Pending', '2025-09-01', '2025-08-29 09:00:00', '2025-08-29 09:00:00');
+
 -- --------------------------------------------------------
 
 --
@@ -216,21 +298,28 @@ CREATE TABLE `todo` (
 CREATE TABLE `userinfo` (
   `userInfoID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
-  `profilePicture` varchar(300) NOT NULL,
-  `firstName` varchar(100) NOT NULL,
-  `middleName` varchar(100) NOT NULL,
-  `lastName` varchar(100) NOT NULL,
+  `profilePicture` varchar(100) NOT NULL,
+  `firstName` varchar(50) NOT NULL,
+  `middleName` varchar(50) NOT NULL,
+  `lastName` varchar(50) NOT NULL,
   `studentID` varchar(50) NOT NULL,
-  `program` varchar(100) NOT NULL,
-  `gender` enum('Male','Female','Other','') NOT NULL,
+  `programID` varchar(50) NOT NULL,
+  `gender` varchar(50) NOT NULL,
   `yearLevel` varchar(20) NOT NULL,
-  `schoolEmail` varchar(255) NOT NULL,
+  `schoolEmail` varchar(50) NOT NULL,
   `contactNumber` varchar(20) NOT NULL,
   `facebookLink` text NOT NULL,
   `linkedInLink` text NOT NULL,
   `instagramLink` text NOT NULL,
   `createdAt` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `userinfo`
+--
+
+INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `middleName`, `lastName`, `studentID`, `programID`, `gender`, `yearLevel`, `schoolEmail`, `contactNumber`, `facebookLink`, `linkedInLink`, `instagramLink`, `createdAt`) VALUES
+(1, 2, 'profile_2.jpg', 'Jane', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 'jane.smith@university.edu', '+639123456789', 'https://facebook.com/jane.smith', 'https://linkedin.com/in/jane-smith', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53');
 
 -- --------------------------------------------------------
 
@@ -242,9 +331,17 @@ CREATE TABLE `users` (
   `userID` int(11) NOT NULL,
   `password` varchar(50) NOT NULL,
   `email` varchar(50) NOT NULL,
-  `role` varchar(8) NOT NULL,
+  `role` varchar(8) NOT NULL DEFAULT 'user',
   `userName` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`) VALUES
+(1, 'Pass@123', 'john.doe@gmail.com', 'admin', 'johndoe'),
+(2, 'Hello@world', 'jane.smith@example.com', 'student', 'janesmith');
 
 --
 -- Indexes for dumped tables
@@ -311,6 +408,18 @@ ALTER TABLE `points`
   ADD PRIMARY KEY (`pointsID`);
 
 --
+-- Indexes for table `program`
+--
+ALTER TABLE `program`
+  ADD PRIMARY KEY (`programID`);
+
+--
+-- Indexes for table `report`
+--
+ALTER TABLE `report`
+  ADD PRIMARY KEY (`reportID`);
+
+--
 -- Indexes for table `todo`
 --
 ALTER TABLE `todo`
@@ -336,25 +445,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `adminID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `adminID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `announcements`
 --
 ALTER TABLE `announcements`
-  MODIFY `announcementID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `announcementID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `courses`
 --
 ALTER TABLE `courses`
-  MODIFY `courseID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `courseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `files`
 --
 ALTER TABLE `files`
-  MODIFY `fileID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `fileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `follows`
@@ -372,13 +481,13 @@ ALTER TABLE `gameresult`
 -- AUTO_INCREMENT for table `leaderboard`
 --
 ALTER TABLE `leaderboard`
-  MODIFY `leaderboardID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `leaderboardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `lessons`
 --
 ALTER TABLE `lessons`
-  MODIFY `lessonID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `lessonID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `minigames`
@@ -390,25 +499,37 @@ ALTER TABLE `minigames`
 -- AUTO_INCREMENT for table `points`
 --
 ALTER TABLE `points`
-  MODIFY `pointsID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `pointsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `program`
+--
+ALTER TABLE `program`
+  MODIFY `programID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `report`
+--
+ALTER TABLE `report`
+  MODIFY `reportID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `todo`
 --
 ALTER TABLE `todo`
-  MODIFY `todoID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `todoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `userinfo`
 --
 ALTER TABLE `userinfo`
-  MODIFY `userInfoID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `userInfoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
