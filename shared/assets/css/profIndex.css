@@ -1,0 +1,127 @@
+ /* Course card */
+ .custom-course-card {
+   width: 200px;
+   height: 190px;
+   border-radius: 15px;
+   overflow: hidden;
+   border: 1px solid var(--black);
+ }
+
+ .custom-course-card .card-img-top {
+   height: 125px;
+   object-fit: cover;
+ }
+
+ .left-card {
+   border-radius: 25px;
+   border: 1px solid var(--black);
+ }
+
+ .show-on-top {
+   position: absolute !important;
+   z-index: 2000 !important;
+   transform: translate3d(0, 40px, 0) !important;
+ }
+
+ .stats {
+   font-size: 20px
+ }
+
+ .dropdown-menu {
+   border: 1px solid var(--black);
+   background-color: rgba(255, 255, 255, 1);
+   box-shadow: 0px 4px 11.2px 5px rgba(0, 0, 0, 0.25);
+   border-radius: 26px;
+   overflow: hidden;
+ }
+
+ /* Make dropdown text smaller */
+ .dropdown-menu .dropdown-item {
+   font-size: 13px;  
+   padding: 6px 12px;
+   margin-inline-start: 7px;
+ }
+
+ /* Make dropdown icons smaller */
+ .dropdown-menu .dropdown-item img {
+   width: 15px;
+   height: 13px;
+ }
+
+ .stats-count {
+   font-weight: var(--Bold);
+ }
+
+ .stats-label {
+   font-weight: 500;
+   margin-top: 2px;
+   color: var(--black);
+ }
+
+ .btn-custom {
+   background: var(--primaryColor) !important;
+   border: 1px solid var(--black);
+   color: inherit; 
+   box-shadow: none !important; 
+}
+ 
+
+ .custom-course-card {
+   width: 240px;
+   height: 400px;
+ }
+
+ .left-card .scrollable-tasks { 
+  height: 400px;               
+  overflow-y: auto;
+  scrollbar-width: thin;       
+  -ms-overflow-style: none;    
+ }
+
+
+ .left-card .scrollable-tasks::-webkit-scrollbar {
+   display: none;
+ }
+
+ .stats .col-12 {
+  text-align: center;
+}
+
+.stats .d-flex.align-items-center {
+  justify-content: center;
+}
+
+@media (max-width: 767px) {
+  .col-12.d-flex.justify-content-center.justify-content-md-end {
+    justify-content: center !important;
+  }
+}
+
+
+ @media (max-width: 576px) {
+   .text-22 {
+     font-size: 19px !important;
+   }
+
+   .text-16 {
+     font-size: 12px !important;
+   }
+ }
+
+@media (max-width: 767px) {
+  .col-12.col-md-5 {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .stats .col-12 {
+    text-align: center;
+  }
+
+  .stats .d-flex.align-items-center {
+    justify-content: center;
+  }
+}
+
+
