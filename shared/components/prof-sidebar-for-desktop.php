@@ -5,7 +5,7 @@
             <div class="card border-0 sidebar mx-2 p-2 overflow-y-auto" style="width: 220px;">
                 <!-- Logo -->
                 <div class="d-flex justify-content-center">
-                    <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid pt-5 pb-5 px-3" width="180px;">
+                    <img src="../shared/assets/img/webstar-logo-black.png" class="img-fluid pt-5 pb-5 px-3" width="180px;">
                 </div>
 
                 <!-- Navigation -->
@@ -13,37 +13,37 @@
 
                     <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'home') ? 'selected-box' : ''; ?>"
                         data-page="">
-                        <img src="shared/assets/img/dashboard.png" class="img-fluid" style="width: 30px; height: 30px;">
+                        <img src="../shared/assets/img/dashboard.png" class="img-fluid" style="width: 30px; height: 30px;">
                         <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'home') ? 'selected' : ''; ?>"
-                            href=""><strong>Home</strong></a>
+                            href="profIndex.php"><strong>Home</strong></a>
                     </li>
 
                     <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'course') ? 'selected-box' : ''; ?>"
                         data-page="">
-                        <img src="shared/assets/img/courses.png" class="img-fluid" style="width: 30px; height: 30px;">
+                        <img src="../shared/assets/img/courses.png" class="img-fluid" style="width: 30px; height: 30px;">
                         <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'course') ? 'selected' : ''; ?>"
-                            href=""><strong>Courses</strong></a>
+                            href="#"><strong>Courses</strong></a>
                     </li>
 
                     <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'inbox') ? 'selected-box' : ''; ?>"
                         data-page="">
-                        <img src="shared/assets/img/inbox.png" class="img-fluid" style="width: 30px; height: 30px;">
+                        <img src="../shared/assets/img/inbox.png" class="img-fluid" style="width: 30px; height: 30px;">
                         <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'inbox') ? 'inbox' : ''; ?>"
-                            href=""><strong>Inbox</strong></a>
+                            href="#"><strong>Inbox</strong></a>
                     </li>
 
                     <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'search') ? 'selected-box' : ''; ?>"
                         data-page="">
-                        <img src="shared/assets/img/todo.png" class="img-fluid" style="width: 30px; height: 30px;">
+                        <img src="../shared/assets/img/profIndex/search.png" class="img-fluid" style="width: 30px; height: 30px;">
                         <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'search') ? 'selected' : ''; ?>"
-                            href=""><strong>Search</strong></a>
+                            href="#"><strong>Search</strong></a>
                     </li>
 
                     <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'assess') ? 'selected-box' : ''; ?>"
                         data-page="">
-                        <img src="shared/assets/img/shop.png" class="img-fluid" style="width: 30px; height: 30px;">
+                        <img src="../shared/assets/img/profIndex/assess.png" class="img-fluid" style="width: 30px; height: 30px;">
                         <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'assess') ? 'selected' : ''; ?>"
-                            href=""><strong>Assess</strong></a>
+                            href="#"><strong>Assess</strong></a>
                     </li>
 
                 </ul>

@@ -6,7 +6,7 @@
     <div class="offcanvas-body d-flex flex-column p-0">
         <div class="d-flex flex-column flex-shrink-0 p-3" style="width: 100%;">
             <a class="d-flex align-items-center  text-decoration-none">
-                <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid w-100 py-3 px-2" />
+                <img src="../shared/assets/img/webstar-logo-black.png" class="img-fluid w-100 py-3 px-2" />
             </a>
 
             <hr>
@@ -14,37 +14,37 @@
 
                 <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3 <?php echo ($activePage == 'home') ? 'selected-box' : ''; ?>"
                     data-page="home">
-                    <img src="shared/assets/img/dashboard.png" style="width: 30px; height: 30px;">
+                    <img src="../shared/assets/img/dashboard.png" style="width: 30px; height: 30px;">
                     <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'home') ? 'selected' : ''; ?>"
-                        href=""><strong>Home</strong></a>
+                        href="profIndex.php"><strong>Home</strong></a>
                 </li>
 
                 <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3 <?php echo ($activePage == 'course') ? 'selected-box' : ''; ?>"
                     data-page="course">
-                    <img src="shared/assets/img/courses.png" style="width: 30px; height: 30px;">
+                    <img src="../shared/assets/img/courses.png" style="width: 30px; height: 30px;">
                     <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'course') ? 'selected' : ''; ?>"
-                        href=""><strong>Courses</strong></a>
+                        href="#"><strong>Courses</strong></a>
                 </li>
 
                 <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3 <?php echo ($activePage == 'inbox') ? 'selected-box' : ''; ?>"
                     data-page="inbox">
-                    <img src="shared/assets/img/inbox.png" style="width: 30px; height: 30px;">
+                    <img src="../shared/assets/img/inbox.png" style="width: 30px; height: 30px;">
                     <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'inbox') ? 'selected' : ''; ?>"
-                        href=""><strong>Inbox</strong></a>
+                        href="#"><strong>Inbox</strong></a>
                 </li>
 
                 <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3 <?php echo ($activePage == 'search') ? 'selected-box' : ''; ?>"
                     data-page="todo">
-                    <img src="shared/assets/img/todo.png" style="width: 30px; height: 30px;">
+                    <img src="../shared/assets/img/profIndex/search.png" style="width: 30px; height: 30px;">
                     <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'search') ? 'selected' : ''; ?>"
-                        href=""><strong>Search</strong></a>
+                        href="#"><strong>Search</strong></a>
                 </li>
 
                 <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3 <?php echo ($activePage == 'assess') ? 'selected-box' : ''; ?>"
                     data-page="shop">
-                    <img src="shared/assets/img/shop.png" style="width: 30px; height: 30px;">
+                    <img src="../shared/assets/img/profIndex/assess.png" style="width: 30px; height: 30px;">
                     <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'assess') ? 'selected' : ''; ?>"
-                        href=""><strong>Assess</strong></a>
+                        href="#"><strong>Assess</strong></a>
                 </li>
 
             </ul>
