@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 04, 2025 at 04:18 PM
+-- Generation Time: Sep 04, 2025 at 05:23 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -69,17 +69,19 @@ INSERT INTO `announcementnotes` (`noteID`, `announcementID`, `userID`, `notedAt`
 CREATE TABLE `announcements` (
   `announcementID` int(11) NOT NULL,
   `courseID` int(11) NOT NULL,
-  `userID` int(11) NOT NULL,
-  `content` text NOT NULL,
-  `createdAt` datetime DEFAULT current_timestamp()
+  `announcementTitle` varchar(255) NOT NULL,
+  `announcementContent` text NOT NULL,
+  `announcementDate` date NOT NULL,
+  `announcementTime` time NOT NULL,
+  `isRequired` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `announcements`
 --
 
-INSERT INTO `announcements` (`announcementID`, `courseID`, `userID`, `content`, `createdAt`) VALUES
-(1, 1, 1, 'Welcome to our course! Please make sure to check the Course Overview under the \"Lessons\" tab before our first face-to-face session this week.', '2025-01-29 09:00:00');
+INSERT INTO `announcements` (`announcementID`, `courseID`, `announcementTitle`, `announcementContent`, `announcementDate`, `announcementTime`, `isRequired`) VALUES
+(1, 1, 'Project Deadline Reminder', 'Final project is due next week. Submit via LMS.', '2025-08-30', '09:00:00', 1);
 
 -- --------------------------------------------------------
 
@@ -117,15 +119,34 @@ CREATE TABLE `courses` (
   `courseImage` varchar(255) NOT NULL,
   `yearSection` varchar(50) NOT NULL,
   `schedule` varchar(255) NOT NULL,
-  `accessCode` varchar(20) NOT NULL
+  `code` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `courses`
 --
 
-INSERT INTO `courses` (`courseID`, `userID`, `courseCode`, `courseTitle`, `courseImage`, `yearSection`, `schedule`, `accessCode`) VALUES
+INSERT INTO `courses` (`courseID`, `userID`, `courseCode`, `courseTitle`, `courseImage`, `yearSection`, `schedule`, `code`) VALUES
 (1, 1, 'WEBDEV101', 'Web Development', 'webdev101.jpg', '2', 'MWF 10:00–11:30AM', 'WD-2A-2025');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `enrollment`
+--
+
+CREATE TABLE `enrollment` (
+  `enrollmentID` int(11) NOT NULL,
+  `userID` int(11) NOT NULL,
+  `yearSectionID` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `enrollment`
+--
+
+INSERT INTO `enrollment` (`enrollmentID`, `userID`, `yearSectionID`) VALUES
+(1, 2, 2023);
 
 -- --------------------------------------------------------
 
@@ -427,9 +448,7 @@ ALTER TABLE `announcementnotes`
 -- Indexes for table `announcements`
 --
 ALTER TABLE `announcements`
-  ADD PRIMARY KEY (`announcementID`),
-  ADD KEY `courseId` (`courseID`),
-  ADD KEY `fk_announcements_user` (`userID`);
+  ADD PRIMARY KEY (`announcementID`);
 
 --
 -- Indexes for table `assessments`
@@ -443,6 +462,12 @@ ALTER TABLE `assessments`
 --
 ALTER TABLE `courses`
   ADD PRIMARY KEY (`courseID`);
+
+--
+-- Indexes for table `enrollment`
+--
+ALTER TABLE `enrollment`
+  ADD PRIMARY KEY (`enrollmentID`);
 
 --
 -- Indexes for table `files`
@@ -535,28 +560,22 @@ ALTER TABLE `admin`
   MODIFY `adminID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `announcementnotes`
---
-ALTER TABLE `announcementnotes`
-  MODIFY `noteID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
 -- AUTO_INCREMENT for table `announcements`
 --
 ALTER TABLE `announcements`
   MODIFY `announcementID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `assessments`
---
-ALTER TABLE `assessments`
-  MODIFY `assessmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
 -- AUTO_INCREMENT for table `courses`
 --
 ALTER TABLE `courses`
   MODIFY `courseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `enrollment`
+--
+ALTER TABLE `enrollment`
+  MODIFY `enrollmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `files`
@@ -575,12 +594,6 @@ ALTER TABLE `follows`
 --
 ALTER TABLE `gameresult`
   MODIFY `gameResultID` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `inbox`
---
-ALTER TABLE `inbox`
-  MODIFY `messageID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `leaderboard`
@@ -635,37 +648,6 @@ ALTER TABLE `userinfo`
 --
 ALTER TABLE `users`
   MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `announcementnotes`
---
-ALTER TABLE `announcementnotes`
-  ADD CONSTRAINT `announcementnotes_ibfk_1` FOREIGN KEY (`announcementId`) REFERENCES `announcements` (`announcementId`),
-  ADD CONSTRAINT `fk_announcementNotes_user` FOREIGN KEY (`userId`) REFERENCES `users` (`userID`);
-
---
--- Constraints for table `announcements`
---
-ALTER TABLE `announcements`
-  ADD CONSTRAINT `announcements_ibfk_1` FOREIGN KEY (`courseId`) REFERENCES `courses` (`courseID`),
-  ADD CONSTRAINT `fk_announcements_user` FOREIGN KEY (`userId`) REFERENCES `users` (`userID`);
-
---
--- Constraints for table `assessments`
---
-ALTER TABLE `assessments`
-  ADD CONSTRAINT `assessments_ibfk_1` FOREIGN KEY (`courseID`) REFERENCES `courses` (`courseID`);
-
---
--- Constraints for table `inbox`
---
-ALTER TABLE `inbox`
-  ADD CONSTRAINT `inbox_ibfk_1` FOREIGN KEY (`courseID`) REFERENCES `courses` (`courseID`),
-  ADD CONSTRAINT `inbox_ibfk_2` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
