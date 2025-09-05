@@ -240,52 +240,75 @@
                                                 <i class="fa-solid fa-chevron-right"></i>
                                             </button>
 
-                                            <ul class="nav nav-tabs custom-nav-tabs mb-3" id="mobileTabScroll">
-                                                <li class="nav-item me-3">
-                                                    <a class="nav-link" href="#"
-                                                        data-label="Announcements">Announcements</a>
+                                            <!-- Tab Navigation -->
+                                            <ul class="nav nav-tabs custom-nav-tabs mb-3" id="mobileTabScroll"
+                                                role="tablist">
+                                                <li class="nav-item me-3" role="presentation">
+                                                    <a class="nav-link active" id="announcements-tab"
+                                                        data-bs-toggle="tab" href="#announcements" role="tab"
+                                                        aria-controls="announcements" aria-selected="true">
+                                                        Announcements
+                                                    </a>
                                                 </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link" href="#" data-label="Lessons">Lessons</a>
+                                                <li class="nav-item" role="presentation">
+                                                    <a class="nav-link" id="lessons-tab" data-bs-toggle="tab"
+                                                        href="#lessons" role="tab" aria-controls="lessons"
+                                                        aria-selected="false">
+                                                        Lessons
+                                                    </a>
                                                 </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link" href="#" data-label="To-do">To-do</a>
+                                                <li class="nav-item" role="presentation">
+                                                    <a class="nav-link" id="todo-tab" data-bs-toggle="tab" href="#todo"
+                                                        role="tab" aria-controls="todo" aria-selected="false">
+                                                        To-do
+                                                    </a>
                                                 </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link" href="#" data-label="Files">Files</a>
+                                                <li class="nav-item" role="presentation">
+                                                    <a class="nav-link" id="files-tab" data-bs-toggle="tab"
+                                                        href="#files" role="tab" aria-controls="files"
+                                                        aria-selected="false">
+                                                        Files
+                                                    </a>
                                                 </li>
-                                                <li class="nav-item2 nav-leaderboard">
-                                                    <a class="nav-link" href="#"
-                                                        data-label="Leaderboard">Leaderboard</a>
+                                                <li class="nav-item2 nav-leaderboard" role="presentation">
+                                                    <a class="nav-link" id="leaderboard-tab" data-bs-toggle="tab"
+                                                        href="#leaderboard" role="tab" aria-controls="leaderboard"
+                                                        aria-selected="false">
+                                                        Leaderboard
+                                                    </a>
                                                 </li>
                                             </ul>
                                         </div>
 
                                         <!-- Desktop Tabs -->
                                         <div class="tab-carousel-wrapper d-none d-md-block">
-                                            <ul class="nav nav-tabs custom-nav-tabs mb-3">
+                                            <ul class="nav nav-tabs custom-nav-tabs mb-3" id="myTab" role="tablist">
                                                 <li class="nav-item">
-                                                    <a class="nav-link" href="#"
-                                                        data-label="Announcements">Announcements</a>
+                                                    <a class="nav-link active" id="announcements-tab"
+                                                        data-bs-toggle="tab" href="#announcements"
+                                                        role="tab">Announcements</a>
                                                 </li>
                                                 <li class="nav-item">
-                                                    <a class="nav-link" href="#" data-label="Lessons">Lessons</a>
+                                                    <a class="nav-link" id="lessons-tab" data-bs-toggle="tab"
+                                                        href="#lessons" role="tab">Lessons</a>
                                                 </li>
                                                 <li class="nav-item">
-                                                    <a class="nav-link" href="#" data-label="To-do">To-do</a>
+                                                    <a class="nav-link" id="todo-tab" data-bs-toggle="tab" href="#todo"
+                                                        role="tab">To-do</a>
                                                 </li>
                                                 <li class="nav-item">
-                                                    <a class="nav-link" href="#" data-label="Files">Files</a>
+                                                    <a class="nav-link" id="files-tab" data-bs-toggle="tab"
+                                                        href="#files" role="tab">Files</a>
                                                 </li>
                                                 <li class="nav-item nav-leaderboard">
-                                                    <a class="nav-link" href="#"
-                                                        data-label="Leaderboard">Leaderboard</a>
+                                                    <a class="nav-link" id="leaderboard-tab" data-bs-toggle="tab"
+                                                        href="#leaderboard" role="tab">Leaderboard</a>
                                                 </li>
                                             </ul>
                                         </div>
 
                                         <!-- Sort by dropdown -->
-                                        <div class="d-flex align-items-center flex-nowrap" id="header">
+                                        <div class="d-flex align-items-center flex-nowrap mb-3" id="header">
                                             <span class="dropdown-label me-2">Sort by:</span>
                                             <button class="btn dropdown-toggle dropdown-custom" type="button"
                                                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -298,9 +321,39 @@
                                             </ul>
                                         </div>
 
-                                        <div class="tab-content-area" id="tabContentArea">
-                                            <!-- JIT content will be injected here -->
+                                        <!-- Tab Content -->
+                                        <div class="tab-content" id="myTabContent">
+
+                                            <!-- Announcements -->
+                                            <div class="tab-pane fade show active" id="announcements" role="tabpanel">
+                                                <?php include 'course-info-contents/announcements.php'; ?>
+                                            </div>
+
+                                            <!-- Lessons -->
+                                            <div class="tab-pane fade" id="lessons" role="tabpanel">
+                                                <?php include 'course-info-contents/lessons.php'; ?>
+                                            </div>
+
+                                            <!-- To-do -->
+                                            <div class="tab-pane fade" id="todo" role="tabpanel">
+                                                <?php include 'course-info-contents/to-do.php'; ?>
+                                            </div>
+
+                                            <!-- Files -->
+                                            <div class="tab-pane fade" id="files" role="tabpanel">
+                                                <?php include 'course-info-contents/files.php'; ?>
+                                            </div>
+
+                                            <!-- Leaderboard -->
+                                            <div class="tab-pane fade" id="leaderboard" role="tabpanel">
+                                                <?php include 'course-info-contents/leaderboard.php'; ?>
+                                            </div>
                                         </div>
+
+                                        <!-- Bootstrap JS -->
+                                        <script
+                                            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
                                     </div>
                                 </div>
 
@@ -311,355 +364,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const navLinks = document.querySelectorAll('.custom-nav-tabs .nav-link');
-
-        navLinks.forEach(link => {
-            link.addEventListener('click', function() {
-                navLinks.forEach(el => el.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
-        document.addEventListener("DOMContentLoaded", function() {
-            const tabs = document.querySelectorAll('.custom-nav-tabs .nav-link, #desktopTabs .nav-link');
-            const contentArea = document.getElementById('tabContentArea');
-
-
-            const jitContent = {
-                "Announcements": `
-                    <div class="announcement-card d-flex align-items-start mb-3">
-                        <!-- Instructor Image -->
-                        <div class="flex-shrink-0 me-3">
-                            <img src="shared/assets/img/courseInfo/prof.png" alt="Instructor Image"
-                                style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
-                        </div>
-
-                        <!-- Text Content -->
-                        <div class="text-start">
-                            <div class="text-reg text-12" style="color: var(--black); line-height: 140%;">
-                                <strong>Prof. Christian James</strong><br>
-                                <span style="font-weight: normal;">January 12, 2024 8:00AM</span>
-                            </div>
-
-
-                            <p class="d-none d-md-block mb-0 mt-3 text-reg text-14" style="color: var(--black); line-height: 140%;">
-                                Welcome to our course! Please make sure to check the Course Overview
-                                under the “Lessons” tab before our first face-to-face session this week.
-                            </p>
-
-
-                            <!-- For mobile -->
-                            <p class="text-reg d-md-none mb-0 mt-3 text-reg text-12" style="color: var(--black); line-height: 140%;">
-                                Welcome to our course! Please make sure to check the Course Overview
-                                under the “Lessons” tab before our first face-to-face session this week.
-                            </p>
-                        </div>
-                    </div>
-
-                `,
-                "Lessons": `
-                    <div class="customCard text-sbold p-3">
-                        <p>Course Overview</p>
-                        <p>Here you will find all the lessons and learning materials.</p>
-                    </div>
-                `,
-                "To-do": `
-                <!-- Task container -->
-                <div class="row mb-0 mt-3">
-                    <div class="col-12 col-md-10">
-                        <div class="todo-card d-flex align-items-stretch">
-                            <!-- Date -->
-                            <div
-                                class="date d-flex align-items-center justify-content-center text-sbold text-20">
-                                SEP 9
-                            </div>
-                            <!-- Main content -->
-                            <div class="d-flex flex-grow-1 flex-wrap justify-content-between p-2 w-100">
-                                <!-- For small screen of main content -->
-                                <div class="px-3 py-0">
-                                    <div class="text-sbold text-16">Activity #1</div>
-                                        <span
-                                        class="course-badge rounded-pill px-3 text-reg text-12 mt-2 d-inline d-md-none">Task</span>
-                                </div>
-                                <!-- Pill and Arrow on Large screen-->
-                                <div class="d-flex align-items-center gap-2 ms-auto">
-                                    <span
-                                        class="course-badge rounded-pill px-3 text-reg text-12 d-none d-md-inline">Task</span>
-                                    <i class="fa-solid fa-arrow-right text-reg text-12 pe-2"
-                                        style="color: var(--black);"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                `,
-                "Files": `
-                <div class="row mb-0 mt-3">
-                    <div class="col">
-                        <div class="todo-card d-flex align-items-stretch p-2">
-                            <div class="d-flex w-100 align-items-center justify-content-between">
-
-                                <!-- Left side: File icon and Text -->
-                                <div class="d-flex align-items-center flex-grow-1">
-                                    <!-- File icon -->
-                                    <div class="mx-4">
-                                        <img src="shared/assets/img/doc.png" alt="File Icon"
-                                            style="width: 16px; height: 20px;">
-                                    </div>
-
-                                    <!-- Content -->
-                                    <div>
-                                        <div class="text-sbold text-16 py-1" style="line-height: 1;">
-                                             Web Development Course Material
-                                        </div>
-                                        <div class="text-reg text-12" style="line-height: 1;">Uploaded January 12, 2024</div>
-                                    </div>
-                                </div>
-
-                                <!-- Download icon aligned to the right end -->
-                                <div class="mx-4">
-                                    <img src="shared/assets/img/dl.png" alt="Download Icon"
-                                        style="width: 16px; height: 20px;">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                `,
-                "Leaderboard": `
-                    <div class="customCard text-sbold p-3">
-                            <div class="row">
-                                <div class="col-12 col-xl-4 mt-3 px-0 mx-auto mx-md-0 d-flex d-md-block justify-content-center justify-content-md-auto px-1">
-                                    <div class="card rounded-4 col-6 col-md-12">
-                                        <div class="card-body border border-black rounded-4">
-                                            <div class="row">
-                                                <div class="col-6 d-flex align-items-center">
-                                                    <img src="https://avatars.githubusercontent.com/u/181800261?s=96&amp;v=4" alt="" width="90" height="90" class="rounded-circle float-start leaderboard-img">
-                                                </div>
-                                                <div class="col-6">
-                                                    <div class="row">
-                                                        <div class="col-12">
-                                                            <div class="float-end text-xl-36 text-xs-28 text-40">1</div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="badge rounded-pill text-dark text-reg float-end d-flex flex-row d-xxs-none" style="background-color: #C8ECC1;">
-                                                        <i class="bi bi-caret-up-fill me-1"></i><div class="me-1">2</div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-12 mt-3 text-xl-12 text-lg-16 text-xs-12">
-                                                    Christian James D. Torrillo
-                                                </div>
-                                                <div class="col-12 text-reg text-xl-12 text-lg-16 text-xs-12">
-                                                    3160 XPs
-                                                </div>
-                                            </div>                           
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-6 col-md-12 col-xl-4 mt-3 px-0 px-1">
-                                    <div class="card rounded-4">
-                                        <div class="card-body border border-black rounded-4">
-                                            <div class="row">
-                                                <div class="col-6 d-flex align-items-center">
-                                                    <img src="https://avatars.githubusercontent.com/u/181800261?s=96&amp;v=4" alt="" width="90" height="90" class="rounded-circle float-start leaderboard-img">
-                                                </div>
-                                                <div class="col-6">
-                                                    <div class="row">
-                                                        <div class="col-12">
-                                                            <div class="float-end text-xl-36 text-xs-28 text-40">2</div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="badge rounded-pill text-dark text-reg float-end d-flex flex-row d-xxs-none" style="background-color: #ECC1C1;">
-                                                        <i class="bi bi-caret-down-fill me-1"></i><div class="me-1">1</div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-12 mt-3 text-xl-12 text-lg-16 text-xs-12">
-                                                    Christian James D. Torrillo
-                                                </div>
-                                                <div class="col-12 text-reg text-xl-12 text-lg-16 text-xs-12">
-                                                    3160 XPs
-                                                </div>
-                                            </div>                           
-                                        </div>
-                                    </div>
-                                </div>
-                                 <div class="col-6 col-md-12 col-xl-4 mt-3 px-0 px-1">
-                                    <div class="card rounded-4">
-                                        <div class="card-body border border-black rounded-4">
-                                            <div class="row">
-                                                <div class="col-6 d-flex align-items-center">
-                                                    <img src="https://avatars.githubusercontent.com/u/181800261?s=96&amp;v=4" alt="" width="90" height="90" class="rounded-circle float-start leaderboard-img">
-                                                </div>
-                                                <div class="col-6">
-                                                    <div class="row">
-                                                        <div class="col-12">
-                                                            <div class="float-end text-xl-36 text-xs-28 text-40">3</div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="badge rounded-pill text-dark text-reg float-end d-flex flex-row d-xxs-none" style="background-color: #DFDFDF;">
-                                                        =
-                                                    </div>
-                                                </div>
-                                                <div class="col-12 mt-3 text-xl-12 text-lg-16 text-xs-12">
-                                                    Christian James D. Torrillo
-                                                </div>
-                                                <div class="col-12 text-reg text-xl-12 text-lg-16 text-xs-12">
-                                                    3160 XPs
-                                                </div>
-                                            </div>                           
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="container-fluid">
-                                    <div class="row px-1">
-                                        <div class="col-12 border border-black mx-auto mt-3 rounded-4 px-4 py-2 bg-white">
-                                            <div class="row">
-                                                <div class="col-3 d-flex align-items-center justify-content-around">
-                                                    <span class="text-xl-36 text-xs-28 text-30">
-                                                        4
-                                                    </span>
-                                                    <span class="badge rounded-pill text-dark text-reg float-end d-flex flex-row d-xs-none d-md-none d-lg-flex" style="background-color: #C8ECC1;">
-                                                        <i class="bi bi-caret-up-fill me-1"></i><div class="me-1">2</div>
-                                                    </span>
-                                                </div>
-                                                <div class="col-9 d-flex align-items-center justify-content-between">
-                                                    <div class="d-flex align-items-center gap-3">
-                                                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" 
-                                                            alt="" width="40" height="40" 
-                                                            class="rounded-circle me-2 d-xxs-none">
-                                                        <span class="text-xl-12">Christian James D. Torrillo</span>
-                                                    </div>
-                                                    <div class="text-reg text-xl-12 d-block d-md-none d-lg-block">
-                                                        3160 XPs
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                    </div>
-                `
-            };
-
-            function loadContent(label) {
-                contentArea.innerHTML = jitContent[label] || `<p>No content available for ${label}</p>`;
-
-                document.getElementById('header').innerHTML =
-                    `
-                     <span class="dropdown-label me-2">Sort by:</span>
-                     <button class="btn dropdown-toggle dropdown-custom" type="button"
-                         data-bs-toggle="dropdown" aria-expanded="false">
-                         <span>Newest</span>
-                     </button>
-                     <ul class="dropdown-menu">
-                         <li><a class="dropdown-item text-reg" href="#">Newest</a></li>
-                         <li><a class="dropdown-item text-reg" href="#">Oldest</a></li>
-                         <li><a class="dropdown-item text-reg" href="#">Unread first</a></li>
-                     </ul>
-                    `;
-            }
-
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    tabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    loadContent(this.getAttribute('data-label'));
-                });
-            });
-
-            tabs[0].classList.add('active');
-            loadContent(tabs[0].getAttribute('data-label'));
-        });
-
-        document.addEventListener("DOMContentLoaded", function() {
-            const tabContainer = document.getElementById('mobileTabScroll');
-            const scrollLeftBtn = document.getElementById('scrollLeftBtn');
-            const scrollRightBtn = document.getElementById('scrollRightBtn');
-
-            function updateArrowVisibility() {
-                if (!tabContainer) return;
-
-                scrollLeftBtn.classList.toggle('d-none', tabContainer.scrollLeft === 0);
-                scrollRightBtn.classList.toggle('d-none', tabContainer.scrollLeft + tabContainer.clientWidth >= tabContainer.scrollWidth);
-            }
-
-            scrollLeftBtn.addEventListener('click', () => {
-                tabContainer.scrollBy({
-                    left: -100,
-                    behavior: 'smooth'
-                });
-            });
-
-            scrollRightBtn.addEventListener('click', () => {
-                tabContainer.scrollBy({
-                    left: 100,
-                    behavior: 'smooth'
-                });
-            });
-
-            tabContainer.addEventListener('scroll', updateArrowVisibility);
-
-            updateArrowVisibility(); // Initial check
-        });
-
-
-        const dropdownHeader = document.getElementById('dropdownHeader');
-        const dropdownContent = document.getElementById('mobileCourseCard');
-        const courseCard = dropdownHeader.closest('.course-card'); // find the parent card
-
-        // Show dropdown
-        dropdownContent.addEventListener('show.bs.collapse', function() {
-            dropdownHeader.style.borderBottom = '1px solid var(--black)';
-            courseCard.style.borderBottomLeftRadius = '10px';
-            courseCard.style.borderBottomRightRadius = '10px';
-        });
-
-        // Hide dropdown
-        dropdownContent.addEventListener('hide.bs.collapse', function() {
-            dropdownHeader.style.borderBottom = 'none';
-            courseCard.style.borderBottomLeftRadius = '0';
-            courseCard.style.borderBottomRightRadius = '0';
-        });
-
-        var navLeaderboards = document.querySelectorAll('.nav-leaderboard');
-        var isActive = false;
-
-        navLeaderboards.forEach(function(navLeaderboard) {
-            navLeaderboard.addEventListener("click", function() {
-                document.getElementById('header').innerHTML =
-                    `
-                <div class="container-fluid">
-                    <div class="row align-items-center justify-content-center flex-column flex-md-row">
-                        <div class="col-8 col-sm-6 col-md-12 col-lg-6 d-flex search-container mb-2 mb-lg-0">
-                            <input type="text" placeholder="Search classmates" class="form-control py-1 text-reg text-lg-12 text-14">
-                            <button type="button" class="btn btn-outline-secondary ms-2">
-                                <i class="bi bi-search"></i>
-                            </button>
-                        </div>
-                        <div class="col-6 d-flex justify-content-center justify-content-lg-start align-items-center">
-                            <span class="dropdown-label me-2">View by:</span>
-                            <button class="btn dropdown-toggle dropdown-custom" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <span>Weekly</span>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item text-reg" href="#">Monthly</a></li>
-                                <li><a class="dropdown-item text-reg" href="#">Weekly</a></li>
-                                <li><a class="dropdown-item text-reg" href="#">Daily</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                    `;
-            });
-        });
-    </script>
 </body>
 
 </html>
