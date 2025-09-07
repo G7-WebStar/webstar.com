@@ -87,7 +87,7 @@
                                             </div>
                                             <div class="col-12 col-sm-6 col-lg-12 d-flex justify-content-end justify-content-sm-center justify-content-md-end align-items-center px-0">
                                                 <button class="add-course-btn btn btn-primary px-3 py-1 rounded-pill text-reg text-md-14">
-                                                    + Add Course
+                                                    <a href="course-join.php" style="text-decoration: none; color: black;">+ Add Course</a>
                                                 </button>
                                             </div>
                                         </div>

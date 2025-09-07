@@ -1,4 +1,44 @@
-<?php $activePage = 'home'; ?>
+<?php $activePage = 'home';
+include('shared/assets/database/connect.php');
+$userID = '2';
+$invalidCode = false;
+$enrolled = false;
+
+if (isset($_POST['access_code'])) {
+    $code = $_POST['access_code'];
+
+    $checkCourseQuery = "SELECT * FROM courses WHERE code = '$code';";
+    $checkCourseResult = executeQuery($checkCourseQuery);
+
+    if (mysqli_num_rows($checkCourseResult) > 0) {
+        $availableCourses = mysqli_fetch_assoc($checkCourseResult);
+        $courseID = $availableCourses['courseID'];
+
+        $checkEnrollmentQuery = "SELECT * FROM enrollment WHERE userID = '$userID' AND courseID = '$courseID';";
+        $checkEnrollmentResult = executeQuery($checkEnrollmentQuery);
+
+        if (mysqli_num_rows($checkEnrollmentResult) > 0) {
+            $enrolled = true;
+        } else {
+            $selectUserQuery = "SELECT yearSection FROM userinfo WHERE userID = '$userID';";
+            $selectUserResult = executeQuery($selectUserQuery);
+
+            if (mysqli_num_rows($selectUserResult) > 0) {
+                $selectedUser = mysqli_fetch_assoc($selectUserResult);
+                $yearSection = $selectedUser['yearSection'];
+
+                $enrollQuery = "INSERT INTO enrollment (`userID`, `courseID`, `yearSection`) VALUES ('$userID','$courseID','$yearSection')";
+                $enrollResult = executeQuery($enrollQuery);
+
+                header("Location: index.php");
+                exit();
+            }
+        }
+    } else {
+        $invalidCode = true;
+    }
+}
+?>
 
 <!doctype html>
 <html lang="en">
@@ -15,11 +55,11 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
-    
+
     <!-- Bootstrap Icons SVG Sprite -->
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
         <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
         </symbol>
     </svg>
 
@@ -52,8 +92,8 @@
                                     <img src="shared/assets/img/courseJoin/folder-dynamic-color.png" alt="Course Enrollment" class="course-join-image">
                                     <h1 class="course-join-headline">Enroll in your first course to begin</h1>
                                     <p class="course-join-subheadline">Enter the access code provided by your professor.</p>
-                                    
-                                    <form id="enrollForm">
+
+                                    <form method="POST" id="enrollForm">
                                         <div class="row mb-3 gx-3">
                                             <div class="col">
                                                 <div class="form-floating">
@@ -62,16 +102,18 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        
-                                        <div id="alertContainer" style="display: none;">
+
+                                        <div id="alertContainer" style="display: <?php echo ($invalidCode || $enrolled) ? 'block' : 'none'; ?>;">
                                             <div class="alert alert-danger d-flex align-items-center" role="alert">
-                                                <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+                                                <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:">
+                                                    <use xlink:href="#exclamation-triangle-fill" />
+                                                </svg>
                                                 <div>
-                                                    The access code you entered does not exist.
+                                                    <?php echo $invalidCode ? 'The access code you entered does not exist.' : 'Course already enrolled.'; ?>
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                         <button type="submit" class="course-join-button">Enroll</button>
                                     </form>
                                 </div>
@@ -82,25 +124,24 @@
             </div>
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-            
+
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     const form = document.getElementById('enrollForm');
                     const alertContainer = document.getElementById('alertContainer');
                     const inputField = document.querySelector('input[name="access_code"]');
-                    
+
                     form.addEventListener('submit', function(e) {
-                        e.preventDefault();
-                        
                         const accessCode = inputField.value.trim();
-                        
+
                         console.log('Form submitted, access code:', accessCode);
-                        
+
                         if (accessCode === '') {
                             // Show the alert
                             alertContainer.style.display = 'block';
                             inputField.classList.add('alert-active');
                             console.log('Showing alert');
+                            e.preventDefault();
                             return;
                         } else {
                             // Hide the alert if there is input
@@ -108,7 +149,7 @@
                             inputField.classList.remove('alert-active');
                             console.log('Hiding alert');
                         }
-                        
+
                         // If we get here, the input is valid
                         // You can add success logic here
                         console.log('Form submitted with access code:', accessCode);

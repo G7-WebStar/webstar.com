@@ -2,7 +2,7 @@
 <?php
 include('shared/assets/database/connect.php');
 
-$userID = '1';
+$userID = '2';
 $selectEnrolledQuery = "SELECT 
 	courses.userID  AS profID,
     profInfo.firstName AS profName,
@@ -420,10 +420,13 @@ $selectAnnouncementsResult = executeQuery($selectAnnouncementsQuery);
                                             </div>
                                         </div>
                                     </div>
-                                <?php
+                            <?php
                                 }
-                            } else { ?>
-                                <div class="col-12 mx-auto text-center">
+                            } else {
+                                echo "<script>window.location.href = 'course-join.php';</script>";
+                            }
+                            ?>
+                            <!--<div class="col-12 mx-auto text-center">
                                     <img src="shared/assets/img/courseJoin/folder-dynamic-color.png" class="mx-auto folder-image" style="width: 400px; height: 400px; object-fit: cover; border-radius: 50%;">
                                     <p class="text-30 text-lg-22 text-sbold lh-1">Enroll in your first course to begin</p>
                                     <p class="text-20 text-lg-16 text-reg lh-1">Enter the access code provided by your professor.</p>
@@ -431,10 +434,7 @@ $selectAnnouncementsResult = executeQuery($selectAnnouncementsQuery);
                                         <textarea class="form-control border border-black rounded-4" placeholder="Leave a comment here" id="floatingTextarea"></textarea>
                                         <label for="floatingTextarea">Access Code</label>
                                     </div>
-                                </div>
-                            <?php
-                            }
-                            ?>
+                                </div>-->
                         </div>
                     </div>
                 </div> <!-- End here -->
