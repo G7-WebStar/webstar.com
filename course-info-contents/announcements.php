@@ -23,9 +23,6 @@ if (isset($_POST['announcementID'])) {
                         WHERE announcementID='$announcementID' AND userID='$userID'";
         executeQuery($deleteQuery);
     }
-
-     header("Location: course-info.php");
-    exit();
 }
 
 

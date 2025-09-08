@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 04, 2025 at 05:23 PM
+-- Generation Time: Sep 08, 2025 at 05:56 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -69,6 +69,7 @@ INSERT INTO `announcementnotes` (`noteID`, `announcementID`, `userID`, `notedAt`
 CREATE TABLE `announcements` (
   `announcementID` int(11) NOT NULL,
   `courseID` int(11) NOT NULL,
+  `userID` int(5) NOT NULL,
   `announcementTitle` varchar(255) NOT NULL,
   `announcementContent` text NOT NULL,
   `announcementDate` date NOT NULL,
@@ -80,8 +81,8 @@ CREATE TABLE `announcements` (
 -- Dumping data for table `announcements`
 --
 
-INSERT INTO `announcements` (`announcementID`, `courseID`, `announcementTitle`, `announcementContent`, `announcementDate`, `announcementTime`, `isRequired`) VALUES
-(1, 1, 'Project Deadline Reminder', 'Final project is due next week. Submit via LMS.', '2025-08-30', '09:00:00', 1);
+INSERT INTO `announcements` (`announcementID`, `courseID`, `userID`, `announcementTitle`, `announcementContent`, `announcementDate`, `announcementTime`, `isRequired`) VALUES
+(1, 1, 2, 'Project Deadline Reminder', 'Final project is due next week. Submit via LMS.', '2025-08-30', '09:00:00', 1);
 
 -- --------------------------------------------------------
 
@@ -132,21 +133,22 @@ INSERT INTO `courses` (`courseID`, `userID`, `courseCode`, `courseTitle`, `cours
 -- --------------------------------------------------------
 
 --
--- Table structure for table `enrollment`
+-- Table structure for table `enrollments`
 --
 
-CREATE TABLE `enrollment` (
+CREATE TABLE `enrollments` (
   `enrollmentID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
-  `yearSectionID` int(11) NOT NULL
+  `courseID` int(5) NOT NULL,
+  `yearSection` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `enrollment`
+-- Dumping data for table `enrollments`
 --
 
-INSERT INTO `enrollment` (`enrollmentID`, `userID`, `yearSectionID`) VALUES
-(1, 2, 2023);
+INSERT INTO `enrollments` (`enrollmentID`, `userID`, `courseID`, `yearSection`) VALUES
+(1, 2, 1, 2023);
 
 -- --------------------------------------------------------
 
@@ -402,7 +404,7 @@ CREATE TABLE `userinfo` (
 --
 
 INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `middleName`, `lastName`, `studentID`, `programID`, `gender`, `yearLevel`, `schoolEmail`, `contactNumber`, `facebookLink`, `linkedInLink`, `instagramLink`, `createdAt`) VALUES
-(1, 2, 'profile_2.jpg', 'Jane', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 'jane.smith@university.edu', '+639123456789', 'https://facebook.com/jane.smith', 'https://linkedin.com/in/jane-smith', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53');
+(1, 2, 'prof.png', 'Jane', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 'jane.smith@university.edu', '+639123456789', 'https://facebook.com/jane.smith', 'https://linkedin.com/in/jane-smith', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53');
 
 -- --------------------------------------------------------
 
@@ -464,9 +466,9 @@ ALTER TABLE `courses`
   ADD PRIMARY KEY (`courseID`);
 
 --
--- Indexes for table `enrollment`
+-- Indexes for table `enrollments`
 --
-ALTER TABLE `enrollment`
+ALTER TABLE `enrollments`
   ADD PRIMARY KEY (`enrollmentID`);
 
 --
@@ -572,9 +574,9 @@ ALTER TABLE `courses`
   MODIFY `courseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `enrollment`
+-- AUTO_INCREMENT for table `enrollments`
 --
-ALTER TABLE `enrollment`
+ALTER TABLE `enrollments`
   MODIFY `enrollmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
