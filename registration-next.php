@@ -1,7 +1,7 @@
 <?php $activePage = 'signUp'; ?>
 <?php
 include("shared/assets/database/connect.php");
-include("shared/assets/processes/registrationNext-process.php");
+include("shared/assets/processes/registration-next-process.php");
 ?>
 
 

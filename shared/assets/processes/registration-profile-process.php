@@ -11,14 +11,14 @@ if (isset($_POST['nextBtn'])) {
     $lastName = $_POST['lastName'];
     $userName = $_POST['userName'];
     $studentID = $_POST['studentID'];
-    $programID = $_POST['program']; // direct programID na to galing sa dropdown
+    $programID = $_POST['program'];
     $gender = $_POST['gender'];
     $yearLevel = $_POST['yearLevel'];
 
     $htmlfileupload = $_FILES['fileUpload']['name'];
     $htmlfileuploadTMP = $_FILES['fileUpload']['tmp_name'];
 
-    $htmlfolder = "uploads/";
+    $htmlfolder = "pfp-uploads/";
     move_uploaded_file($htmlfileuploadTMP, $htmlfolder . $htmlfileupload);
 
     if (!isset($_SESSION['userID'])) {
@@ -39,11 +39,11 @@ if (isset($_POST['nextBtn'])) {
         $userQuery = "UPDATE users SET userName = '$userName' WHERE userID = '$userID'";
         executeQuery($userQuery);
 
-        header("Location: registrationNext.php");
+        header("Location: registration-next.php");
         exit();
     }
 
-    header("Location: registrationProfile.php");
+    header("Location: registration-profile.php");
     exit();
 }
 ?>

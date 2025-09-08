@@ -1,4 +1,9 @@
-<?php $activePage = 'courseInfo'; ?>
+<?php 
+$activePage = 'courseInfo'; 
+
+include("shared/assets/database/connect.php");
+?>
+
 
 <!doctype html>
 <html lang="en">
@@ -161,7 +166,7 @@
                                                                 alt="Instructor Image" class="img-fluid">
                                                         </div>
                                                         <div class="ms-2">
-                                                            <strong class="text-sbold" style="text-12">Christian James
+                                                            <strong class="text-sbold text-12">Christian James
                                                                 Torrillo</strong><br>
                                                             <small class="text-reg">Professor</small>
                                                         </div>
