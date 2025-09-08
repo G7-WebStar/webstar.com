@@ -138,6 +138,17 @@ body {
     right: 0;
 }
 
+/* Checkbox */
+.form-check-input {
+    border-color: var(--black) !important;
+}
+
+.form-check-input:checked {
+    background-color: var(--black) !important;
+    border-color: var(--black) !important;
+}
+
+
 /* neil again */
 @media (max-width: 767.98px) {
     .custom-nav-tabs {

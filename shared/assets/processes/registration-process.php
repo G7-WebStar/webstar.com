@@ -36,7 +36,7 @@ if (isset($_POST['signUpBtn'])) {
             if (executeQuery($insertUser)) {
                 $userID = mysqli_insert_id($conn);
                 $_SESSION['userID'] = $userID;
-                header("Location: registrationProfile.php");
+                header("Location: registration-profile.php");
                 exit();
             } else {
                 $_SESSION['alert'] = 'signupFailed';
