@@ -1,4 +1,25 @@
-<?php $activePage = 'course'; ?>
+<?php
+$activePage = 'course';
+
+include('shared/assets/database/connect.php');
+$userID = '2';
+
+$selectCourseQuery = "SELECT 
+    courses.*, 
+   	profInfo.firstName AS profFirstName,
+    profInfo.middleName AS profMiddleName,
+    profInfo.lastName AS profLastName,
+    SUBSTRING_INDEX(courses.schedule, ' ', 1)  AS courseDays,
+    SUBSTRING_INDEX(courses.schedule, ' ', -1) AS courseTime
+    FROM courses
+    INNER JOIN userinfo AS profInfo
+    	ON courses.userID = profInfo.userID
+    INNER JOIN enrollment
+    	ON courses.courseID = enrollment.courseID
+    WHERE enrollment.userID = '$userID';
+";
+$selectCourseResult = executeQuery($selectCourseQuery);
+?>
 
 <!doctype html>
 <html lang="en">
@@ -98,93 +119,42 @@
                                 <!-- Start of Cards Section -->
                                 <div class="row px-0">
                                     <!-- Card -->
-                                    <div class="col-12 col-lg-6 col-xl-4 mt-4">
-                                        <div class="card border border-black rounded-4">
-                                            <img src="" class="card-img-top p-2 rounded-top-4" alt="..." style="background-color: #FDDF94; height: 190px;">
-                                            <div class="card-body border-top border-black">
-                                                <div class="row lh-1 mb-2">
-                                                    <p class="card-text text-bold text-18 m-0">COMP-006</p>
-                                                    <p class="card-text text-reg text-14 mb-2">Web Development</p>
-                                                </div>
-                                                <div class="row px-3 mb-2">
-                                                    <div class="col-1 d-flex justify-content-center align-items-center m-0 p-0">
-                                                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&amp;v=4" alt="" width="32" height="32" class="rounded-circle">
-                                                    </div>
-                                                    <div class="col-11 my-0 lh-sm">
-                                                        <p class="card-text text-bold text-14 m-0">Christian James Torillo</p>
-                                                        <p class="card-text text-med text-12 mb-2">Professor</p>
-                                                    </div>
-                                                </div>
-                                                <div class="row px-3 mb-2">
-                                                    <div class="col-1 d-flex justify-content-center align-items-center m-0 p-0">
-                                                        <img src="shared/assets/img/course/Calendar.png" alt="" width="24" height="24">
-                                                    </div>
-                                                    <div class="col-11 my-0 lh-sm">
-                                                        <p class="card-text text-reg text-14 mb-1"><span class="text-med">Thursdays</span> 8:00AM - 10:00AM</p>
-                                                        <p class="card-text text-reg text-14 mb-0"><span class="text-med">Fridays</span> 9:00AM - 12:00PM</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-lg-6 col-xl-4 mt-4">
-                                        <div class="card border border-black rounded-4">
-                                            <img src="" class="card-img-top p-2 rounded-top-4" alt="..." style="background-color: #FDDF94; height: 190px;">
-                                            <div class="card-body border-top border-black">
-                                                <div class="row lh-1 mb-2">
-                                                    <p class="card-text text-bold text-18 m-0">COMP-006</p>
-                                                    <p class="card-text text-reg text-14 mb-2">Web Development</p>
-                                                </div>
-                                                <div class="row px-3 mb-2">
-                                                    <div class="col-1 d-flex justify-content-center align-items-center m-0 p-0">
-                                                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&amp;v=4" alt="" width="32" height="32" class="rounded-circle">
-                                                    </div>
-                                                    <div class="col-11 my-0 lh-sm">
-                                                        <p class="card-text text-bold text-14 m-0">Christian James Torillo</p>
-                                                        <p class="card-text text-med text-12 mb-2">Professor</p>
-                                                    </div>
-                                                </div>
-                                                <div class="row px-3 mb-2">
-                                                    <div class="col-1 d-flex justify-content-center align-items-center m-0 p-0">
-                                                        <img src="shared/assets/img/course/Calendar.png" alt="" width="24" height="24">
-                                                    </div>
-                                                    <div class="col-11 my-0 lh-sm">
-                                                        <p class="card-text text-reg text-14 mb-1"><span class="text-med">Thursdays</span> 8:00AM - 10:00AM</p>
-                                                        <p class="card-text text-reg text-14 mb-0"><span class="text-med">Fridays</span> 9:00AM - 12:00PM</p>
+                                    <?php
+                                    if (mysqli_num_rows($selectCourseResult) > 0) {
+                                        while ($courses = mysqli_fetch_assoc($selectCourseResult)) {
+                                    ?>
+                                            <div class="col-12 col-lg-6 col-xl-4 mt-4">
+                                                <div class="card border border-black rounded-4">
+                                                    <img src="" class="card-img-top p-2 rounded-top-4" alt="..." style="background-color: #FDDF94; height: 190px;">
+                                                    <div class="card-body border-top border-black">
+                                                        <div class="row lh-1 mb-2">
+                                                            <p class="card-text text-bold text-18 m-0"><?php echo $courses['courseCode']; ?></p>
+                                                            <p class="card-text text-reg text-14 mb-2"><?php echo $courses['courseTitle']; ?></p>
+                                                        </div>
+                                                        <div class="row px-3 mb-2">
+                                                            <div class="col-1 d-flex justify-content-center align-items-center m-0 p-0">
+                                                                <img src="https://avatars.githubusercontent.com/u/181800261?s=96&amp;v=4" alt="" width="32" height="32" class="rounded-circle">
+                                                            </div>
+                                                            <div class="col-11 my-0 lh-sm">
+                                                                <p class="card-text text-bold text-14 m-0"><?php echo $courses['profFirstName'] . " " . $courses['profMiddleName'] . " " . $courses['profLastName']; ?></p>
+                                                                <p class="card-text text-med text-12 mb-2">Professor</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row px-3 mb-2">
+                                                            <div class="col-1 d-flex justify-content-center align-items-center m-0 p-0">
+                                                                <img src="shared/assets/img/course/Calendar.png" alt="" width="24" height="24">
+                                                            </div>
+                                                            <div class="col-11 my-0 lh-sm">
+                                                                <p class="card-text text-reg text-14 mb-1"><span class="text-med"><?php echo $courses['courseDays']; ?></span> <?php echo $courses['courseTime']; ?></p>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-lg-6 col-xl-4 mt-4">
-                                        <div class="card border border-black rounded-4">
-                                            <img src="" class="card-img-top p-2 rounded-top-4" alt="..." style="background-color: #FDDF94; height: 190px;">
-                                            <div class="card-body border-top border-black">
-                                                <div class="row lh-1 mb-2">
-                                                    <p class="card-text text-bold text-18 m-0">COMP-006</p>
-                                                    <p class="card-text text-reg text-14 mb-2">Web Development</p>
-                                                </div>
-                                                <div class="row px-3 mb-2">
-                                                    <div class="col-1 d-flex justify-content-center align-items-center m-0 p-0">
-                                                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&amp;v=4" alt="" width="32" height="32" class="rounded-circle">
-                                                    </div>
-                                                    <div class="col-11 my-0 lh-sm">
-                                                        <p class="card-text text-bold text-14 m-0">Christian James Torillo</p>
-                                                        <p class="card-text text-med text-12 mb-2">Professor</p>
-                                                    </div>
-                                                </div>
-                                                <div class="row px-3 mb-2">
-                                                    <div class="col-1 d-flex justify-content-center align-items-center m-0 p-0">
-                                                        <img src="shared/assets/img/course/Calendar.png" alt="" width="24" height="24">
-                                                    </div>
-                                                    <div class="col-11 my-0 lh-sm">
-                                                        <p class="card-text text-reg text-14 mb-1"><span class="text-med">Thursdays</span> 8:00AM - 10:00AM</p>
-                                                        <p class="card-text text-reg text-14 mb-0"><span class="text-med">Fridays</span> 9:00AM - 12:00PM</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
                                 </div>
                                 <!-- End of Cards Section -->
                             </div>
