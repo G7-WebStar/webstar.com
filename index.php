@@ -43,12 +43,43 @@ $selectAnnouncementsQuery = "SELECT
     INNER JOIN users
         ON courses.userID = users.userID
     INNER JOIN announcements
-        ON courses.courseID = announcements.announcementID
+        ON courses.courseID = announcements.courseID
     INNER JOIN userinfo AS profInfo
         ON users.userID = profInfo.userID
     WHERE enrollment.userID = '$userID';
     ";
 $selectAnnouncementsResult = executeQuery($selectAnnouncementsQuery);
+
+$selectAssessmentQuery = "SELECT
+    assessments.*,
+    courses.courseCode,
+    DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline,
+    (SELECT COUNT(*) 
+     FROM assessments 
+     INNER JOIN enrollment
+        ON assessments.courseID = enrollment.courseID
+     WHERE enrollment.userID = '$userID') AS totalAssessments
+    FROM assessments
+    INNER JOIN courses
+        ON assessments.courseID = courses.courseID
+    INNER JOIN enrollment
+        ON courses.courseID = enrollment.courseID
+    WHERE enrollment.userID = '$userID';
+";
+$selectAssessmentResult = executeQuery($selectAssessmentQuery);
+
+$selectLeaderboardQuery = "SELECT 
+    courses.courseID,
+    courses.courseCode,
+    courses.courseTitle,
+    SUM(leaderboard.xpPoints) AS totalPoints
+FROM leaderboard
+INNER JOIN courses
+    ON leaderboard.courseID = courses.courseID
+WHERE leaderboard.userID = '$userID'
+GROUP BY courses.courseID, courses.courseCode, courses.courseTitle;
+";
+$selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
 ?>
 <!doctype html>
 <html lang="en">
@@ -195,8 +226,15 @@ $selectAnnouncementsResult = executeQuery($selectAnnouncementsQuery);
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                        <?php
+                                                            <?php
                                                             }
+                                                        } else {
+                                                            ?>
+                                                            <div class="col-12 text-center">
+                                                                <p class="text-bold mb-0">Nothing new here.</p>
+                                                                <p class="text-reg">Announcements are all caught up.</p>
+                                                            </div>
+                                                        <?php
                                                         }
                                                         ?>
                                                     </div>
@@ -224,90 +262,61 @@ $selectAnnouncementsResult = executeQuery($selectAnnouncementsQuery);
 
                                                             <span>Upcoming</span>
                                                         </div>
-                                                        <div>21</div>
+                                                        <div><?php if (mysqli_num_rows($selectAssessmentResult) > 0) {
+                                                                    $emptyAssessment = false;
+                                                                    $totalAssessments = mysqli_fetch_assoc($selectAssessmentResult);
+                                                                    echo $totalAssessments['totalAssessments'];
+                                                                } else {
+                                                                    $emptyAssessment = true;
+                                                                }
+                                                                ?></div>
                                                     </div>
                                                     <!-- Scrollable course -->
                                                     <div style="height: 100%; overflow-y: auto; padding-right: 5px; scroll-behavior: smooth; scrollbar-width: none; -ms-overflow-style: none;">
                                                         <!-- Card 1 -->
-                                                        <div class="todo-card d-flex align-items-stretch mb-2">
-                                                            <!-- Date -->
-                                                            <div
-                                                                class="date d-flex align-items-center justify-content-center text-sbold text-20">
-                                                                SEP 9
-                                                            </div>
-                                                            <!-- Main content -->
-                                                            <div class="d-flex flex-grow-1 flex-wrap justify-content-between p-2 w-100">
-                                                                <!-- For small screen of main content -->
-                                                                <div class="px-3 py-0">
-                                                                    <div class="text-sbold text-16">Activity #1</div>
-                                                                    <div class="text-reg text-12">COMP-006</div>
-                                                                    <span
-                                                                        class="course-badge rounded-pill px-3 text-reg text-12 mt-2 d-inline d-md-none">Task</span>
+                                                        <?php
+                                                        if (mysqli_num_rows($selectAssessmentResult) > 0) {
+                                                            mysqli_data_seek($selectAssessmentResult, 0);
+                                                            while ($activities = mysqli_fetch_assoc($selectAssessmentResult)) {
+                                                        ?>
+                                                                <div class="todo-card d-flex align-items-stretch mb-2">
+                                                                    <!-- Date -->
+                                                                    <div
+                                                                        class="date d-flex align-items-center justify-content-center text-sbold text-20">
+                                                                        <?php echo $activities['assessmentDeadline']; ?>
+                                                                    </div>
+                                                                    <!-- Main content -->
+                                                                    <div class="d-flex flex-grow-1 flex-wrap justify-content-between p-2 w-100">
+                                                                        <!-- For small screen of main content -->
+                                                                        <div class="px-3 py-0">
+                                                                            <div class="text-sbold text-16"><?php echo $activities['title']; ?></div>
+                                                                            <div class="text-reg text-12"><?php echo $activities['courseCode']; ?></div>
+                                                                            <span
+                                                                                class="course-badge rounded-pill px-3 text-reg text-12 mt-2 d-inline d-md-none">Task</span>
+                                                                        </div>
+                                                                        <!-- Pill and Arrow on Large screen-->
+                                                                        <div class="d-flex align-items-center gap-2 ms-auto">
+                                                                            <span
+                                                                                class="course-badge rounded-pill px-3 text-reg text-12 d-none d-md-inline">Task</span>
+                                                                            <i class="fa-solid fa-arrow-right text-reg text-12 pe-2"
+                                                                                style="color: var(--black);"></i>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                                <!-- Pill and Arrow on Large screen-->
-                                                                <div class="d-flex align-items-center gap-2 ms-auto">
-                                                                    <span
-                                                                        class="course-badge rounded-pill px-3 text-reg text-12 d-none d-md-inline">Task</span>
-                                                                    <i class="fa-solid fa-arrow-right text-reg text-12 pe-2"
-                                                                        style="color: var(--black);"></i>
-                                                                </div>
+                                                            <?php
+                                                            }
+                                                        } else {
+                                                            ?>
+                                                            <div class="col-12 text-center">
+                                                                <p class="text-bold mb-0">You're on track.</p>
+                                                                <p class="text-reg mb-0">No new assessments ahead.</p>
                                                             </div>
-                                                        </div>
-
-                                                        <!-- Card 2 -->
-                                                        <div class="todo-card d-flex align-items-stretch mb-2">
-                                                            <!-- Date -->
-                                                            <div
-                                                                class="date d-flex align-items-center justify-content-center text-sbold text-20">
-                                                                SEP 9
-                                                            </div>
-                                                            <!-- Main content -->
-                                                            <div class="d-flex flex-grow-1 flex-wrap justify-content-between p-2 w-100">
-                                                                <!-- For small screen of main content -->
-                                                                <div class="px-3 py-0">
-                                                                    <div class="text-sbold text-16">Activity #1</div>
-                                                                    <div class="text-reg text-12">COMP-006</div>
-                                                                    <span
-                                                                        class="course-badge rounded-pill px-3 text-reg text-12 mt-2 d-inline d-md-none">Task</span>
-                                                                </div>
-                                                                <!-- Pill and Arrow on Large screen-->
-                                                                <div class="d-flex align-items-center gap-2 ms-auto">
-                                                                    <span
-                                                                        class="course-badge rounded-pill px-3 text-reg text-12 d-none d-md-inline">Task</span>
-                                                                    <i class="fa-solid fa-arrow-right text-reg text-12 pe-2"
-                                                                        style="color: var(--black);"></i>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Card 3 -->
-                                                        <div class="todo-card d-flex align-items-stretch mb-2">
-                                                            <!-- Date -->
-                                                            <div
-                                                                class="date d-flex align-items-center justify-content-center text-sbold text-20">
-                                                                SEP 9
-                                                            </div>
-                                                            <!-- Main content -->
-                                                            <div class="d-flex flex-grow-1 flex-wrap justify-content-between p-2 w-100">
-                                                                <!-- For small screen of main content -->
-                                                                <div class="px-3 py-0">
-                                                                    <div class="text-sbold text-16">Activity #1</div>
-                                                                    <div class="text-reg text-12">COMP-006</div>
-                                                                    <span
-                                                                        class="course-badge rounded-pill px-3 text-reg text-12 mt-2 d-inline d-md-none">Task</span>
-                                                                </div>
-                                                                <!-- Pill and Arrow on Large screen-->
-                                                                <div class="d-flex align-items-center gap-2 ms-auto">
-                                                                    <span
-                                                                        class="course-badge rounded-pill px-3 text-reg text-12 d-none d-md-inline">Task</span>
-                                                                    <i class="fa-solid fa-arrow-right text-reg text-12 pe-2"
-                                                                        style="color: var(--black);"></i>
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                        <?php
+                                                        }
+                                                        ?>
                                                         <div style="display:flex; justify-content: flex-end; align-items: center; gap:6px; margin-right: 10px;">
-                                                            <span class="text-reg text-12" style="color: var(--black);">View More</span>
-                                                            <i class="fa-solid fa-arrow-right text-reg text-12" style="color: var(--black);"></i>
+                                                            <span class="text-reg text-12" style="color: var(--black);"><?php echo $emptyAssessment ? '' : 'View More </span>
+                                                            <i class="fa-solid fa-arrow-right text-reg text-12" style="color: var(--black);"></i>'; ?>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -341,81 +350,46 @@ $selectAnnouncementsResult = executeQuery($selectAnnouncementsQuery);
                                                     <!-- Scrollable leaderboard -->
                                                     <div style="max-height: 240px; overflow-y: auto; padding-right: 5px; display: flex; flex-wrap: wrap; gap: 8px; scroll-behavior: smooth; scrollbar-width: none; -ms-overflow-style: none;">
                                                         <!-- Card 1 -->
-                                                        <div class="card custom-leaderboard-card">
-                                                            <div class="card-body p-4">
-                                                                <div style="display: inline-flex; align-items: center;">
-                                                                    <span class="rank-number text-bold text-18">11</span>
-                                                                    <span class="text-reg text-12 badge rounded-pill ms-2 learderboard-badge" style="display: inline-flex; align-items: center; gap: 4px;">
-                                                                        <i class="fa-solid fa-caret-up"></i>
-                                                                        2
-                                                                    </span>
-                                                                </div>
+                                                        <?php
+                                                        if (mysqli_num_rows($selectLeaderboardResult) > 0) {
+                                                            while ($leaderboards = mysqli_fetch_assoc($selectLeaderboardResult)) {
+                                                        ?>
+                                                                <div class="card custom-leaderboard-card">
+                                                                    <div class="card-body p-4">
+                                                                        <div style="display: inline-flex; align-items: center;">
+                                                                            <span class="rank-number text-bold text-18">11</span>
+                                                                            <span class="text-reg text-12 badge rounded-pill ms-2 learderboard-badge" style="display: inline-flex; align-items: center; gap: 4px;">
+                                                                                <i class="fa-solid fa-caret-up"></i>
+                                                                                2
+                                                                            </span>
+                                                                        </div>
 
-                                                                <!-- NEW WRAPPER -->
-                                                                <div class="info-block">
-                                                                    <div class="comp-code text-sbold text-16">COMP–006</div>
-                                                                    <div class="subj-code text-reg text-12 mb-0">Web Development</div>
+                                                                        <!-- NEW WRAPPER -->
+                                                                        <div class="info-block">
+                                                                            <div class="comp-code text-sbold text-16"><?php echo $leaderboards['courseCode']; ?></div>
+                                                                            <div class="subj-code text-reg text-12 mb-0 text-truncate"><?php echo $leaderboards['courseTitle']; ?></div>
 
-                                                                    <div class="xp-container">
-                                                                        <div class="xp-block text-reg text-12 mb-0">3160 XPs</div>
-                                                                        <div class="xp-arrow">
-                                                                            <i class="fa-solid fa-arrow-right text-reg text-12" style="color: var(--black);"></i>
+                                                                            <div class="xp-container">
+                                                                                <div class="xp-block text-reg text-12 mb-0"><?php echo $leaderboards['totalPoints']; ?> XPs</div>
+                                                                                <div class="xp-arrow">
+                                                                                    <i class="fa-solid fa-arrow-right text-reg text-12" style="color: var(--black);"></i>
+                                                                                </div>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
+                                                            <?php
+                                                            }
+                                                        } else {
+                                                            ?>
+                                                            <div class="col-12 text-center">
+                                                                <p class="text-bold mb-0">Leaderboard is empty.</p>
+                                                                <p class="text-reg">Start submitting tasks to earn scores.</p>
                                                             </div>
-                                                        </div>
-
-
-                                                        <div class="card custom-leaderboard-card">
-                                                            <div class="card-body p-4">
-                                                                <div style="display: inline-flex; align-items: center;">
-                                                                    <span class="rank-number text-bold text-18">10</span>
-                                                                    <span class="text-reg text-12 badge rounded-pill ms-2 learderboard-badge" style="display: inline-flex; align-items: center; gap: 4px;">
-                                                                        <i class="fa-solid fa-caret-up"></i>
-                                                                        2
-                                                                    </span>
-                                                                </div>
-
-                                                                <div class="info-block">
-                                                                    <div class="comp-code text-sbold text-16">COMP–006</div>
-                                                                    <div class="subj-code text-reg text-12 mb-0">Web Development</div>
-
-                                                                    <div class="xp-container">
-                                                                        <div class="xp-block text-reg text-12 mb-0">3160 XPs</div>
-                                                                        <div class="xp-arrow">
-                                                                            <i class="fa-solid fa-arrow-right text-reg text-12" style="color: var(--black);"></i>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="card custom-leaderboard-card">
-                                                            <div class="card-body p-4">
-                                                                <div style="display: inline-flex; align-items: center;">
-                                                                    <span class="rank-number text-bold text-18">21</span>
-                                                                    <span class="text-reg text-12 badge rounded-pill ms-2 learderboard-badge" style="display: inline-flex; align-items: center; gap: 4px;">
-                                                                        <i class="fa-solid fa-caret-up"></i>
-                                                                        2
-                                                                    </span>
-                                                                </div>
-
-                                                                <div class="info-block">
-                                                                    <div class="comp-code text-sbold text-16">COMP–006</div>
-                                                                    <div class="subj-code text-reg text-12 mb-0">Web Development</div>
-
-                                                                    <div class="xp-container">
-                                                                        <div class="xp-block text-reg text-12 mb-0">3160 XPs</div>
-                                                                        <div class="xp-arrow">
-                                                                            <i class="fa-solid fa-arrow-right text-reg text-12" style="color: var(--black);"></i>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                        <?php
+                                                        }
+                                                        ?>
                                                     </div>
-
                                                 </div>
                                             </div>
                                         </div>

@@ -109,7 +109,7 @@ if (isset($_POST['access_code'])) {
                                                     <use xlink:href="#exclamation-triangle-fill" />
                                                 </svg>
                                                 <div>
-                                                    <?php echo $invalidCode ? 'The access code you entered does not exist.' : 'Course already enrolled.'; ?>
+                                                    <?php echo $invalidCode ? 'The access code you entered does not exist.' : ($enrolled ? 'Course already enrolled.' : 'The access code you entered does not exist.'); ?>
                                                 </div>
                                             </div>
                                         </div>
