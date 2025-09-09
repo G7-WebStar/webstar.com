@@ -126,10 +126,14 @@ $selectCourseResult = executeQuery($selectCourseQuery);
                                     ?>
                                             <div class="col-12 col-lg-6 col-xl-4 mt-4">
                                                 <div class="card border border-black rounded-4">
-                                                    <img src="" class="card-img-top p-2 rounded-top-4" alt="..." style="background-color: #FDDF94; height: 190px;">
+                                                    <a href="course-info.php?courseID=<?php echo $courses['courseID']; ?>">
+                                                        <img src="shared/assets/img/home/<?php echo $courses['courseImage']; ?>" class="card-img-top object-fit-cover rounded-top-4" alt="..." style="background-color: #FDDF94; height: 190px;">
+                                                    </a>
                                                     <div class="card-body border-top border-black">
                                                         <div class="row lh-1 mb-2">
-                                                            <a href="course-info.php?courseID=<?php echo $courses['courseID']; ?>" class="text-decoration-none text-black"><p class="card-text text-bold text-18 m-0"><?php echo $courses['courseCode']; ?></p></a>
+                                                            <a href="course-info.php?courseID=<?php echo $courses['courseID']; ?>" class="text-decoration-none text-black">
+                                                                <p class="card-text text-bold text-18 m-0"><?php echo $courses['courseCode']; ?></p>
+                                                            </a>
                                                             <p class="card-text text-reg text-14 mb-2"><?php echo $courses['courseTitle']; ?></p>
                                                         </div>
                                                         <div class="row px-3 mb-2">

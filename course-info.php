@@ -124,7 +124,7 @@ if (isset($_GET['courseID'])) {
                                                         id="mobileCourseCard">
                                                         <div class="course-image w-100 mb-3"
                                                             style="height: 250px; overflow: hidden; border-radius: 10px;">
-                                                            <img src="shared/assets/img/home/webdev.jpg" alt="Course Image"
+                                                            <img src="shared/assets/img/home/<?php echo $courses['courseImage']; ?>" alt="Course Image"
                                                                 class="img-fluid w-100 h-100" style="object-fit: cover;">
                                                         </div>
 
@@ -213,7 +213,7 @@ if (isset($_GET['courseID'])) {
                                                     <!-- Course Image -->
                                                     <div class="course-image w-100 mb-3"
                                                         style="height: 250px; overflow: hidden; border-radius: 10px;">
-                                                        <img src="shared/assets/img/home/webdev.jpg" alt="Course Image"
+                                                        <img src="shared/assets/img/home/<?php echo $courses['courseImage']; ?>" alt="Course Image"
                                                             class="img-fluid w-100 h-100" style="object-fit: cover;">
                                                     </div>
 
