@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Webstar | My Inbox</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="shared/assets/css/global-styles.css" />
     <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
@@ -91,8 +92,8 @@
                                                     <div
                                                         class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
                                                         <div class="avatar-image">
-                                                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
-                                                        class="rounded-circle responsive-circle ">
+                                                            <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
+                                                                class="rounded-circle responsive-circle ">
                                                         </div>
                                                     </div>
 
@@ -140,8 +141,8 @@
                                                     <div
                                                         class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
                                                         <div class="avatar-image">
-                                                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
-                                                        class="rounded-circle responsive-circle ">
+                                                            <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
+                                                                class="rounded-circle responsive-circle ">
                                                         </div>
                                                     </div>
 
@@ -189,8 +190,8 @@
                                                     <div
                                                         class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
                                                         <div class="avatar-image">
-                                                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
-                                                        class="rounded-circle responsive-circle ">
+                                                            <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
+                                                                class="rounded-circle responsive-circle ">
                                                         </div>
                                                     </div>
 
@@ -234,12 +235,12 @@
                                             style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
                                             <div class="card-body p-3">
                                                 <div class="row align-items-start">
-                                                     <!-- Profile Image -->
-                                                     <div
+                                                    <!-- Profile Image -->
+                                                    <div
                                                         class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
                                                         <div class="avatar-image">
-                                                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
-                                                        class="rounded-circle responsive-circle ">
+                                                            <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
+                                                                class="rounded-circle responsive-circle ">
                                                         </div>
                                                     </div>
 
@@ -287,8 +288,8 @@
                                                     <div
                                                         class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
                                                         <div class="avatar-image">
-                                                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
-                                                        class="rounded-circle responsive-circle ">
+                                                            <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
+                                                                class="rounded-circle responsive-circle ">
                                                         </div>
                                                     </div>
 
@@ -336,8 +337,8 @@
                                                     <div
                                                         class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
                                                         <div class="avatar-image">
-                                                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
-                                                        class="rounded-circle responsive-circle ">
+                                                            <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
+                                                                class="rounded-circle responsive-circle ">
                                                         </div>
                                                     </div>
 
@@ -385,8 +386,8 @@
                                                     <div
                                                         class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
                                                         <div class="avatar-image">
-                                                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
-                                                        class="rounded-circle responsive-circle ">
+                                                            <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
+                                                                class="rounded-circle responsive-circle ">
                                                         </div>
                                                     </div>
 

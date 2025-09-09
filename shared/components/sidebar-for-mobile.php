@@ -43,7 +43,7 @@
                 <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3 <?php echo ($activePage == 'explore') ? 'selected-box' : ''; ?>"
                     data-page="explore" data-bs-toggle="modal" data-bs-target="#searchModalMobile">
                     <img src="shared/assets/img/explore.png" class="img-fluid" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'explore') ? 'selected' : ''; ?>">
+                    <a href="#" class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'explore') ? 'selected' : ''; ?>">
                         <strong>Explore</strong></a>
                 </li>
 
@@ -101,7 +101,7 @@
             <!-- Search Bar (separated, clean, no background) -->
             <div class="p-3 position-relative">
                 <input type="text" class="form-control rounded-pill pe-5 border-black" placeholder="Search students & professors">
-                <i class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-5 text-muted"></i>
+                <i class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-5 text-muted z-3"></i>
             </div>
 
             <!-- Search Results -->
