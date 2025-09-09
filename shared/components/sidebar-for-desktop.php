@@ -43,7 +43,7 @@
                         data-page="explore" data-bs-toggle="modal" data-bs-target="#searchModal">
                         <img src="shared/assets/img/explore.png" class="img-fluid" style="width: 30px; height: 30px;">
                         <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'explore') ? 'selected' : ''; ?>"
-                            href="#"><strong>Explore</strong></a>
+                            href=""><strong>Explore</strong></a>
                     </li>
 
 
