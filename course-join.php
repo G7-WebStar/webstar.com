@@ -14,7 +14,7 @@ if (isset($_POST['access_code'])) {
         $availableCourses = mysqli_fetch_assoc($checkCourseResult);
         $courseID = $availableCourses['courseID'];
 
-        $checkEnrollmentQuery = "SELECT * FROM enrollment WHERE userID = '$userID' AND courseID = '$courseID';";
+        $checkEnrollmentQuery = "SELECT * FROM enrollments WHERE userID = '$userID' AND courseID = '$courseID';";
         $checkEnrollmentResult = executeQuery($checkEnrollmentQuery);
 
         if (mysqli_num_rows($checkEnrollmentResult) > 0) {
@@ -27,7 +27,7 @@ if (isset($_POST['access_code'])) {
                 $selectedUser = mysqli_fetch_assoc($selectUserResult);
                 $yearSection = $selectedUser['yearSection'];
 
-                $enrollQuery = "INSERT INTO enrollment (`userID`, `courseID`, `yearSection`) VALUES ('$userID','$courseID','$yearSection')";
+                $enrollQuery = "INSERT INTO enrollments (`userID`, `courseID`, `yearSection`) VALUES ('$userID','$courseID','$yearSection')";
                 $enrollResult = executeQuery($enrollQuery);
 
                 header("Location: index.php");

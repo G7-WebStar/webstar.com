@@ -1,7 +1,57 @@
-<?php 
-$activePage = 'courseInfo'; 
+<?php
+$activePage = 'courseInfo';
 
 include("shared/assets/database/connect.php");
+$userID = '2';
+if (isset($_GET['courseID'])) {
+    $courseID = $_GET['courseID'];
+    $selectCourseQuery = "SELECT 
+    courses.*, 
+   	profInfo.firstName AS profFirstName,
+    profInfo.middleName AS profMiddleName,
+    profInfo.lastName AS profLastName,
+    profInfo.profilePicture AS profPFP,
+    SUBSTRING_INDEX(courses.schedule, ' ', 1)  AS courseDays,
+    SUBSTRING_INDEX(courses.schedule, ' ', -1) AS courseTime
+    FROM courses
+    INNER JOIN userinfo AS profInfo
+    	ON courses.userID = profInfo.userID
+    INNER JOIN enrollments
+    	ON courses.courseID = enrollments.courseID
+    WHERE enrollments.userID = '$userID' AND enrollments.courseID = '$courseID';
+;
+";
+    $selectCourseResult = executeQuery($selectCourseQuery);
+
+    $selectAssessmentQuery = "SELECT
+    assessments.*,
+    courses.courseCode,
+    DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline
+    FROM assessments
+    INNER JOIN courses
+        ON assessments.courseID = courses.courseID
+    INNER JOIN enrollments
+        ON courses.courseID = enrollments.courseID
+    WHERE enrollments.userID = '$userID' AND enrollments.courseID = '$courseID'
+    ORDER BY assessmentID DESC
+	LIMIT 1;
+";
+    $selectAssessmentResult = executeQuery($selectAssessmentQuery);
+
+    $selectLeaderboardQuery = "SELECT 
+	courses.courseTitle,
+    SUM(leaderboard.xpPoints) AS totalPoints
+    FROM leaderboard
+    INNER JOIN courses
+        ON leaderboard.courseID = courses.courseID
+    WHERE leaderboard.userID = '$userID' AND leaderboard.courseID = '$courseID'
+    GROUP BY courses.courseTitle;
+";
+    $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
+} else {
+    header("Location: 404.php");
+    exit();
+}
 ?>
 
 
@@ -45,189 +95,223 @@ include("shared/assets/database/connect.php");
 
                                 <!-- LEFT: Course Card -->
                                 <div class="col-md-4">
+                                    <?php
+                                    if (mysqli_num_rows($selectCourseResult) > 0) {
+                                        while ($courses = mysqli_fetch_assoc($selectCourseResult)) {
+                                    ?>
+                                            <!-- Mobile Dropdown Course Card -->
+                                            <div class="course-card-mobile d-block d-md-none">
+                                                <div class="course-card p-0"
+                                                    style="width: 100%; margin: 0 auto; outline: 1px solid var(--black); border-radius: 10px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; overflow: hidden;">
+                                                    <!-- Yellow header section -->
+                                                    <div id="dropdownHeader"
+                                                        class="d-flex justify-content-between align-items-center px-3 py-2"
+                                                        style="background-color: var(--primaryColor);">
 
-                                    <!-- Mobile Dropdown Course Card -->
-                                    <div class="course-card-mobile d-block d-md-none">
-                                        <div class="course-card p-0"
-                                            style="width: 100%; margin: 0 auto; outline: 1px solid var(--black); border-radius: 10px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; overflow: hidden;">
-                                            <!-- Yellow header section -->
-                                            <div id="dropdownHeader"
-                                                class="d-flex justify-content-between align-items-center px-3 py-2"
-                                                style="background-color: var(--primaryColor);">
-
-                                                <div class="flex-grow-1 text-center">
-                                                    <h5 class="text-bold mb-1">COMP-006</h5>
-                                                    <p class="text-reg mb-0">Web Development</p>
-                                                </div>
-                                                <button class="btn p-0 d-md-none" type="button"
-                                                    data-bs-toggle="collapse" data-bs-target="#mobileCourseCard"
-                                                    aria-expanded="false" aria-controls="mobileCourseCard">
-                                                    <i class="fa fa-chevron-down text-dark"></i>
-                                                </button>
-                                            </div>
-
-                                            <!-- White dropdown section -->
-                                            <div class="collapse d-md-block px-3 pt-2 pb-3 bg-white"
-                                                id="mobileCourseCard">
-                                                <div class="course-image w-100 mb-3"
-                                                    style="height: 250px; overflow: hidden; border-radius: 10px;">
-                                                    <img src="shared/assets/img/home/webdev.jpg" alt="Course Image"
-                                                        class="img-fluid w-100 h-100" style="object-fit: cover;">
-                                                </div>
-
-                                                <div class="d-flex align-items-center mb-2">
-                                                    <div class="avatar-image">
-                                                        <img src="shared/assets/img/courseInfo/prof.png"
-                                                            alt="Instructor Image" class="img-fluid">
-                                                    </div>
-                                                    <div class="ms-2">
-                                                        <strong class="text-sbold" style="font-size: 12px;">Christian
-                                                            James
-                                                            Torrillo</strong>
-                                                        <br>
-                                                        <small class="text-reg">Professor</small>
-                                                    </div>
-                                                </div>
-
-                                                <div class="mb-2">
-                                                    <div class="d-flex align-items-start">
-                                                        <img src="shared/assets/img/courseInfo/calendar.png"
-                                                            alt="Calendar" width="20" class="me-2 mt-3">
-                                                        <div>
-                                                            <small class="text-reg">Thursdays 8:00AM – 10:00AM</small>
-                                                            <br>
-                                                            <small class="text-reg">Fridays 9:00AM – 12:00PM</small>
+                                                        <div class="flex-grow-1 text-center">
+                                                            <h5 class="text-bold mb-1"><?php echo $courses['courseCode']; ?></h5>
+                                                            <p class="text-reg mb-0"><?php echo $courses['courseTitle']; ?></p>
                                                         </div>
+                                                        <button class="btn p-0 d-md-none" type="button"
+                                                            data-bs-toggle="collapse" data-bs-target="#mobileCourseCard"
+                                                            aria-expanded="false" aria-controls="mobileCourseCard">
+                                                            <i class="fa fa-chevron-down text-dark"></i>
+                                                        </button>
                                                     </div>
-                                                </div>
 
-                                                <div class="mb-2">
-                                                    <label class="text-reg small mb-1">Class Standing</label>
-                                                    <div
-                                                        class="class-standing d-flex justify-content-between align-items-center">
-                                                        <span><img src="shared/assets/img/courseInfo/star.png"
-                                                                alt="Star" width="14" class="me-2">1ST</span>
-                                                        <span class="fw-medium">3160 WBSTRS</span>
-                                                        <span><i class="fas fa-arrow-right"></i></span>
-                                                    </div>
-                                                </div>
-                                                <label class="text-reg small mb-1 ">To-do</label>
-                                                <div class="todo-card d-flex align-items-stretch rounded-4 mt-2">
-                                                    <div class="date-section text-sbold text-12">SEP 9</div>
-                                                    <div
-                                                        class="d-flex align-items-center flex-wrap flex-grow-1 p-2 gap-3">
-                                                        <div class="flex-grow-1 px-2">
-                                                            <div class="text-sbold text-12">Activity #1</div>
+                                                    <!-- White dropdown section -->
+                                                    <div class="collapse d-md-block px-3 pt-2 pb-3 bg-white"
+                                                        id="mobileCourseCard">
+                                                        <div class="course-image w-100 mb-3"
+                                                            style="height: 250px; overflow: hidden; border-radius: 10px;">
+                                                            <img src="shared/assets/img/home/webdev.jpg" alt="Course Image"
+                                                                class="img-fluid w-100 h-100" style="object-fit: cover;">
                                                         </div>
-                                                        <div class="course-badge rounded-pill px-3 text-reg text-12">
-                                                            Task</div>
 
-                                                        <!-- Arrow icon that always shows and aligns to the right -->
-                                                        <div class="ms-auto">
-                                                            <i class="fa-solid fa-arrow-right text-reg text-12"
-                                                                style="color: var(--black);"></i>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <!-- Desktop Course Card -->
-                                    <div class="course-card-desktop d-none d-md-block">
-                                        <div class="course-card mx-auto"
-                                            style="outline: 1px solid var(--black); border-radius: 10px;">
-                                            <!-- Back Button -->
-                                            <div class="mb-3">
-                                                <a href="course.php" class="text-dark fs-5">
-                                                    <i class="fas fa-arrow-left"></i>
-                                                </a>
-                                            </div>
-
-                                            <!-- Course Image -->
-                                            <div class="course-image w-100 mb-3"
-                                                style="height: 250px; overflow: hidden; border-radius: 10px;">
-                                                <img src="shared/assets/img/home/webdev.jpg" alt="Course Image"
-                                                    class="img-fluid w-100 h-100" style="object-fit: cover;">
-                                            </div>
-
-                                            <!-- Course Info -->
-                                            <h5 class="text-bold text-center mb-1">COMP-006</h5>
-                                            <p class="text-center text-reg mb-3">Web Development</p>
-
-                                            <div class="row mb-2">
-                                                <div class="col">
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="avatar-image">
-                                                            <img src="shared/assets/img/courseInfo/prof.png"
-                                                                alt="Instructor Image" class="img-fluid">
-                                                        </div>
-                                                        <div class="ms-2">
-                                                            <strong class="text-sbold text-12">Christian James
-                                                                Torrillo</strong><br>
-                                                            <small class="text-reg">Professor</small>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row mb-3">
-                                                <div class="col">
-                                                    <div class="d-flex align-items-start">
-                                                        <img src="shared/assets/img/courseInfo/calendar.png"
-                                                            alt="Calendar" width="20" class="me-2 mt-3">
-                                                        <div>
-                                                            <small class="text-reg">Thursdays 8:00AM –
-                                                                10:00AM</small><br>
-                                                            <small class="text-reg">Fridays 9:00AM – 12:00PM</small>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row mb-3">
-                                                <div class="col">
-                                                    <label class="text-reg small mb-1">Class Standing</label>
-                                                    <div
-                                                        class="text-reg class-standing d-flex justify-content-between align-items-center">
-                                                        <span><img src="shared/assets/img/courseInfo/star.png"
-                                                                alt="Star" width="14" class="me-2">1ST</span>
-                                                        <span class="text-sbold">3160 WBSTRS</span>
-                                                        <span><i class="fas fa-arrow-right"></i></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-12">
-                                                    <label class="text-reg small mb-1">To-do</label>
-                                                    <div class="todo-card d-flex align-items-stretch rounded-4">
-                                                        <div class="date-section text-sbold text-12">SEP 9</div>
-                                                        <div
-                                                            class="d-flex align-items-center flex-wrap flex-grow-1 p-2 gap-3">
-                                                            <div class="flex-grow-1 px-2">
-                                                                <div class="text-sbold text-12">Activity #1</div>
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <div class="avatar-image">
+                                                                <img src="pfp-uploads/<?php echo $courses['profPFP']; ?>"
+                                                                    alt="Instructor Image" class="img-fluid">
                                                             </div>
+                                                            <div class="ms-2">
+                                                                <strong class="text-sbold" style="font-size: 12px;"><?php echo $courses['profFirstName'] . " " . $courses['profMiddleName'] . " " . $courses['profLastName']; ?></strong>
+                                                                <br>
+                                                                <small class="text-reg">Professor</small>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="mb-2">
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="shared/assets/img/courseInfo/calendar.png"
+                                                                    alt="Calendar" width="20" class="me-2">
+                                                                <div>
+                                                                    <small class="text-reg"><?php echo $courses['courseDays']; ?></span> <?php echo $courses['courseTime']; ?></small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="mb-2">
+                                                            <label class="text-reg small mb-1">Class Standing</label>
                                                             <div
-                                                                class="course-badge rounded-pill px-3 text-reg text-12">
-                                                                Task
+                                                                class="class-standing d-flex justify-content-between align-items-center">
+                                                                <span><img src="shared/assets/img/courseInfo/star.png"
+                                                                        alt="Star" width="14" class="me-2">1ST</span>
+                                                                <?php
+                                                                if (mysqli_num_rows($selectLeaderboardResult) > 0) {
+                                                                    while ($points = mysqli_fetch_assoc($selectLeaderboardResult)) {
+                                                                ?>
+                                                                        <span class="fw-medium"><?php echo $points['totalPoints']; ?> WBSTRS</span>
+                                                                <?php
+                                                                    }
+                                                                }
+                                                                ?>
+                                                                <span><i class="fas fa-arrow-right"></i></span>
                                                             </div>
-                                                            <div class="d-none d-lg-block"
-                                                                style="margin-left: auto; margin-right: 10px;">
-                                                                <i class="fa-solid fa-arrow-right text-reg text-12"
-                                                                    style="color: var(--black);"></i>
+                                                        </div>
+                                                        <label class="text-reg small mb-1 ">To-do</label>
+                                                        <?php
+                                                        if (mysqli_num_rows($selectAssessmentResult) > 0) {
+                                                            while ($activities = mysqli_fetch_assoc($selectAssessmentResult)) {
+                                                        ?>
+                                                                <div class="todo-card d-flex align-items-stretch rounded-4 mt-2">
+                                                                    <div class="date-section text-sbold text-12"><?php echo $activities['assessmentDeadline']; ?></div>
+                                                                    <div
+                                                                        class="d-flex align-items-center flex-wrap flex-grow-1 p-2 gap-3">
+                                                                        <div class="flex-grow-1 px-2">
+                                                                            <div class="text-sbold text-12"><?php echo $activities['title']; ?></div>
+                                                                        </div>
+                                                                        <div class="course-badge rounded-pill px-3 text-reg text-12">
+                                                                            Task</div>
+
+                                                                        <!-- Arrow icon that always shows and aligns to the right -->
+                                                                        <div class="ms-auto">
+                                                                            <i class="fa-solid fa-arrow-right text-reg text-12"
+                                                                                style="color: var(--black);"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                        <?php
+                                                            }
+                                                        }
+                                                        ?>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <!-- Desktop Course Card -->
+                                            <div class="course-card-desktop d-none d-md-block">
+                                                <div class="course-card mx-auto"
+                                                    style="outline: 1px solid var(--black); border-radius: 10px;">
+                                                    <!-- Back Button -->
+                                                    <div class="mb-3">
+                                                        <a href="course.php" class="text-dark fs-5">
+                                                            <i class="fas fa-arrow-left"></i>
+                                                        </a>
+                                                    </div>
+
+                                                    <!-- Course Image -->
+                                                    <div class="course-image w-100 mb-3"
+                                                        style="height: 250px; overflow: hidden; border-radius: 10px;">
+                                                        <img src="shared/assets/img/home/webdev.jpg" alt="Course Image"
+                                                            class="img-fluid w-100 h-100" style="object-fit: cover;">
+                                                    </div>
+
+                                                    <!-- Course Info -->
+                                                    <h5 class="text-bold text-center mb-1"><?php echo $courses['courseCode']; ?></h5>
+                                                    <p class="text-center text-reg mb-3"><?php echo $courses['courseTitle']; ?></p>
+
+                                                    <div class="row mb-2">
+                                                        <div class="col">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="avatar-image">
+                                                                    <img src="pfp-uploads/<?php echo $courses['profPFP']; ?>"
+                                                                        alt="Instructor Image" class="img-fluid">
+                                                                </div>
+                                                                <div class="ms-2">
+                                                                    <strong class="text-sbold text-12"><?php echo $courses['profFirstName'] . " " . $courses['profMiddleName'] . " " . $courses['profLastName']; ?></strong><br>
+                                                                    <small class="text-reg">Professor</small>
+                                                                </div>
                                                             </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row mb-3">
+                                                        <div class="col">
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="shared/assets/img/courseInfo/calendar.png"
+                                                                    alt="Calendar" width="20" class="me-2">
+                                                                <div>
+                                                                    <small class="text-reg"><?php echo $courses['courseDays']; ?></span> <?php echo $courses['courseTime']; ?></small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row mb-3">
+                                                        <div class="col">
+                                                            <label class="text-reg small mb-1">Class Standing</label>
+                                                            <div
+                                                                class="text-reg class-standing d-flex justify-content-between align-items-center">
+                                                                <span><img src="shared/assets/img/courseInfo/star.png"
+                                                                        alt="Star" width="14" class="me-2">1ST</span>
+                                                                <?php
+                                                                if (mysqli_num_rows($selectLeaderboardResult) > 0) {
+                                                                    mysqli_data_seek($selectLeaderboardResult, 0);
+                                                                    while ($points = mysqli_fetch_assoc($selectLeaderboardResult)) {
+                                                                ?>
+                                                                        <span class="fw-medium"><?php echo $points['totalPoints']; ?> WBSTRS</span>
+                                                                <?php
+                                                                    }
+                                                                }
+                                                                ?>
+                                                                <span><i class="fas fa-arrow-right"></i></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <label class="text-reg small mb-1">To-do</label>
+                                                            <?php if (mysqli_num_rows($selectAssessmentResult) > 0) {
+                                                                mysqli_data_seek($selectAssessmentResult, 0);
+                                                                while ($activities = mysqli_fetch_assoc($selectAssessmentResult)) {
+                                                            ?>
+                                                                    <div class="todo-card d-flex align-items-stretch rounded-4">
+                                                                        <div class="date-section text-sbold text-12"><?php echo $activities['assessmentDeadline']; ?></div>
+                                                                        <div
+                                                                            class="d-flex align-items-center flex-wrap flex-grow-1 p-2 gap-3">
+                                                                            <div class="flex-grow-1 px-2">
+                                                                                <div class="text-sbold text-12"><?php echo $activities['title']; ?></div>
+                                                                            </div>
+                                                                            <div
+                                                                                class="course-badge rounded-pill px-3 text-reg text-12">
+                                                                                Task
+                                                                            </div>
+                                                                            <div class="d-none d-lg-block"
+                                                                                style="margin-left: auto; margin-right: 10px;">
+                                                                                <i class="fa-solid fa-arrow-right text-reg text-12"
+                                                                                    style="color: var(--black);"></i>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                            <?php
+                                                                }
+                                                            } ?>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
+                                        <?php
+                                        }
+                                    } else { ?>
+                                        <script>
+                                            window.location.href = "404.php"
+                                        </script>
+                                    <?php
+                                    }
+                                    ?>
                                 </div>
-
                                 <!-- RIGHT: Tabs and Content -->
                                 <div class="col-md-8">
                                     <div class="tab-section">
@@ -361,7 +445,6 @@ include("shared/assets/database/connect.php");
 
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>

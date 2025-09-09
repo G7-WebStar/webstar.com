@@ -10,25 +10,26 @@ $selectEnrolledQuery = "SELECT
     student.userID AS studentID,
     studentInfo.firstName AS studentName,
     studentInfo.profilePicture as studentProfile,
+    courses.courseID,
     courses.courseCode,
     courses.courseTitle,
     courses.courseImage,
     courses.schedule,
     (SELECT COUNT(*) 
-     FROM enrollment AS e
-     WHERE e.userID = enrollment.userID) AS totalEnrollments
-    FROM enrollment
+     FROM enrollments AS e
+     WHERE e.userID = enrollments.userID) AS totalEnrollments
+    FROM enrollments
     INNER JOIN courses 
-        ON enrollment.courseID = courses.courseID
+        ON enrollments.courseID = courses.courseID
     INNER JOIN users AS prof 
         ON courses.userID = prof.userID
     INNER JOIN users AS student 
-        ON enrollment.userID = student.userID
+        ON enrollments.userID = student.userID
     INNER JOIN userinfo AS profInfo
         ON prof.userID = profInfo.userID
     INNER JOIN userinfo AS studentInfo
         ON student.userID = studentInfo.userID
-    WHERE enrollment.userID = '$userID';
+    WHERE enrollments.userID = '$userID';
 ";
 $selectEnrolledResult = executeQuery($selectEnrolledQuery);
 
@@ -37,16 +38,16 @@ $selectAnnouncementsQuery = "SELECT
     profInfo.firstName AS profName,
     profInfo.profilePicture,
     courses.courseCode
-    FROM enrollment
+    FROM enrollments
     INNER JOIN courses
-        ON enrollment.courseID = courses.courseID
+        ON enrollments.courseID = courses.courseID
     INNER JOIN users
         ON courses.userID = users.userID
     INNER JOIN announcements
         ON courses.courseID = announcements.courseID
     INNER JOIN userinfo AS profInfo
         ON users.userID = profInfo.userID
-    WHERE enrollment.userID = '$userID';
+    WHERE enrollments.userID = '$userID';
     ";
 $selectAnnouncementsResult = executeQuery($selectAnnouncementsQuery);
 
@@ -56,15 +57,15 @@ $selectAssessmentQuery = "SELECT
     DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline,
     (SELECT COUNT(*) 
      FROM assessments 
-     INNER JOIN enrollment
-        ON assessments.courseID = enrollment.courseID
-     WHERE enrollment.userID = '$userID') AS totalAssessments
+     INNER JOIN enrollments
+        ON assessments.courseID = enrollments.courseID
+     WHERE enrollments.userID = '$userID') AS totalAssessments
     FROM assessments
     INNER JOIN courses
         ON assessments.courseID = courses.courseID
-    INNER JOIN enrollment
-        ON courses.courseID = enrollment.courseID
-    WHERE enrollment.userID = '$userID';
+    INNER JOIN enrollments
+        ON courses.courseID = enrollments.courseID
+    WHERE enrollments.userID = '$userID';
 ";
 $selectAssessmentResult = executeQuery($selectAssessmentQuery);
 
@@ -161,11 +162,13 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                             ?>
                                                                     <!-- Card 1 -->
                                                                     <div class="card custom-course-card">
-                                                                        <img src="shared/assets/img/home/<?php echo $enrolledSubjects['courseImage']; ?>" class="card-img-top" alt="...">
-                                                                        <div class="card-body px-3 py-2">
-                                                                            <div class="text-sbold text-16"><?php echo $enrolledSubjects['courseCode']; ?></div>
-                                                                            <p class="text-reg text-14 mb-0"><?php echo $enrolledSubjects['courseTitle']; ?></p>
-                                                                        </div>
+                                                                        <a href="course-info.php?courseID=<?php echo $enrolledSubjects['courseID']; ?>" class="text-decoration-none text-black">
+                                                                            <img src="shared/assets/img/home/<?php echo $enrolledSubjects['courseImage']; ?>" class="card-img-top" alt="...">
+                                                                            <div class="card-body px-3 py-2">
+                                                                                <div class="text-sbold text-16"><?php echo $enrolledSubjects['courseCode']; ?></div>
+                                                                                <p class="text-reg text-14 mb-0"><?php echo $enrolledSubjects['courseTitle']; ?></p>
+                                                                            </div>
+                                                                        </a>
                                                                     </div>
                                                             <?php
                                                                 }

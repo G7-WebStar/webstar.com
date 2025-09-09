@@ -9,14 +9,15 @@ $selectCourseQuery = "SELECT
    	profInfo.firstName AS profFirstName,
     profInfo.middleName AS profMiddleName,
     profInfo.lastName AS profLastName,
+    profInfo.profilePicture AS profPFP,
     SUBSTRING_INDEX(courses.schedule, ' ', 1)  AS courseDays,
     SUBSTRING_INDEX(courses.schedule, ' ', -1) AS courseTime
     FROM courses
     INNER JOIN userinfo AS profInfo
     	ON courses.userID = profInfo.userID
-    INNER JOIN enrollment
-    	ON courses.courseID = enrollment.courseID
-    WHERE enrollment.userID = '$userID';
+    INNER JOIN enrollments
+    	ON courses.courseID = enrollments.courseID
+    WHERE enrollments.userID = '$userID';
 ";
 $selectCourseResult = executeQuery($selectCourseQuery);
 ?>
@@ -128,12 +129,12 @@ $selectCourseResult = executeQuery($selectCourseQuery);
                                                     <img src="" class="card-img-top p-2 rounded-top-4" alt="..." style="background-color: #FDDF94; height: 190px;">
                                                     <div class="card-body border-top border-black">
                                                         <div class="row lh-1 mb-2">
-                                                            <p class="card-text text-bold text-18 m-0"><?php echo $courses['courseCode']; ?></p>
+                                                            <a href="course-info.php?courseID=<?php echo $courses['courseID']; ?>" class="text-decoration-none text-black"><p class="card-text text-bold text-18 m-0"><?php echo $courses['courseCode']; ?></p></a>
                                                             <p class="card-text text-reg text-14 mb-2"><?php echo $courses['courseTitle']; ?></p>
                                                         </div>
                                                         <div class="row px-3 mb-2">
                                                             <div class="col-1 d-flex justify-content-center align-items-center m-0 p-0">
-                                                                <img src="https://avatars.githubusercontent.com/u/181800261?s=96&amp;v=4" alt="" width="32" height="32" class="rounded-circle">
+                                                                <img src="pfp-uploads/<?php echo $courses['profPFP']; ?>" alt="" width="32" height="32" class="rounded-circle">
                                                             </div>
                                                             <div class="col-11 my-0 lh-sm">
                                                                 <p class="card-text text-bold text-14 m-0"><?php echo $courses['profFirstName'] . " " . $courses['profMiddleName'] . " " . $courses['profLastName']; ?></p>
@@ -145,7 +146,7 @@ $selectCourseResult = executeQuery($selectCourseQuery);
                                                                 <img src="shared/assets/img/course/Calendar.png" alt="" width="24" height="24">
                                                             </div>
                                                             <div class="col-11 my-0 lh-sm">
-                                                                <p class="card-text text-reg text-14 mb-1"><span class="text-med"><?php echo $courses['courseDays']; ?></span> <?php echo $courses['courseTime']; ?></p>
+                                                                <p class="card-text text-reg text-14"><span class="text-med"><?php echo $courses['courseDays']; ?></span> <?php echo $courses['courseTime']; ?></p>
                                                             </div>
                                                         </div>
                                                     </div>
