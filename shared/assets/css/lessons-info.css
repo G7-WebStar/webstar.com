@@ -1,0 +1,52 @@
+.cardHeader {
+    border-radius: 15px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+}
+
+.cardFile {
+    border-radius: 10px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+}
+
+/* Mobile specific styles */
+@media (max-width: 576px) {
+    .cardHeader {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+
+    .mobile-assignment {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        text-align: center;
+    }
+
+    .mobile-top {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        width: 100%;
+    }
+
+    .mobile-top .arrow {
+        position: absolute;
+        left: 0;
+        display: flex;
+        align-items: center;
+        padding-left: 10px;
+    }
+}
+
+@media (max-width: 576px) {
+    .cardFile i {
+        font-size: 1.3rem; /* enlarge the icon */
+        margin-top: 0.5rem; /* same as Bootstrap mt-2 */
+    }
+}
+

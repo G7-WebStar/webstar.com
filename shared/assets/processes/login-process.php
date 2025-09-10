@@ -24,6 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
 
         if ($password === $dbPassword) {
             $_SESSION['email'] = $email;
+            $_SESSION['userID'] = $userID;
             header("Location: index.php");
             exit();
         } else {
