@@ -9,6 +9,7 @@
     <title>Webstar | Shop</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="shared/assets/css/global-styles.css">
     <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
     <link rel="stylesheet" href="shared/assets/css/shop.css">
@@ -17,7 +18,7 @@
 </head>
 
 <body>
-<div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center p-0 p-md-3"
+    <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center p-0 p-md-3"
         style="background-color: var(--black);">
 
         <div class="row w-100">
@@ -87,7 +88,7 @@
 
     <!-- Shop Page Script -->
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const tabs = document.querySelectorAll('#shopTabs .nav-link');
             const contentArea = document.getElementById('tabContentArea');
 
@@ -144,7 +145,7 @@
             contentArea.innerHTML = shopContent["Frame"];
 
             tabs.forEach(tab => {
-                tab.addEventListener('click', function (e) {
+                tab.addEventListener('click', function(e) {
                     e.preventDefault();
                     tabs.forEach(t => t.classList.remove('active'));
                     this.classList.add('active');

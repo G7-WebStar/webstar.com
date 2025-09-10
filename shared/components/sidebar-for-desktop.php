@@ -40,11 +40,12 @@
                     </li>
 
                     <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'explore') ? 'selected-box' : ''; ?>"
-                        data-page="explore">
+                        data-page="explore" data-bs-toggle="modal" data-bs-target="#searchModal">
                         <img src="shared/assets/img/explore.png" class="img-fluid" style="width: 30px; height: 30px;">
-                        <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'explore') ? 'selected' : ''; ?>"
-                           ><strong>Explore</strong></a>
+                        <a href="#" class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'explore') ? 'selected' : ''; ?>">
+                            <strong>Explore</strong></a>
                     </li>
+
 
                     <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'shop') ? 'selected-box' : ''; ?>"
                         data-page="shop">
@@ -91,6 +92,48 @@
                 </div>
 
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Modal -->
+<div class="modal fade text-reg" id="searchModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow" style="background: transparent !important; box-shadow: none !important;">
+
+            <!-- Search Bar (separated, clean, no background) -->
+            <div class="p-3 position-relative">
+                <input type="text" class="form-control rounded-pill pe-5 border-black" placeholder="Search students & professors">
+                <i class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-5 text-muted z-3"></i>
+            </div>
+
+            <!-- Search Results -->
+            <div class="p-3">
+                <div class="list-group rounded-3 shadow-sm border border-black">
+                    <a href="#" class="list-group-item list-group-item-action d-flex align-items-center border-0">
+                        <div class="rounded-circle bg-primary me-3" style="width:40px; height:40px;"></div>
+                        <div>
+                            <div class="fw-bold">Christian James D. Torrillo</div>
+                            <small class="text-muted">@jamesdoe</small>
+                        </div>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action d-flex align-items-center border-0">
+                        <div class="rounded-circle bg-primary me-3" style="width:40px; height:40px;"></div>
+                        <div>
+                            <div class="fw-bold">Christian James D. Torrillo</div>
+                            <small class="text-muted">@jamesdoe</small>
+                        </div>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action d-flex align-items-center border-0">
+                        <div class="rounded-circle bg-primary me-3" style="width:40px; height:40px;"></div>
+                        <div>
+                            <div class="fw-bold">Christian James D. Torrillo</div>
+                            <small class="text-muted">@jamesdoe</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
