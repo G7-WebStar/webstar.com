@@ -156,8 +156,14 @@ $selectCourseResult = executeQuery($selectCourseQuery);
                                                     </div>
                                                 </div>
                                             </div>
-                                    <?php
+                                        <?php
                                         }
+                                    } else {
+                                        ?>
+                                        <script>
+                                            window.location.href = "course-join.php";
+                                        </script>
+                                    <?php
                                     }
                                     ?>
                                 </div>
