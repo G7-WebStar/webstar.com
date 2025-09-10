@@ -94,7 +94,7 @@
 </div>
 
 <!-- Search Modal -->
-<div class="modal fade" id="searchModalMobile" tabindex="-1" aria-hidden="true">
+<div class="modal fade text-reg" id="searchModalMobile" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow" style="background: transparent !important; box-shadow: none !important;">
 
