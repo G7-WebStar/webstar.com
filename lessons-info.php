@@ -43,7 +43,7 @@
                                 <!-- DESKTOP VIEW -->
                                 <div class="row desktop-header d-none d-sm-flex">
                                     <div class="col-auto me-2">
-                                        <a href="course-info.php" class="text-decoration-none">
+                                        <a href="#" class="text-decoration-none">
                                             <i class="fa-solid fa-arrow-left text-reg text-16"
                                                 style="color: var(--black);"></i>
                                         </a>
@@ -59,7 +59,7 @@
                                 <div class="d-block d-sm-none mobile-assignment">
                                     <div class="mobile-top">
                                         <div class="arrow">
-                                            <a href="course-info.php" class="text-decoration-none">
+                                            <a href="#" class="text-decoration-none">
                                                 <i class="fa-solid fa-arrow-left text-reg text-16"
                                                     style="color: var(--black);"></i>
                                             </a>
