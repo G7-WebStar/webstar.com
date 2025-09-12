@@ -12,10 +12,10 @@
             <hr>
             <ul class="nav nav-pills flex-column mb-auto">
 
-                <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3 <?php echo ($activePage == 'home') ? 'selected-box' : ''; ?>"
+                <li class="nav-item d-flex align-items-center gap-2 my-1 p-2 rounded-3 <?php echo ($activePage == 'profIndex') ? 'selected-box' : ''; ?>"
                     data-page="home">
                     <img src="../shared/assets/img/dashboard.png" style="width: 30px; height: 30px;">
-                    <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'home') ? 'selected' : ''; ?>"
+                    <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'profIndex') ? 'selected' : ''; ?>"
                         href="profIndex.php"><strong>Home</strong></a>
                 </li>
 

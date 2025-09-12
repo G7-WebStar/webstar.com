@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 10, 2025 at 07:22 PM
+-- Generation Time: Sep 10, 2025 at 07:55 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `webstar_cato`
+-- Database: `webstar`
 --
 
 -- --------------------------------------------------------
@@ -405,7 +405,8 @@ CREATE TABLE `userinfo` (
 --
 
 INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `middleName`, `lastName`, `studentID`, `programID`, `gender`, `yearLevel`, `yearSection`, `schoolEmail`, `contactNumber`, `facebookLink`, `linkedInLink`, `instagramLink`, `createdAt`) VALUES
-(1, 2, 'prof.png', 'Jane', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 2023, 'jane.smith@university.edu', '+639123456789', 'https://facebook.com/jane.smith', 'https://linkedin.com/in/jane-smith', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53');
+(1, 2, 'prof.png', 'Jane', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 2023, 'jane.smith@university.edu', '+639123456789', 'https://facebook.com/jane.smith', 'https://linkedin.com/in/jane-smith', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53'),
+(2, 1, 'prof.png', 'Chistian James', 'Dom', 'Torillo', '202310002', '1', 'Male', '2', 2023, 'james.dom@university.edu', '+639123456789', 'https://facebook.com/james.dom', 'https://linkedin.com/in/james-dom', 'https://instagram.com/james.dom', '2025-08-30 08:18:53');
 
 -- --------------------------------------------------------
 
@@ -563,6 +564,12 @@ ALTER TABLE `admin`
   MODIFY `adminID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `announcementnotes`
+--
+ALTER TABLE `announcementnotes`
+  MODIFY `noteID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `announcements`
 --
 ALTER TABLE `announcements`
@@ -644,7 +651,7 @@ ALTER TABLE `todo`
 -- AUTO_INCREMENT for table `userinfo`
 --
 ALTER TABLE `userinfo`
-  MODIFY `userInfoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `userInfoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `users`

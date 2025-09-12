@@ -11,10 +11,10 @@
                 <!-- Navigation -->
                 <ul class="nav flex-column">
 
-                    <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'home') ? 'selected-box' : ''; ?>"
-                        data-page="">
+                    <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'profIndex') ? 'selected-box' : ''; ?>"
+                        data-page="home">
                         <img src="../shared/assets/img/dashboard.png" class="img-fluid" style="width: 30px; height: 30px;">
-                        <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'home') ? 'selected' : ''; ?>"
+                        <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'profIndex') ? 'selected' : ''; ?>"
                             href="profIndex.php"><strong>Home</strong></a>
                     </li>
 
