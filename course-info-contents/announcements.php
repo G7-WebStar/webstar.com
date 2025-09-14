@@ -1,12 +1,4 @@
-<?php 
-// session_start();
-
-// hardcoded
-if (!isset($_SESSION['userID'])) {
-    $_SESSION['userID'] = '2';
-}
-
-$userID = $_SESSION['userID'];
+<?php
 
 $courseID = isset($_GET['courseID']) ? $_GET['courseID'] : '';
 
@@ -24,7 +16,6 @@ if (isset($_POST['announcementID'])) {
         executeQuery($deleteQuery);
     }
 }
-
 
 $announcementQuery = "
     SELECT 
@@ -51,7 +42,7 @@ $announcementQuery = "
 
 $announcementResult = executeQuery($announcementQuery);
 
-while ($row = mysqli_fetch_assoc($announcementResult)) { 
+while ($row = mysqli_fetch_assoc($announcementResult)) {
     $profilePicture = !empty($row['profilePicture']) ? $row['profilePicture'] : "shared/assets/img/courseInfo/prof.png";
     $fullName = $row['firstName'] . " " . $row['lastName'];
     $announcementDate = date("F j, Y g:iA", strtotime($row['announcementDate'] . " " . $row['announcementTime']));
