@@ -1,4 +1,4 @@
-<?php $activePage = 'post-announcement'; ?>
+<?php $activePage = 'add-lesson'; ?>
 
 <!doctype html>
 <html lang="en">
@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | Post Announcement</title>
+    <title>Webstar | Add Lesson</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="../shared/assets/css/global-styles.css">
@@ -53,12 +53,23 @@
                                         </a>
                                     </div>
                                     <div class="col text-center text-md-start">
-                                        <span class="text-sbold text-25">Post Announcement</span>
+                                        <span class="text-sbold text-25">Add Lesson</span>
                                     </div>
                                 </div>
 
                                 <!-- Form starts -->
                                 <form>
+                                    <div class="row">
+                                        <div class="col-12 pt-3 mb-3">
+                                            <label for="lessonInfo" class="form-label text-med text-16">Lesson
+                                                Information</label>
+                                            <input type="text"
+                                                class="form-control form-control textbox mb-3 p-2 text-reg text-14 text-muted"
+                                                id="lessonInfo" aria-describedby="lessonInfo"
+                                                placeholder="Lesson Title">
+                                        </div>
+                                    </div>
+
                                     <!-- Rich Text Editor -->
                                     <div class="row">
                                         <div class="col-12 mb-3">
@@ -84,7 +95,7 @@
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="learning-materials">
-                                                <label class="text-med text-16 mt-4">Attachments</label>
+                                                <label class="text-med text-16 mt-4">Learning Materials</label>
                                                 <span class="fst-italic text-reg text-14 ms-2">You can add up to 10
                                                     files or
                                                     links.</span>
@@ -177,6 +188,7 @@
                                                                     Link
                                                                 </button>
                                                             </div>
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -214,12 +226,12 @@
                                                             </ul>
                                                         </div>
                                                     </div>
-                                                    <!-- Post Button -->
+                                                    <!-- Add Button -->
                                                     <div class="col-md-6 text-center text-md-center mt-3 mt-md-0 ms-md-5">
                                                         <button type="submit"
                                                             class="px-4 py-2 rounded-pill text-sbold text-md-14 mt-3 ms-3"
                                                             style="background-color: var(--primaryColor); border: 1px solid var(--black);">
-                                                            Post
+                                                            Add
                                                         </button>
                                                     </div>
                                                 </div>
@@ -238,18 +250,9 @@
     <!-- Quill JS -->
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script>
-        var icons = Quill.import("ui/icons");
-
-        // Custom upload icon (styled same as bold/italic)
-        icons['upload'] = '<svg viewBox="0 0 18 18">' +
-            '<line class="ql-stroke" x1="9" x2="9" y1="15" y2="3"></line>' +
-            '<polyline class="ql-stroke" points="5 7 9 3 13 7"></polyline>' +
-            '<rect class="ql-fill" height="2" width="12" x="3" y="15"></rect>' +
-            '</svg>';
-
         var quill = new Quill('#editor', {
             theme: 'snow',
-            placeholder: 'Announce something to your class ',
+            placeholder: 'Lesson Description / Objectives',
             modules: {
                 toolbar: '#toolbar'
             }
