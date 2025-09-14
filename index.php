@@ -10,6 +10,7 @@ $selectEnrolledQuery = "SELECT
     student.userID AS studentID,
     studentInfo.firstName AS studentName,
     studentInfo.profilePicture as studentProfile,
+    studentInfo.isNewUser AS isNewUser, 
     courses.courseID,
     courses.courseCode,
     courses.courseTitle,
@@ -32,6 +33,23 @@ $selectEnrolledQuery = "SELECT
     WHERE enrollments.userID = '$userID';
 ";
 $selectEnrolledResult = executeQuery($selectEnrolledQuery);
+
+
+// Welcoming Message for new/older users
+if (mysqli_num_rows($selectEnrolledResult) > 0) {
+    $studentEnrolled = mysqli_fetch_assoc($selectEnrolledResult);
+
+    if ($studentEnrolled['isNewUser']) {
+        $welcomeText = "Welcome, " . $studentEnrolled['studentName'] . "!";
+        $updateUserQuery = "UPDATE userinfo SET isNewUser = 0 WHERE userID = '{$studentEnrolled['studentID']}'";
+        executeQuery($updateUserQuery);
+    } else {
+        $welcomeText = "Welcome back, " . $studentEnrolled['studentName'] . "!";
+    }
+
+    mysqli_data_seek($selectEnrolledResult, 0); // reset pointer 
+}
+
 
 $selectAnnouncementsQuery = "SELECT 
     announcements.*, 
@@ -131,16 +149,21 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                             ?>
                                     <!-- left side -->
                                     <div class="col-12 col-sm-12 col-md-7">
-                                        <div class="row ps-4">
-                                            <div class="col-12 text-center text-sm-start">
-                                                <div class="text-sbold text-22">Welcome back,
-                                                    <?php echo $studentEnrolled['studentName']; ?>!
-                                                </div>
-                                                <div class="text-reg text-16">Pick up where you left off and keep
-                                                    building you skills.
-                                                </div>
+                                        <div class="row align-items-center ps-4">
+                                            <!-- Image column -->
+                                            <div class="col-auto d-none d-sm-block">
+                                                <img src="./shared/assets/img/profIndex/folder.png" alt="Folder"
+                                                    class="img-fluid rounded-circle folder-img"
+                                                    style="width:68px; height:68px;">
+                                            </div>
+
+                                            <!-- Text column -->
+                                            <div class="col text-center text-sm-start">
+                                                <div class="text-sbold text-22"><?php echo $welcomeText; ?></div>
+                                                <div class="text-reg text-16">Pick up where you left off and keep building your skills.</div>
                                             </div>
                                         </div>
+
                                         <!-- Another row for foldering -->
                                         <div class="row pt-1 text-sbold text-18">
                                             <div class="col pt-3">
