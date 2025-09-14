@@ -94,11 +94,13 @@ $selectLeaderboardQuery = "SELECT
     courses.courseCode,
     courses.courseTitle,
     SUM(leaderboard.xpPoints) AS totalPoints
-FROM leaderboard
-INNER JOIN courses
-    ON leaderboard.courseID = courses.courseID
-WHERE leaderboard.userID = '$userID'
-GROUP BY courses.courseID, courses.courseCode, courses.courseTitle;
+    FROM leaderboard
+    INNER JOIN enrollments
+        ON leaderboard.enrollmentID = enrollments.enrollmentID
+    INNER JOIN courses
+	    ON enrollments.courseID = courses.courseID
+    WHERE enrollments.userID = '$userID'
+    GROUP BY courses.courseID, courses.courseCode, courses.courseTitle;
 ";
 $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
 ?>

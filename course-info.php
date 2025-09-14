@@ -42,9 +42,11 @@ if (isset($_GET['courseID'])) {
 	courses.courseTitle,
     SUM(leaderboard.xpPoints) AS totalPoints
     FROM leaderboard
-    INNER JOIN courses
-        ON leaderboard.courseID = courses.courseID
-    WHERE leaderboard.userID = '$userID' AND leaderboard.courseID = '$courseID'
+    INNER JOIN enrollments
+        ON leaderboard.enrollmentID = enrollments.enrollmentID
+   	INNER JOIN courses
+    	ON enrollments.courseID = courses.courseID
+    WHERE enrollments.userID = '$userID' AND enrollments.courseID = '$courseID'
     GROUP BY courses.courseTitle;
 ";
     $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
