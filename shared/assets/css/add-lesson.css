@@ -1,0 +1,15 @@
+.textbox {
+    background: var(--pureWhite);
+    border: 1px solid var(--black);
+    border-radius: 10px;
+    width: 100%;
+    max-width: 700px;
+}
+
+.materials-card {
+    background-color: var(--pureWhite);
+    border-radius: 15px;
+    border: 1px solid var(--black);
+    overflow: hidden;
+    max-width: 700px;
+}
