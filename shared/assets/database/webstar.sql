@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 15, 2025 at 06:39 AM
+-- Generation Time: Sep 15, 2025 at 06:58 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -212,6 +212,7 @@ CREATE TABLE `gameresult` (
 --
 
 CREATE TABLE `inbox` (
+  `inboxID` int(11) NOT NULL,
   `messageID` int(11) NOT NULL,
   `enrollmentID` int(11) NOT NULL,
   `messageText` text NOT NULL,
@@ -223,8 +224,8 @@ CREATE TABLE `inbox` (
 -- Dumping data for table `inbox`
 --
 
-INSERT INTO `inbox` (`messageID`, `enrollmentID`, `messageText`, `createdAt`, `isRead`) VALUES
-(1, 1, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 0);
+INSERT INTO `inbox` (`inboxID`, `messageID`, `enrollmentID`, `messageText`, `createdAt`, `isRead`) VALUES
+(0, 1, 1, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 0);
 
 -- --------------------------------------------------------
 
@@ -361,12 +362,9 @@ INSERT INTO `report` (`reportID`, `courseID`, `userID`, `totalXP`, `allTimeRank`
 CREATE TABLE `todo` (
   `todoID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
-  `courseID` int(11) NOT NULL,
+  `assessmentID` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
-  `type` varchar(50) NOT NULL,
   `status` varchar(20) NOT NULL,
-  `dueDate` date NOT NULL,
-  `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -374,8 +372,8 @@ CREATE TABLE `todo` (
 -- Dumping data for table `todo`
 --
 
-INSERT INTO `todo` (`todoID`, `userID`, `courseID`, `title`, `type`, `status`, `dueDate`, `createdAt`, `updatedAt`) VALUES
-(1, 4, 1, 'Review CSS Grid and Flexbox', 'Study', 'Pending', '2025-09-01', '2025-08-29 09:00:00', '2025-08-29 09:00:00');
+INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `title`, `status`, `updatedAt`) VALUES
+(1, 4, 1, 'Review CSS Grid and Flexbox', 'Pending', '2025-08-29 09:00:00');
 
 -- --------------------------------------------------------
 
