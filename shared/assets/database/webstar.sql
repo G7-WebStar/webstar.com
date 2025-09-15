@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 14, 2025 at 02:58 PM
+-- Generation Time: Sep 15, 2025 at 06:39 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -82,7 +82,7 @@ CREATE TABLE `announcements` (
 --
 
 INSERT INTO `announcements` (`announcementID`, `courseID`, `userID`, `announcementTitle`, `announcementContent`, `announcementDate`, `announcementTime`, `isRequired`) VALUES
-(1, 1, 2, 'Project Deadline Reminder', 'Final project is due next week. Submit via LMS.', '2025-08-30', '09:00:00', 1);
+(1, 1, 1, 'Project Deadline Reminder', 'Final project is due next week. Submit via LMS.', '2025-08-30', '09:00:00', 1);
 
 -- --------------------------------------------------------
 
@@ -104,7 +104,10 @@ CREATE TABLE `assessments` (
 --
 
 INSERT INTO `assessments` (`assessmentID`, `courseID`, `title`, `type`, `deadline`, `createdAt`) VALUES
-(1, 1, 'Activity #1', 'Task', '2025-09-09', '2025-09-04 22:00:15');
+(1, 1, 'Activity #1', 'Task', '2025-09-09', '2025-09-04 22:00:15'),
+(2, 2, 'Exam #1', 'Exam', '2025-09-09', '2025-09-04 22:00:15'),
+(3, 1, 'Activity #2', 'Task', '2025-09-10', '2025-09-04 22:00:15'),
+(4, 2, 'Activity #1', 'Exam', '2025-09-11', '2025-09-04 22:00:15');
 
 -- --------------------------------------------------------
 
@@ -128,7 +131,8 @@ CREATE TABLE `courses` (
 --
 
 INSERT INTO `courses` (`courseID`, `userID`, `courseCode`, `courseTitle`, `courseImage`, `yearSection`, `schedule`, `code`) VALUES
-(1, 1, 'WEBDEV101', 'Web Development', 'webdev101.jpg', '2', 'MWF 10:00–11:30AM', 'WD-2A-2025');
+(1, 1, 'WEBDEV101', 'Web Development', 'webdev.jpg', '2', 'MWF 10:00–11:30AM', 'WD-2A-2025'),
+(2, 1, 'WEBDEV102', 'Web Development 2', 'webdev.jpg', '2', 'MWF 01:00–02:30AM', 'WD-2B-2025');
 
 -- --------------------------------------------------------
 
@@ -148,7 +152,8 @@ CREATE TABLE `enrollments` (
 --
 
 INSERT INTO `enrollments` (`enrollmentID`, `userID`, `courseID`, `yearSection`) VALUES
-(1, 2, 1, 2023);
+(1, 2, 1, 2023),
+(2, 2, 2, 2023);
 
 -- --------------------------------------------------------
 
@@ -208,8 +213,7 @@ CREATE TABLE `gameresult` (
 
 CREATE TABLE `inbox` (
   `messageID` int(11) NOT NULL,
-  `userID` int(11) NOT NULL,
-  `courseID` int(11) NOT NULL,
+  `enrollmentID` int(11) NOT NULL,
   `messageText` text NOT NULL,
   `createdAt` datetime DEFAULT current_timestamp(),
   `isRead` tinyint(1) DEFAULT 0
@@ -219,8 +223,8 @@ CREATE TABLE `inbox` (
 -- Dumping data for table `inbox`
 --
 
-INSERT INTO `inbox` (`messageID`, `userID`, `courseID`, `messageText`, `createdAt`, `isRead`) VALUES
-(1, 2, 1, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 0);
+INSERT INTO `inbox` (`messageID`, `enrollmentID`, `messageText`, `createdAt`, `isRead`) VALUES
+(1, 1, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 0);
 
 -- --------------------------------------------------------
 
@@ -230,8 +234,7 @@ INSERT INTO `inbox` (`messageID`, `userID`, `courseID`, `messageText`, `createdA
 
 CREATE TABLE `leaderboard` (
   `leaderboardID` int(11) NOT NULL,
-  `courseID` int(11) NOT NULL,
-  `userID` int(11) NOT NULL,
+  `enrollmentID` int(11) NOT NULL,
   `timeRange` varchar(10) NOT NULL,
   `periodStart` date NOT NULL,
   `xpPoints` int(11) NOT NULL,
@@ -244,8 +247,9 @@ CREATE TABLE `leaderboard` (
 -- Dumping data for table `leaderboard`
 --
 
-INSERT INTO `leaderboard` (`leaderboardID`, `courseID`, `userID`, `timeRange`, `periodStart`, `xpPoints`, `rank`, `previousRank`, `updatedAt`) VALUES
-(1, 1, 2, 'Weekly', '2025-08-25', 450, 3, 5, '2025-08-30 12:00:00');
+INSERT INTO `leaderboard` (`leaderboardID`, `enrollmentID`, `timeRange`, `periodStart`, `xpPoints`, `rank`, `previousRank`, `updatedAt`) VALUES
+(1, 1, 'Weekly', '2025-08-25', 450, 3, 5, '2025-08-30 12:00:00'),
+(2, 2, 'Weekly', '2025-08-25', 450, 3, 5, '2025-08-30 12:00:00');
 
 -- --------------------------------------------------------
 
@@ -256,7 +260,6 @@ INSERT INTO `leaderboard` (`leaderboardID`, `courseID`, `userID`, `timeRange`, `
 CREATE TABLE `lessons` (
   `lessonID` int(11) NOT NULL,
   `courseID` int(11) NOT NULL,
-  `userID` int(11) NOT NULL,
   `lessonTitle` varchar(255) NOT NULL,
   `lessonDescription` text NOT NULL,
   `lessonContent` text NOT NULL,
@@ -270,8 +273,8 @@ CREATE TABLE `lessons` (
 -- Dumping data for table `lessons`
 --
 
-INSERT INTO `lessons` (`lessonID`, `courseID`, `userID`, `lessonTitle`, `lessonDescription`, `lessonContent`, `attachment`, `lessonType`, `createdAt`, `updatedAt`) VALUES
-(1, 1, 2, 'Introduction to CSS Grid', 'Basics of layout with CSS Grid', 'Learn how to create grid layouts', 'css-grid.pdf', 'Lecture', '2025-08-30 09:00:00', '2025-08-30 09:00:00');
+INSERT INTO `lessons` (`lessonID`, `courseID`, `lessonTitle`, `lessonDescription`, `lessonContent`, `attachment`, `lessonType`, `createdAt`, `updatedAt`) VALUES
+(1, 1, 'Introduction to CSS Grid', 'Basics of layout with CSS Grid', 'Learn how to create grid layouts', 'css-grid.pdf', 'Lecture', '2025-08-30 09:00:00', '2025-08-30 09:00:00');
 
 -- --------------------------------------------------------
 
@@ -496,9 +499,7 @@ ALTER TABLE `gameresult`
 -- Indexes for table `inbox`
 --
 ALTER TABLE `inbox`
-  ADD PRIMARY KEY (`messageID`),
-  ADD KEY `courseID` (`courseID`),
-  ADD KEY `userID` (`userID`) USING BTREE;
+  ADD PRIMARY KEY (`messageID`);
 
 --
 -- Indexes for table `leaderboard`
@@ -577,16 +578,22 @@ ALTER TABLE `announcements`
   MODIFY `announcementID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `assessments`
+--
+ALTER TABLE `assessments`
+  MODIFY `assessmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT for table `courses`
 --
 ALTER TABLE `courses`
-  MODIFY `courseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `courseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `enrollments`
 --
 ALTER TABLE `enrollments`
-  MODIFY `enrollmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `enrollmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `files`
@@ -607,10 +614,16 @@ ALTER TABLE `gameresult`
   MODIFY `gameResultID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `inbox`
+--
+ALTER TABLE `inbox`
+  MODIFY `messageID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `leaderboard`
 --
 ALTER TABLE `leaderboard`
-  MODIFY `leaderboardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `leaderboardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `lessons`

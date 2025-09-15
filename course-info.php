@@ -34,9 +34,11 @@ if (isset($_GET['courseID'])) {
         ON courses.courseID = enrollments.courseID
     WHERE enrollments.userID = '$userID' AND enrollments.courseID = '$courseID'
     ORDER BY assessmentID DESC
-	LIMIT 1;
 ";
     $selectAssessmentResult = executeQuery($selectAssessmentQuery);
+
+    $selectLimitAssessmentQuery = $selectAssessmentQuery .= " LIMIT 1";
+    $selectLimitAssessmentResult = executeQuery($selectLimitAssessmentQuery);
 
     $selectLeaderboardQuery = "SELECT 
 	courses.courseTitle,
@@ -172,8 +174,8 @@ if (isset($_GET['courseID'])) {
                                                         </div>
                                                         <label class="text-reg small mb-1 ">To-do</label>
                                                         <?php
-                                                        if (mysqli_num_rows($selectAssessmentResult) > 0) {
-                                                            while ($activities = mysqli_fetch_assoc($selectAssessmentResult)) {
+                                                        if (mysqli_num_rows($selectLimitAssessmentResult) > 0) {
+                                                            while ($activities = mysqli_fetch_assoc($selectLimitAssessmentResult)) {
                                                         ?>
                                                                 <div class="todo-card d-flex align-items-stretch rounded-4 mt-2">
                                                                     <div class="date-section text-sbold text-12"><?php echo $activities['assessmentDeadline']; ?></div>
@@ -183,7 +185,7 @@ if (isset($_GET['courseID'])) {
                                                                             <div class="text-sbold text-12"><?php echo $activities['title']; ?></div>
                                                                         </div>
                                                                         <div class="course-badge rounded-pill px-3 text-reg text-12">
-                                                                            Task</div>
+                                                                            <?php echo $activities['type']; ?></div>
 
                                                                         <!-- Arrow icon that always shows and aligns to the right -->
                                                                         <div class="ms-auto">
@@ -275,9 +277,9 @@ if (isset($_GET['courseID'])) {
                                                     <div class="row">
                                                         <div class="col-12">
                                                             <label class="text-reg small mb-1">To-do</label>
-                                                            <?php if (mysqli_num_rows($selectAssessmentResult) > 0) {
-                                                                mysqli_data_seek($selectAssessmentResult, 0);
-                                                                while ($activities = mysqli_fetch_assoc($selectAssessmentResult)) {
+                                                            <?php if (mysqli_num_rows($selectLimitAssessmentResult) > 0) {
+                                                                mysqli_data_seek($selectLimitAssessmentResult, 0);
+                                                                while ($activities = mysqli_fetch_assoc($selectLimitAssessmentResult)) {
                                                             ?>
                                                                     <div class="todo-card d-flex align-items-stretch rounded-4">
                                                                         <div class="date-section text-sbold text-12"><?php echo $activities['assessmentDeadline']; ?></div>
@@ -288,7 +290,7 @@ if (isset($_GET['courseID'])) {
                                                                             </div>
                                                                             <div
                                                                                 class="course-badge rounded-pill px-3 text-reg text-12">
-                                                                                Task
+                                                                                <?php echo $activities['type']; ?>
                                                                             </div>
                                                                             <div class="d-none d-lg-block"
                                                                                 style="margin-left: auto; margin-right: 10px;">
