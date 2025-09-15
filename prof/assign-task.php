@@ -1,4 +1,4 @@
-<?php $activePage = 'post-announcement'; ?>
+<?php $activePage = 'assign-task'; ?>
 
 <!doctype html>
 <html lang="en">
@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | Post Announcement</title>
+    <title>Webstar | Assign Task</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="../shared/assets/css/global-styles.css">
@@ -53,12 +53,22 @@
                                         </a>
                                     </div>
                                     <div class="col text-center text-md-start">
-                                        <span class="text-sbold text-25">Post Announcement</span>
+                                        <span class="text-sbold text-25">Assign Task</span>
                                     </div>
                                 </div>
 
                                 <!-- Form starts -->
                                 <form>
+                                    <div class="row">
+                                        <div class="col-12 pt-3 mb-3">
+                                            <label for="lessonInfo" class="form-label text-med text-16">Task
+                                                Information</label>
+                                            <input type="text"
+                                                class="form-control textbox mb-3 p-2 text-reg text-14 text-muted"
+                                                id="lessonInfo" aria-describedby="lessonInfo" placeholder="Task Title">
+                                        </div>
+                                    </div>
+
                                     <!-- Rich Text Editor -->
                                     <div class="row">
                                         <div class="col-12 mb-3">
@@ -76,16 +86,52 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <input type="hidden" name="lesson" id="lesson">
+                                            <input type="hidden" name="task" id="task">
                                         </div>
                                     </div>
+
+                                    <div class="row g-3">
+                                        <div class="row g-3 mt-3">
+                                            <!-- Deadline -->
+                                            <div class="col-md-4">
+                                                <label class="form-label text-med text-16">
+                                                    Deadline
+                                                </label>
+                                                <span class="fst-italic text-reg text-12">Optional.</span>
+                                                <div class="input-group" style="max-width: 320px;">
+                                                    <input type="datetime-local"
+                                                        class="form-control textbox text-reg text-14" />
+                                                </div>
+                                            </div>
+
+                                            <!-- Points -->
+                                            <div class="col-md-4">
+                                                <label class="form-label text-med text-16">
+                                                    Points
+                                                </label>
+                                                <span class="fst-italic text-reg text-12">Optional. Ungraded if left
+                                                    blank</span>
+                                                <input type="number" class="form-control textbox text-reg text-14"
+                                                    style="max-width: 320px;" placeholder="100" />
+                                            </div>
+                                        </div>
+
+                                        <div class="form-check mt-2 col ms-2">
+                                            <input class="form-check-input" type="checkbox" id="stopSubmissions"
+                                                style="border: 1px solid var(--black);" />
+                                            <label class="form-check-label" for="stopSubmissions">
+                                                Stop accepting submissions after the deadline.
+                                            </label>
+                                        </div>
+                                    </div>
+
 
                                     <!-- Learning Materials -->
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="learning-materials">
-                                                <label class="text-med text-16 mt-4">Attachments</label>
-                                                <span class="fst-italic text-reg text-14 ms-2">You can add up to 10
+                                                <label class="text-med text-16 mt-5">Learning Materials</label>
+                                                <span class="fst-italic text-reg text-12 ms-2">You can add up to 10
                                                     files or
                                                     links.</span>
                                                 <!-- Example Link Item -->
@@ -158,6 +204,7 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
+
                                                             <!-- Buttons -->
                                                             <div class="mt-3 mb-4 text-center text-md-start">
                                                                 <button type="submit"
@@ -177,79 +224,127 @@
                                                                     Link
                                                                 </button>
                                                             </div>
+
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <!-- Course selection + Post button -->
-                                                <div class="row align-items-center mb-5 text-center text-md-start">
-                                                    <div
-                                                        class="col-12 col-md-auto mt-3 d-flex justify-content-center justify-content-md-start">
-                                                        <div class="d-flex align-items-center flex-nowrap">
-                                                            <span class="me-2 text-med text-16 pe-3">Add to
-                                                                Course</span>
-                                                            <button
-                                                                class="btn dropdown-toggle dropdown-shape text-med text-16 me-md-5"
-                                                                type="button" data-bs-toggle="dropdown"
-                                                                aria-expanded="false">
-                                                                <span>COMP-006</span>
+                                                <!-- Rubrics -->
+                                                <div class="row mb-0">
+                                                    <div class="col">
+                                                        <label class="text-med text-16 mt-3">Rubric</label>
+                                                        <span class="fst-italic text-reg text-12 ms-2">Optional. Any
+                                                            points entered above will be replaced by the rubric’s total
+                                                            points.</span>
+                                                        <div class="row mb-0 mt-3">
+                                                            <div class="col-12">
+                                                                <div
+                                                                    class="materials-card d-flex align-items-stretch p-2 w-100">
+                                                                    <div
+                                                                        class="d-flex w-100 align-items-center justify-content-between">
+                                                                        <div
+                                                                            class="d-flex align-items-center flex-grow-1">
+                                                                            <div class="mx-4">
+                                                                                <img src="../shared/assets/img/rubrics.png"
+                                                                                    alt="Rubrics"
+                                                                                    style="width: 20px; height: 20px;">
+                                                                            </div>
+                                                                            <div>
+                                                                                <div class="text-sbold text-16 py-1"
+                                                                                    style="line-height: 1;">
+                                                                                    Essay Rubric
+                                                                                </div>
+                                                                                <div class="text-reg text-12 text-break"
+                                                                                    style="line-height: 1;">
+                                                                                    20 points
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <!-- Delete icon aligned to the right end -->
+                                                                        <div class="mx-4"> <img
+                                                                                src="../shared/assets/img/trash.png"
+                                                                                alt="Delete Icon"
+                                                                                style="width: 12px; height: 16px;">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Buttons -->
+                                                        <div class="mt-3 mb-4 text-center text-md-start">
+                                                            <button type="submit"
+                                                                class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-2 ms-2"
+                                                                style="background-color: var(--primaryColor); border: 1px solid var(--black);">
+                                                                <i class="bi bi-plus-circle me-1"
+                                                                    style="font-size: 14px;"></i>
+                                                                Rubric
                                                             </button>
-                                                            <ul class="dropdown-menu p-2" style="min-width: 200px;">
-                                                                <li>
-                                                                    <div class="form-check">
-                                                                        <input class="form-check-input" type="checkbox"
-                                                                            value="COMP-006" id="course1" checked>
-                                                                        <label class="form-check-label text-reg"
-                                                                            for="course1">COMP-006</label>
-                                                                    </div>
-                                                                </li>
-                                                                <li>
-                                                                    <div class="form-check">
-                                                                        <input class="form-check-input" type="checkbox"
-                                                                            value="COMP-007" id="course2">
-                                                                        <label class="form-check-label text-reg"
-                                                                            for="course2">COMP-007</label>
-                                                                    </div>
-                                                                </li>
-                                                            </ul>
                                                         </div>
                                                     </div>
-                                                    <!-- Post Button -->
-                                                    <div class="col-md-6 text-center text-md-center mt-3 mt-md-0 ms-md-5">
-                                                        <button type="submit"
-                                                            class="px-4 py-2 rounded-pill text-sbold text-md-14 mt-3 ms-3"
-                                                            style="background-color: var(--primaryColor); border: 1px solid var(--black);">
-                                                            Post
+                                                </div>
+                                            </div>
+
+                                            <!-- Course selection + Post button -->
+                                            <div class="row align-items-center mb-5 text-center text-md-start">
+                                                <div
+                                                    class="col-12 col-md-auto mt-3 d-flex justify-content-center justify-content-md-start">
+                                                    <div class="d-flex align-items-center flex-nowrap">
+                                                        <span class="me-2 text-med text-16 pe-3">Assign to
+                                                            Course</span>
+                                                        <button
+                                                            class="btn dropdown-toggle dropdown-shape text-med text-16 me-md-3"
+                                                            type="button" data-bs-toggle="dropdown"
+                                                            aria-expanded="false">
+                                                            <span>COMP-006</span>
                                                         </button>
+                                                        <ul class="dropdown-menu p-2" style="min-width: 200px;">
+                                                            <li>
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                        value="COMP-006" id="course1" checked>
+                                                                    <label class="form-check-label text-reg"
+                                                                        for="course1">COMP-006</label>
+                                                                </div>
+                                                            </li>
+                                                            <li>
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                        value="COMP-007" id="course2">
+                                                                    <label class="form-check-label text-reg"
+                                                                        for="course2">COMP-007</label>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
                                                     </div>
+                                                </div>
+                                                <!-- Assign Button -->
+                                                <div class="col-md-6 text-center text-md-center mt-3 mt-md-0 ms-md-5">
+                                                    <button type="submit"
+                                                        class="px-4 py-2 rounded-pill text-sbold text-md-14 mt-3 ms-3"
+                                                        style="background-color: var(--primaryColor); border: 1px solid var(--black);">
+                                                        Assign
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </form>
                             </div>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    </div>
 
     <!-- Quill JS -->
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script>
-        var icons = Quill.import("ui/icons");
-
-        // Custom upload icon (styled same as bold/italic)
-        icons['upload'] = '<svg viewBox="0 0 18 18">' +
-            '<line class="ql-stroke" x1="9" x2="9" y1="15" y2="3"></line>' +
-            '<polyline class="ql-stroke" points="5 7 9 3 13 7"></polyline>' +
-            '<rect class="ql-fill" height="2" width="12" x="3" y="15"></rect>' +
-            '</svg>';
-
-        var quill = new Quill('#editor', {
+       var quill = new Quill('#editor', {
             theme: 'snow',
-            placeholder: 'Announce something to your class ',
+            placeholder: 'Task Instructions',
             modules: {
                 toolbar: '#toolbar'
             }
