@@ -83,7 +83,9 @@ $selectAssessmentQuery = "SELECT
         ON assessments.courseID = courses.courseID
     INNER JOIN enrollments
         ON courses.courseID = enrollments.courseID
-    WHERE enrollments.userID = '$userID';
+    WHERE enrollments.userID = '$userID'
+    GROUP BY assessments.assessmentID DESC
+    LIMIT 3;
 ";
 $selectAssessmentResult = executeQuery($selectAssessmentQuery);
 
@@ -92,11 +94,13 @@ $selectLeaderboardQuery = "SELECT
     courses.courseCode,
     courses.courseTitle,
     SUM(leaderboard.xpPoints) AS totalPoints
-FROM leaderboard
-INNER JOIN courses
-    ON leaderboard.courseID = courses.courseID
-WHERE leaderboard.userID = '$userID'
-GROUP BY courses.courseID, courses.courseCode, courses.courseTitle;
+    FROM leaderboard
+    INNER JOIN enrollments
+        ON leaderboard.enrollmentID = enrollments.enrollmentID
+    INNER JOIN courses
+	    ON enrollments.courseID = courses.courseID
+    WHERE enrollments.userID = '$userID'
+    GROUP BY courses.courseID, courses.courseCode, courses.courseTitle;
 ";
 $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
 ?>
@@ -342,7 +346,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                         }
                                                         ?>
                                                         <div style="display:flex; justify-content: flex-end; align-items: center; gap:6px; margin-right: 10px;">
-                                                            <span class="text-reg text-12" style="color: var(--black);"><?php echo $emptyAssessment ? '' : 'View More </span>
+                                                            <a href="todo.php" class="text-decoration-none text-black"><span class="text-reg text-12" style="color: var(--black);"><?php echo $emptyAssessment ? '' : 'View More </span></a>
                                                             <i class="fa-solid fa-arrow-right text-reg text-12" style="color: var(--black);"></i>'; ?>
                                                         </div>
                                                     </div>

@@ -72,7 +72,7 @@ $selectCourseResult = executeQuery($selectCourseQuery);
                                         <div class="col-12 col-lg-6 px-0 px-xl-auto">
                                             <div class="search-container d-flex mx-sm-auto">
                                                 <input type="text" placeholder="Search" class="form-control py-1 text-reg text-14">
-                                                <button type="button" class="btn btn-outline-secondary ms-2">
+                                                <button type="button" class="btn-outline-secondary ms-2">
                                                     <i class="bi bi-search"></i>
                                                 </button>
                                             </div>
