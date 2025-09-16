@@ -3,7 +3,7 @@ $activePage = 'course';
 
 include('shared/assets/database/connect.php');
 $userID = '2';
-
+$noResult = false;
 $selectCourseQuery = "SELECT 
     courses.*, 
    	profInfo.firstName AS profFirstName,
@@ -17,9 +17,25 @@ $selectCourseQuery = "SELECT
     	ON courses.userID = profInfo.userID
     INNER JOIN enrollments
     	ON courses.courseID = enrollments.courseID
-    WHERE enrollments.userID = '$userID';
+    WHERE enrollments.userID = '$userID'
 ";
-$selectCourseResult = executeQuery($selectCourseQuery);
+
+$baseCourseQuery = $selectCourseQuery;
+
+if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
+    $search = $_GET['search'];
+
+    $searchCourseQuery = $selectCourseQuery .= " AND (courses.courseCode LIKE '%$search%' OR courses.courseTitle LIKE '%$search%')";
+    $selectCourseResult = executeQuery($searchCourseQuery);
+
+    if (mysqli_num_rows($selectCourseResult) == 0) {
+        $selectCourseResult = executeQuery($baseCourseQuery);
+        $noResult = true;
+    }
+} else {
+    $search = '';
+    $selectCourseResult = executeQuery($baseCourseQuery);
+}
 ?>
 
 <!doctype html>
@@ -71,10 +87,12 @@ $selectCourseResult = executeQuery($selectCourseQuery);
                                         </div>
                                         <div class="col-12 col-lg-6 px-0 px-xl-auto">
                                             <div class="search-container d-flex mx-sm-auto">
-                                                <input type="text" placeholder="Search" class="form-control py-1 text-reg text-14">
-                                                <button type="button" class="btn-outline-secondary ms-2">
-                                                    <i class="bi bi-search"></i>
-                                                </button>
+                                                <form method="GET" class="form-control bg-transparent border-0">
+                                                    <input type="text" placeholder="Search" name="search" value="<?php echo $search ?>" class="form-control py-1 text-reg text-14">
+                                                    <button type="submit" class="btn-outline-secondary">
+                                                        <i class="bi bi-search me-2"></i>
+                                                    </button>
+                                                </form>
                                             </div>
                                         </div>
                                         <div class="col-12 col-sm-3 justify-content-lg-end justify-content-xl-start align-items-center px-0 px-xl-auto d-flex d-sm-none d-lg-flex">
@@ -121,7 +139,7 @@ $selectCourseResult = executeQuery($selectCourseQuery);
                                 <div class="row px-0">
                                     <!-- Card -->
                                     <?php
-                                    if (mysqli_num_rows($selectCourseResult) > 0) {
+                                    if (mysqli_num_rows($selectCourseResult) > 0 && !$noResult) {
                                         while ($courses = mysqli_fetch_assoc($selectCourseResult)) {
                                     ?>
                                             <div class="col-12 col-lg-6 col-xl-4 mt-4">
@@ -158,8 +176,11 @@ $selectCourseResult = executeQuery($selectCourseQuery);
                                             </div>
                                         <?php
                                         }
+                                    } else if ($noResult) { ?>
+                                    <div class="text-sbold h1 text-center mt-5">No Result.</div>
+                                    <?php
                                     } else {
-                                        ?>
+                                    ?>
                                         <script>
                                             window.location.href = "course-join.php";
                                         </script>

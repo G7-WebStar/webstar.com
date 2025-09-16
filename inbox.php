@@ -1,6 +1,7 @@
 <?php $activePage = 'inbox'; 
 include('shared/assets/database/connect.php');
 
+
 ?>
 <!doctype html>
 <html lang="en">
