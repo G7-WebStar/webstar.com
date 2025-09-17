@@ -308,3 +308,18 @@ body {
         display: none !important;
     }
 }
+
+.tab-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+
+.tab-scroll .nav-tabs {
+    display: flex;
+    flex-wrap: nowrap; /* prevents wrapping */
+}
+
+.tab-scroll .nav-item {
+    flex: 0 0 auto; /* keeps items from shrinking */
+}

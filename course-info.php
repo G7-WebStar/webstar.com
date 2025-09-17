@@ -127,7 +127,7 @@ if (isset($_GET['courseID'])) {
                                                     <div class="collapse d-md-block px-3 pt-2 pb-3 bg-white"
                                                         id="mobileCourseCard">
                                                         <div class="course-image w-100 mb-3"
-                                                            style="height: 250px; overflow: hidden; border-radius: 10px;">
+                                                            style="height: 200px; overflow: hidden; border-radius: 10px;">
                                                             <img src="shared/assets/img/home/<?php echo $courses['courseImage']; ?>" alt="Course Image"
                                                                 class="img-fluid w-100 h-100" style="object-fit: cover;">
                                                         </div>
@@ -216,7 +216,7 @@ if (isset($_GET['courseID'])) {
 
                                                     <!-- Course Image -->
                                                     <div class="course-image w-100 mb-3"
-                                                        style="height: 250px; overflow: hidden; border-radius: 10px;">
+                                                        style="height: 200px; overflow: hidden; border-radius: 10px;">
                                                         <img src="shared/assets/img/home/<?php echo $courses['courseImage']; ?>" alt="Course Image"
                                                             class="img-fluid w-100 h-100" style="object-fit: cover;">
                                                     </div>
@@ -363,11 +363,25 @@ if (isset($_GET['courseID'])) {
                                                         Files
                                                     </a>
                                                 </li>
-                                                <li class="nav-item2 nav-leaderboard" role="presentation">
+                                                <li class="nav-item nav-leaderboard" role="presentation">
                                                     <a class="nav-link" id="leaderboard-tab" data-bs-toggle="tab"
                                                         href="#leaderboard" role="tab" aria-controls="leaderboard"
                                                         aria-selected="false">
                                                         Leaderboard
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item nav-report" role="presentation">
+                                                    <a class="nav-link" id="report-tab" data-bs-toggle="tab"
+                                                        href="#report" role="tab" aria-controls="report"
+                                                        aria-selected="false">
+                                                        Report
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item nav-student" role="presentation">
+                                                    <a class="nav-link" id="student-tab" data-bs-toggle="tab"
+                                                        href="#student" role="tab" aria-controls="student"
+                                                        aria-selected="false">
+                                                        Students
                                                     </a>
                                                 </li>
                                             </ul>
@@ -375,30 +389,34 @@ if (isset($_GET['courseID'])) {
 
                                         <!-- Desktop Tabs -->
                                         <div class="tab-carousel-wrapper d-none d-md-block">
-                                            <ul class="nav nav-tabs custom-nav-tabs mb-3" id="myTab" role="tablist">
-                                                <li class="nav-item">
-                                                    <a class="nav-link active" id="announcements-tab"
-                                                        data-bs-toggle="tab" href="#announcements"
-                                                        role="tab">Announcements</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link" id="lessons-tab" data-bs-toggle="tab"
-                                                        href="#lessons" role="tab">Lessons</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link" id="todo-tab" data-bs-toggle="tab" href="#todo"
-                                                        role="tab">To-do</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link" id="files-tab" data-bs-toggle="tab"
-                                                        href="#files" role="tab">Files</a>
-                                                </li>
-                                                <li class="nav-item nav-leaderboard">
-                                                    <a class="nav-link" id="leaderboard-tab" data-bs-toggle="tab"
-                                                        href="#leaderboard" role="tab">Leaderboard</a>
-                                                </li>
-                                            </ul>
+                                            <div class="tab-scroll">
+                                                <ul class="nav nav-tabs custom-nav-tabs mb-3 flex-nowrap" id="myTab" role="tablist">
+                                                    <li class="nav-item">
+                                                        <a class="nav-link active" id="announcements-tab" data-bs-toggle="tab" href="#announcements" role="tab">Announcements</a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" id="lessons-tab" data-bs-toggle="tab" href="#lessons" role="tab">Lessons</a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" id="todo-tab" data-bs-toggle="tab" href="#todo" role="tab">To-do</a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" id="files-tab" data-bs-toggle="tab" href="#files" role="tab">Files</a>
+                                                    </li>
+                                                    <li class="nav-item nav-leaderboard">
+                                                        <a class="nav-link" id="leaderboard-tab" data-bs-toggle="tab" href="#leaderboard" role="tab">Leaderboard</a>
+                                                    </li>
+                                                    <li class="nav-item nav-report">
+                                                        <a class="nav-link" id="report-tab" data-bs-toggle="tab" href="#report" role="tab">Report</a>
+                                                    </li>
+                                                    <li class="nav-item nav-report">
+                                                        <a class="nav-link" id="student-tab" data-bs-toggle="tab" href="#student" role="tab">Students</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </div>
+
+
 
                                         <!-- Sort by dropdown -->
                                         <div class="d-flex align-items-center flex-nowrap mb-3" id="header">
@@ -441,11 +459,86 @@ if (isset($_GET['courseID'])) {
                                             <div class="tab-pane fade" id="leaderboard" role="tabpanel">
                                                 <?php include 'course-info-contents/leaderboard.php'; ?>
                                             </div>
+
+                                            <!-- Report -->
+                                            <div class="tab-pane fade" id="report" role="tabpanel">
+                                                <?php include 'course-info-contents/report.php'; ?>
+                                            </div>
+
+                                            <!-- Student -->
+                                            <div class="tab-pane fade" id="student" role="tabpanel">
+                                                <?php include 'course-info-contents/student.php'; ?>
+                                            </div>
                                         </div>
 
                                         <!-- Bootstrap JS -->
                                         <script
                                             src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+                                        <script>
+                                            document.addEventListener("DOMContentLoaded", function () {
+                                                const tabContainer = document.getElementById('mobileTabScroll');
+                                                const scrollLeftBtn = document.getElementById('scrollLeftBtn');
+                                                const scrollRightBtn = document.getElementById('scrollRightBtn');
+
+                                                function updateArrowVisibility() {
+                                                    if (!tabContainer) return;
+
+                                                    scrollLeftBtn.classList.toggle('d-none', tabContainer.scrollLeft === 0);
+                                                    scrollRightBtn.classList.toggle('d-none', tabContainer.scrollLeft + tabContainer.clientWidth >= tabContainer.scrollWidth);
+                                                }
+
+                                                scrollLeftBtn.addEventListener('click', () => {
+                                                    tabContainer.scrollBy({
+                                                        left: -100,
+                                                        behavior: 'smooth'
+                                                    });
+                                                });
+
+                                                scrollRightBtn.addEventListener('click', () => {
+                                                    tabContainer.scrollBy({
+                                                        left: 100,
+                                                        behavior: 'smooth'
+                                                    });
+                                                });
+
+                                                tabContainer.addEventListener('scroll', updateArrowVisibility);
+
+                                                updateArrowVisibility(); // Initial check
+                                            });
+
+                                            const dropdownHeader = document.getElementById('dropdownHeader');
+                                            const dropdownContent = document.getElementById('mobileCourseCard');
+                                            const courseCard = dropdownHeader.closest('.course-card'); // find the parent card
+
+                                            // Show dropdown
+                                            dropdownContent.addEventListener('show.bs.collapse', function() {
+                                                dropdownHeader.style.borderBottom = '1px solid var(--black)';
+                                                courseCard.style.borderBottomLeftRadius = '10px';
+                                                courseCard.style.borderBottomRightRadius = '10px';
+                                            });
+
+                                            // Hide dropdown
+                                            dropdownContent.addEventListener('hide.bs.collapse', function() {
+                                                dropdownHeader.style.borderBottom = 'none';
+                                                courseCard.style.borderBottomLeftRadius = '0';
+                                                courseCard.style.borderBottomRightRadius = '0';
+                                            });
+
+                                            document.addEventListener("DOMContentLoaded", function () {
+                                                const collapseElement = document.getElementById("mobileCourseCard");
+                                                const icon = document.querySelector('[data-bs-target="#mobileCourseCard"] i');
+
+                                                collapseElement.addEventListener("show.bs.collapse", function () {
+                                                    icon.classList.remove("fa-chevron-down");
+                                                    icon.classList.add("fa-chevron-up");
+                                                });
+
+                                                collapseElement.addEventListener("hide.bs.collapse", function () {
+                                                    icon.classList.remove("fa-chevron-up");
+                                                    icon.classList.add("fa-chevron-down");
+                                                });
+                                            });
+                                        </script>
 
                                     </div>
                                 </div>
