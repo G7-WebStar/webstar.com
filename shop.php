@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
     <link rel="stylesheet" href="shared/assets/css/shop.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
 </head>
 
@@ -42,7 +43,8 @@
                             <div class="col-12">
 
                                 <div class="d-flex align-items-center">
-                                    <h1 class="text-bold text-30 mb-0 mt-2 shop-title" style="color: var(--black);">Shop</h1>
+                                    <h1 class="text-bold text-30 mb-0 mt-2 shop-title" style="color: var(--black);">Shop
+                                    </h1>
                                     <div class="tab-container">
                                         <div class="tab-scroll-container">
                                             <ul class="nav nav-tabs custom-nav-tabs" id="shopTabs">
@@ -50,7 +52,8 @@
                                                     <a class="nav-link active" href="#" data-label="Frame">Frame</a>
                                                 </li>
                                                 <li class="nav-item">
-                                                    <a class="nav-link" href="#" data-label="Color Theme">Color Theme</a>
+                                                    <a class="nav-link" href="#" data-label="Color Theme">Color
+                                                        Theme</a>
                                                 </li>
                                                 <li class="nav-item">
                                                     <a class="nav-link" href="#" data-label="Fonts">Fonts</a>
@@ -83,6 +86,53 @@
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="cardModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-modal position-relative rounded-4 overflow-hidden">
+                <div class="modal-header border-0 p-0 d-flex justify-content-end">
+                    <!-- Close Button -->
+                    <button type="button" class="custom-close px-4 pt-4" data-bs-dismiss="modal"
+                        aria-label="Close">✕</button>
+                </div>
+
+                <!-- Divider Line Under X -->
+                <hr class="modal-divider mt-3 mb-3">
+                <div class="modal-body p-0">
+                    <div class="container mb-2 px-5">
+                        <div class="d-flex flex-column align-items-center gap-4">
+                            <!-- Left Box (Image) -->
+                            <div class="modal-img"></div>
+
+                            <!-- Right Details -->
+                            <div class="text-center">
+                                <div class="mb-1 modalTitle" id="modalTitle">Frame 1</div>
+                                <div class="mb-1 description">Customize your profile or avatar with stylish borders
+                                </div>
+                                <div class="title d-flex justify-content-center align-items-center gap-2 mb-3">
+                                    <i class="bi bi-star-fill"></i>
+                                    <span id="modalPrice">1200 WBSTRS</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Divider Line Before Buy Button (Full Width) -->
+                    <hr class="modal-divider mb-2">
+                </div>
+                <div class="modal-footer border-0 px-2 py-1">
+                    <!-- Buy Button Container -->
+                    <div class="d-flex justify-content-end pb-2 pe-2 w-100">
+                        <button class="modalButton btn px-4 py-1 rounded-pill me-0">Buy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
     <!-- Bootstrap Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -91,6 +141,8 @@
         document.addEventListener("DOMContentLoaded", function() {
             const tabs = document.querySelectorAll('#shopTabs .nav-link');
             const contentArea = document.getElementById('tabContentArea');
+            const modalElement = document.getElementById('cardModal');
+            const bsModal = modalElement ? new bootstrap.Modal(modalElement) : null;
 
             function createShopCard(title, points) {
                 return `
@@ -101,7 +153,7 @@
                                 <div class="cardContent">
                                     <div class="cardTitle">${title}</div>
                                     <div class="cardPrice">
-                                        <i class="fa-solid fa-star text-warning"></i>
+                                        <i class="bi bi-star-fill"></i>
                                         <span>${points} WBSTRS</span>
                                     </div>
                                 </div>
@@ -153,6 +205,25 @@
                     const label = this.getAttribute('data-label');
                     contentArea.innerHTML = shopContent[label] || `<p>No items available.</p>`;
                 });
+            });
+
+            // Open modal when a shop card is clicked
+            contentArea.addEventListener('click', function (e) {
+                const card = e.target.closest('.customCard');
+                if (!card) return;
+
+                const titleEl = card.querySelector('.cardTitle');
+                const priceEl = card.querySelector('.cardPrice span');
+                const titleText = titleEl ? titleEl.textContent.trim() : '';
+                const priceText = priceEl ? priceEl.textContent.trim() : '';
+                const priceNumber = priceText.split(' ')[0];
+
+                const modalTitle = document.getElementById('modalTitle');
+                const modalPrice = document.getElementById('modalPrice');
+                if (modalTitle) modalTitle.textContent = titleText || 'Item';
+                if (modalPrice) modalPrice.textContent = (priceNumber || '') + ' WBSTRS';
+
+                if (bsModal) bsModal.show();
             });
 
             function scrollTabs(direction) {

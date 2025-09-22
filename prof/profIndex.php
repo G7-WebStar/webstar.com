@@ -1,4 +1,16 @@
 <?php $activePage = 'profIndex'; ?>
+<?php
+include('../shared/assets/database/connect.php');
+
+$courses = [];
+$result = executeQuery("SELECT courseID, userID, courseCode, courseTitle, courseImage, yearSection, schedule FROM courses ORDER BY courseID DESC");
+if ($result && mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $courses[] = $row;
+    }
+}
+$totalCourses = count($courses);
+?>
 
 <!doctype html>
 <html lang="en">
@@ -172,8 +184,8 @@
                                         </div>
                                         <div class="col-12 col-md-3 mb-3">
                                             <div class="d-flex align-items-center">
-                                                <img src="../shared/assets/img/profIndex/tasks.png" alt="Tasks" width="26"
-                                                    height="26" class="me-2">
+                                                <img src="../shared/assets/img/profIndex/tasks.png" alt="Tasks"
+                                                    width="26" height="26" class="me-2">
                                                 <div class="stats-count text-22 text-bold">80</div>
                                             </div>
                                             <div class="stats-label text-18 text-sbold">tasks to grade</div>
@@ -209,106 +221,67 @@
                                                                 style="color: var(--black); font-size: 20px; width: 26px; margin-right: 5px;"></i>
                                                             <span>Your Courses</span>
                                                         </div>
-                                                        <div>5</div>
+                                                        <div><?php echo (int) $totalCourses; ?></div>
                                                     </div>
                                                     <!-- Scrollable course -->
                                                     <div class="ps-4 pb-4 pe-4"
                                                         style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth;">
                                                         <div style="display: inline-flex; gap: 20px;">
-                                                            <!-- Card 1 -->
-                                                            <div class="card custom-course-card">
-                                                                <img src="../shared/assets/img/home/webdev.jpg"
-                                                                    class="card-img-top" alt="...">
-                                                                <!-- Body -->
-                                                                <div class="card-body px-3 py-2">
-                                                                    <div class="text-sbold text-16">COMP–006</div>
-                                                                    <p class="text-reg text-14 mb-0">Web Development</p>
-                                                                    <!-- Students -->
-                                                                    <div class="d-flex align-items-center mb-2 mt-4">
-                                                                        <img src="../shared/assets/img/profIndex/people.png" alt="people" width="26" height="26">
-                                                                        <span class="text-reg text-14 ms-2">56
-                                                                            Students</span>
-                                                                    </div>
-
-                                                                    <!-- Schedule -->
-                                                                    <div class="d-flex align-items-start mb-2 mt-4">
-                                                                        <img src="../shared/assets/img/profIndex/calendar.png" alt="calendar" width="26" height="26" class="mt-2">  
-                                                                        <div class="calendar-schedule ms-2">
-                                                                            <div class="text-14">
-                                                                                <span class="text-sbold">THUR</span>
-                                                                                <span class="text-reg">8:00AM –
-                                                                                    10:00AM</span>
+                                                            <?php if ($totalCourses === 0) { ?>
+                                                                <div class="text-reg text-14"
+                                                                    style="color: var(--black); opacity: 0.85;">No courses
+                                                                    found.</div>
+                                                            <?php } else {
+                                                                foreach ($courses as $course) {
+                                                                    $courseCode = ($course['courseCode'] ?? '');
+                                                                    $courseTitle = ($course['courseTitle'] ?? '');
+                                                                    $yearSection = ($course['yearSection'] ?? '');
+                                                                    $schedule = ($course['schedule'] ?? '');
+                                                                    $imageFile = trim((string) ($course['courseImage'] ?? ''));
+                                                                    $imagePath = "../shared/assets/img/home/" . $imageFile;
+                                                                    $fallbackImage = "../shared/assets/img/home/webdev.jpg";
+                                                                    ?>
+                                                                    <div class="card custom-course-card">
+                                                                        <img src="<?php echo $imageFile ? $imagePath : $fallbackImage; ?>"
+                                                                            class="card-img-top"
+                                                                            alt="<?php echo $courseTitle; ?>"
+                                                                            onerror="this.onerror=null;this.src='<?php echo $fallbackImage; ?>';">
+                                                                        <div class="card-body px-3 py-2">
+                                                                            <div class="text-sbold text-16">
+                                                                                <?php echo $courseCode; ?>
                                                                             </div>
-                                                                            <div class="text-14">
-                                                                                <span class="text-sbold">FRI</span>
-                                                                                <span class="text-reg">9:00AM –
-                                                                                    12:00PM</span>
+                                                                            <p class="text-reg text-14 mb-0">
+                                                                                <?php echo $courseTitle; ?>
+                                                                            </p>
+                                                                            <div class="d-flex align-items-center mb-2 mt-4">
+                                                                                <img src="../shared/assets/img/profIndex/people.png"
+                                                                                    alt="people" width="26" height="26">
+                                                                                <span class="text-reg text-14 ms-2">0
+                                                                                    Students</span>
                                                                             </div>
+                                                                            <div class="d-flex align-items-start mb-2 mt-4">
+                                                                                <img src="../shared/assets/img/profIndex/calendar.png"
+                                                                                    alt="calendar" width="26" height="26"
+                                                                                    class="mt-2">
+                                                                                <div class="calendar-schedule ms-2">
+                                                                                    <div class="text-reg">
+                                                                                        <?php echo nl2br(($course['schedule'] ?: 'Schedule TBA')); ?>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="d-flex align-items-center mb-2 mt-4">
+                                                                                <img src="../shared/assets/img/profIndex/tag.png"
+                                                                                    alt="tag">
+                                                                                <span
+                                                                                    class="text-reg text-14 ms-2"><?php echo $yearSection ?: '—'; ?></span>
+                                                                            </div>
+                                                                            <div class="text-reg fst-italic text-12 mt-4"
+                                                                                style="color: var(--black); opacity: 0.75;">Last
+                                                                                updated recently</div>
                                                                         </div>
                                                                     </div>
-
-
-                                                                    <!-- Section -->
-                                                                    <div class="d-flex align-items-center mb-2 mt-4">
-                                                                        <img src="../shared/assets/img/profIndex/tag.png">
-                                                                        <span class="text-reg text-14 ms-2">BSIT
-                                                                            3–1</span>
-                                                                    </div>
-
-                                                                    <!-- Last Updated -->
-                                                                    <div class="text-reg fst-italic text-12 mt-4"
-                                                                        style="color: var(--black); opacity: 0.75;">Last
-                                                                        updated
-                                                                        5hrs ago</div>
-                                                                </div>
-                                                            </div>
-                                                            <!-- Card 2 -->
-                                                            <div class="card custom-course-card">
-                                                                <img src="../shared/assets/img/home/webdev.jpg"
-                                                                    class="card-img-top" alt="...">
-                                                                <div class="card-body px-3 py-2">
-                                                                    <div class="text-sbold text-16">COMP–007</div>
-                                                                    <p class="text-reg text-14 mb-0">Database Systems
-                                                                    </p>
-                                                                    <!-- Students -->
-                                                                    <div class="d-flex align-items-center mb-2 mt-4">
-                                                                       <img src="../shared/assets/img/profIndex/people.png" alt="people" width="26" height="26">
-                                                                        <span class="text-reg text-14 ms-2">56
-                                                                            Students</span>
-                                                                    </div>
-
-                                                                    <!-- Schedule -->
-                                                                    <div class="d-flex align-items-start mb-2 mt-4">
-                                                                        <img src="../shared/assets/img/profIndex/calendar.png" alt="calendar" width="26" height="26" class="mt-2">  
-                                                                        <div class="calendar-schedule ms-2">
-                                                                            <div class="text-14">
-                                                                                <span class="text-sbold">THUR</span>
-                                                                                <span class="text-reg">8:00AM –
-                                                                                    10:00AM</span>
-                                                                            </div>
-                                                                            <div class="text-14">
-                                                                                <span class="text-sbold">FRI</span>
-                                                                                <span class="text-reg">9:00AM –
-                                                                                    12:00PM</span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-
-
-                                                                    <!-- Section -->
-                                                                    <div class="d-flex align-items-center mb-2 mt-4">
-                                                                        <img src="../shared/assets/img/profIndex/tag.png">
-                                                                        <span class="text-reg text-14 ms-2">BSIT
-                                                                            3–1</span>
-                                                                    </div>
-
-                                                                    <!-- Last Updated -->
-                                                                    <div class="text-reg fst-italic text-12 mt-4"
-                                                                        style="color: var(--black); opacity: 0.75;">Last
-                                                                        updated
-                                                                        5hrs ago</div>
-                                                                </div>
-                                                            </div>
+                                                                <?php }
+                                                            } ?>
                                                         </div>
                                                     </div>
                                                 </div>
