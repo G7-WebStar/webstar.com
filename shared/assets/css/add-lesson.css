@@ -13,3 +13,63 @@
     overflow: hidden;
     max-width: 700px;
 }
+
+/* Link Popover Styles - applied to the popover container */
+.popover.link-popover {
+    width: clamp(320px, 50vw, 650px);
+    border: 1px solid var(--black);
+    border-radius: 12px;
+    overflow: visible; /* allow arrow to render outside */
+
+    /* Keep Bootstrap internals in sync (body + arrow) */
+    --bs-popover-bg: var(--pureWhite);
+    --bs-popover-border-color: var(--black);
+    --bs-popover-border-radius: 12px;
+    --bs-popover-arrow-bg: var(--pureWhite);
+    --bs-popover-arrow-border: var(--black);
+    --bs-popover-arrow-width: 12px;  /* slightly larger arrow */
+    --bs-popover-arrow-height: 12px;
+    font-family: 'Poppins', sans-serif; /* ensure Poppins inside popover */
+}
+
+.popover.link-popover .popover-body {
+    padding: 16px 16px 56px;
+    position: relative;
+    background: var(--pureWhite); 
+    border-radius: 12px; 
+    font-family: 'Poppins', sans-serif;
+}
+
+.popover.link-popover .form-floating {
+    margin-bottom: 15px;
+    height: 38px;
+}
+
+.popover.link-popover .form-control {
+    background-color: var(--pureWhite);
+    border: 1px solid var(--black);
+    color: var(--black);
+    font-family: 'Poppins', sans-serif;
+}
+
+.popover.link-popover .form-control:focus {
+    background-color: var(--pureWhite);
+    outline: none;
+    box-shadow: none !important;
+    border-color: var(--black);
+}
+
+.popover.link-popover .form-floating > label {
+    color: var(--black);
+    opacity: 0.7;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Bottom-right action area for the popover */
+.popover.link-popover .link-popover-actions {
+    position: absolute;
+    right: 16px;
+    bottom: 12px;
+}
+
+/* Button uses global styles - no custom styles needed */
