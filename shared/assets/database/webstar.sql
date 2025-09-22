@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 15, 2025 at 06:58 AM
+-- Generation Time: Sep 22, 2025 at 01:24 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -166,7 +166,7 @@ CREATE TABLE `files` (
   `courseID` int(11) NOT NULL,
   `fileName` varchar(255) NOT NULL,
   `filePath` text NOT NULL,
-  `uploadedBy` int(11) NOT NULL,
+  `userID` int(10) NOT NULL,
   `uploadedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -174,8 +174,8 @@ CREATE TABLE `files` (
 -- Dumping data for table `files`
 --
 
-INSERT INTO `files` (`fileID`, `courseID`, `fileName`, `filePath`, `uploadedBy`, `uploadedAt`) VALUES
-(1, 1, 'css-grid-cheatsheet.pdf', 'uploads/course110/css-grid-cheatsheet.pdf', 1, '2025-08-30 10:30:00');
+INSERT INTO `files` (`fileID`, `courseID`, `fileName`, `filePath`, `userID`, `uploadedAt`) VALUES
+(1, 1, 'Web Development Course Material', 'uploads/course110/css-grid-cheatsheet.pdf', 1, '2025-08-30 10:30:00');
 
 -- --------------------------------------------------------
 
@@ -265,6 +265,7 @@ CREATE TABLE `lessons` (
   `lessonDescription` text NOT NULL,
   `lessonContent` text NOT NULL,
   `attachment` varchar(255) NOT NULL,
+  `link` varchar(100) NOT NULL,
   `lessonType` varchar(255) NOT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp()
@@ -274,8 +275,8 @@ CREATE TABLE `lessons` (
 -- Dumping data for table `lessons`
 --
 
-INSERT INTO `lessons` (`lessonID`, `courseID`, `lessonTitle`, `lessonDescription`, `lessonContent`, `attachment`, `lessonType`, `createdAt`, `updatedAt`) VALUES
-(1, 1, 'Introduction to CSS Grid', 'Basics of layout with CSS Grid', 'Learn how to create grid layouts', 'css-grid.pdf', 'Lecture', '2025-08-30 09:00:00', '2025-08-30 09:00:00');
+INSERT INTO `lessons` (`lessonID`, `courseID`, `lessonTitle`, `lessonDescription`, `lessonContent`, `attachment`, `link`, `lessonType`, `createdAt`, `updatedAt`) VALUES
+(1, 1, 'Lesson 1: Introduction to CSS Grid', '1. Explain what HTML is and its role in web development.\r\n2. Identify the basic structure of an HTML document.\r\n3. Use common HTML tags such as headings, paragraphs, and links. \r\n4. Create a simple webpage using basic HTML elements.', 'Learn how to create grid layouts', 'Web Development Course Material.pptx', 'https://example.com/lesson1,https://example.com/lesson1.1', 'Lecture', '2025-08-30 09:00:00', '2025-08-30 09:00:00');
 
 -- --------------------------------------------------------
 
@@ -365,15 +366,16 @@ CREATE TABLE `todo` (
   `assessmentID` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `status` varchar(20) NOT NULL,
-  `updatedAt` datetime NOT NULL DEFAULT current_timestamp()
+  `updatedAt` datetime NOT NULL DEFAULT current_timestamp(),
+  `isRead` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `todo`
 --
 
-INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `title`, `status`, `updatedAt`) VALUES
-(1, 4, 1, 'Review CSS Grid and Flexbox', 'Pending', '2025-08-29 09:00:00');
+INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `title`, `status`, `updatedAt`, `isRead`) VALUES
+(1, 4, 1, 'Review CSS Grid and Flexbox', 'Pending', '2025-08-29 09:00:00', 0);
 
 -- --------------------------------------------------------
 

@@ -41,6 +41,16 @@
         align-items: center;
         padding-left: 10px;
     }
+
+    /* link ellipsis */
+    .cardFile .link {
+        display: inline-block;    
+        max-width: 80%;           
+        white-space: nowrap;     
+        overflow: hidden;        
+        text-overflow: ellipsis; 
+        vertical-align: middle;
+    }
 }
 
 @media (max-width: 576px) {

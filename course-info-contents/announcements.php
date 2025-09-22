@@ -1,6 +1,6 @@
 <?php
 
-$courseID = isset($_GET['courseID']) ? $_GET['courseID'] : '';
+// $courseID = isset($_GET['courseID']) ? $_GET['courseID'] : '';
 
 // HANDLE POST FIRST
 if (isset($_POST['announcementID'])) {
@@ -56,7 +56,7 @@ while ($row = mysqli_fetch_assoc($announcementResult)) {
     <div class="announcement-card d-flex align-items-start mb-3">
         <!-- Instructor Image -->
         <div class="flex-shrink-0 me-3">
-            <img src="pfp-uploads/<?php echo $profilePicture; ?>" alt="Instructor Image"
+            <img src="shared/assets/pfp-uploads/<?php echo $profilePicture; ?>" alt="Instructor Image"
                 style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
         </div>
 
