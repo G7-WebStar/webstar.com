@@ -1,4 +1,45 @@
-<?php $activePage = 'lessons-info'; ?>
+<?php
+$activePage = 'lessons-info';
+include('shared/assets/database/connect.php');
+
+if (!isset($_GET['lessonID'])) {
+    echo "Lesson ID is missing in the URL.";
+}
+
+$lessonID = intval($_GET['lessonID']);
+
+$lessonInfoQuery = "
+    SELECT * FROM users
+    LEFT JOIN userInfo ON users.userID = userInfo.userID
+    LEFT JOIN courses ON users.userID = courses.userID
+    LEFT JOIN lessons ON courses.courseID = lessons.courseID
+    WHERE lessons.lessonID = $lessonID
+";
+
+$lessonInfoResult = executeQuery($lessonInfoQuery);
+
+if (!$lesson = mysqli_fetch_assoc($lessonInfoResult)) {
+    echo "Lesson not found.";
+}
+
+// Count attachments and links
+$attachmentsArray = !empty($lesson['attachment']) ? array_filter(array_map('trim', explode(',', $lesson['attachment']))) : [];
+$linksArray = !empty($lesson['link']) ? array_filter(array_map('trim', explode(',', $lesson['link']))) : [];
+$fileCount = count($attachmentsArray);
+$linkCount = count($linksArray);
+$courseID = $lesson['courseID'];
+
+$lessonTitle = $lesson['lessonTitle'];
+$lessonDescription = $lesson['lessonDescription'];
+$profName = $lesson['firstName'] . " " . $lesson['lastName'];
+$profPic = !empty($lesson['profilePicture']) ? $lesson['profilePicture'] : "shared/assets/img/courseInfo/prof.png";
+
+// Use createdAt for date/time
+$displayTime = !empty($lesson['updatedAt']) ? $lesson['updatedAt'] : $lesson['createdAt'];
+$formattedTime = !empty($displayTime) ? date("F j, Y g:i A", strtotime($displayTime)) : "";
+
+
+?>
 
 <!doctype html>
 <html lang="en">
@@ -19,7 +60,6 @@
 <body>
     <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center p-0 p-md-3"
         style="background-color: var(--black);">
-
         <div class="row w-100">
 
             <!-- Sidebar (only shows on mobile) -->
@@ -43,31 +83,28 @@
                                 <!-- DESKTOP VIEW -->
                                 <div class="row desktop-header d-none d-sm-flex">
                                     <div class="col-auto me-2">
-                                        <a href="#" class="text-decoration-none">
+                                        <a href="course-info.php?courseID=<?= $courseID ?>" class="text-decoration-none">
                                             <i class="fa-solid fa-arrow-left text-reg text-16"
                                                 style="color: var(--black);"></i>
                                         </a>
                                     </div>
                                     <div class="col">
-                                        <span class="text-sbold text-25">Lesson 1: Introduction to HTML</span>
-                                        <div class="text-reg text-18">3 files . 1 link</div>
+                                        <span class="text-sbold text-25"><?php echo $lessonTitle; ?></span>
+                                        <div class="text-reg text-18"><?php echo $fileCount ?> <?php echo $fileCount == 1 ? "file" : "files" ?> · <?php echo $linkCount ?> <?php echo $linkCount == 1 ? "link" : "links" ?></div>
                                     </div>
                                 </div>
-
 
                                 <!-- MOBILE VIEW -->
                                 <div class="d-block d-sm-none mobile-assignment">
                                     <div class="mobile-top">
                                         <div class="arrow">
-                                            <a href="#" class="text-decoration-none">
-                                                <i class="fa-solid fa-arrow-left text-reg text-16"
-                                                    style="color: var(--black);"></i>
+                                            <a href="course-info.php?courseID=<?php echo $courseID ?>" class="text-decoration-none">
+                                                <i class="fa-solid fa-arrow-left text-reg text-16" style="color: var(--black);"></i>
                                             </a>
                                         </div>
-                                        <div class="title text-sbold text-25">Lesson 1:</div>
+                                        <div class="title text-sbold text-25"><?php echo $lessonTitle; ?></div>
                                     </div>
-                                    <div class="title text-sbold text-25">Introduction to HTML</div>
-                                    <div class="due text-reg text-18">3 files · 1 link</div>
+                                    <div class="due text-reg text-18"><?php echo $fileCount ?> <?php echo $fileCount == 1 ? "file" : "files" ?> · <?php echo $linkCount ?> <?php echo $linkCount == 1 ? "link" : "links" ?></div>
                                 </div>
                             </div>
                         </div>
@@ -77,35 +114,56 @@
                             <div class="col-12 col-lg-8">
                                 <div class="p-0 px-lg-5">
                                     <div class="text-sbold text-14 mt-3">Lesson Objectives</div>
-                                    <p class="mt-3 text-med text-14">By the end of this lesson, students should be
-                                        able to:
-                                    </p>
-                                    <p class="mb-4 text-med text-14">
-                                        1. Explain what HTML is and its role in web development.<br>
-                                        2. Identify the basic structure of an HTML document.<br>
-                                        3. Use common HTML tags such as headings, paragraphs, and links.<br>
-                                        4. Create a simple webpage using basic HTML elements.</p>
+                                    <p class="mt-3 text-med text-14"><?php echo nl2br($lessonDescription) ?></p>
                                     <hr>
 
                                     <div class="text-sbold text-14 mt-4">Learning Materials</div>
-                                    <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
-                                        style="width:400px; max-width:100%; min-width:310px;">
-                                        <i class="px-4 py-3 fa-solid fa-file"></i>
-                                        <div class="ms-2">
-                                            <div class="text-sbold text-16 mt-1">Web Development Course Material</div>
-                                            <div class="due text-reg text-14 mb-1">PPTX · 2 MB</div>
+                                    <!-- Temporary filename -->
+                                    <?php foreach ($attachmentsArray as $file):
+                                        $filePath = "shared/uploads/" . $file;
+                                        $fileExt = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
+                                        $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
+                                        $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
+
+                                        // Remove extension from display name
+                                        $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
+                                    ?>
+                                        <div class="cardFile my-3 w-lg-25 d-flex align-items-start" style="width:400px; max-width:100%; min-width:310px;">
+                                            <i class="px-4 py-3 fa-solid fa-file"></i>
+                                            <div class="ms-2">
+                                                <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
+                                                <div class="due text-reg text-14 mb-1"><?php echo $fileExt ?> · <?php echo $fileSizeMB ?></div>
+                                            </div>
                                         </div>
-                                    </div>
+                                    <?php endforeach; ?>
+
+
+                                    <?php foreach ($linksArray as $link): ?>
+                                        <div class="cardFile my-3 w-lg-25 d-flex align-items-start" style="width:400px; max-width:100%; min-width:310px;">
+                                            <i class="px-4 py-3 fa-solid fa-link" style="font-size: 13px;"></i>
+                                            <div class="ms-2">
+                                                <!-- temoparary lang ang filename here -->
+                                                <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
+                                                <div class="text-reg link text-12 mt-0">
+                                                    <a href="<?php echo $link ?>" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: var(--black);">
+                                                        <?php echo $link ?>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+
                                     <hr>
 
                                     <div class="text-sbold text-14 pb-3">Prepared by</div>
                                     <div class="d-flex align-items-center pb-5">
-                                        <div class="rounded-circle me-2"
-                                            style="width: 50px; height: 50px; background-color: var(--highlight75);">
+                                        <div class="rounded-circle me-2" style="width: 50px; height: 50px; background-color: var(--highlight75);">
+                                            <img src="<?php echo !empty($lesson['profilePicture']) ? 'shared/assets/pfp-uploads/' . $lesson['profilePicture'] : 'shared/assets/img/default-profile.png'; ?>"
+                                                alt="Prof Picture" class="rounded-circle" style="width:50px;height:50px;">
                                         </div>
                                         <div>
-                                            <div class="text-sbold text-14">Prof. Christian James</div>
-                                            <div class="text-med text-12">January 12, 2024 8:00AM</div>
+                                            <div class="text-sbold text-14"><?php echo $profName; ?></div>
+                                            <div class="text-med text-12"><?php echo $formattedTime; ?></div>
                                         </div>
                                     </div>
                                 </div>

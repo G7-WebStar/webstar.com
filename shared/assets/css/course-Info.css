@@ -298,7 +298,7 @@ body {
         height: 40px !important;
     }
 
-     .d-xxs-none {
+    .d-xxs-none {
         display: none !important;
     }
 }
@@ -313,13 +313,25 @@ body {
     overflow-x: auto;
     overflow-y: hidden;
     white-space: nowrap;
+
+    -webkit-overflow-scrolling: touch;
+    /* smooth scroll on mobile */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.tab-scroll::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Edge */
 }
 
 .tab-scroll .nav-tabs {
     display: flex;
-    flex-wrap: nowrap; /* prevents wrapping */
+    flex-wrap: nowrap;
+    /* prevents wrapping */
 }
 
 .tab-scroll .nav-item {
-    flex: 0 0 auto; /* keeps items from shrinking */
+    flex: 0 0 auto;
+    /* keeps items from shrinking */
 }

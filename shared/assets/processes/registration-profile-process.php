@@ -18,7 +18,7 @@ if (isset($_POST['nextBtn'])) {
     $htmlfileupload = $_FILES['fileUpload']['name'];
     $htmlfileuploadTMP = $_FILES['fileUpload']['tmp_name'];
 
-    $htmlfolder = "pfp-uploads/";
+    $htmlfolder = "shared/assets/pfp-uploads/";
     move_uploaded_file($htmlfileuploadTMP, $htmlfolder . $htmlfileupload);
 
     if (!isset($_SESSION['userID'])) {
