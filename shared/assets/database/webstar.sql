@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 22, 2025 at 01:24 PM
+-- Generation Time: Sep 23, 2025 at 01:23 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -166,7 +166,7 @@ CREATE TABLE `files` (
   `courseID` int(11) NOT NULL,
   `fileName` varchar(255) NOT NULL,
   `filePath` text NOT NULL,
-  `userID` int(10) NOT NULL,
+  `userID` int(11) NOT NULL,
   `uploadedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -225,7 +225,8 @@ CREATE TABLE `inbox` (
 --
 
 INSERT INTO `inbox` (`inboxID`, `messageID`, `enrollmentID`, `messageText`, `createdAt`, `isRead`) VALUES
-(0, 1, 1, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 0);
+(1, 1, 1, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 1),
+(2, 2, 2, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 1);
 
 -- --------------------------------------------------------
 
@@ -276,7 +277,7 @@ CREATE TABLE `lessons` (
 --
 
 INSERT INTO `lessons` (`lessonID`, `courseID`, `lessonTitle`, `lessonDescription`, `lessonContent`, `attachment`, `link`, `lessonType`, `createdAt`, `updatedAt`) VALUES
-(1, 1, 'Lesson 1: Introduction to CSS Grid', '1. Explain what HTML is and its role in web development.\r\n2. Identify the basic structure of an HTML document.\r\n3. Use common HTML tags such as headings, paragraphs, and links. \r\n4. Create a simple webpage using basic HTML elements.', 'Learn how to create grid layouts', 'Web Development Course Material.pptx', 'https://example.com/lesson1,https://example.com/lesson1.1', 'Lecture', '2025-08-30 09:00:00', '2025-08-30 09:00:00');
+(1, 1, 'Lesson 1: Introduction to CSS Grid', '1. Explain what HTML is and its role in web development.\n2. Identify the basic structure of an HTML document.\n3. Use common HTML tags such as headings, paragraphs, and links. \n4. Create a simple webpage using basic HTML elements.', 'Learn how to create grid layouts', 'Web Development Course Material.pptx', 'https://example.com/lesson1,https://example.com/lesson1.1', 'Lecture', '2025-08-30 09:00:00', '2025-08-30 09:00:00');
 
 -- --------------------------------------------------------
 
@@ -375,7 +376,8 @@ CREATE TABLE `todo` (
 --
 
 INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `title`, `status`, `updatedAt`, `isRead`) VALUES
-(1, 4, 1, 'Review CSS Grid and Flexbox', 'Pending', '2025-08-29 09:00:00', 0);
+(1, 2, 1, 'Review CSS Grid and Flexbox', 'Pending', '2025-08-29 09:00:00', 1),
+(2, 2, 2, 'Review CSS Grid and Flexbox 2', 'Pending', '2025-08-29 09:00:00', 1);
 
 -- --------------------------------------------------------
 
@@ -499,7 +501,7 @@ ALTER TABLE `gameresult`
 -- Indexes for table `inbox`
 --
 ALTER TABLE `inbox`
-  ADD PRIMARY KEY (`messageID`);
+  ADD PRIMARY KEY (`inboxID`);
 
 --
 -- Indexes for table `leaderboard`
@@ -617,7 +619,7 @@ ALTER TABLE `gameresult`
 -- AUTO_INCREMENT for table `inbox`
 --
 ALTER TABLE `inbox`
-  MODIFY `messageID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `inboxID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `leaderboard`
@@ -659,7 +661,7 @@ ALTER TABLE `report`
 -- AUTO_INCREMENT for table `todo`
 --
 ALTER TABLE `todo`
-  MODIFY `todoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `todoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `userinfo`
