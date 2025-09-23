@@ -1,7 +1,40 @@
-<?php $activePage = 'inbox'; 
+<?php $activePage = 'inbox';
 include('shared/assets/database/connect.php');
+$userID = '2';
 
+$selectEnrolledQuery = "SELECT
+courses.courseCode
+FROM courses
+INNER JOIN enrollments
+    ON courses.courseID = enrollments.courseID
+WHERE enrollments.userID = '$userID'
+";
+$selectEnrolledResult = executeQuery($selectEnrolledQuery);
 
+$selectInboxQuery = "SELECT 
+inbox.createdAt AS inboxCreatedAt,
+inbox.messageText,
+courses.courseCode,
+assessments.title AS assessmentTitle,
+userinfo.profilePicture AS profPFP
+FROM inbox
+INNER JOIN enrollments
+	ON inbox.enrollmentID = enrollments.enrollmentID
+INNER JOIN todo
+	ON enrollments.userID = todo.userID
+    AND enrollments.courseID = (SELECT courseID 
+                               FROM assessments 
+                               WHERE assessments.assessmentID = todo.assessmentID)
+INNER JOIN assessments
+	ON todo.assessmentID = assessments.assessmentID
+INNER JOIN courses
+	ON assessments.courseID = courses.courseID
+INNER JOIN userinfo
+	ON courses.userID = userinfo.userID
+WHERE enrollments.userID = '$userID' AND todo.status = 'Pending'
+ORDER BY inbox.inboxID DESC
+";
+$selectInboxResult = executeQuery($selectInboxQuery);
 ?>
 <!doctype html>
 <html lang="en">
@@ -78,8 +111,15 @@ include('shared/assets/database/connect.php');
                                                 </button>
                                                 <ul class="dropdown-menu">
                                                     <li><a class="dropdown-item text-reg" href="#">All</a></li>
-                                                    <li><a class="dropdown-item text-reg" href="#">COMP-006</a></li>
-                                                    <li><a class="dropdown-item text-reg" href="#">Other courses</a>
+                                                    <?php
+                                                    if (mysqli_num_rows($selectEnrolledResult) > 0) {
+                                                        while ($inboxSelectTag = mysqli_fetch_assoc($selectEnrolledResult)) {
+                                                    ?>
+                                                            <li><a class="dropdown-item text-reg" href="#"><?php echo $inboxSelectTag['courseCode']; ?></a></li>
+                                                    <?php
+                                                        }
+                                                    }
+                                                    ?>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -88,349 +128,61 @@ include('shared/assets/database/connect.php');
 
                                     <!-- Message Content -->
                                     <div class="message-container mt-4 mt-lg-4 pb-4">
-                                        <div class="card mb-3 me-3 w-100 mt-3"
-                                            style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
-                                            <div class="card-body p-3">
-                                                <div class="row align-items-start">
-                                                    <!-- Profile Image -->
-                                                    <div
-                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
-                                                        <div class="avatar-image">
-                                                            <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
-                                                                class="rounded-circle responsive-circle ">
+                                        <?php
+                                        if (mysqli_num_rows($selectInboxResult) > 0) {
+                                            while ($inbox = mysqli_fetch_assoc($selectInboxResult)) {
+                                        ?>
+                                                <div class="card mb-3 me-3 w-100 mt-3"
+                                                    style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
+                                                    <div class="card-body p-3">
+                                                        <div class="row align-items-start">
+                                                            <!-- Profile Image -->
+                                                            <div
+                                                                class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
+                                                                <div class="avatar-image">
+                                                                    <img src="pfp-uploads/<?php echo $inbox['profPFP']; ?>" alt="" width="40" height="40"
+                                                                        class="rounded-circle responsive-circle ">
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Message Text -->
+                                                            <div class="col d-flex flex-column text-start mt-3 mt-lg-2 mb-2">
+                                                                <p class="mb-2 text-sbold text-17"
+                                                                    style="color: var(--black); line-height: 140%;">
+                                                                    <?php echo $inbox['messageText'] . " " . $inbox['assessmentTitle']; ?>
+                                                                </p>
+                                                                <small class="text-reg text-12"
+                                                                    style="color: var(--black); opacity: 0.7;">January 12, 2024
+                                                                    8:00AM</small>
+
+                                                                <!-- Course tag on small screen below message text -->
+                                                                <div class="d-block d-lg-none mt-2">
+                                                                    <span
+                                                                        class="text-reg text-12 badge rounded-pill course-badge"
+                                                                        style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
+                                                                        <?php echo $inbox['courseCode']; ?>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Course tag on large screen right side, vertically centered -->
+                                                            <div
+                                                                class="col-auto d-none d-lg-flex justify-content-end align-items-center mt-4">
+                                                                <span class="text-reg text-12 badge rounded-pill course-badge"
+                                                                    style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
+                                                                    <?php echo $inbox['courseCode']; ?>
+                                                                </span>
+                                                            </div>
                                                         </div>
+
                                                     </div>
 
-                                                    <!-- Message Text -->
-                                                    <div class="col d-flex flex-column text-start mt-3 mt-lg-2 mb-2">
-                                                        <p class="mb-2 text-sbold text-17"
-                                                            style="color: var(--black); line-height: 140%;">
-                                                            Prof. Christian James has posted a new assignment 'Activity
-                                                            3'.
-                                                        </p>
-                                                        <small class="text-reg text-12"
-                                                            style="color: var(--black); opacity: 0.7;">January 12, 2024
-                                                            8:00AM</small>
-
-                                                        <!-- Course tag on small screen below message text -->
-                                                        <div class="d-block d-lg-none mt-2">
-                                                            <span
-                                                                class="text-reg text-12 badge rounded-pill course-badge"
-                                                                style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                                COMP-006
-                                                            </span>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Course tag on large screen right side, vertically centered -->
-                                                    <div
-                                                        class="col-auto d-none d-lg-flex justify-content-end align-items-center mt-4">
-                                                        <span class="text-reg text-12 badge rounded-pill course-badge"
-                                                            style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                            COMP-006
-                                                        </span>
-                                                    </div>
                                                 </div>
-
-                                            </div>
-
-                                        </div>
-
-                                        <!-- Second Message -->
-                                        <div class="card mb-3 me-3 w-100 mt-3"
-                                            style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
-                                            <div class="card-body p-3">
-                                                <div class="row align-items-start">
-                                                    <!-- Profile Image -->
-                                                    <div
-                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
-                                                        <div class="avatar-image">
-                                                            <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
-                                                                class="rounded-circle responsive-circle ">
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Message Text -->
-                                                    <div class="col d-flex flex-column text-start mt-3 mt-lg-2 mb-2">
-                                                        <p class="mb-2 text-sbold text-17"
-                                                            style="color: var(--black); line-height: 140%;">
-                                                            Prof. Sarah Johnson has posted a new announcement 'Midterm
-                                                            Schedule'.
-                                                        </p>
-                                                        <small class="text-reg text-12"
-                                                            style="color: var(--black); opacity: 0.7;">January 11, 2024
-                                                            2:30PM</small>
-
-                                                        <!-- Course tag on small screen below message text -->
-                                                        <div class="d-block d-lg-none mt-2">
-                                                            <span
-                                                                class="text-reg text-12 badge rounded-pill course-badge"
-                                                                style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                                COMP-007
-                                                            </span>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Course tag on large screen right side, vertically centered -->
-                                                    <div
-                                                        class="col-auto d-none d-lg-flex justify-content-end align-items-center mt-4">
-                                                        <span class="text-reg text-12 badge rounded-pill course-badge"
-                                                            style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                            COMP-007
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                        <!-- Third Message -->
-                                        <div class="card mb-3 me-3 w-100 mt-3"
-                                            style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
-                                            <div class="card-body p-3">
-                                                <div class="row align-items-start">
-                                                    <!-- Profile Image -->
-                                                    <div
-                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
-                                                        <div class="avatar-image">
-                                                            <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
-                                                                class="rounded-circle responsive-circle ">
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Message Text -->
-                                                    <div class="col d-flex flex-column text-start mt-3 mt-lg-2 mb-2">
-                                                        <p class="mb-2 text-sbold text-17"
-                                                            style="color: var(--black); line-height: 140%;">
-                                                            Prof. Michael Chen has updated the course materials for
-                                                            'Database Design'.
-                                                        </p>
-                                                        <small class="text-reg text-12"
-                                                            style="color: var(--black); opacity: 0.7;">January 10, 2024
-                                                            11:15AM</small>
-
-                                                        <!-- Course tag on small screen below message text -->
-                                                        <div class="d-block d-lg-none mt-2">
-                                                            <span
-                                                                class="text-reg text-12 badge rounded-pill course-badge"
-                                                                style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                                COMP-008
-                                                            </span>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Course tag on large screen right side, vertically centered -->
-                                                    <div
-                                                        class="col-auto d-none d-lg-flex justify-content-end align-items-center mt-4">
-                                                        <span class="text-reg text-12 badge rounded-pill course-badge"
-                                                            style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                            COMP-008
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                        <!-- Fourth Message -->
-                                        <div class="card mb-3 me-3 w-100 mt-3"
-                                            style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
-                                            <div class="card-body p-3">
-                                                <div class="row align-items-start">
-                                                    <!-- Profile Image -->
-                                                    <div
-                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
-                                                        <div class="avatar-image">
-                                                            <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
-                                                                class="rounded-circle responsive-circle ">
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Message Text -->
-                                                    <div class="col d-flex flex-column text-start mt-3 mt-lg-2 mb-2">
-                                                        <p class="mb-2 text-sbold text-17"
-                                                            style="color: var(--black); line-height: 140%;">
-                                                            Prof. Lisa Rodriguez has posted grades for 'Final Project
-                                                            Submission'.
-                                                        </p>
-                                                        <small class="text-reg text-12"
-                                                            style="color: var(--black); opacity: 0.7;">January 9, 2024
-                                                            4:45PM</small>
-
-                                                        <!-- Course tag on small screen below message text -->
-                                                        <div class="d-block d-lg-none mt-2">
-                                                            <span
-                                                                class="text-reg text-12 badge rounded-pill course-badge"
-                                                                style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                                COMP-009
-                                                            </span>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Course tag on large screen right side, vertically centered -->
-                                                    <div
-                                                        class="col-auto d-none d-lg-flex justify-content-end align-items-center mt-4">
-                                                        <span class="text-reg text-12 badge rounded-pill course-badge"
-                                                            style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                            COMP-009
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                        <!-- Fifth Message -->
-                                        <div class="card mb-3 me-3 w-100 mt-3"
-                                            style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
-                                            <div class="card-body p-3">
-                                                <div class="row align-items-start">
-                                                    <!-- Profile Image -->
-                                                    <div
-                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
-                                                        <div class="avatar-image">
-                                                            <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
-                                                                class="rounded-circle responsive-circle ">
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Message Text -->
-                                                    <div class="col d-flex flex-column text-start mt-3 mt-lg-2 mb-2">
-                                                        <p class="mb-2 text-sbold text-17"
-                                                            style="color: var(--black); line-height: 140%;">
-                                                            Prof. Lisa Rodriguez has posted grades for 'Final Project
-                                                            Submission'.
-                                                        </p>
-                                                        <small class="text-reg text-12"
-                                                            style="color: var(--black); opacity: 0.7;">January 9, 2024
-                                                            4:45PM</small>
-
-                                                        <!-- Course tag on small screen below message text -->
-                                                        <div class="d-block d-lg-none mt-2">
-                                                            <span
-                                                                class="text-reg text-12 badge rounded-pill course-badge"
-                                                                style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                                COMP-009
-                                                            </span>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Course tag on large screen right side, vertically centered -->
-                                                    <div
-                                                        class="col-auto d-none d-lg-flex justify-content-end align-items-center mt-4">
-                                                        <span class="text-reg text-12 badge rounded-pill course-badge"
-                                                            style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                            COMP-009
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                        <!-- Sixth Message -->
-                                        <div class="card mb-3 me-3 w-100 mt-3"
-                                            style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
-                                            <div class="card-body p-3">
-                                                <div class="row align-items-start">
-                                                    <!-- Profile Image -->
-                                                    <div
-                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
-                                                        <div class="avatar-image">
-                                                            <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
-                                                                class="rounded-circle responsive-circle ">
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Message Text -->
-                                                    <div class="col d-flex flex-column text-start mt-3 mt-lg-2 mb-2">
-                                                        <p class="mb-2 text-sbold text-17"
-                                                            style="color: var(--black); line-height: 140%;">
-                                                            Prof. Lisa Rodriguez has posted grades for 'Final Project
-                                                            Submission'.
-                                                        </p>
-                                                        <small class="text-reg text-12"
-                                                            style="color: var(--black); opacity: 0.7;">January 9, 2024
-                                                            4:45PM</small>
-
-                                                        <!-- Course tag on small screen below message text -->
-                                                        <div class="d-block d-lg-none mt-2">
-                                                            <span
-                                                                class="text-reg text-12 badge rounded-pill course-badge"
-                                                                style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                                COMP-009
-                                                            </span>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Course tag on large screen right side, vertically centered -->
-                                                    <div
-                                                        class="col-auto d-none d-lg-flex justify-content-end align-items-center mt-4">
-                                                        <span class="text-reg text-12 badge rounded-pill course-badge"
-                                                            style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                            COMP-009
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                        <!-- Seventh Message -->
-                                        <div class="card mb-3 me-3 w-100 mt-3"
-                                            style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
-                                            <div class="card-body p-3">
-                                                <div class="row align-items-start">
-                                                    <!-- Profile Image -->
-                                                    <div
-                                                        class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
-                                                        <div class="avatar-image">
-                                                            <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="40" height="40"
-                                                                class="rounded-circle responsive-circle ">
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Message Text -->
-                                                    <div class="col d-flex flex-column text-start mt-3 mt-lg-2 mb-2">
-                                                        <p class="mb-2 text-sbold text-17"
-                                                            style="color: var(--black); line-height: 140%;">
-                                                            Prof. Lisa Rodriguez has posted grades for 'Final Project
-                                                            Submission'.
-                                                        </p>
-                                                        <small class="text-reg text-12"
-                                                            style="color: var(--black); opacity: 0.7;">January 9, 2024
-                                                            4:45PM</small>
-
-                                                        <!-- Course tag on small screen below message text -->
-                                                        <div class="d-block d-lg-none mt-2">
-                                                            <span
-                                                                class="text-reg text-12 badge rounded-pill course-badge"
-                                                                style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                                COMP-009
-                                                            </span>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Course tag on large screen right side, vertically centered -->
-                                                    <div
-                                                        class="col-auto d-none d-lg-flex justify-content-end align-items-center mt-4">
-                                                        <span class="text-reg text-12 badge rounded-pill course-badge"
-                                                            style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                            COMP-009
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
-                                        </div>
+                                        <?php
+                                            }
+                                        }
+                                        ?>
                                     </div>
-
                                 </div>
                             </div>
                         </div>

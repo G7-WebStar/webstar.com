@@ -25,6 +25,9 @@ if (isset($_GET['courseID'])) {
 
     $selectAssessmentQuery = "SELECT
     assessments.*,
+    assessments.title AS assessmentTitle,
+    todo.*,
+    todo.title AS todoTitle,
     courses.courseCode,
     DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline
     FROM assessments
@@ -32,8 +35,10 @@ if (isset($_GET['courseID'])) {
         ON assessments.courseID = courses.courseID
     INNER JOIN enrollments
         ON courses.courseID = enrollments.courseID
-    WHERE enrollments.userID = '$userID' AND enrollments.courseID = '$courseID'
-    ORDER BY assessmentID DESC
+    INNER JOIN todo 
+        ON assessments.assessmentID = todo.assessmentID
+    WHERE todo.userID = '$userID' AND todo.status = 'Pending' AND courses.courseID = '$courseID'
+    ORDER BY assessments.assessmentID DESC
 ";
     $selectAssessmentResult = executeQuery($selectAssessmentQuery);
 
@@ -182,7 +187,7 @@ if (isset($_GET['courseID'])) {
                                                                     <div
                                                                         class="d-flex align-items-center flex-wrap flex-grow-1 p-2 gap-3">
                                                                         <div class="flex-grow-1 px-2">
-                                                                            <div class="text-sbold text-12"><?php echo $activities['title']; ?></div>
+                                                                            <div class="text-sbold text-12"><?php echo $activities['assessmentTitle']; ?></div>
                                                                         </div>
                                                                         <div class="course-badge rounded-pill px-3 text-reg text-12">
                                                                             <?php echo $activities['type']; ?></div>
@@ -286,7 +291,7 @@ if (isset($_GET['courseID'])) {
                                                                         <div
                                                                             class="d-flex align-items-center flex-wrap flex-grow-1 p-2 gap-3">
                                                                             <div class="flex-grow-1 px-2">
-                                                                                <div class="text-sbold text-12"><?php echo $activities['title']; ?></div>
+                                                                                <div class="text-sbold text-12"><?php echo $activities['assessmentTitle']; ?></div>
                                                                             </div>
                                                                             <div
                                                                                 class="course-badge rounded-pill px-3 text-reg text-12">
