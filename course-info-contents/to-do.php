@@ -14,7 +14,7 @@
                     <div class="d-flex flex-grow-1 flex-wrap justify-content-between p-2 w-100">
                         <!-- For small screen of main content -->
                         <div class="px-3 py-0">
-                            <div class="text-sbold text-16"><?php echo $todo['title']; ?></div>
+                            <div class="text-sbold text-16"><?php echo $todo['assessmentTitle']; ?></div>
                             <span class="course-badge rounded-pill px-3 text-reg text-12 mt-2 d-inline d-md-none"><?php echo $todo['type']; ?></span>
                         </div>
                         <!-- Pill and Arrow on Large screen-->

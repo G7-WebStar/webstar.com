@@ -71,19 +71,21 @@ $selectAnnouncementsResult = executeQuery($selectAnnouncementsQuery);
 
 $selectAssessmentQuery = "SELECT
     assessments.*,
+    assessments.title AS assessmentTitle,
+    todo.*,
+    todo.title AS todoTitle,
     courses.courseCode,
     DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline,
     (SELECT COUNT(*) 
-     FROM assessments 
-     INNER JOIN enrollments
-        ON assessments.courseID = enrollments.courseID
-     WHERE enrollments.userID = '$userID') AS totalAssessments
+     FROM todo WHERE todo.userID = '$userID' AND todo.status = 'Pending') AS totalAssessments
     FROM assessments
     INNER JOIN courses
         ON assessments.courseID = courses.courseID
     INNER JOIN enrollments
         ON courses.courseID = enrollments.courseID
-    WHERE enrollments.userID = '$userID'
+    INNER JOIN todo 
+    	ON assessments.assessmentID = todo.assessmentID
+    WHERE todo.userID = '$userID' AND todo.status = 'Pending'
     GROUP BY assessments.assessmentID DESC
     LIMIT 3;
 ";
@@ -243,8 +245,6 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                                         <strong>Prof. <?php echo $announcements['profName']; ?></strong>
                                                                                         <span class="text-reg text-12 badge rounded-pill ms-2 courses-badge"><?php echo $announcements['courseCode']; ?></span>
                                                                                     </div>
-                                                                                    <i class="announcement-arrow ms-auto pe-2 fa-solid fa-arrow-right text-reg text-12 "
-                                                                                        style="color: var(--black);"></i>
                                                                                 </div>
                                                                                 <div class="date-row d-flex justify-content-between align-items-center mt-1" style="position: relative;">
                                                                                     <span style="font-weight: normal;"><?php echo $announcements['announcementDate'] . " | " . $announcements['announcementTime']; ?></span>
@@ -255,6 +255,8 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                                 <?php echo $announcements['announcementContent']; ?>
                                                                             </p>
                                                                         </div>
+                                                                        <i class="announcement-arrow ms-auto pe-2 fa-solid fa-arrow-right text-reg text-12 "
+                                                                            style="color: var(--black);"></i>
                                                                     </div>
                                                                 </div>
                                                             <?php
@@ -320,7 +322,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                     <div class="d-flex flex-grow-1 flex-wrap justify-content-between p-2 w-100">
                                                                         <!-- For small screen of main content -->
                                                                         <div class="px-3 py-0">
-                                                                            <div class="text-sbold text-16"><?php echo $activities['title']; ?></div>
+                                                                            <div class="text-sbold text-16"><?php echo $activities['assessmentTitle']; ?></div>
                                                                             <div class="text-reg text-12"><?php echo $activities['courseCode']; ?></div>
                                                                             <span
                                                                                 class="course-badge rounded-pill px-3 text-reg text-12 mt-2 d-inline d-md-none">Task</span>

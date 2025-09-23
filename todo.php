@@ -2,8 +2,20 @@
 include('shared/assets/database/connect.php');
 $userID = '2';
 
+$selectEnrolledQuery = "SELECT
+courses.courseCode
+FROM courses
+INNER JOIN enrollments
+    ON courses.courseID = enrollments.courseID
+WHERE enrollments.userID = '$userID'
+";
+$selectEnrolledResult = executeQuery($selectEnrolledQuery);
+
 $selectAssessmentQuery = "SELECT
     assessments.*,
+    assessments.title AS assessmentTitle,
+    todo.*,
+    todo.title AS todoTitle,
     courses.courseCode,
     DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline
     FROM assessments
@@ -11,8 +23,10 @@ $selectAssessmentQuery = "SELECT
         ON assessments.courseID = courses.courseID
     INNER JOIN enrollments
         ON courses.courseID = enrollments.courseID
-    WHERE enrollments.userID = '$userID'
-    ORDER BY assessmentID DESC
+    INNER JOIN todo
+    	ON assessments.assessmentID = todo.assessmentID
+    WHERE todo.userID = '$userID' AND todo.status = 'Pending'
+    ORDER BY todo.assessmentID DESC
 ";
 $selectAssessmentResult = executeQuery($selectAssessmentQuery);
 ?>
@@ -96,8 +110,15 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                                     </button>
                                                     <ul class="dropdown-menu">
                                                         <li><a class="dropdown-item text-reg" href="#">All</a></li>
-                                                        <li><a class="dropdown-item text-reg" href="#">COMP-006</a></li>
-                                                        <li><a class="dropdown-item text-reg" href="#">Other courses</a>
+                                                        <?php
+                                                        if (mysqli_num_rows($selectEnrolledResult) > 0) {
+                                                            while ($inboxSelectTag = mysqli_fetch_assoc($selectEnrolledResult)) {
+                                                        ?>
+                                                                <li><a class="dropdown-item text-reg" href="#"><?php echo $inboxSelectTag['courseCode']; ?></a></li>
+                                                        <?php
+                                                            }
+                                                        }
+                                                        ?>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -141,7 +162,7 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                                         <!-- For small screen of main content -->
                                                         <div class="px-3 py-0">
                                                             <div class="text-sbold text-16">
-                                                                <?php echo $todo['title']; ?>
+                                                                <?php echo $todo['assessmentTitle']; ?>
                                                             </div>
                                                             <div class="text-reg text-12">
                                                                 <?php echo $todo['courseCode']; ?>
