@@ -233,7 +233,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                     <div class="announcement-card d-flex align-items-start mb-3">
                                                                         <!-- Instructor Image -->
                                                                         <div class="flex-shrink-0 me-3">
-                                                                            <img src="shared/assets/img/courseInfo/<?php echo $announcements['profilePicture']; ?>" alt="Instructor Image"
+                                                                            <img src="shared/assets/pfp-uploads/<?php echo $announcements['profilePicture']; ?>" alt="Instructor Image"
                                                                                 style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
                                                                         </div>
 

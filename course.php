@@ -156,7 +156,7 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                                                         </div>
                                                         <div class="row px-3 mb-2">
                                                             <div class="col-1 d-flex justify-content-center align-items-center m-0 p-0">
-                                                                <img src="pfp-uploads/<?php echo $courses['profPFP']; ?>" alt="" width="32" height="32" class="rounded-circle">
+                                                                <img src="shared/assets/pfp-uploads/<?php echo $courses['profPFP']; ?>" alt="" width="32" height="32" class="rounded-circle">
                                                             </div>
                                                             <div class="col-11 my-0 lh-sm">
                                                                 <p class="card-text text-bold text-14 m-0"><?php echo $courses['profFirstName'] . " " . $courses['profMiddleName'] . " " . $courses['profLastName']; ?></p>

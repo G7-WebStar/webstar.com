@@ -180,9 +180,14 @@
                                                                     File
                                                                 </button>
 
-                                                                <button type="submit"
+                                                                <button type="button"
                                                                     class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-2 ms-2"
-                                                                    style="background-color: var(--primaryColor); border: 1px solid var(--black);">
+                                                                    style="background-color: var(--primaryColor); border: 1px solid var(--black);"
+                                                                    data-bs-container="body"
+                                                                    data-bs-toggle="popover"
+                                                                    data-bs-placement="right"
+                                                                    data-bs-html="true"
+                                                                    data-bs-content='<div class="form-floating mb-3"><input type="url" class="form-control" id="linkInput" placeholder="Paste link here"><label for="linkInput">Link</label></div><div class="link-popover-actions"><button type="button" class="btn btn-sm px-3 py-1 rounded-pill" id="addLinkBtn" style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);">Add link</button></div>'>
                                                                     <img src="../shared/assets/img/link.png"
                                                                         alt="Upload Icon" class="me-1">
                                                                     Link
@@ -227,7 +232,8 @@
                                                         </div>
                                                     </div>
                                                     <!-- Add Button -->
-                                                    <div class="col-md-6 text-center text-md-center mt-3 mt-md-0 ms-md-5">
+                                                    <div
+                                                        class="col-md-6 text-center text-md-center mt-3 mt-md-0 ms-md-5">
                                                         <button type="submit"
                                                             class="px-4 py-2 rounded-pill text-sbold text-md-14 mt-3 ms-3"
                                                             style="background-color: var(--primaryColor); border: 1px solid var(--black);">
@@ -278,8 +284,29 @@
         // document.querySelector('form').addEventListener('submit', function () {
         //     document.querySelector('#announcement').value = quill.root.innerHTML;
         // });
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize Bootstrap popovers for Link button
+        document.addEventListener('DOMContentLoaded', function () {
+            var triggers = document.querySelectorAll('[data-bs-toggle="popover"]');
+            triggers.forEach(function (el) {
+                var pop = new bootstrap.Popover(el, {
+                    html: true,
+                    container: 'body',
+                    sanitize: false
+                });
+                // Add custom class to the created popover for styling
+                el.addEventListener('shown.bs.popover', function () {
+                    var tip = document.querySelector('.popover.show');
+                    if (tip) {
+                        tip.classList.add('link-popover');
+                    }
+                });
+            });
+        });
+    </script>
 
 </body>
 

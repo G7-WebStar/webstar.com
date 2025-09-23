@@ -36,19 +36,26 @@ include("shared/assets/processes/registration-process.php");
 
                     <form method="POST" action="" class="text-reg mx-auto custom-form" style="max-width: 315px;">
                         <div class="form-floating mb-3">
-                            <input type="email" name="email" class="form-control" placeholder="Email" pattern=".+@gmail\.com" title="Only Gmail addresses allowed" required >
+                            <input type="email" name="email" class="form-control"
+                                placeholder="Email" pattern=".+@gmail\.com"
+                                title="Only Gmail addresses allowed"
+                                value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
                             <label for="email">Email</label>
                         </div>
 
                         <div class="password-wrapper mb-3 form-floating ">
-                            <input type="password" name="password" id="password" class="form-control" placeholder="Password" required>
+                            <input type="password" name="password" id="password" class="form-control"
+                                placeholder="Password"
+                                value="<?php echo isset($_POST['password']) ? htmlspecialchars($_POST['password']) : ''; ?>" required>
                             <label for="password">Password</label>
                             <i class="fas fa-eye toggle-password" onclick="togglePassword('password', this)"
                                 style="font-size: 0.85rem; color:#6c757d; position:absolute; right:15px; top:50%; transform: translateY(-50%); cursor:pointer;"></i>
                         </div>
 
                         <div class="password-wrapper mb-3 form-floating">
-                            <input type="password" name="confirmPassword" id="confirmPassword" class="form-control" placeholder="Confirm password" required>
+                            <input type="password" name="confirmPassword" id="confirmPassword" class="form-control"
+                                placeholder="Confirm password"
+                                value="<?php echo isset($_POST['confirmPassword']) ? htmlspecialchars($_POST['confirmPassword']) : ''; ?>" required>
                             <label for="confirm password">Confirm password</label>
                             <i class="fas fa-eye toggle-password" onclick="togglePassword('confirmPassword', this)"
                                 style="font-size: 0.85rem; color:#6c757d; position:absolute; right:15px; top:50%; transform: translateY(-50%); cursor:pointer;"></i>

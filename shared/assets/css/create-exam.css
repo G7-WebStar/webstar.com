@@ -1,0 +1,61 @@
+.editor-wrapper {
+    background: var(--pureWhite);
+    border: 1px solid var(--black);
+    border-radius: 15px;
+    width: 100%;
+    max-width: 700px;
+}
+
+#editor {
+    height: 250px;
+    padding: 10px;
+    border: none;
+}
+
+#toolbar {
+    border: none;
+}
+
+#toolbar .ql-attach i,
+#toolbar .ql-attach img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    pointer-events: none;
+    filter: grayscale(50%);
+}
+
+.ql-editor.ql-blank::before {
+    content: attr(data-placeholder);
+    font-size: 16px;
+    font-family: var(--Regular);
+    font-style: normal !important;
+}
+
+.dropdown-shape {
+    min-width: auto;
+    height: 25px;
+    border: 1px solid var(--black);
+    border-radius: 25px;
+    background-color: var(--pureWhite);
+    color: var(--black);
+    padding: 18px 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.dropdown-shape:hover {
+    background-color: var(--pureWhite);
+    border-color: var(--black);
+}
+
+.dropdown-shape:focus,
+.dropdown-shape:active,
+.dropdown-shape.show {
+    background-color: var(--pureWhite);
+    border-color: var(--black);
+    outline: none;
+}

@@ -41,6 +41,23 @@ body {
   font-size: 17px;
 }
 
+/* Ensure label and badge alignment inside sidebar rows */
+.nav .nav-item {
+  display: flex;
+  align-items: center;
+}
+.nav .nav-item .nav-link {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+}
+.badge-container {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+  flex: 0 0 auto; /* keep badge from shrinking */
+}
+
 .text-dark {
   color: var(--black) !important;
 }
@@ -62,4 +79,50 @@ body {
 
 .custom-toggler .navbar-toggler-icon {
   background-size: 20px 20px !important;
+}
+
+/*Inbox count badge */
+.inbox-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 43px; 
+  height: 26px;  
+  padding: 0 10px;
+  line-height: 26px; 
+  border-radius: 20px; 
+  border: 1px solid var(--black); 
+  background: var(--primaryColor);
+  color: var(--black);
+  font-family: var(--SemiBold);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 100%;
+  letter-spacing: -0.03em;
+  text-align: center;
+  vertical-align: middle;
+  opacity: 1;
+}
+
+/* Same layout for To-do badge */
+.todo-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 43px;
+  height: 26px;
+  padding: 0 10px;
+  line-height: 26px;
+  border-radius: 20px;
+  border: 1px solid var(--black);
+  background: var(--primaryColor);
+  color: var(--black);
+  font-family: var(--SemiBold);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 100%;
+  letter-spacing: -0.03em;
+  text-align: center;
+  vertical-align: middle;
+  opacity: 1;
 }
