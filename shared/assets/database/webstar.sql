@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 23, 2025 at 01:23 PM
+-- Generation Time: Sep 26, 2025 at 05:28 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -215,6 +215,7 @@ CREATE TABLE `inbox` (
   `inboxID` int(11) NOT NULL,
   `messageID` int(11) NOT NULL,
   `enrollmentID` int(11) NOT NULL,
+  `userID` int(11) NOT NULL,
   `messageText` text NOT NULL,
   `createdAt` datetime DEFAULT current_timestamp(),
   `isRead` tinyint(1) DEFAULT 0
@@ -224,9 +225,9 @@ CREATE TABLE `inbox` (
 -- Dumping data for table `inbox`
 --
 
-INSERT INTO `inbox` (`inboxID`, `messageID`, `enrollmentID`, `messageText`, `createdAt`, `isRead`) VALUES
-(1, 1, 1, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 1),
-(2, 2, 2, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 1);
+INSERT INTO `inbox` (`inboxID`, `messageID`, `enrollmentID`, `userID`, `messageText`, `createdAt`, `isRead`) VALUES
+(1, 1, 1, 2, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 0),
+(2, 2, 2, 2, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 0);
 
 -- --------------------------------------------------------
 
