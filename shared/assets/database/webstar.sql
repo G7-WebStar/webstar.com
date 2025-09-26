@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 23, 2025 at 01:23 PM
+-- Generation Time: Sep 26, 2025 at 05:23 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -217,16 +217,17 @@ CREATE TABLE `inbox` (
   `enrollmentID` int(11) NOT NULL,
   `messageText` text NOT NULL,
   `createdAt` datetime DEFAULT current_timestamp(),
-  `isRead` tinyint(1) DEFAULT 0
+  `isRead` tinyint(1) DEFAULT 0,
+  `userID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `inbox`
 --
 
-INSERT INTO `inbox` (`inboxID`, `messageID`, `enrollmentID`, `messageText`, `createdAt`, `isRead`) VALUES
-(1, 1, 1, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 1),
-(2, 2, 2, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 1);
+INSERT INTO `inbox` (`inboxID`, `messageID`, `enrollmentID`, `messageText`, `createdAt`, `isRead`, `userID`) VALUES
+(1, 1, 1, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 1, 0),
+(2, 2, 2, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 1, 0);
 
 -- --------------------------------------------------------
 
