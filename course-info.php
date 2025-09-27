@@ -2,7 +2,15 @@
 $activePage = 'courseInfo';
 
 include("shared/assets/database/connect.php");
-$userID = '2';
+session_start();
+
+if (isset($_SESSION['userID'])) {
+    $userID = $_SESSION['userID'];
+} else {
+    header("Location: login.php");
+    exit();
+}
+
 if (isset($_GET['courseID'])) {
     $courseID = $_GET['courseID'];
     $selectCourseQuery = "SELECT 
@@ -139,7 +147,7 @@ if (isset($_GET['courseID'])) {
 
                                                         <div class="d-flex align-items-center mb-2">
                                                             <div class="avatar-image">
-                                                                <img src="pfp-uploads/<?php echo $courses['profPFP']; ?>"
+                                                                <img src="shared/assets/pfp-uploads/<?php echo $courses['profPFP']; ?>"
                                                                     alt="Instructor Image" class="img-fluid">
                                                             </div>
                                                             <div class="ms-2">
@@ -234,7 +242,7 @@ if (isset($_GET['courseID'])) {
                                                         <div class="col">
                                                             <div class="d-flex align-items-center">
                                                                 <div class="avatar-image">
-                                                                    <img src="pfp-uploads/<?php echo $courses['profPFP']; ?>"
+                                                                    <img src="shared/assets/pfp-uploads/<?php echo $courses['profPFP']; ?>"
                                                                         alt="Instructor Image" class="img-fluid">
                                                                 </div>
                                                                 <div class="ms-2">
@@ -480,7 +488,7 @@ if (isset($_GET['courseID'])) {
                                         <script
                                             src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
                                         <script>
-                                            document.addEventListener("DOMContentLoaded", function () {
+                                            document.addEventListener("DOMContentLoaded", function() {
                                                 const tabContainer = document.getElementById('mobileTabScroll');
                                                 const scrollLeftBtn = document.getElementById('scrollLeftBtn');
                                                 const scrollRightBtn = document.getElementById('scrollRightBtn');
@@ -529,16 +537,16 @@ if (isset($_GET['courseID'])) {
                                                 courseCard.style.borderBottomRightRadius = '0';
                                             });
 
-                                            document.addEventListener("DOMContentLoaded", function () {
+                                            document.addEventListener("DOMContentLoaded", function() {
                                                 const collapseElement = document.getElementById("mobileCourseCard");
                                                 const icon = document.querySelector('[data-bs-target="#mobileCourseCard"] i');
 
-                                                collapseElement.addEventListener("show.bs.collapse", function () {
+                                                collapseElement.addEventListener("show.bs.collapse", function() {
                                                     icon.classList.remove("fa-chevron-down");
                                                     icon.classList.add("fa-chevron-up");
                                                 });
 
-                                                collapseElement.addEventListener("hide.bs.collapse", function () {
+                                                collapseElement.addEventListener("hide.bs.collapse", function() {
                                                     icon.classList.remove("fa-chevron-up");
                                                     icon.classList.add("fa-chevron-down");
                                                 });

@@ -7,7 +7,7 @@ $basePath = "uploads/files/";
 
 <?php if (mysqli_num_rows($fileResult) > 0): ?>
     <?php while ($file = mysqli_fetch_assoc($fileResult)): ?>
-        <?php $fileFullPath = $basePath . $file['filePath']; ?>
+        <?php $fileFullPath = $basePath . $file['fileAttachment']; ?>
 
         <div class="row mb-0 mt-3">
             <div class="col">
@@ -21,7 +21,7 @@ $basePath = "uploads/files/";
                             </div>
                             <div>
                                 <div class="text-sbold text-16 py-1" style="line-height: 1;">
-                                    <?php echo ($file['fileName']); ?>
+                                    <?php echo ($file['fileAttachment']); ?>
                                 </div>
                                 <div class="text-reg text-12" style="line-height: 1;">
                                     Uploaded <?php echo date("F d, Y", strtotime($file['uploadedAt'])); ?>
@@ -33,7 +33,7 @@ $basePath = "uploads/files/";
                         <!-- initial download -->
                         <div class="mx-4">
                             <a href="<?php echo ($fileFullPath); ?>"
-                                download="<?php echo ($file['fileName']); ?>">
+                                download="<?php echo ($file['fileAttachment']); ?>">
                                 <img src="shared/assets/img/dl.png"
                                     alt="Download Icon"
                                     style="width: 16px; height: 20px; cursor:pointer;">
