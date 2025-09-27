@@ -4,6 +4,7 @@ include('shared/assets/database/connect.php');
 
 if (!isset($_GET['lessonID'])) {
     echo "Lesson ID is missing in the URL.";
+    exit;
 }
 
 $lessonID = intval($_GET['lessonID']);
@@ -20,26 +21,41 @@ $lessonInfoResult = executeQuery($lessonInfoQuery);
 
 if (!$lesson = mysqli_fetch_assoc($lessonInfoResult)) {
     echo "Lesson not found.";
+    exit;
 }
 
-// Count attachments and links
-$attachmentsArray = !empty($lesson['attachment']) ? array_filter(array_map('trim', explode(',', $lesson['attachment']))) : [];
-$linksArray = !empty($lesson['link']) ? array_filter(array_map('trim', explode(',', $lesson['link']))) : [];
-$fileCount = count($attachmentsArray);
-$linkCount = count($linksArray);
 $courseID = $lesson['courseID'];
-
 $lessonTitle = $lesson['lessonTitle'];
 $lessonDescription = $lesson['lessonDescription'];
 $profName = $lesson['firstName'] . " " . $lesson['lastName'];
 $profPic = !empty($lesson['profilePicture']) ? $lesson['profilePicture'] : "shared/assets/img/courseInfo/prof.png";
 
-// Use createdAt for date/time
 $displayTime = !empty($lesson['updatedAt']) ? $lesson['updatedAt'] : $lesson['createdAt'];
 $formattedTime = !empty($displayTime) ? date("F j, Y g:i A", strtotime($displayTime)) : "";
 
+$filesQuery = "SELECT * FROM files WHERE lessonID = '$lessonID'";
+$filesResult = executeQuery($filesQuery);
 
+$attachmentsArray = [];
+$linksArray = [];
+
+while ($file = mysqli_fetch_assoc($filesResult)) {
+    if (!empty($file['fileAttachment'])) {
+        $attachments = array_map('trim', explode(',', $file['fileAttachment']));
+        $attachmentsArray = array_merge($attachmentsArray, $attachments);
+    }
+
+    if (!empty($file['fileLink'])) {
+        $links = array_map('trim', explode(',', $file['fileLink']));
+        $linksArray = array_merge($linksArray, $links);
+    }
+}
+
+// Update counts
+$fileCount = count($attachmentsArray);
+$linkCount = count($linksArray);
 ?>
+
 
 <!doctype html>
 <html lang="en">

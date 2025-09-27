@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 26, 2025 at 05:28 PM
+-- Generation Time: Sep 27, 2025 at 02:41 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -112,6 +112,30 @@ INSERT INTO `assessments` (`assessmentID`, `courseID`, `title`, `type`, `deadlin
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `assignments`
+--
+
+CREATE TABLE `assignments` (
+  `assignmentID` int(5) NOT NULL,
+  `userID` int(5) NOT NULL,
+  `courseID` int(5) NOT NULL,
+  `lessonID` int(5) NOT NULL,
+  `assignmentTitle` varchar(50) NOT NULL,
+  `assignmentDescription` varchar(500) NOT NULL,
+  `assignmentDeadline` datetime(6) NOT NULL DEFAULT current_timestamp(6),
+  `assignmentPoints` int(5) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `assignments`
+--
+
+INSERT INTO `assignments` (`assignmentID`, `userID`, `courseID`, `lessonID`, `assignmentTitle`, `assignmentDescription`, `assignmentDeadline`, `assignmentPoints`) VALUES
+(1, 1, 1, 1, 'Assignment #1', 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', '2025-09-30 20:21:04.000000', 100);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `courses`
 --
 
@@ -164,9 +188,12 @@ INSERT INTO `enrollments` (`enrollmentID`, `userID`, `courseID`, `yearSection`) 
 CREATE TABLE `files` (
   `fileID` int(11) NOT NULL,
   `courseID` int(11) NOT NULL,
-  `fileName` varchar(255) NOT NULL,
-  `filePath` text NOT NULL,
-  `userID` int(11) NOT NULL,
+  `userID` int(5) NOT NULL,
+  `announcementID` int(5) DEFAULT NULL,
+  `lessonID` int(5) DEFAULT NULL,
+  `assignmentID` int(5) DEFAULT NULL,
+  `fileAttachment` varchar(255) NOT NULL,
+  `fileLink` varchar(100) NOT NULL,
   `uploadedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -174,36 +201,8 @@ CREATE TABLE `files` (
 -- Dumping data for table `files`
 --
 
-INSERT INTO `files` (`fileID`, `courseID`, `fileName`, `filePath`, `userID`, `uploadedAt`) VALUES
-(1, 1, 'Web Development Course Material', 'uploads/course110/css-grid-cheatsheet.pdf', 1, '2025-08-30 10:30:00');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `follows`
---
-
-CREATE TABLE `follows` (
-  `followID` int(11) NOT NULL,
-  `followingID` int(11) NOT NULL,
-  `followedID` int(11) NOT NULL,
-  `dateFollowed` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `gameresult`
---
-
-CREATE TABLE `gameresult` (
-  `gameResultID` int(11) NOT NULL,
-  `userID` int(11) NOT NULL,
-  `gameID` int(11) NOT NULL,
-  `score` int(100) NOT NULL,
-  `pointsEarned` int(100) NOT NULL,
-  `dateTaken` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+INSERT INTO `files` (`fileID`, `courseID`, `userID`, `announcementID`, `lessonID`, `assignmentID`, `fileAttachment`, `fileLink`, `uploadedAt`) VALUES
+(1, 1, 1, 1, 1, NULL, 'Web Development Course Material', 'https://example.com/lesson1,https://example.com/lesson1.1', '2025-08-30 10:30:00');
 
 -- --------------------------------------------------------
 
@@ -266,8 +265,6 @@ CREATE TABLE `lessons` (
   `lessonTitle` varchar(255) NOT NULL,
   `lessonDescription` text NOT NULL,
   `lessonContent` text NOT NULL,
-  `attachment` varchar(255) NOT NULL,
-  `link` varchar(100) NOT NULL,
   `lessonType` varchar(255) NOT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp()
@@ -277,21 +274,8 @@ CREATE TABLE `lessons` (
 -- Dumping data for table `lessons`
 --
 
-INSERT INTO `lessons` (`lessonID`, `courseID`, `lessonTitle`, `lessonDescription`, `lessonContent`, `attachment`, `link`, `lessonType`, `createdAt`, `updatedAt`) VALUES
-(1, 1, 'Lesson 1: Introduction to CSS Grid', '1. Explain what HTML is and its role in web development.\n2. Identify the basic structure of an HTML document.\n3. Use common HTML tags such as headings, paragraphs, and links. \n4. Create a simple webpage using basic HTML elements.', 'Learn how to create grid layouts', 'Web Development Course Material.pptx', 'https://example.com/lesson1,https://example.com/lesson1.1', 'Lecture', '2025-08-30 09:00:00', '2025-08-30 09:00:00');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `minigames`
---
-
-CREATE TABLE `minigames` (
-  `gameID` int(11) NOT NULL,
-  `gameName` varchar(255) NOT NULL,
-  `type` varchar(255) NOT NULL,
-  `lessonID` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+INSERT INTO `lessons` (`lessonID`, `courseID`, `lessonTitle`, `lessonDescription`, `lessonContent`, `lessonType`, `createdAt`, `updatedAt`) VALUES
+(1, 1, 'Lesson 1: Introduction to CSS Grid', '1. Explain what HTML is and its role in web development.\n2. Identify the basic structure of an HTML document.\n3. Use common HTML tags such as headings, paragraphs, and links. \n4. Create a simple webpage using basic HTML elements.', 'Learn how to create grid layouts', 'Lecture', '2025-08-30 09:00:00', '2025-08-30 09:00:00');
 
 -- --------------------------------------------------------
 
@@ -355,6 +339,28 @@ CREATE TABLE `report` (
 
 INSERT INTO `report` (`reportID`, `courseID`, `userID`, `totalXP`, `allTimeRank`, `assignmentScorePercent`, `assesmentScorePercent`, `generatedAt`) VALUES
 (1, 1, 2, 4500, 10, 89, 92, '2025-08-30 14:26:32');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `scores`
+--
+
+CREATE TABLE `scores` (
+  `scoreID` int(5) NOT NULL,
+  `userID` int(5) NOT NULL,
+  `assignmentID` int(5) DEFAULT NULL,
+  `examID` int(5) DEFAULT NULL,
+  `quizID` int(5) DEFAULT NULL,
+  `score` int(5) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `scores`
+--
+
+INSERT INTO `scores` (`scoreID`, `userID`, `assignmentID`, `examID`, `quizID`, `score`) VALUES
+(1, 1, 1, NULL, NULL, 100);
 
 -- --------------------------------------------------------
 
@@ -469,6 +475,12 @@ ALTER TABLE `assessments`
   ADD KEY `courseID` (`courseID`);
 
 --
+-- Indexes for table `assignments`
+--
+ALTER TABLE `assignments`
+  ADD PRIMARY KEY (`assignmentID`);
+
+--
 -- Indexes for table `courses`
 --
 ALTER TABLE `courses`
@@ -485,18 +497,6 @@ ALTER TABLE `enrollments`
 --
 ALTER TABLE `files`
   ADD PRIMARY KEY (`fileID`);
-
---
--- Indexes for table `follows`
---
-ALTER TABLE `follows`
-  ADD PRIMARY KEY (`followID`);
-
---
--- Indexes for table `gameresult`
---
-ALTER TABLE `gameresult`
-  ADD PRIMARY KEY (`gameResultID`);
 
 --
 -- Indexes for table `inbox`
@@ -517,12 +517,6 @@ ALTER TABLE `lessons`
   ADD PRIMARY KEY (`lessonID`);
 
 --
--- Indexes for table `minigames`
---
-ALTER TABLE `minigames`
-  ADD PRIMARY KEY (`gameID`);
-
---
 -- Indexes for table `points`
 --
 ALTER TABLE `points`
@@ -539,6 +533,12 @@ ALTER TABLE `program`
 --
 ALTER TABLE `report`
   ADD PRIMARY KEY (`reportID`);
+
+--
+-- Indexes for table `scores`
+--
+ALTER TABLE `scores`
+  ADD PRIMARY KEY (`scoreID`);
 
 --
 -- Indexes for table `todo`
@@ -587,6 +587,12 @@ ALTER TABLE `assessments`
   MODIFY `assessmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
+-- AUTO_INCREMENT for table `assignments`
+--
+ALTER TABLE `assignments`
+  MODIFY `assignmentID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `courses`
 --
 ALTER TABLE `courses`
@@ -603,18 +609,6 @@ ALTER TABLE `enrollments`
 --
 ALTER TABLE `files`
   MODIFY `fileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `follows`
---
-ALTER TABLE `follows`
-  MODIFY `followID` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `gameresult`
---
-ALTER TABLE `gameresult`
-  MODIFY `gameResultID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `inbox`
@@ -635,12 +629,6 @@ ALTER TABLE `lessons`
   MODIFY `lessonID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `minigames`
---
-ALTER TABLE `minigames`
-  MODIFY `gameID` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `points`
 --
 ALTER TABLE `points`
@@ -657,6 +645,12 @@ ALTER TABLE `program`
 --
 ALTER TABLE `report`
   MODIFY `reportID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `scores`
+--
+ALTER TABLE `scores`
+  MODIFY `scoreID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `todo`

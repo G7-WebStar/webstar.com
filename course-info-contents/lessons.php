@@ -1,26 +1,32 @@
 <?php
-
 $lessonQuery = "SELECT * FROM lessons WHERE courseID = '$courseID'";
 $lessonResult = executeQuery($lessonQuery);
 
 while ($lesson = mysqli_fetch_assoc($lessonResult)) {
 
-    // Count attachments and links
-    $fileCount = 0;
-    $linkCount = 0;
-
-    if (!empty($lesson['attachment'])) {
-        $attachmentsArray = explode(',', $lesson['attachment']);
-        $fileCount = count($attachmentsArray);
-    }
-
-    if (!empty($lesson['link'])) {
-        $linksArray = explode(',', $lesson['link']);
-        $linkCount = count($linksArray);
-    }
-
-    $lessonTitle = $lesson['lessonTitle'];
     $lessonID = $lesson['lessonID'];
+    $lessonTitle = $lesson['lessonTitle'];
+
+    $fileQuery = "SELECT * FROM files WHERE lessonID = '$lessonID'";
+    $fileResult = executeQuery($fileQuery);
+
+    $attachmentsArray = [];
+    $linksArray = [];
+
+    while ($file = mysqli_fetch_assoc($fileResult)) {
+        if (!empty($file['fileAttachment'])) {
+            $attachments = array_map('trim', explode(',', $file['fileAttachment']));
+            $attachmentsArray = array_merge($attachmentsArray, $attachments);
+        }
+
+        if (!empty($file['fileLink'])) {
+            $links = array_map('trim', explode(',', $file['fileLink']));
+            $linksArray = array_merge($linksArray, $links);
+        }
+    }
+
+    $fileCount = count($attachmentsArray);
+    $linkCount = count($linksArray);
 ?>
 
     <div class="row mb-0 mt-3">
