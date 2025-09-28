@@ -157,7 +157,7 @@ if (isset($_GET['courseID'])) {
 
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 ms-2 overflow-y-auto">
+                    <div class="container-fluid py-3 ms-2 overflow-y-auto" style="white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth;">
                         <div class="row">
                             <div class="row mt-0">
 
