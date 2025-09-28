@@ -4,12 +4,14 @@ $activePage = 'courseInfo';
 include("shared/assets/database/connect.php");
 session_start();
 
-if (isset($_SESSION['userID'])) {
+/*if (isset($_SESSION['userID'])) {
     $userID = $_SESSION['userID'];
 } else {
     header("Location: login.php");
     exit();
-}
+}*/
+
+$userID = 2;
 
 if (isset($_GET['courseID'])) {
     $courseID = $_GET['courseID'];
@@ -41,8 +43,6 @@ if (isset($_GET['courseID'])) {
     FROM assessments
     INNER JOIN courses
         ON assessments.courseID = courses.courseID
-    INNER JOIN enrollments
-        ON courses.courseID = enrollments.courseID
     INNER JOIN todo 
         ON assessments.assessmentID = todo.assessmentID
     WHERE todo.userID = '$userID' AND todo.status = 'Pending' AND courses.courseID = '$courseID'
@@ -50,7 +50,7 @@ if (isset($_GET['courseID'])) {
 ";
     $selectAssessmentResult = executeQuery($selectAssessmentQuery);
 
-    $selectLimitAssessmentQuery = $selectAssessmentQuery .= " LIMIT 1";
+    $selectLimitAssessmentQuery = $selectAssessmentQuery . " LIMIT 1";
     $selectLimitAssessmentResult = executeQuery($selectLimitAssessmentQuery);
 
     $selectLeaderboardQuery = "SELECT 
@@ -65,6 +65,57 @@ if (isset($_GET['courseID'])) {
     GROUP BY courses.courseTitle;
 ";
     $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
+
+    $TotalPlacementQuery = "SELECT 
+	userinfo.profilePicture,
+    userinfo.firstName,
+    userinfo.middleName,
+    userinfo.lastName,
+    enrollments.userID,
+    SUM(leaderboard.xpPoints) AS totalPoints
+    FROM leaderboard
+    INNER JOIN enrollments
+        ON leaderboard.enrollmentID = enrollments.enrollmentID
+    INNER JOIN userinfo
+	    ON enrollments.userID = userinfo.userID
+    WHERE enrollments.courseID = '$courseID'
+    GROUP BY enrollments.userID
+    ORDER BY totalPoints DESC
+    LIMIT";
+
+    $selectTopOneQuery = $TotalPlacementQuery . " 1;";
+    $selectTopOneResult = executeQuery($selectTopOneQuery);
+
+    $selectTopTwoToThreeQuery = $TotalPlacementQuery . " 2 OFFSET 1;";
+    $selectTopTwoToThreeResult = executeQuery($selectTopTwoToThreeQuery);
+
+    $selectTopFourToTenQuery = $TotalPlacementQuery . " 7 OFFSET 3;";
+    $selectTopFourToTenResult = executeQuery($selectTopFourToTenQuery);
+
+    $selectPlacementQuery = "SELECT
+    userinfo.profilePicture,
+    userinfo.firstName,
+    userinfo.middleName,
+    userinfo.lastName, 
+    ranked.userID,
+    ranked.totalPoints,
+    ranked.rank
+    FROM (SELECT 
+        enrollments.userID,
+        SUM(leaderboard.xpPoints) AS totalPoints,
+        RANK() OVER (ORDER BY SUM(leaderboard.xpPoints) DESC) AS rank
+        FROM leaderboard
+        INNER JOIN enrollments
+            ON leaderboard.enrollmentID = enrollments.enrollmentID
+        WHERE enrollments.courseID = '$courseID'
+        GROUP BY enrollments.userID
+        ) AS ranked
+    INNER JOIN userinfo
+    	ON ranked.userID = userinfo.userID
+    WHERE ranked.userID = '$userID'
+    AND ranked.rank > 10;
+    ";
+    $selectPlacementResult = executeQuery($selectPlacementQuery);
 } else {
     header("Location: 404.php");
     exit();

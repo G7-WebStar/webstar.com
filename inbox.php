@@ -140,7 +140,7 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                                             <div
                                                                 class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
                                                                 <div class="avatar-image">
-                                                                    <img src="pfp-uploads/<?php echo $inbox['profPFP']; ?>" alt="" width="40" height="40"
+                                                                    <img src="shared/assets/pfp-uploads/<?php echo $inbox['profPFP']; ?>" alt="" width="40" height="40"
                                                                         class="rounded-circle responsive-circle ">
                                                                 </div>
                                                             </div>
