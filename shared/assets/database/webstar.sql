@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 27, 2025 at 02:41 PM
+-- Generation Time: Sep 29, 2025 at 03:21 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -70,7 +70,6 @@ CREATE TABLE `announcements` (
   `announcementID` int(11) NOT NULL,
   `courseID` int(11) NOT NULL,
   `userID` int(5) NOT NULL,
-  `announcementTitle` varchar(255) NOT NULL,
   `announcementContent` text NOT NULL,
   `announcementDate` date NOT NULL,
   `announcementTime` time NOT NULL,
@@ -81,8 +80,8 @@ CREATE TABLE `announcements` (
 -- Dumping data for table `announcements`
 --
 
-INSERT INTO `announcements` (`announcementID`, `courseID`, `userID`, `announcementTitle`, `announcementContent`, `announcementDate`, `announcementTime`, `isRequired`) VALUES
-(1, 1, 1, 'Project Deadline Reminder', 'Final project is due next week. Submit via LMS.', '2025-08-30', '09:00:00', 1);
+INSERT INTO `announcements` (`announcementID`, `courseID`, `userID`, `announcementContent`, `announcementDate`, `announcementTime`, `isRequired`) VALUES
+(1, 1, 1, 'Final project is due next week. Submit via LMS.', '2025-08-30', '09:00:00', 1);
 
 -- --------------------------------------------------------
 
@@ -93,8 +92,8 @@ INSERT INTO `announcements` (`announcementID`, `courseID`, `userID`, `announceme
 CREATE TABLE `assessments` (
   `assessmentID` int(11) NOT NULL,
   `courseID` int(11) NOT NULL,
-  `title` varchar(100) NOT NULL,
-  `type` enum('Task','Exam') DEFAULT 'Task',
+  `assessmentTitle` varchar(100) NOT NULL,
+  `type` enum('Task','Exam','Quiz') DEFAULT 'Task',
   `deadline` date NOT NULL,
   `createdAt` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -103,7 +102,7 @@ CREATE TABLE `assessments` (
 -- Dumping data for table `assessments`
 --
 
-INSERT INTO `assessments` (`assessmentID`, `courseID`, `title`, `type`, `deadline`, `createdAt`) VALUES
+INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `type`, `deadline`, `createdAt`) VALUES
 (1, 1, 'Activity #1', 'Task', '2025-09-09', '2025-09-04 22:00:15'),
 (2, 2, 'Exam #1', 'Exam', '2025-09-09', '2025-09-04 22:00:15'),
 (3, 1, 'Activity #2', 'Task', '2025-09-10', '2025-09-04 22:00:15'),
@@ -225,8 +224,8 @@ CREATE TABLE `inbox` (
 --
 
 INSERT INTO `inbox` (`inboxID`, `messageID`, `enrollmentID`, `userID`, `messageText`, `createdAt`, `isRead`) VALUES
-(1, 1, 1, 2, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 0),
-(2, 2, 2, 2, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 0);
+(1, 1, 1, 2, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 1),
+(2, 2, 2, 2, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 1);
 
 -- --------------------------------------------------------
 
@@ -264,8 +263,6 @@ CREATE TABLE `lessons` (
   `courseID` int(11) NOT NULL,
   `lessonTitle` varchar(255) NOT NULL,
   `lessonDescription` text NOT NULL,
-  `lessonContent` text NOT NULL,
-  `lessonType` varchar(255) NOT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -274,8 +271,8 @@ CREATE TABLE `lessons` (
 -- Dumping data for table `lessons`
 --
 
-INSERT INTO `lessons` (`lessonID`, `courseID`, `lessonTitle`, `lessonDescription`, `lessonContent`, `lessonType`, `createdAt`, `updatedAt`) VALUES
-(1, 1, 'Lesson 1: Introduction to CSS Grid', '1. Explain what HTML is and its role in web development.\n2. Identify the basic structure of an HTML document.\n3. Use common HTML tags such as headings, paragraphs, and links. \n4. Create a simple webpage using basic HTML elements.', 'Learn how to create grid layouts', 'Lecture', '2025-08-30 09:00:00', '2025-08-30 09:00:00');
+INSERT INTO `lessons` (`lessonID`, `courseID`, `lessonTitle`, `lessonDescription`, `createdAt`, `updatedAt`) VALUES
+(1, 1, 'Lesson 1: Introduction to CSS Grid', '1. Explain what HTML is and its role in web development.\n2. Identify the basic structure of an HTML document.\n3. Use common HTML tags such as headings, paragraphs, and links. \n4. Create a simple webpage using basic HTML elements.', '2025-08-30 09:00:00', '2025-08-30 09:00:00');
 
 -- --------------------------------------------------------
 

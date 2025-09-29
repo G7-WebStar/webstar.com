@@ -1,4 +1,58 @@
-<?php $activePage = 'assignment'; ?>
+<?php
+$activePage = 'assignment';
+
+include('shared/assets/database/connect.php');
+
+session_start();
+
+$userID = $_SESSION['userID'];
+
+$assignmentID = intval($_GET['assignmentID']);
+
+$userQuery = "SELECT * FROM users 
+              LEFT JOIN userinfo ON users.userID = userInfo.userID 
+              WHERE users.userID = $userID";
+$userResult = executeQuery($userQuery);
+
+$assignmentQuery = "SELECT * FROM users 
+                    LEFT JOIN userinfo ON users.userID = userInfo.userID 
+                    LEFT JOIN assignments ON users.userID = assignments.userID
+                    LEFT JOIN assessments on assignments.courseID = assessments.courseID
+                    LEFT JOIN courses ON users.userID = courses.userID
+                    LEFT JOIN lessons ON courses.courseID = lessons.courseID
+                    LEFT JOIN scores ON assignments.assignmentID = scores.assignmentID
+                    WHERE assignments.assignmentID = $assignmentID";
+$assignmentResult = executeQuery($assignmentQuery);
+
+$assignmentRow = mysqli_fetch_assoc($assignmentResult);
+
+
+$assignmentTitle = $assignmentRow['assessmentTitle'];
+$assignmentDescription = $assignmentRow['assignmentDescription'];
+$profName = $assignmentRow['firstName'] . ' ' . $assignmentRow['lastName'];
+$profProfile = $assignmentRow['profilePicture'];
+$deadline = $assignmentRow['deadline'];
+$score = $assignmentRow['score'] ?? null;
+$totalPoints = $assignmentRow['assignmentPoints'] ?? 0;
+
+$filesQuery = "SELECT * FROM files WHERE assignmentID = '$assignmentID'";
+$filesResult = executeQuery($filesQuery);
+
+$attachmentsArray = [];
+$linksArray = [];
+
+while ($file = mysqli_fetch_assoc($filesResult)) {
+    if (!empty($file['fileAttachment'])) {
+        $attachments = array_map('trim', explode(',', $file['fileAttachment']));
+        $attachmentsArray = array_merge($attachmentsArray, $attachments);
+    }
+
+    if (!empty($file['fileLink'])) {
+        $links = array_map('trim', explode(',', $file['fileLink']));
+        $linksArray = array_merge($linksArray, $links);
+    }
+}
+?>
 
 <!doctype html>
 <html lang="en">
@@ -43,19 +97,22 @@
                                 <!-- DESKTOP VIEW -->
                                 <div class="row desktop-header d-none d-sm-flex">
                                     <div class="col-auto me-2">
-                                        <a href="#" class="text-decoration-none">
+                                        <a href="todo.php?userID=<?php echo $userID; ?>" class="text-decoration-none">
                                             <i class="fa-solid fa-arrow-left text-reg text-16"
                                                 style="color: var(--black);"></i>
                                         </a>
                                     </div>
                                     <div class="col">
-                                        <span class="text-sbold text-25">Assignment #1</span>
-                                        <div class="text-reg text-18">Due Sept 9</div>
+                                        <span class="text-sbold text-25"><?php echo $assignmentTitle ?></span>
+                                        <div class="text-reg text-18">Due <?php echo date("M d, Y", strtotime($deadline)); ?></div>
                                     </div>
                                     <div class="col-auto text-end">
-                                        <div class="text-reg text-18">Graded</div>
+                                        <?php echo $score !== null ? 'Graded' : 'Pending'; ?>
                                         <div class="text-sbold text-25">
-                                            100<span class="text-muted">/100</span>
+                                            <?php
+                                            echo $score !== null ? $score : '-';
+                                            ?>
+                                            <span class="text-muted">/<?php echo $totalPoints; ?></span>
                                         </div>
                                     </div>
                                 </div>
@@ -65,16 +122,21 @@
                                 <div class="d-block d-sm-none mobile-assignment">
                                     <div class="mobile-top">
                                         <div class="arrow">
-                                            <a href="#" class="text-decoration-none">
+                                            <a href="todo.php?userID=<?php echo $userID; ?>" class="text-decoration-none">
                                                 <i class="fa-solid fa-arrow-left text-reg text-16"
                                                     style="color: var(--black);"></i>
                                             </a>
                                         </div>
-                                        <div class="title text-sbold text-25">Assignment #1</div>
+                                        <div class="title text-sbold text-25"><?php echo $assignmentTitle ?></div>
                                     </div>
-                                    <div class="due text-reg text-18">Due Sept 9</div>
-                                    <div class="graded text-reg text-18 mt-4">Graded</div>
-                                    <div class="score text-sbold text-25">100<span class="text-muted">/100</span></div>
+                                    <div class="due text-reg text-18">Due <?php echo date("M d, Y", strtotime($deadline)); ?></div>
+                                    <div class="graded text-reg text-18 mt-4"><?php echo $score !== null ? 'Graded' : 'Pending'; ?></div>
+                                    <div class="score text-sbold text-25">
+                                        <?php
+                                        echo $score !== null ? $score : '-';
+                                        ?>
+                                        <span class="text-muted"><?php echo $totalPoints; ?></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -84,20 +146,44 @@
                             <div class="col-12 col-lg-8">
                                 <div class="p-0 px-lg-5">
                                     <div class="text-sbold text-14 mt-3">Instructions</div>
-                                    <p class="mb-5 mt-3 text-med text-14">Attached is a Google Doc that you can edit.
-                                    </p>
-                                    <p class="mb-4 text-med text-14">In Figma, design a “404 Not Found” page.</p>
-                                    <p class="mb-1 text-med text-14">Create two versions, one for the mobile and one for
-                                        the desktop.
-                                        Turn in when done.</p>
-                                    <p class="mb-4 text-med text-14">Turn in when done.</p>
+                                    <p class="mb-5 mt-3 text-med text-14"><?php echo nl2br($assignmentDescription) ?></p>
 
                                     <hr>
 
                                     <div class="text-sbold text-14 mt-4">Attachments</div>
-                                    <div class="cardFile text-sbold text-16 my-3 w-lg-25" style="width:200px;">
-                                        <i class="px-4 py-3 fa-solid fa-file"></i> ADET A03
-                                    </div>
+                                    <?php foreach ($attachmentsArray as $file):
+                                        $filePath = "shared/uploads/" . $file;
+                                        $fileExt = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
+                                        $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
+                                        $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
+
+                                        // Remove extension from display name
+                                        $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
+                                    ?>
+                                        <div class="cardFile my-3 w-lg-25 d-flex align-items-start" style="width:400px; max-width:100%; min-width:310px;">
+                                            <i class="px-4 py-3 fa-solid fa-file"></i>
+                                            <div class="ms-2">
+                                                <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
+                                                <div class="due text-reg text-14 mb-1"><?php echo $fileExt ?> · <?php echo $fileSizeMB ?></div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+
+
+                                    <?php foreach ($linksArray as $link): ?>
+                                        <div class="cardFile my-3 w-lg-25 d-flex align-items-start" style="width:400px; max-width:100%; min-width:310px;">
+                                            <i class="px-4 py-3 fa-solid fa-link" style="font-size: 13px;"></i>
+                                            <div class="ms-2">
+                                                <!-- temoparary lang ang filename here -->
+                                                <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
+                                                <div class="text-reg link text-12 mt-0">
+                                                    <a href="<?php echo $link ?>" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: var(--black);">
+                                                        <?php echo $link ?>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
 
                                     <hr>
 
@@ -105,9 +191,10 @@
                                     <div class="d-flex align-items-center pb-5">
                                         <div class="rounded-circle me-2"
                                             style="width: 50px; height: 50px; background-color: var(--highlight75);">
+                                            <img src="shared/assets/pfp-uploads/<?php echo $profProfile ?>" alt="professor" class="rounded-circle" style="width:50px;height:50px;">
                                         </div>
                                         <div>
-                                            <div class="text-sbold text-14">Prof. Christian James</div>
+                                            <div class="text-sbold text-14"><?php echo $profName ?></div>
                                             <div class="text-med text-12">January 12, 2024 8:00AM</div>
                                         </div>
                                     </div>
@@ -154,10 +241,10 @@
                                             <button class="button px-3 py-1 flex-fill rounded-pill text-reg text-md-14">
                                                 + Attach Files
                                             </button>
-                                                <button class="button px-3 py-1 flex-fill rounded-pill text-reg text-md-14"
-                                                    style="background-color: var(--primaryColor);">
-                                                    Turn In
-                                                </button>
+                                            <button class="button px-3 py-1 flex-fill rounded-pill text-reg text-md-14"
+                                                style="background-color: var(--primaryColor);">
+                                                Turn In
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
