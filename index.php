@@ -71,7 +71,7 @@ $selectAnnouncementsResult = executeQuery($selectAnnouncementsQuery);
 
 $selectAssessmentQuery = "SELECT
     assessments.*,
-    assessments.title AS assessmentTitle,
+    assessments.assessmentTitle AS assessmentTitle,
     todo.*,
     todo.title AS todoTitle,
     courses.courseCode,
@@ -255,8 +255,10 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                                 <?php echo $announcements['announcementContent']; ?>
                                                                             </p>
                                                                         </div>
-                                                                        <i class="announcement-arrow ms-auto pe-2 fa-solid fa-arrow-right text-reg text-12 "
-                                                                            style="color: var(--black);"></i>
+                                                                        <a href="course-info.php?courseID=<?php echo $announcements['courseID']; ?>"
+                                                                            class="ms-auto pe-2 d-flex align-items-center text-decoration-none">
+                                                                            <i class="announcement-arrow fa-solid fa-arrow-right text-reg text-12" style="color: var(--black);"></i>
+                                                                        </a>
                                                                     </div>
                                                                 </div>
                                                             <?php
@@ -306,16 +308,23 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                     </div>
                                                     <!-- Scrollable course -->
                                                     <div style="height: 100%; overflow-y: auto; padding-right: 5px; scroll-behavior: smooth; scrollbar-width: none; -ms-overflow-style: none;">
-                                                        <!-- Card 1 -->
                                                         <?php
                                                         if (mysqli_num_rows($selectAssessmentResult) > 0) {
                                                             mysqli_data_seek($selectAssessmentResult, 0);
                                                             while ($activities = mysqli_fetch_assoc($selectAssessmentResult)) {
+                                                                $type = strtolower(trim($activities['type']));
+                                                                $link = "#";
+                                                                if ($type === 'task') {
+                                                                    $link = "assignment.php?assignmentID=" . $activities['assessmentID'];
+                                                                } elseif ($type === 'exam') {
+                                                                    $link = "exam.php?examID=" . $activities['assessmentID'];
+                                                                } elseif ($type === 'quiz') {
+                                                                    $link = "quiz.php?quizID=" . $activities['assessmentID'];
+                                                                }
                                                         ?>
                                                                 <div class="todo-card d-flex align-items-stretch mb-2">
                                                                     <!-- Date -->
-                                                                    <div
-                                                                        class="date d-flex align-items-center justify-content-center text-sbold text-20">
+                                                                    <div class="date d-flex align-items-center justify-content-center text-sbold text-20">
                                                                         <?php echo $activities['assessmentDeadline']; ?>
                                                                     </div>
                                                                     <!-- Main content -->
@@ -324,15 +333,18 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                         <div class="px-3 py-0">
                                                                             <div class="text-sbold text-16"><?php echo $activities['assessmentTitle']; ?></div>
                                                                             <div class="text-reg text-12"><?php echo $activities['courseCode']; ?></div>
-                                                                            <span
-                                                                                class="course-badge rounded-pill px-3 text-reg text-12 mt-2 d-inline d-md-none">Task</span>
+                                                                            <span class="course-badge rounded-pill px-3 text-reg text-12 mt-2 d-inline d-md-none">
+                                                                                <?php echo ucfirst($activities['type']); ?>
+                                                                            </span>
                                                                         </div>
                                                                         <!-- Pill and Arrow on Large screen-->
                                                                         <div class="d-flex align-items-center gap-2 ms-auto">
-                                                                            <span
-                                                                                class="course-badge rounded-pill px-3 text-reg text-12 d-none d-md-inline">Task</span>
-                                                                            <i class="fa-solid fa-arrow-right text-reg text-12 pe-2"
-                                                                                style="color: var(--black);"></i>
+                                                                            <span class="course-badge rounded-pill px-3 text-reg text-12 d-none d-md-inline">
+                                                                                <?php echo ucfirst($activities['type']); ?>
+                                                                            </span>
+                                                                            <a href="<?php echo $link; ?>" class="text-decoration-none">
+                                                                                <i class="fa-solid fa-arrow-right text-reg text-12 pe-2" style="color: var(--black);"></i>
+                                                                            </a>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -347,10 +359,16 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                         <?php
                                                         }
                                                         ?>
-                                                        <div style="display:flex; justify-content: flex-end; align-items: center; gap:6px; margin-right: 10px;">
-                                                            <a href="todo.php" class="text-decoration-none text-black"><span class="text-reg text-12" style="color: var(--black);"><?php echo $emptyAssessment ? '' : 'View More </span></a>
-                                                            <i class="fa-solid fa-arrow-right text-reg text-12" style="color: var(--black);"></i>'; ?>
-                                                        </div>
+
+                                                        <!-- View More (always to todo.php) -->
+                                                        <?php if (!$emptyAssessment) { ?>
+                                                            <div style="display:flex; justify-content: flex-end; align-items: center; gap:6px; margin-right: 10px;">
+                                                                <a href="todo.php" class="text-decoration-none text-black d-flex align-items-center gap-2">
+                                                                    <span class="text-reg text-12" style="color: var(--black);">View More</span>
+                                                                    <i class="fa-solid fa-arrow-right text-reg text-12" style="color: var(--black);"></i>
+                                                                </a>
+                                                            </div>
+                                                        <?php } ?>
                                                     </div>
                                                 </div>
                                             </div>
