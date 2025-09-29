@@ -1,5 +1,40 @@
 <?php $activePage = 'add-lesson'; ?>
 
+<?php
+include('../shared/assets/database/connect.php');
+
+session_start();
+
+
+if (!isset($_SESSION['userID'])) {
+    header("Location: ../login.php"); //mali pa yan
+    exit;
+}
+
+$userID = $_SESSION['userID'];
+
+$course = "SELECT courseID, courseCode 
+           FROM courses 
+           WHERE userID = '$userID'";
+$courses = executeQuery($course);
+
+if (isset($_POST['save_lesson'])) {
+    $title = $_POST['lessonTitle'];
+    $content = $_POST['lessonContent'];
+    $createdAt = date("Y-m-d H:i:s");
+    $updatedAt = date("Y-m-d H:i:s");
+
+    if (!empty($_POST['courses'])) {
+        foreach ($_POST['courses'] as $selectedCourseID) {
+            $lessons = "INSERT INTO lessons 
+                (courseID, lessonTitle, lessonDescription, createdAt, updatedAt) 
+                VALUES 
+                ('$selectedCourseID', '$title', '$content', '$createdAt', '$updatedAt')";
+            executeQuery($lessons);
+        }
+    }
+}
+?>
 <!doctype html>
 <html lang="en">
 
@@ -58,15 +93,14 @@
                                 </div>
 
                                 <!-- Form starts -->
-                                <form>
+                                <form action="" method="POST" enctype="multipart/form-data">
                                     <div class="row">
                                         <div class="col-12 pt-3 mb-3">
                                             <label for="lessonInfo" class="form-label text-med text-16">Lesson
                                                 Information</label>
                                             <input type="text"
                                                 class="form-control form-control textbox mb-3 p-2 text-reg text-14 text-muted"
-                                                id="lessonInfo" aria-describedby="lessonInfo"
-                                                placeholder="Lesson Title">
+                                                id="lessonInfo" name="lessonTitle" placeholder="Lesson Title" required>
                                         </div>
                                     </div>
 
@@ -87,7 +121,8 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <input type="hidden" name="lesson" id="lesson">
+                                            <!-- Hidden input to capture editor content -->
+                                            <input type="hidden" name="lessonContent" id="lesson">
                                         </div>
                                     </div>
 
@@ -97,8 +132,8 @@
                                             <div class="learning-materials">
                                                 <label class="text-med text-16 mt-4">Learning Materials</label>
                                                 <span class="fst-italic text-reg text-14 ms-2">You can add up to 10
-                                                    files or
-                                                    links.</span>
+                                                    files or links.</span>
+
                                                 <!-- Example Link Item -->
                                                 <div class="row mb-0">
                                                     <div class="col">
@@ -126,9 +161,8 @@
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                        <!-- Delete icon aligned to the right end -->
-                                                                        <div class="mx-4"> <img
-                                                                                src="../shared/assets/img/trash.png"
+                                                                        <div class="mx-4">
+                                                                            <img src="../shared/assets/img/trash.png"
                                                                                 alt="Delete Icon"
                                                                                 style="width: 12px; height: 16px;">
                                                                         </div>
@@ -146,9 +180,10 @@
                                                                         class="d-flex w-100 align-items-center justify-content-between">
                                                                         <div
                                                                             class="d-flex align-items-center flex-grow-1">
-                                                                            <div class="mx-4"> <i
-                                                                                    class="bi bi-file-earmark-fill"
-                                                                                    style="font-size: 18px;"></i> </div>
+                                                                            <div class="mx-4">
+                                                                                <i class="bi bi-file-earmark-fill"
+                                                                                    style="font-size: 18px;"></i>
+                                                                            </div>
                                                                             <div>
                                                                                 <div class="text-sbold text-16 py-1"
                                                                                     style="line-height: 1;">
@@ -160,38 +195,41 @@
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                        <!-- Delete icon aligned to the right end -->
-                                                                        <div class="mx-4"> <img
-                                                                                src="../shared/assets/img/trash.png"
+                                                                        <div class="mx-4">
+                                                                            <img src="../shared/assets/img/trash.png"
                                                                                 alt="Delete Icon"
                                                                                 style="width: 12px; height: 16px;">
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
+
                                                             <!-- Buttons -->
                                                             <div class="mt-3 mb-4 text-center text-md-start">
-                                                                <button type="submit"
+                                                                <button type="button"
                                                                     class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-2 ms-2"
-                                                                    style="background-color: var(--primaryColor); border: 1px solid var(--black);">
+                                                                    style="background-color: var(--primaryColor); border: 1px solid var(--black);"
+                                                                    onclick="document.getElementById('fileUpload').click()">
                                                                     <img src="../shared/assets/img/upload.png"
                                                                         alt="Upload Icon"
                                                                         style="width:12px; height:14px;" class="me-1">
                                                                     File
                                                                 </button>
+                                                                <input type="file" name="materials[]" id="fileUpload"
+                                                                    class="d-none" multiple>
 
                                                                 <button type="button"
                                                                     class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-2 ms-2"
                                                                     style="background-color: var(--primaryColor); border: 1px solid var(--black);"
-                                                                    data-bs-container="body"
-                                                                    data-bs-toggle="popover"
-                                                                    data-bs-placement="right"
-                                                                    data-bs-html="true"
+                                                                    data-bs-container="body" data-bs-toggle="popover"
+                                                                    data-bs-placement="right" data-bs-html="true"
                                                                     data-bs-content='<div class="form-floating mb-3"><input type="url" class="form-control" id="linkInput" placeholder="Paste link here"><label for="linkInput">Link</label></div><div class="link-popover-actions"><button type="button" class="btn btn-sm px-3 py-1 rounded-pill" id="addLinkBtn" style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);">Add link</button></div>'>
                                                                     <img src="../shared/assets/img/link.png"
                                                                         alt="Upload Icon" class="me-1">
                                                                     Link
                                                                 </button>
+                                                                <!-- Hidden input to store added links -->
+                                                                <input type="hidden" name="links[]" id="lessonLinks">
                                                             </div>
 
                                                         </div>
@@ -209,32 +247,41 @@
                                                                 class="btn dropdown-toggle dropdown-shape text-med text-16 me-md-5"
                                                                 type="button" data-bs-toggle="dropdown"
                                                                 aria-expanded="false">
-                                                                <span>COMP-006</span>
+                                                                <span>Select Course</span>
                                                             </button>
                                                             <ul class="dropdown-menu p-2" style="min-width: 200px;">
-                                                                <li>
-                                                                    <div class="form-check">
-                                                                        <input class="form-check-input" type="checkbox"
-                                                                            value="COMP-006" id="course1" checked>
-                                                                        <label class="form-check-label text-reg"
-                                                                            for="course1">COMP-006</label>
-                                                                    </div>
-                                                                </li>
-                                                                <li>
-                                                                    <div class="form-check">
-                                                                        <input class="form-check-input" type="checkbox"
-                                                                            value="COMP-007" id="course2">
-                                                                        <label class="form-check-label text-reg"
-                                                                            for="course2">COMP-007</label>
-                                                                    </div>
-                                                                </li>
+                                                                <?php
+                                                                if ($courses && $courses->num_rows > 0) {
+                                                                    while ($course = $courses->fetch_assoc()) {
+                                                                        ?>
+                                                                        <li>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" type="checkbox"
+                                                                                    name="courses[]"
+                                                                                    value="<?php echo htmlspecialchars($course['courseID']); ?>"
+                                                                                    id="course<?php echo $course['courseID']; ?>">
+                                                                                <label class="form-check-label text-reg"
+                                                                                    for="course<?php echo $course['courseID']; ?>">
+                                                                                    <?php echo htmlspecialchars($course['courseCode']); ?>
+                                                                                </label>
+                                                                            </div>
+                                                                        </li>
+                                                                        <?php
+                                                                    }
+                                                                } else {
+                                                                    ?>
+                                                                    <li><span class="dropdown-item-text text-muted">No
+                                                                            courses found</span></li>
+                                                                    <?php
+                                                                }
+                                                                ?>
                                                             </ul>
                                                         </div>
                                                     </div>
                                                     <!-- Add Button -->
                                                     <div
                                                         class="col-md-6 text-center text-md-center mt-3 mt-md-0 ms-md-5">
-                                                        <button type="submit"
+                                                        <button type="submit" name="save_lesson"
                                                             class="px-4 py-2 rounded-pill text-sbold text-md-14 mt-3 ms-3"
                                                             style="background-color: var(--primaryColor); border: 1px solid var(--black);">
                                                             Add
@@ -245,6 +292,7 @@
                                         </div>
                                     </div>
                                 </form>
+                                <!-- End Form -->
                             </div>
                         </div>
                     </div>
@@ -274,21 +322,19 @@
             if (words > maxWords) {
                 let limited = text.split(/\s+/).slice(0, maxWords).join(" ");
                 quill.setText(limited + " ");
-                quill.setSelection(quill.getLength()); // keep cursor at end
+                quill.setSelection(quill.getLength());
             }
 
             counter.textContent = `${Math.min(words, maxWords)}/${maxWords}`;
         });
 
-        // Sync content to hidden input before submit
-        // document.querySelector('form').addEventListener('submit', function () {
-        //     document.querySelector('#announcement').value = quill.root.innerHTML;
-        // });
-
+        // Sync editor content before form submit
+        document.querySelector('form').addEventListener('submit', function () {
+            document.querySelector('#lesson').value = quill.root.innerHTML;
+        });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Initialize Bootstrap popovers for Link button
         document.addEventListener('DOMContentLoaded', function () {
             var triggers = document.querySelectorAll('[data-bs-toggle="popover"]');
             triggers.forEach(function (el) {
@@ -297,7 +343,6 @@
                     container: 'body',
                     sanitize: false
                 });
-                // Add custom class to the created popover for styling
                 el.addEventListener('shown.bs.popover', function () {
                     var tip = document.querySelector('.popover.show');
                     if (tip) {

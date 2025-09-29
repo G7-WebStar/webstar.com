@@ -1,5 +1,53 @@
 <?php $activePage = 'assign-task'; ?>
 
+<?php
+
+include('../shared/assets/database/connect.php');
+
+session_start();
+
+
+if (!isset($_SESSION['userID'])) {
+    header("Location: ../login.php"); //mali pa yan
+    exit;
+}
+
+$userID = $_SESSION['userID'];
+
+$course = "SELECT courseID, courseCode 
+           FROM courses 
+           WHERE userID = '$userID'";
+$courses = executeQuery($course);
+
+if (isset($_POST['save_assignment'])) {
+    $title = $_POST['taskTitle'];
+    $content = $_POST['taskContent'];
+    $assignmentDeadline = !empty($_POST['deadline']) ? $_POST['deadline'] : null;
+    $assignmentPoints = !empty($_POST['points']) ? $_POST['points'] : 0;
+
+    $createdAt = date("Y-m-d H:i:s");
+
+    if (!empty($_POST['courses'])) {
+        foreach ($_POST['courses'] as $selectedCourseID) {
+            $assignments = "INSERT INTO assignments 
+                (courseID, userID, assignmentTitle, assignmentDescription, assignmentDeadline, assignmentPoints) 
+                VALUES 
+                ('$selectedCourseID', '$userID', '$title', '$content', " .
+                ($assignmentDeadline ? "'$assignmentDeadline'" : "NULL") . ", 
+                '$assignmentPoints')";
+            executeQuery($assignments);
+
+            $assessments = "INSERT INTO assessments
+                (courseID, title, type, deadline, createdAt) 
+                VALUES 
+                ('$selectedCourseID', '$title', 'task', " .
+                ($assignmentDeadline ? "'$assignmentDeadline'" : "NULL") . ", 
+                '$createdAt')";
+            executeQuery($assessments);
+        }
+    }
+}
+?>
 <!doctype html>
 <html lang="en">
 
@@ -58,14 +106,14 @@
                                 </div>
 
                                 <!-- Form starts -->
-                                <form>
+                                <form action="" method="POST" enctype="multipart/form-data">
                                     <div class="row">
                                         <div class="col-12 pt-3 mb-3">
                                             <label for="lessonInfo" class="form-label text-med text-16">Task
                                                 Information</label>
                                             <input type="text"
                                                 class="form-control textbox mb-3 p-2 text-reg text-14 text-muted"
-                                                id="lessonInfo" aria-describedby="lessonInfo" placeholder="Task Title">
+                                                id="lessonInfo" name="taskTitle" placeholder="Task Title" required>
                                         </div>
                                     </div>
 
@@ -86,7 +134,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <input type="hidden" name="task" id="task">
+                                            <input type="hidden" name="taskContent" id="task">
                                         </div>
                                     </div>
 
@@ -100,7 +148,7 @@
                                                 <span class="fst-italic text-reg text-12">Optional.</span>
                                                 <div class="input-group" style="max-width: 320px;">
                                                     <input type="datetime-local"
-                                                        class="form-control textbox text-reg text-14" />
+                                                        class="form-control textbox text-reg text-14" name="deadline">
                                                 </div>
                                             </div>
 
@@ -112,12 +160,13 @@
                                                 <span class="fst-italic text-reg text-12">Optional. Ungraded if left
                                                     blank</span>
                                                 <input type="number" class="form-control textbox text-reg text-14"
-                                                    style="max-width: 320px;" placeholder="100" />
+                                                    style="max-width: 320px;" name="points" placeholder="100" />
                                             </div>
                                         </div>
 
                                         <div class="form-check mt-2 col ms-2">
                                             <input class="form-check-input" type="checkbox" id="stopSubmissions"
+                                                name="stop_submissions" value="1"
                                                 style="border: 1px solid var(--black);" />
                                             <label class="form-check-label" for="stopSubmissions">
                                                 Stop accepting submissions after the deadline.
@@ -132,11 +181,12 @@
                                             <div class="learning-materials">
                                                 <label class="text-med text-16 mt-5">Learning Materials</label>
                                                 <span class="fst-italic text-reg text-12 ms-2">You can add up to 10
-                                                    files or
-                                                    links.</span>
+                                                    files or links.</span>
+
                                                 <!-- Example Link Item -->
                                                 <div class="row mb-0">
                                                     <div class="col">
+                                                        <!-- Cards stay exactly as you had them -->
                                                         <div class="row mb-0 mt-3">
                                                             <div class="col-12">
                                                                 <div
@@ -161,9 +211,8 @@
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                        <!-- Delete icon aligned to the right end -->
-                                                                        <div class="mx-4"> <img
-                                                                                src="../shared/assets/img/trash.png"
+                                                                        <div class="mx-4">
+                                                                            <img src="../shared/assets/img/trash.png"
                                                                                 alt="Delete Icon"
                                                                                 style="width: 12px; height: 16px;">
                                                                         </div>
@@ -181,9 +230,10 @@
                                                                         class="d-flex w-100 align-items-center justify-content-between">
                                                                         <div
                                                                             class="d-flex align-items-center flex-grow-1">
-                                                                            <div class="mx-4"> <i
-                                                                                    class="bi bi-file-earmark-fill"
-                                                                                    style="font-size: 18px;"></i> </div>
+                                                                            <div class="mx-4">
+                                                                                <i class="bi bi-file-earmark-fill"
+                                                                                    style="font-size: 18px;"></i>
+                                                                            </div>
                                                                             <div>
                                                                                 <div class="text-sbold text-16 py-1"
                                                                                     style="line-height: 1;">
@@ -195,9 +245,8 @@
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                        <!-- Delete icon aligned to the right end -->
-                                                                        <div class="mx-4"> <img
-                                                                                src="../shared/assets/img/trash.png"
+                                                                        <div class="mx-4">
+                                                                            <img src="../shared/assets/img/trash.png"
                                                                                 alt="Delete Icon"
                                                                                 style="width: 12px; height: 16px;">
                                                                         </div>
@@ -207,24 +256,33 @@
 
                                                             <!-- Buttons -->
                                                             <div class="mt-3 mb-4 text-center text-md-start">
-                                                                <button type="submit"
+                                                                <input type="file" name="materials[]" class="d-none"
+                                                                    id="fileUpload" multiple>
+                                                                <button type="button"
                                                                     class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-2 ms-2"
-                                                                    style="background-color: var(--primaryColor); border: 1px solid var(--black);">
+                                                                    style="background-color: var(--primaryColor); border: 1px solid var(--black);"
+                                                                    onclick="document.getElementById('fileUpload').click();">
                                                                     <img src="../shared/assets/img/upload.png"
                                                                         alt="Upload Icon"
                                                                         style="width:12px; height:14px;" class="me-1">
                                                                     File
                                                                 </button>
 
-                                                                <button type="submit"
+                                                                <input type="file" name="materials[]" id="fileUpload"
+                                                                    class="d-none" multiple>
+                                                                <button type="button"
                                                                     class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-2 ms-2"
-                                                                    style="background-color: var(--primaryColor); border: 1px solid var(--black);">
+                                                                    style="background-color: var(--primaryColor); border: 1px solid var(--black);"
+                                                                    data-bs-container="body" data-bs-toggle="popover"
+                                                                    data-bs-placement="right" data-bs-html="true"
+                                                                    data-bs-content='<div class="form-floating mb-3"><input type="url" class="form-control" id="linkInput" placeholder="Paste link here"><label for="linkInput">Link</label></div><div class="link-popover-actions"><button type="button" class="btn btn-sm px-3 py-1 rounded-pill" id="addLinkBtn" style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);">Add link</button></div>'>
                                                                     <img src="../shared/assets/img/link.png"
                                                                         alt="Upload Icon" class="me-1">
                                                                     Link
                                                                 </button>
+                                                                <!-- Hidden input to store added links -->
+                                                                <input type="hidden" name="links[]" id="taskLinks">
                                                             </div>
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -260,9 +318,8 @@
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                        <!-- Delete icon aligned to the right end -->
-                                                                        <div class="mx-4"> <img
-                                                                                src="../shared/assets/img/trash.png"
+                                                                        <div class="mx-4">
+                                                                            <img src="../shared/assets/img/trash.png"
                                                                                 alt="Delete Icon"
                                                                                 style="width: 12px; height: 16px;">
                                                                         </div>
@@ -273,9 +330,10 @@
 
                                                         <!-- Buttons -->
                                                         <div class="mt-3 mb-4 text-center text-md-start">
-                                                            <button type="submit"
+                                                            <button type="button"
                                                                 class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-2 ms-2"
-                                                                style="background-color: var(--primaryColor); border: 1px solid var(--black);">
+                                                                style="background-color: var(--primaryColor); border: 1px solid var(--black);"
+                                                                onclick="document.getElementById('rubricUpload').click();">
                                                                 <i class="bi bi-plus-circle me-1"
                                                                     style="font-size: 14px;"></i>
                                                                 Rubric
@@ -290,37 +348,45 @@
                                                 <div
                                                     class="col-12 col-md-auto mt-3 d-flex justify-content-center justify-content-md-start">
                                                     <div class="d-flex align-items-center flex-nowrap">
-                                                        <span class="me-2 text-med text-16 pe-3">Assign to
-                                                            Course</span>
+                                                        <span class="me-2 text-med text-16 pe-3">Assign to Course</span>
                                                         <button
                                                             class="btn dropdown-toggle dropdown-shape text-med text-16 me-md-3"
                                                             type="button" data-bs-toggle="dropdown"
                                                             aria-expanded="false">
-                                                            <span>COMP-006</span>
+                                                            <span>Select Course</span>
                                                         </button>
                                                         <ul class="dropdown-menu p-2" style="min-width: 200px;">
-                                                            <li>
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox"
-                                                                        value="COMP-006" id="course1" checked>
-                                                                    <label class="form-check-label text-reg"
-                                                                        for="course1">COMP-006</label>
-                                                                </div>
-                                                            </li>
-                                                            <li>
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox"
-                                                                        value="COMP-007" id="course2">
-                                                                    <label class="form-check-label text-reg"
-                                                                        for="course2">COMP-007</label>
-                                                                </div>
-                                                            </li>
+                                                            <?php
+                                                            if ($courses && $courses->num_rows > 0) {
+                                                                while ($course = $courses->fetch_assoc()) {
+                                                                    ?>
+                                                                    <li>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" type="checkbox"
+                                                                                name="courses[]"
+                                                                                value="<?php echo htmlspecialchars($course['courseID']); ?>"
+                                                                                id="course<?php echo $course['courseID']; ?>">
+                                                                            <label class="form-check-label text-reg"
+                                                                                for="course<?php echo $course['courseID']; ?>">
+                                                                                <?php echo htmlspecialchars($course['courseCode']); ?>
+                                                                            </label>
+                                                                        </div>
+                                                                    </li>
+                                                                    <?php
+                                                                }
+                                                            } else {
+                                                                ?>
+                                                                <li><span class="dropdown-item-text text-muted">No courses
+                                                                        found</span></li>
+                                                                <?php
+                                                            }
+                                                            ?>
                                                         </ul>
                                                     </div>
                                                 </div>
                                                 <!-- Assign Button -->
                                                 <div class="col-md-6 text-center text-md-center mt-3 mt-md-0 ms-md-5">
-                                                    <button type="submit"
+                                                    <button type="submit" name="save_assignment"
                                                         class="px-4 py-2 rounded-pill text-sbold text-md-14 mt-3 ms-3"
                                                         style="background-color: var(--primaryColor); border: 1px solid var(--black);">
                                                         Assign
@@ -342,7 +408,7 @@
     <!-- Quill JS -->
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script>
-       var quill = new Quill('#editor', {
+        var quill = new Quill('#editor', {
             theme: 'snow',
             placeholder: 'Task Instructions',
             modules: {
@@ -360,16 +426,34 @@
             if (words > maxWords) {
                 let limited = text.split(/\s+/).slice(0, maxWords).join(" ");
                 quill.setText(limited + " ");
-                quill.setSelection(quill.getLength()); // keep cursor at end
+                quill.setSelection(quill.getLength());
             }
 
             counter.textContent = `${Math.min(words, maxWords)}/${maxWords}`;
         });
 
         // Sync content to hidden input before submit
-        // document.querySelector('form').addEventListener('submit', function () {
-        //     document.querySelector('#announcement').value = quill.root.innerHTML;
-        // });
+        document.querySelector('form').addEventListener('submit', function () {
+            document.querySelector('#task').value = quill.root.innerHTML;
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var triggers = document.querySelectorAll('[data-bs-toggle="popover"]');
+            triggers.forEach(function (el) {
+                var pop = new bootstrap.Popover(el, {
+                    html: true,
+                    container: 'body',
+                    sanitize: false
+                });
+                el.addEventListener('shown.bs.popover', function () {
+                    var tip = document.querySelector('.popover.show');
+                    if (tip) {
+                        tip.classList.add('link-popover');
+                    }
+                });
+            });
+        });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
