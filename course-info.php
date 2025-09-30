@@ -85,6 +85,7 @@ if (isset($_GET['courseID'])) {
     <link rel="stylesheet" href="shared/assets/css/global-styles.css">
     <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
     <link rel="stylesheet" href="shared/assets/css/course-Info.css">
+    <link rel="stylesheet" href="shared/assets/css/lessons-info.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
@@ -199,12 +200,27 @@ if (isset($_GET['courseID'])) {
                                                                             <div class="text-sbold text-12"><?php echo $activities['assessmentTitle']; ?></div>
                                                                         </div>
                                                                         <div class="course-badge rounded-pill px-3 text-reg text-12">
-                                                                            <?php echo $activities['type']; ?></div>
+                                                                            <?php echo $activities['type']; ?>
+
+                                                                            <?php
+                                                                            $type = strtolower(trim($activities['type']));
+                                                                            $link = "#";
+
+                                                                            if ($type === 'task') {
+                                                                                $link = "assignment.php?assignmentID=" . $activities['assessmentID'];
+                                                                            } elseif ($type === 'exam') {
+                                                                                $link = "exam.php?examID=" . $activities['assessmentID'];
+                                                                            } elseif ($type === 'quiz') {
+                                                                                $link = "quiz.php?quizID=" . $activities['assessmentID'];
+                                                                            }
+                                                                            ?>
+                                                                        </div>
 
                                                                         <!-- Arrow icon that always shows and aligns to the right -->
                                                                         <div class="ms-auto">
-                                                                            <i class="fa-solid fa-arrow-right text-reg text-12"
-                                                                                style="color: var(--black);"></i>
+                                                                            <a href="<?php echo $link; ?>" class="text-decoration-none">
+                                                                                <i class="fa-solid fa-arrow-right text-reg text-12 pe-2" style="color: var(--black);"></i>
+                                                                            </a>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -392,7 +408,7 @@ if (isset($_GET['courseID'])) {
                                                         Files
                                                     </a>
                                                 </li>
-                                                 <li class="nav-item" role="presentation">
+                                                <li class="nav-item" role="presentation">
                                                     <a class="nav-link" id="link-tab" data-bs-toggle="tab"
                                                         href="#link" role="tab" aria-controls="link"
                                                         aria-selected="false">
@@ -439,7 +455,7 @@ if (isset($_GET['courseID'])) {
                                                     <li class="nav-item">
                                                         <a class="nav-link" id="files-tab" data-bs-toggle="tab" href="#files" role="tab">Files</a>
                                                     </li>
-                                                     <li class="nav-item">
+                                                    <li class="nav-item">
                                                         <a class="nav-link" id="link-tab" data-bs-toggle="tab" href="#link" role="tab">Links</a>
                                                     </li>
                                                     <li class="nav-item nav-leaderboard">
@@ -584,8 +600,8 @@ if (isset($_GET['courseID'])) {
                                             });
                                         </script>
                                         <!-- Hide sort on reports -->
-                                         <script>
-                                            document.addEventListener("DOMContentLoaded", function () {
+                                        <script>
+                                            document.addEventListener("DOMContentLoaded", function() {
                                                 const sortBy = document.getElementById("header");
                                                 const reportTab = document.getElementById("report-tab");
                                                 const otherTabs = document.querySelectorAll('#myTab a[data-bs-toggle="tab"], #mobileTabScroll a[data-bs-toggle="tab"]');
@@ -600,7 +616,7 @@ if (isset($_GET['courseID'])) {
 
                                                 // Desktop & Mobile tab switching
                                                 otherTabs.forEach(tab => {
-                                                    tab.addEventListener("shown.bs.tab", function (e) {
+                                                    tab.addEventListener("shown.bs.tab", function(e) {
                                                         const targetId = e.target.getAttribute("href").replace("#", "");
                                                         toggleSortBy(targetId);
                                                     });
