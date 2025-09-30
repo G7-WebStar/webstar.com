@@ -25,20 +25,23 @@ if (isset($_POST['save_announcement'])) {
     if (!empty($_POST['courses'])) {
         foreach ($_POST['courses'] as $selectedCourseID) {
 
+            // Generate a unique announcementID manually
+            $announcementID = uniqid(); // Generates a unique string ID
+
             // Insert announcement
             $insertAnnouncement = "INSERT INTO announcements 
-                (courseID, userID, announcementContent, announcementDate, announcementTime, isRequired) 
+                (announcementID, courseID, userID, announcementContent, announcementDate, announcementTime, isRequired) 
                 VALUES 
-                ('$selectedCourseID', '$userID', '$content', '$date', '$time', '$isRequired')";
+                ('$announcementID', '$selectedCourseID', '$userID', '$content', '$date', '$time', '$isRequired')";
             executeQuery($insertAnnouncement);
-
-            // Get the new announcementID
-            global $conn;
-            $announcementID = mysqli_insert_id($conn);
 
             // Handle file uploads
             if (!empty($_FILES['materials']['name'][0])) {
                 $uploadDir = __DIR__ . "/../shared/assets/files/";
+
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
 
                 foreach ($_FILES['materials']['name'] as $key => $fileName) {
                     $tmpName = $_FILES['materials']['tmp_name'][$key];
@@ -75,6 +78,7 @@ if (isset($_POST['save_announcement'])) {
                     }
                 }
             }
+
         }
     }
 }
@@ -93,8 +97,7 @@ if (isset($_GET['fetchTitle'])) {
     if ($html !== false) {
         if (preg_match('/<meta property="og:title" content="([^"]+)"/i', $html, $matches)) {
             $title = $matches[1];
-        }
-        elseif (preg_match("/<title>(.*?)<\/title>/i", $html, $matches)) {
+        } elseif (preg_match("/<title>(.*?)<\/title>/i", $html, $matches)) {
             $title = $matches[1];
         }
     }
@@ -374,7 +377,7 @@ if (isset($_GET['fetchTitle'])) {
                         const urlObj = new URL(linkValue);
                         const domain = urlObj.hostname;
                         const faviconURL = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
-                        
+
                         // Unique ID for link preview elements
                         const uniqueID = Date.now();
                         let displayTitle = "Loading...";
