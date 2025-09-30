@@ -396,7 +396,7 @@ if (isset($_GET['courseID'])) {
                                                     <a class="nav-link" id="link-tab" data-bs-toggle="tab"
                                                         href="#link" role="tab" aria-controls="link"
                                                         aria-selected="false">
-                                                        Link
+                                                        Links
                                                     </a>
                                                 </li>
                                                 <li class="nav-item nav-leaderboard" role="presentation">
@@ -440,7 +440,7 @@ if (isset($_GET['courseID'])) {
                                                         <a class="nav-link" id="files-tab" data-bs-toggle="tab" href="#files" role="tab">Files</a>
                                                     </li>
                                                      <li class="nav-item">
-                                                        <a class="nav-link" id="link-tab" data-bs-toggle="tab" href="#link" role="tab">Link</a>
+                                                        <a class="nav-link" id="link-tab" data-bs-toggle="tab" href="#link" role="tab">Links</a>
                                                     </li>
                                                     <li class="nav-item nav-leaderboard">
                                                         <a class="nav-link" id="leaderboard-tab" data-bs-toggle="tab" href="#leaderboard" role="tab">Leaderboard</a>
