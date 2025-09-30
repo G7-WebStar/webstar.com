@@ -35,7 +35,7 @@ if (isset($_GET['courseID'])) {
 
     $selectAssessmentQuery = "SELECT
     assessments.*,
-    assessments.title AS assessmentTitle,
+    assessments.assessmentTitle AS assessmentTitle,
     todo.*,
     todo.title AS todoTitle,
     courses.courseCode,
@@ -355,11 +355,26 @@ if (isset($_GET['courseID'])) {
                                                                             <div
                                                                                 class="course-badge rounded-pill px-3 text-reg text-12">
                                                                                 <?php echo $activities['type']; ?>
+
+                                                                                <?php
+                                                                                $type = strtolower(trim($activities['type']));
+                                                                                $link = "#";
+
+                                                                                if ($type === 'task') {
+                                                                                    $link = "assignment.php?assignmentID=" . $activities['assessmentID'];
+                                                                                } elseif ($type === 'exam') {
+                                                                                    $link = "exam.php?examID=" . $activities['assessmentID'];
+                                                                                } elseif ($type === 'quiz') {
+                                                                                    $link = "quiz.php?quizID=" . $activities['assessmentID'];
+                                                                                }
+                                                                                ?>
+
                                                                             </div>
                                                                             <div class="d-none d-lg-block"
                                                                                 style="margin-left: auto; margin-right: 10px;">
-                                                                                <i class="fa-solid fa-arrow-right text-reg text-12"
-                                                                                    style="color: var(--black);"></i>
+                                                                                <a href="<?php echo $link; ?>" class="text-decoration-none">
+                                                                                    <i class="fa-solid fa-arrow-right text-reg text-12 pe-2" style="color: var(--black);"></i>
+                                                                                </a>
                                                                             </div>
                                                                         </div>
                                                                     </div>

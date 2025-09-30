@@ -20,7 +20,6 @@ if (isset($_POST['announcementID'])) {
 $announcementQuery = "
     SELECT 
         a.announcementID,
-        a.announcementTitle,
         a.announcementContent,
         a.announcementDate,
         a.announcementTime,

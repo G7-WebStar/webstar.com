@@ -15,7 +15,7 @@ $selectInboxQuery = "SELECT
 inbox.createdAt AS inboxCreatedAt,
 inbox.messageText,
 courses.courseCode,
-assessments.title AS assessmentTitle,
+assessments.assessmentTitle AS assessmentTitle,
 userinfo.profilePicture AS profPFP
 FROM inbox
 INNER JOIN enrollments

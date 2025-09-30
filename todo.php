@@ -13,7 +13,7 @@ $selectEnrolledResult = executeQuery($selectEnrolledQuery);
 
 $selectAssessmentQuery = "SELECT
     assessments.*,
-    assessments.title AS assessmentTitle,
+    assessments.assessmentTitle AS assessmentTitle,
     todo.*,
     todo.title AS todoTitle,
     courses.courseCode,
@@ -169,14 +169,25 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                                                 class="course-badge rounded-pill px-3 text-reg text-12 mt-2 d-inline d-md-none">
                                                                 <?php echo $todo['type']; ?>
                                                             </span>
+
+                                                            <?php
+                                                            $type = strtolower(trim($todo['type']));
+                                                            $link = "#";
+
+                                                            if ($type === 'task') {
+                                                                $link = "assignment.php?assignmentID=" . $todo['assessmentID'];
+                                                            } elseif ($type === 'exam') {
+                                                                $link = "exam.php?examID=" . $todo['assessmentID'];
+                                                            } elseif ($type === 'quiz') {
+                                                                $link = "quiz.php?quizID=" . $todo['assessmentID'];
+                                                            }
+                                                            ?>
+
                                                         </div>
                                                         <!-- Pill and Arrow on Large screen-->
-                                                        <div class="d-flex align-items-center gap-2 ms-auto">
-                                                            <span
-                                                                class="course-badge rounded-pill px-3 text-reg text-12 d-none d-md-inline"><?php echo $todo['type']; ?></span>
-                                                            <i class="fa-solid fa-arrow-right text-reg text-12 pe-2"
-                                                                style="color: var(--black);"></i>
-                                                        </div>
+                                                        <a href="<?php echo $link; ?>" class="text-decoration-none">
+                                                            <i class="fa-solid fa-arrow-right text-reg text-12 pe-2" style="color: var(--black);"></i>
+                                                        </a>
                                                     </div>
                                                 </div>
                                         <?php
