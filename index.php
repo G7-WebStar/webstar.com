@@ -183,7 +183,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                         <div><?php echo $studentEnrolled['totalEnrollments']; ?></div>
                                                     </div>
                                                     <!-- Scrollable course -->
-                                                    <div class="ps-4 pb-4" style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth;">
+                                                    <div class="ps-4 pb-3 overflow-x-auto scroll-attachments" style="padding-bottom: 20px;">
                                                         <div style="display: inline-flex; gap: 12px;">
                                                             <?php
                                                             if (mysqli_num_rows($selectEnrolledResult) > 0) {

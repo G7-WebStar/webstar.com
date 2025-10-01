@@ -40,6 +40,10 @@ if (isset($_POST['save_announcement'])) {
             if (!empty($_FILES['materials']['name'][0])) {
                 $uploadDir = __DIR__ . "/../shared/assets/files/";
 
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+
                 foreach ($_FILES['materials']['name'] as $key => $fileName) {
                     $tmpName = $_FILES['materials']['tmp_name'][$key];
                     $fileError = $_FILES['materials']['error'][$key];
@@ -93,8 +97,7 @@ if (isset($_GET['fetchTitle'])) {
     if ($html !== false) {
         if (preg_match('/<meta property="og:title" content="([^"]+)"/i', $html, $matches)) {
             $title = $matches[1];
-        }
-        elseif (preg_match("/<title>(.*?)<\/title>/i", $html, $matches)) {
+        } elseif (preg_match("/<title>(.*?)<\/title>/i", $html, $matches)) {
             $title = $matches[1];
         }
     }
@@ -374,7 +377,7 @@ if (isset($_GET['fetchTitle'])) {
                         const urlObj = new URL(linkValue);
                         const domain = urlObj.hostname;
                         const faviconURL = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
-                        
+
                         // Unique ID for link preview elements
                         const uniqueID = Date.now();
                         let displayTitle = "Loading...";
