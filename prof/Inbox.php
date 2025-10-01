@@ -1,20 +1,3 @@
-<?php $activePage = 'inbox'; ?>
-
-<?php
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
-include '../shared/assets/database/connect.php';
-
-$profInboxCount = 0;
-if (isset($conn)) {
-  $res = mysqli_query($conn, "SELECT COUNT(*) AS cnt FROM inbox");
-  if ($res) {
-    $row = mysqli_fetch_assoc($res);
-    if (isset($row['cnt'])) { $profInboxCount = (int)$row['cnt']; }
-  }
-}
-$_SESSION['profInboxCount'] = $profInboxCount;
-?>
-
 <!doctype html>
 <html lang="en">
 
@@ -89,6 +72,7 @@ $_SESSION['profInboxCount'] = $profInboxCount;
                                                     <li><a class="dropdown-item text-reg" href="#">Unread first</a></li>
                                                 </ul>
                                             </div>
+
 
                                             <!-- Course dropdown -->
                                             <div class="d-flex align-items-center flex-nowrap">
