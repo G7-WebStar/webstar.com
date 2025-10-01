@@ -25,15 +25,16 @@ if (isset($_POST['save_announcement'])) {
     if (!empty($_POST['courses'])) {
         foreach ($_POST['courses'] as $selectedCourseID) {
 
-            // Generate a unique announcementID manually
-            $announcementID = uniqid(); // Generates a unique string ID
-
             // Insert announcement
             $insertAnnouncement = "INSERT INTO announcements 
-                (announcementID, courseID, userID, announcementContent, announcementDate, announcementTime, isRequired) 
+                (courseID, userID, announcementContent, announcementDate, announcementTime, isRequired) 
                 VALUES 
-                ('$announcementID', '$selectedCourseID', '$userID', '$content', '$date', '$time', '$isRequired')";
+                ('$selectedCourseID', '$userID', '$content', '$date', '$time', '$isRequired')";
             executeQuery($insertAnnouncement);
+
+            // Get the new announcementID
+            global $conn;
+            $announcementID = mysqli_insert_id($conn);
 
             // Handle file uploads
             if (!empty($_FILES['materials']['name'][0])) {
@@ -78,7 +79,6 @@ if (isset($_POST['save_announcement'])) {
                     }
                 }
             }
-
         }
     }
 }
