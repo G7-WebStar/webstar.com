@@ -21,8 +21,6 @@ $selectAssessmentQuery = "SELECT
     FROM assessments
     INNER JOIN courses
         ON assessments.courseID = courses.courseID
-    INNER JOIN enrollments
-        ON courses.courseID = enrollments.courseID
     INNER JOIN todo
     	ON assessments.assessmentID = todo.assessmentID
     WHERE todo.userID = '$userID' AND todo.status = 'Pending'

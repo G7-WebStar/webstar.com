@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 29, 2025 at 03:21 PM
+-- Generation Time: Oct 01, 2025 at 06:23 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -70,6 +70,7 @@ CREATE TABLE `announcements` (
   `announcementID` int(11) NOT NULL,
   `courseID` int(11) NOT NULL,
   `userID` int(5) NOT NULL,
+  `announcementTitle` varchar(255) NOT NULL,
   `announcementContent` text NOT NULL,
   `announcementDate` date NOT NULL,
   `announcementTime` time NOT NULL,
@@ -80,8 +81,8 @@ CREATE TABLE `announcements` (
 -- Dumping data for table `announcements`
 --
 
-INSERT INTO `announcements` (`announcementID`, `courseID`, `userID`, `announcementContent`, `announcementDate`, `announcementTime`, `isRequired`) VALUES
-(1, 1, 1, 'Final project is due next week. Submit via LMS.', '2025-08-30', '09:00:00', 1);
+INSERT INTO `announcements` (`announcementID`, `courseID`, `userID`, `announcementTitle`, `announcementContent`, `announcementDate`, `announcementTime`, `isRequired`) VALUES
+(1, 1, 1, 'Project Deadline Reminder', 'Final project is due next week. Submit via LMS.', '2025-08-30', '09:00:00', 1);
 
 -- --------------------------------------------------------
 
@@ -93,7 +94,7 @@ CREATE TABLE `assessments` (
   `assessmentID` int(11) NOT NULL,
   `courseID` int(11) NOT NULL,
   `assessmentTitle` varchar(100) NOT NULL,
-  `type` enum('Task','Exam','Quiz') DEFAULT 'Task',
+  `type` enum('Task','Exam') DEFAULT 'Task',
   `deadline` date NOT NULL,
   `createdAt` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -104,7 +105,7 @@ CREATE TABLE `assessments` (
 
 INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `type`, `deadline`, `createdAt`) VALUES
 (1, 1, 'Activity #1', 'Task', '2025-09-09', '2025-09-04 22:00:15'),
-(2, 2, 'Exam #1', 'Exam', '2025-09-09', '2025-09-04 22:00:15'),
+(2, 1, 'Exam #1', 'Exam', '2025-09-09', '2025-09-04 22:00:15'),
 (3, 1, 'Activity #2', 'Task', '2025-09-10', '2025-09-04 22:00:15'),
 (4, 2, 'Activity #1', 'Exam', '2025-09-11', '2025-09-04 22:00:15');
 
@@ -176,7 +177,17 @@ CREATE TABLE `enrollments` (
 
 INSERT INTO `enrollments` (`enrollmentID`, `userID`, `courseID`, `yearSection`) VALUES
 (1, 2, 1, 2023),
-(2, 2, 2, 2023);
+(2, 2, 2, 2023),
+(3, 3, 1, 2023),
+(4, 4, 1, 2023),
+(5, 5, 1, 2023),
+(6, 6, 1, 2023),
+(7, 7, 1, 2023),
+(8, 8, 1, 2023),
+(9, 9, 1, 2023),
+(10, 10, 1, 2023),
+(11, 11, 1, 2023),
+(12, 12, 1, 2023);
 
 -- --------------------------------------------------------
 
@@ -224,8 +235,8 @@ CREATE TABLE `inbox` (
 --
 
 INSERT INTO `inbox` (`inboxID`, `messageID`, `enrollmentID`, `userID`, `messageText`, `createdAt`, `isRead`) VALUES
-(1, 1, 1, 2, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 1),
-(2, 2, 2, 2, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 1);
+(1, 1, 1, 0, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 1),
+(2, 2, 2, 0, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 1);
 
 -- --------------------------------------------------------
 
@@ -250,7 +261,18 @@ CREATE TABLE `leaderboard` (
 
 INSERT INTO `leaderboard` (`leaderboardID`, `enrollmentID`, `timeRange`, `periodStart`, `xpPoints`, `rank`, `previousRank`, `updatedAt`) VALUES
 (1, 1, 'Weekly', '2025-08-25', 450, 3, 5, '2025-08-30 12:00:00'),
-(2, 2, 'Weekly', '2025-08-25', 450, 3, 5, '2025-08-30 12:00:00');
+(2, 2, 'Weekly', '2025-08-25', 450, 3, 5, '2025-08-30 12:00:00'),
+(3, 1, 'Weekly', '2025-09-28', 100, 3, 5, '2025-09-28 16:50:22'),
+(4, 3, 'Weekly', '2025-09-28', 400, 3, 5, '2025-09-28 16:58:09'),
+(5, 4, 'Weekly', '2025-09-01', 152, 3, 5, '2025-09-28 21:03:44'),
+(6, 5, 'Weekly', '2025-09-01', 189, 3, 5, '2025-09-28 21:03:44'),
+(7, 6, 'Weekly', '2025-09-01', 215, 3, 5, '2025-09-28 21:03:44'),
+(8, 7, 'Weekly', '2025-09-01', 176, 3, 5, '2025-09-28 21:03:44'),
+(9, 8, 'Weekly', '2025-09-01', 221, 3, 5, '2025-09-28 21:03:44'),
+(10, 9, 'Weekly', '2025-09-01', 167, 3, 5, '2025-09-28 21:03:44'),
+(11, 10, 'Weekly', '2025-09-01', 195, 3, 5, '2025-09-28 21:03:44'),
+(12, 11, 'Weekly', '2025-09-01', 214, 3, 5, '2025-09-28 21:03:44'),
+(13, 12, 'Monthly', '2025-09-01', 95, 3, 5, '2025-09-28 21:34:51');
 
 -- --------------------------------------------------------
 
@@ -263,6 +285,8 @@ CREATE TABLE `lessons` (
   `courseID` int(11) NOT NULL,
   `lessonTitle` varchar(255) NOT NULL,
   `lessonDescription` text NOT NULL,
+  `lessonContent` text NOT NULL,
+  `lessonType` varchar(255) NOT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -271,8 +295,8 @@ CREATE TABLE `lessons` (
 -- Dumping data for table `lessons`
 --
 
-INSERT INTO `lessons` (`lessonID`, `courseID`, `lessonTitle`, `lessonDescription`, `createdAt`, `updatedAt`) VALUES
-(1, 1, 'Lesson 1: Introduction to CSS Grid', '1. Explain what HTML is and its role in web development.\n2. Identify the basic structure of an HTML document.\n3. Use common HTML tags such as headings, paragraphs, and links. \n4. Create a simple webpage using basic HTML elements.', '2025-08-30 09:00:00', '2025-08-30 09:00:00');
+INSERT INTO `lessons` (`lessonID`, `courseID`, `lessonTitle`, `lessonDescription`, `lessonContent`, `lessonType`, `createdAt`, `updatedAt`) VALUES
+(1, 1, 'Lesson 1: Introduction to CSS Grid', '1. Explain what HTML is and its role in web development.\n2. Identify the basic structure of an HTML document.\n3. Use common HTML tags such as headings, paragraphs, and links. \n4. Create a simple webpage using basic HTML elements.', 'Learn how to create grid layouts', 'Lecture', '2025-08-30 09:00:00', '2025-08-30 09:00:00');
 
 -- --------------------------------------------------------
 
@@ -416,7 +440,17 @@ CREATE TABLE `userinfo` (
 
 INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `middleName`, `lastName`, `studentID`, `programID`, `gender`, `yearLevel`, `yearSection`, `schoolEmail`, `contactNumber`, `facebookLink`, `linkedInLink`, `instagramLink`, `createdAt`, `isNewUser`) VALUES
 (1, 2, 'prof.png', 'Jane', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 2023, 'jane.smith@university.edu', '+639123456789', 'https://facebook.com/jane.smith', 'https://linkedin.com/in/jane-smith', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
-(2, 1, 'prof.png', 'Chistian James', 'Dom', 'Torillo', '202310002', '1', 'Male', '2', 2023, 'james.dom@university.edu', '+639123456789', 'https://facebook.com/james.dom', 'https://linkedin.com/in/james-dom', 'https://instagram.com/james.dom', '2025-08-30 08:18:53', 1);
+(2, 1, 'prof.png', 'Chistian James', 'Dom', 'Torillo', '202310002', '1', 'Male', '2', 2023, 'james.dom@university.edu', '+639123456789', 'https://facebook.com/james.dom', 'https://linkedin.com/in/james-dom', 'https://instagram.com/james.dom', '2025-08-30 08:18:53', 1),
+(3, 3, 'prof.png', 'John', 'Cruz', 'Doe', '202310003', '1', 'Male', '2', 2023, 'john.doe@university.edu', '+639123456783', '', '', '', '2025-09-28 11:58:33', 1),
+(4, 4, 'prof.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 2023, 'michael.lee@school.edu', '09171234567', 'facebook.com/michael.lee', 'linkedin.com/in/michaellee', 'instagram.com/michael.lee', '2025-09-28 20:59:48', 1),
+(5, 5, 'prof.png', 'Sophia', 'B.', 'Garcia', '202310004', '1', 'Female', '2', 2023, 'sophia.garcia@school.edu', '09181234567', 'facebook.com/sophia.garcia', 'linkedin.com/in/sophiagarcia', 'instagram.com/sophia.garcia', '2025-09-28 20:59:48', 1),
+(6, 6, 'prof.png', 'Daniel', 'C.', 'Kim', '202310005', '1', 'Male', '2', 2023, 'daniel.kim@school.edu', '09191234567', 'facebook.com/daniel.kim', 'linkedin.com/in/danielkim', 'instagram.com/daniel.kim', '2025-09-28 20:59:48', 1),
+(7, 7, 'prof.png', 'Olivia', 'D.', 'Brown', '202310006', '1', 'Female', '2', 2023, 'olivia.brown@school.edu', '09201234567', 'facebook.com/olivia.brown', 'linkedin.com/in/oliviabrown', 'instagram.com/olivia.brown', '2025-09-28 20:59:48', 1),
+(8, 8, 'prof.png', 'Ethan', 'E.', 'Wilson', '202310007', '1', 'Male', '2', 2023, 'ethan.wilson@school.edu', '09211234567', 'facebook.com/ethan.wilson', 'linkedin.com/in/ethanwilson', 'instagram.com/ethan.wilson', '2025-09-28 20:59:48', 1),
+(9, 9, 'prof.png', 'Isabella', 'F.', 'Martin', '202310008', '1', 'Female', '2', 2023, 'isabella.martin@school.edu', '09221234567', 'facebook.com/isabella.martin', 'linkedin.com/in/isabellamartin', 'instagram.com/isabella.martin', '2025-09-28 20:59:48', 1),
+(10, 10, 'prof.png', 'Liam', 'G.', 'Torres', '202310009', '1', 'Male', '2', 2023, 'liam.torres@school.edu', '09231234567', 'facebook.com/liam.torres', 'linkedin.com/in/liamtorres', 'instagram.com/liam.torres', '2025-09-28 20:59:48', 1),
+(11, 11, 'prof.png', 'Emma', 'H.', 'Davis', '202310010', '1', 'Female', '2', 2023, 'emma.davis@school.edu', '09241234567', 'facebook.com/emma.davis', 'linkedin.com/in/emmadavis', 'instagram.com/emma.davis', '2025-09-28 20:59:48', 1),
+(12, 12, 'prof.png', 'Chloe', 'I.', 'Nguyen', '202310011', '1', 'Female', '2', 2023, 'chloe.nguyen@school.edu', '09251234567', 'facebook.com/chloe.nguyen', 'linkedin.com/in/chloenguyen', 'instagram.com/chloe.nguyen', '2025-09-28 21:34:51', 1);
 
 -- --------------------------------------------------------
 
@@ -438,7 +472,17 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`) VALUES
 (1, 'Pass@123', 'john.doe@gmail.com', 'admin', 'johndoe'),
-(2, 'Hello@world', 'jane.smith@example.com', 'student', 'janesmith');
+(2, 'Hello@world', 'jane.smith@example.com', 'student', 'janesmith'),
+(3, 'HelloWorld', 'john.doe@gmail.com', 'user', 'JohnDoe'),
+(4, 'password123', 'michael.lee@example.com', 'student', 'michael_lee'),
+(5, 'securePass!1', 'sophia.garcia@example.com', 'student', 'sophia_garcia'),
+(6, 'helloWorld9', 'daniel.kim@example.com', 'student', 'daniel_kim'),
+(7, 'qwerty2025', 'olivia.brown@example.com', 'student', 'olivia_brown'),
+(8, 'pass4321', 'ethan.wilson@example.com', 'student', 'ethan_wilson'),
+(9, 'abcXYZ987', 'isabella.martin@example.com', 'student', 'isabella_martin'),
+(10, 'myPass!77', 'liam.torres@example.com', 'student', 'liam_torres'),
+(11, 'safeKey555', 'emma.davis@example.com', 'student', 'emma_davis'),
+(12, 'newPass!11', 'chloe.nguyen@example.com', 'student', 'chloe_nguyen');
 
 --
 -- Indexes for dumped tables
@@ -599,7 +643,7 @@ ALTER TABLE `courses`
 -- AUTO_INCREMENT for table `enrollments`
 --
 ALTER TABLE `enrollments`
-  MODIFY `enrollmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `enrollmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `files`
@@ -617,7 +661,7 @@ ALTER TABLE `inbox`
 -- AUTO_INCREMENT for table `leaderboard`
 --
 ALTER TABLE `leaderboard`
-  MODIFY `leaderboardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `leaderboardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `lessons`
@@ -659,13 +703,13 @@ ALTER TABLE `todo`
 -- AUTO_INCREMENT for table `userinfo`
 --
 ALTER TABLE `userinfo`
-  MODIFY `userInfoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `userInfoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

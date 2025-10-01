@@ -4,12 +4,14 @@ $activePage = 'courseInfo';
 include("shared/assets/database/connect.php");
 session_start();
 
-if (isset($_SESSION['userID'])) {
+/*if (isset($_SESSION['userID'])) {
     $userID = $_SESSION['userID'];
 } else {
     header("Location: login.php");
     exit();
-}
+}*/
+
+$userID = 2;
 
 if (isset($_GET['courseID'])) {
     $courseID = $_GET['courseID'];
@@ -41,8 +43,6 @@ if (isset($_GET['courseID'])) {
     FROM assessments
     INNER JOIN courses
         ON assessments.courseID = courses.courseID
-    INNER JOIN enrollments
-        ON courses.courseID = enrollments.courseID
     INNER JOIN todo 
         ON assessments.assessmentID = todo.assessmentID
     WHERE todo.userID = '$userID' AND todo.status = 'Pending' AND courses.courseID = '$courseID'
@@ -50,7 +50,7 @@ if (isset($_GET['courseID'])) {
 ";
     $selectAssessmentResult = executeQuery($selectAssessmentQuery);
 
-    $selectLimitAssessmentQuery = $selectAssessmentQuery .= " LIMIT 1";
+    $selectLimitAssessmentQuery = $selectAssessmentQuery . " LIMIT 1";
     $selectLimitAssessmentResult = executeQuery($selectLimitAssessmentQuery);
 
     $selectLeaderboardQuery = "SELECT 
@@ -65,6 +65,73 @@ if (isset($_GET['courseID'])) {
     GROUP BY courses.courseTitle;
 ";
     $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
+
+    $whereTotalPlacementQuery = "WHERE enrollments.courseID = '$courseID'";
+    $dateFilter = $_POST['dateFilter'] ?? null;
+
+    if (!empty($dateFilter)) {
+        if ($dateFilter === 'Monthly') {
+            $whereTotalPlacementQuery .= " AND leaderboard.timeRange = '$dateFilter'";
+        } else if ($dateFilter === 'Weekly') {
+            $whereTotalPlacementQuery .= " AND leaderboard.timeRange = '$dateFilter'";
+        } else if ($dateFilter === 'Daily') {
+            $whereTotalPlacementQuery .= " AND leaderboard.timeRange = '$dateFilter'";
+        }
+        $navState = "active";
+    } else {
+        $navState = "";
+        $whereTotalPlacementQuery .= " AND leaderboard.timeRange = 'Weekly'";
+    }
+
+    $TotalPlacementQuery = "SELECT 
+	userinfo.profilePicture,
+    userinfo.firstName,
+    userinfo.middleName,
+    userinfo.lastName,
+    enrollments.userID,
+    SUM(leaderboard.xpPoints) AS totalPoints
+    FROM leaderboard
+    INNER JOIN enrollments
+        ON leaderboard.enrollmentID = enrollments.enrollmentID
+    INNER JOIN userinfo
+	    ON enrollments.userID = userinfo.userID
+    $whereTotalPlacementQuery
+    GROUP BY enrollments.userID
+    ORDER BY totalPoints DESC
+    LIMIT";
+
+    $selectTopOneQuery = $TotalPlacementQuery . " 1;";
+    $selectTopOneResult = executeQuery($selectTopOneQuery);
+
+    $selectTopTwoToThreeQuery = $TotalPlacementQuery . " 2 OFFSET 1;";
+    $selectTopTwoToThreeResult = executeQuery($selectTopTwoToThreeQuery);
+
+    $selectTopFourToTenQuery = $TotalPlacementQuery . " 7 OFFSET 3;";
+    $selectTopFourToTenResult = executeQuery($selectTopFourToTenQuery);
+
+    $selectPlacementQuery = "SELECT
+    userinfo.profilePicture,
+    userinfo.firstName,
+    userinfo.middleName,
+    userinfo.lastName, 
+    ranked.userID,
+    ranked.totalPoints,
+    ranked.rank
+    FROM (SELECT 
+        enrollments.userID,
+        SUM(leaderboard.xpPoints) AS totalPoints,
+        RANK() OVER (ORDER BY SUM(leaderboard.xpPoints) DESC) AS rank
+        FROM leaderboard
+        INNER JOIN enrollments
+            ON leaderboard.enrollmentID = enrollments.enrollmentID
+        $whereTotalPlacementQuery
+        GROUP BY enrollments.userID
+        ) AS ranked
+    INNER JOIN userinfo
+    	ON ranked.userID = userinfo.userID
+    WHERE ranked.userID = '$userID' AND ranked.rank > 10
+    ";
+    $selectPlacementResult = executeQuery($selectPlacementQuery);
 } else {
     header("Location: 404.php");
     exit();
@@ -108,7 +175,7 @@ if (isset($_GET['courseID'])) {
 
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 ms-2 overflow-y-auto">
+                    <div class="container-fluid py-3 ms-2 overflow-y-auto" style="white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth;">
                         <div class="row">
                             <div class="row mt-0">
 
@@ -382,7 +449,7 @@ if (isset($_GET['courseID'])) {
                                             <ul class="nav nav-tabs custom-nav-tabs mb-3" id="mobileTabScroll"
                                                 role="tablist">
                                                 <li class="nav-item me-3" role="presentation">
-                                                    <a class="nav-link active" id="announcements-tab"
+                                                    <a class="nav-link <?php echo $navState == "active" ? "" : "active"; ?>" id="announcements-tab"
                                                         data-bs-toggle="tab" href="#announcements" role="tab"
                                                         aria-controls="announcements" aria-selected="true">
                                                         Announcements
@@ -416,7 +483,7 @@ if (isset($_GET['courseID'])) {
                                                     </a>
                                                 </li>
                                                 <li class="nav-item nav-leaderboard" role="presentation">
-                                                    <a class="nav-link" id="leaderboard-tab" data-bs-toggle="tab"
+                                                    <a class="nav-link <?php echo $navState == "active" ? "active" : ""; ?>" id="leaderboard-tab" data-bs-toggle="tab"
                                                         href="#leaderboard" role="tab" aria-controls="leaderboard"
                                                         aria-selected="false">
                                                         Leaderboard
@@ -444,7 +511,7 @@ if (isset($_GET['courseID'])) {
                                             <div class="tab-scroll">
                                                 <ul class="nav nav-tabs custom-nav-tabs mb-3 flex-nowrap" id="myTab" role="tablist">
                                                     <li class="nav-item">
-                                                        <a class="nav-link active" id="announcements-tab" data-bs-toggle="tab" href="#announcements" role="tab">Announcements</a>
+                                                        <a class="nav-link <?php echo $navState == "active" ? "" : "active"; ?>" id="announcements-tab" data-bs-toggle="tab" href="#announcements" role="tab">Announcements</a>
                                                     </li>
                                                     <li class="nav-item">
                                                         <a class="nav-link" id="lessons-tab" data-bs-toggle="tab" href="#lessons" role="tab">Lessons</a>
@@ -459,7 +526,7 @@ if (isset($_GET['courseID'])) {
                                                         <a class="nav-link" id="link-tab" data-bs-toggle="tab" href="#link" role="tab">Links</a>
                                                     </li>
                                                     <li class="nav-item nav-leaderboard">
-                                                        <a class="nav-link" id="leaderboard-tab" data-bs-toggle="tab" href="#leaderboard" role="tab">Leaderboard</a>
+                                                        <a class="nav-link <?php echo $navState == "active" ? "active" : ""; ?>" id="leaderboard-tab" data-bs-toggle="tab" href="#leaderboard" role="tab">Leaderboard</a>
                                                     </li>
                                                     <li class="nav-item nav-report">
                                                         <a class="nav-link" id="report-tab" data-bs-toggle="tab" href="#report" role="tab">Report</a>
@@ -491,7 +558,7 @@ if (isset($_GET['courseID'])) {
                                         <div class="tab-content" id="myTabContent">
 
                                             <!-- Announcements -->
-                                            <div class="tab-pane fade show active" id="announcements" role="tabpanel">
+                                            <div class="tab-pane fade <?php echo $navState == "active" ? "" : "show active"; ?>" id="announcements" role="tabpanel">
                                                 <?php include 'course-info-contents/announcements.php'; ?>
                                             </div>
 
@@ -516,7 +583,7 @@ if (isset($_GET['courseID'])) {
                                             </div>
 
                                             <!-- Leaderboard -->
-                                            <div class="tab-pane fade" id="leaderboard" role="tabpanel">
+                                            <div class="tab-pane fade <?php echo $navState == "active" ? "show active" : ""; ?>" id="leaderboard" role="tabpanel">
                                                 <?php include 'course-info-contents/leaderboard.php'; ?>
                                             </div>
 
