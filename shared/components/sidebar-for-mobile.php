@@ -48,18 +48,36 @@ $userId = sidebar_resolve_user_id();
 $unreadInboxCount = 0;
 $newTodoCount = 0;
 
-// Inbox: clear and count
+// Get enrollmentIDs for the user
+$enrollmentIds = [];
 if ($userId !== null) {
-	if ($isInboxPage) executeQuery("UPDATE inbox SET isRead = 1 WHERE userID = $userId AND isRead = 0");
-	$unreadInboxCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE userID = $userId AND isRead = 0");
+	$enrollmentQuery = "SELECT enrollmentID FROM enrollments WHERE userID = $userId";
+	$enrollmentResult = executeQuery($enrollmentQuery);
+	if ($enrollmentResult) {
+		while ($row = mysqli_fetch_assoc($enrollmentResult)) {
+			$enrollmentIds[] = $row['enrollmentID'];
+		}
+	}
+}
+
+// Inbox: clear and count using enrollmentID only
+if (!empty($enrollmentIds)) {
+	$enrollmentIdsStr = implode(',', $enrollmentIds);
+	if ($isInboxPage) executeQuery("UPDATE inbox SET isRead = 1 WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
+	$unreadInboxCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
 } else {
 	if ($isInboxPage) executeQuery("UPDATE inbox SET isRead = 1 WHERE isRead = 0");
 	$unreadInboxCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE isRead = 0");
 }
 
-// To-do: clear and count (global)
-if ($isTodoPage) executeQuery("UPDATE todo SET isRead = 1 WHERE isRead = 0");
-$newTodoCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM todo WHERE isRead = 0");
+// To-do: clear and count
+if ($userId !== null) {
+	if ($isTodoPage) executeQuery("UPDATE todo SET isRead = 1 WHERE userID = $userId AND isRead = 0");
+	$newTodoCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM todo WHERE userID = $userId AND isRead = 0");
+} else {
+	if ($isTodoPage) executeQuery("UPDATE todo SET isRead = 1 WHERE isRead = 0");
+	$newTodoCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM todo WHERE isRead = 0");
+}
 
 // Share to session for view fallback
 $_SESSION['InboxCount'] = $unreadInboxCount;

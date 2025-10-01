@@ -1,0 +1,289 @@
+/* Title */
+h1.text-bold.text-25 {
+    margin-right: 20px;
+}
+
+/* Dropdown spacing adjustments */
+.dropdown-container {
+    margin-right: 40px; /* Spacing between dropdowns */
+}
+
+.dropdown-container:last-child {
+    margin-right: 0; 
+}
+
+/* Assessment Card Styling */
+.assessment-card {
+    width: 670px;
+    height: 212px;
+    border-radius: 12px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+    padding: 20px;
+    position: relative;
+    margin-top: 30px; 
+    margin-left: 10px;
+} 
+
+
+/* Bottom row with action buttons */
+.bottom-row {
+    display: flex;
+    justify-content: space-between; 
+    align-items: flex-end;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 12px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.options-container .more-options {
+    color: var(--black);
+    font-size: 18px;
+    font-family: 'Regular', 'Poppins', sans-serif;
+    padding: 4px;
+    margin-right: 6px; /* slight right gap */
+}
+
+.options-container .more-options:hover {
+    background: rgba(0,0,0,0.05);
+    border-radius: 6px;
+}
+
+.btn-action {
+    background: var(--primaryColor);
+    border: 1px solid var(--black);
+    border-radius: 16px;
+    color: var(--black);
+    font-size: 13px;
+    width: 150px; 
+    height: 35px;
+    padding: 0 16px; 
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Regular', 'Poppins', sans-serif;
+    white-space: nowrap;
+}
+
+.btn-action:hover {
+    background: var(--primaryColor);
+    border-color: var(--black);
+    color: var(--black);
+}
+
+/* Space between icon and text */
+.btn-action i {
+    padding-right: 6px; /* adjust: 4–10px */
+}
+
+.card-content {
+    width: 100%;
+    height: 172px; /* 212px - 40px padding */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    overflow: visible; /* allow dropdowns to pop outside */
+}
+
+.top-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    margin-bottom: 5px;
+    width: 100%;
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    column-gap: 24px;
+}
+
+.left-info {
+    flex: 0 0 auto;
+    max-width: 45%;
+    box-sizing: border-box;
+}
+
+.submission-stats {
+    text-align: left;
+    margin-left: 100px;
+    margin-top: 15px; 
+    flex: 0 0 auto;
+    align-self: flex-start;
+}
+
+.submission-stats .stat-value {
+    font-family: 'SemiBold', 'Poppins', sans-serif;
+    font-weight: 600;
+}
+
+.right-section {
+    margin-left: auto; /* push to the far right */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* center the chart inside */
+    padding-right: 12px; /* small gap on the right */
+}
+
+.chart-container {
+    width: 100px; /* slightly smaller */
+    height: 100px; /* slightly smaller */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-container canvas {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.task-badge {
+    background: var(--highlight50);
+    color: var(--black);
+    font-size: 12px;
+    padding: 4px 8px;
+    width: 50px;
+}
+
+@media (max-width: 768px) {
+  /* Center page title on small screens */
+  h1.text-bold.text-25 {
+    margin-right: 0;
+    width: 100%;
+    text-align: center;
+    display: block;
+  }
+
+  /* Card base */
+  .assessment-card {
+    height: auto;
+    min-height: 212px;
+    width: 90%;                
+    max-width: 560px;          
+    justify-content: center;             
+  }
+
+  /* Top row stacks like the mock */
+  .top-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  /* Left meta block */
+  .left-info {
+    max-width: 100%;
+    align-self: flex-start;    
+    text-align: left;          
+    margin-top: 20px;         
+  }
+
+  /* Submission stats align left with tighter spacing */
+  .submission-stats {
+    margin: 20px 0 0 0;
+    text-align: left;
+  }
+
+  /* Chart (mobile): keep same position, smaller footprint */
+  .right-section {
+    width: 100%;
+    padding-right: 0;
+    display: flex;
+    flex-direction: column;      
+    align-items: flex-start;     
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .chart-container {
+    width: 72px;
+    height: 72px;
+    margin: 4px 0 0 6px;
+  }
+
+
+  /* Let card content expand to fit inner content on small screens */
+  .card-content {
+    height: auto;
+  }
+
+  /* NEW: button under chart (only on small screens) */
+  .btn-chart {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primaryColor);
+    border: 1px solid var(--black);
+    border-radius: 16px;
+    color: var(--black);
+    font-size: 12px;
+    height: 34px;
+    padding: 0 12px;
+    min-width: 120px;
+    white-space: nowrap;
+    margin-top: 20px;
+  }
+  .btn-chart i { padding-right: 6px; }
+
+  /* Bottom row stacks and stays left on small screens */
+  .bottom-row {
+    flex-direction: column;
+    align-items: center;          
+    justify-content: center;      
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  /* Center action buttons on small screens */
+  .action-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .btn-action {
+    width: auto;
+    min-width: 120px;
+    font-size: 12px;
+    padding: 0 12px;
+  }
+
+  /* 3-dots menu pinned top-right of the card */
+  .bottom-row .options-container {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    margin-top: 7px;
+  }
+
+  /* Filters: 2 per row */
+  .col-12.col-lg-auto.mt-4 > .d-flex.flex-nowrap.justify-content-center.justify-content-lg-start.gap-3 {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    justify-content: center !important;   
+  }
+  .dropdown-container {
+    margin-right: 0;
+    margin-bottom: 10px;
+    flex: 0 0 calc(50% - 8px);
+    display: flex;
+    justify-content: center;              
+  }
+
+  /* Place Task badge at top-left of the card on small screens */
+  .assessment-card .task-badge {
+    position: absolute;
+    top: 18px;
+    left: 16px;
+    z-index: 1;
+  }
+}
+
+@media (max-width: 992px) {
+  .assessment-card { width: 100%; max-width: 805px; }
+}

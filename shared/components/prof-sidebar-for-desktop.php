@@ -45,9 +45,24 @@ $profIsInboxPage = isset($activePage) && $activePage === 'inbox';
 $profUserId = prof_sidebar_resolve_user_id();
 $profInboxCount = 0;
 
+// Get enrollmentIDs for the professor's courses
+$enrollmentIds = [];
 if ($profUserId !== null) {
-	if ($profIsInboxPage) executeQuery("UPDATE inbox SET isRead = 1 WHERE userID = $profUserId AND isRead = 0");
-	$profInboxCount = prof_sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE userID = $profUserId AND isRead = 0");
+	$enrollmentQuery = "SELECT DISTINCT e.enrollmentID FROM enrollments e 
+		INNER JOIN courses c ON e.courseID = c.courseID 
+		WHERE c.userID = $profUserId";
+	$enrollmentResult = executeQuery($enrollmentQuery);
+	if ($enrollmentResult) {
+		while ($row = mysqli_fetch_assoc($enrollmentResult)) {
+			$enrollmentIds[] = $row['enrollmentID'];
+		}
+	}
+}
+
+if (!empty($enrollmentIds)) {
+	$enrollmentIdsStr = implode(',', $enrollmentIds);
+	if ($profIsInboxPage) executeQuery("UPDATE inbox SET isRead = 1 WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
+	$profInboxCount = prof_sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
 } else {
 	if ($profIsInboxPage) executeQuery("UPDATE inbox SET isRead = 1 WHERE isRead = 0");
 	$profInboxCount = prof_sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE isRead = 0");
@@ -75,7 +90,7 @@ $_SESSION['profInboxCount'] = $profInboxCount;
                         <img src="../shared/assets/img/dashboard.png" class="img-fluid"
                             style="width: 30px; height: 30px;">
                         <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'profIndex') ? 'selected' : ''; ?>"
-                            href="profIndex.php"><strong>Home</strong></a>
+                            href="index.php"><strong>Home</strong></a>
                     </li>
 
                     <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'course') ? 'selected-box' : ''; ?>"
@@ -90,7 +105,7 @@ $_SESSION['profInboxCount'] = $profInboxCount;
                         data-page="">
                         <img src="../shared/assets/img/inbox.png" class="img-fluid" style="width: 30px; height: 30px;">
                         <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'inbox') ? 'inbox' : ''; ?>"
-                            href="profInbox.php"><strong>Inbox</strong></a>
+                            href="inbox.php"><strong>Inbox</strong></a>
                         <?php
                         $displayProfInbox = isset($profInboxCount) && is_numeric($profInboxCount)
                             ? (int) $profInboxCount
