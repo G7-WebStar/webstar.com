@@ -66,6 +66,23 @@ if (isset($_GET['courseID'])) {
 ";
     $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
 
+    $whereTotalPlacementQuery = "WHERE enrollments.courseID = '$courseID'";
+    $dateFilter = $_POST['dateFilter'] ?? null;
+
+    if (!empty($dateFilter)) {
+        if ($dateFilter === 'Monthly') {
+            $whereTotalPlacementQuery .= " AND leaderboard.timeRange = '$dateFilter'";
+        } else if ($dateFilter === 'Weekly') {
+            $whereTotalPlacementQuery .= " AND leaderboard.timeRange = '$dateFilter'";
+        } else if ($dateFilter === 'Daily') {
+            $whereTotalPlacementQuery .= " AND leaderboard.timeRange = '$dateFilter'";
+        }
+        $navState = "active";
+    } else {
+        $navState = "";
+        $whereTotalPlacementQuery .= " AND leaderboard.timeRange = 'Weekly'";
+    }
+
     $TotalPlacementQuery = "SELECT 
 	userinfo.profilePicture,
     userinfo.firstName,
@@ -78,7 +95,7 @@ if (isset($_GET['courseID'])) {
         ON leaderboard.enrollmentID = enrollments.enrollmentID
     INNER JOIN userinfo
 	    ON enrollments.userID = userinfo.userID
-    WHERE enrollments.courseID = '$courseID'
+    $whereTotalPlacementQuery
     GROUP BY enrollments.userID
     ORDER BY totalPoints DESC
     LIMIT";
@@ -107,13 +124,12 @@ if (isset($_GET['courseID'])) {
         FROM leaderboard
         INNER JOIN enrollments
             ON leaderboard.enrollmentID = enrollments.enrollmentID
-        WHERE enrollments.courseID = '$courseID'
+        $whereTotalPlacementQuery
         GROUP BY enrollments.userID
         ) AS ranked
     INNER JOIN userinfo
     	ON ranked.userID = userinfo.userID
-    WHERE ranked.userID = '$userID'
-    AND ranked.rank > 10;
+    WHERE ranked.userID = '$userID' AND ranked.rank > 10
     ";
     $selectPlacementResult = executeQuery($selectPlacementQuery);
 } else {
@@ -433,7 +449,7 @@ if (isset($_GET['courseID'])) {
                                             <ul class="nav nav-tabs custom-nav-tabs mb-3" id="mobileTabScroll"
                                                 role="tablist">
                                                 <li class="nav-item me-3" role="presentation">
-                                                    <a class="nav-link active" id="announcements-tab"
+                                                    <a class="nav-link <?php echo $navState == "active" ? "" : "active"; ?>" id="announcements-tab"
                                                         data-bs-toggle="tab" href="#announcements" role="tab"
                                                         aria-controls="announcements" aria-selected="true">
                                                         Announcements
@@ -467,7 +483,7 @@ if (isset($_GET['courseID'])) {
                                                     </a>
                                                 </li>
                                                 <li class="nav-item nav-leaderboard" role="presentation">
-                                                    <a class="nav-link" id="leaderboard-tab" data-bs-toggle="tab"
+                                                    <a class="nav-link <?php echo $navState == "active" ? "active" : ""; ?>" id="leaderboard-tab" data-bs-toggle="tab"
                                                         href="#leaderboard" role="tab" aria-controls="leaderboard"
                                                         aria-selected="false">
                                                         Leaderboard
@@ -495,7 +511,7 @@ if (isset($_GET['courseID'])) {
                                             <div class="tab-scroll">
                                                 <ul class="nav nav-tabs custom-nav-tabs mb-3 flex-nowrap" id="myTab" role="tablist">
                                                     <li class="nav-item">
-                                                        <a class="nav-link active" id="announcements-tab" data-bs-toggle="tab" href="#announcements" role="tab">Announcements</a>
+                                                        <a class="nav-link <?php echo $navState == "active" ? "" : "active"; ?>" id="announcements-tab" data-bs-toggle="tab" href="#announcements" role="tab">Announcements</a>
                                                     </li>
                                                     <li class="nav-item">
                                                         <a class="nav-link" id="lessons-tab" data-bs-toggle="tab" href="#lessons" role="tab">Lessons</a>
@@ -510,7 +526,7 @@ if (isset($_GET['courseID'])) {
                                                         <a class="nav-link" id="link-tab" data-bs-toggle="tab" href="#link" role="tab">Links</a>
                                                     </li>
                                                     <li class="nav-item nav-leaderboard">
-                                                        <a class="nav-link" id="leaderboard-tab" data-bs-toggle="tab" href="#leaderboard" role="tab">Leaderboard</a>
+                                                        <a class="nav-link <?php echo $navState == "active" ? "active" : ""; ?>" id="leaderboard-tab" data-bs-toggle="tab" href="#leaderboard" role="tab">Leaderboard</a>
                                                     </li>
                                                     <li class="nav-item nav-report">
                                                         <a class="nav-link" id="report-tab" data-bs-toggle="tab" href="#report" role="tab">Report</a>
@@ -542,7 +558,7 @@ if (isset($_GET['courseID'])) {
                                         <div class="tab-content" id="myTabContent">
 
                                             <!-- Announcements -->
-                                            <div class="tab-pane fade show active" id="announcements" role="tabpanel">
+                                            <div class="tab-pane fade <?php echo $navState == "active" ? "" : "show active"; ?>" id="announcements" role="tabpanel">
                                                 <?php include 'course-info-contents/announcements.php'; ?>
                                             </div>
 
@@ -567,7 +583,7 @@ if (isset($_GET['courseID'])) {
                                             </div>
 
                                             <!-- Leaderboard -->
-                                            <div class="tab-pane fade" id="leaderboard" role="tabpanel">
+                                            <div class="tab-pane fade <?php echo $navState == "active" ? "show active" : ""; ?>" id="leaderboard" role="tabpanel">
                                                 <?php include 'course-info-contents/leaderboard.php'; ?>
                                             </div>
 

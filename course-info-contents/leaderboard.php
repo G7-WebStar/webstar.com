@@ -10,15 +10,13 @@
         </div>
         <div class="col-6 d-flex justify-content-center justify-content-lg-start align-items-center">
             <span class="dropdown-label me-2">View by:</span>
-            <button class="btn dropdown-toggle dropdown-custom" type="button" data-bs-toggle="dropdown"
-                aria-expanded="false">
-                <span>Weekly</span>
-            </button>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item text-reg" href="#">Monthly</a></li>
-                <li><a class="dropdown-item text-reg" href="#">Weekly</a></li>
-                <li><a class="dropdown-item text-reg" href="#">Daily</a></li>
-            </ul>
+            <form method="POST">
+                <select class="dropdown-custom" name="dateFilter" onchange="this.form.submit()">
+                    <option value="Monthly" <?php echo $dateFilter == 'Monthly' ? 'selected' : '';?> class="dropdown-item text-reg">Monthly</option>
+                    <option value="Weekly" <?php echo ($dateFilter == 'Weekly' || empty($dateFilter)) ? 'selected' : '';?> class="dropdown-item text-reg">Weekly</option>
+                    <option value="Daily" <?php echo $dateFilter == 'Daily' ? 'selected' : '';?> class="dropdown-item text-reg">Daily</option>
+                </select>
+            </form>
         </div>
     </div>
 </div>
@@ -48,7 +46,7 @@
                                         <div class="me-1">2</div>
                                     </div>
                                 </div>
-                                <div class="col-12 mt-3 text-xl-12 text-lg-16 text-xs-12">
+                                <div class="col-12 mt-3 text-xl-12 text-lg-16 text-xs-12 text-wrap">
                                     <?php echo $topOne['firstName'] . " " . $topOne['middleName'] . " " . $topOne['lastName']; ?>
                                 </div>
                                 <div class="col-12 text-reg text-xl-12 text-lg-16 text-xs-12">
@@ -87,7 +85,7 @@
                                         <div class="me-1">1</div>
                                     </div>
                                 </div>
-                                <div class="col-12 mt-3 text-xl-12 text-lg-16 text-xs-12">
+                                <div class="col-12 mt-3 text-xl-12 text-lg-16 text-xs-12 text-wrap">
                                     <?php echo $topTwoToThree['firstName'] . " " . $topTwoToThree['middleName'] . " " . $topTwoToThree['lastName']; ?>
                                 </div>
                                 <div class="col-12 text-reg text-xl-12 text-lg-16 text-xs-12">
@@ -126,7 +124,7 @@
                                     <div class="d-flex align-items-center gap-3">
                                         <img src="shared/assets/pfp-uploads/<?php echo $topFourToTen['profilePicture']; ?>" alt="" width="40"
                                             height="40" class="rounded-circle me-2 d-xxs-none">
-                                        <span class="text-xl-12">
+                                        <span class="text-xl-12 text-wrap">
                                             <?php echo $topFourToTen['firstName'] . " " . $topFourToTen['middleName'] . " " . $topFourToTen['lastName']; ?>
                                         </span>
                                     </div>
@@ -161,7 +159,7 @@
                             <div class="row">
                                 <div class="col-3 d-flex align-items-center justify-content-around">
                                     <span class="text-xl-36 text-xs-28 text-30">
-                                        <?php echo $placement['rank'];?>
+                                        <?php echo $placement['rank']; ?>
                                     </span>
                                     <span
                                         class="badge rounded-pill text-dark text-reg float-end d-flex flex-row d-xs-none d-md-none d-lg-flex"
@@ -174,7 +172,7 @@
                                     <div class="d-flex align-items-center gap-3">
                                         <img src="shared/assets/pfp-uploads/<?php echo $placement['profilePicture']; ?>" alt="" width="40"
                                             height="40" class="rounded-circle me-2 d-xxs-none">
-                                        <span class="text-xl-12">
+                                        <span class="text-xl-12 text-wrap">
                                             <?php echo $placement['firstName'] . " " . $placement['middleName'] . " " . $placement['lastName']; ?>
                                         </span>
                                     </div>
