@@ -147,11 +147,16 @@
                                         <!-- Bottom Row: Action Buttons -->
                                         <div class="bottom-row">
                                             <div class="action-buttons">
-                                                <button class="btn btn-action me-2">
-                                                    <i class="fas fa-info-circle me-1"></i>Task details
+                                            <button class="btn btn-action">
+                                                    <img src="../shared/assets/img/assess/info.png"
+                                                        alt="Assess Icon"
+                                                        style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Task Details
                                                 </button>
                                                 <button class="btn btn-action">
-                                                    <i class="fas fa-file-alt me-1"></i>Grading Sheet
+                                                    <img src="../shared/assets/img/assess/assess.png"
+                                                        alt="Assess Icon"
+                                                        style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
+                                                    Sheet
                                                 </button>
                                             </div>
                                             <!-- More Options aligned with buttons on the right -->

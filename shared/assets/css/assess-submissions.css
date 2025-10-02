@@ -18,6 +18,7 @@
     background-color: var(--pureWhite);
 }
 
+
 .chart-container {
     width: 100px; /* slightly smaller */
     height: 100px; /* slightly smaller */
@@ -29,6 +30,12 @@
 .chart-container canvas {
     max-width: 100%;
     max-height: 100%;
+}
+
+/* Dropdown container styling */
+.dropdown-container {
+    gap: 16px;
+    margin-top: 40px; 
 }
 
 .btn-action {
@@ -47,16 +54,91 @@
     white-space: nowrap;
 }
 
+/* Specific layout for Return All button - same size as dropdown */
+.btn-return-all {
+    width: auto;
+    height: 25px;
+    border-radius: 25px;
+    border-width: 1px;
+    opacity: 1;
+    padding: 0 12px;
+    font-size: 14px;
+}
+
+/* Submissions list styling */
+.submissions-list {
+    background-color: transparent;
+    border: none;
+}
+
+.submission-item {
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(44, 44, 44, 0.5) !important;
+}
+
+.submission-item:hover {
+    background-color: #f8f9fa;
+}
+
+.submission-item:last-child {
+    border-bottom: none !important;
+}
+
+/* Badge styling */
+.badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid;
+    font-family: 'Regular', sans-serif;
+}
+
+.badge-pending {
+    background-color: #DFDFDF;
+    border-color: #DFDFDF;
+    color: #2C2C2C;
+}
+
+.badge-submitted {
+    background-color: #C8ECC1;
+    border-color: #C8ECC1;
+    color: #5B6D58;
+}
+
+.badge-missing {
+    background-color: #ECC1C1;
+    border-color: #ECC1C1;
+    color: #6D5858;
+}
+
+.badge-score {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--black);
+    font-family: var(--SemiBold);
+    font-weight: 600;
+}
+
 .btn-action:hover {
     background: var(--primaryColor);
     border-color: var(--black);
     color: var(--black);
 }
 
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .cardSticky {
+        margin-top: 20px; 
+    }
+}
+
 /* Space between icon and text */
 .btn-action i {
-    padding-right: 6px; /* adjust: 4–10px */
+    padding-right: 6px; 
 }
+
 
 /* Fixed header and scrollable content */
 .cardHeader {
@@ -67,7 +149,7 @@
 }
 
 .content-scroll-container {
-    max-height: calc(100vh - 200px); /* Adjust based on header height */
+    max-height: calc(100vh - 200px); 
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -138,5 +220,4 @@
     font-weight: bold;
     background-color: transparent !important;
 }
-
 
