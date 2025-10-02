@@ -1,0 +1,184 @@
+.cardHeader {
+    border-radius: 15px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+}
+
+
+.cardSticky {
+    border-radius: 15px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+    padding: 20px;
+}
+
+.cardFile {
+    border-radius: 10px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+}
+
+.timeline {
+    position: relative;
+}
+
+.timeline-item {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 30px;
+}
+
+.timeline-circle {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.timeline-circle.big {
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--black);
+    margin-left: -4px;
+}
+
+.timeline-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 5px;
+    width: 1px;
+    bottom: -10px;
+    background-color: var(--black);
+}
+
+.button {
+    background-color: var(--pureWhite);
+    border: 1px solid #000;
+    color: #000;
+}
+
+.chart-container {
+    width: 100px; /* slightly smaller */
+    height: 100px; /* slightly smaller */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-container canvas {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.btn-action {
+    background: var(--primaryColor);
+    border: 1px solid var(--black);
+    border-radius: 16px;
+    color: var(--black);
+    font-size: 13px;
+    width: 150px; 
+    height: 35px;
+    padding: 0 16px; 
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Regular', 'Poppins', sans-serif;
+    white-space: nowrap;
+}
+
+.btn-action:hover {
+    background: var(--primaryColor);
+    border-color: var(--black);
+    color: var(--black);
+}
+
+/* Space between icon and text */
+.btn-action i {
+    padding-right: 6px; /* adjust: 4–10px */
+}
+
+/* Fixed header and scrollable content */
+.cardHeader {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--pureWhite);
+}
+
+.content-scroll-container {
+    max-height: calc(100vh - 200px); /* Adjust based on header height */
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Mobile specific styles */
+@media (max-width: 576px) {
+    .cardHeader {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .mobile-assignment {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        text-align: center;
+    }
+
+    .mobile-top {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        width: 100%;
+    }
+
+    .mobile-top .arrow {
+        position: absolute;
+        left: 0;
+        display: flex;
+        align-items: center;
+        padding-left: 10px;
+    }
+
+    /* Center tabs on mobile */
+    .tab-scroll { overflow-x: visible; }
+    .custom-nav-tabs { justify-content: center; gap: 16px; }
+    .custom-nav-tabs .nav-link { margin-right: 0; }
+}
+
+/* Nav tabs styling (aligned with course-Info.css) */
+.custom-nav-tabs {
+    border-bottom: 1px solid var(--black);
+    gap: 24px;
+}
+.custom-nav-tabs .nav-item { white-space: nowrap; }
+.custom-nav-tabs .nav-link {
+    font-family: var(--SemiBold);
+    color: #2c2c2cbf;
+    border: none;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    font-weight: normal;
+    background-color: transparent !important;
+    padding: 8px 0 10px 0;
+    margin-right: 24px;
+}
+.custom-nav-tabs .nav-link:hover {
+    color: var(--black);
+    text-decoration: none;
+    background-color: transparent !important;
+}
+.custom-nav-tabs .nav-link.active {
+    border-bottom: 3px solid var(--black);
+    color: var(--black);
+    font-weight: bold;
+    background-color: transparent !important;
+}
+
+

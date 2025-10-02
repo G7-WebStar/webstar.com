@@ -1,17 +1,3 @@
-<?php $activePage = 'profIndex'; ?>
-<?php
-include('../shared/assets/database/connect.php');
-
-$courses = [];
-$result = executeQuery("SELECT courseID, userID, courseCode, courseTitle, courseImage, yearSection, schedule FROM courses ORDER BY courseID DESC");
-if ($result && mysqli_num_rows($result) > 0) {
-    while ($row = mysqli_fetch_assoc($result)) {
-        $courses[] = $row;
-    }
-}
-$totalCourses = count($courses);
-?>
-
 <!doctype html>
 <html lang="en">
 
@@ -24,7 +10,7 @@ $totalCourses = count($courses);
     <link rel="stylesheet" href="../shared/assets/css/global-styles.css">
     <link rel="stylesheet" href="../shared/assets/css/sidebar-and-container-styles.css">
     <link rel="stylesheet" href="../shared/assets/css/profIndex.css">
-    <link rel="stylesheet" href="../shared/assets/css/assess-prof.css">
+    <link rel="stylesheet" href="../shared/assets/css/assess.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
 
