@@ -65,101 +65,126 @@
                                         </a>
                                     </div>
                                     <div class="col">
-                                    <span class="text-sbold text-25">Assignment #1</span>
-                                    <div class="text-reg text-18">Due Sep 9, 2024</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Scrollable Content Container -->
-                    <div class="content-scroll-container">
-                        <div class="container-fluid py-3">
-                            <div class="row">
-                            <!-- Left Content -->
-                            <div class="col-12 col-lg-8">
-                                <div class="p-0 px-lg-5">
-                                    <div class="tab-carousel-wrapper d-block" style="--tabs-right-extend: 60px;">
-                                        <div class="tab-scroll">
-                                            <ul class="nav nav-tabs custom-nav-tabs mb-3 flex-nowrap" id="myTab" role="tablist">
-                                                <li class="nav-item">
-                                                    <a class="nav-link active" id="announcements-tab" data-bs-toggle="tab" href="#announcements" role="tab">Task Details</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link" id="lessons-tab" data-bs-toggle="tab" href="#lessons" role="tab">Submissions</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div class="text-sbold text-14 mt-5">Task Instructions</div>
-                                    <p class="mb-5 mt-2 text-med text-14">Attached is a Google Doc that you can edit.
-                                    </p>
-                                    <p class="mb-5 mt-2 text-med text-14">In Figma, design a "404 Not Found" page.</p>
-                                    <p class="mb-1 mt-2 text-med text-14">Create two versions, one for the mobile and
-                                        one for the desktop.</p>
-                                    <p class="mb-5  text-med text-14">Turn in when done.</p>
-
-                                    <hr>
-
-                                    <div class="text-sbold text-14 mt-3">Task Materials</div>
-                                    <div class="cardFile my-3 w-lg-25 d-flex align-items-center"
-                                        style="width:400px; max-width:100%; min-width:310px;">
-                                        <i class="px-4 py-3 fa-solid fa-file"></i>
-                                        <div class="ms-2">
-                                            <div class="text-sbold text-16 mt-1">ADET A03</div>
-                                        </div>
-                                    </div>
-
-                                    <hr>
-
-                                    <div class="text-sbold text-14 pb-3">Prepared by</div>
-                                    <div class="d-flex align-items-center pb-5">
-                                        <div class="rounded-circle me-2"
-                                            style="width: 50px; height: 50px; background-color: var(--highlight75);">
-                                            <img src="../shared/assets/img/assess/prof.png" alt="professor"
-                                                class="rounded-circle" style="width:50px;height:50px;">
-                                        </div>
-                                        <div>
-                                            <div class="text-sbold text-14">Prof. Jane Smith</div>
-                                            <div class="text-med text-12">January 12, 2024 8:00AM</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <div class="col-12 col-lg-4">
-                                <div class="cardSticky position-sticky" style="top: 20px;">
-                                    <div class="p-2">
-                                        <div class="row align-items-center justify-content-center mb-3">
-                                            <div class="col-auto">
-                                                <div class="chart-container" style="width: 100px; height: 100px;">
-                                                    <canvas id="taskChart" width="100" height="100"></canvas>
-                                                </div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <!-- Submission Stats -->
-                                                <div class="submission-stats">
-                                                    <div class="text-reg text-14 mb-1"><span
-                                                            class="stat-value">10</span> submitted</div>
-                                                    <div class="text-reg text-14 mb-1"><span
-                                                            class="stat-value">11</span> did not submit</div>
-                                                    <div class="text-reg text-14 mb-1"><span class="stat-value">0</span>
-                                                        graded</div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="d-flex justify-content-center pt-3">
-                                            <button class="btn btn-action">
-                                                <i class="fas fa-file-alt me-1"></i>Grading Sheet
-                                            </button>
-                                        </div>
+                                        <span class="text-sbold text-25">Assignment #1</span>
+                                        <div class="text-reg text-18">Due Sep 9, 2024</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+
+                        <!-- Scrollable Content Container -->
+                        <div class="content-scroll-container">
+                            <div class="container-fluid py-3">
+                                <div class="row">
+                                    <!-- Left Content -->
+                                    <div class="col-12 col-lg-8">
+                                        <div class="p-0 px-lg-5">
+                                            <div class="tab-carousel-wrapper d-block"
+                                                style="--tabs-right-extend: 60px;">
+                                                <div class="tab-scroll">
+                                                    <ul class="nav nav-tabs custom-nav-tabs mb-3 flex-nowrap" id="myTab"
+                                                        role="tablist">
+                                                        <li class="nav-item">
+                                                            <a class="nav-link active" id="announcements-tab"
+                                                                data-bs-toggle="tab" href="#announcements"
+                                                                role="tab">Task Details</a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a class="nav-link" id="lessons-tab" href="assess-submissions.php" role="tab">Submissions</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                            <!-- Tab Content -->
+                                            <div class="tab-content" id="myTabContent">
+                                                <!-- Task Details Tab - Active -->
+                                                <div class="tab-pane fade show active" id="announcements" role="tabpanel" aria-labelledby="announcements-tab">
+                                                    <div class="text-sbold text-14 mt-5">Task Instructions</div>
+                                                    <p class="mb-5 mt-2 text-med text-14">Attached is a Google Doc that you can
+                                                        edit.
+                                                    </p>
+                                                    <p class="mb-5 mt-2 text-med text-14">In Figma, design a "404 Not Found"
+                                                        page.</p>
+                                                    <p class="mb-1 mt-2 text-med text-14">Create two versions, one for the
+                                                        mobile and
+                                                        one for the desktop.</p>
+                                                    <p class="mb-5  text-med text-14">Turn in when done.</p>
+
+                                                    <hr>
+
+                                                    <div class="text-sbold text-14 mt-3">Task Materials</div>
+                                                    <div class="cardFile my-3 w-lg-25 d-flex align-items-center"
+                                                        style="width:400px; max-width:100%; min-width:310px;">
+                                                        <i class="px-4 py-3 fa-solid fa-file"></i>
+                                                        <div class="ms-2 d-flex align-items-center">
+                                                            <div class="text-sbold text-16">ADET A03</div>
+                                                        </div>
+                                                    </div>
+
+                                                    <hr>
+
+                                                    <div class="text-sbold text-14 pb-3">Prepared by</div>
+                                                    <div class="d-flex align-items-center pb-5">
+                                                        <div class="rounded-circle me-2"
+                                                            style="width: 50px; height: 50px; background-color: var(--highlight75);">
+                                                            <img src="../shared/assets/img/assess/prof.png" alt="professor"
+                                                                class="rounded-circle" style="width:50px;height:50px;">
+                                                        </div>
+                                                        <div>
+                                                            <div class="text-sbold text-14">Prof. Jane Smith</div>
+                                                            <div class="text-med text-12">January 12, 2024 8:00AM</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Submissions Tab - Disabled -->
+                                                <div class="tab-pane fade" id="lessons" role="tabpanel" aria-labelledby="lessons-tab">
+                                                    <!-- Empty content - tab is disabled -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-12 col-lg-4">
+                                        <div class="cardSticky position-sticky" style="top: 20px;">
+                                            <div class="p-2">
+                                                <div class="row align-items-center justify-content-center mb-3">
+                                                    <div class="col-auto">
+                                                        <div class="chart-container"
+                                                            style="width: 100px; height: 100px;">
+                                                            <canvas id="taskChart" width="100" height="100"></canvas>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <!-- Submission Stats -->
+                                                        <div class="submission-stats">
+                                                            <div class="text-reg text-14 mb-1"><span
+                                                                    class="stat-value">10</span> submitted</div>
+                                                            <div class="text-reg text-14 mb-1"><span
+                                                                    class="stat-value">11</span> did not submit</div>
+                                                            <div class="text-reg text-14 mb-1"><span
+                                                                    class="stat-value">0</span>
+                                                                graded</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="d-flex justify-content-center pt-3">
+                                                    <button class="btn btn-action">
+                                                        <img src="../shared/assets/img/assess/assess.png"
+                                                            alt="Assess Icon"
+                                                            style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
+                                                        Sheet
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div> <!-- Close content-scroll-container -->
                 </div>
             </div>
