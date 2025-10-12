@@ -316,10 +316,8 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                 $link = "#";
                                                                 if ($type === 'task') {
                                                                     $link = "assignment.php?assignmentID=" . $activities['assessmentID'];
-                                                                } elseif ($type === 'exam') {
-                                                                    $link = "exam.php?examID=" . $activities['assessmentID'];
-                                                                } elseif ($type === 'quiz') {
-                                                                    $link = "quiz.php?quizID=" . $activities['assessmentID'];
+                                                                } elseif ($type === 'test') {
+                                                                    $link = "test.php?testID=" . $activities['assessmentID'];
                                                                 }
                                                         ?>
                                                                 <div class="todo-card d-flex align-items-stretch mb-2">
