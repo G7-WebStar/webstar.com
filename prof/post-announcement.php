@@ -70,10 +70,25 @@ if (isset($_POST['save_announcement'])) {
                     foreach ($links as $link) {
                         $link = trim($link);
                         if ($link !== '') {
+                            // Fetch link title using get_meta_tags
+                            $title = '';
+                            $metaTags = @get_meta_tags($link);
+                            if (!empty($metaTags['title'])) {
+                                $title = $metaTags['title'];
+                            } else {
+                                // If get_meta_tags doesn't have title, try fetching it manually
+                                $html = @file_get_contents($link);
+                                if ($html) {
+                                    if (preg_match("/<title>(.*?)<\/title>/i", $html, $matches)) {
+                                        $title = $matches[1];
+                                    }
+                                }
+                            }
+
                             $insertLink = "INSERT INTO files 
-                                (courseID, userID, announcementID, fileAttachment, fileLink) 
-                                VALUES 
-                                ('$selectedCourseID', '$userID', '$announcementID', '', '$link')";
+                            (courseID, userID, announcementID, fileAttachment, fileTitle, fileLink) 
+                            VALUES 
+                            ('$selectedCourseID', '$userID', '$announcementID', '', '$title', '$link')";
                             executeQuery($insertLink);
                         }
                     }

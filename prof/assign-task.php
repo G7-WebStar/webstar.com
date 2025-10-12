@@ -1,9 +1,7 @@
 <?php $activePage = 'assign-task'; ?>
 <?php
 include('../shared/assets/database/connect.php');
-
 session_start();
-
 
 if (!isset($_SESSION['userID'])) {
     header("Location: ../login.php");
@@ -17,35 +15,46 @@ $course = "SELECT courseID, courseCode
            WHERE userID = '$userID'";
 $courses = executeQuery($course);
 
-if (isset($_POST['save_assignment'])) {
-    $title = $_POST['taskTitle'];
-    $content = $_POST['taskContent'];
+if (isset($_POST['saveAssignment'])) {
+    $title = $_POST['assignmentTitle'];
+    $content = $_POST['assignmentContent'];
     $assignmentDeadline = !empty($_POST['deadline']) ? $_POST['deadline'] : null;
     $assignmentPoints = !empty($_POST['points']) ? $_POST['points'] : 0;
     $createdAt = date("Y-m-d H:i:s");
 
     if (!empty($_POST['courses'])) {
         foreach ($_POST['courses'] as $selectedCourseID) {
-            $assignments = "INSERT INTO assignments 
-            (courseID, userID, assignmentTitle, assignmentDescription, assignmentDeadline, assignmentPoints) 
-            VALUES 
-            ('$selectedCourseID', '$userID', '$title', '$content', " .
-                        ($assignmentDeadline ? "'$assignmentDeadline'" : "NULL") . ", 
-            '$assignmentPoints')";
-            executeQuery($assignments);
 
-            // Get the correct assignmentID
-            $assignmentID = mysqli_insert_id($conn);
+            $deadlineEnabled = isset($_POST['stopSubmissions']) ? 1 : 0;
 
-            // Then insert into assessments
-            $assessments = "INSERT INTO assessments
-            (courseID, title, type, deadline, createdAt) 
+            $insertAssessment = "INSERT INTO assessments 
+            (courseID, assessmentTitle, type, deadline, deadlineEnabled, createdAt)
             VALUES 
             ('$selectedCourseID', '$title', 'task', " .
-                        ($assignmentDeadline ? "'$assignmentDeadline'" : "NULL") . ", 
-            '$createdAt')";
-            executeQuery($assessments);
+                ($assignmentDeadline ? "'$assignmentDeadline'" : "NULL") . ", '$deadlineEnabled', '$createdAt')";
+            executeQuery($insertAssessment);
 
+            // Retrieve assessmentID based on unique data
+            $assessmentID = mysqli_insert_id($conn);
+            // Insert into assignments (linked to assessmentID)
+            $insertAssignment = "INSERT INTO assignments 
+            (assessmentID, assignmentTitle, assignmentDescription, assignmentPoints)
+            VALUES 
+            ('$assessmentID','$title', '$content', '$assignmentPoints')";
+            executeQuery($insertAssignment);
+
+            // Get assignmentID right after inserting into assignments
+            $assignmentID = mysqli_insert_id($conn);
+
+            // Then insert into todo
+            $insertTodo = "INSERT INTO todo 
+            (userID, assessmentID, title, status, updatedAt, isRead)
+            VALUES 
+            ('$userID', '$assessmentID', '$title', 'Pending', '$createdAt', 0)";
+            executeQuery($insertTodo);
+
+
+            // Handle file uploads
             if (!empty($_FILES['materials']['name'][0])) {
                 $uploadDir = __DIR__ . "/../shared/assets/files/";
 
@@ -62,17 +71,15 @@ if (isset($_POST['save_assignment'])) {
                         $targetPath = $uploadDir . $safeName;
 
                         if (move_uploaded_file($tmpName, $targetPath)) {
-                            // For uploaded files
                             $insertFile = "INSERT INTO files 
-                            (courseID, userID, assignmentID, fileAttachment, fileLink) 
+                            (courseID, userID, assignmentID, fileAttachment, fileTitle, fileLink) 
                             VALUES 
-                            ('$selectedCourseID', '$userID', '$assignmentID', '$safeName', '')";
+                            ('$selectedCourseID', '$userID', '$assignmentID', '$safeName', '$fileTitle', '')";
                             executeQuery($insertFile);
                         }
                     }
                 }
             }
-
             // Handle file links
             if (!empty($_POST['links'])) {
                 $links = $_POST['links'];
@@ -80,10 +87,27 @@ if (isset($_POST['save_assignment'])) {
                     foreach ($links as $link) {
                         $link = trim($link);
                         if ($link !== '') {
+
+                            // Try to fetch link title
+                            $fileTitle = $link;
+                            $context = stream_context_create([
+                                "http" => ["header" => "User-Agent: Mozilla/5.0"]
+                            ]);
+                            $html = @file_get_contents($link, false, $context);
+
+                            if ($html !== false) {
+                                if (preg_match('/<meta property="og:title" content="([^"]+)"/i', $html, $matches)) {
+                                    $fileTitle = $matches[1];
+                                } elseif (preg_match("/<title>(.*?)<\/title>/i", $html, $matches)) {
+                                    $fileTitle = $matches[1];
+                                }
+                            }
+
+                            // Insert with title
                             $insertLink = "INSERT INTO files 
-                            (courseID, userID, assignmentID, fileAttachment, fileLink) 
+                            (courseID, userID, assignmentID, fileAttachment, fileTitle, fileLink) 
                             VALUES 
-                            ('$selectedCourseID', '$userID', '$assignmentID', '', '$link')";
+                            ('$selectedCourseID', '$userID', '$assignmentID', '', '" . mysqli_real_escape_string($conn, $fileTitle) . "', '$link')";
                             executeQuery($insertLink);
                         }
                     }
@@ -180,7 +204,7 @@ if (isset($_GET['fetchTitle'])) {
                                                 Information</label>
                                             <input type="text"
                                                 class="form-control textbox mb-3 p-2 text-reg text-14 text-muted"
-                                                id="taskInfo" name="taskTitle" placeholder="Task Title" required>
+                                                id="taskInfo" name="assignmentTitle" placeholder="Task Title" required>
                                         </div>
                                     </div>
 
@@ -201,7 +225,7 @@ if (isset($_GET['fetchTitle'])) {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <input type="hidden" name="taskContent" id="task">
+                                            <input type="hidden" name="assignmentContent" id="task">
                                         </div>
                                     </div>
 
@@ -233,7 +257,7 @@ if (isset($_GET['fetchTitle'])) {
 
                                         <div class="form-check mt-2 col ms-2">
                                             <input class="form-check-input" type="checkbox" id="stopSubmissions"
-                                                name="stop_submissions" value="1"
+                                                name="stopSubmissions" value="1"
                                                 style="border: 1px solid var(--black);" />
                                             <label class="form-check-label" for="stopSubmissions">
                                                 Stop accepting submissions after the deadline.
@@ -380,7 +404,7 @@ if (isset($_GET['fetchTitle'])) {
                                                         <!-- Assign Button -->
                                                         <div
                                                             class="col-md-6 text-center text-md-center mt-3 mt-md-0 ms-md-3">
-                                                            <button type="submit" name="save_assignment"
+                                                            <button type="submit" name="saveAssignment"
                                                                 class="px-4 py-2 rounded-pill text-sbold text-md-14 mt-3 ms-3"
                                                                 style="background-color: var(--primaryColor); border: 1px solid var(--black);">
                                                                 Assign
@@ -594,9 +618,9 @@ if (isset($_GET['fetchTitle'])) {
             });
         });
 
-            // Checkbox function for Stop Submissions
+        // Checkbox function for Stop Submissions
         const stopCheckbox = document.getElementById('stopSubmissions');
-        stopCheckbox.addEventListener('change', function() {
+        stopCheckbox.addEventListener('change', function () {
             if (this.checked) {
                 console.log('Stop submissions enabled');
             } else {

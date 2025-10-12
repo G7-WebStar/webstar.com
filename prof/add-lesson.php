@@ -68,10 +68,22 @@ if (isset($_POST['save_lesson'])) {
                     foreach ($links as $link) {
                         $link = trim($link);
                         if ($link !== '') {
+                            // Fetch link title using get_meta_tags or fallback to <title> tag
+                            $title = '';
+                            $metaTags = @get_meta_tags($link);
+                            if (!empty($metaTags['title'])) {
+                                $title = $metaTags['title'];
+                            } else {
+                                $html = @file_get_contents($link);
+                                if ($html && preg_match("/<title>(.*?)<\/title>/i", $html, $matches)) {
+                                    $title = $matches[1];
+                                }
+                            }
+
                             $insertLink = "INSERT INTO files 
-                            (courseID, userID, lessonID, fileAttachment, fileLink) 
+                            (courseID, userID, lessonID, fileAttachment, fileTitle, fileLink) 
                             VALUES 
-                            ('$selectedCourseID', '$userID', '$lessonID', '', '$link')";
+                            ('$selectedCourseID', '$userID', '$lessonID', '', '$title', '$link')";
                             executeQuery($insertLink);
                         }
                     }
