@@ -43,8 +43,5 @@ if (isset($_POST['signUpBtn'])) {
             }
         }
     }
-
-    header("Location: " . $_SERVER['PHP_SELF']);
-    exit();
 }
 ?>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 01, 2025 at 07:04 PM
+-- Generation Time: Oct 12, 2025 at 10:59 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -94,8 +94,9 @@ CREATE TABLE `assessments` (
   `assessmentID` int(11) NOT NULL,
   `courseID` int(11) NOT NULL,
   `assessmentTitle` varchar(100) NOT NULL,
-  `type` enum('Task','Exam') DEFAULT 'Task',
+  `type` enum('Task','Test') DEFAULT 'Task',
   `deadline` date NOT NULL,
+  `deadlineEnabled` tinyint(1) NOT NULL DEFAULT 0,
   `createdAt` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -103,11 +104,11 @@ CREATE TABLE `assessments` (
 -- Dumping data for table `assessments`
 --
 
-INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `type`, `deadline`, `createdAt`) VALUES
-(1, 1, 'Activity #1', 'Task', '2025-09-09', '2025-09-04 22:00:15'),
-(2, 1, 'Exam #1', 'Exam', '2025-09-09', '2025-09-04 22:00:15'),
-(3, 1, 'Activity #2', 'Task', '2025-09-10', '2025-09-04 22:00:15'),
-(4, 2, 'Activity #1', 'Exam', '2025-09-11', '2025-09-04 22:00:15');
+INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `type`, `deadline`, `deadlineEnabled`, `createdAt`) VALUES
+(1, 1, 'Activity #1', 'Task', '2025-09-09', 0, '2025-09-04 22:00:15'),
+(2, 1, 'Exam #1', 'Test', '2025-09-09', 0, '2025-09-04 22:00:15'),
+(3, 1, 'Activity #2', 'Task', '2025-09-10', 0, '2025-09-04 22:00:15'),
+(4, 2, 'Activity #1', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15');
 
 -- --------------------------------------------------------
 
@@ -117,12 +118,10 @@ INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `type`
 
 CREATE TABLE `assignments` (
   `assignmentID` int(5) NOT NULL,
-  `userID` int(5) NOT NULL,
-  `courseID` int(5) NOT NULL,
+  `assessmentID` int(5) NOT NULL,
   `lessonID` int(5) NOT NULL,
   `assignmentTitle` varchar(50) NOT NULL,
   `assignmentDescription` varchar(500) NOT NULL,
-  `assignmentDeadline` datetime(6) NOT NULL DEFAULT current_timestamp(6),
   `assignmentPoints` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -130,8 +129,8 @@ CREATE TABLE `assignments` (
 -- Dumping data for table `assignments`
 --
 
-INSERT INTO `assignments` (`assignmentID`, `userID`, `courseID`, `lessonID`, `assignmentTitle`, `assignmentDescription`, `assignmentDeadline`, `assignmentPoints`) VALUES
-(1, 1, 1, 1, 'Assignment #1', 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', '2025-09-30 20:21:04.000000', 100);
+INSERT INTO `assignments` (`assignmentID`, `assessmentID`, `lessonID`, `assignmentTitle`, `assignmentDescription`, `assignmentPoints`) VALUES
+(1, 1, 1, 'Assignment #1', 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100);
 
 -- --------------------------------------------------------
 
@@ -203,6 +202,7 @@ CREATE TABLE `files` (
   `lessonID` int(5) DEFAULT NULL,
   `assignmentID` int(5) DEFAULT NULL,
   `fileAttachment` varchar(255) NOT NULL,
+  `fileTitle` varchar(50) NOT NULL,
   `fileLink` varchar(100) NOT NULL,
   `uploadedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -211,8 +211,8 @@ CREATE TABLE `files` (
 -- Dumping data for table `files`
 --
 
-INSERT INTO `files` (`fileID`, `courseID`, `userID`, `announcementID`, `lessonID`, `assignmentID`, `fileAttachment`, `fileLink`, `uploadedAt`) VALUES
-(1, 1, 1, 1, 1, NULL, 'Web Development Course Material', 'https://example.com/lesson1,https://example.com/lesson1.1', '2025-08-30 10:30:00');
+INSERT INTO `files` (`fileID`, `courseID`, `userID`, `announcementID`, `lessonID`, `assignmentID`, `fileAttachment`, `fileTitle`, `fileLink`, `uploadedAt`) VALUES
+(1, 1, 1, 1, 1, NULL, 'Web Development Course Material', 'Web Development Tutorial', 'https://example.com/lesson1,https://example.com/lesson1.1', '2025-08-30 10:30:00');
 
 -- --------------------------------------------------------
 
@@ -370,8 +370,7 @@ CREATE TABLE `scores` (
   `scoreID` int(5) NOT NULL,
   `userID` int(5) NOT NULL,
   `assignmentID` int(5) DEFAULT NULL,
-  `examID` int(5) DEFAULT NULL,
-  `quizID` int(5) DEFAULT NULL,
+  `testID` int(5) DEFAULT NULL,
   `score` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -379,8 +378,71 @@ CREATE TABLE `scores` (
 -- Dumping data for table `scores`
 --
 
-INSERT INTO `scores` (`scoreID`, `userID`, `assignmentID`, `examID`, `quizID`, `score`) VALUES
-(1, 1, 1, NULL, NULL, 100);
+INSERT INTO `scores` (`scoreID`, `userID`, `assignmentID`, `testID`, `score`) VALUES
+(1, 1, 1, NULL, 100);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `testquestionchoices`
+--
+
+CREATE TABLE `testquestionchoices` (
+  `choiceID` int(5) NOT NULL,
+  `testQuestionID` int(5) NOT NULL,
+  `choiceText` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `testquestions`
+--
+
+CREATE TABLE `testquestions` (
+  `testQuestionID` int(5) NOT NULL,
+  `testID` int(5) NOT NULL,
+  `testQuestion` varchar(100) NOT NULL,
+  `questionType` enum('Multiple Choice','Identification') NOT NULL DEFAULT 'Multiple Choice',
+  `testQuestionImage` varchar(50) DEFAULT NULL,
+  `correctAnswer` varchar(50) NOT NULL,
+  `testQuestionPoints` int(5) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `testresponses`
+--
+
+CREATE TABLE `testresponses` (
+  `testResponseID` int(5) NOT NULL,
+  `testID` int(5) NOT NULL,
+  `testQuestionID` int(5) NOT NULL,
+  `userID` int(5) NOT NULL,
+  `userAnswer` varchar(50) NOT NULL,
+  `isCorrect` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tests`
+--
+
+CREATE TABLE `tests` (
+  `testID` int(5) NOT NULL,
+  `userID` int(5) NOT NULL,
+  `courseID` int(5) NOT NULL,
+  `lessonID` int(5) NOT NULL,
+  `assessmentID` int(5) NOT NULL,
+  `testType` enum('Exam','Quiz') NOT NULL DEFAULT 'Exam',
+  `testTitle` varchar(100) NOT NULL,
+  `generalGuidance` varchar(500) NOT NULL,
+  `testTimelimit` int(5) DEFAULT NULL,
+  `userSection` varchar(10) NOT NULL,
+  `testInstruction` varchar(500) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -472,7 +534,7 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`) VALUES
 (1, 'Pass@123', 'john.doe@gmail.com', 'admin', 'johndoe'),
 (2, 'Hello@world', 'jane.smith@example.com', 'student', 'janesmith'),
-(3, 'HelloWorld', 'john.doe@gmail.com', 'user', 'JohnDoe'),
+(3, 'HelloWorld', 'john.doe1@gmail.com', 'user', 'JohnDoe'),
 (4, 'password123', 'michael.lee@example.com', 'student', 'michael_lee'),
 (5, 'securePass!1', 'sophia.garcia@example.com', 'student', 'sophia_garcia'),
 (6, 'helloWorld9', 'daniel.kim@example.com', 'student', 'daniel_kim'),
@@ -579,6 +641,30 @@ ALTER TABLE `report`
 --
 ALTER TABLE `scores`
   ADD PRIMARY KEY (`scoreID`);
+
+--
+-- Indexes for table `testquestionchoices`
+--
+ALTER TABLE `testquestionchoices`
+  ADD PRIMARY KEY (`choiceID`);
+
+--
+-- Indexes for table `testquestions`
+--
+ALTER TABLE `testquestions`
+  ADD PRIMARY KEY (`testQuestionID`);
+
+--
+-- Indexes for table `testresponses`
+--
+ALTER TABLE `testresponses`
+  ADD PRIMARY KEY (`testResponseID`);
+
+--
+-- Indexes for table `tests`
+--
+ALTER TABLE `tests`
+  ADD PRIMARY KEY (`testID`);
 
 --
 -- Indexes for table `todo`
@@ -691,6 +777,30 @@ ALTER TABLE `report`
 --
 ALTER TABLE `scores`
   MODIFY `scoreID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `testquestionchoices`
+--
+ALTER TABLE `testquestionchoices`
+  MODIFY `choiceID` int(5) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `testquestions`
+--
+ALTER TABLE `testquestions`
+  MODIFY `testQuestionID` int(5) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `testresponses`
+--
+ALTER TABLE `testresponses`
+  MODIFY `testResponseID` int(5) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tests`
+--
+ALTER TABLE `tests`
+  MODIFY `testID` int(5) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `todo`

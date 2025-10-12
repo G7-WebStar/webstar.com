@@ -96,7 +96,7 @@ include("shared/assets/processes/login-process.php");
 
                 <!-- Registration Redirect -->
                 <div class="container text-center text-small">
-                    <a href="registration.html" class="text-decoration-none">
+                    <a href="registration.php" class="text-decoration-none">
                         <span class="text-dark">Don't have an account? </span>
                         <span class="fw-bold text-dark highlight">Sign up</span>
                     </a>

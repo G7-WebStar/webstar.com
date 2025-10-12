@@ -148,32 +148,17 @@ body {
     border-color: var(--black) !important;
 }
 
-/* cindy */
-.scroll-attachments {
-    scrollbar-width: none;
+/* Cindy */
+.cardHeader {
+    border-radius: 15px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
 }
 
-.scroll-attachments:hover {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
-}
-
-.scroll-attachments::-webkit-scrollbar {
-    width: 0px;
-    transition: width 0.3s;
-}
-
-.scroll-attachments:hover::-webkit-scrollbar {
-    width: 6px;
-}
-
-.scroll-attachments::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.scroll-attachments::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.25);
-    border-radius: 4px;
+.cardFile {
+    border-radius: 10px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
 }
 
 /* card file */
