@@ -533,22 +533,6 @@ if (isset($_GET['courseID'])) {
                                             </div>
                                         </div>
 
-
-
-                                        <!-- Sort by dropdown -->
-                                        <div class="d-flex align-items-center flex-nowrap mb-3" id="header">
-                                            <span class="dropdown-label me-2">Sort by:</span>
-                                            <button class="btn dropdown-toggle dropdown-custom" type="button"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                <span>Newest</span>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item text-reg" href="#">Newest</a></li>
-                                                <li><a class="dropdown-item text-reg" href="#">Oldest</a></li>
-                                                <li><a class="dropdown-item text-reg" href="#">Unread first</a></li>
-                                            </ul>
-                                        </div>
-
                                         <!-- Tab Content -->
                                         <div class="tab-content" id="myTabContent">
 

@@ -1,3 +1,17 @@
+<!-- Sort By Dropdown (Front-End Only, above announcements) -->
+<div class="d-flex align-items-center flex-nowrap mb-3" id="header">
+    <span class="dropdown-label me-2">Sort by:</span>
+    <button class="btn dropdown-toggle dropdown-custom" type="button"
+        data-bs-toggle="dropdown" aria-expanded="false">
+        <span>Newest</span>
+    </button>
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item text-reg" href="#">Newest</a></li>
+        <li><a class="dropdown-item text-reg" href="#">Oldest</a></li>
+        <li><a class="dropdown-item text-reg" href="#">Unread first</a></li>
+    </ul>
+</div>
+
 <?php if (mysqli_num_rows($selectAssessmentResult) > 0) {
     mysqli_data_seek($selectAssessmentResult, 0);
     while ($todo = mysqli_fetch_assoc($selectAssessmentResult)) {
