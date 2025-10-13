@@ -150,9 +150,9 @@ $courses = executeQuery($course);
                                                         style="background-color: var(--primaryColor); height: 190px;">
                                                     <div class="card-body border-top border-black">
                                                         <div class="row lh-1 mb-2">
-                                                            <p class="card-text text-bold text-18 m-0 course-code">
-                                                                <?php echo $row['courseCode']; ?>
-                                                            </p>
+                                                            <a href="course-info.php?courseID=<?php echo $row['courseID']; ?>" class="text-decoration-none text-black">
+                                                                <p class="card-text text-bold text-18 m-0"><?php echo $row['courseCode']; ?></p>
+                                                            </a>
                                                             <p class="card-text text-reg text-14 mb-1 course-title">
                                                                 <?php echo $row['courseTitle']; ?>
                                                             </p>
