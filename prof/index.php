@@ -193,7 +193,7 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                     </div>
 
                                     <!-- Right side button for desktop-->
-                                    <div class="col-12 col-md-5">
+                                    <div class="col-12 col-md-5 desktop">
                                         <div class="row position-relative">
                                             <!-- Button placed on the upper right -->
                                             <div
@@ -412,7 +412,7 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                             </div>
 
                                             <!-- Right Side -->
-                                            <div class="col-12 col-md-5">
+                                            <div class="col-12 col-md-5 right-side">
                                                 <!-- Main Card -->
                                                 <div class="card left-card">
                                                     <!-- Top Header -->

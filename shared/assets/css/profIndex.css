@@ -88,10 +88,72 @@
  }
 
 @media (max-width: 767px) {
-  .col-12.col-md-5 {
+  .desktop {
     display: none;
   }
 }
+/* Mobile layout for Active Assessments (Right Side) */
+@media (max-width: 767px) {
+  .right-side {
+    display: block;
+    margin-top: 20px;
+  }
+
+  /* ✅ Horizontal scroll only (UI untouched) */
+  .right-side .scrollable-tasks {
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+    scroll-behavior: smooth;
+    padding-bottom: 15px;
+  }
+
+  .right-side .scrollable-tasks::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
+
+  /* ✅ Arrange inner cards side by side */
+  .right-side .scrollable-tasks > div {
+    display: inline-flex;
+    gap: 20px;
+  }
+
+  /* ✅ Card styling (same UI, just fixed width for horizontal scroll) */
+  .right-side .card.mb-3 {
+    width: 240px !important;
+    height: 350px !important;
+    display: inline-block;
+    border-radius: 20px;
+    border: 1px solid var(--black);
+    padding-top: 18px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    white-space: normal;
+    flex: 0 0 auto;
+    margin-right: 20px;
+  }
+
+  /* Keep original layout inside card (UI untouched) */
+  .right-side .d-flex.align-items-center.justify-content-between {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* Graph alignment unchanged (same as original) */
+  .right-side canvas {
+    width: 60px !important;
+    height: 60px !important;
+    margin-top: 10px;
+  }
+
+  /* Arrow spacing same */
+  .right-side .d-flex.justify-content-end {
+    margin-top: 10px;
+  }
+}
+
 
 @media (max-width: 767px) {
   .stats .col-12 {
