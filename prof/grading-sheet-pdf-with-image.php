@@ -1,4 +1,4 @@
-<?php $activePage = 'grading-sheet-pdf-with-image'; ?> 
+<?php $activePage = 'grading-sheet-pdf-with-image'; ?>
 <?php
 include("../shared/assets/database/connect.php");
 
@@ -57,6 +57,7 @@ if (!empty($fileLinks)) {
     <link rel="stylesheet" href="../shared/assets/css/sidebar-and-container-styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:FILL@1" rel="stylesheet" />
 </head>
 
 <body>
@@ -204,7 +205,8 @@ if (!empty($fileLinks)) {
 
                                     <?php else: ?>
                                         <p class="text-danger mt-3">No attachments found for lessonID
-                                            <?php echo $lessonID; ?>.</p>
+                                            <?php echo $lessonID; ?>.
+                                        </p>
                                     <?php endif; ?>
 
                                 </div>
@@ -226,11 +228,18 @@ if (!empty($fileLinks)) {
                                             <div class="text-sbold text-15 mb-3" style="color: var(--black);">Optional
                                                 Actions</div>
                                             <div class="d-flex flex-column align-items-center gap-2 mb-5">
-                                                <button class="btn custom-btn"><i class="fa-solid fa-trophy me-2"></i>
-                                                    Award badge</button>
-                                                <button class="btn custom-btn"><i class="fa-solid fa-comment me-2"></i>
-                                                    Add feedback</button>
+                                                <button
+                                                    class="btn custom-btn d-flex align-items-center justify-content-center">
+                                                    <span class="material-symbols-rounded me-2">emoji_events</span>
+                                                    Award badge
+                                                </button>
+                                                <button
+                                                    class="btn custom-btn d-flex align-items-center justify-content-center">
+                                                    <span class="material-symbols-rounded me-2">comment</span>
+                                                    Add feedback
+                                                </button>
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>
