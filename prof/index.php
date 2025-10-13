@@ -15,6 +15,21 @@ $courses = [];
 $result = executeQuery("SELECT * FROM courses WHERE userID = '$userID' AND isActive = 'Yes' ORDER BY courseID DESC");
 if ($result && mysqli_num_rows($result) > 0) {
     while ($row = mysqli_fetch_assoc($result)) {
+        $courseID = $row['courseID'];
+
+        $countStudentsQuery = "SELECT COUNT(*) AS studentCount FROM enrollments  
+        INNER JOIN courses ON enrollments.courseID = courses.courseID 
+        WHERE enrollments.courseID = '$courseID'";
+        $countStudentResult = executeQuery($countStudentsQuery);
+
+        $studentCount = 0;
+
+        if (mysqli_num_rows($countStudentResult) > 0) {
+            $countRow = mysqli_fetch_assoc($countStudentResult);
+            $studentCount = $countRow['studentCount'];
+        }
+
+        $row['studentCount'] = $studentCount;
         $courses[] = $row;
     }
 }
@@ -38,9 +53,37 @@ $countAssessmentsQuery = "SELECT
 COUNT(*) AS activeAssessments FROM assessments
 INNER JOIN courses
 	ON assessments.courseID = courses.courseID
-WHERE courses.userID = 1 AND courses.isActive = 'Yes';
+WHERE courses.userID = $userID AND assessments.deadline > CURRENT_DATE AND courses.isActive = 'Yes';
 ";
 $countAssessmentsResult = executeQuery($countAssessmentsQuery);
+
+$baseJoinGrading = " FROM todo 
+INNER JOIN assessments
+	ON todo.assessmentID = assessments.assessmentID
+INNER JOIN courses
+	ON assessments.courseID = courses.courseID
+WHERE status != 'Graded' AND  courses.userID = $userID";
+
+$toGradeQuery = "SELECT COUNT(*) AS toGrade $baseJoinGrading;
+";
+$toGradeResult = executeQuery($toGradeQuery);
+
+$toGradeTodayQuery = "SELECT COUNT(*) AS toGradeToday $baseJoinGrading AND todo.updatedAt >= (CURRENT_TIMESTAMP - INTERVAL 1 DAY)";
+$toGradeTodayResult = executeQuery($toGradeTodayQuery);
+
+$activeAssessmentsQuery = "SELECT COUNT(*) FROM assessments
+INNER JOIN courses
+	ON assessments.courseID = courses.courseID
+WHERE courses.userID = $userID AND assessments.deadline > CURRENT_DATE";
+$activeAssessmentsResult = executeQuery($activeAssessmentsQuery);
+
+$pendingTodoQuery = "SELECT COUNT(*) AS pending FROM todo 
+INNER JOIN assessments
+	ON todo.assessmentID = assessments.assessmentID
+INNER JOIN courses
+	ON assessments.courseID = courses.courseID
+WHERE (status = 'Pending' OR status = 'Missing') AND courses.userID = $userID;";
+$pendingTodoResult = executeQuery($pendingTodoQuery);
 ?>
 
 <!doctype html>
@@ -245,16 +288,26 @@ $countAssessmentsResult = executeQuery($countAssessmentsQuery);
                                                 }
                                             }
                                         ?>
-                                        <div class="col-12 col-md-3 mb-3">
-                                            <div class="d-flex align-items-center">
-                                                <img src="../shared/assets/img/profIndex/tasks.png" alt="Tasks"
-                                                    width="26" height="26" class="me-2">
-                                                <div class="stats-count text-22 text-bold">80</div>
-                                            </div>
-                                            <div class="stats-label text-18 text-sbold">tasks to grade</div>
-                                            <div class="text-reg text-16">+50 in the past 24 hours</div>
-                                        </div>
                                         <?php
+                                        if (mysqli_num_rows($toGradeResult) > 0) {
+                                            $toGradeToday = mysqli_fetch_assoc($toGradeTodayResult);
+                                            while ($toGrade = mysqli_fetch_assoc($toGradeResult)) {
+                                        ?>
+                                                <div class="col-12 col-md-3 mb-3">
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="../shared/assets/img/profIndex/tasks.png" alt="Tasks"
+                                                            width="26" height="26" class="me-2">
+                                                        <div class="stats-count text-22 text-bold"><?php echo $toGrade['toGrade']; ?></div>
+                                                    </div>
+                                                    <div class="stats-label text-18 text-sbold">tasks to grade</div>
+                                                    <div class="text-reg text-16">+<?php echo $toGradeToday['toGradeToday']; ?> in the past 24 hours</div>
+                                                </div>
+                                        <?php
+                                            }
+                                        }
+                                        ?>
+                                        <?php
+                                        $pendingTodo = mysqli_fetch_assoc($pendingTodoResult);
                                         if (mysqli_num_rows($countAssessmentsResult) > 0) {
                                             while ($countAssessments = mysqli_fetch_assoc($countAssessmentsResult)) {
                                         ?>
@@ -265,7 +318,7 @@ $countAssessmentsResult = executeQuery($countAssessmentsQuery);
                                                         <div class="stats-count text-22 text-bold"><?php echo $countAssessments['activeAssessments']; ?></div>
                                                     </div>
                                                     <div class="stats-label text-18 text-sbold">active assessments</div>
-                                                    <div class="text-reg text-16">55 students yet to complete</div>
+                                                    <div class="text-reg text-16"><?php echo $pendingTodo['pending']; ?> students yet to complete</div>
                                                 </div>
                                         <?php
                                             }
@@ -327,7 +380,7 @@ $countAssessmentsResult = executeQuery($countAssessmentsQuery);
                                                                             <div class="d-flex align-items-center mb-2 mt-4">
                                                                                 <img src="../shared/assets/img/profIndex/people.png"
                                                                                     alt="people" width="26" height="26">
-                                                                                <span class="text-reg text-14 ms-2">0
+                                                                                <span class="text-reg text-14 ms-2"><?php echo $course['studentCount']; ?>
                                                                                     Students</span>
                                                                             </div>
                                                                             <div class="d-flex align-items-start mb-2 mt-4">
