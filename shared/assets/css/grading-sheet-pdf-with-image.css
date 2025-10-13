@@ -1,0 +1,194 @@
+.cardHeader {
+    border-radius: 15px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+}
+
+.cardSticky {
+    border-radius: 15px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+    padding: 20px;
+}
+
+.cardFile {
+    border-radius: 10px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+}
+
+.timeline {
+    position: relative;
+}
+
+.timeline-item {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 30px;
+}
+
+.timeline-circle {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.timeline-circle.big {
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--black);
+    margin-left: -4px;
+}
+
+.timeline-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 5px;
+    width: 1px;
+    bottom: -10px;
+    background-color: var(--black);
+}
+
+.button {
+    background-color: var(--pureWhite);
+    border: 1px solid #000;
+    color: #000;
+}
+
+/* Mobile specific styles */
+@media (max-width: 576px) {
+    .cardHeader {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+
+    .mobile-assignment {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        text-align: center;
+    }
+
+    .mobile-top {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        width: 100%;
+    }
+
+    .mobile-top .arrow {
+        position: absolute;
+        left: 0;
+        display: flex;
+        align-items: center;
+        padding-left: 10px;
+    }
+}
+
+/* PDF preview box (clickable) */
+.pdf-preview-box {
+    width: 180px;
+    height: 180px;
+    background-color: var(--primaryColor);
+    border-radius: 15px;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pdf-preview-box:hover {
+    transform: scale(1.02);
+}
+
+/* Prevent scrollbars and center the content */
+.pdf-preview-box iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    pointer-events: none;
+    overflow: hidden;
+    object-fit: contain;
+}
+
+/* Hide scrollbar globally */
+::-webkit-scrollbar {
+    display: none;
+}
+
+html,
+body {
+    overflow: hidden;
+}
+
+.custom-btn {
+    background-color: var(--primaryColor);
+    border: 1px solid var(--black);
+    color: var(--black);
+    border-radius: 50px;
+    font-weight: 600;
+    padding: 8px 15px;
+    width: fit-content;
+    /* Makes button size fit content */
+    transition: all 0.3s ease;
+}
+
+.custom-btn:hover {
+    background-color: var(--primaryColor);
+    color: var(--black);
+}
+
+/* small overrides to ensure modal image is pannable within container */
+.pdf-preview-box img {
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.modal-img-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.modal-img-wrapper img {
+    max-width: 100%;
+    max-height: 100%;
+    transform-origin: center center;
+    transition: transform 0.12s ease;
+    cursor: zoom-in;
+}
+
+.modal .btn-close {
+    z-index: 1056 !important;
+    position: absolute !important;
+    top: 20px;
+    right: 25px;
+    padding: 10px;
+}
+
+.modal .modal-img-wrapper img {
+    pointer-events: auto;
+}
+
+.modal .modal-img-wrapper {
+    pointer-events: none;
+}
+
+.modal .modal-img-wrapper img {
+    pointer-events: auto;
+}
