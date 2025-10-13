@@ -177,10 +177,8 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
 
                                                             if ($type === 'task') {
                                                                 $link = "assignment.php?assignmentID=" . $todo['assessmentID'];
-                                                            } elseif ($type === 'exam') {
-                                                                $link = "exam.php?examID=" . $todo['assessmentID'];
-                                                            } elseif ($type === 'quiz') {
-                                                                $link = "quiz.php?quizID=" . $todo['assessmentID'];
+                                                            } elseif ($type === 'test') {
+                                                                $link = "test.php?testID=" . $todo['assessmentID'];
                                                             }
                                                             ?>
 

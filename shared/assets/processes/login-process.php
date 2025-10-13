@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
 
             // ✅ Redirect based on role
             if ($role === "admin") {
-                header("Location: prof/profIndex.php");
+                header("Location: prof/index.php");
             } else {
                 header("Location: index.php");
             }

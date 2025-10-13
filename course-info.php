@@ -146,7 +146,6 @@ if (isset($_GET['courseID'])) {
     <link rel="stylesheet" href="shared/assets/css/global-styles.css">
     <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
     <link rel="stylesheet" href="shared/assets/css/course-Info.css">
-    <link rel="stylesheet" href="shared/assets/css/lessons-info.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
@@ -269,10 +268,8 @@ if (isset($_GET['courseID'])) {
 
                                                                             if ($type === 'task') {
                                                                                 $link = "assignment.php?assignmentID=" . $activities['assessmentID'];
-                                                                            } elseif ($type === 'exam') {
-                                                                                $link = "exam.php?examID=" . $activities['assessmentID'];
-                                                                            } elseif ($type === 'quiz') {
-                                                                                $link = "quiz.php?quizID=" . $activities['assessmentID'];
+                                                                            } elseif ($type === 'test') {
+                                                                                $link = "test.php?testID=" . $activities['assessmentID'];
                                                                             }
                                                                             ?>
                                                                         </div>
@@ -389,10 +386,8 @@ if (isset($_GET['courseID'])) {
 
                                                                                 if ($type === 'task') {
                                                                                     $link = "assignment.php?assignmentID=" . $activities['assessmentID'];
-                                                                                } elseif ($type === 'exam') {
-                                                                                    $link = "exam.php?examID=" . $activities['assessmentID'];
-                                                                                } elseif ($type === 'quiz') {
-                                                                                    $link = "quiz.php?quizID=" . $activities['assessmentID'];
+                                                                                } elseif ($type === 'test') {
+                                                                                    $link = "test.php?testID=" . $activities['assessmentID'];
                                                                                 }
                                                                                 ?>
 

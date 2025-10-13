@@ -14,13 +14,20 @@ $userQuery = "SELECT * FROM users
               WHERE users.userID = $userID";
 $userResult = executeQuery($userQuery);
 
-$assignmentQuery = "SELECT * FROM users 
-                    LEFT JOIN userinfo ON users.userID = userInfo.userID 
-                    LEFT JOIN assignments ON users.userID = assignments.userID
-                    LEFT JOIN assessments on assignments.courseID = assessments.courseID
-                    LEFT JOIN courses ON users.userID = courses.userID
-                    LEFT JOIN lessons ON courses.courseID = lessons.courseID
-                    LEFT JOIN scores ON assignments.assignmentID = scores.assignmentID
+$assignmentQuery = "SELECT 
+                    assessments.assessmentTitle,
+                    assessments.deadline,
+                    assignments.assignmentDescription,
+                    assignments.assignmentPoints,
+                    userinfo.firstName,
+                    userinfo.lastName,
+                    userinfo.profilePicture,
+                    scores.score
+                    FROM courses 
+                    INNER JOIN assessments ON courses.courseID = assessments.courseID 
+                    INNER JOIN assignments ON assessments.assessmentID = assignments.assessmentID
+                    INNER JOIN userinfo ON courses.userID = userInfo.userID 
+                    INNER JOIN scores ON assignments.assignmentID = scores.assignmentID
                     WHERE assignments.assignmentID = $assignmentID";
 $assignmentResult = executeQuery($assignmentQuery);
 
@@ -97,7 +104,7 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
                                 <!-- DESKTOP VIEW -->
                                 <div class="row desktop-header d-none d-sm-flex">
                                     <div class="col-auto me-2">
-                                        <a href="todo.php?userID=<?php echo $userID; ?>" class="text-decoration-none">
+                                        <a href="todo.php" class="text-decoration-none">
                                             <i class="fa-solid fa-arrow-left text-reg text-16"
                                                 style="color: var(--black);"></i>
                                         </a>
@@ -122,7 +129,7 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
                                 <div class="d-block d-sm-none mobile-assignment">
                                     <div class="mobile-top">
                                         <div class="arrow">
-                                            <a href="todo.php?userID=<?php echo $userID; ?>" class="text-decoration-none">
+                                            <a href="todo.php" class="text-decoration-none">
                                                 <i class="fa-solid fa-arrow-left text-reg text-16"
                                                     style="color: var(--black);"></i>
                                             </a>
