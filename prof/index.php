@@ -2,14 +2,45 @@
 <?php
 include('../shared/assets/database/connect.php');
 
+$userID = '1';
+
+$profInfoQuery = "SELECT firstName FROM userinfo
+INNER JOIN courses
+	ON userinfo.userID = courses.userID
+WHERE courses.userID = 1
+GROUP BY courses.userID;";
+$profInfoResult = executeQuery($profInfoQuery);
+
 $courses = [];
-$result = executeQuery("SELECT courseID, userID, courseCode, courseTitle, courseImage, yearSection, schedule FROM courses ORDER BY courseID DESC");
+$result = executeQuery("SELECT * FROM courses WHERE userID = '$userID' AND isActive = 'Yes' ORDER BY courseID DESC");
 if ($result && mysqli_num_rows($result) > 0) {
     while ($row = mysqli_fetch_assoc($result)) {
         $courses[] = $row;
     }
 }
 $totalCourses = count($courses);
+
+$studentsTaughtQuery = "SELECT 
+COUNT(enrollments.enrollmentID) AS studentsTaught
+FROM enrollments
+INNER JOIN courses
+	ON courses.courseID = enrollments.courseID
+WHERE courses.userID = '$userID';
+";
+$studentsTaughtResult = executeQuery($studentsTaughtQuery);
+
+$coursesQuery = "SELECT COUNT(*) AS activeCourses FROM courses WHERE userID = '$userID'";
+$coursesResult = executeQuery($coursesQuery);
+$activeCoursesQuery = $coursesQuery .= " AND isActive = 'Yes'";
+$activeCoursesResult = executeQuery($activeCoursesQuery);
+
+$countAssessmentsQuery = "SELECT 
+COUNT(*) AS activeAssessments FROM assessments
+INNER JOIN courses
+	ON assessments.courseID = courses.courseID
+WHERE courses.userID = 1 AND courses.isActive = 'Yes';
+";
+$countAssessmentsResult = executeQuery($countAssessmentsQuery);
 ?>
 
 <!doctype html>
@@ -66,12 +97,20 @@ $totalCourses = count($courses);
                                                     <img src="../shared/assets/img/profIndex/folder.png" alt="Folder"
                                                         class="img-fluid rounded-circle me-3 folder-img d-none d-sm-block"
                                                         style="width:68px; height:68px;">
-                                                    <div class="text-truncate w-100">
-                                                        <div class="text-sbold text-22">Welcome back, Prof. James!</div>
-                                                        <div class="text-reg text-16">Resume your work and keep
-                                                            developing your
-                                                            course.</div>
-                                                    </div>
+                                                    <?php
+                                                    if (mysqli_num_rows($profInfoResult) > 0) {
+                                                        while ($profInfo = mysqli_fetch_assoc($profInfoResult)) {
+                                                    ?>
+                                                            <div class="text-truncate w-100">
+                                                                <div class="text-sbold text-22">Welcome back, Prof. <?php echo $profInfo['firstName']; ?>!</div>
+                                                                <div class="text-reg text-16">Resume your work and keep
+                                                                    developing your
+                                                                    course.</div>
+                                                            </div>
+                                                    <?php
+                                                        }
+                                                    }
+                                                    ?>
                                                 </div>
                                             </div>
 
@@ -164,24 +203,48 @@ $totalCourses = count($courses);
 
                                     <!-- Stats Section -->
                                     <div class="row stats mt-5 align-items-center">
-                                        <div class="col-12 col-md-3 mb-3">
-                                            <div class="d-flex align-items-center">
-                                                <img src="../shared/assets/img/profIndex/people.png" alt="Students"
-                                                    width="26" height="26" class="me-2">
-                                                <div class="stats-count text-22 text-bold">55</div>
-                                            </div>
-                                            <div class="stats-label text-18 text-sbold">currently enrolled</div>
-                                            <div class="text-reg text-16">55 students taught all-time</div>
-                                        </div>
-                                        <div class="col-12 col-md-3 mb-3">
-                                            <div class="d-flex align-items-center">
-                                                <img src="../shared/assets/img/courses.png" alt="Courses" width="26"
-                                                    height="26" class="me-2">
-                                                <div class="stats-count text-22 text-bold">2</div>
-                                            </div>
-                                            <div class="stats-label text-18 text-sbold">active courses</div>
-                                            <div class="text-reg text-16">55 courses created all-time</div>
-                                        </div>
+                                        <?php
+                                        if (mysqli_num_rows($studentsTaughtResult) > 0) {
+                                            while ($studentsTaught = mysqli_fetch_assoc($studentsTaughtResult)) {
+                                        ?>
+                                                <div class="col-12 col-md-3 mb-3">
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="../shared/assets/img/profIndex/people.png" alt="Students"
+                                                            width="26" height="26" class="me-2">
+                                                        <div class="stats-count text-22 text-bold"><?php echo $studentsTaught['studentsTaught']; ?></div>
+                                                    </div>
+                                                    <div class="stats-label text-18 text-sbold">currently enrolled</div>
+                                                    <div class="text-reg text-16"><?php echo $studentsTaught['studentsTaught']; ?> students taught all-time</div>
+                                                </div>
+                                        <?php
+                                            }
+                                        }
+                                        ?>
+                                        <?php
+                                        if (mysqli_num_rows($activeCoursesResult) > 0) {
+                                            while ($activeCourses = mysqli_fetch_assoc($activeCoursesResult)) {
+                                        ?>
+                                                <div class="col-12 col-md-3 mb-3">
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="../shared/assets/img/courses.png" alt="Courses" width="26"
+                                                            height="26" class="me-2">
+                                                        <div class="stats-count text-22 text-bold"><?php echo $activeCourses['activeCourses']; ?></div>
+                                                    </div>
+                                                    <div class="stats-label text-18 text-sbold">active courses</div>
+                                            <?php
+                                            }
+                                        }
+                                            ?>
+                                            <?php
+                                            if (mysqli_num_rows($coursesResult) > 0) {
+                                                while ($totalCourse = mysqli_fetch_assoc($coursesResult)) {
+                                            ?>
+                                                    <div class="text-reg text-16"><?php echo $totalCourse['activeCourses']; ?> courses created all-time</div>
+                                                </div>
+                                        <?php
+                                                }
+                                            }
+                                        ?>
                                         <div class="col-12 col-md-3 mb-3">
                                             <div class="d-flex align-items-center">
                                                 <img src="../shared/assets/img/profIndex/tasks.png" alt="Tasks"
@@ -191,15 +254,23 @@ $totalCourses = count($courses);
                                             <div class="stats-label text-18 text-sbold">tasks to grade</div>
                                             <div class="text-reg text-16">+50 in the past 24 hours</div>
                                         </div>
-                                        <div class="col-12 col-md-3 mb-3">
-                                            <div class="d-flex align-items-center">
-                                                <img src="../shared/assets/img/profIndex/assess.png" alt="Assessments"
-                                                    width="26" height="26" class="me-2">
-                                                <div class="stats-count text-22 text-bold">5</div>
-                                            </div>
-                                            <div class="stats-label text-18 text-sbold">active assessments</div>
-                                            <div class="text-reg text-16">55 students yet to complete</div>
-                                        </div>
+                                        <?php
+                                        if (mysqli_num_rows($countAssessmentsResult) > 0) {
+                                            while ($countAssessments = mysqli_fetch_assoc($countAssessmentsResult)) {
+                                        ?>
+                                                <div class="col-12 col-md-3 mb-3">
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="../shared/assets/img/profIndex/assess.png" alt="Assessments"
+                                                            width="26" height="26" class="me-2">
+                                                        <div class="stats-count text-22 text-bold"><?php echo $countAssessments['activeAssessments']; ?></div>
+                                                    </div>
+                                                    <div class="stats-label text-18 text-sbold">active assessments</div>
+                                                    <div class="text-reg text-16">55 students yet to complete</div>
+                                                </div>
+                                        <?php
+                                            }
+                                        }
+                                        ?>
                                     </div>
 
 
@@ -231,7 +302,7 @@ $totalCourses = count($courses);
                                                                 <div class="text-reg text-14"
                                                                     style="color: var(--black); opacity: 0.85;">No courses
                                                                     found.</div>
-                                                            <?php } else {
+                                                                <?php } else {
                                                                 foreach ($courses as $course) {
                                                                     $courseCode = ($course['courseCode'] ?? '');
                                                                     $courseTitle = ($course['courseTitle'] ?? '');
@@ -240,7 +311,7 @@ $totalCourses = count($courses);
                                                                     $imageFile = trim((string) ($course['courseImage'] ?? ''));
                                                                     $imagePath = "../shared/assets/img/home/" . $imageFile;
                                                                     $fallbackImage = "../shared/assets/img/home/webdev.jpg";
-                                                                    ?>
+                                                                ?>
                                                                     <div class="card custom-course-card">
                                                                         <img src="<?php echo $imageFile ? $imagePath : $fallbackImage; ?>"
                                                                             class="card-img-top"
@@ -280,7 +351,7 @@ $totalCourses = count($courses);
                                                                                 updated recently</div>
                                                                         </div>
                                                                     </div>
-                                                                <?php }
+                                                            <?php }
                                                             } ?>
                                                         </div>
                                                     </div>
@@ -428,8 +499,12 @@ $totalCourses = count($courses);
                     options: {
                         cutout: '75%',
                         plugins: {
-                            legend: { display: false },
-                            tooltip: { enabled: false }
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: false
+                            }
                         }
                     }
                 });

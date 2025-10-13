@@ -1,6 +1,7 @@
 <?php $activePage = 'todo';
+session_start();
 include('shared/assets/database/connect.php');
-$userID = '2';
+include("shared/assets/processes/session-process.php");
 
 $selectEnrolledQuery = "SELECT
 courses.courseCode

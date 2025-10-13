@@ -3,13 +3,7 @@ $activePage = 'courseInfo';
 
 include("shared/assets/database/connect.php");
 session_start();
-
-/*if (isset($_SESSION['userID'])) {
-    $userID = $_SESSION['userID'];
-} else {
-    header("Location: login.php");
-    exit();
-}*/
+include("shared/assets/processes/session-process.php");
 
 $userID = 2;
 

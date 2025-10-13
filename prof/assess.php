@@ -1,3 +1,20 @@
+<?php
+include("../shared/assets/database/connect.php");
+$userID = '1';
+
+$assessmentsQuery = "SELECT 
+assessments.type, 
+assessments.assessmentTitle, 
+courses.courseCode, 
+courses.courseTitle, 
+DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline
+FROM assessments
+INNER JOIN courses
+	ON assessments.courseID = courses.courseID
+WHERE courses.userID = $userID AND courses.isActive = 'Yes'";
+$assessmentsResult = executeQuery($assessmentsQuery);
+?>
+
 <!doctype html>
 <html lang="en">
 
@@ -113,66 +130,78 @@
                                 </div>
 
                                 <!-- Assessment Card -->
-                                <div class="assessment-card mb-3">
-                                    <div class="card-content">
-                                        <!-- Top Row: Left Info and Submission Stats -->
-                                        <div class="top-row">
-                                            <!-- Left Info -->
-                                            <div class="left-info">
-                                                <div class="mb-2 text-reg">
-                                                    <span class="badge rounded-pill task-badge">Task</span>
-                                                </div>
-                                                <div class="text-bold text-18 mb-2">Assignment #1</div>
-                                                <div class="text-sbold text-14">COMP-006<br>
-                                                    <div class="text-reg text-14">Web Development</div>
-                                                </div>
-                                            </div>
+                                <?php
+                                $chartsIDs = [];
+                                if (mysqli_num_rows($assessmentsResult) > 0) {
+                                    $i = 1;
+                                    while ($assessments = mysqli_fetch_assoc($assessmentsResult)) {
+                                        $chartsIDs[] = "chart$i";
+                                ?>
+                                        <div class="assessment-card mb-3">
+                                            <div class="card-content">
+                                                <!-- Top Row: Left Info and Submission Stats -->
+                                                <div class="top-row">
+                                                    <!-- Left Info -->
+                                                    <div class="left-info">
+                                                        <div class="mb-2 text-reg">
+                                                            <span class="badge rounded-pill task-badge"><?php echo $assessments['type']; ?></span>
+                                                        </div>
+                                                        <div class="text-bold text-18 mb-2"><?php echo $assessments['assessmentTitle']; ?></div>
+                                                        <div class="text-sbold text-14"><?php echo $assessments['courseCode']; ?><br>
+                                                            <div class="text-reg text-14"><?php echo $assessments['courseTitle']; ?></div>
+                                                        </div>
+                                                    </div>
 
-                                            <!-- Submission Stats -->
-                                            <div class="submission-stats">
-                                                <div class="text-reg text-14 mb-1"><span class="stat-value">10</span> submitted</div>
-                                                <div class="text-reg text-14 mb-1"><span class="stat-value">11</span> pending submission</div>
-                                                <div class="text-reg text-14 mb-1"><span class="stat-value">0</span> graded</div>
-                                                <div class="text-reg text-14">Due Sep 9</div>
-                                            </div>
+                                                    <!-- Submission Stats -->
+                                                    <div class="submission-stats">
+                                                        <div class="text-reg text-14 mb-1"><span class="stat-value">10</span> submitted</div>
+                                                        <div class="text-reg text-14 mb-1"><span class="stat-value">11</span> pending submission</div>
+                                                        <div class="text-reg text-14 mb-1"><span class="stat-value">0</span> graded</div>
+                                                        <div class="text-reg text-14">Due <?php echo $assessments['assessmentDeadline']; ?></div>
+                                                    </div>
 
-                                            <!-- Right Side: Progress Chart and Options -->
-                                            <div class="right-section">
-                                                <div class="chart-container">
-                                                    <canvas id="chart1" width="120" height="120"></canvas>
+                                                    <!-- Right Side: Progress Chart and Options -->
+                                                    <div class="right-section">
+                                                        <div class="chart-container">
+                                                            <canvas id="chart<?php echo $i; ?>" width="120" height="120"></canvas>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Bottom Row: Action Buttons -->
+                                                <div class="bottom-row">
+                                                    <div class="action-buttons">
+                                                        <button class="btn btn-action">
+                                                            <img src="../shared/assets/img/assess/info.png"
+                                                                alt="Assess Icon"
+                                                                style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Task Details
+                                                        </button>
+                                                        <button class="btn btn-action">
+                                                            <img src="../shared/assets/img/assess/assess.png"
+                                                                alt="Assess Icon"
+                                                                style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
+                                                            Sheet
+                                                        </button>
+                                                    </div>
+                                                    <!-- More Options aligned with buttons on the right -->
+                                                    <div class="options-container">
+                                                        <div class="dropdown dropend">
+                                                            <button class="btn btn-link more-options" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                <i class="fas fa-ellipsis-v"></i>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                                <li><a class="dropdown-item" href="#"><i class="fas fa-archive me-2"></i>Mark as Archived</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <!-- Bottom Row: Action Buttons -->
-                                        <div class="bottom-row">
-                                            <div class="action-buttons">
-                                            <button class="btn btn-action">
-                                                    <img src="../shared/assets/img/assess/info.png"
-                                                        alt="Assess Icon"
-                                                        style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Task Details
-                                                </button>
-                                                <button class="btn btn-action">
-                                                    <img src="../shared/assets/img/assess/assess.png"
-                                                        alt="Assess Icon"
-                                                        style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
-                                                    Sheet
-                                                </button>
-                                            </div>
-                                            <!-- More Options aligned with buttons on the right -->
-                                            <div class="options-container">
-                                                <div class="dropdown dropend">
-                                                    <button class="btn btn-link more-options" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i class="fas fa-ellipsis-v"></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu dropdown-menu-end">
-                                                        <li><a class="dropdown-item" href="#"><i class="fas fa-archive me-2"></i>Mark as Archived</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <?php
+                                        $i++;
+                                    }
+                                }
+                                ?>
                             </div>
                         </div>
                     </div>
@@ -202,14 +231,21 @@
                 options: {
                     cutout: '75%',
                     plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: false }
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: false
+                        }
                     }
                 }
             });
         }
 
-        createDoughnutChart('chart1', 10, 11, 0);
+        document.addEventListener("DOMContentLoaded", function() {
+            const chartsIDs = <?php echo json_encode($chartsIDs); ?>;
+            chartsIDs.forEach(id => createDoughnutChart(id, 10, 11, 0));
+        });
     </script>
     </div>
     </div>
