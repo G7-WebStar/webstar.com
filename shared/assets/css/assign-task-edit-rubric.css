@@ -1,0 +1,224 @@
+/* Form styling */
+.create-rubric-form,
+.criteria-title,
+.criterion-description {
+    width: 710px;
+    margin: 0;
+}
+
+/* Input styling */
+.create-rubric-form .form-control,
+.criteria-title .form-control,
+.criterion-description .form-control {
+    border: 1px solid var(--black);
+    border-radius: 15px;
+    font-family: 'Regular', sans-serif;
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: -0.03em;
+}
+
+.create-rubric-form .form-control:focus,
+.criteria-title .form-control:focus,
+.criterion-description .form-control:focus {
+    border-color: var(--black);
+    box-shadow: none;
+    outline: none;
+}
+
+/* Divider styling */
+.section-divider {
+    border: 0;
+    border-top: 1px solid var(--black);
+    opacity: 1; 
+    margin-top: 15px;
+    margin-bottom: 15px;
+    width: 62%;
+}
+ 
+/* Remove button styling */
+.card-remove-btn {
+    background: transparent !important;
+    border: none !important;
+    color: var(--black) !important;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: absolute;
+    top: 26px;
+    right: 8px;
+    z-index: 10;
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+}
+
+/* Material Symbols add_circle icon styling */
+.btn .material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 20
+}
+
+.criterion-remove-btn {
+    background: transparent !important;
+    border: none !important;
+    color: var(--black) !important;
+    width: 32px;
+    height: 32px;
+    margin-left: calc(62% - 185px); /* aligns with 62% divider end */
+}
+
+/* Criterion Description Card - matching image design */
+.criterion-description-card {
+    width: 711px;
+    min-height: 300px; 
+    border: 1px solid var(--black);
+    border-radius: 15px; 
+    background: var(--pureWhite);
+    position: relative;
+    padding: 10px;
+}
+
+.level-title,
+.level-description{
+    width: 610px;
+    margin: 0 auto; /* centers the form horizontally */
+}
+
+.level-title .form-control,
+.level-description .form-control {
+    border: 1px solid var(--black);
+    border-radius: 15px;
+    font-family: var(--Regular);
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: -0.03em;
+}
+
+.level-title .form-control:focus,
+.level-description .form-control:focus {
+    border-color: var(--black);
+    box-shadow: none;
+    outline: none;
+}
+
+/* Points label styling */
+.points-label {
+    font-family: 'Regular', sans-serif;
+    font-style: italic;
+    font-size: 14px;
+    line-height: 21px;
+    letter-spacing: -0.03em; /* -3% */
+    width: 136px;
+    height: 21px;
+    color: var(--black);
+    opacity: 1;
+    padding-left: 23px;
+}
+
+.points-label{
+    width: 130px;
+}
+
+.points-label .form-control {
+    border: 1px solid var(--black);
+    border-radius: 15px;
+    font-family: 'Regular', sans-serif;
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: -0.03em;
+}
+
+.points-label .form-control:focus {
+    border-color: var(--black);
+    box-shadow: none;
+    outline: none;
+}
+
+/* Responsive Design for Small Screens */
+@media (max-width: 768px) {
+    /* Form containers - make them responsive */
+    .create-rubric-form,
+    .criteria-title,
+    .criterion-description {
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    /* Criterion description card - responsive width */
+    .criterion-description-card {
+        width: 100%;
+        max-width: 100%;
+        min-height: 290px;
+    }
+    
+    /* Level forms - responsive width */
+    .level-title,
+    .level-description {
+        width: 95%;
+        max-width: 95%;
+    }
+    
+    /* Points label - responsive width */
+    .points-label {
+        width: 95%;
+        max-width: 95%;
+        padding-left: 10px;
+        width: 120px;
+    }
+    
+    /* Section divider - full width on mobile */
+    .section-divider {
+        width: 100%;
+    }
+    
+    /* Criterion remove button - keep same positioning as large screen */
+    .criterion-remove-btn {
+        margin-left: calc(100% - 185px);
+    }
+    
+    /* Card remove button - adjust positioning for mobile */
+    .card-remove-btn {
+        top: 24px;
+        right: 2px;
+        z-index: 10;
+    }
+    
+    /* Input padding adjustments for mobile */
+    .form-control {
+        padding: 12px 16px !important;
+    }
+    
+    /* Container padding adjustments */
+    .container-fluid {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+
+     /* Header margin adjustment for mobile */
+     .row.mb-3.align-items-center {
+        justify-content: center;
+        margin-right: 25px;
+    }
+    
+    /* Arrow gap adjustment for mobile */
+    .row.mb-3.align-items-center .col-auto {
+       justify-content: flex-start;
+    }
+}
+
+
+
+
+
