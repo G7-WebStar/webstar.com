@@ -37,7 +37,8 @@ $totalCourses = count($courses);
 
 //Active Assessments Tab
 $assessments = [];
-$activeAssessmentsTabQuery = "SELECT 
+$activeAssessmentsTabQuery = "SELECT
+assessments.type, 
 courses.courseID, 
 assessments.assessmentID, 
 assessments.assessmentTitle, 
@@ -75,7 +76,7 @@ if ($activeAssessmentsTabResult && mysqli_num_rows($activeAssessmentsTabResult) 
 	                                ON todo.assessmentID = assessments.assessmentID
                                 INNER JOIN courses
 	                                ON assessments.courseID = courses.courseID
-                                WHERE courses.userID = '$userID' AND assessments.courseID = '$courseID' AND todo.status = 'Graded' OR todo.status = 'Submitted'";
+                                WHERE courses.userID = '$userID' AND assessments.courseID = '$assessmentCourseID' AND todo.status = 'Graded' OR todo.status = 'Submitted'";
         $countSubmittedResult = executeQuery($countSubmittedQuery);
 
         $submittedTodoCount = 0;
@@ -482,7 +483,7 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                                 style="width: 26px; height: 26px; margin-right: 5px; object-fit: contain;">
                                                             <span>Active Assessments</span>
                                                         </div>
-                                                        <div>5</div>
+                                                        <div><?php echo $totalAssessments ?></div>
                                                     </div>
 
                                                     <!-- Scrollable tasks -->
@@ -495,13 +496,19 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                                 style="color: var(--black); opacity: 0.85;">No assessments
                                                                 found.</div>
                                                             <?php } else {
+                                                            $chartsIDs = [];
+                                                            $i = 1;
                                                             foreach ($assessments as $assessment) {
+                                                                $assessmentType = ($assessment['type'] ?? '');
                                                                 $assessmentTitle = ($assessment['assessmentTitle'] ?? '');
                                                                 $about = ($assessment['about'] ?? '');
                                                                 $assessmentCourseCode = ($assessment['courseCode'] ?? '');
                                                                 $assessmentDeadline = ($assessment['assessmentDeadline'] ?? '');
                                                                 $courseStudents = ($assessment['courseStudents'] ?? '');
                                                                 $submittedTodo = ($assessment['submittedTodo'] ?? '');
+                                                                $chartsIDs[] = "chart$i";
+                                                                $submittedChart[] = $submittedTodo;
+                                                                $studentChart[] = $courseStudents;
                                                             ?>
                                                                 <div class="card mb-3"
                                                                     style="border-radius: 12px; border: 1px solid var(--black); padding: 15px;">
@@ -511,19 +518,19 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                                         <div class="flex-grow-1 ">
                                                                             <div class="mb-2 text-reg">
                                                                                 <span class="badge rounded-pill"
-                                                                                    style="background: var(--highlight50); color: var(--black); font-size:12px;">Task</span>
+                                                                                    style="background: var(--highlight50); color: var(--black); font-size:12px;"><?php echo $assessmentType ?></span>
                                                                             </div>
-                                                                            <div class="text-bold"><?php echo $assessmentTitle?></div>
-                                                                            <div class="text-sbold text-14 pt-1"><?php echo $assessmentCourseCode?><br>
-                                                                                <div class="text-reg text-14"><?php echo $about?>
+                                                                            <div class="text-bold"><?php echo $assessmentTitle ?></div>
+                                                                            <div class="text-sbold text-14 pt-1"><?php echo $assessmentCourseCode ?><br>
+                                                                                <div class="text-reg text-14"><?php echo $about ?>
                                                                                 </div>
                                                                             </div>
                                                                             <div class="text-reg text-12 mt-2"
                                                                                 style="color: var(--black);">
-                                                                                <span class="text-sbold"><?php echo $submittedTodo?></span> of <?php echo $courseStudents?>
+                                                                                <span class="text-sbold"><?php echo $submittedTodo ?></span> of <?php echo $courseStudents ?>
                                                                                 students
                                                                                 submitted<br>
-                                                                                <span class="text-reg">Due <?php echo $assessmentDeadline?></span>
+                                                                                <span class="text-reg">Due <?php echo $assessmentDeadline ?></span>
                                                                             </div>
 
                                                                         </div>
@@ -532,7 +539,7 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                                         <div class="d-flex flex-column align-items-center ms-3">
                                                                             <!-- Graph -->
                                                                             <div class="me-5 mt-3">
-                                                                                <canvas id="chart1" width="100"
+                                                                                <canvas id="chart<?php echo $i; ?>" width="100"
                                                                                     height="100"></canvas>
                                                                             </div>
                                                                         </div>
@@ -545,7 +552,9 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                                         </a>
                                                                     </div>
                                                                 </div>
-                                                        <?php }
+                                                        <?php
+                                                                $i++;
+                                                            }
                                                         } ?>
                                                     </div>
                                                 </div>
@@ -592,8 +601,14 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                 });
             }
 
-            createDoughnutChart('chart1', 29, 59);
-            createDoughnutChart('chart2', 45, 60);
+            document.addEventListener("DOMContentLoaded", function() {
+                const chartsIDs = <?php echo json_encode($chartsIDs); ?>;
+                const submitted = <?php echo json_encode($submittedChart); ?>;
+                const student = <?php echo json_encode($studentChart); ?>;
+                chartsIDs.forEach((id, index) => {
+                    createDoughnutChart(id, submitted[index], student[index]);
+                });
+            });
         </script>
 
 </body>
