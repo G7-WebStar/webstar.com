@@ -22,12 +22,11 @@ $assignmentQuery = "SELECT
                     userinfo.firstName,
                     userinfo.lastName,
                     userinfo.profilePicture,
-                    scores.score
+                    assignments.assignmentPoints
                     FROM courses 
                     INNER JOIN assessments ON courses.courseID = assessments.courseID 
                     INNER JOIN assignments ON assessments.assessmentID = assignments.assessmentID
                     INNER JOIN userinfo ON courses.userID = userInfo.userID 
-                    INNER JOIN scores ON assignments.assignmentID = scores.assignmentID
                     WHERE assignments.assignmentID = $assignmentID";
 $assignmentResult = executeQuery($assignmentQuery);
 

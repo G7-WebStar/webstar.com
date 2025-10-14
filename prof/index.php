@@ -35,6 +35,64 @@ if ($result && mysqli_num_rows($result) > 0) {
 }
 $totalCourses = count($courses);
 
+//Active Assessments Tab
+$assessments = [];
+$activeAssessmentsTabQuery = "SELECT 
+courses.courseID, 
+assessments.assessmentID, 
+assessments.assessmentTitle, 
+assessments.about,
+courses.courseCode, 
+DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline 
+FROM assignments
+INNER JOIN assessments
+	ON assignments.assessmentID = assessments.assessmentID
+INNER JOIN courses
+	ON assessments.courseID = courses.courseID
+WHERE assessments.deadline > CURRENT_DATE
+";
+$activeAssessmentsTabResult = executeQuery($activeAssessmentsTabQuery);
+if ($activeAssessmentsTabResult && mysqli_num_rows($activeAssessmentsTabResult) > 0) {
+    while ($rowAssessment = mysqli_fetch_assoc($activeAssessmentsTabResult)) {
+        $assessmentCourseID = $rowAssessment['courseID'];
+
+        $countStudentAssessmentQuery = "SELECT COUNT(*) AS courseStudents
+                                        FROM enrollments
+                                        INNER JOIN courses
+	                                        ON courses.courseID = enrollments.courseID
+                                        WHERE courses.userID = '$userID' AND enrollments.courseID = '$assessmentCourseID';";
+        $countStudentAssessmentResult = executeQuery($countStudentAssessmentQuery);
+
+        $studentAssessmentCount = 0;
+
+        if (mysqli_num_rows($countStudentAssessmentResult) > 0) {
+            $countRowAssessment = mysqli_fetch_assoc($countStudentAssessmentResult);
+            $studentAssessmentCount = $countRowAssessment['courseStudents'];
+        }
+
+        $countSubmittedQuery = "SELECT COUNT(*) AS submittedTodo FROM todo 
+                                INNER JOIN assessments
+	                                ON todo.assessmentID = assessments.assessmentID
+                                INNER JOIN courses
+	                                ON assessments.courseID = courses.courseID
+                                WHERE courses.userID = '$userID' AND assessments.courseID = '$courseID' AND todo.status = 'Graded' OR todo.status = 'Submitted'";
+        $countSubmittedResult = executeQuery($countSubmittedQuery);
+
+        $submittedTodoCount = 0;
+
+        if (mysqli_num_rows($countSubmittedResult) > 0) {
+            $countRowSubmitted = mysqli_fetch_assoc($countSubmittedResult);
+            $submittedTodoCount = $countRowSubmitted['submittedTodo'];
+        }
+
+        $rowAssessment['courseStudents'] = $studentAssessmentCount;
+        $rowAssessment['submittedTodo'] = $submittedTodoCount;
+        $assessments[] = $rowAssessment;
+    }
+}
+$totalAssessments = count($assessments);
+//END
+
 $studentsTaughtQuery = "SELECT 
 COUNT(enrollments.enrollmentID) AS studentsTaught
 FROM enrollments
@@ -432,92 +490,63 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                         style="max-height: 500px; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth;">
 
                                                         <!-- Assessment Card -->
-                                                        <div class="card mb-3"
-                                                            style="border-radius: 12px; border: 1px solid var(--black); padding: 15px;">
-                                                            <div
-                                                                class="d-flex align-items-center justify-content-between">
-                                                                <!-- Left Info -->
-                                                                <div class="flex-grow-1 ">
-                                                                    <div class="mb-2 text-reg">
-                                                                        <span class="badge rounded-pill"
-                                                                            style="background: var(--highlight50); color: var(--black); font-size:12px;">Task</span>
-                                                                    </div>
-                                                                    <div class="text-bold">Assignment #1</div>
-                                                                    <div class="text-sbold text-14 pt-1">COMP–006<br>
-                                                                        <div class="text-reg text-14">Database Systems
+                                                        <?php if ($totalAssessments === 0) { ?>
+                                                            <div class="text-reg text-14"
+                                                                style="color: var(--black); opacity: 0.85;">No assessments
+                                                                found.</div>
+                                                            <?php } else {
+                                                            foreach ($assessments as $assessment) {
+                                                                $assessmentTitle = ($assessment['assessmentTitle'] ?? '');
+                                                                $about = ($assessment['about'] ?? '');
+                                                                $assessmentCourseCode = ($assessment['courseCode'] ?? '');
+                                                                $assessmentDeadline = ($assessment['assessmentDeadline'] ?? '');
+                                                                $courseStudents = ($assessment['courseStudents'] ?? '');
+                                                                $submittedTodo = ($assessment['submittedTodo'] ?? '');
+                                                            ?>
+                                                                <div class="card mb-3"
+                                                                    style="border-radius: 12px; border: 1px solid var(--black); padding: 15px;">
+                                                                    <div
+                                                                        class="d-flex align-items-center justify-content-between">
+                                                                        <!-- Left Info -->
+                                                                        <div class="flex-grow-1 ">
+                                                                            <div class="mb-2 text-reg">
+                                                                                <span class="badge rounded-pill"
+                                                                                    style="background: var(--highlight50); color: var(--black); font-size:12px;">Task</span>
+                                                                            </div>
+                                                                            <div class="text-bold"><?php echo $assessmentTitle?></div>
+                                                                            <div class="text-sbold text-14 pt-1"><?php echo $assessmentCourseCode?><br>
+                                                                                <div class="text-reg text-14"><?php echo $about?>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="text-reg text-12 mt-2"
+                                                                                style="color: var(--black);">
+                                                                                <span class="text-sbold"><?php echo $submittedTodo?></span> of <?php echo $courseStudents?>
+                                                                                students
+                                                                                submitted<br>
+                                                                                <span class="text-reg">Due <?php echo $assessmentDeadline?></span>
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                        <!-- Right Side: Graph + Arrow -->
+                                                                        <div class="d-flex flex-column align-items-center ms-3">
+                                                                            <!-- Graph -->
+                                                                            <div class="me-5 mt-3">
+                                                                                <canvas id="chart1" width="100"
+                                                                                    height="100"></canvas>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="text-reg text-12 mt-2"
-                                                                        style="color: var(--black);">
-                                                                        <span class="text-sbold">29</span> of 59
-                                                                        students
-                                                                        submitted<br>
-                                                                        <span class="text-reg">Due Sep 9</span>
-                                                                    </div>
-
-                                                                </div>
-
-                                                                <!-- Right Side: Graph + Arrow -->
-                                                                <div class="d-flex flex-column align-items-center ms-3">
-                                                                    <!-- Graph -->
-                                                                    <div class="me-5 mt-3">
-                                                                        <canvas id="chart1" width="100"
-                                                                            height="100"></canvas>
+                                                                    <!-- Arrow at the bottom -->
+                                                                    <div class="d-flex justify-content-end">
+                                                                        <a href="#">
+                                                                            <i class="fa-solid fa-arrow-right"
+                                                                                style="color: var(--black);"></i>
+                                                                        </a>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                            <!-- Arrow at the bottom -->
-                                                            <div class="d-flex justify-content-end">
-                                                                <a href="#">
-                                                                    <i class="fa-solid fa-arrow-right"
-                                                                        style="color: var(--black);"></i>
-                                                                </a>
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Duplicate another card -->
-                                                        <div class="card mb-3"
-                                                            style="border-radius: 12px; border: 1px solid var(--black); padding: 15px;">
-                                                            <div
-                                                                class="d-flex align-items-center justify-content-between">
-                                                                <!-- Left Info -->
-                                                                <div class="flex-grow-1">
-                                                                    <div class="mb-2 text-reg">
-                                                                        <span class="badge rounded-pill"
-                                                                            style="background: var(--highlight50); color: var(--black); font-size:12px;">Task</span>
-                                                                    </div>
-                                                                    <div class="text-bold">Assignment #2</div>
-                                                                    <div class="text-sbold text-14 pt-1">COMP–007<br>
-                                                                        <div class="text-reg text-14">Database Systems
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="text-reg text-12 mt-2"
-                                                                        style="color: var(--black);">
-                                                                        <span class="text-sbold">45</span> of 60
-                                                                        students
-                                                                        submitted<br>
-                                                                        <span class="text-reg">Due Sep 12</span>
-                                                                    </div>
-                                                                </div>
-
-                                                                <!-- Right Side: Graph + Arrow -->
-                                                                <div class="d-flex flex-column align-items-center ms-3">
-                                                                    <!-- Graph -->
-                                                                    <div class="me-5 mt-3">
-                                                                        <canvas id="chart2" width="100"
-                                                                            height="100"></canvas>
-                                                                    </div>
-                                                                </div>
-
-                                                            </div>
-                                                            <!-- Arrow at the bottom -->
-                                                            <div class="d-flex justify-content-end">
-                                                                <a href="#">
-                                                                    <i class="fa-solid fa-arrow-right"
-                                                                        style="color: var(--black);"></i>
-                                                                </a>
-                                                            </div>
-                                                        </div>
+                                                        <?php }
+                                                        } ?>
                                                     </div>
                                                 </div>
                                             </div>
