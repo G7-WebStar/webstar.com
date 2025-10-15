@@ -28,6 +28,7 @@ $selectAssessmentQuery = "SELECT
     INNER JOIN assignments
     	ON assignments.assessmentID = todo.assessmentID
     WHERE todo.userID = '$userID' AND todo.status = 'Pending'
+    GROUP BY assignments.assignmentID
     ORDER BY todo.assessmentID DESC
 ";
 $selectAssessmentResult = executeQuery($selectAssessmentQuery);

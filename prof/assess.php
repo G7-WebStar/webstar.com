@@ -5,6 +5,7 @@ $userID = '1';
 $assessmentsQuery = "SELECT 
 assessments.type, 
 assessments.assessmentTitle, 
+courses.courseID,
 courses.courseCode, 
 courses.courseTitle, 
 DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline
