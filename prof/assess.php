@@ -2,6 +2,7 @@
 include("../shared/assets/database/connect.php");
 $userID = '1';
 
+$assessments = [];
 $assessmentsQuery = "SELECT 
 assessments.type, 
 assessments.assessmentTitle, 
@@ -14,6 +15,43 @@ INNER JOIN courses
 	ON assessments.courseID = courses.courseID
 WHERE courses.userID = $userID AND courses.isActive = 'Yes'";
 $assessmentsResult = executeQuery($assessmentsQuery);
+
+if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
+    while ($rowAssessment = mysqli_fetch_assoc($assessmentsResult)) {
+        $assessmentCourseID = $rowAssessment['courseID'];
+
+        $countStudentAssessmentQuery = "SELECT COUNT(*) AS courseStudents
+                                        FROM enrollments
+                                        INNER JOIN courses
+	                                        ON courses.courseID = enrollments.courseID
+                                        WHERE courses.userID = '$userID' AND enrollments.courseID = '$assessmentCourseID';";
+        $countStudentAssessmentResult = executeQuery($countStudentAssessmentQuery);
+
+        if (mysqli_num_rows($countStudentAssessmentResult) > 0) {
+            $countRowAssessment = mysqli_fetch_assoc($countStudentAssessmentResult);
+            $studentAssessmentCount = $countRowAssessment['courseStudents'];
+        }
+
+        $countSubmittedQuery = "SELECT COUNT(*) AS submittedTodo FROM todo 
+                                INNER JOIN assessments
+	                                ON todo.assessmentID = assessments.assessmentID
+                                INNER JOIN courses
+	                                ON assessments.courseID = courses.courseID
+                                WHERE courses.userID = '$userID' AND assessments.courseID = '$assessmentCourseID' AND todo.status = 'Graded' OR todo.status = 'Submitted'";
+        $countSubmittedResult = executeQuery($countSubmittedQuery);
+
+        $submittedTodoCount = 0;
+
+        if (mysqli_num_rows($countSubmittedResult) > 0) {
+            $countRowSubmitted = mysqli_fetch_assoc($countSubmittedResult);
+            $submittedTodoCount = $countRowSubmitted['submittedTodo'];
+        }
+
+        $rowAssessment['courseStudents'] = $studentAssessmentCount;
+        $rowAssessment['submittedTodo'] = $submittedTodoCount;
+        $assessments[] = $rowAssessment;
+    }
+}
 ?>
 
 <!doctype html>
