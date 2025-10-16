@@ -2,16 +2,7 @@
 $activePage = 'create-exam';
 
 include('../shared/assets/database/connect.php');
-
-session_start();
-
-
-if (!isset($_SESSION['userID'])) {
-    header("Location: ../login.php");
-    exit;
-}
-
-$userID = $_SESSION['userID'];
+include("../shared/assets/processes/prof-session-process.php");
 
 $course = "SELECT courseID, courseCode 
            FROM courses 

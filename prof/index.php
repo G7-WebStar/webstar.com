@@ -1,8 +1,7 @@
 <?php $activePage = 'profIndex'; ?>
 <?php
 include('../shared/assets/database/connect.php');
-
-$userID = '1';
+include("../shared/assets/processes/prof-session-process.php");
 
 $profInfoQuery = "SELECT firstName FROM userinfo
 INNER JOIN courses

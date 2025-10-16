@@ -1,7 +1,7 @@
 <?php
 $activePage = 'lessons-info';
 include('shared/assets/database/connect.php');
-
+include("shared/assets/processes/session-process.php");
 if (!isset($_GET['lessonID'])) {
     echo "Lesson ID is missing in the URL.";
     exit;

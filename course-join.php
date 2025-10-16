@@ -1,5 +1,4 @@
 <?php $activePage = 'home';
-session_start();
 include('shared/assets/database/connect.php');
 include("shared/assets/processes/session-process.php");
 $invalidCode = false;

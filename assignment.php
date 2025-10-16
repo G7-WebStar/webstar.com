@@ -2,9 +2,6 @@
 $activePage = 'assignment';
 
 include('shared/assets/database/connect.php');
-
-session_start();
-
 include("shared/assets/processes/session-process.php");
 
 $assignmentID = intval($_GET['assignmentID']);

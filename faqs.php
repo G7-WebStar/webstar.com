@@ -1,4 +1,7 @@
 <?php $activePage = 'course'; ?>
+<?php
+include("shared/assets/processes/session-process.php");
+?>
 
 <!doctype html>
 <html lang="en">
@@ -137,7 +140,6 @@
                     }, 150); // Delay matches half the transition time
                 });
             });
-
         </script>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>

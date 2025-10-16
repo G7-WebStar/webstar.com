@@ -1,5 +1,10 @@
 <?php $activePage = 'create-exam'; ?>
 
+<?php
+include("../shared/assets/database/connect.php");
+include("../shared/assets/processes/prof-session-process.php");
+?>
+
 <!doctype html>
 <html lang="en">
 

@@ -1,6 +1,6 @@
 <?php
 include("../shared/assets/database/connect.php");
-$userID = '1';
+include("../shared/assets/processes/prof-session-process.php");
 
 $assessments = [];
 $assessmentsQuery = "SELECT 
