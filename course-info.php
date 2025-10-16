@@ -27,6 +27,7 @@ if (isset($_GET['courseID'])) {
     $selectCourseResult = executeQuery($selectCourseQuery);
 
     $selectAssessmentQuery = "SELECT
+    tests.testID,
     assignments.assignmentID,
     assessments.*,
     assessments.assessmentTitle AS assessmentTitle,
@@ -41,6 +42,8 @@ if (isset($_GET['courseID'])) {
         ON assessments.assessmentID = todo.assessmentID
     INNER JOIN assignments
     	ON assignments.assessmentID = todo.assessmentID
+    INNER JOIN tests
+        ON tests.assessmentID = todo.assessmentID
     WHERE todo.userID = '$userID' AND todo.status = 'Pending' AND courses.courseID = '$courseID'
     ORDER BY assessments.assessmentID DESC
 ";

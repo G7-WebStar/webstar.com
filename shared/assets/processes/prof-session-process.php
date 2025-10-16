@@ -7,3 +7,11 @@ if (!isset($_SESSION['userID'])) {
 } else {
     $userID = $_SESSION['userID'];
 }
+
+if ($_SESSION['role'] != 'admin' && $_SESSION['role'] == 'student') {
+    header("Location: ../index.php");
+    exit();
+} else {
+    header("Location: ../login.php");
+    exit();
+}

@@ -42,7 +42,7 @@
                             if ($type === 'task') {
                                 $link = "assignment.php?assignmentID=" . $todo['assignmentID'];
                             } elseif ($type === 'test') {
-                                $link = "test.php?testID=" . $todo['assignmentID'];
+                                $link = "test.php?testID=" . $todo['testID'];
                             }
                             ?>
 

@@ -12,6 +12,7 @@ WHERE enrollments.userID = '$userID'
 $selectEnrolledResult = executeQuery($selectEnrolledQuery);
 
 $selectAssessmentQuery = "SELECT
+    tests.testID,
 	assignments.assignmentID,
     assessments.*,
     assessments.assessmentTitle AS assessmentTitle,
@@ -26,6 +27,8 @@ $selectAssessmentQuery = "SELECT
     	ON assessments.assessmentID = todo.assessmentID
     INNER JOIN assignments
     	ON assignments.assessmentID = todo.assessmentID
+    INNER JOIN tests
+        ON tests.assessmentID = todo.assessmentID
     WHERE todo.userID = '$userID' AND todo.status = 'Pending'
     GROUP BY assignments.assignmentID
     ORDER BY todo.assessmentID DESC
@@ -181,7 +184,7 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                                             if ($type === 'task') {
                                                                 $link = "assignment.php?assignmentID=" . $todo['assignmentID'];
                                                             } elseif ($type === 'test') {
-                                                                $link = "test.php?testID=" . $todo['examID'];
+                                                                $link = "test.php?testID=" . $todo['testID'];
                                                             }
                                                             ?>
 

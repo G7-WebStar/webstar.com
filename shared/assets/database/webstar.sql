@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 16, 2025 at 10:52 AM
+-- Generation Time: Oct 16, 2025 at 02:49 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -344,10 +344,10 @@ INSERT INTO `program` (`programID`, `programName`) VALUES
 
 CREATE TABLE `report` (
   `reportID` int(11) NOT NULL,
-  `courseID` int(11) NOT NULL,
-  `userID` int(11) NOT NULL,
+  `enrollmentID` int(11) NOT NULL,
   `totalXP` int(11) NOT NULL,
   `allTimeRank` int(11) NOT NULL,
+  `testScorePercent` decimal(10,0) NOT NULL,
   `assignmentScorePercent` decimal(10,0) NOT NULL,
   `assesmentScorePercent` decimal(10,0) NOT NULL,
   `generatedAt` datetime NOT NULL DEFAULT current_timestamp()
@@ -357,8 +357,8 @@ CREATE TABLE `report` (
 -- Dumping data for table `report`
 --
 
-INSERT INTO `report` (`reportID`, `courseID`, `userID`, `totalXP`, `allTimeRank`, `assignmentScorePercent`, `assesmentScorePercent`, `generatedAt`) VALUES
-(1, 1, 2, 4500, 10, 89, 92, '2025-08-30 14:26:32');
+INSERT INTO `report` (`reportID`, `enrollmentID`, `totalXP`, `allTimeRank`, `testScorePercent`, `assignmentScorePercent`, `assesmentScorePercent`, `generatedAt`) VALUES
+(1, 1, 4500, 10, 0, 89, 92, '2025-08-30 14:26:32');
 
 -- --------------------------------------------------------
 
@@ -432,8 +432,6 @@ CREATE TABLE `testresponses` (
 
 CREATE TABLE `tests` (
   `testID` int(5) NOT NULL,
-  `userID` int(5) NOT NULL,
-  `courseID` int(5) NOT NULL,
   `lessonID` int(5) NOT NULL,
   `assessmentID` int(5) NOT NULL,
   `testType` enum('Exam','Quiz') NOT NULL DEFAULT 'Exam',
@@ -507,7 +505,7 @@ INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `
 (4, 4, 'prof.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 2023, 'michael.lee@school.edu', '09171234567', 'facebook.com/michael.lee', 'linkedin.com/in/michaellee', 'instagram.com/michael.lee', '2025-09-28 20:59:48', 1),
 (5, 5, 'prof.png', 'Sophia', 'B.', 'Garcia', '202310004', '1', 'Female', '2', 2023, 'sophia.garcia@school.edu', '09181234567', 'facebook.com/sophia.garcia', 'linkedin.com/in/sophiagarcia', 'instagram.com/sophia.garcia', '2025-09-28 20:59:48', 1),
 (6, 6, 'prof.png', 'Daniel', 'C.', 'Kim', '202310005', '1', 'Male', '2', 2023, 'daniel.kim@school.edu', '09191234567', 'facebook.com/daniel.kim', 'linkedin.com/in/danielkim', 'instagram.com/daniel.kim', '2025-09-28 20:59:48', 1),
-(7, 7, 'prof.png', 'Olivia', 'D.', 'Brown', '202310006', '1', 'Female', '2', 2023, 'olivia.brown@school.edu', '09201234567', 'facebook.com/olivia.brown', 'linkedin.com/in/oliviabrown', 'instagram.com/olivia.brown', '2025-09-28 20:59:48', 1),
+(7, 7, 'prof.png', 'Olivia', 'D.', 'Brown', '202310006', '1', 'Female', '2', 2023, 'olivia.brown@school.edu', '09201234567', 'facebook.com/olivia.brown', 'linkedin.com/in/oliviabrown', 'instagram.com/olivia.brown', '2025-09-28 20:59:48', 0),
 (8, 8, 'prof.png', 'Ethan', 'E.', 'Wilson', '202310007', '1', 'Male', '2', 2023, 'ethan.wilson@school.edu', '09211234567', 'facebook.com/ethan.wilson', 'linkedin.com/in/ethanwilson', 'instagram.com/ethan.wilson', '2025-09-28 20:59:48', 1),
 (9, 9, 'prof.png', 'Isabella', 'F.', 'Martin', '202310008', '1', 'Female', '2', 2023, 'isabella.martin@school.edu', '09221234567', 'facebook.com/isabella.martin', 'linkedin.com/in/isabellamartin', 'instagram.com/isabella.martin', '2025-09-28 20:59:48', 1),
 (10, 10, 'prof.png', 'Liam', 'G.', 'Torres', '202310009', '1', 'Male', '2', 2023, 'liam.torres@school.edu', '09231234567', 'facebook.com/liam.torres', 'linkedin.com/in/liamtorres', 'instagram.com/liam.torres', '2025-09-28 20:59:48', 1),
@@ -533,9 +531,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`) VALUES
-(1, 'Pass@123', 'john.doe@gmail.com', 'admin', 'johndoe'),
+(1, 'Password123', 'john.doe@gmail.com', 'admin', 'johndoe'),
 (2, 'Hello@world', 'jane.smith@example.com', 'student', 'janesmith'),
-(3, 'HelloWorld', 'john.doe@gmail.com', 'user', 'JohnDoe'),
+(3, 'HelloWorld', 'john.doe2@gmail.com', 'user', 'JohnDoe'),
 (4, 'password123', 'michael.lee@example.com', 'student', 'michael_lee'),
 (5, 'securePass!1', 'sophia.garcia@example.com', 'student', 'sophia_garcia'),
 (6, 'helloWorld9', 'daniel.kim@example.com', 'student', 'daniel_kim'),
