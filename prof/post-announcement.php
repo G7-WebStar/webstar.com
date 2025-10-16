@@ -2,15 +2,7 @@
 <?php
 include('../shared/assets/database/connect.php');
 date_default_timezone_set('Asia/Manila');
-
-session_start();
-
-if (!isset($_SESSION['userID'])) {
-    header("Location: ../login.php");
-    exit;
-}
-
-$userID = $_SESSION['userID'];
+include("../shared/assets/processes/prof-session-process.php");
 
 // Get all courses owned by this user
 $sql = "SELECT courseID, courseCode FROM courses WHERE userID = '$userID'";

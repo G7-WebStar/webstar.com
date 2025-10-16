@@ -1,4 +1,7 @@
 <?php $activePage = 'course'; ?>
+<?php
+include("shared/assets/processes/session-process.php");
+?>
 
 <!doctype html>
 <html lang="en">

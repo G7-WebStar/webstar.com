@@ -2,14 +2,7 @@
 $activePage = 'courseInfo';
 
 include("shared/assets/database/connect.php");
-session_start();
-
-/*if (isset($_SESSION['userID'])) {
-    $userID = $_SESSION['userID'];
-} else {
-    header("Location: login.php");
-    exit();
-}*/
+include("shared/assets/processes/session-process.php");
 
 $userID = 2;
 
@@ -34,6 +27,8 @@ if (isset($_GET['courseID'])) {
     $selectCourseResult = executeQuery($selectCourseQuery);
 
     $selectAssessmentQuery = "SELECT
+    tests.testID,
+    assignments.assignmentID,
     assessments.*,
     assessments.assessmentTitle AS assessmentTitle,
     todo.*,
@@ -45,6 +40,10 @@ if (isset($_GET['courseID'])) {
         ON assessments.courseID = courses.courseID
     INNER JOIN todo 
         ON assessments.assessmentID = todo.assessmentID
+    INNER JOIN assignments
+    	ON assignments.assessmentID = todo.assessmentID
+    INNER JOIN tests
+        ON tests.assessmentID = todo.assessmentID
     WHERE todo.userID = '$userID' AND todo.status = 'Pending' AND courses.courseID = '$courseID'
     ORDER BY assessments.assessmentID DESC
 ";

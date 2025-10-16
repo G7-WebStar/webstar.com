@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 12, 2025 at 10:59 AM
+-- Generation Time: Oct 16, 2025 at 02:49 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -94,7 +94,8 @@ CREATE TABLE `assessments` (
   `assessmentID` int(11) NOT NULL,
   `courseID` int(11) NOT NULL,
   `assessmentTitle` varchar(100) NOT NULL,
-  `type` enum('Task','Test') DEFAULT 'Task',
+  `about` varchar(255) NOT NULL,
+  `type` enum('Task','Exam') DEFAULT 'Task',
   `deadline` date NOT NULL,
   `deadlineEnabled` tinyint(1) NOT NULL DEFAULT 0,
   `createdAt` datetime DEFAULT current_timestamp()
@@ -104,11 +105,11 @@ CREATE TABLE `assessments` (
 -- Dumping data for table `assessments`
 --
 
-INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `type`, `deadline`, `deadlineEnabled`, `createdAt`) VALUES
-(1, 1, 'Activity #1', 'Task', '2025-09-09', 0, '2025-09-04 22:00:15'),
-(2, 1, 'Exam #1', 'Test', '2025-09-09', 0, '2025-09-04 22:00:15'),
-(3, 1, 'Activity #2', 'Task', '2025-09-10', 0, '2025-09-04 22:00:15'),
-(4, 2, 'Activity #1', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15');
+INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `about`, `type`, `deadline`, `deadlineEnabled`, `createdAt`) VALUES
+(1, 1, 'Activity #1', 'Review CSS Grid and Flexbox', 'Task', '2025-10-15', 0, '2025-09-09 23:00:15'),
+(2, 1, 'Exam #1', 'Review CSS Grid and Flexbox', 'Exam', '2025-11-06', 0, '2025-09-04 22:00:15'),
+(3, 2, 'Activity #2', 'Review CSS Grid and Flexbox', 'Task', '2025-10-23', 0, '2025-10-22 22:00:15'),
+(4, 2, 'Activity #1', 'Review CSS Grid and Flexbox', 'Exam', '2025-09-11', 0, '2025-09-04 22:00:15');
 
 -- --------------------------------------------------------
 
@@ -118,9 +119,7 @@ INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `type`
 
 CREATE TABLE `assignments` (
   `assignmentID` int(5) NOT NULL,
-  `assessmentID` int(5) NOT NULL,
-  `lessonID` int(5) NOT NULL,
-  `assignmentTitle` varchar(50) NOT NULL,
+  `assessmentID` int(11) NOT NULL,
   `assignmentDescription` varchar(500) NOT NULL,
   `assignmentPoints` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -129,8 +128,10 @@ CREATE TABLE `assignments` (
 -- Dumping data for table `assignments`
 --
 
-INSERT INTO `assignments` (`assignmentID`, `assessmentID`, `lessonID`, `assignmentTitle`, `assignmentDescription`, `assignmentPoints`) VALUES
-(1, 1, 1, 'Assignment #1', 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100);
+INSERT INTO `assignments` (`assignmentID`, `assessmentID`, `assignmentDescription`, `assignmentPoints`) VALUES
+(1, 1, 'Attached is a Google Doc that you can edit.\n\nIn Figma, design a “404 Not Found” page.\n\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\n\nTurn in when done.\n\n', 100),
+(2, 3, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100),
+(3, 2, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100);
 
 -- --------------------------------------------------------
 
@@ -146,6 +147,7 @@ CREATE TABLE `courses` (
   `courseImage` varchar(255) NOT NULL,
   `yearSection` varchar(50) NOT NULL,
   `schedule` varchar(255) NOT NULL,
+  `isActive` varchar(3) NOT NULL DEFAULT 'Yes',
   `code` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -153,9 +155,9 @@ CREATE TABLE `courses` (
 -- Dumping data for table `courses`
 --
 
-INSERT INTO `courses` (`courseID`, `userID`, `courseCode`, `courseTitle`, `courseImage`, `yearSection`, `schedule`, `code`) VALUES
-(1, 1, 'WEBDEV101', 'Web Development', 'webdev.jpg', '2', 'MWF 10:00–11:30AM', 'WD-2A-2025'),
-(2, 1, 'WEBDEV102', 'Web Development 2', 'webdev.jpg', '2', 'MWF 01:00–02:30AM', 'WD-2B-2025');
+INSERT INTO `courses` (`courseID`, `userID`, `courseCode`, `courseTitle`, `courseImage`, `yearSection`, `schedule`, `isActive`, `code`) VALUES
+(1, 1, 'WEBDEV101', 'Web Development', 'webdev.jpg', '2', 'MWF 10:00–11:30AM', 'Yes', 'WD-2A-2025'),
+(2, 1, 'WEBDEV102', 'Web Development 2', 'webdev.jpg', '2', 'MWF 01:00–02:30AM', 'Yes', 'WD-2B-2025');
 
 -- --------------------------------------------------------
 
@@ -212,7 +214,7 @@ CREATE TABLE `files` (
 --
 
 INSERT INTO `files` (`fileID`, `courseID`, `userID`, `announcementID`, `lessonID`, `assignmentID`, `fileAttachment`, `fileTitle`, `fileLink`, `uploadedAt`) VALUES
-(1, 1, 1, 1, 1, NULL, 'Web Development Course Material', 'Web Development Tutorial', 'https://example.com/lesson1,https://example.com/lesson1.1', '2025-08-30 10:30:00');
+(1, 1, 1, 1, 1, NULL, 'Web Development Course Material', '', 'https://example.com/lesson1,https://example.com/lesson1.1', '2025-08-30 10:30:00');
 
 -- --------------------------------------------------------
 
@@ -249,8 +251,6 @@ CREATE TABLE `leaderboard` (
   `timeRange` varchar(10) NOT NULL,
   `periodStart` date NOT NULL,
   `xpPoints` int(11) NOT NULL,
-  `rank` int(11) NOT NULL,
-  `previousRank` int(11) NOT NULL,
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -258,20 +258,20 @@ CREATE TABLE `leaderboard` (
 -- Dumping data for table `leaderboard`
 --
 
-INSERT INTO `leaderboard` (`leaderboardID`, `enrollmentID`, `timeRange`, `periodStart`, `xpPoints`, `rank`, `previousRank`, `updatedAt`) VALUES
-(1, 1, 'Weekly', '2025-08-25', 450, 3, 5, '2025-08-30 12:00:00'),
-(2, 2, 'Weekly', '2025-08-25', 450, 3, 5, '2025-08-30 12:00:00'),
-(3, 1, 'Weekly', '2025-09-28', 100, 3, 5, '2025-09-28 16:50:22'),
-(4, 3, 'Weekly', '2025-09-28', 400, 3, 5, '2025-09-28 16:58:09'),
-(5, 4, 'Weekly', '2025-09-01', 152, 3, 5, '2025-09-28 21:03:44'),
-(6, 5, 'Weekly', '2025-09-01', 189, 3, 5, '2025-09-28 21:03:44'),
-(7, 6, 'Weekly', '2025-09-01', 215, 3, 5, '2025-09-28 21:03:44'),
-(8, 7, 'Weekly', '2025-09-01', 176, 3, 5, '2025-09-28 21:03:44'),
-(9, 8, 'Weekly', '2025-09-01', 221, 3, 5, '2025-09-28 21:03:44'),
-(10, 9, 'Weekly', '2025-09-01', 167, 3, 5, '2025-09-28 21:03:44'),
-(11, 10, 'Weekly', '2025-09-01', 195, 3, 5, '2025-09-28 21:03:44'),
-(12, 11, 'Weekly', '2025-09-01', 214, 3, 5, '2025-09-28 21:03:44'),
-(13, 12, 'Monthly', '2025-09-01', 95, 3, 5, '2025-09-28 21:34:51');
+INSERT INTO `leaderboard` (`leaderboardID`, `enrollmentID`, `timeRange`, `periodStart`, `xpPoints`, `updatedAt`) VALUES
+(1, 1, 'Weekly', '2025-08-25', 450, '2025-08-30 12:00:00'),
+(2, 2, 'Weekly', '2025-08-25', 450, '2025-08-30 12:00:00'),
+(3, 1, 'Weekly', '2025-09-28', 100, '2025-09-28 16:50:22'),
+(4, 3, 'Weekly', '2025-09-28', 400, '2025-09-28 16:58:09'),
+(5, 4, 'Weekly', '2025-09-01', 152, '2025-09-28 21:03:44'),
+(6, 5, 'Weekly', '2025-09-01', 189, '2025-09-28 21:03:44'),
+(7, 6, 'Weekly', '2025-09-01', 215, '2025-09-28 21:03:44'),
+(8, 7, 'Weekly', '2025-09-01', 176, '2025-09-28 21:03:44'),
+(9, 8, 'Weekly', '2025-09-01', 221, '2025-09-28 21:03:44'),
+(10, 9, 'Weekly', '2025-09-01', 167, '2025-09-28 21:03:44'),
+(11, 10, 'Weekly', '2025-09-01', 195, '2025-09-28 21:03:44'),
+(12, 11, 'Weekly', '2025-09-01', 214, '2025-09-28 21:03:44'),
+(13, 12, 'Monthly', '2025-09-01', 95, '2025-09-28 21:34:51');
 
 -- --------------------------------------------------------
 
@@ -344,10 +344,10 @@ INSERT INTO `program` (`programID`, `programName`) VALUES
 
 CREATE TABLE `report` (
   `reportID` int(11) NOT NULL,
-  `courseID` int(11) NOT NULL,
-  `userID` int(11) NOT NULL,
+  `enrollmentID` int(11) NOT NULL,
   `totalXP` int(11) NOT NULL,
   `allTimeRank` int(11) NOT NULL,
+  `testScorePercent` decimal(10,0) NOT NULL,
   `assignmentScorePercent` decimal(10,0) NOT NULL,
   `assesmentScorePercent` decimal(10,0) NOT NULL,
   `generatedAt` datetime NOT NULL DEFAULT current_timestamp()
@@ -357,8 +357,8 @@ CREATE TABLE `report` (
 -- Dumping data for table `report`
 --
 
-INSERT INTO `report` (`reportID`, `courseID`, `userID`, `totalXP`, `allTimeRank`, `assignmentScorePercent`, `assesmentScorePercent`, `generatedAt`) VALUES
-(1, 1, 2, 4500, 10, 89, 92, '2025-08-30 14:26:32');
+INSERT INTO `report` (`reportID`, `enrollmentID`, `totalXP`, `allTimeRank`, `testScorePercent`, `assignmentScorePercent`, `assesmentScorePercent`, `generatedAt`) VALUES
+(1, 1, 4500, 10, 0, 89, 92, '2025-08-30 14:26:32');
 
 -- --------------------------------------------------------
 
@@ -379,7 +379,7 @@ CREATE TABLE `scores` (
 --
 
 INSERT INTO `scores` (`scoreID`, `userID`, `assignmentID`, `testID`, `score`) VALUES
-(1, 1, 1, NULL, 100);
+(1, 2, 1, NULL, 100);
 
 -- --------------------------------------------------------
 
@@ -432,8 +432,6 @@ CREATE TABLE `testresponses` (
 
 CREATE TABLE `tests` (
   `testID` int(5) NOT NULL,
-  `userID` int(5) NOT NULL,
-  `courseID` int(5) NOT NULL,
   `lessonID` int(5) NOT NULL,
   `assessmentID` int(5) NOT NULL,
   `testType` enum('Exam','Quiz') NOT NULL DEFAULT 'Exam',
@@ -465,8 +463,9 @@ CREATE TABLE `todo` (
 --
 
 INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `title`, `status`, `updatedAt`, `isRead`) VALUES
-(1, 2, 1, 'Review CSS Grid and Flexbox', 'Pending', '2025-08-29 09:00:00', 1),
-(2, 2, 2, 'Review CSS Grid and Flexbox 2', 'Pending', '2025-08-29 09:00:00', 1);
+(1, 2, 1, 'Review CSS Grid and Flexbox', 'Graded', '2025-10-12 19:00:00', 1),
+(2, 2, 3, 'Review CSS Grid and Flexbox 2', 'Pending', '2025-10-29 09:00:00', 1),
+(3, 2, 2, 'Review CSS Grid and Flexbox 3', 'Pending', '2025-10-29 09:00:00', 1);
 
 -- --------------------------------------------------------
 
@@ -506,7 +505,7 @@ INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `
 (4, 4, 'prof.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 2023, 'michael.lee@school.edu', '09171234567', 'facebook.com/michael.lee', 'linkedin.com/in/michaellee', 'instagram.com/michael.lee', '2025-09-28 20:59:48', 1),
 (5, 5, 'prof.png', 'Sophia', 'B.', 'Garcia', '202310004', '1', 'Female', '2', 2023, 'sophia.garcia@school.edu', '09181234567', 'facebook.com/sophia.garcia', 'linkedin.com/in/sophiagarcia', 'instagram.com/sophia.garcia', '2025-09-28 20:59:48', 1),
 (6, 6, 'prof.png', 'Daniel', 'C.', 'Kim', '202310005', '1', 'Male', '2', 2023, 'daniel.kim@school.edu', '09191234567', 'facebook.com/daniel.kim', 'linkedin.com/in/danielkim', 'instagram.com/daniel.kim', '2025-09-28 20:59:48', 1),
-(7, 7, 'prof.png', 'Olivia', 'D.', 'Brown', '202310006', '1', 'Female', '2', 2023, 'olivia.brown@school.edu', '09201234567', 'facebook.com/olivia.brown', 'linkedin.com/in/oliviabrown', 'instagram.com/olivia.brown', '2025-09-28 20:59:48', 1),
+(7, 7, 'prof.png', 'Olivia', 'D.', 'Brown', '202310006', '1', 'Female', '2', 2023, 'olivia.brown@school.edu', '09201234567', 'facebook.com/olivia.brown', 'linkedin.com/in/oliviabrown', 'instagram.com/olivia.brown', '2025-09-28 20:59:48', 0),
 (8, 8, 'prof.png', 'Ethan', 'E.', 'Wilson', '202310007', '1', 'Male', '2', 2023, 'ethan.wilson@school.edu', '09211234567', 'facebook.com/ethan.wilson', 'linkedin.com/in/ethanwilson', 'instagram.com/ethan.wilson', '2025-09-28 20:59:48', 1),
 (9, 9, 'prof.png', 'Isabella', 'F.', 'Martin', '202310008', '1', 'Female', '2', 2023, 'isabella.martin@school.edu', '09221234567', 'facebook.com/isabella.martin', 'linkedin.com/in/isabellamartin', 'instagram.com/isabella.martin', '2025-09-28 20:59:48', 1),
 (10, 10, 'prof.png', 'Liam', 'G.', 'Torres', '202310009', '1', 'Male', '2', 2023, 'liam.torres@school.edu', '09231234567', 'facebook.com/liam.torres', 'linkedin.com/in/liamtorres', 'instagram.com/liam.torres', '2025-09-28 20:59:48', 1),
@@ -532,9 +531,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`) VALUES
-(1, 'Pass@123', 'john.doe@gmail.com', 'admin', 'johndoe'),
+(1, 'Password123', 'john.doe@gmail.com', 'admin', 'johndoe'),
 (2, 'Hello@world', 'jane.smith@example.com', 'student', 'janesmith'),
-(3, 'HelloWorld', 'john.doe1@gmail.com', 'user', 'JohnDoe'),
+(3, 'HelloWorld', 'john.doe2@gmail.com', 'user', 'JohnDoe'),
 (4, 'password123', 'michael.lee@example.com', 'student', 'michael_lee'),
 (5, 'securePass!1', 'sophia.garcia@example.com', 'student', 'sophia_garcia'),
 (6, 'helloWorld9', 'daniel.kim@example.com', 'student', 'daniel_kim'),
@@ -716,7 +715,7 @@ ALTER TABLE `assessments`
 -- AUTO_INCREMENT for table `assignments`
 --
 ALTER TABLE `assignments`
-  MODIFY `assignmentID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `assignmentID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `courses`
@@ -776,7 +775,7 @@ ALTER TABLE `report`
 -- AUTO_INCREMENT for table `scores`
 --
 ALTER TABLE `scores`
-  MODIFY `scoreID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `scoreID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `testquestionchoices`
@@ -806,7 +805,7 @@ ALTER TABLE `tests`
 -- AUTO_INCREMENT for table `todo`
 --
 ALTER TABLE `todo`
-  MODIFY `todoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `todoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `userinfo`

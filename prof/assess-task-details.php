@@ -1,3 +1,8 @@
+<?php
+include("../shared/assets/database/connect.php");
+include("../shared/assets/processes/prof-session-process.php");
+?>
+
 <!doctype html>
 <html lang="en">
 
@@ -208,8 +213,12 @@
                 options: {
                     cutout: '75%',
                     plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: false }
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: false
+                        }
                     }
                 }
             });

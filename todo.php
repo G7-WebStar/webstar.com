@@ -1,6 +1,6 @@
 <?php $activePage = 'todo';
 include('shared/assets/database/connect.php');
-$userID = '2';
+include("shared/assets/processes/session-process.php");
 
 $selectEnrolledQuery = "SELECT
 courses.courseCode
@@ -12,6 +12,8 @@ WHERE enrollments.userID = '$userID'
 $selectEnrolledResult = executeQuery($selectEnrolledQuery);
 
 $selectAssessmentQuery = "SELECT
+    tests.testID,
+	assignments.assignmentID,
     assessments.*,
     assessments.assessmentTitle AS assessmentTitle,
     todo.*,
@@ -23,7 +25,12 @@ $selectAssessmentQuery = "SELECT
         ON assessments.courseID = courses.courseID
     INNER JOIN todo
     	ON assessments.assessmentID = todo.assessmentID
+    INNER JOIN assignments
+    	ON assignments.assessmentID = todo.assessmentID
+    INNER JOIN tests
+        ON tests.assessmentID = todo.assessmentID
     WHERE todo.userID = '$userID' AND todo.status = 'Pending'
+    GROUP BY assignments.assignmentID
     ORDER BY todo.assessmentID DESC
 ";
 $selectAssessmentResult = executeQuery($selectAssessmentQuery);
@@ -175,9 +182,9 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                                             $link = "#";
 
                                                             if ($type === 'task') {
-                                                                $link = "assignment.php?assignmentID=" . $todo['assessmentID'];
+                                                                $link = "assignment.php?assignmentID=" . $todo['assignmentID'];
                                                             } elseif ($type === 'test') {
-                                                                $link = "test.php?testID=" . $todo['assessmentID'];
+                                                                $link = "test.php?testID=" . $todo['testID'];
                                                             }
                                                             ?>
 

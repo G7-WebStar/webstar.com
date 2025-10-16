@@ -2,7 +2,7 @@
 <?php
 include('shared/assets/database/connect.php');
 
-$userID = '2';
+include("shared/assets/processes/session-process.php");
 $selectEnrolledQuery = "SELECT 
 	courses.userID  AS profID,
     profInfo.firstName AS profName,

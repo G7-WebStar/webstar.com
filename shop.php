@@ -1,4 +1,7 @@
 <?php $activePage = 'shop'; ?>
+<?php
+include("shared/assets/processes/session-process.php");
+?>
 
 <!doctype html>
 <html lang="en">
@@ -208,7 +211,7 @@
             });
 
             // Open modal when a shop card is clicked
-            contentArea.addEventListener('click', function (e) {
+            contentArea.addEventListener('click', function(e) {
                 const card = e.target.closest('.customCard');
                 if (!card) return;
 

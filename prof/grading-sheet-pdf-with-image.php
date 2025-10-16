@@ -1,6 +1,7 @@
 <?php $activePage = 'grading-sheet-pdf-with-image'; ?>
 <?php
 include("../shared/assets/database/connect.php");
+include("../shared/assets/processes/prof-session-process.php");
 
 // Use GET lessonID if provided, otherwise default to 5
 $lessonID = isset($_GET['lessonID']) ? intval($_GET['lessonID']) : 19;

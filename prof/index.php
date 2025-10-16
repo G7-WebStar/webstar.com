@@ -1,15 +1,147 @@
 <?php $activePage = 'profIndex'; ?>
 <?php
 include('../shared/assets/database/connect.php');
+include("../shared/assets/processes/prof-session-process.php");
+
+$profInfoQuery = "SELECT firstName FROM userinfo
+INNER JOIN courses
+	ON userinfo.userID = courses.userID
+WHERE courses.userID = 1
+GROUP BY courses.userID;";
+$profInfoResult = executeQuery($profInfoQuery);
 
 $courses = [];
-$result = executeQuery("SELECT courseID, userID, courseCode, courseTitle, courseImage, yearSection, schedule FROM courses ORDER BY courseID DESC");
+$result = executeQuery("SELECT * FROM courses WHERE userID = '$userID' AND isActive = 'Yes' ORDER BY courseID DESC");
 if ($result && mysqli_num_rows($result) > 0) {
     while ($row = mysqli_fetch_assoc($result)) {
+        $courseID = $row['courseID'];
+
+        $countStudentsQuery = "SELECT COUNT(*) AS studentCount FROM enrollments  
+        INNER JOIN courses ON enrollments.courseID = courses.courseID 
+        WHERE enrollments.courseID = '$courseID'";
+        $countStudentResult = executeQuery($countStudentsQuery);
+
+        $studentCount = 0;
+
+        if (mysqli_num_rows($countStudentResult) > 0) {
+            $countRow = mysqli_fetch_assoc($countStudentResult);
+            $studentCount = $countRow['studentCount'];
+        }
+
+        $row['studentCount'] = $studentCount;
         $courses[] = $row;
     }
 }
 $totalCourses = count($courses);
+
+//Active Assessments Tab
+$assessments = [];
+$activeAssessmentsTabQuery = "SELECT
+assessments.type, 
+courses.courseID, 
+assessments.assessmentID, 
+assessments.assessmentTitle, 
+assessments.about,
+courses.courseCode, 
+DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline 
+FROM assignments
+INNER JOIN assessments
+	ON assignments.assessmentID = assessments.assessmentID
+INNER JOIN courses
+	ON assessments.courseID = courses.courseID
+WHERE assessments.deadline > CURRENT_DATE
+";
+$activeAssessmentsTabResult = executeQuery($activeAssessmentsTabQuery);
+if ($activeAssessmentsTabResult && mysqli_num_rows($activeAssessmentsTabResult) > 0) {
+    while ($rowAssessment = mysqli_fetch_assoc($activeAssessmentsTabResult)) {
+        $assessmentCourseID = $rowAssessment['courseID'];
+
+        $countStudentAssessmentQuery = "SELECT COUNT(*) AS courseStudents
+                                        FROM enrollments
+                                        INNER JOIN courses
+	                                        ON courses.courseID = enrollments.courseID
+                                        WHERE courses.userID = '$userID' AND enrollments.courseID = '$assessmentCourseID';";
+        $countStudentAssessmentResult = executeQuery($countStudentAssessmentQuery);
+
+        $studentAssessmentCount = 0;
+
+        if (mysqli_num_rows($countStudentAssessmentResult) > 0) {
+            $countRowAssessment = mysqli_fetch_assoc($countStudentAssessmentResult);
+            $studentAssessmentCount = $countRowAssessment['courseStudents'];
+        }
+
+        $countSubmittedQuery = "SELECT COUNT(*) AS submittedTodo FROM todo 
+                                INNER JOIN assessments
+	                                ON todo.assessmentID = assessments.assessmentID
+                                INNER JOIN courses
+	                                ON assessments.courseID = courses.courseID
+                                WHERE courses.userID = '$userID' AND assessments.courseID = '$assessmentCourseID' AND todo.status = 'Graded' OR todo.status = 'Submitted'";
+        $countSubmittedResult = executeQuery($countSubmittedQuery);
+
+        $submittedTodoCount = 0;
+
+        if (mysqli_num_rows($countSubmittedResult) > 0) {
+            $countRowSubmitted = mysqli_fetch_assoc($countSubmittedResult);
+            $submittedTodoCount = $countRowSubmitted['submittedTodo'];
+        }
+
+        $rowAssessment['courseStudents'] = $studentAssessmentCount;
+        $rowAssessment['submittedTodo'] = $submittedTodoCount;
+        $assessments[] = $rowAssessment;
+    }
+}
+$totalAssessments = count($assessments);
+//END
+
+$studentsTaughtQuery = "SELECT 
+COUNT(enrollments.enrollmentID) AS studentsTaught
+FROM enrollments
+INNER JOIN courses
+	ON courses.courseID = enrollments.courseID
+WHERE courses.userID = '$userID';
+";
+$studentsTaughtResult = executeQuery($studentsTaughtQuery);
+
+$coursesQuery = "SELECT COUNT(*) AS activeCourses FROM courses WHERE userID = '$userID'";
+$coursesResult = executeQuery($coursesQuery);
+$activeCoursesQuery = $coursesQuery .= " AND isActive = 'Yes'";
+$activeCoursesResult = executeQuery($activeCoursesQuery);
+
+$countAssessmentsQuery = "SELECT 
+COUNT(*) AS activeAssessments FROM assessments
+INNER JOIN courses
+	ON assessments.courseID = courses.courseID
+WHERE courses.userID = $userID AND assessments.deadline > CURRENT_DATE AND courses.isActive = 'Yes';
+";
+$countAssessmentsResult = executeQuery($countAssessmentsQuery);
+
+$baseJoinGrading = " FROM todo 
+INNER JOIN assessments
+	ON todo.assessmentID = assessments.assessmentID
+INNER JOIN courses
+	ON assessments.courseID = courses.courseID
+WHERE status != 'Graded' AND  courses.userID = $userID";
+
+$toGradeQuery = "SELECT COUNT(*) AS toGrade $baseJoinGrading;
+";
+$toGradeResult = executeQuery($toGradeQuery);
+
+$toGradeTodayQuery = "SELECT COUNT(*) AS toGradeToday $baseJoinGrading AND todo.updatedAt >= (CURRENT_TIMESTAMP - INTERVAL 1 DAY)";
+$toGradeTodayResult = executeQuery($toGradeTodayQuery);
+
+$activeAssessmentsQuery = "SELECT COUNT(*) FROM assessments
+INNER JOIN courses
+	ON assessments.courseID = courses.courseID
+WHERE courses.userID = $userID AND assessments.deadline > CURRENT_DATE";
+$activeAssessmentsResult = executeQuery($activeAssessmentsQuery);
+
+$pendingTodoQuery = "SELECT COUNT(*) AS pending FROM todo 
+INNER JOIN assessments
+	ON todo.assessmentID = assessments.assessmentID
+INNER JOIN courses
+	ON assessments.courseID = courses.courseID
+WHERE (status = 'Pending' OR status = 'Missing') AND courses.userID = $userID;";
+$pendingTodoResult = executeQuery($pendingTodoQuery);
 ?>
 
 <!doctype html>
@@ -66,12 +198,20 @@ $totalCourses = count($courses);
                                                     <img src="../shared/assets/img/profIndex/folder.png" alt="Folder"
                                                         class="img-fluid rounded-circle me-3 folder-img d-none d-sm-block"
                                                         style="width:68px; height:68px;">
-                                                    <div class="text-truncate w-100">
-                                                        <div class="text-sbold text-22">Welcome back, Prof. James!</div>
-                                                        <div class="text-reg text-16">Resume your work and keep
-                                                            developing your
-                                                            course.</div>
-                                                    </div>
+                                                    <?php
+                                                    if (mysqli_num_rows($profInfoResult) > 0) {
+                                                        while ($profInfo = mysqli_fetch_assoc($profInfoResult)) {
+                                                    ?>
+                                                            <div class="text-truncate w-100">
+                                                                <div class="text-sbold text-22">Welcome back, Prof. <?php echo $profInfo['firstName']; ?>!</div>
+                                                                <div class="text-reg text-16">Resume your work and keep
+                                                                    developing your
+                                                                    course.</div>
+                                                            </div>
+                                                    <?php
+                                                        }
+                                                    }
+                                                    ?>
                                                 </div>
                                             </div>
 
@@ -164,42 +304,84 @@ $totalCourses = count($courses);
 
                                     <!-- Stats Section -->
                                     <div class="row stats mt-5 align-items-center">
-                                        <div class="col-12 col-md-3 mb-3">
-                                            <div class="d-flex align-items-center">
-                                                <img src="../shared/assets/img/profIndex/people.png" alt="Students"
-                                                    width="26" height="26" class="me-2">
-                                                <div class="stats-count text-22 text-bold">55</div>
-                                            </div>
-                                            <div class="stats-label text-18 text-sbold">currently enrolled</div>
-                                            <div class="text-reg text-16">55 students taught all-time</div>
-                                        </div>
-                                        <div class="col-12 col-md-3 mb-3">
-                                            <div class="d-flex align-items-center">
-                                                <img src="../shared/assets/img/courses.png" alt="Courses" width="26"
-                                                    height="26" class="me-2">
-                                                <div class="stats-count text-22 text-bold">2</div>
-                                            </div>
-                                            <div class="stats-label text-18 text-sbold">active courses</div>
-                                            <div class="text-reg text-16">55 courses created all-time</div>
-                                        </div>
-                                        <div class="col-12 col-md-3 mb-3">
-                                            <div class="d-flex align-items-center">
-                                                <img src="../shared/assets/img/profIndex/tasks.png" alt="Tasks"
-                                                    width="26" height="26" class="me-2">
-                                                <div class="stats-count text-22 text-bold">80</div>
-                                            </div>
-                                            <div class="stats-label text-18 text-sbold">tasks to grade</div>
-                                            <div class="text-reg text-16">+50 in the past 24 hours</div>
-                                        </div>
-                                        <div class="col-12 col-md-3 mb-3">
-                                            <div class="d-flex align-items-center">
-                                                <img src="../shared/assets/img/profIndex/assess.png" alt="Assessments"
-                                                    width="26" height="26" class="me-2">
-                                                <div class="stats-count text-22 text-bold">5</div>
-                                            </div>
-                                            <div class="stats-label text-18 text-sbold">active assessments</div>
-                                            <div class="text-reg text-16">55 students yet to complete</div>
-                                        </div>
+                                        <?php
+                                        if (mysqli_num_rows($studentsTaughtResult) > 0) {
+                                            while ($studentsTaught = mysqli_fetch_assoc($studentsTaughtResult)) {
+                                        ?>
+                                                <div class="col-12 col-md-3 mb-3">
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="../shared/assets/img/profIndex/people.png" alt="Students"
+                                                            width="26" height="26" class="me-2">
+                                                        <div class="stats-count text-22 text-bold"><?php echo $studentsTaught['studentsTaught']; ?></div>
+                                                    </div>
+                                                    <div class="stats-label text-18 text-sbold">currently enrolled</div>
+                                                    <div class="text-reg text-16"><?php echo $studentsTaught['studentsTaught']; ?> students taught all-time</div>
+                                                </div>
+                                        <?php
+                                            }
+                                        }
+                                        ?>
+                                        <?php
+                                        if (mysqli_num_rows($activeCoursesResult) > 0) {
+                                            while ($activeCourses = mysqli_fetch_assoc($activeCoursesResult)) {
+                                        ?>
+                                                <div class="col-12 col-md-3 mb-3">
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="../shared/assets/img/courses.png" alt="Courses" width="26"
+                                                            height="26" class="me-2">
+                                                        <div class="stats-count text-22 text-bold"><?php echo $activeCourses['activeCourses']; ?></div>
+                                                    </div>
+                                                    <div class="stats-label text-18 text-sbold">active courses</div>
+                                            <?php
+                                            }
+                                        }
+                                            ?>
+                                            <?php
+                                            if (mysqli_num_rows($coursesResult) > 0) {
+                                                while ($totalCourse = mysqli_fetch_assoc($coursesResult)) {
+                                            ?>
+                                                    <div class="text-reg text-16"><?php echo $totalCourse['activeCourses']; ?> courses created all-time</div>
+                                                </div>
+                                        <?php
+                                                }
+                                            }
+                                        ?>
+                                        <?php
+                                        if (mysqli_num_rows($toGradeResult) > 0) {
+                                            $toGradeToday = mysqli_fetch_assoc($toGradeTodayResult);
+                                            while ($toGrade = mysqli_fetch_assoc($toGradeResult)) {
+                                        ?>
+                                                <div class="col-12 col-md-3 mb-3">
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="../shared/assets/img/profIndex/tasks.png" alt="Tasks"
+                                                            width="26" height="26" class="me-2">
+                                                        <div class="stats-count text-22 text-bold"><?php echo $toGrade['toGrade']; ?></div>
+                                                    </div>
+                                                    <div class="stats-label text-18 text-sbold">tasks to grade</div>
+                                                    <div class="text-reg text-16">+<?php echo $toGradeToday['toGradeToday']; ?> in the past 24 hours</div>
+                                                </div>
+                                        <?php
+                                            }
+                                        }
+                                        ?>
+                                        <?php
+                                        $pendingTodo = mysqli_fetch_assoc($pendingTodoResult);
+                                        if (mysqli_num_rows($countAssessmentsResult) > 0) {
+                                            while ($countAssessments = mysqli_fetch_assoc($countAssessmentsResult)) {
+                                        ?>
+                                                <div class="col-12 col-md-3 mb-3">
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="../shared/assets/img/profIndex/assess.png" alt="Assessments"
+                                                            width="26" height="26" class="me-2">
+                                                        <div class="stats-count text-22 text-bold"><?php echo $countAssessments['activeAssessments']; ?></div>
+                                                    </div>
+                                                    <div class="stats-label text-18 text-sbold">active assessments</div>
+                                                    <div class="text-reg text-16"><?php echo $pendingTodo['pending']; ?> students yet to complete</div>
+                                                </div>
+                                        <?php
+                                            }
+                                        }
+                                        ?>
                                     </div>
 
 
@@ -231,7 +413,7 @@ $totalCourses = count($courses);
                                                                 <div class="text-reg text-14"
                                                                     style="color: var(--black); opacity: 0.85;">No courses
                                                                     found.</div>
-                                                            <?php } else {
+                                                                <?php } else {
                                                                 foreach ($courses as $course) {
                                                                     $courseCode = ($course['courseCode'] ?? '');
                                                                     $courseTitle = ($course['courseTitle'] ?? '');
@@ -240,7 +422,7 @@ $totalCourses = count($courses);
                                                                     $imageFile = trim((string) ($course['courseImage'] ?? ''));
                                                                     $imagePath = "../shared/assets/img/home/" . $imageFile;
                                                                     $fallbackImage = "../shared/assets/img/home/webdev.jpg";
-                                                                    ?>
+                                                                ?>
                                                                     <div class="card custom-course-card">
                                                                         <img src="<?php echo $imageFile ? $imagePath : $fallbackImage; ?>"
                                                                             class="card-img-top"
@@ -256,7 +438,7 @@ $totalCourses = count($courses);
                                                                             <div class="d-flex align-items-center mb-2 mt-4">
                                                                                 <img src="../shared/assets/img/profIndex/people.png"
                                                                                     alt="people" width="26" height="26">
-                                                                                <span class="text-reg text-14 ms-2">0
+                                                                                <span class="text-reg text-14 ms-2"><?php echo $course['studentCount']; ?>
                                                                                     Students</span>
                                                                             </div>
                                                                             <div class="d-flex align-items-start mb-2 mt-4">
@@ -280,7 +462,7 @@ $totalCourses = count($courses);
                                                                                 updated recently</div>
                                                                         </div>
                                                                     </div>
-                                                                <?php }
+                                                            <?php }
                                                             } ?>
                                                         </div>
                                                     </div>
@@ -300,7 +482,7 @@ $totalCourses = count($courses);
                                                                 style="width: 26px; height: 26px; margin-right: 5px; object-fit: contain;">
                                                             <span>Active Assessments</span>
                                                         </div>
-                                                        <div>5</div>
+                                                        <div><?php echo $totalAssessments ?></div>
                                                     </div>
 
                                                     <!-- Scrollable tasks -->
@@ -308,92 +490,71 @@ $totalCourses = count($courses);
                                                         style="max-height: 500px; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth;">
 
                                                         <!-- Assessment Card -->
-                                                        <div class="card mb-3"
-                                                            style="border-radius: 12px; border: 1px solid var(--black); padding: 15px;">
-                                                            <div
-                                                                class="d-flex align-items-center justify-content-between">
-                                                                <!-- Left Info -->
-                                                                <div class="flex-grow-1 ">
-                                                                    <div class="mb-2 text-reg">
-                                                                        <span class="badge rounded-pill"
-                                                                            style="background: var(--highlight50); color: var(--black); font-size:12px;">Task</span>
-                                                                    </div>
-                                                                    <div class="text-bold">Assignment #1</div>
-                                                                    <div class="text-sbold text-14 pt-1">COMP–006<br>
-                                                                        <div class="text-reg text-14">Database Systems
+                                                        <?php if ($totalAssessments === 0) { ?>
+                                                            <div class="text-reg text-14"
+                                                                style="color: var(--black); opacity: 0.85;">No assessments
+                                                                found.</div>
+                                                            <?php } else {
+                                                            $chartsIDs = [];
+                                                            $i = 1;
+                                                            foreach ($assessments as $assessment) {
+                                                                $assessmentType = ($assessment['type'] ?? '');
+                                                                $assessmentTitle = ($assessment['assessmentTitle'] ?? '');
+                                                                $about = ($assessment['about'] ?? '');
+                                                                $assessmentCourseCode = ($assessment['courseCode'] ?? '');
+                                                                $assessmentDeadline = ($assessment['assessmentDeadline'] ?? '');
+                                                                $courseStudents = ($assessment['courseStudents'] ?? '');
+                                                                $submittedTodo = ($assessment['submittedTodo'] ?? '');
+                                                                $chartsIDs[] = "chart$i";
+                                                                $submittedChart[] = $submittedTodo;
+                                                                $studentChart[] = $courseStudents;
+                                                            ?>
+                                                                <div class="card mb-3"
+                                                                    style="border-radius: 12px; border: 1px solid var(--black); padding: 15px;">
+                                                                    <div
+                                                                        class="d-flex align-items-center justify-content-between">
+                                                                        <!-- Left Info -->
+                                                                        <div class="flex-grow-1 ">
+                                                                            <div class="mb-2 text-reg">
+                                                                                <span class="badge rounded-pill"
+                                                                                    style="background: var(--highlight50); color: var(--black); font-size:12px;"><?php echo $assessmentType ?></span>
+                                                                            </div>
+                                                                            <div class="text-bold"><?php echo $assessmentTitle ?></div>
+                                                                            <div class="text-sbold text-14 pt-1"><?php echo $assessmentCourseCode ?><br>
+                                                                                <div class="text-reg text-14"><?php echo $about ?>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="text-reg text-12 mt-2"
+                                                                                style="color: var(--black);">
+                                                                                <span class="text-sbold"><?php echo $submittedTodo ?></span> of <?php echo $courseStudents ?>
+                                                                                students
+                                                                                submitted<br>
+                                                                                <span class="text-reg">Due <?php echo $assessmentDeadline ?></span>
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                        <!-- Right Side: Graph + Arrow -->
+                                                                        <div class="d-flex flex-column align-items-center ms-3">
+                                                                            <!-- Graph -->
+                                                                            <div class="me-5 mt-3">
+                                                                                <canvas id="chart<?php echo $i; ?>" width="100"
+                                                                                    height="100"></canvas>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="text-reg text-12 mt-2"
-                                                                        style="color: var(--black);">
-                                                                        <span class="text-sbold">29</span> of 59
-                                                                        students
-                                                                        submitted<br>
-                                                                        <span class="text-reg">Due Sep 9</span>
-                                                                    </div>
-
-                                                                </div>
-
-                                                                <!-- Right Side: Graph + Arrow -->
-                                                                <div class="d-flex flex-column align-items-center ms-3">
-                                                                    <!-- Graph -->
-                                                                    <div class="me-5 mt-3">
-                                                                        <canvas id="chart1" width="100"
-                                                                            height="100"></canvas>
+                                                                    <!-- Arrow at the bottom -->
+                                                                    <div class="d-flex justify-content-end">
+                                                                        <a href="#">
+                                                                            <i class="fa-solid fa-arrow-right"
+                                                                                style="color: var(--black);"></i>
+                                                                        </a>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                            <!-- Arrow at the bottom -->
-                                                            <div class="d-flex justify-content-end">
-                                                                <a href="#">
-                                                                    <i class="fa-solid fa-arrow-right"
-                                                                        style="color: var(--black);"></i>
-                                                                </a>
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Duplicate another card -->
-                                                        <div class="card mb-3"
-                                                            style="border-radius: 12px; border: 1px solid var(--black); padding: 15px;">
-                                                            <div
-                                                                class="d-flex align-items-center justify-content-between">
-                                                                <!-- Left Info -->
-                                                                <div class="flex-grow-1">
-                                                                    <div class="mb-2 text-reg">
-                                                                        <span class="badge rounded-pill"
-                                                                            style="background: var(--highlight50); color: var(--black); font-size:12px;">Task</span>
-                                                                    </div>
-                                                                    <div class="text-bold">Assignment #2</div>
-                                                                    <div class="text-sbold text-14 pt-1">COMP–007<br>
-                                                                        <div class="text-reg text-14">Database Systems
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="text-reg text-12 mt-2"
-                                                                        style="color: var(--black);">
-                                                                        <span class="text-sbold">45</span> of 60
-                                                                        students
-                                                                        submitted<br>
-                                                                        <span class="text-reg">Due Sep 12</span>
-                                                                    </div>
-                                                                </div>
-
-                                                                <!-- Right Side: Graph + Arrow -->
-                                                                <div class="d-flex flex-column align-items-center ms-3">
-                                                                    <!-- Graph -->
-                                                                    <div class="me-5 mt-3">
-                                                                        <canvas id="chart2" width="100"
-                                                                            height="100"></canvas>
-                                                                    </div>
-                                                                </div>
-
-                                                            </div>
-                                                            <!-- Arrow at the bottom -->
-                                                            <div class="d-flex justify-content-end">
-                                                                <a href="#">
-                                                                    <i class="fa-solid fa-arrow-right"
-                                                                        style="color: var(--black);"></i>
-                                                                </a>
-                                                            </div>
-                                                        </div>
+                                                        <?php
+                                                                $i++;
+                                                            }
+                                                        } ?>
                                                     </div>
                                                 </div>
                                             </div>
@@ -428,15 +589,25 @@ $totalCourses = count($courses);
                     options: {
                         cutout: '75%',
                         plugins: {
-                            legend: { display: false },
-                            tooltip: { enabled: false }
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: false
+                            }
                         }
                     }
                 });
             }
 
-            createDoughnutChart('chart1', 29, 59);
-            createDoughnutChart('chart2', 45, 60);
+            document.addEventListener("DOMContentLoaded", function() {
+                const chartsIDs = <?php echo json_encode($chartsIDs); ?>;
+                const submitted = <?php echo json_encode($submittedChart); ?>;
+                const student = <?php echo json_encode($studentChart); ?>;
+                chartsIDs.forEach((id, index) => {
+                    createDoughnutChart(id, submitted[index], student[index]);
+                });
+            });
         </script>
 
 </body>

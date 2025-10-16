@@ -1,6 +1,6 @@
 <?php $activePage = 'home';
 include('shared/assets/database/connect.php');
-$userID = '2';
+include("shared/assets/processes/session-process.php");
 $invalidCode = false;
 $enrolled = false;
 
