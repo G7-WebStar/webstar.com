@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 17, 2025 at 07:53 AM
+-- Generation Time: Oct 17, 2025 at 08:08 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -107,7 +107,7 @@ CREATE TABLE `assessments` (
 
 INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `about`, `type`, `deadline`, `deadlineEnabled`, `createdAt`) VALUES
 (1, 1, 'Activity #1', 'Review CSS Grid and Flexbox', 'Task', '2025-10-15', 0, '2025-09-09 23:00:15'),
-(2, 1, 'Exam #1', 'Review CSS Grid and Flexbox', 'Test', '2025-11-06', 0, '2025-09-04 22:00:15'),
+(2, 1, 'Test #1', 'Review CSS Grid and Flexbox', 'Test', '2025-11-06', 0, '2025-09-04 22:00:15'),
 (3, 2, 'Activity #2', 'Review CSS Grid and Flexbox', 'Task', '2025-10-23', 0, '2025-10-22 22:00:15'),
 (4, 2, 'Activity #1', 'Review CSS Grid and Flexbox', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15');
 
@@ -130,7 +130,7 @@ CREATE TABLE `assignments` (
 
 INSERT INTO `assignments` (`assignmentID`, `assessmentID`, `assignmentDescription`, `assignmentPoints`) VALUES
 (1, 1, 'Attached is a Google Doc that you can edit.\n\nIn Figma, design a “404 Not Found” page.\n\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\n\nTurn in when done.\n\n', 100),
-(2, 3, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100),
+(2, 4, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100),
 (3, 2, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100);
 
 -- --------------------------------------------------------
@@ -214,7 +214,7 @@ CREATE TABLE `files` (
 --
 
 INSERT INTO `files` (`fileID`, `courseID`, `userID`, `announcementID`, `lessonID`, `assignmentID`, `fileAttachment`, `fileTitle`, `fileLink`, `uploadedAt`) VALUES
-(1, 1, 1, 1, 1, NULL, 'Web Development Course Material', '', 'https://example.com/lesson1,https://example.com/lesson1.1', '2025-08-30 10:30:00');
+(1, 1, 1, 1, 1, NULL, 'Web Development Course Material', '', 'https://Testple.com/lesson1,https://Testple.com/lesson1.1', '2025-08-30 10:30:00');
 
 -- --------------------------------------------------------
 
@@ -316,7 +316,7 @@ CREATE TABLE `points` (
 --
 
 INSERT INTO `points` (`pointsID`, `userID`, `sourceType`, `pointsEarned`, `dateEarned`) VALUES
-(1, 2, 'Exam', 50, '2025-08-30 08:28:27');
+(1, 2, 'Test', 50, '2025-08-30 08:28:27');
 
 -- --------------------------------------------------------
 
@@ -434,7 +434,7 @@ CREATE TABLE `tests` (
   `testID` int(5) NOT NULL,
   `lessonID` int(5) NOT NULL,
   `assessmentID` int(5) NOT NULL,
-  `testType` enum('Exam','Quiz') NOT NULL DEFAULT 'Exam',
+  `testType` enum('Test','Quiz') NOT NULL DEFAULT 'Test',
   `testTitle` varchar(100) NOT NULL,
   `generalGuidance` varchar(500) NOT NULL,
   `testTimelimit` int(5) DEFAULT NULL,
@@ -464,7 +464,7 @@ CREATE TABLE `todo` (
 
 INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `title`, `status`, `updatedAt`, `isRead`) VALUES
 (1, 2, 1, 'Review CSS Grid and Flexbox', 'Graded', '2025-10-12 19:00:00', 1),
-(2, 2, 3, 'Review CSS Grid and Flexbox 2', 'Pending', '2025-10-29 09:00:00', 1),
+(2, 2, 4, 'Review CSS Grid and Flexbox 2', 'Pending', '2025-10-29 09:00:00', 1),
 (3, 2, 2, 'Review CSS Grid and Flexbox 3', 'Pending', '2025-10-29 09:00:00', 1);
 
 -- --------------------------------------------------------
@@ -502,7 +502,7 @@ INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `
 (1, 2, 'prof.png', 'Jane', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 2023, 'jane.smith@university.edu', '+639123456789', 'https://facebook.com/jane.smith', 'https://linkedin.com/in/jane-smith', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
 (2, 1, 'prof.png', 'Chistian James', 'Dom', 'Torillo', '202310002', '1', 'Male', '2', 2023, 'james.dom@university.edu', '+639123456789', 'https://facebook.com/james.dom', 'https://linkedin.com/in/james-dom', 'https://instagram.com/james.dom', '2025-08-30 08:18:53', 1),
 (3, 3, 'prof.png', 'John', 'Cruz', 'Doe', '202310003', '1', 'Male', '2', 2023, 'john.doe@university.edu', '+639123456783', '', '', '', '2025-09-28 11:58:33', 1),
-(4, 4, 'prof.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 2023, 'michael.lee@school.edu', '09171234567', 'facebook.com/michael.lee', 'linkedin.com/in/michaellee', 'instagram.com/michael.lee', '2025-09-28 20:59:48', 0),
+(4, 4, 'prof.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 2023, 'michael.lee@school.edu', '09171234567', 'facebook.com/michael.lee', 'linkedin.com/in/michaellee', 'instagram.com/michael.lee', '2025-09-28 20:59:48', 1),
 (5, 5, 'prof.png', 'Sophia', 'B.', 'Garcia', '202310004', '1', 'Female', '2', 2023, 'sophia.garcia@school.edu', '09181234567', 'facebook.com/sophia.garcia', 'linkedin.com/in/sophiagarcia', 'instagram.com/sophia.garcia', '2025-09-28 20:59:48', 1),
 (6, 6, 'prof.png', 'Daniel', 'C.', 'Kim', '202310005', '1', 'Male', '2', 2023, 'daniel.kim@school.edu', '09191234567', 'facebook.com/daniel.kim', 'linkedin.com/in/danielkim', 'instagram.com/daniel.kim', '2025-09-28 20:59:48', 1),
 (7, 7, 'prof.png', 'Olivia', 'D.', 'Brown', '202310006', '1', 'Female', '2', 2023, 'olivia.brown@school.edu', '09201234567', 'facebook.com/olivia.brown', 'linkedin.com/in/oliviabrown', 'instagram.com/olivia.brown', '2025-09-28 20:59:48', 0),
@@ -532,17 +532,17 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`) VALUES
 (1, 'Password123', 'john.doe@gmail.com', 'admin', 'johndoe'),
-(2, 'Hello@world', 'jane.smith@example.com', 'student', 'janesmith'),
+(2, 'Hello@world', 'jane.smith@Testple.com', 'student', 'janesmith'),
 (3, 'HelloWorld', 'john.doe2@gmail.com', 'user', 'JohnDoe'),
-(4, 'password123', 'michael.lee@example.com', 'student', 'michael_lee'),
-(5, 'securePass!1', 'sophia.garcia@example.com', 'student', 'sophia_garcia'),
-(6, 'helloWorld9', 'daniel.kim@example.com', 'student', 'daniel_kim'),
-(7, 'qwerty2025', 'olivia.brown@example.com', 'student', 'olivia_brown'),
-(8, 'pass4321', 'ethan.wilson@example.com', 'student', 'ethan_wilson'),
-(9, 'abcXYZ987', 'isabella.martin@example.com', 'student', 'isabella_martin'),
-(10, 'myPass!77', 'liam.torres@example.com', 'student', 'liam_torres'),
-(11, 'safeKey555', 'emma.davis@example.com', 'student', 'emma_davis'),
-(12, 'newPass!11', 'chloe.nguyen@example.com', 'student', 'chloe_nguyen');
+(4, 'password123', 'michael.lee@Testple.com', 'student', 'michael_lee'),
+(5, 'securePass!1', 'sophia.garcia@Testple.com', 'student', 'sophia_garcia'),
+(6, 'helloWorld9', 'daniel.kim@Testple.com', 'student', 'daniel_kim'),
+(7, 'qwerty2025', 'olivia.brown@Testple.com', 'student', 'olivia_brown'),
+(8, 'pass4321', 'ethan.wilson@Testple.com', 'student', 'ethan_wilson'),
+(9, 'abcXYZ987', 'isabella.martin@Testple.com', 'student', 'isabella_martin'),
+(10, 'myPass!77', 'liam.torres@Testple.com', 'student', 'liam_torres'),
+(11, 'safeKey555', 'emma.davis@Testple.com', 'student', 'emma_davis'),
+(12, 'newPass!11', 'chloe.nguyen@Testple.com', 'student', 'chloe_nguyen');
 
 --
 -- Indexes for dumped tables

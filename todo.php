@@ -25,9 +25,9 @@ $selectAssessmentQuery = "SELECT
         ON assessments.courseID = courses.courseID
     INNER JOIN todo
     	ON assessments.assessmentID = todo.assessmentID
-    INNER JOIN assignments
+    LEFT JOIN assignments
     	ON assignments.assessmentID = todo.assessmentID
-    INNER JOIN tests
+    LEFT JOIN tests
         ON tests.assessmentID = todo.assessmentID
     WHERE todo.userID = '$userID' AND todo.status = 'Pending'
     GROUP BY assignments.assignmentID

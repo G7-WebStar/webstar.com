@@ -70,6 +70,8 @@ $selectAnnouncementsQuery = "SELECT
 $selectAnnouncementsResult = executeQuery($selectAnnouncementsQuery);
 
 $selectAssessmentQuery = "SELECT
+    tests.testID,
+    assignments.assignmentID,
     assessments.*,
     assessments.assessmentTitle AS assessmentTitle,
     todo.*,
@@ -85,6 +87,10 @@ $selectAssessmentQuery = "SELECT
         ON courses.courseID = enrollments.courseID
     INNER JOIN todo 
     	ON assessments.assessmentID = todo.assessmentID
+    LEFT JOIN assignments
+        ON assessments.assessmentID = assignments.assessmentID
+    LEFT JOIN tests
+        ON assessments.assessmentID = tests.assessmentID
     WHERE todo.userID = '$userID' AND todo.status = 'Pending'
     GROUP BY assessments.assessmentID DESC
     LIMIT 3;
@@ -315,9 +321,9 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                 $type = strtolower(trim($activities['type']));
                                                                 $link = "#";
                                                                 if ($type === 'task') {
-                                                                    $link = "assignment.php?assignmentID=" . $activities['assessmentID'];
+                                                                    $link = "assignment.php?assignmentID=" . $activities['assignmentID'];
                                                                 } elseif ($type === 'test') {
-                                                                    $link = "test.php?testID=" . $activities['assessmentID'];
+                                                                    $link = "test.php?testID=" . $activities['testID'];
                                                                 }
                                                         ?>
                                                                 <div class="todo-card d-flex align-items-stretch mb-2">
