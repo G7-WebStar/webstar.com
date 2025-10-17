@@ -46,16 +46,19 @@ body {
   display: flex;
   align-items: center;
 }
+
 .nav .nav-item .nav-link {
   flex: 1 1 auto;
   min-width: 0;
   white-space: nowrap;
 }
+
 .badge-container {
   display: inline-flex;
   align-items: center;
   margin-left: auto;
-  flex: 0 0 auto; /* keep badge from shrinking */
+  flex: 0 0 auto;
+  /* keep badge from shrinking */
 }
 
 .text-dark {
@@ -86,12 +89,12 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 43px; 
-  height: 26px;  
+  min-width: 43px;
+  height: 26px;
   padding: 0 10px;
-  line-height: 26px; 
-  border-radius: 20px; 
-  border: 1px solid var(--black); 
+  line-height: 26px;
+  border-radius: 20px;
+  border: 1px solid var(--black);
   background: var(--primaryColor);
   color: var(--black);
   font-family: var(--SemiBold);
@@ -126,3 +129,4 @@ body {
   vertical-align: middle;
   opacity: 1;
 }
+
