@@ -95,7 +95,7 @@ CREATE TABLE `assessments` (
   `courseID` int(11) NOT NULL,
   `assessmentTitle` varchar(100) NOT NULL,
   `about` varchar(255) NOT NULL,
-  `type` enum('Task','Exam') DEFAULT 'Task',
+  `type` enum('Task','Test') DEFAULT 'Task',
   `deadline` date NOT NULL,
   `deadlineEnabled` tinyint(1) NOT NULL DEFAULT 0,
   `createdAt` datetime DEFAULT current_timestamp()
@@ -107,7 +107,7 @@ CREATE TABLE `assessments` (
 
 INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `about`, `type`, `deadline`, `deadlineEnabled`, `createdAt`) VALUES
 (1, 1, 'Activity #1', 'Review CSS Grid and Flexbox', 'Task', '2025-10-15', 0, '2025-09-09 23:00:15'),
-(2, 1, 'Exam #1', 'Review CSS Grid and Flexbox', 'Exam', '2025-11-06', 0, '2025-09-04 22:00:15'),
+(2, 1, 'Test #1', 'Review CSS Grid and Flexbox', 'Test', '2025-11-06', 0, '2025-09-04 22:00:15'),
 (3, 2, 'Activity #2', 'Review CSS Grid and Flexbox', 'Task', '2025-10-23', 0, '2025-10-22 22:00:15'),
 (4, 2, 'Activity #1', 'Review CSS Grid and Flexbox', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15');
 
@@ -214,7 +214,7 @@ CREATE TABLE `files` (
 --
 
 INSERT INTO `files` (`fileID`, `courseID`, `userID`, `announcementID`, `lessonID`, `assignmentID`, `fileAttachment`, `fileTitle`, `fileLink`, `uploadedAt`) VALUES
-(1, 1, 1, 1, 1, NULL, 'Web Development Course Material', '', 'https://example.com/lesson1,https://example.com/lesson1.1', '2025-08-30 10:30:00');
+(1, 1, 1, 1, 1, NULL, 'Web Development Course Material', '', 'https://Testple.com/lesson1,https://Testple.com/lesson1.1', '2025-08-30 10:30:00');
 
 -- --------------------------------------------------------
 
@@ -316,7 +316,7 @@ CREATE TABLE `points` (
 --
 
 INSERT INTO `points` (`pointsID`, `userID`, `sourceType`, `pointsEarned`, `dateEarned`) VALUES
-(1, 2, 'Exam', 50, '2025-08-30 08:28:27');
+(1, 2, 'Test', 50, '2025-08-30 08:28:27');
 
 -- --------------------------------------------------------
 
@@ -434,7 +434,7 @@ CREATE TABLE `tests` (
   `testID` int(5) NOT NULL,
   `lessonID` int(5) NOT NULL,
   `assessmentID` int(5) NOT NULL,
-  `testType` enum('Exam','Quiz') NOT NULL DEFAULT 'Exam',
+  `testType` enum('Test','Quiz') NOT NULL DEFAULT 'Test',
   `testTitle` varchar(100) NOT NULL,
   `generalGuidance` varchar(500) NOT NULL,
   `testTimelimit` int(5) DEFAULT NULL,
@@ -532,17 +532,17 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`) VALUES
 (1, 'Password123', 'john.doe@gmail.com', 'admin', 'johndoe'),
-(2, 'Hello@world', 'jane.smith@example.com', 'student', 'janesmith'),
+(2, 'Hello@world', 'jane.smith@Testple.com', 'student', 'janesmith'),
 (3, 'HelloWorld', 'john.doe2@gmail.com', 'user', 'JohnDoe'),
-(4, 'password123', 'michael.lee@example.com', 'student', 'michael_lee'),
-(5, 'securePass!1', 'sophia.garcia@example.com', 'student', 'sophia_garcia'),
-(6, 'helloWorld9', 'daniel.kim@example.com', 'student', 'daniel_kim'),
-(7, 'qwerty2025', 'olivia.brown@example.com', 'student', 'olivia_brown'),
-(8, 'pass4321', 'ethan.wilson@example.com', 'student', 'ethan_wilson'),
-(9, 'abcXYZ987', 'isabella.martin@example.com', 'student', 'isabella_martin'),
-(10, 'myPass!77', 'liam.torres@example.com', 'student', 'liam_torres'),
-(11, 'safeKey555', 'emma.davis@example.com', 'student', 'emma_davis'),
-(12, 'newPass!11', 'chloe.nguyen@example.com', 'student', 'chloe_nguyen');
+(4, 'password123', 'michael.lee@Testple.com', 'student', 'michael_lee'),
+(5, 'securePass!1', 'sophia.garcia@Testple.com', 'student', 'sophia_garcia'),
+(6, 'helloWorld9', 'daniel.kim@Testple.com', 'student', 'daniel_kim'),
+(7, 'qwerty2025', 'olivia.brown@Testple.com', 'student', 'olivia_brown'),
+(8, 'pass4321', 'ethan.wilson@Testple.com', 'student', 'ethan_wilson'),
+(9, 'abcXYZ987', 'isabella.martin@Testple.com', 'student', 'isabella_martin'),
+(10, 'myPass!77', 'liam.torres@Testple.com', 'student', 'liam_torres'),
+(11, 'safeKey555', 'emma.davis@Testple.com', 'student', 'emma_davis'),
+(12, 'newPass!11', 'chloe.nguyen@Testple.com', 'student', 'chloe_nguyen');
 
 --
 -- Indexes for dumped tables
