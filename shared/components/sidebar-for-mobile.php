@@ -201,7 +201,7 @@ $_SESSION['TodoNewCount'] = $newTodoCount;
 
             <!-- Search Bar -->
             <form class="p-3 position-relative">
-                <input type="text" id="searchInput" class="form-control rounded-pill pt-3 pb-3"
+                <input type="text" id="searchInputMobile" class="form-control rounded-pill pt-3 pb-3"
                     placeholder="Search students & professors"
                     style="border: 1.5px solid #2c2c2c; padding-right: 5rem; padding-left: 27px; letter-spacing: -0.03em;">
                 <span class="material-symbols-outlined pe-3" style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%);
@@ -212,7 +212,7 @@ $_SESSION['TodoNewCount'] = $newTodoCount;
             <div class="p-3">
                 <div class="rounded-4 shadow-sm scroll-box" style="border: 1.5px solid #2c2c2c;
           border-radius: 16px; height: 350px; background-color: #fff; padding:10px;">
-                    <div id="searchResults" class="scroll-content"
+                    <div id="searchResultsMobile" class="scroll-content"
                         style="height: 100%; overflow-y: auto; border-radius: 12px;">
                         <div class="text-center text-muted p-3">Type a name or username to search.</div>
                     </div>
@@ -225,14 +225,14 @@ $_SESSION['TodoNewCount'] = $newTodoCount;
 
 <!-- Search Modal JS -->
 <script>
-    const searchInput = document.getElementById('searchInput');
-    const searchResults = document.getElementById('searchResults');
+    const searchInputMobile = document.getElementById('searchInputMobile');
+    const searchResultsMobile = document.getElementById('searchResultsMobile');
 
-    searchInput.addEventListener('input', () => {
-        const query = searchInput.value.trim();
+    searchInputMobile.addEventListener('input', () => {
+        const query = searchInputMobile.value.trim();
 
         if (query === '') {
-            searchResults.innerHTML = '<div class="text-center text-muted p-3">Type a name or username to search.</div>';
+            searchResultsMobile.innerHTML = '<div class="text-center text-muted p-3">Type a name or username to search.</div>';
             return;
         }
 
@@ -242,8 +242,8 @@ $_SESSION['TodoNewCount'] = $newTodoCount;
             body: 'searchTerm=' + encodeURIComponent(query)
         })
             .then(res => res.text())
-            .then(html => searchResults.innerHTML = html)
-            .catch(() => searchResults.innerHTML = '<div class="text-center text-muted p-3">Error loading results.</div>');
+            .then(html => searchResultsMobile.innerHTML = html)
+            .catch(() => searchResultsMobile.innerHTML = '<div class="text-center text-muted p-3">Error loading results.</div>');
     });
 
 </script>

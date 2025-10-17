@@ -162,6 +162,7 @@ if (isset($_GET['courseID'])) {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
 
+   
 </head>
 
 <body>
