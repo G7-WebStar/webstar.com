@@ -168,6 +168,111 @@ body {
     overflow-wrap: anywhere;
 }
 
+.cardFile .ms-2 {
+    min-width: 0;
+    /* important for flex child */
+}
+
+.cardFile .file-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    max-width: 100%;
+}
+
+.btn-attachments {
+    border-radius: 25px;
+    /* fully rounded */
+    border: 2px solid var(--black);
+    /* border color (Bootstrap primary) */
+    background-color: #ffffff;
+    /* normal background */
+    color: var(--black);
+    /* text color */
+    padding: 0.35rem 1.6rem;
+    /* adjust padding if needed */
+    background-color: var(--primaryColor);
+}
+
+.btn-attachments:hover,
+.btn-attachments:focus {
+    background-color: var(--primaryColor);
+    border: 2px solid var(--black);
+    /* keep same on hover */
+    color: var(--black);
+    /* keep same on hover */
+    box-shadow: none;
+    /* remove default focus shadow if needed */
+}
+
+/* Files ellipsis */
+@media (max-width: 576px) {
+    .todo-card .text-sbold {
+        white-space: nowrap;
+        /* Prevent line breaks */
+        overflow: hidden;
+        /* Hide overflow */
+        text-overflow: ellipsis;
+        /* Show ... */
+        max-width: 70%;
+        /* Adjust width as needed */
+    }
+
+    /* Keep download button visible and aligned */
+    .todo-card .mx-4:last-child {
+        flex-shrink: 0;
+        /* Prevent button from shrinking */
+    }
+}
+
+@media (max-width: 767px) {
+    .announcement-card .mobile-announcement-content {
+        display: block;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+}
+
+/* Megaphone no announcements */
+.no-announcements {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    width: 100%;
+    text-align: center;
+    padding: 0 1rem;
+}
+
+.no-announcements-img {
+    width: 210px;
+    max-width: 80vw;
+    height: auto;
+}
+
+.no-announcements-text {
+    color: var(--black);
+    line-height: 1.5;
+    word-break: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+    max-width: 90vw;
+}
+
+@media (max-width: 576px) {
+    .no-announcements {
+        min-height: 50vh;
+    }
+
+    .no-announcements-text {
+        font-size: 14px;
+        margin-top: 0.25rem !important;
+    }
+}
+
 
 /* neil again */
 @media (max-width: 767.98px) {
@@ -354,4 +459,87 @@ body {
 .tab-scroll .nav-item {
     flex: 0 0 auto;
     /* keeps items from shrinking */
+}
+
+/* records */
+.dropdown {
+    position: relative;
+}
+
+/* Button */
+.dropdown-btn {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    padding: 6px 14px;
+    font-size: 14px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    min-width: 120px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dropdown-btn:hover {
+    background-color: #f8f8f8;
+}
+
+/* Dropdown menu */
+.dropdown-menu-custom {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 8px 0;
+    list-style: none;
+    display: none;
+    min-width: 160px;
+    z-index: 10;
+}
+
+/* Show dropdown on button click */
+.dropdown:focus-within .dropdown-menu-custom {
+    display: block;
+}
+
+/* Section headers */
+.dropdown-section {
+    font-weight: 600;
+    font-size: 12px;
+    color: #666;
+    padding: 4px 14px;
+}
+
+/* Items */
+.dropdown-item-custom {
+    display: block;
+    padding: 6px 14px;
+    font-size: 14px;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-item-custom:hover {
+    background-color: #f1f1f1;
+    border-radius: 6px;
+}
+
+/* Arrow icon */
+.arrow {
+    font-size: 12px;
+}
+
+/* Responsive: slightly smaller button on mobile */
+@media (max-width: 576px) {
+    .dropdown-btn {
+        font-size: 13px;
+        padding: 5px 12px;
+    }
 }
