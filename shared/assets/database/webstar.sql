@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 16, 2025 at 02:49 PM
+-- Generation Time: Oct 17, 2025 at 07:53 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -95,7 +95,7 @@ CREATE TABLE `assessments` (
   `courseID` int(11) NOT NULL,
   `assessmentTitle` varchar(100) NOT NULL,
   `about` varchar(255) NOT NULL,
-  `type` enum('Task','Exam') DEFAULT 'Task',
+  `type` enum('Task','Test') DEFAULT 'Task',
   `deadline` date NOT NULL,
   `deadlineEnabled` tinyint(1) NOT NULL DEFAULT 0,
   `createdAt` datetime DEFAULT current_timestamp()
@@ -107,9 +107,9 @@ CREATE TABLE `assessments` (
 
 INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `about`, `type`, `deadline`, `deadlineEnabled`, `createdAt`) VALUES
 (1, 1, 'Activity #1', 'Review CSS Grid and Flexbox', 'Task', '2025-10-15', 0, '2025-09-09 23:00:15'),
-(2, 1, 'Exam #1', 'Review CSS Grid and Flexbox', 'Exam', '2025-11-06', 0, '2025-09-04 22:00:15'),
+(2, 1, 'Exam #1', 'Review CSS Grid and Flexbox', 'Test', '2025-11-06', 0, '2025-09-04 22:00:15'),
 (3, 2, 'Activity #2', 'Review CSS Grid and Flexbox', 'Task', '2025-10-23', 0, '2025-10-22 22:00:15'),
-(4, 2, 'Activity #1', 'Review CSS Grid and Flexbox', 'Exam', '2025-09-11', 0, '2025-09-04 22:00:15');
+(4, 2, 'Activity #1', 'Review CSS Grid and Flexbox', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15');
 
 -- --------------------------------------------------------
 
@@ -502,7 +502,7 @@ INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `
 (1, 2, 'prof.png', 'Jane', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 2023, 'jane.smith@university.edu', '+639123456789', 'https://facebook.com/jane.smith', 'https://linkedin.com/in/jane-smith', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
 (2, 1, 'prof.png', 'Chistian James', 'Dom', 'Torillo', '202310002', '1', 'Male', '2', 2023, 'james.dom@university.edu', '+639123456789', 'https://facebook.com/james.dom', 'https://linkedin.com/in/james-dom', 'https://instagram.com/james.dom', '2025-08-30 08:18:53', 1),
 (3, 3, 'prof.png', 'John', 'Cruz', 'Doe', '202310003', '1', 'Male', '2', 2023, 'john.doe@university.edu', '+639123456783', '', '', '', '2025-09-28 11:58:33', 1),
-(4, 4, 'prof.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 2023, 'michael.lee@school.edu', '09171234567', 'facebook.com/michael.lee', 'linkedin.com/in/michaellee', 'instagram.com/michael.lee', '2025-09-28 20:59:48', 1),
+(4, 4, 'prof.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 2023, 'michael.lee@school.edu', '09171234567', 'facebook.com/michael.lee', 'linkedin.com/in/michaellee', 'instagram.com/michael.lee', '2025-09-28 20:59:48', 0),
 (5, 5, 'prof.png', 'Sophia', 'B.', 'Garcia', '202310004', '1', 'Female', '2', 2023, 'sophia.garcia@school.edu', '09181234567', 'facebook.com/sophia.garcia', 'linkedin.com/in/sophiagarcia', 'instagram.com/sophia.garcia', '2025-09-28 20:59:48', 1),
 (6, 6, 'prof.png', 'Daniel', 'C.', 'Kim', '202310005', '1', 'Male', '2', 2023, 'daniel.kim@school.edu', '09191234567', 'facebook.com/daniel.kim', 'linkedin.com/in/danielkim', 'instagram.com/daniel.kim', '2025-09-28 20:59:48', 1),
 (7, 7, 'prof.png', 'Olivia', 'D.', 'Brown', '202310006', '1', 'Female', '2', 2023, 'olivia.brown@school.edu', '09201234567', 'facebook.com/olivia.brown', 'linkedin.com/in/oliviabrown', 'instagram.com/olivia.brown', '2025-09-28 20:59:48', 0),
