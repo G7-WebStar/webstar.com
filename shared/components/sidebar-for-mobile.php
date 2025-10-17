@@ -196,41 +196,54 @@ $_SESSION['TodoNewCount'] = $newTodoCount;
 <!-- Search Modal -->
 <div class="modal fade text-reg" id="searchModalMobile" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow" style="background: transparent !important; box-shadow: none !important;">
+        <div class="modal-content border-0 shadow"
+            style="background: transparent !important; box-shadow: none !important;">
 
-            <!-- Search Bar (separated, clean, no background) -->
-            <div class="p-3 position-relative">
-                <input type="text" class="form-control rounded-pill pe-5 border-black" placeholder="Search students & professors">
-                <i class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-5 text-muted z-3"></i>
-            </div>
+            <!-- Search Bar -->
+            <form class="p-3 position-relative">
+                <input type="text" id="searchInput" class="form-control rounded-pill pt-3 pb-3"
+                    placeholder="Search students & professors"
+                    style="border: 1.5px solid #2c2c2c; padding-right: 5rem; padding-left: 27px; letter-spacing: -0.03em;">
+                <span class="material-symbols-outlined pe-3" style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%);
+          color: #2c2c2c; font-size: 24px;">search</span>
+            </form>
 
             <!-- Search Results -->
             <div class="p-3">
-                <div class="list-group rounded-3 shadow-sm border border-black">
-                    <a href="#" class="list-group-item list-group-item-action d-flex align-items-center border-0">
-                        <div class="rounded-circle bg-primary me-3" style="width:40px; height:40px;"></div>
-                        <div>
-                            <div class="fw-bold">Christian James D. Torrillo</div>
-                            <small class="text-muted">@jamesdoe</small>
-                        </div>
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action d-flex align-items-center border-0">
-                        <div class="rounded-circle bg-primary me-3" style="width:40px; height:40px;"></div>
-                        <div>
-                            <div class="fw-bold">Christian James D. Torrillo</div>
-                            <small class="text-muted">@jamesdoe</small>
-                        </div>
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action d-flex align-items-center border-0">
-                        <div class="rounded-circle bg-primary me-3" style="width:40px; height:40px;"></div>
-                        <div>
-                            <div class="fw-bold">Christian James D. Torrillo</div>
-                            <small class="text-muted">@jamesdoe</small>
-                        </div>
-                    </a>
+                <div class="rounded-4 shadow-sm scroll-box" style="border: 1.5px solid #2c2c2c;
+          border-radius: 16px; height: 350px; background-color: #fff; padding:10px;">
+                    <div id="searchResults" class="scroll-content"
+                        style="height: 100%; overflow-y: auto; border-radius: 12px;">
+                        <div class="text-center text-muted p-3">Type a name or username to search.</div>
+                    </div>
                 </div>
             </div>
 
         </div>
     </div>
 </div>
+
+<!-- Search Modal JS -->
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim();
+
+        if (query === '') {
+            searchResults.innerHTML = '<div class="text-center text-muted p-3">Type a name or username to search.</div>';
+            return;
+        }
+
+        fetch('shared/assets/processes/search-modal.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'searchTerm=' + encodeURIComponent(query)
+        })
+            .then(res => res.text())
+            .then(html => searchResults.innerHTML = html)
+            .catch(() => searchResults.innerHTML = '<div class="text-center text-muted p-3">Error loading results.</div>');
+    });
+
+</script>
