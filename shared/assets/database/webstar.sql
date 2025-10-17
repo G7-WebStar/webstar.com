@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 16, 2025 at 02:49 PM
+-- Generation Time: Oct 17, 2025 at 08:08 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -109,7 +109,7 @@ INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `about
 (1, 1, 'Activity #1', 'Review CSS Grid and Flexbox', 'Task', '2025-10-15', 0, '2025-09-09 23:00:15'),
 (2, 1, 'Exam #1', 'Review CSS Grid and Flexbox', 'Exam', '2025-11-06', 0, '2025-09-04 22:00:15'),
 (3, 2, 'Activity #2', 'Review CSS Grid and Flexbox', 'Task', '2025-10-23', 0, '2025-10-22 22:00:15'),
-(4, 2, 'Activity #1', 'Review CSS Grid and Flexbox', 'Exam', '2025-09-11', 0, '2025-09-04 22:00:15');
+(4, 2, 'Activity #1', 'Review CSS Grid and Flexbox', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15');
 
 -- --------------------------------------------------------
 
@@ -130,7 +130,7 @@ CREATE TABLE `assignments` (
 
 INSERT INTO `assignments` (`assignmentID`, `assessmentID`, `assignmentDescription`, `assignmentPoints`) VALUES
 (1, 1, 'Attached is a Google Doc that you can edit.\n\nIn Figma, design a “404 Not Found” page.\n\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\n\nTurn in when done.\n\n', 100),
-(2, 3, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100),
+(2, 4, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100),
 (3, 2, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100);
 
 -- --------------------------------------------------------
@@ -464,7 +464,7 @@ CREATE TABLE `todo` (
 
 INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `title`, `status`, `updatedAt`, `isRead`) VALUES
 (1, 2, 1, 'Review CSS Grid and Flexbox', 'Graded', '2025-10-12 19:00:00', 1),
-(2, 2, 3, 'Review CSS Grid and Flexbox 2', 'Pending', '2025-10-29 09:00:00', 1),
+(2, 2, 4, 'Review CSS Grid and Flexbox 2', 'Pending', '2025-10-29 09:00:00', 1),
 (3, 2, 2, 'Review CSS Grid and Flexbox 3', 'Pending', '2025-10-29 09:00:00', 1);
 
 -- --------------------------------------------------------

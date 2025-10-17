@@ -58,7 +58,8 @@ if (!empty($fileLinks)) {
     <link rel="stylesheet" href="../shared/assets/css/sidebar-and-container-styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:FILL@1" rel="stylesheet" />
+    <!-- Quill CSS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 </head>
 
 <body>
@@ -151,7 +152,7 @@ if (!empty($fileLinks)) {
                                                     <?php foreach ($images as $index => $f):
                                                         $link = htmlspecialchars($f['path']);
                                                         $name = htmlspecialchars($f['name']);
-                                                        ?>
+                                                    ?>
                                                         <div class="col-12 col-sm-6 col-md-4">
                                                             <div class="pdf-preview-box text-center" data-bs-toggle="modal"
                                                                 data-bs-target="#imageModal<?php echo $index; ?>"
@@ -206,8 +207,7 @@ if (!empty($fileLinks)) {
 
                                     <?php else: ?>
                                         <p class="text-danger mt-3">No attachments found for lessonID
-                                            <?php echo $lessonID; ?>.
-                                        </p>
+                                            <?php echo $lessonID; ?>.</p>
                                     <?php endif; ?>
 
                                 </div>
@@ -229,18 +229,13 @@ if (!empty($fileLinks)) {
                                             <div class="text-sbold text-15 mb-3" style="color: var(--black);">Optional
                                                 Actions</div>
                                             <div class="d-flex flex-column align-items-center gap-2 mb-5">
-                                                <button
-                                                    class="btn custom-btn d-flex align-items-center justify-content-center">
-                                                    <span class="material-symbols-rounded me-2">emoji_events</span>
-                                                    Award badge
-                                                </button>
-                                                <button
-                                                    class="btn custom-btn d-flex align-items-center justify-content-center">
-                                                    <span class="material-symbols-rounded me-2">comment</span>
-                                                    Add feedback
+                                                <button class="btn custom-btn"><i class="fa-solid fa-trophy me-2"></i>
+                                                    Award badge</button>
+                                                <!-- ADD FEEDBACK BUTTON (opens modal) -->
+                                                <button class="btn custom-btn" data-bs-toggle="modal" data-bs-target="#feedbackModal">
+                                                    <i class="fa-solid fa-comment me-2"></i> Add feedback
                                                 </button>
                                             </div>
-
                                         </div>
                                     </div>
                                 </div>
@@ -250,10 +245,88 @@ if (!empty($fileLinks)) {
                 </div>
             </div>
         </div>
+
+        <!-- FEEDBACK MODAL -->
+        <div class="modal fade" id="feedbackModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border rounded-4">
+
+                    <!-- HEADER -->
+                    <div class="modal-header border-bottom">
+                        <div class="modal-title text-sbold text-30 ms-3">
+                            Add feedback
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form id="feedbackForm" action="" method="POST">
+                        <div class="modal-body pb-2">
+                            <p class="mb-3 mt-2 text-med text-14 ms-3" style="color: var(--black);">
+                                Write feedback that helps your student level up their learning journey!
+                            </p>
+
+                            <!-- Rich text editor -->
+                            <div class="editor-wrapper mb-3 border rounded-3 text-reg text-20">
+                                <div id="editor" style="min-height:100px;"></div>
+
+                                <div id="toolbar" class="border-top d-flex align-items-center p-2 px-3 bg-white">
+                                    <button class="ql-bold"></button>
+                                    <button class="ql-italic"></button>
+                                    <button class="ql-underline"></button>
+                                    <button class="ql-list" value="bullet"></button>
+                                    <span id="word-counter" class="ms-auto text-muted text-reg text-12">Max word limit: 120 words</span>
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="feedbackContent" id="feedbackContent">
+                            <input type="hidden" name="studentID" value="2">
+                            <input type="hidden" name="assignmentID" value="1">
+                        </div>
+
+                        <!-- FOOTER -->
+                        <div class="modal-footer border-top">
+                            <button type="submit" class="btn rounded-pill px-4 text-sbold text-18" style="background-color: var(--primaryColor); border: 1px solid var(--black);">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- bootstrap bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Quill JS -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script>
+        const quill = new Quill('#editor', {
+            theme: 'snow',
+            placeholder: 'Feedback',
+            modules: {
+                toolbar: '#toolbar'
+            }
+        });
+
+        const maxWords = 120;
+        const counter = document.getElementById("word-counter");
+
+        quill.on('text-change', function() {
+            let text = quill.getText().trim();
+            let words = text.length > 0 ? text.split(/\s+/).length : 0;
+
+            if (words > maxWords) {
+                let limited = text.split(/\s+/).slice(0, maxWords).join(" ");
+                quill.setText(limited + " ");
+                quill.setSelection(quill.getLength());
+            }
+
+            counter.textContent = `${Math.min(words, maxWords)}/${maxWords}`;
+        });
+
+        document.getElementById("feedbackForm").addEventListener("submit", function() {
+            document.getElementById("feedbackContent").value = quill.root.innerHTML;
+        });
+    </script>
 
     <script>
         // THUMBNAIL hover zoom
@@ -319,7 +392,7 @@ if (!empty($fileLinks)) {
         });
 
         // Modal image zoom/scroll/drag logic
-        (function () {
+        (function() {
             // initialize for each modal image present
             const modalImages = document.querySelectorAll('.modal-zoomable');
 
@@ -395,7 +468,9 @@ if (!empty($fileLinks)) {
                         img.style.cursor = zoom > 1 ? 'grab' : 'zoom-in';
                         applyTransform();
                     }
-                }, { passive: false });
+                }, {
+                    passive: false
+                });
 
                 // dragging
                 img.addEventListener('mousedown', (e) => {

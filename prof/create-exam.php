@@ -648,9 +648,8 @@ if (isset($_POST['save_lesson'])) {
             const container = document.getElementById("toastContainer");
 
             const alert = document.createElement("div");
-            alert.className = "alert alert-danger alert-dismissible fade show mb-2 text-center d-flex align-items-center justify-content-center shadow-lg";
+            alert.className = "alert alert-danger alert-dismissible fade show mb-2 text-center d-flex align-items-center justify-content-center shadow-lg text-reg text-16";
             alert.role = "alert";
-            alert.style.fontSize = "0.85rem";
             alert.innerHTML = `
             <i class="bi bi-exclamation-triangle-fill me-2 fs-6"></i>
             <span>${message}</span>
