@@ -214,7 +214,7 @@ CREATE TABLE `files` (
 --
 
 INSERT INTO `files` (`fileID`, `courseID`, `userID`, `announcementID`, `lessonID`, `assignmentID`, `fileAttachment`, `fileTitle`, `fileLink`, `uploadedAt`) VALUES
-(1, 1, 1, 1, 1, NULL, 'Web Development Course Material', '', 'https://Testple.com/lesson1,https://Testple.com/lesson1.1', '2025-08-30 10:30:00');
+(1, 1, 1, 1, 1, NULL, 'Web Development Course Material', '', 'https://example.com/lesson1,https://example.com/lesson1.1', '2025-08-30 10:30:00');
 
 -- --------------------------------------------------------
 
@@ -532,17 +532,17 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`) VALUES
 (1, 'Password123', 'john.doe@gmail.com', 'admin', 'johndoe'),
-(2, 'Hello@world', 'jane.smith@Testple.com', 'student', 'janesmith'),
+(2, 'Hello@world', 'jane.smith@example.com', 'student', 'janesmith'),
 (3, 'HelloWorld', 'john.doe2@gmail.com', 'user', 'JohnDoe'),
-(4, 'password123', 'michael.lee@Testple.com', 'student', 'michael_lee'),
-(5, 'securePass!1', 'sophia.garcia@Testple.com', 'student', 'sophia_garcia'),
-(6, 'helloWorld9', 'daniel.kim@Testple.com', 'student', 'daniel_kim'),
-(7, 'qwerty2025', 'olivia.brown@Testple.com', 'student', 'olivia_brown'),
-(8, 'pass4321', 'ethan.wilson@Testple.com', 'student', 'ethan_wilson'),
-(9, 'abcXYZ987', 'isabella.martin@Testple.com', 'student', 'isabella_martin'),
-(10, 'myPass!77', 'liam.torres@Testple.com', 'student', 'liam_torres'),
-(11, 'safeKey555', 'emma.davis@Testple.com', 'student', 'emma_davis'),
-(12, 'newPass!11', 'chloe.nguyen@Testple.com', 'student', 'chloe_nguyen');
+(4, 'password123', 'michael.lee@example.com', 'student', 'michael_lee'),
+(5, 'securePass!1', 'sophia.garcia@example.com', 'student', 'sophia_garcia'),
+(6, 'helloWorld9', 'daniel.kim@example.com', 'student', 'daniel_kim'),
+(7, 'qwerty2025', 'olivia.brown@example.com', 'student', 'olivia_brown'),
+(8, 'pass4321', 'ethan.wilson@example.com', 'student', 'ethan_wilson'),
+(9, 'abcXYZ987', 'isabella.martin@example.com', 'student', 'isabella_martin'),
+(10, 'myPass!77', 'liam.torres@example.com', 'student', 'liam_torres'),
+(11, 'safeKey555', 'emma.davis@example.com', 'student', 'emma_davis'),
+(12, 'newPass!11', 'chloe.nguyen@example.com', 'student', 'chloe_nguyen');
 
 --
 -- Indexes for dumped tables
