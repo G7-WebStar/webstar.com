@@ -13,11 +13,10 @@
     <link rel="stylesheet" href="shared/assets/css/index.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
-
 </head>
 
 <body>
-    <div class="container-fluid min-vh-100  justify-content-center align-items-center p-0 p-md-3"
+    <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center p-0 p-md-3"
         style="background-color: var(--black);">
 
         <div class="row w-100">
@@ -28,7 +27,7 @@
             <!-- Sidebar Column (fixed on desktop) -->
             <?php include 'shared/components/sidebar-for-desktop.php'; ?>
 
-            <!-- Main Container Column-->
+            <!-- Main Container Column -->
             <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-0 p-md-4 overflow-y-auto">
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
@@ -36,17 +35,18 @@
                     <!-- Navbar for mobile -->
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-1 overflow-y-auto">
-                        <div class="row">
-                            <!-- PUT CONTENT HERE -->
-                            <div class="container">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <!--Quiz Nav-->
+                    <div class="container-fluid py-1 overflow-hidden d-flex flex-column h-100">
+                        <div class="row flex-grow-1">
+                            <div class="container d-flex flex-column h-100">
+                                <div class="row flex-grow-1">
+                                    <div class="col-12 d-flex flex-column h-100">
+                                        <!-- Quiz Nav -->
                                         <div class="row bg-white border border-black rounded-4 my-3 text-sbold">
-                                            <div class="quiz-nav col-12 d-flex flex-row align-items-center my-2 px-5 py-3">
+                                            <div
+                                                class="quiz-nav col-12 d-flex flex-row align-items-center my-2 px-5 py-3">
                                                 <div class="d-flex flex-row">
-                                                    <i class="announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 mt-3" style="color: var(--black);"></i>
+                                                    <i class="announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 mt-3"
+                                                        style="color: var(--black);"></i>
                                                     <div class="h2 ms-5 my-0">
                                                         Quiz #1
                                                     </div>
@@ -57,30 +57,57 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <!--End of Quiz Nav-->
-                                        <div class="row mt-5">
-                                            <div class="col-12">
-                                                <div class="h2 text-sbold text-center">
+                                        <!-- End of Quiz Nav -->
+
+                                        <!-- Content -->
+                                        <div class="row flex-grow-1 d-flex flex-column">
+                                            <div class="col-12 d-flex flex-column flex-grow-1">
+                                                <div class="h2 text-sbold text-center mt-4">
                                                     Multiple Choice
                                                 </div>
-                                                <div class="col-8 h4 text-reg mx-auto mt-5">
-                                                    Read each question carefully and choose the best answer from the given options. 
-                                                    Only one option is correct for each question. Once you move to the next question, 
-                                                    you will not be able to return to the previous one, so review your answer before proceeding. 
-                                                    The exam will automatically submit when the timer ends. Avoid refreshing or closing the browser 
-                                                    during the exam to prevent submission issues.
+                                                <div class="col-8 h4 text-reg mx-auto mt-4">
+                                                    Read each question carefully and choose the best answer from the
+                                                    given options. Only one option is correct for each question. Once
+                                                    you move to the next question, you will not be able to return to the
+                                                    previous one, so review your answer before proceeding. The exam will
+                                                    automatically submit when the timer ends. Avoid refreshing or
+                                                    closing the browser during the exam to prevent submission issues.
                                                 </div>
-                                                <div class="button-container mt-5">
-                                                    <div class="btn border border-black rounded-4">
-                                                        Prev
+                                                <div class="d-flex flex-column justify-content-end flex-grow-1 my-3 text-sbold">
+                                                    <div class="d-flex justify-content-around mb-4">
+                                                        <div class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 my-auto px-4 py-2"
+                                                            style="background-color: var(--primaryColor);">
+                                                            <i class="fa-solid fs-5 fa-arrow-left text-reg text-12" style="color: var(--black);"></i>
+                                                            <span class="h5 m-0">Prev</span>
+                                                        </div>
+
+                                                        <div class="btn d-flex align-items-center justify-content-center border border-black rounded-5 my-auto px-4 py-2"
+                                                            style="background-color: var(--primaryColor);">
+                                                            <span class="h5 m-0">Submit</span>
+                                                        </div>
+
+                                                        <div class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 my-auto px-4 py-2"
+                                                            style="background-color: var(--primaryColor);">
+                                                            <span class="h5 m-0">Next</span>
+                                                            <i class="fa-solid fs-5 fa-arrow-right text-reg text-12" style="color: var(--black);"></i>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                <!-- End Purple Section -->
                                             </div>
                                         </div>
+                                        <!-- End Content -->
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div> <!-- End here -->
+                </div> <!-- End Card -->
             </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
