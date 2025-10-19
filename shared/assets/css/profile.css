@@ -148,24 +148,20 @@ body {
 }
 
 .sticky-header {
-    position: fixed; /* stick to viewport top */
-    top: 0px;
+    position: fixed;
+    top: -100px; /* start hidden above the viewport */
     left: 0;
+    width: 100%;
     background: var(--dirtyWhite);
+    z-index: 1000;
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     border-bottom: 1px solid #ccc;
+
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 5px 20px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-    z-index: 1000;
-}
 
-.sticky-header.show {
-    transform: translateY(0); /* slide into view */
-    opacity: 1;
+    transition: top 0.3s ease-in-out; /* smooth slide transition */
 }
 
 
@@ -173,4 +169,14 @@ body {
     width: 30px;
     height: 30px;
     border-radius: 50%;
+}
+
+@media (max-width: 767px) {
+    .sticky-header.show {
+        transform: translateY(0);
+        /* slide into view */
+        opacity: 1;
+        top: 0; /* slides down into view */
+    }
+
 }

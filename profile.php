@@ -191,7 +191,7 @@
                                             <!-- My Badges Header-->
                                             <div class="d-flex align-items-center" style="margin-bottom:150px">
                                                 <span class="material-symbols-rounded me-2">
-                                                    editor_choice
+                                                    trophy
                                                 </span>
                                                 <span class="text-sbold">My Badges</span>
                                             </div>
