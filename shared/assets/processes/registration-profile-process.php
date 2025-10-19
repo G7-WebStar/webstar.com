@@ -10,10 +10,12 @@ if (isset($_POST['nextBtn'])) {
     $middleName = $_POST['middleName'];
     $lastName = $_POST['lastName'];
     $userName = $_POST['userName'];
-    $studentID = $_POST['studentID'];
+    $studentID = strtoupper($_POST['studentID']);
     $programID = $_POST['program'];
     $gender = $_POST['gender'];
     $yearLevel = $_POST['yearLevel'];
+
+    $yearSection = date('Y');
 
     $htmlfileupload = $_FILES['fileUpload']['name'];
     $htmlfileuploadTMP = $_FILES['fileUpload']['tmp_name'];
@@ -30,9 +32,9 @@ if (isset($_POST['nextBtn'])) {
 
     // insert user info gamit ang programID (wala nang SELECT)
     $nextQuery = "INSERT INTO userinfo 
-        (userID, firstName, middleName, lastName, studentID, programID, gender, yearLevel, profilePicture) 
+        (userID, firstName, middleName, lastName, studentID, programID, gender, yearLevel, yearSection, profilePicture, createdAt) 
         VALUES 
-        ('$userID', '$firstName', '$middleName', '$lastName', '$studentID', '$programID', '$gender', '$yearLevel', '$htmlfolder$htmlfileupload')";
+        ('$userID', '$firstName', '$middleName', '$lastName', '$studentID', '$programID', '$gender', '$yearLevel', '$yearSection', '$htmlfolder$htmlfileupload', NOW())";
     $nextResult = executeQuery($nextQuery);
 
     if ($nextResult) {
