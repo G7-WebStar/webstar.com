@@ -59,27 +59,33 @@
 /* Font families */
 .text-reg {
   font-family: 'Regular', sans-serif;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.03em;
+  color: var(--black);
 }
 
 .text-med {
   font-family: 'Medium', sans-serif;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.03em;
+  color: var(--black);
+  
 }
 
 .text-bold {
   font-family: 'Bold', sans-serif;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.03em;
+  color: var(--black);
 }
 
 .text-sbold {
   font-family: 'SemiBold', sans-serif;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.03em;
+  color: var(--black);
 }
 
 .text-black {
   font-family: 'Black', sans-serif;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.03em;
+  color: var(--black);
 }
 
 /* Font sizes */
