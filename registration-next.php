@@ -125,7 +125,7 @@ include("shared/assets/processes/registration-next-process.php");
                         </div>
 
                         <div class="modal-footer">
-                            <a href="index.php" class="text-sbold btn btn-go-custom">
+                            <a href="course-join.php" class="text-sbold btn btn-go-custom">
                                 Let's go!
                             </a>
                         </div>

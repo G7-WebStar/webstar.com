@@ -166,3 +166,30 @@
 }
 
 
+ /* Index Scrollbar */
+ .scroll-attachments {
+   scrollbar-width: none;
+ }
+
+ .scroll-attachments:hover {
+   scrollbar-width: thin;
+   scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+ }
+
+ .scroll-attachments::-webkit-scrollbar {
+   width: 0px;
+   transition: width 0.3s;
+ }
+
+ .scroll-attachments:hover::-webkit-scrollbar {
+   width: 6px;
+ }
+
+ .scroll-attachments::-webkit-scrollbar-track {
+   background: transparent;
+ }
+
+ .scroll-attachments::-webkit-scrollbar-thumb {
+   background-color: rgba(0, 0, 0, 0.25);
+   border-radius: 4px;
+ }
