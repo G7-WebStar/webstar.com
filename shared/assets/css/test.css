@@ -1,0 +1,30 @@
+@media screen and (max-width: 767px) {
+    .fs-sm-6 {
+        font-size: 1rem !important;
+    }
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--dirtyWhite);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primaryColor);
+    /* Your accent color */
+    border-radius: 10px;
+    border: 2px solid var(--dirtyWhite);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #ff7b82;
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primaryColor) var(--dirtyWhite);
+}
