@@ -4,8 +4,6 @@ $activePage = 'courseInfo';
 include("shared/assets/database/connect.php");
 include("shared/assets/processes/session-process.php");
 
-$userID = 2;
-
 if (isset($_GET['courseID'])) {
     $courseID = $_GET['courseID'];
     $selectCourseQuery = "SELECT 
