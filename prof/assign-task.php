@@ -29,11 +29,12 @@ if (isset($_POST['saveAssignment'])) {
 
             // Retrieve assessmentID based on unique data
             $assessmentID = mysqli_insert_id($conn);
+            
             // Insert into assignments (linked to assessmentID)
             $insertAssignment = "INSERT INTO assignments 
-            (assessmentID, assignmentTitle, assignmentDescription, assignmentPoints)
+            (assessmentID,  assignmentDescription, assignmentPoints)
             VALUES 
-            ('$assessmentID','$title', '$content', '$assignmentPoints')";
+            ('$assessmentID', '$content', '$assignmentPoints')";
             executeQuery($insertAssignment);
 
             // Get assignmentID right after inserting into assignments
@@ -41,9 +42,9 @@ if (isset($_POST['saveAssignment'])) {
 
             // Then insert into todo
             $insertTodo = "INSERT INTO todo 
-            (userID, assessmentID, title, status, updatedAt, isRead)
+            (userID, assessmentID, title, status, isRead)
             VALUES 
-            ('$userID', '$assessmentID', '$title', 'Pending', '$createdAt', 0)";
+            ('$userID', '$assessmentID', '$title', 'Pending',  0)";
             executeQuery($insertTodo);
 
 
@@ -65,9 +66,9 @@ if (isset($_POST['saveAssignment'])) {
 
                         if (move_uploaded_file($tmpName, $targetPath)) {
                             $insertFile = "INSERT INTO files 
-                            (courseID, userID, assignmentID, fileAttachment, fileTitle, fileLink) 
+                            (courseID, userID, assignmentID, fileAttachment, fileLink) 
                             VALUES 
-                            ('$selectedCourseID', '$userID', '$assignmentID', '$safeName', '$fileTitle', '')";
+                            ('$selectedCourseID', '$userID', '$assignmentID', '$safeName', '')";
                             executeQuery($insertFile);
                         }
                     }
@@ -473,6 +474,7 @@ if (isset($_GET['fetchTitle'])) {
         document.addEventListener('DOMContentLoaded', function () {
             const fileInput = document.getElementById('fileUpload');
             const container = document.getElementById('filePreviewContainer');
+            let allFiles = [];
 
             // Link popovers
             const popovers = document.querySelectorAll('[data-bs-toggle="popover"]');
@@ -497,44 +499,42 @@ if (isset($_GET['fetchTitle'])) {
                             return;
                         }
 
-                        // Get domain and favicon for link icon
+                        // Get domain and favicon
                         const urlObj = new URL(linkValue);
                         const domain = urlObj.hostname;
                         const faviconURL = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
 
-                        // Unique ID for link preview elements
                         const uniqueID = Date.now();
                         let displayTitle = "Loading...";
 
-                        // Create link preview HTML
                         const previewHTML = `
-                            <div class="col-12 mt-2" data-id="${uniqueID}">
-                                <div class="materials-card d-flex align-items-stretch p-2 w-100">
-                                    <div class="d-flex w-100 align-items-center justify-content-between">
-                                        <div class="d-flex align-items-center flex-grow-1">
-                                            <div class="mx-4">
-                                                <img src="${faviconURL}" alt="${domain} Icon" 
-                                                    onerror="this.onerror=null;this.src='../shared/assets/img/web.png';" 
-                                                    style="width: 30px; height: 30px;">
-                                            </div>
-                                            <div>
-                                                <div id="title-${uniqueID}" class="text-sbold text-16 py-1">${displayTitle}</div>
-                                                <div class="text-reg text-12 text-break">
-                                                    <a href="${linkValue}" target="_blank">${linkValue}</a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="mx-4 delete-file" style="cursor:pointer;">
-                                            <img src="../shared/assets/img/trash.png" alt="Delete Icon">
+                    <div class="col-12 mt-2" data-id="${uniqueID}">
+                        <div class="materials-card d-flex align-items-stretch p-2 w-100">
+                            <div class="d-flex w-100 align-items-center justify-content-between">
+                                <div class="d-flex align-items-center flex-grow-1">
+                                    <div class="mx-4">
+                                        <img src="${faviconURL}" alt="${domain} Icon" 
+                                            onerror="this.onerror=null;this.src='../shared/assets/img/web.png';" 
+                                            style="width: 30px; height: 30px;">
+                                    </div>
+                                    <div>
+                                        <div id="title-${uniqueID}" class="text-sbold text-16 py-1">${displayTitle}</div>
+                                        <div class="text-reg text-12 text-break">
+                                            <a href="${linkValue}" target="_blank">${linkValue}</a>
                                         </div>
                                     </div>
                                 </div>
-                                <input type="hidden" name="links[]" value="${linkValue}" class="link-hidden">
+                                <div class="mx-4 delete-file" style="cursor:pointer;">
+                                    <img src="../shared/assets/img/trash.png" alt="Delete Icon">
+                                </div>
                             </div>
-                            `;
-                        container.innerHTML += previewHTML;
+                        </div>
+                        <input type="hidden" name="links[]" value="${linkValue}" class="link-hidden">
+                    </div>
+                `;
+                        container.insertAdjacentHTML('beforeend', previewHTML);
 
-                        // Fetch real page title for link
+                        // Fetch page title
                         fetch("?fetchTitle=" + encodeURIComponent(linkValue))
                             .then(res => res.json())
                             .then(data => {
@@ -545,7 +545,7 @@ if (isset($_GET['fetchTitle'])) {
                                 if (titleEl) titleEl.textContent = linkValue.split('/').pop() || "Link";
                             });
 
-                        // Delete handler for link
+                        // Delete handler
                         container.querySelectorAll('.delete-file').forEach((btn) => {
                             btn.addEventListener('click', function () {
                                 const col = this.closest('.col-12');
@@ -562,54 +562,52 @@ if (isset($_GET['fetchTitle'])) {
 
             // File input change
             fileInput.addEventListener('change', function (event) {
-                const currentCount = container.querySelectorAll('.col-12').length;
-                const incomingCount = event.target.files.length;
+                // Merge new selections with existing files
+                let dt = new DataTransfer();
+                Array.from(allFiles).forEach(f => dt.items.add(f));
+                Array.from(event.target.files).forEach(f => dt.items.add(f));
+                fileInput.files = dt.files;
+                allFiles = Array.from(fileInput.files); // update allFiles list
 
-                // Limit check
-                if (currentCount + incomingCount > 10) {
-                    alert("You can only add up to 10 files or links total.");
-                    fileInput.value = '';
-                    return;
-                }
+                // 🔹 Remove only file previews, keep links
+                container.querySelectorAll('.file-preview').forEach(el => el.remove());
 
-                let previewHTML = "";
-                Array.from(event.target.files).forEach((file, index) => {
+                // Rebuild file previews
+                allFiles.forEach((file, index) => {
                     const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
                     const ext = file.name.split('.').pop().toUpperCase();
-
-                    // File preview HTML with icon
-                    previewHTML += `
-                        <div class="col-12 mt-2">
-                            <div class="materials-card d-flex align-items-stretch p-2 w-100">
-                                <div class="d-flex w-100 align-items-center justify-content-between">
-                                    <div class="d-flex align-items-center flex-grow-1">
-                                        <div class="mx-4">
-                                            <i class="bi bi-file-earmark-fill" style="font-size: 22px;"></i>
-                                        </div>
-                                        <div>
-                                            <div class="text-sbold text-16 py-1">${file.name}</div>
-                                            <div class="text-reg text-12">${ext} · ${fileSizeMB} MB</div>
-                                        </div>
-                                    </div>
-                                    <div class="mx-4 delete-file" style="cursor:pointer;">
-                                        <img src="../shared/assets/img/trash.png" alt="Delete Icon">
-                                    </div>
+                    const fileHTML = `
+                <div class="col-12 mt-2 file-preview">
+                    <div class="materials-card d-flex align-items-stretch p-2 w-100">
+                        <div class="d-flex w-100 align-items-center justify-content-between">
+                            <div class="d-flex align-items-center flex-grow-1">
+                                <div class="mx-4">
+                                    <i class="bi bi-file-earmark-fill" style="font-size: 22px;"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sbold text-16 py-1">${file.name}</div>
+                                    <div class="text-reg text-12">${ext} · ${fileSizeMB} MB</div>
                                 </div>
                             </div>
-                        </div>`;
-
+                            <div class="mx-4 delete-file" style="cursor:pointer;" data-index="${index}">
+                                <img src="../shared/assets/img/trash.png" alt="Delete Icon">
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+                    container.insertAdjacentHTML('beforeend', fileHTML);
                 });
 
-                container.innerHTML += previewHTML;
-
-                // Delete handler for files
-                container.querySelectorAll('.delete-file').forEach((btn, idx) => {
+                // Allow deletion of specific files
+                container.querySelectorAll('.delete-file').forEach((btn) => {
                     btn.addEventListener('click', function () {
-                        let dt = new DataTransfer();
-                        Array.from(fileInput.files).forEach((f, i) => {
-                            if (i !== idx) dt.items.add(f);
-                        });
-                        fileInput.files = dt.files;
+                        const index = parseInt(this.dataset.index);
+                        if (!isNaN(index)) {
+                            allFiles.splice(index, 1);
+                            let dt2 = new DataTransfer();
+                            allFiles.forEach(f => dt2.items.add(f));
+                            fileInput.files = dt2.files;
+                        }
                         this.closest('.col-12').remove();
                     });
                 });
