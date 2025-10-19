@@ -183,15 +183,10 @@ body {
 
 .btn-attachments {
     border-radius: 25px;
-    /* fully rounded */
-    border: 2px solid var(--black);
-    /* border color (Bootstrap primary) */
-    background-color: #ffffff;
-    /* normal background */
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
     color: var(--black);
-    /* text color */
     padding: 0.35rem 1.6rem;
-    /* adjust padding if needed */
     background-color: var(--primaryColor);
 }
 
@@ -199,30 +194,21 @@ body {
 .btn-attachments:focus {
     background-color: var(--primaryColor);
     border: 2px solid var(--black);
-    /* keep same on hover */
     color: var(--black);
-    /* keep same on hover */
     box-shadow: none;
-    /* remove default focus shadow if needed */
 }
 
 /* Files ellipsis */
 @media (max-width: 576px) {
     .todo-card .text-sbold {
         white-space: nowrap;
-        /* Prevent line breaks */
         overflow: hidden;
-        /* Hide overflow */
         text-overflow: ellipsis;
-        /* Show ... */
         max-width: 70%;
-        /* Adjust width as needed */
     }
 
-    /* Keep download button visible and aligned */
     .todo-card .mx-4:last-child {
         flex-shrink: 0;
-        /* Prevent button from shrinking */
     }
 }
 

@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     $email = trim($_POST['email']);
     $password = $_POST['password'];
 
-    // ✅ Get password, role, and userID
+    // Get password, role, and userID
     $stmt = $conn->prepare("SELECT userID, role, password FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
             $_SESSION['userID'] = $userID;
             $_SESSION['role'] = $role;
 
-            // ✅ Redirect based on role
+            // Redirect based on role
             if ($role === "admin") {
                 header("Location: prof/index.php");
             } else {
