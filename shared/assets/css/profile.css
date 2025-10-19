@@ -1,0 +1,148 @@
+body {
+    font-family: var(--Regular);
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #fffbf3;
+}
+
+.row.g-0 {
+    margin: 0;
+    width: 100%;
+}
+
+.profile {
+    background: linear-gradient(to bottom, #FDDF94, #FFFFFF);
+    min-height: 200px;
+    position: relative;
+}
+
+.profile {
+    overflow: hidden;
+}
+
+.cover-photo {
+    width: 100%;
+    height: 150px;
+    background: url('../pfp-uploads/cover4.jpg') center/cover no-repeat;
+    border-radius: 15px 15px 0 0;
+    -webkit-mask-image: linear-gradient(to bottom, black 10%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 10%, transparent 100%);
+}
+
+.profile-block {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    margin-top: -115px;
+    text-align: start;
+    z-index: 2;
+}
+
+.profile-pic {
+    width: 90px;
+    height: 90px;
+    border-radius: 15px;
+    background: url('../pfp-uploads/pfp.jpg') center/cover no-repeat white;
+    border: 2px solid var(--black);
+}
+
+.profile-text {
+    width: 100%;
+    margin-top: 15px;
+}
+
+.user-name {
+    line-height: 1.2;
+}
+
+.user-username {
+    line-height: 1.2;
+}
+
+
+.logo-badge {
+    background-color: var(--white1);
+    border: 1px solid var(--black) !important;
+}
+
+.progress {
+    background-color: var(--black);
+}
+
+.rank-edit-button-md {
+    display: block;
+}
+
+.rank-edit-button-sm {
+    display: none;
+}
+
+.text-white {
+    color: var(--black) !important;
+}
+
+.btn-primary {
+    background-color: var(--primaryColor);
+    color: var(--black);
+    border: 1px solid var(--black);
+}
+
+.btn-primary:hover {
+    background-color: var(--primaryColor);
+    color: var(--black);
+    border: 1px solid var(--black);
+}
+
+.btn-secondary {
+    background-color: var(--black);
+    color: var(--white1);
+    border: 1px solid var(--black);
+}
+
+@media (max-width: 1300px) {
+    .first-column {
+        width: 100%;
+        margin-bottom: 10px;
+        position: relative !important;
+    }
+
+    .second-column {
+        width: 100%;
+    }
+
+    .third-column {
+        width: 100%;
+    }
+
+    .course-name-col {
+        width: 100%;
+    }
+
+    .course-name-text {
+        text-align: center;
+    }
+
+    .progress-bar-col {
+        width: 100%;
+    }
+
+    .cover-photo {
+        height: 200px;
+    }
+
+    .profile-pic {
+        top: 130px;
+        left: 50%;
+        width: 100px;
+        height: 100px;
+    }
+
+    .profile-block {
+        margin-top: -55px;
+    }
+}
