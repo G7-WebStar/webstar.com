@@ -17,7 +17,7 @@ $query = "
         u.role
     FROM users AS u
     INNER JOIN userinfo AS i ON u.userID = i.userID
-    WHERE (u.role = 'student' OR u.role = 'instructor')
+    WHERE (u.role = 'student' OR u.role = 'instructor' OR u.role = 'developer')
       AND (
           u.userName LIKE '%$escaped%' OR
           i.firstName LIKE '%$escaped%' OR
@@ -38,10 +38,13 @@ if (mysqli_num_rows($result) > 0) {
         $roleBadge = '';
         if ($row['role'] === 'instructor') {
             $roleBadge = '<span style="background-color: #b3d4ff; color: #0a3d91; font-size: 0.75rem; 
-            padding: 2px 8px; border-radius: 12px; margin-left: 8px;">Instructor</span>';
+    padding: 2px 8px; border-radius: 12px; margin-left: 8px;">Instructor</span>';
         } elseif ($row['role'] === 'student') {
             $roleBadge = '<span style="background-color: #d3f9d8; color: #196c2c; font-size: 0.75rem; 
-            padding: 2px 8px; border-radius: 12px; margin-left: 8px;">Student</span>';
+    padding: 2px 8px; border-radius: 12px; margin-left: 8px;">Student</span>';
+        } elseif ($row['role'] === 'developer') {
+            $roleBadge = '<span style="background-color: #e0ccff; color: #4b0082; font-size: 0.75rem; 
+    padding: 2px 8px; border-radius: 12px; margin-left: 8px;">Developer</span>';
         }
 
         echo '
@@ -53,8 +56,8 @@ if (mysqli_num_rows($result) > 0) {
                    background-size: cover; background-position: center;">
         </div>
         <div class="d-flex flex-column justify-content-center">
-            <span style="font-weight: 600; color: #000;">' . htmlspecialchars($row['firstName'] . ' ' . $row['lastName']) . $roleBadge . '</span>
-            <small style="color: #777;">@' . htmlspecialchars($row['userName']) . '</small>
+            <span class="text-sbold">' . htmlspecialchars($row['firstName'] . ' ' . $row['lastName']) . $roleBadge . '</span>
+            <small class="text-reg">@' . htmlspecialchars($row['userName']) . '</small>
         </div>
     </a>';
     }
