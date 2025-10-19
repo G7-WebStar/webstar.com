@@ -40,7 +40,7 @@ if (isset($_POST['save_lesson'])) {
             $testQuery = "INSERT INTO tests 
                 (courseID, userID, assessmentID, testTitle, generalGuidance, testTimeLimit, userSection, testInstruction, testType) 
                 VALUES 
-                ('$courseID', '$userID', '$assessmentID', '$title', '$generalGuidance', 
+                ('$assessmentID', '$title', '$generalGuidance', 
                 '$testTimeLimit', '$userSection', '$testInstruction', '$testType')";
 
             executeQuery($testQuery);

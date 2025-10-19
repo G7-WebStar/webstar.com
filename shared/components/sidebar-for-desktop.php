@@ -172,7 +172,7 @@ $_SESSION['TodoNewCount'] = $newTodoCount;
 
 
 
-                <div class="dropdown mt-auto p-4" style="letter-spacing: -1px;">
+                <div class="dropdown mt-auto p-4">
                     <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
                         data-bs-toggle="dropdown" aria-expanded="false">
                         <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="32"
@@ -220,7 +220,7 @@ $_SESSION['TodoNewCount'] = $newTodoCount;
             <form class="p-3 position-relative">
                 <input type="text" id="searchInput" class="form-control rounded-pill pt-3 pb-3"
                     placeholder="Search students & professors"
-                    style="border: 1.5px solid #2c2c2c; padding-right: 5rem; padding-left: 27px; letter-spacing: -0.03em;">
+                    style="border: 1.5px solid #2c2c2c; padding-right: 5rem; padding-left: 27px;">
                 <span class="material-symbols-outlined pe-3" style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%);
           color: #2c2c2c; font-size: 24px;">search</span>
             </form>

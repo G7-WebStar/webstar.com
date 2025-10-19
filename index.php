@@ -65,7 +65,10 @@ $selectAnnouncementsQuery = "SELECT
         ON courses.courseID = announcements.courseID
     INNER JOIN userinfo AS profInfo
         ON users.userID = profInfo.userID
-    WHERE enrollments.userID = '$userID';
+    WHERE enrollments.userID = '$userID'
+    AND announcements.announcementID NOT IN (
+        SELECT announcementID FROM announcementNotes WHERE userID = '$userID'
+    );
     ";
 $selectAnnouncementsResult = executeQuery($selectAnnouncementsQuery);
 

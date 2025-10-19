@@ -6,10 +6,10 @@ $error = "";
 
 // define error messages
 $errorMessages = [
+    "invalidPasswordFormat" => "Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and special characters.",
     "passwordMismatch" => "Passwords do not match.",
     "emailExists"      => "The email address you entered is already registered.",
     "signupFailed"     => "Something went wrong. Please try again.",
-    // "invalidEmailDomain" => "Only Gmail addresses are allowed."
 ];
 
 if (isset($_SESSION['alert'])) {
@@ -23,7 +23,9 @@ if (isset($_POST['signUpBtn'])) {
     $confirmPassword = $_POST['confirmPassword'];
 
     // Check if password mismatch
-    if ($password !== $confirmPassword) {
+    if (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*\W).{8,}$/', $password)) {
+        $_SESSION['alert'] = 'invalidPasswordFormat';
+    } elseif ($password !== $confirmPassword) {
         $_SESSION['alert'] = 'passwordMismatch';
     } else {
         $checkEmailSql = "SELECT * FROM users WHERE email = '$email'";
