@@ -271,13 +271,13 @@ if (!empty($fileLinks)) {
                             style="transform: scale(0.8); filter: grayscale(100%);"></button>
                     </div>
 
-                    <div class="modal-body">
+                    <div class="modal-body overflow-auto">
                         <p class="mb-3 text-med text-14 ms-3" style="color: var(--black);">
                             Choose a badge to reward and recognize your student’s hard work.
                         </p>
 
-                        <div class="col px-2">
-                            <div class="card rounded-4 mb-2"
+                        <div class="col p-0 m-3">
+                            <div class="card rounded-3 mb-2"
                                 style="background-color: var(--pureWhite); border: 1px solid var(--black);">
                                 <div class="card-body p-0">
                                     <div class="badge-option rounded-4 d-flex align-items-center"
@@ -296,7 +296,115 @@ if (!empty($fileLinks)) {
                                 </div>
                             </div>
 
-                            <div class="card rounded-4 mb-2"
+                            <div class="card rounded-3 mb-2"
+                                style="background-color: var(--pureWhite); border: 1px solid var(--black);">
+                                <div class="card-body p-0">
+                                    <div class="badge-option rounded-4 d-flex align-items-center"
+                                        style="cursor: pointer;">
+                                        <img src="../shared/assets/img/badge/Badge.png" alt="Badge"
+                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
+                                        <div>
+                                            <div style="line-height: 1.1;">
+                                                <div class="text-bold text-14">Ahead of the Curve</div>
+                                                <div class="text-med text-12">
+                                                    You submitted before the deadline—way to stay ahead!
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card rounded-3 mb-2"
+                                style="background-color: var(--pureWhite); border: 1px solid var(--black);">
+                                <div class="card-body p-0">
+                                    <div class="badge-option rounded-4 d-flex align-items-center"
+                                        style="cursor: pointer;">
+                                        <img src="../shared/assets/img/badge/Badge.png" alt="Badge"
+                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
+                                        <div>
+                                            <div style="line-height: 1.1;">
+                                                <div class="text-bold text-14">Ahead of the Curve</div>
+                                                <div class="text-med text-12">
+                                                    You submitted before the deadline—way to stay ahead!
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card rounded-3 mb-2"
+                                style="background-color: var(--pureWhite); border: 1px solid var(--black);">
+                                <div class="card-body p-0">
+                                    <div class="badge-option rounded-4 d-flex align-items-center"
+                                        style="cursor: pointer;">
+                                        <img src="../shared/assets/img/badge/Badge.png" alt="Badge"
+                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
+                                        <div>
+                                            <div style="line-height: 1.1;">
+                                                <div class="text-bold text-14">Ahead of the Curve</div>
+                                                <div class="text-med text-12">
+                                                    You submitted before the deadline—way to stay ahead!
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card rounded-3 mb-2"
+                                style="background-color: var(--pureWhite); border: 1px solid var(--black);">
+                                <div class="card-body p-0">
+                                    <div class="badge-option rounded-4 d-flex align-items-center"
+                                        style="cursor: pointer;">
+                                        <img src="../shared/assets/img/badge/Badge.png" alt="Badge"
+                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
+                                        <div>
+                                            <div style="line-height: 1.1;">
+                                                <div class="text-bold text-14">Ahead of the Curve</div>
+                                                <div class="text-med text-12">
+                                                    You submitted before the deadline—way to stay ahead!
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card rounded-3 mb-2"
+                                style="background-color: var(--pureWhite); border: 1px solid var(--black);">
+                                <div class="card-body p-0">
+                                    <div class="badge-option rounded-4 d-flex align-items-center"
+                                        style="cursor: pointer;">
+                                        <img src="../shared/assets/img/badge/Badge.png" alt="Badge"
+                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
+                                        <div>
+                                            <div style="line-height: 1.1;">
+                                                <div class="text-bold text-14">Ahead of the Curve</div>
+                                                <div class="text-med text-12">
+                                                    You submitted before the deadline—way to stay ahead!
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card rounded-3 mb-2"
+                                style="background-color: var(--pureWhite); border: 1px solid var(--black);">
+                                <div class="card-body p-0">
+                                    <div class="badge-option rounded-4 d-flex align-items-center"
+                                        style="cursor: pointer;">
+                                        <img src="../shared/assets/img/badge/Badge.png" alt="Badge"
+                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
+                                        <div>
+                                            <div style="line-height: 1.1;">
+                                                <div class="text-bold text-14">Ahead of the Curve</div>
+                                                <div class="text-med text-12">
+                                                    You submitted before the deadline—way to stay ahead!
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card rounded-3 mb-2"
                                 style="background-color: var(--pureWhite); border: 1px solid var(--black);">
                                 <div class="card-body p-0">
                                     <div class="badge-option rounded-4 d-flex align-items-center"

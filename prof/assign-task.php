@@ -29,7 +29,7 @@ if (isset($_POST['saveAssignment'])) {
 
             // Retrieve assessmentID based on unique data
             $assessmentID = mysqli_insert_id($conn);
-            
+
             // Insert into assignments (linked to assessmentID)
             $insertAssignment = "INSERT INTO assignments 
             (assessmentID,  assignmentDescription, assignmentPoints)
@@ -156,6 +156,9 @@ if (isset($_GET['fetchTitle'])) {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet" />
+
 
 </head>
 
@@ -277,16 +280,18 @@ if (isset($_GET['fetchTitle'])) {
                                                 <div id="filePreviewContainer" class="row mb-0 mt-3"></div>
 
                                                 <!-- Upload buttons -->
-                                                <div class="mt-3 mb-4 text-center text-md-start">
+                                                <div class="mt-2 mb-4 text-center text-md-start">
                                                     <input type="file" name="materials[]" class="d-none" id="fileUpload"
                                                         multiple>
                                                     <button type="button"
-                                                        class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-2 ms-2"
+                                                        class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-2"
                                                         style="background-color: var(--primaryColor); border: 1px solid var(--black);"
                                                         onclick="document.getElementById('fileUpload').click();">
-                                                        <img src="../shared/assets/img/upload.png" alt="Upload Icon"
-                                                            style="width:12px; height:14px;" class="me-1">
-                                                        File
+                                                        <div style="display: flex; align-items: center; gap: 5px;">
+                                                            <span class="material-symbols-rounded"
+                                                                style="font-size:16px">upload</span>
+                                                            <span>Upload</span>
+                                                        </div>
                                                     </button>
 
                                                     <button type="button"
@@ -295,9 +300,11 @@ if (isset($_GET['fetchTitle'])) {
                                                         data-bs-container="body" data-bs-toggle="popover"
                                                         data-bs-placement="right" data-bs-html="true"
                                                         data-bs-content='<div class="form-floating mb-3"><input type="url" class="form-control" id="linkInput" placeholder="Paste link here"><label for="linkInput">Link</label></div><div class="link-popover-actions"><button type="button" class="btn btn-sm px-3 py-1 rounded-pill" id="addLinkBtn" style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);">Add link</button></div>'>
-                                                        <img src="../shared/assets/img/link.png" alt="Upload Icon"
-                                                            class="me-1">
-                                                        Link
+                                                        <div style="display: flex; align-items: center; gap: 5px;">
+                                                            <span class="material-symbols-rounded"
+                                                                style="font-size:20px">link</span>
+                                                            <span>Link</span>
+                                                        </div>
                                                     </button>
 
                                                     <!-- Hidden input to store added links -->
@@ -314,45 +321,48 @@ if (isset($_GET['fetchTitle'])) {
                                                         points.</span>
                                                     <div class="row mb-0 mt-3">
                                                         <div class="col-12">
+                                                            <!-- Rubric Card -->
                                                             <div
-                                                                class="materials-card d-flex align-items-stretch p-2 w-100">
+                                                                class="materials-card d-flex align-items-stretch px-2 py-2 w-100 rounded-3">
                                                                 <div
                                                                     class="d-flex w-100 align-items-center justify-content-between">
                                                                     <div class="d-flex align-items-center flex-grow-1">
-                                                                        <div class="mx-4">
-                                                                            <img src="../shared/assets/img/rubrics.png"
-                                                                                alt="Rubrics"
-                                                                                style="width: 20px; height: 20px;">
+                                                                        <div class="mx-3 d-flex align-items-center">
+                                                                            <span class="material-symbols-rounded">
+                                                                                rate_review
+                                                                            </span>
                                                                         </div>
                                                                         <div>
-                                                                            <div class="text-sbold text-16 py-1"
-                                                                                style="line-height: 1;">
+                                                                            <div class="text-sbold text-16"
+                                                                                style="line-height: 1.5;">
                                                                                 Essay Rubric
                                                                             </div>
                                                                             <div class="text-reg text-12 text-break"
-                                                                                style="line-height: 1;">
-                                                                                20 points
+                                                                                style="line-height: 1.5;">
+                                                                                20 Points · 2 Criteria
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="mx-4">
-                                                                        <img src="../shared/assets/img/trash.png"
-                                                                            alt="Delete Icon"
-                                                                            style="width: 12px; height: 16px;">
+                                                                    <div class="mx-3 d-flex align-items-center">
+                                                                        <span
+                                                                            class="material-symbols-outlined">close</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <!-- Buttons -->
-                                                    <div class="mt-3 mb-4 text-center text-md-start">
+                                                    <div class="mt-2 mb-4 text-center text-md-start">
+                                                        <!-- Select Rubric Button -->
                                                         <button type="button"
-                                                            class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-2 ms-2"
+                                                            class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-2"
                                                             style="background-color: var(--primaryColor); border: 1px solid var(--black);"
-                                                            onclick="document.getElementById('rubricUpload').click();">
-                                                            <i class="bi bi-plus-circle me-1"
-                                                                style="font-size: 14px;"></i>
-                                                            Rubric
+                                                            data-bs-toggle="modal" data-bs-target="#selectRubricModal">
+                                                            <div style="display: flex; align-items: center; gap: 5px;">
+                                                                <span class="material-symbols-outlined"
+                                                                    style="font-size:16px">add_circle</span>
+                                                                <span>Rubric</span>
+                                                            </div>
                                                         </button>
                                                     </div>
 
@@ -421,6 +431,156 @@ if (isset($_GET['fetchTitle'])) {
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Select Rubric Modal -->
+    <div class="modal fade" id="selectRubricModal" tabindex="-1" aria-labelledby="selectRubricModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered py-4 " style="max-width: 700px;  height: 80vh">
+            <div class="modal-content d-flex flex-column" style="height: 100%;">
+
+                <!-- HEADER -->
+                <div class="modal-header flex-shrink-0">
+                    <div class="modal-title text-sbold text-20 ms-3" id="selectRubricModalLabel">Select Rubric</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        style="transform: scale(0.8); filter: grayscale(100%);"></button>
+                </div>
+
+                <!-- DESC -->
+                <div class="modal-body flex-grow-1 overflow-auto">
+                    <p class="mb-3 text-med text-14 ms-3" style="color: var(--black);">
+                        Choose from preset rubrics, create your own, or edit an existing one.
+                    </p>
+                    <div class="col p-0 m-3">
+                        <div class="card rounded-3 mb-2 border-0">
+                            <div class="card-body p-0">
+                                <!-- OPTIONS -->
+                                <div class="rubric-option rounded-3 d-flex align-items-center justify-content-between mb-2"
+                                    style="cursor: pointer; background-color: var(--pureWhite); border: 1px solid var(--black);">
+                                    <div
+                                        style="line-height: 1.5; padding-left:15px; padding-right:15px; padding-top:10px; padding-bottom:10px">
+                                        <div class="text-sbold text-14">Essay Rubric</div>
+                                        <div class="text-med text-12">
+                                            20 Points · 2 Criteria
+                                        </div>
+                                    </div>
+                                    <span class="material-symbols-rounded"
+                                        style="font-variation-settings: 'FILL' 1; padding-right:15px">
+                                        edit
+                                    </span>
+                                </div>
+                                <div class="rubric-option rounded-3 d-flex align-items-center justify-content-between mb-2"
+                                    style="cursor: pointer; background-color: var(--primaryColor); border: 1px solid var(--black);">
+                                    <div
+                                        style="line-height: 1.5; padding-left:15px; padding-right:15px; padding-top:10px; padding-bottom:10px">
+                                        <div class="text-sbold text-14">Essay Rubric</div>
+                                        <div class="text-med text-12">
+                                            20 Points · 2 Criteria
+                                        </div>
+                                    </div>
+                                    <span class="material-symbols-rounded"
+                                        style="font-variation-settings: 'FILL' 1; padding-right:15px">
+                                        edit
+                                    </span>
+                                </div>
+                                <div class="rubric-option rounded-3 d-flex align-items-center justify-content-between mb-2"
+                                    style="cursor: pointer; background-color: var(--pureWhite); border: 1px solid var(--black);">
+                                    <div
+                                        style="line-height: 1.5; padding-left:15px; padding-right:15px; padding-top:10px; padding-bottom:10px">
+                                        <div class="text-sbold text-14">Essay Rubric</div>
+                                        <div class="text-med text-12">
+                                            20 Points · 2 Criteria
+                                        </div>
+                                    </div>
+                                    <span class="material-symbols-rounded"
+                                        style="font-variation-settings: 'FILL' 1; padding-right:15px">
+                                        edit
+                                    </span>
+                                </div>
+                                <div class="rubric-option rounded-3 d-flex align-items-center justify-content-between mb-2"
+                                    style="cursor: pointer; background-color: var(--pureWhite); border: 1px solid var(--black);">
+                                    <div
+                                        style="line-height: 1.5; padding-left:15px; padding-right:15px; padding-top:10px; padding-bottom:10px">
+                                        <div class="text-sbold text-14">Essay Rubric</div>
+                                        <div class="text-med text-12">
+                                            20 Points · 2 Criteria
+                                        </div>
+                                    </div>
+                                    <span class="material-symbols-rounded"
+                                        style="font-variation-settings: 'FILL' 1; padding-right:15px">
+                                        edit
+                                    </span>
+                                </div>
+                                <div class="rubric-option rounded-3 d-flex align-items-center justify-content-between mb-2"
+                                    style="cursor: pointer; background-color: var(--pureWhite); border: 1px solid var(--black);">
+                                    <div
+                                        style="line-height: 1.5; padding-left:15px; padding-right:15px; padding-top:10px; padding-bottom:10px">
+                                        <div class="text-sbold text-14">Essay Rubric</div>
+                                        <div class="text-med text-12">
+                                            20 Points · 2 Criteria
+                                        </div>
+                                    </div>
+                                    <span class="material-symbols-rounded"
+                                        style="font-variation-settings: 'FILL' 1; padding-right:15px">
+                                        edit
+                                    </span>
+                                </div>
+                                <div class="rubric-option rounded-3 d-flex align-items-center justify-content-between mb-2"
+                                    style="cursor: pointer; background-color: var(--pureWhite); border: 1px solid var(--black);">
+                                    <div
+                                        style="line-height: 1.5; padding-left:15px; padding-right:15px; padding-top:10px; padding-bottom:10px">
+                                        <div class="text-sbold text-14">Essay Rubric</div>
+                                        <div class="text-med text-12">
+                                            20 Points · 2 Criteria
+                                        </div>
+                                    </div>
+                                    <span class="material-symbols-rounded"
+                                        style="font-variation-settings: 'FILL' 1; padding-right:15px">
+                                        edit
+                                    </span>
+                                </div>
+                                <div class="rubric-option rounded-3 d-flex align-items-center justify-content-between mb-2"
+                                    style="cursor: pointer; background-color: var(--pureWhite); border: 1px solid var(--black);">
+                                    <div
+                                        style="line-height: 1.5; padding-left:15px; padding-right:15px; padding-top:10px; padding-bottom:10px">
+                                        <div class="text-sbold text-14">Essay Rubric</div>
+                                        <div class="text-med text-12">
+                                            20 Points · 2 Criteria
+                                        </div>
+                                    </div>
+                                    <span class="material-symbols-rounded"
+                                        style="font-variation-settings: 'FILL' 1; padding-right:15px">
+                                        edit
+                                    </span>
+                                </div>
+                                <!-- Select Rubric Button -->
+                                <button type="button" class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14"
+                                    style="background-color: var(--primaryColor); border: 1px solid var(--black);">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <span class="material-symbols-outlined" style="font-size:16px">add_circle</span>
+                                        <span>Create</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="modal-footer border-top flex-shrink-0">
+
+                    <!-- BUTTON -->
+                    <button type="submit" class="btn rounded-5 px-4 text-sbold text-14 me-3"
+                        style="background-color: var(--primaryColor); border: 1px solid var(--black);">
+                        Select
+                    </button>
+
+                </div>
+            </div>
+
+
+        </div>
+    </div>
     </div>
 
     <!-- Quill JS -->
@@ -509,29 +669,32 @@ if (isset($_GET['fetchTitle'])) {
 
                         const previewHTML = `
                     <div class="col-12 mt-2" data-id="${uniqueID}">
-                        <div class="materials-card d-flex align-items-stretch p-2 w-100">
+                        <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
                             <div class="d-flex w-100 align-items-center justify-content-between">
                                 <div class="d-flex align-items-center flex-grow-1">
-                                    <div class="mx-4">
+                                    <div class="mx-3 d-flex align-items-center">
                                         <img src="${faviconURL}" alt="${domain} Icon" 
                                             onerror="this.onerror=null;this.src='../shared/assets/img/web.png';" 
                                             style="width: 30px; height: 30px;">
                                     </div>
                                     <div>
-                                        <div id="title-${uniqueID}" class="text-sbold text-16 py-1">${displayTitle}</div>
-                                        <div class="text-reg text-12 text-break">
+                                        <div id="title-${uniqueID}" class="text-sbold text-16" style="line-height: 1.5;">${displayTitle}</div>
+                                        <div class="text-reg text-12 text-break" style="line-height: 1.5;">
                                             <a href="${linkValue}" target="_blank">${linkValue}</a>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="mx-4 delete-file" style="cursor:pointer;">
-                                    <img src="../shared/assets/img/trash.png" alt="Delete Icon">
+                                <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">
+                                    <span
+                                    class="material-symbols-outlined">close</span>
                                 </div>
                             </div>
                         </div>
                         <input type="hidden" name="links[]" value="${linkValue}" class="link-hidden">
                     </div>
                 `;
+
+                
                         container.insertAdjacentHTML('beforeend', previewHTML);
 
                         // Fetch page title
@@ -578,19 +741,22 @@ if (isset($_GET['fetchTitle'])) {
                     const ext = file.name.split('.').pop().toUpperCase();
                     const fileHTML = `
                 <div class="col-12 mt-2 file-preview">
-                    <div class="materials-card d-flex align-items-stretch p-2 w-100">
+                    <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
                         <div class="d-flex w-100 align-items-center justify-content-between">
                             <div class="d-flex align-items-center flex-grow-1">
-                                <div class="mx-4">
-                                    <i class="bi bi-file-earmark-fill" style="font-size: 22px;"></i>
+                                <div class="mx-3 d-flex align-items-center">
+                                    <span class="material-symbols-rounded">
+                                        description
+                                    </span>
                                 </div>
                                 <div>
-                                    <div class="text-sbold text-16 py-1">${file.name}</div>
-                                    <div class="text-reg text-12">${ext} · ${fileSizeMB} MB</div>
+                                    <div class="text-sbold text-16" style="line-height: 1.5;">${file.name}</div>
+                                    <div class="text-reg text-12 " style="line-height: 1.5;">${ext} · ${fileSizeMB} MB</div>
                                 </div>
                             </div>
-                            <div class="mx-4 delete-file" style="cursor:pointer;" data-index="${index}">
-                                <img src="../shared/assets/img/trash.png" alt="Delete Icon">
+                            <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;" data-index="${index}">
+                                <span
+                                    class="material-symbols-outlined">close</span>
                             </div>
                         </div>
                     </div>
