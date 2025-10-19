@@ -59,15 +59,31 @@
                         </div>
                     </nav>
 
-                    <div class="container-fluid py-3 overflow-y-auto">
+                    <div class="container-fluid py-3 overflow-y-auto" style="position: relative;">
                         <div class="row g-0 w-100">
+
+
+
+                            <!-- Sticky Header -->
+                            <div class="d-flex align-items-center text-decoration-none sticky-header py-4" id="stickyHeader"
+                                style="padding: 14px 18px;">
+                                <div class="rounded-circle me-3 flex-shrink-0 ms-3" style="width: 40px; height: 40px; background-color: #5ba9ff;
+                                background: url('shared/assets/pfp-uploads/pfp.jpg') no-repeat center center;
+                                background-size: cover;">
+                                </div>
+                                <div class="d-flex flex-column justify-content-center">
+                                    <span class="text-sbold">Christian James D. Torrillo</span>
+                                    <small class="text-reg">@jamesdoe</small>
+                                </div>
+                            </div>
+
 
                             <!-- First Column -->
                             <div class="col-12 col-md-4 first-column d-flex flex-column"
                                 style="position: sticky; top: 0px; z-index: 5; align-self: flex-start; height: fit-content;">
 
                                 <!-- Profile -->
-                                <div class="row m-0 w-100">
+                                <div class="row m-0 w-100" id="firstColumn">
                                     <div class="col m-0 p-0 ">
                                         <div class="card profile rounded-4 me-md-2"
                                             style="border: 1px solid var(--black);">
@@ -249,6 +265,25 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const profileCard = document.getElementById('firstColumn');
+        const stickyHeader = document.getElementById('stickyHeader');
+        if (window.innerWidth < 768) { // only for mobile
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach(entry => {
+                        if (!entry.isIntersecting) {
+                            stickyHeader.classList.add('show');
+                        } else {
+                            stickyHeader.classList.remove('show');
+                        }
+                    });
+                },
+                { threshold: 0 }
+            );
+            observer.observe(profileCard);
+        }
+    </script>
 </body>
 
 

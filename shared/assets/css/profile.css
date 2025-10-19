@@ -146,3 +146,31 @@ body {
         margin-top: -55px;
     }
 }
+
+.sticky-header {
+    position: fixed; /* stick to viewport top */
+    top: 0px;
+    left: 0;
+    background: var(--dirtyWhite);
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+}
+
+.sticky-header.show {
+    transform: translateY(0); /* slide into view */
+    opacity: 1;
+}
+
+
+.profile-pic-small {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
