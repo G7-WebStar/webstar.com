@@ -3,7 +3,21 @@
 include('../shared/assets/database/connect.php');
 include("../shared/assets/processes/prof-session-process.php");
 
-// Base query
+if (isset($_POST['markUnarchived'])) {
+    $courseID = $_POST['courseID'];
+    $update = "UPDATE courses SET isActive = 'Yes' WHERE courseID = '$courseID'";
+    executeQuery($update);
+}
+
+if (isset($_POST['markArchived'])) {
+    $courseID = $_POST['courseID'];
+    $update = "UPDATE courses SET isActive = 'No' WHERE courseID = '$courseID'";
+    executeQuery($update);
+}
+
+$filter = isset($_GET['status']) ? $_GET['status'] : 'active';
+$isActive = ($filter == 'archived') ? 'No' : 'Yes';
+
 $course = "SELECT 
               userinfo.userInfoID,
               userinfo.userID,
@@ -18,9 +32,9 @@ $course = "SELECT
               SUBSTRING_INDEX(courses.schedule, ' ', -1) AS courseTime
             FROM userinfo
             INNER JOIN courses ON userinfo.userID = courses.userID
-            WHERE courses.userID = '$userID'"; 
+            WHERE courses.userID = '$userID'
+              AND courses.isActive = '$isActive'";
 
-// Execute the query
 $courses = executeQuery($course);
 ?>
 <!doctype html>
@@ -36,14 +50,13 @@ $courses = executeQuery($course);
     <link rel="stylesheet" href="../shared/assets/css/sidebar-and-container-styles.css">
     <link rel="stylesheet" href="../shared/assets/css/course.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
 
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
-    
+
 </head>
 
 <body>
@@ -94,13 +107,15 @@ $courses = executeQuery($course);
                                                 <span class="dropdown-label me-2 text-reg">Status:</span>
                                                 <button class="btn dropdown-toggle dropdown-custom" type="button"
                                                     data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <span class="text-reg text-14">Active</span>
+                                                    <span class="text-reg text-14">
+                                                        <?php echo ($filter == 'archived') ? 'Archived' : 'Active'; ?>
+                                                    </span>
                                                 </button>
                                                 <ul class="dropdown-menu text-reg text-14">
-                                                    <li><a class="dropdown-item text-reg text-14" href="#">Active</a>
-                                                    </li>
-                                                    <li><a class="dropdown-item text-reg text-14" href="#">Archived</a>
-                                                    </li>
+                                                    <li><a class="dropdown-item text-reg text-14"
+                                                            href="?status=active">Active</a></li>
+                                                    <li><a class="dropdown-item text-reg text-14"
+                                                            href="?status=archived">Archived</a></li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -110,21 +125,24 @@ $courses = executeQuery($course);
                                 <div class="col-12 col-xl-4">
                                     <div class="row g-3">
                                         <div
-                                            class="col-12 d-flex justsify-content-end align-items-center px-0 px-xl-auto">
+                                            class="col-12 d-flex justify-content-end align-items-center px-0 px-xl-auto">
                                             <div
                                                 class="col-6 d-none d-sm-flex d-lg-none justify-content-center justify-content-md-start align-items-center flex-nowrap">
                                                 <span class="dropdown-label me-2 text-reg">Status:</span>
                                                 <button class="btn dropdown-toggle dropdown-custom" type="button"
                                                     data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <span class="text-reg text-14">Active</span>
+                                                    <span class="text-reg text-14">
+                                                        <?php echo ($filter == 'archived') ? 'Archived' : 'Active'; ?>
+                                                    </span>
                                                 </button>
                                                 <ul class="dropdown-menu text-reg text-14">
-                                                    <li><a class="dropdown-item text-reg text-14" href="#">Active</a>
-                                                    </li>
-                                                    <li><a class="dropdown-item text-reg text-14" href="#">Archived</a>
-                                                    </li>
+                                                    <li><a class="dropdown-item text-reg text-14"
+                                                            href="?status=active">Active</a></li>
+                                                    <li><a class="dropdown-item text-reg text-14"
+                                                            href="?status=archived">Archived</a></li>
                                                 </ul>
                                             </div>
+                                            <!-- Create Course Button -->
                                             <div
                                                 class="col-12 col-sm-6 col-lg-12 d-flex justify-content-end justify-content-sm-center justify-content-md-end align-items-center px-0">
                                                 <button
@@ -136,6 +154,7 @@ $courses = executeQuery($course);
                                         </div>
                                     </div>
                                 </div>
+
                                 <!-- End Header Section -->
 
                                 <!-- Courses Section -->
@@ -144,13 +163,18 @@ $courses = executeQuery($course);
                                         <?php while ($row = mysqli_fetch_assoc($courses)) { ?>
                                             <div class="col-12 col-lg-6 col-xl-4 mt-4 course-card">
                                                 <div class="card border border-black rounded-4">
-                                                    <img src="../shared/assets/img/home/<?php echo $row['courseImage']; ?>"
-                                                        class="card-img-top object-fit-cover rounded-top-4" alt="..."
-                                                        style="background-color: var(--primaryColor); height: 190px;">
+                                                    <a href="prof-courses-info.php?courseID=<?php echo $row['courseID']; ?>">
+                                                        <img src="../shared/assets/img/home/<?php echo $row['courseImage']; ?>"
+                                                            class="card-img-top object-fit-cover rounded-top-4" alt="..."
+                                                            style="background-color: var(--primaryColor); height: 190px;">
+                                                    </a>
                                                     <div class="card-body border-top border-black">
                                                         <div class="row lh-1 mb-2">
-                                                            <a href="course-info.php?courseID=<?php echo $row['courseID']; ?>" class="text-decoration-none text-black">
-                                                                <p class="card-text text-bold text-18 m-0"><?php echo $row['courseCode']; ?></p>
+                                                            <a href="prof-courses-info.php?courseID=<?php echo $row['courseID']; ?>"
+                                                                class="text-decoration-none text-black">
+                                                                <p class="card-text text-bold text-18 m-0 course-code">
+                                                                    <?php echo $row['courseCode']; ?>
+                                                                </p>
                                                             </a>
                                                             <p class="card-text text-reg text-14 mb-1 course-title">
                                                                 <?php echo $row['courseTitle']; ?>
@@ -183,6 +207,40 @@ $courses = executeQuery($course);
                                                                     <?php echo $row['courseTime']; ?>
                                                                 </p>
                                                             </div>
+                                                        </div>
+
+                                                        <div class="dropdown position-absolute bottom-0 end-0 m-2">
+                                                            <button class="btn btn-light btn-sm" type="button"
+                                                                id="dropdownMenuButton<?php echo $row['courseID']; ?>"
+                                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                                <i class="bi bi-three-dots-vertical"></i>
+                                                            </button>
+                                                            <ul class="dropdown-menu"
+                                                                aria-labelledby="dropdownMenuButton<?php echo $row['courseID']; ?>">
+                                                                <?php if ($isActive == 'Yes') { ?>
+                                                                    <li>
+                                                                        <form method="POST" style="display:inline;">
+                                                                            <input type="hidden" name="courseID"
+                                                                                value="<?php echo $row['courseID']; ?>">
+                                                                            <button type="submit" name="markArchived"
+                                                                                class="dropdown-item text-reg text-14">
+                                                                                Mark as Archived
+                                                                            </button>
+                                                                        </form>
+                                                                    </li>
+                                                                <?php } else { ?>
+                                                                    <li>
+                                                                        <form method="POST" style="display:inline;">
+                                                                            <input type="hidden" name="courseID"
+                                                                                value="<?php echo $row['courseID']; ?>">
+                                                                            <button type="submit" name="markUnarchived"
+                                                                                class="dropdown-item text-reg text-14">
+                                                                                Unarchive
+                                                                            </button>
+                                                                        </form>
+                                                                    </li>
+                                                                <?php } ?>
+                                                            </ul>
                                                         </div>
                                                     </div>
                                                 </div>

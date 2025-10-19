@@ -2,7 +2,6 @@
 <?php
 include('../shared/assets/database/connect.php');
 date_default_timezone_set('Asia/Manila');
-
 include("../shared/assets/processes/prof-session-process.php");
 
 $course = "SELECT courseID, courseCode 
@@ -261,7 +260,7 @@ if (isset($_GET['fetchTitle'])) {
                                                             <?php
                                                             if ($courses && $courses->num_rows > 0) {
                                                                 while ($course = $courses->fetch_assoc()) {
-                                                            ?>
+                                                                    ?>
                                                                     <li>
                                                                         <div class="form-check">
                                                                             <input class="form-check-input course-checkbox"
@@ -274,13 +273,13 @@ if (isset($_GET['fetchTitle'])) {
                                                                             </label>
                                                                         </div>
                                                                     </li>
-                                                                <?php
+                                                                    <?php
                                                                 }
                                                             } else {
                                                                 ?>
                                                                 <li><span class="dropdown-item-text text-muted">No courses
                                                                         found</span></li>
-                                                            <?php
+                                                                <?php
                                                             }
                                                             ?>
                                                         </ul>
@@ -331,7 +330,7 @@ if (isset($_GET['fetchTitle'])) {
         const maxWords = 120;
         const counter = document.getElementById("word-counter");
 
-        quill.on('text-change', function() {
+        quill.on('text-change', function () {
             let text = quill.getText().trim();
             let words = text.length > 0 ? text.split(/\s+/).length : 0;
 
@@ -345,7 +344,7 @@ if (isset($_GET['fetchTitle'])) {
         });
 
         // Sync Quill content to hidden input before form submit
-        document.querySelector('form').addEventListener('submit', function() {
+        document.querySelector('form').addEventListener('submit', function () {
             let html = quill.root.innerHTML;
             html = html.replace(/<p>/g, '').replace(/<\/p>/g, '<br>');
             html = html.replace(/<li>/g, '• ').replace(/<\/li>/g, '<br>');
@@ -355,7 +354,7 @@ if (isset($_GET['fetchTitle'])) {
         });
 
         // Ensure at least one course is selected
-        document.querySelector("form").addEventListener("submit", function(e) {
+        document.querySelector("form").addEventListener("submit", function (e) {
             let checkboxes = document.querySelectorAll(".course-checkbox");
             let checked = Array.from(checkboxes).some(cb => cb.checked);
             if (!checked) {
@@ -365,26 +364,24 @@ if (isset($_GET['fetchTitle'])) {
         });
 
         // File & Link preview logic with total limit of 10
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const fileInput = document.getElementById('fileUpload');
             const container = document.getElementById('filePreviewContainer');
+            let allFiles = [];
 
             // Link popovers
             const popovers = document.querySelectorAll('[data-bs-toggle="popover"]');
             popovers.forEach(el => {
-                new bootstrap.Popover(el, {
-                    html: true,
-                    sanitize: false
-                });
+                new bootstrap.Popover(el, { html: true, sanitize: false });
 
-                el.addEventListener('shown.bs.popover', function() {
+                el.addEventListener('shown.bs.popover', function () {
                     const tip = document.querySelector('.popover.show');
                     if (tip) tip.classList.add('link-popover');
 
                     const addLinkBtn = tip.querySelector('#addLinkBtn');
                     const linkInput = tip.querySelector('#linkInput');
 
-                    addLinkBtn.addEventListener('click', function() {
+                    addLinkBtn.addEventListener('click', function () {
                         const linkValue = linkInput.value.trim();
                         if (!linkValue) return;
 
@@ -395,44 +392,42 @@ if (isset($_GET['fetchTitle'])) {
                             return;
                         }
 
-                        // Get domain and favicon for link icon
+                        // Get domain and favicon
                         const urlObj = new URL(linkValue);
                         const domain = urlObj.hostname;
                         const faviconURL = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
 
-                        // Unique ID for link preview elements
                         const uniqueID = Date.now();
                         let displayTitle = "Loading...";
 
-                        // Create link preview HTML
                         const previewHTML = `
-                            <div class="col-12 mt-2" data-id="${uniqueID}">
-                                <div class="materials-card d-flex align-items-stretch p-2 w-100">
-                                    <div class="d-flex w-100 align-items-center justify-content-between">
-                                        <div class="d-flex align-items-center flex-grow-1">
-                                            <div class="mx-4">
-                                                <img src="${faviconURL}" alt="${domain} Icon" 
-                                                    onerror="this.onerror=null;this.src='../shared/assets/img/web.png';" 
-                                                    style="width: 30px; height: 30px;">
-                                            </div>
-                                            <div>
-                                                <div id="title-${uniqueID}" class="text-sbold text-16 py-1">${displayTitle}</div>
-                                                <div class="text-reg text-12 text-break">
-                                                    <a href="${linkValue}" target="_blank">${linkValue}</a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="mx-4 delete-file" style="cursor:pointer;">
-                                            <img src="../shared/assets/img/trash.png" alt="Delete Icon">
+                    <div class="col-12 mt-2" data-id="${uniqueID}">
+                        <div class="materials-card d-flex align-items-stretch p-2 w-100">
+                            <div class="d-flex w-100 align-items-center justify-content-between">
+                                <div class="d-flex align-items-center flex-grow-1">
+                                    <div class="mx-4">
+                                        <img src="${faviconURL}" alt="${domain} Icon" 
+                                            onerror="this.onerror=null;this.src='../shared/assets/img/web.png';" 
+                                            style="width: 30px; height: 30px;">
+                                    </div>
+                                    <div>
+                                        <div id="title-${uniqueID}" class="text-sbold text-16 py-1">${displayTitle}</div>
+                                        <div class="text-reg text-12 text-break">
+                                            <a href="${linkValue}" target="_blank">${linkValue}</a>
                                         </div>
                                     </div>
                                 </div>
-                                <input type="hidden" name="links[]" value="${linkValue}" class="link-hidden">
+                                <div class="mx-4 delete-file" style="cursor:pointer;">
+                                    <img src="../shared/assets/img/trash.png" alt="Delete Icon">
+                                </div>
                             </div>
-                            `;
-                        container.innerHTML += previewHTML;
+                        </div>
+                        <input type="hidden" name="links[]" value="${linkValue}" class="link-hidden">
+                    </div>
+                `;
+                        container.insertAdjacentHTML('beforeend', previewHTML);
 
-                        // Fetch real page title for link
+                        // Fetch page title
                         fetch("?fetchTitle=" + encodeURIComponent(linkValue))
                             .then(res => res.json())
                             .then(data => {
@@ -443,9 +438,9 @@ if (isset($_GET['fetchTitle'])) {
                                 if (titleEl) titleEl.textContent = linkValue.split('/').pop() || "Link";
                             });
 
-                        // Delete handler for link
+                        // Delete handler
                         container.querySelectorAll('.delete-file').forEach((btn) => {
-                            btn.addEventListener('click', function() {
+                            btn.addEventListener('click', function () {
                                 const col = this.closest('.col-12');
                                 col.remove();
                             });
@@ -459,55 +454,53 @@ if (isset($_GET['fetchTitle'])) {
             });
 
             // File input change
-            fileInput.addEventListener('change', function(event) {
-                const currentCount = container.querySelectorAll('.col-12').length;
-                const incomingCount = event.target.files.length;
+            fileInput.addEventListener('change', function (event) {
+                // Merge new selections with existing files
+                let dt = new DataTransfer();
+                Array.from(allFiles).forEach(f => dt.items.add(f));
+                Array.from(event.target.files).forEach(f => dt.items.add(f));
+                fileInput.files = dt.files;
+                allFiles = Array.from(fileInput.files); // update allFiles list
 
-                // Limit check
-                if (currentCount + incomingCount > 10) {
-                    alert("You can only add up to 10 files or links total.");
-                    fileInput.value = '';
-                    return;
-                }
+                // 🔹 Remove only file previews, keep links
+                container.querySelectorAll('.file-preview').forEach(el => el.remove());
 
-                let previewHTML = "";
-                Array.from(event.target.files).forEach((file, index) => {
+                // Rebuild file previews
+                allFiles.forEach((file, index) => {
                     const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
                     const ext = file.name.split('.').pop().toUpperCase();
-
-                    // File preview HTML with icon
-                    previewHTML += `
-                        <div class="col-12 mt-2">
-                            <div class="materials-card d-flex align-items-stretch p-2 w-100">
-                                <div class="d-flex w-100 align-items-center justify-content-between">
-                                    <div class="d-flex align-items-center flex-grow-1">
-                                        <div class="mx-4">
-                                            <i class="bi bi-file-earmark-fill" style="font-size: 22px;"></i>
-                                        </div>
-                                        <div>
-                                            <div class="text-sbold text-16 py-1">${file.name}</div>
-                                            <div class="text-reg text-12">${ext} · ${fileSizeMB} MB</div>
-                                        </div>
-                                    </div>
-                                    <div class="mx-4 delete-file" style="cursor:pointer;">
-                                        <img src="../shared/assets/img/trash.png" alt="Delete Icon">
-                                    </div>
+                    const fileHTML = `
+                <div class="col-12 mt-2 file-preview">
+                    <div class="materials-card d-flex align-items-stretch p-2 w-100">
+                        <div class="d-flex w-100 align-items-center justify-content-between">
+                            <div class="d-flex align-items-center flex-grow-1">
+                                <div class="mx-4">
+                                    <i class="bi bi-file-earmark-fill" style="font-size: 22px;"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sbold text-16 py-1">${file.name}</div>
+                                    <div class="text-reg text-12">${ext} · ${fileSizeMB} MB</div>
                                 </div>
                             </div>
-                        </div>`;
-
+                            <div class="mx-4 delete-file" style="cursor:pointer;" data-index="${index}">
+                                <img src="../shared/assets/img/trash.png" alt="Delete Icon">
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+                    container.insertAdjacentHTML('beforeend', fileHTML);
                 });
 
-                container.innerHTML += previewHTML;
-
-                // Delete handler for files
-                container.querySelectorAll('.delete-file').forEach((btn, idx) => {
-                    btn.addEventListener('click', function() {
-                        let dt = new DataTransfer();
-                        Array.from(fileInput.files).forEach((f, i) => {
-                            if (i !== idx) dt.items.add(f);
-                        });
-                        fileInput.files = dt.files;
+                // Allow deletion of specific files
+                container.querySelectorAll('.delete-file').forEach((btn) => {
+                    btn.addEventListener('click', function () {
+                        const index = parseInt(this.dataset.index);
+                        if (!isNaN(index)) {
+                            allFiles.splice(index, 1);
+                            let dt2 = new DataTransfer();
+                            allFiles.forEach(f => dt2.items.add(f));
+                            fileInput.files = dt2.files;
+                        }
                         this.closest('.col-12').remove();
                     });
                 });

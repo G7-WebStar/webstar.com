@@ -1,7 +1,6 @@
-<?php $activePage = 'grading-sheet-pdf-with-image'; ?>
+<?php $activePage = 'sheet-rubrics'; ?>
 <?php
 include("../shared/assets/database/connect.php");
-include("../shared/assets/processes/prof-session-process.php");
 
 // Use GET lessonID if provided, otherwise default to 5
 $lessonID = isset($_GET['lessonID']) ? intval($_GET['lessonID']) : 19;
@@ -58,14 +57,11 @@ if (!empty($fileLinks)) {
     <link rel="stylesheet" href="../shared/assets/css/sidebar-and-container-styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
-    <!-- Quill CSS -->
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:FILL@1" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
-
 </head>
 
 <body>
@@ -224,12 +220,98 @@ if (!empty($fileLinks)) {
                             <div class="col-12 col-lg-4">
                                 <div class="cardSticky position-sticky" style="top: 20px;">
                                     <div class="ms-2 me-2">
-                                        <div class="d-flex align-items-center justify-content-center mb-5 mt-5">
-                                            <input type="number" class="form-control me-2 ms-1 text-16"
-                                                placeholder="Grade"
-                                                style="width: 130px; border-radius: 10px; border: 1px solid var(--black);"
-                                                min="0">
-                                            <span class="text-sbold">/100</span>
+                                        <div class="d-flex align-items-center justify-content-center mt-5">
+                                            <div class="text-sbold">90/100</div>
+                                        </div>
+
+                                        <div class="d-flex align-items-center justify-content-center mb-5">
+                                            <div class="text-reg"><i>Grade</i></div>
+                                        </div>
+
+                                        <div class="text-center mt-5">
+                                            <div class="text-sbold text-15 mb-3" style="color: var(--black);">Content
+                                                Relevance
+                                            </div>
+
+                                            <div id="ratingAccordion">
+                                                <!-- Excellent -->
+                                                <div class="mb-2">
+                                                    <button
+                                                        class="btn w-100 d-flex align-items-center justify-content-center flex-column text-med text-14"
+                                                        type="button" data-bs-toggle="collapse"
+                                                        data-bs-target="#excellent" aria-expanded="false"
+                                                        aria-controls="excellent"
+                                                        style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black);">
+
+                                                        <div
+                                                            class="d-flex justify-content-between align-items-center w-100 px-3">
+                                                            <span class="flex-grow-1 text-center ps-3">Excellent · 5
+                                                                pts</span>
+                                                            <span
+                                                                class="material-symbols-rounded transition">expand_more</span>
+                                                        </div>
+
+                                                        <div class="collapse w-100 mt-2" id="excellent"
+                                                            data-bs-parent="#ratingAccordion">
+                                                            <p class="mb-0 px-3 pb-2 text-reg text-14">
+                                                                Ideas are insightful, well-developed, and directly
+                                                                address the topic.
+                                                            </p>
+                                                        </div>
+                                                    </button>
+                                                </div>
+
+                                                <!-- Good -->
+                                                <div class="mb-2">
+                                                    <button
+                                                        class="btn w-100 d-flex align-items-center justify-content-center flex-column text-med text-14"
+                                                        type="button" data-bs-toggle="collapse" data-bs-target="#good"
+                                                        aria-expanded="false" aria-controls="good"
+                                                        style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black);">
+
+                                                        <div
+                                                            class="d-flex justify-content-between align-items-center w-100 px-3">
+                                                            <span class="flex-grow-1 text-center ps-3">Good · 4
+                                                                pts</span>
+                                                            <span
+                                                                class="material-symbols-rounded transition">expand_more</span>
+                                                        </div>
+
+                                                        <div class="collapse w-100 mt-2" id="good"
+                                                            data-bs-parent="#ratingAccordion">
+                                                            <p class="mb-0 px-3 pb-2 text-reg text-14;">
+                                                                Ideas are clear and relevant but may need further
+                                                                development.
+                                                            </p>
+                                                        </div>
+                                                    </button>
+                                                </div>
+
+                                                <!-- Fair -->
+                                                <div class="mb-2">
+                                                    <button
+                                                        class="btn w-100 d-flex align-items-center justify-content-center flex-column text-med text-14"
+                                                        type="button" data-bs-toggle="collapse" data-bs-target="#fair"
+                                                        aria-expanded="false" aria-controls="fair"
+                                                        style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black);">
+
+                                                        <div
+                                                            class="d-flex justify-content-between align-items-center w-100 px-3">
+                                                            <span class="flex-grow-1 text-center ps-3">Fair · 3
+                                                                pts</span>
+                                                            <span
+                                                                class="material-symbols-rounded transition">expand_more</span>
+                                                        </div>
+
+                                                        <div class="collapse w-100 mt-2" id="fair"
+                                                            data-bs-parent="#ratingAccordion">
+                                                            <p class="mb-0 px-3 pb-2 text-reg text-14">
+                                                                Ideas are limited or partially address the topic.
+                                                            </p>
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div class="text-center mt-5">
@@ -240,7 +322,7 @@ if (!empty($fileLinks)) {
                                                 <button
                                                     class="btn custom-btn d-flex align-items-center justify-content-center"
                                                     data-bs-toggle="modal" data-bs-target="#awardBadgeModal">
-                                                    <span class="material-symbols-rounded me-2">emoji_events</span>
+                                                    <span class="material-symbols-rounded me-2">trophy</span>
                                                     Award badge
                                                 </button>
                                                 <!-- ADD FEEDBACK BUTTON (opens modal) -->
@@ -253,164 +335,15 @@ if (!empty($fileLinks)) {
                                     </div>
                                 </div>
                             </div>
-                        </div> <!-- end row -->
+                        </div> <!-- row -->
                     </div>
                 </div>
             </div>
         </div>
-        <!-- AWARD BADGE MODAL -->
-        <div class="modal fade" id="awardBadgeModal" tabindex="-1" aria-labelledby="awardBadgeModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered py-4" style="max-width: 700px;  height: 25px;">
-                <div class="modal-content" style="height: 100%;">
-
-                    <!-- HEADER -->
-                    <div class="modal-header">
-                        <div class="modal-title text-sbold text-20 ms-3" id="awardBadgeModalLabel">Award badge</div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                            style="transform: scale(0.8); filter: grayscale(100%);"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <p class="mb-3 text-med text-14 ms-3" style="color: var(--black);">
-                            Choose a badge to reward and recognize your student’s hard work.
-                        </p>
-
-                        <div class="col px-2">
-                            <div class="card rounded-4 mb-2"
-                                style="background-color: var(--pureWhite); border: 1px solid var(--black);">
-                                <div class="card-body p-0">
-                                    <div class="badge-option rounded-4 d-flex align-items-center"
-                                        style="cursor: pointer;">
-                                        <img src="../shared/assets/img/badge/Badge.png" alt="Badge"
-                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
-                                        <div>
-                                            <div style="line-height: 1.1;">
-                                                <div class="text-bold text-14">Ahead of the Curve</div>
-                                                <div class="text-med text-12">
-                                                    You submitted before the deadline—way to stay ahead!
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="card rounded-4 mb-2"
-                                style="background-color: var(--pureWhite); border: 1px solid var(--black);">
-                                <div class="card-body p-0">
-                                    <div class="badge-option rounded-4 d-flex align-items-center"
-                                        style="cursor: pointer;">
-                                        <img src="../shared/assets/img/badge/Badge.png" alt="Badge"
-                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
-                                        <div>
-                                            <div style="line-height: 1.1;">
-                                                <div class="text-bold text-14">Ahead of the Curve</div>
-                                                <div class="text-med text-12">
-                                                    You submitted before the deadline—way to stay ahead!
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- FOOTER -->
-                    <div class="modal-footer border-top">
-                        <button type="submit" class="btn rounded-5 px-4 text-sbold text-14 me-3"
-                            style="background-color: var(--primaryColor); border: 1px solid var(--black);">
-                            Award
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- FEEDBACK MODAL -->
-        <div class="modal fade" id="feedbackModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered py-4" style="max-width: 700px;  height: 25px;">
-                <div class="modal-content">
-
-                    <!-- HEADER -->
-                    <div class="modal-header border-bottom">
-                        <div class="modal-title text-sbold text-20 ms-3">
-                            Add feedback
-                        </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <form id="feedbackForm" action="" method="POST">
-                        <div class="modal-body pb-2">
-                            <p class="mb-3 text-med text-14 ms-3" style="color: var(--black);">
-                                Write feedback that helps your student level up their learning journey!
-                            </p>
-
-                            <!-- Rich text editor -->
-                            <div class="editor-wrapper mb-3 border rounded-3 text-reg text-20">
-                                <div id="editor" style="min-height:100px;"></div>
-
-                                <div id="toolbar" class="border-top d-flex align-items-center p-2 px-3 bg-white">
-                                    <button class="ql-bold"></button>
-                                    <button class="ql-italic"></button>
-                                    <button class="ql-underline"></button>
-                                    <button class="ql-list" value="bullet"></button>
-                                    <span id="word-counter" class="ms-auto text-muted text-reg text-12">Max word limit:
-                                        120 words</span>
-                                </div>
-                            </div>
-
-                            <input type="hidden" name="feedbackContent" id="feedbackContent">
-                            <input type="hidden" name="studentID" value="2">
-                            <input type="hidden" name="assignmentID" value="1">
-                        </div>
-
-                        <!-- FOOTER -->
-                        <div class="modal-footer border-top">
-                            <button type="submit" class="btn rounded-5 px-4 text-sbold text-14 me-3"
-                                style="background-color: var(--primaryColor); border: 1px solid var(--black);">Add</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
     </div>
 
     <!-- bootstrap bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Quill JS -->
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-    <script>
-        const quill = new Quill('#editor', {
-            theme: 'snow',
-            placeholder: 'Feedback',
-            modules: {
-                toolbar: '#toolbar'
-            }
-        });
-
-        const maxWords = 120;
-        const counter = document.getElementById("word-counter");
-
-        quill.on('text-change', function () {
-            let text = quill.getText().trim();
-            let words = text.length > 0 ? text.split(/\s+/).length : 0;
-
-            if (words > maxWords) {
-                let limited = text.split(/\s+/).slice(0, maxWords).join(" ");
-                quill.setText(limited + " ");
-                quill.setSelection(quill.getLength());
-            }
-
-            counter.textContent = `${Math.min(words, maxWords)}/${maxWords}`;
-        });
-
-        document.getElementById("feedbackForm").addEventListener("submit", function () {
-            document.getElementById("feedbackContent").value = quill.root.innerHTML;
-        });
-    </script>
 
     <script>
         // THUMBNAIL hover zoom
@@ -552,9 +485,7 @@ if (!empty($fileLinks)) {
                         img.style.cursor = zoom > 1 ? 'grab' : 'zoom-in';
                         applyTransform();
                     }
-                }, {
-                    passive: false
-                });
+                }, { passive: false });
 
                 // dragging
                 img.addEventListener('mousedown', (e) => {
@@ -598,19 +529,31 @@ if (!empty($fileLinks)) {
             });
         })();
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const badgeOptions = document.querySelectorAll(".badge-option");
+        document.addEventListener('DOMContentLoaded', function () {
+            const buttons = document.querySelectorAll('[data-bs-toggle="collapse"]');
 
-            badgeOptions.forEach(option => {
-                option.addEventListener("click", () => {
-                    // Reset all cards
-                    badgeOptions.forEach(o => {
-                        o.parentElement.parentElement.style.backgroundColor = "var(--pureWhite)";
+            buttons.forEach(button => {
+                const target = button.getAttribute('data-bs-target');
+                const icon = button.querySelector('.material-symbols-rounded');
+                const collapse = document.querySelector(target);
+
+                if (collapse && icon) {
+                    collapse.addEventListener('show.bs.collapse', () => {
+                        // Reset all others
+                        buttons.forEach(btn => btn.style.backgroundColor = 'var(--pureWhite)');
+                        document.querySelectorAll('.material-symbols-rounded').forEach(ic => ic.style.transform = 'rotate(0deg)');
+
+                        // Highlight this one
+                        icon.style.transform = 'rotate(180deg)';
+                        icon.style.transition = 'transform 0.3s';
+                        button.style.backgroundColor = 'var(--primaryColor)';
                     });
 
-                    // Highlight selected card
-                    option.parentElement.parentElement.style.backgroundColor = "var(--primaryColor)";
-                });
+                    collapse.addEventListener('hide.bs.collapse', () => {
+                        icon.style.transform = 'rotate(0deg)';
+                        button.style.backgroundColor = 'var(--pureWhite)';
+                    });
+                }
             });
         });
     </script>
