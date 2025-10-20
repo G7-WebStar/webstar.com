@@ -45,7 +45,7 @@ include("shared/assets/processes/login-process.php");
                         </div>
                         <div class="form-floating pt-2 pt-md-3 pb-md-4 pb-2 position-relative">
                             <input type="password" name="password" class="form-control rounded-4 border-blue"
-                                id="password" placeholder="Password" required>
+                                id="password" style="padding-left: 20px;" placeholder="Password" required>
                             <label for="password">
                                 <div class="pt-2 pt-md-3 px-2">Password</div>
                             </label>

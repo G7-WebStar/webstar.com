@@ -104,6 +104,12 @@ body {
     border: 1px solid var(--black);
 }
 
+.star-card {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    align-content: center;
+}
+
 @media (max-width: 1300px) {
     .first-column {
         width: 100%;
@@ -145,23 +151,33 @@ body {
     .profile-block {
         margin-top: -55px;
     }
+
+    .star-card {
+        height: 250px;
+    }
+
+    .star-card-row{
+        margin-top: 0.5rem !important;
+    }
 }
 
 .sticky-header {
     position: fixed;
-    top: -100px; /* start hidden above the viewport */
+    top: -100px;
+    /* start hidden above the viewport */
     left: 0;
     width: 100%;
     background: var(--dirtyWhite);
     z-index: 1000;
     padding: 10px 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid #ccc;
 
     display: flex;
     align-items: center;
 
-    transition: top 0.3s ease-in-out; /* smooth slide transition */
+    transition: top 0.3s ease-in-out;
+    /* smooth slide transition */
 }
 
 
@@ -176,7 +192,8 @@ body {
         transform: translateY(0);
         /* slide into view */
         opacity: 1;
-        top: 0; /* slides down into view */
+        top: 0;
+        /* slides down into view */
     }
 
 }
