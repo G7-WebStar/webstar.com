@@ -2,6 +2,17 @@
 include('shared/assets/database/connect.php');
 
 include("shared/assets/processes/session-process.php");
+
+$selectTestQuery = "SELECT * FROM tests WHERE testID = 1";
+$selectTestResult = executeQuery($selectTestQuery);
+
+$selectQuestionsQuery = "SELECT 
+testquestions.*
+FROM tests 
+INNER JOIN testquestions 
+    ON tests.testID = testquestions.testID 
+WHERE tests.testID = 1";
+$selectQuestionsResult = executeQuery($selectQuestionsQuery);
 ?>
 <!doctype html>
 <html lang="en">
@@ -20,7 +31,17 @@ include("shared/assets/processes/session-process.php");
     <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
     <style>
         .choice-selected {
+            transition: 0.3s ease-in-out;
             background-color: var(--primaryColor) !important;
+        }
+
+        .interactable {
+            cursor: pointer;
+        }
+
+        .interactable:hover {
+            transition: 0.3s ease-in-out;
+            background-color: var(--highlight75) !important;
         }
 
         @media screen and (max-width: 767px) {
@@ -120,18 +141,18 @@ include("shared/assets/processes/session-process.php");
                                         <div class="mt-auto text-sbold">
                                             <div class="d-flex justify-content-center justify-content-md-around align-items-center mb-4 gap-3 gap-md-0 mt-5">
 
-                                                <div class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2"
+                                                <div class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable"
                                                     style="background-color: var(--primaryColor);" onclick="prevQuestion();">
                                                     <i class="fa-solid fs-6 fa-arrow-left text-reg" style="color: var(--black);"></i>
                                                     <span class="m-0 fs-sm-6">Prev</span>
                                                 </div>
 
-                                                <div class="btn d-flex align-items-center justify-content-center border border-black rounded-5 px-sm-4 py-sm-2"
+                                                <div class="btn d-flex align-items-center justify-content-center border border-black rounded-5 px-sm-4 py-sm-2 interactable"
                                                     style="background-color: var(--primaryColor);" onclick="submitQuiz();">
                                                     <span class="m-0 fs-sm-6">Submit</span>
                                                 </div>
 
-                                                <div class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2"
+                                                <div class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable"
                                                     style="background-color: var(--primaryColor);" onclick="nextQuestion();">
                                                     <span class="m-0 fs-sm-6">Next</span>
                                                     <i class="fa-solid fs-6 fa-arrow-right text-reg" style="color: var(--black);"></i>
@@ -154,207 +175,57 @@ include("shared/assets/processes/session-process.php");
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const questions = [{
-                question: "Which HTML tag is used to define the largest heading?",
-                answers: [{
-                        text: "&lt;h3&gt;",
-                        correct: false
-                    },
-                    {
-                        text: "&lt;h6&gt;",
-                        correct: false
-                    },
-                    {
-                        text: "&lt;h1&gt;",
-                        correct: true
-                    },
-                    {
-                        text: "&lt;head&gt;",
-                        correct: false
-                    },
-                ]
-            },
-            {
-                question: "Which tag is used to define a hyperlink in HTML?",
-                answers: [{
-                        text: "&lt;link&gt;",
-                        correct: false
-                    },
-                    {
-                        text: "&lt;a&gt;",
-                        correct: true
-                    },
-                    {
-                        text: "&lt;href&gt;",
-                        correct: false
-                    },
-                    {
-                        text: "&lt;hyper&gt;",
-                        correct: false
-                    },
-                ]
-            },
-            {
-                question: "Which HTML attribute specifies an image source?",
-                answers: [{
-                        text: "src",
-                        correct: true
-                    },
-                    {
-                        text: "href",
-                        correct: false
-                    },
-                    {
-                        text: "alt",
-                        correct: false
-                    },
-                    {
-                        text: "path",
-                        correct: false
-                    },
-                ]
-            },
-            {
-                question: "Which element is used to insert a line break?",
-                answers: [{
-                        text: "&lt;break&gt;",
-                        correct: false
-                    },
-                    {
-                        text: "&lt;br&gt;",
-                        correct: true
-                    },
-                    {
-                        text: "&lt;lb&gt;",
-                        correct: false
-                    },
-                    {
-                        text: "&lt;line&gt;",
-                        correct: false
-                    },
-                ]
-            },
-            {
-                question: "Which tag is used to create an unordered list?",
-                answers: [{
-                        text: "&lt;ol&gt;",
-                        correct: false
-                    },
-                    {
-                        text: "&lt;ul&gt;",
-                        correct: true
-                    },
-                    {
-                        text: "&lt;li&gt;",
-                        correct: false
-                    },
-                    {
-                        text: "&lt;list&gt;",
-                        correct: false
-                    },
-                ]
-            },
-            {
-                question: "What does the &lt;title&gt; tag define?",
-                answers: [{
-                        text: "The title shown inside the page",
-                        correct: false
-                    },
-                    {
-                        text: "The title shown on the browser tab",
-                        correct: true
-                    },
-                    {
-                        text: "A tooltip on hover",
-                        correct: false
-                    },
-                    {
-                        text: "A paragraph heading",
-                        correct: false
-                    },
-                ]
-            },
-            {
-                question: "Which HTML element is used to display a numbered list?",
-                answers: [{
-                        text: "&lt;ol&gt;",
-                        correct: true
-                    },
-                    {
-                        text: "&lt;ul&gt;",
-                        correct: false
-                    },
-                    {
-                        text: "&lt;li&gt;",
-                        correct: false
-                    },
-                    {
-                        text: "&lt;dl&gt;",
-                        correct: false
-                    },
-                ]
-            },
-            {
-                question: "Which HTML attribute is used to define inline CSS styles?",
-                answers: [{
-                        text: "style",
-                        correct: true
-                    },
-                    {
-                        text: "class",
-                        correct: false
-                    },
-                    {
-                        text: "font",
-                        correct: false
-                    },
-                    {
-                        text: "css",
-                        correct: false
-                    },
-                ]
-            },
-            {
-                question: "What is the correct HTML tag for inserting an image?",
-                answers: [{
-                        text: "&lt;img&gt;",
-                        correct: true
-                    },
-                    {
-                        text: "&lt;image&gt;",
-                        correct: false
-                    },
-                    {
-                        text: "&lt;pic&gt;",
-                        correct: false
-                    },
-                    {
-                        text: "&lt;src&gt;",
-                        correct: false
-                    },
-                ]
-            },
-            {
-                question: "Which tag is used to create a table row?",
-                answers: [{
-                        text: "&lt;tr&gt;",
-                        correct: true
-                    },
-                    {
-                        text: "&lt;td&gt;",
-                        correct: false
-                    },
-                    {
-                        text: "&lt;th&gt;",
-                        correct: false
-                    },
-                    {
-                        text: "&lt;table&gt;",
-                        correct: false
-                    },
-                ]
+        const questions = [
+            <?php
+            if (mysqli_num_rows($selectQuestionsResult) > 0) {
+                $totalQuestion = mysqli_num_rows($selectQuestionsResult);
+                $countQuestion = 0;
+                while ($questions = mysqli_fetch_assoc($selectQuestionsResult)) {
+                    $testQuestionID = $questions['testQuestionID'];
+                    $selectChoicesQuery = "SELECT 
+                                       testquestions.testQuestionID, 
+                                       testquestionchoices.* 
+                                       FROM tests 
+                                       INNER JOIN testquestions 
+                                           ON tests.testID = testquestions.testID 
+                                       INNER JOIN testquestionchoices 
+                                           ON testquestions.testQuestionID = testquestionchoices.testQuestionID 
+                                       WHERE tests.testID = 1 AND testquestions.testQuestionID = $testQuestionID;
+                                       ";
+                    $selectChoicesResult = executeQuery($selectChoicesQuery);
+                    $countQuestion++;
+            ?> {
+                        question: "<?php echo $questions['testQuestion']; ?>",
+                        answers: [
+                            <?php
+                            if (mysqli_num_rows($selectChoicesResult) > 0) {
+                                $totalChoice = mysqli_num_rows($selectChoicesResult);
+                                $countChoice = 0;
+                                while ($choices = mysqli_fetch_assoc($selectChoicesResult)) {
+                            ?> {
+                                        text: "<?php echo $choices['choiceText']; ?>",
+                                        correct: <?php echo ($questions['correctAnswer'] == $choices['choiceText']) ? "true" : "false"; ?>
+                                    }
+                                    <?php echo ($countChoice < $totalChoice) ? "," : null; ?>
+                            <?php
+                                }
+                            }
+                            ?>
+                        ]
+                    }
+                    <?php echo ($countQuestion < $totalQuestion) ? "," : null; ?>
+            <?php
+                }
             }
+            ?>
         ];
+
+        console.log(questions);
+
+        let seconds = 600;
+        let minutes = seconds / 60;
+        let hours = minutes / 60
+
 
         let selectedAnswers = new Array(questions.length).fill(null);
 
@@ -388,7 +259,7 @@ include("shared/assets/processes/session-process.php");
             currentQuestion.answers.forEach(answer => {
                 const button = document.createElement('div');
                 button.innerHTML = answer.text;
-                button.classList.add('col-12', 'bg-white', 'border', 'border-black', 'rounded-3', 'my-3', 'p-2', 'text-sbold', 'text-center');
+                button.classList.add('col-12', 'bg-white', 'border', 'border-black', 'rounded-3', 'my-3', 'p-2', 'text-sbold', 'text-center', 'interactable');
                 button.id = "question" + questionNo + "-choice" + choiceNo;
                 choiceIDs.push(button.id);
                 choiceNo++;
@@ -396,11 +267,11 @@ include("shared/assets/processes/session-process.php");
                 choices.appendChild(button);
             });
 
-            const savedIndex = selectedAnswers[currentQuestionIndex]; 
+            const savedIndex = selectedAnswers[currentQuestionIndex];
             if (savedIndex !== null) {
-                    savedChoice = document.getElementById(choiceIDs[savedIndex]);
-                    savedChoice.classList.add('choice-selected');
-                    savedChoice.classList.remove('bg-white');
+                savedChoice = document.getElementById(choiceIDs[savedIndex]);
+                savedChoice.classList.add('choice-selected');
+                savedChoice.classList.remove('bg-white');
             }
         }
 
