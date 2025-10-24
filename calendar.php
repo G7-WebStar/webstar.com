@@ -8,11 +8,10 @@
     <!-- FullCalendar CSS -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
 
-    <!-- jQuery -->
+    <!-- jQuery + Moment -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-    <!-- Moment.js -->
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 
     <!-- FullCalendar JS -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
@@ -34,12 +33,17 @@
     <!-- Global and Layout Styles -->
     <link rel="stylesheet" href="shared/assets/css/global-styles.css">
     <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
-    <link rel="stylesheet" href="shared/assets/css/profile.css">
+    <link rel="stylesheet" href="shared/assets/css/calendar.css">
+
 
     <style>
         body {
             font-family: var(--Medium) !important;
+            letter-spacing: -0.03em !important;
+        }
 
+        a {
+            text-decoration: none !important;
         }
 
         #kt_docs_fullcalendar_basic {
@@ -49,7 +53,60 @@
             margin: 0 auto;
             min-height: 500px;
         }
-        
+
+        .fc-toolbar-title {
+            font-family: var(--SemiBold) !important;
+        }
+
+        .fc-scroller {
+            overflow: hidden !important;
+        }
+
+        .fc .fc-button-primary {
+            background-color: var(--black) !important;
+        }
+
+        a {
+            color: var(--black) !important;
+        }
+
+        .fc-daygrid-event-dot {
+            border-color: var(--black) !important;
+        }
+
+        .fc-event-title-container {
+            background-color: var(--primaryColor) !important;
+            border-color: var(--primaryColor) !important;
+        }
+
+        .fc-event-title {
+            color: var(--black) !important;
+        }
+
+        .fc-event-main {
+            background-color: var(--primaryColor) !important;
+        }
+
+        /* Remove background and border from all FullCalendar events */
+
+        .fc-daygrid-event,
+        .fc-h-event {
+            background-color: var(--primaryColor) !important;
+            border-color: var(--primaryColor) !important;
+        }
+
+        .fc-event-time {
+            color: var(--black) !important;
+        }
+
+        .fc-list-event-dot {
+            border-color: var(--black) !important;
+
+        }
+
+        .fc-theme-standard .fc-list-day-cushion {
+            background-color: color-mix(in srgb, var(--primaryColor) 50%, transparent);
+        }
     </style>
 </head>
 
@@ -99,55 +156,44 @@
     </div>
 
     <script>
-        "use strict";
-
-        var KTGeneralFullCalendarBasicDemos = function () {
-            var exampleBasic = function () {
-                var todayDate = moment().startOf('day');
-                var YM = todayDate.format('YYYY-MM');
-                var YESTERDAY = todayDate.clone().subtract(1, 'day').format('YYYY-MM-DD');
-                var TODAY = todayDate.format('YYYY-MM-DD');
-                var TOMORROW = todayDate.clone().add(1, 'day').format('YYYY-MM-DD');
-
-                var calendarEl = document.getElementById('kt_docs_fullcalendar_basic');
-                var calendar = new FullCalendar.Calendar(calendarEl, {
-                    headerToolbar: {
-                        left: 'prev,next today',
-                        center: 'title',
-                        right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
-                    },
-                    height: 800,
-                    nowIndicator: true,
-                    initialView: 'dayGridMonth',
-                    initialDate: TODAY,
-                    editable: true,
-                    dayMaxEvents: true,
-                    navLinks: true,
-                    events: [
-                        { title: 'All Day Event', start: YM + '-01', className: "fc-event-danger" },
-                        { title: 'Meeting', start: TODAY + 'T10:30:00', end: TODAY + 'T12:30:00' },
-                        { title: 'Lunch', start: TODAY + 'T12:00:00' },
-                        { title: 'Birthday Party', start: TOMORROW + 'T07:00:00', className: "fc-event-primary" },
-                        { title: 'Click for Google', url: 'https://google.com/', start: YM + '-28' }
-                    ]
-                });
-
-                calendar.render();
-            }
-
-            return {
-                init: function () {
-                    exampleBasic();
-                }
-            };
-        }();
-
-        // Initialize after DOM ready
         document.addEventListener("DOMContentLoaded", function () {
-            KTGeneralFullCalendarBasicDemos.init();
+            const todayDate = moment().startOf('day');
+            const YM = todayDate.format('YYYY-MM');
+            const TODAY = todayDate.format('YYYY-MM-DD');
+            const TOMORROW = todayDate.clone().add(1, 'day').format('YYYY-MM-DD');
+
+            const calendarEl = document.getElementById('kt_docs_fullcalendar_basic');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+                },
+                initialView: 'dayGridMonth',
+                editable: false, // disables both dragging and resizing
+                initialDate: TODAY,
+                nowIndicator: true,
+                navLinks: true,
+                dayMaxEvents: true,
+                height: "auto",
+                aspectRatio: 1.5, // makes it scale based on width
+                events: [
+                    { title: 'All Day Event', start: YM + '-01', className: "fc-event-danger" },
+                    { title: 'Meeting', start: TODAY + 'T10:30:00', end: TODAY + 'T12:30:00' },
+                    { title: 'Lunch', start: TODAY + 'T12:00:00' },
+                    { title: 'Birthday Party', start: TOMORROW + 'T07:00:00', className: "fc-event-primary" },
+                    { title: 'Click for Google', url: 'https://google.com/', start: YM + '-28' }
+                ],
+            });
+
+            calendar.render();
+
+            // Re-render on window resize for responsiveness
+            window.addEventListener('resize', () => {
+                calendar.updateSize();
+            });
         });
     </script>
-
 </body>
 
 </html>

@@ -1,0 +1,12 @@
+:root {
+    --fc-button-bg-color: var(--black);
+    --fc-button-border-color: var(--black);
+    --fc-button-hover-bg-color: var(--black);
+    --fc-button-hover-border-color: var(--black);
+    --fc-button-active-bg-color: var(--black);
+    --fc-button-active-border-color: var(--black);
+    --fc-event-bg-color: var(--primaryColor);
+    --fc-event-border-color: var(--primaryColor);
+    --fc-now-indicator-color: var(--black);
+}
+
