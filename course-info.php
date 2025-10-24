@@ -154,13 +154,14 @@ if (isset($_GET['courseID'])) {
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    
+
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
 
-   
+
 </head>
 
 <body>
@@ -468,10 +469,10 @@ if (isset($_GET['courseID'])) {
                                                     </a>
                                                 </li>
                                                 <li class="nav-item" role="presentation">
-                                                    <a class="nav-link" id="files-tab" data-bs-toggle="tab"
-                                                        href="#files" role="tab" aria-controls="files"
+                                                    <a class="nav-link" id="attachments-tab" data-bs-toggle="tab"
+                                                        href="#attachments" role="tab" aria-controls="attachments"
                                                         aria-selected="false">
-                                                        Files
+                                                        Attachments
                                                     </a>
                                                 </li>
                                                 <li class="nav-item" role="presentation">
@@ -519,7 +520,7 @@ if (isset($_GET['courseID'])) {
                                                         <a class="nav-link" id="todo-tab" data-bs-toggle="tab" href="#todo" role="tab">To-do</a>
                                                     </li>
                                                     <li class="nav-item">
-                                                        <a class="nav-link" id="files-tab" data-bs-toggle="tab" href="#files" role="tab">Files</a>
+                                                        <a class="nav-link" id="attachments-tab" data-bs-toggle="tab" href="#attachments" role="tab">Attachments</a>
                                                     </li>
                                                     <li class="nav-item">
                                                         <a class="nav-link" id="link-tab" data-bs-toggle="tab" href="#link" role="tab">Links</a>
@@ -555,9 +556,9 @@ if (isset($_GET['courseID'])) {
                                                 <?php include 'course-info-contents/to-do.php'; ?>
                                             </div>
 
-                                            <!-- Files -->
-                                            <div class="tab-pane fade" id="files" role="tabpanel">
-                                                <?php include 'course-info-contents/files.php'; ?>
+                                            <!-- Attachments -->
+                                            <div class="tab-pane fade" id="attachments" role="tabpanel">
+                                                <?php include 'course-info-contents/attachments.php'; ?>
                                             </div>
 
                                             <!-- Link -->

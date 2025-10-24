@@ -76,7 +76,8 @@ $linkCount = count($linksArray);
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
-    
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
+
 </head>
 
 <body>
@@ -151,7 +152,9 @@ $linkCount = count($linksArray);
                                         $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
                                     ?>
                                         <div class="cardFile my-3 w-lg-25 d-flex align-items-start" style="width:400px; max-width:100%; min-width:310px;">
-                                            <i class="px-4 py-3 fa-solid fa-file"></i>
+                                            <span class="px-3 py-3 material-symbols-outlined">
+                                                draft
+                                            </span>
                                             <div class="ms-2">
                                                 <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
                                                 <div class="due text-reg text-14 mb-1"><?php echo $fileExt ?> · <?php echo $fileSizeMB ?></div>
@@ -162,7 +165,9 @@ $linkCount = count($linksArray);
 
                                     <?php foreach ($linksArray as $link): ?>
                                         <div class="cardFile my-3 w-lg-25 d-flex align-items-start" style="width:400px; max-width:100%; min-width:310px;">
-                                            <i class="px-4 py-3 fa-solid fa-link" style="font-size: 13px;"></i>
+                                            <span class="px-3 py-3 material-symbols-outlined">
+                                                public
+                                            </span>
                                             <div class="ms-2">
                                                 <!-- temoparary lang ang filename here -->
                                                 <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
