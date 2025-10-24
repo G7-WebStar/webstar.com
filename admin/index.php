@@ -24,6 +24,7 @@ include('../shared/assets/database/connect.php');
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
 
 </head>
 
@@ -47,15 +48,13 @@ include('../shared/assets/database/connect.php');
                     <!-- Navbar for mobile -->
                     <?php include '../shared/components/admin-navbar-for-mobile.php'; ?>
 
-                    <!-- Left side -->
+
                     <div class="container-fluid py-1 overflow-y-auto">
                         <div class="row">
-                            <!-- Left side -->
                             <div class="col-12 col-md-7 mb-3 mb-md-0">
                                 <div class="row ps-4">
                                     <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between w-100 text-center text-sm-start"
                                         style="position: relative;">
-                                        <!-- Left side: Image + Text -->
                                         <div class="d-flex align-items-center mb-3 mb-sm-0">
                                             <!-- Image hidden on mobile -->
                                             <img src="../shared/assets/img/settings.png" alt="Folder"
@@ -74,8 +73,9 @@ include('../shared/assets/database/connect.php');
                             <div class="row stats mt-5 align-items-center">
                                 <div class="col-12 col-md-3 mb-3">
                                     <div class="d-flex align-items-center">
-                                        <img src="../shared/assets/img/profIndex/people.png" alt="Students"
-                                            width="26" height="26" class="me-2">
+                                        <span class="material-symbols-outlined me-2" style="font-size: 30px;">
+                                            supervisor_account
+                                        </span>
                                         <div class="stats-count text-22 text-bold">55</div>
                                     </div>
                                     <div class="stats-label text-18 text-sbold">total users</div>
@@ -84,8 +84,9 @@ include('../shared/assets/database/connect.php');
 
                                 <div class="col-12 col-md-3 mb-3">
                                     <div class="d-flex align-items-center">
-                                        <img src="../shared/assets/img/courses.png" alt="Courses" width="26"
-                                            height="26" class="me-2">
+                                        <span class="material-symbols-outlined me-2" style="font-size: 30px;">
+                                            folder
+                                        </span>
                                         <div class="stats-count text-22 text-bold">2</div>
                                     </div>
                                     <div class="stats-label text-18 text-sbold">active courses</div>
@@ -94,8 +95,9 @@ include('../shared/assets/database/connect.php');
 
                                 <div class="col-12 col-md-3 mb-3">
                                     <div class="d-flex align-items-center">
-                                        <img src="../shared/assets/img/feedback.png" alt="Tasks"
-                                            width="26" height="26" class="me-2">
+                                        <span class="material-symbols-outlined me-2" style="font-size: 30px;">
+                                            feedback
+                                        </span>
                                         <div class="stats-count text-22 text-bold">55</div>
                                     </div>
                                     <div class="stats-label text-18 text-sbold">feedbacks</div>
@@ -104,8 +106,9 @@ include('../shared/assets/database/connect.php');
 
                                 <div class="col-12 col-md-3 mb-3">
                                     <div class="d-flex align-items-center">
-                                        <img src="../shared/assets/img/profIndex/assess.png" alt="Assessments"
-                                            width="26" height="26" class="me-2">
+                                        <span class="material-symbols-outlined me-2" style="font-size: 30px;">
+                                            assignment
+                                        </span>
                                         <div class="stats-count text-22 text-bold">5,000</div>
                                     </div>
                                     <div class="stats-label text-18 text-sbold">website visits</div>
@@ -140,10 +143,9 @@ include('../shared/assets/database/connect.php');
                 const ctx = document.getElementById('visitsChart').getContext('2d');
 
                 function getBarThickness() {
-                    // thick bars on desktop, thinner only on small screens
-                    if (window.innerWidth <= 576) return 40; // mobile
-                    if (window.innerWidth <= 768) return 70; // tablet
-                    return 120; // desktop
+                    if (window.innerWidth <= 576) return 40;
+                    if (window.innerWidth <= 768) return 70;
+                    return 120;
                 }
 
                 const visitsChart = new Chart(ctx, {
