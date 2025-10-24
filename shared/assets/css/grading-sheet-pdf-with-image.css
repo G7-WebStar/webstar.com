@@ -90,6 +90,11 @@
         align-items: center;
         padding-left: 10px;
     }
+
+    /* ✅ Make right content appear above attachments */
+    .col-lg-4 {
+        order: -1;
+    }
 }
 
 /* PDF preview box (clickable) */

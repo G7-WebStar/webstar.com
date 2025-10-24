@@ -411,8 +411,7 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                         <div><?php echo (int) $totalCourses; ?></div>
                                                     </div>
                                                     <!-- Scrollable course -->
-                                                    <div class="ps-4 pb-4 pe-4"
-                                                        style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth;">
+                                                    <div class="ps-4 pb-4 pe-4 scroll-attachments" style="overflow-x: auto; white-space: nowrap;">
                                                         <div style="display: inline-flex; gap: 20px;">
                                                             <?php if ($totalCourses === 0) { ?>
                                                                 <div class="text-reg text-14"

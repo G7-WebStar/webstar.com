@@ -17,13 +17,13 @@ include("shared/assets/processes/registration-profile-process.php");
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="shared/assets/css/global-styles.css">
-    <link rel="stylesheet" href="shared/assets/css/registrationProfile.css">
+    <link rel="stylesheet" href="shared/assets/css/registration-profile.css">
 
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
-    
+
 </head>
 
 <body>
@@ -50,7 +50,6 @@ include("shared/assets/processes/registration-profile-process.php");
                     Complete your profile to help others recognize you and connect with you on the platform
                 </p>
             </div>
-
 
             <!-- Registration Form -->
             <div class="container p-4 d-flex justify-content-center">
@@ -158,7 +157,7 @@ include("shared/assets/processes/registration-profile-process.php");
                             </div>
 
                             <input type="file" id="fileInput" name="fileUpload" class="form-control"
-                                accept=".png, .jpg, .svg, .jpeg" required style="display:none;">
+                                accept=".png, .jpg, .jpeg" required style="display:none;">
 
                             <button type="button" class="text-med text-12 btn btn-upload mt-1" id="uploadBtn">Upload Photo</button>
 
@@ -174,7 +173,6 @@ include("shared/assets/processes/registration-profile-process.php");
                 </form>
             </div>
 
-
         </div>
     </div>
 
@@ -184,19 +182,42 @@ include("shared/assets/processes/registration-profile-process.php");
         const fileInput = document.getElementById('fileInput');
         const uploadBtn = document.getElementById('uploadBtn');
         const profilePreview = document.getElementById('profilePreview');
+        const studentIDInput = document.getElementById('studentID');
+
+        // Auto-capitalize Student No. while typing
+        studentIDInput.addEventListener('input', () => {
+            studentIDInput.value = studentIDInput.value.toUpperCase();
+        });
 
         // Trigger file input when button is clicked
         uploadBtn.addEventListener('click', () => {
             fileInput.click();
         });
 
-        // Show preview when a file is selected
+        // File validation and preview
         fileInput.addEventListener('change', () => {
             const file = fileInput.files[0];
             if (file) {
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                const maxSize = 5 * 1024 * 1024;
+
+                if (!allowedTypes.includes(file.type)) {
+                    alert('Invalid file type. Only JPG, JPEG, and PNG are allowed.');
+                    fileInput.value = '';
+                    profilePreview.src = 'https://via.placeholder.com/150';
+                    return;
+                }
+
+                if (file.size > maxSize) {
+                    alert('File is too large. Maximum size is 5 MB.');
+                    fileInput.value = '';
+                    profilePreview.src = 'https://via.placeholder.com/150';
+                    return;
+                }
+
                 const reader = new FileReader();
                 reader.onload = e => {
-                    profilePreview.src = e.target.result; // update image src
+                    profilePreview.src = e.target.result;
                 }
                 reader.readAsDataURL(file);
             }
