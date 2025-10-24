@@ -154,13 +154,14 @@ if (isset($_GET['courseID'])) {
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    
+
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
 
-   
+
 </head>
 
 <body>
@@ -519,7 +520,7 @@ if (isset($_GET['courseID'])) {
                                                         <a class="nav-link" id="todo-tab" data-bs-toggle="tab" href="#todo" role="tab">To-do</a>
                                                     </li>
                                                     <li class="nav-item">
-                                                        <a class="nav-link" id="files-tab" data-bs-toggle="tab" href="#files" role="tab">Files</a>
+                                                        <a class="nav-link" id="attachments-tab" data-bs-toggle="tab" href="#attachments" role="tab">Attachments</a>
                                                     </li>
                                                     <li class="nav-item">
                                                         <a class="nav-link" id="link-tab" data-bs-toggle="tab" href="#link" role="tab">Links</a>
@@ -555,9 +556,9 @@ if (isset($_GET['courseID'])) {
                                                 <?php include 'course-info-contents/to-do.php'; ?>
                                             </div>
 
-                                            <!-- Files -->
-                                            <div class="tab-pane fade" id="files" role="tabpanel">
-                                                <?php include 'course-info-contents/files.php'; ?>
+                                            <!-- Attachments -->
+                                            <div class="tab-pane fade" id="attachments" role="tabpanel">
+                                                <?php include 'course-info-contents/attachments.php'; ?>
                                             </div>
 
                                             <!-- Link -->
@@ -677,6 +678,57 @@ if (isset($_GET['courseID'])) {
                                                 if (activeTab) {
                                                     toggleSortBy(activeTab.getAttribute("href").replace("#", ""));
                                                 }
+                                            });
+                                        </script>
+                                        <!-- Dropdown js -->
+                                        <script>
+                                            document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+                                                const btn = dropdown.querySelector('.dropdown-btn');
+                                                const list = dropdown.querySelector('.dropdown-list');
+
+                                                btn.addEventListener('click', () => {
+                                                    list.style.display = list.style.display === 'block' ? 'none' : 'block';
+                                                });
+
+                                                list.querySelectorAll('li').forEach(item => {
+                                                    item.addEventListener('click', () => {
+                                                        btn.textContent = item.dataset.value;
+                                                        list.style.display = 'none';
+
+                                                        const todoList = document.getElementById('todo-list');
+                                                        const emptyAssigned = document.getElementById('empty-assigned');
+                                                        const emptyMissing = document.getElementById('empty-missing');
+                                                        const emptyDone = document.getElementById('empty-done');
+                                                        const defaultEmpty = document.querySelector('.empty-state:not(#empty-assigned):not(#empty-missing):not(#empty-done)');
+
+                                                        [emptyAssigned, emptyMissing, emptyDone, defaultEmpty].forEach(el => {
+                                                            if (el) el.classList.add('d-none');
+                                                        });
+
+                                                        if (todoList) todoList.style.display = 'none';
+
+                                                        if (btn.textContent === 'Pending') {
+                                                            emptyAssigned?.classList.remove('d-none');
+                                                        } else if (btn.textContent === 'Missing') {
+                                                            emptyMissing?.classList.remove('d-none');
+                                                        } else if (btn.textContent === 'Done') {
+                                                            emptyDone?.classList.remove('d-none');
+                                                        } else if (btn.textContent === 'All') {
+                                                            if (todoList && todoList.children.length > 0) {
+                                                                todoList.style.display = 'block';
+                                                            } else {
+                                                                defaultEmpty?.classList.remove('d-none');
+                                                            }
+                                                        }
+                                                    });
+                                                });
+
+                                                // Close dropdown if clicked outside
+                                                document.addEventListener('click', (e) => {
+                                                    if (!dropdown.contains(e.target)) {
+                                                        list.style.display = 'none';
+                                                    }
+                                                });
                                             });
                                         </script>
                                     </div>

@@ -221,8 +221,8 @@ body {
     }
 }
 
-/* Megaphone no announcements */
-.no-announcements {
+/* Empty state */
+.empty-state {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -233,13 +233,14 @@ body {
     padding: 0 1rem;
 }
 
-.no-announcements-img {
+.empty-state-img {
     width: 210px;
     max-width: 80vw;
     height: auto;
+    filter: grayscale(100%) brightness(2) contrast(0.6) opacity(0.8);
 }
 
-.no-announcements-text {
+.empty-state-text {
     color: var(--black);
     line-height: 1.5;
     word-break: break-word;
@@ -249,13 +250,88 @@ body {
 }
 
 @media (max-width: 576px) {
-    .no-announcements {
+    .empty-state {
         min-height: 50vh;
     }
 
-    .no-announcements-text {
+    .empty-state-text {
         font-size: 14px;
         margin-top: 0.25rem !important;
+    }
+}
+
+/* Filter Dropdown */
+/* Sort dropdown */
+.custom-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown Button */
+.dropdown-btn {
+    background-color: var(--pureWhite);
+    border: 1px solid var(--black) !important;
+    border-radius: 25px;
+    padding: 3px 14px !important;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    min-width: 110px !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.dropdown-btn::after {
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #000;
+    margin-left: 8px;
+}
+
+/* Dropdown list */
+.dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 8px;
+    padding: 0;
+    list-style: none;
+    border: 1px solid #000;
+    border-radius: 15px;
+    background-color: #fff;
+    width: 100%;
+    display: none;
+    z-index: 100;
+    overflow: hidden;
+}
+
+/* Items */
+.dropdown-list li {
+    padding: 8px 16px;
+    cursor: pointer;
+    border: none;
+}
+
+.dropdown-list li:hover {
+    background-color: var(--primaryColor);
+}
+
+/* Dropdown in small screen */
+@media (max-width: 991.98px) {
+    .custom-dropdown .dropdown-btn {
+        min-width: 90px;
+        padding: 4px 12px;
+        font-size: 13px;
+    }
+
+    .mobile-dropdown {
+        margin-left: 0.5rem;
     }
 }
 
