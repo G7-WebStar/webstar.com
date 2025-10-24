@@ -1,0 +1,92 @@
+.cardHeader {
+    border-radius: 15px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+}
+.cardSticky {
+    border-radius: 15px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+    padding: 20px;
+}
+
+.cardFile {
+    border-radius: 10px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+}
+
+.timeline {
+    position: relative;
+}
+
+.timeline-item {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 30px;
+}
+
+.timeline-circle {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.timeline-circle.big {
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--black);
+    margin-left: -4px;
+}
+
+.timeline-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 5px;
+    width: 1px;
+    bottom: -10px;
+    background-color: var(--black);
+}
+
+.button {
+    background-color: var(--pureWhite);
+    border: 1px solid #000;
+    color: #000;
+}
+
+/* Mobile specific styles */
+@media (max-width: 576px) {
+    .cardHeader {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+
+    .mobile-assignment {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        text-align: center;
+    }
+
+    .mobile-top {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        width: 100%;
+    }
+
+    .mobile-top .arrow {
+        position: absolute;
+        left: 0;
+        display: flex;
+        align-items: center;
+        padding-left: 10px;
+    }
+}
