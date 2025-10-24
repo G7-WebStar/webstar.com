@@ -1,3 +1,20 @@
+/* Search */
+.search-sort-row {
+    padding-left: 0 !important;
+}
+
+.search-sort-row .col-12.col-lg-4 .search-container {
+    margin-left: 10px !important;
+}
+
+.search-sort-row .mobile-dropdown {
+    margin-left: 0.45rem !important;
+}
+/* space between Sort and Status */
+.search-sort-row .mobile-dropdown + .mobile-dropdown {
+    margin-left: 1rem !important; 
+}
+
 /* Table */
 .custom-table {
     width: 100%;
@@ -51,4 +68,88 @@ table.custom-table thead th {
 
 .custom-table th:last-child {
     border-top-right-radius: 5px !important;
+}
+
+/* Checkbox */
+.form-check-input {
+    border-color: var(--black) !important;
+}
+
+.form-check-input:checked {
+    background-color: var(--black) !important;
+    border-color: var(--black) !important;
+}
+
+/* Sort dropdown */
+.custom-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown Button */
+.dropdown-btn {
+    background-color: var(--pureWhite);
+    border: 1px solid var(--black);
+    border-radius: 25px;
+    padding: 3px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    min-width: 120px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.dropdown-btn::after {
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #000;
+    margin-left: 8px;
+}
+
+/* Dropdown list */
+.dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 8px;
+    padding: 0;
+    list-style: none;
+    border: 1px solid #000;
+    border-radius: 15px;
+    background-color: #fff;
+    width: 100%;
+    display: none;
+    z-index: 100;
+    overflow: hidden;
+}
+
+/* Items */
+.dropdown-list li {
+    padding: 8px 16px;
+    cursor: pointer;
+    border: none;
+}
+
+.dropdown-list li:hover {
+    background-color: var(--primaryColor);
+}
+
+/* Dropdown in small screen */
+@media (max-width: 991.98px) {
+    .custom-dropdown .dropdown-btn {
+        min-width: 90px;
+        padding: 4px 12px;
+        font-size: 13px;
+    }
+
+    .mobile-dropdown {
+        margin-left: 0.5rem;
+    }
 }
