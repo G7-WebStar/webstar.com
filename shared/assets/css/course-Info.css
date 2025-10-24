@@ -322,6 +322,7 @@ body {
     background-color: var(--primaryColor);
 }
 
+
 /* Dropdown in small screen */
 @media (max-width: 991.98px) {
     .custom-dropdown .dropdown-btn {

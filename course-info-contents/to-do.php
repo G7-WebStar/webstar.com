@@ -78,32 +78,6 @@
         <?php endwhile; ?>
     </div>
 
-    <!-- Status-Based Empty States  -->
-    <div id="empty-assigned" class="empty-state text-center d-none">
-        <img src="shared/assets/img/courseInfo/puzzle.png" alt="No Assigned Quests" class="empty-state-img">
-        <div class="empty-state-text text-16 d-flex flex-column align-items-center">
-            <p class="text-med mb-0">No quests have been assigned yet.</p>
-            <p class="text-reg">Your next adventure awaits!</p>
-        </div>
-    </div>
-
-
-    <div id="empty-missing" class="empty-state text-center d-none">
-        <img src="shared/assets/img/courseInfo/thumbs-up.png" alt="No Missing Quests" class="empty-state-img">
-        <div class="empty-state-text text-16 d-flex flex-column align-items-center">
-            <p class="text-med mb-0">No missing quests.</p>
-            <p class="text-reg">You’re right on track, adventurer!</p>
-        </div>
-    </div>
-
-    <div id="empty-done" class="empty-state text-center d-none">
-        <img src="shared/assets/img/courseInfo/file.png" alt="No Done Quests" class="empty-state-img">
-        <div class="empty-state-text text-16 d-flex flex-column align-items-center">
-            <p class="text-med mb-0">You haven’t submitted any quests yet.</pp>
-            <p class="text-reg">Complete one to earn XPs!</p>
-        </div>
-    </div>
-
 <?php else: ?>
     <!-- No To-Do Placeholder -->
     <div class="empty-state text-center">

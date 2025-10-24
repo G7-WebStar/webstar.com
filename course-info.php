@@ -469,10 +469,10 @@ if (isset($_GET['courseID'])) {
                                                     </a>
                                                 </li>
                                                 <li class="nav-item" role="presentation">
-                                                    <a class="nav-link" id="files-tab" data-bs-toggle="tab"
-                                                        href="#files" role="tab" aria-controls="files"
+                                                    <a class="nav-link" id="attachments-tab" data-bs-toggle="tab"
+                                                        href="#attachments" role="tab" aria-controls="attachments"
                                                         aria-selected="false">
-                                                        Files
+                                                        Attachments
                                                     </a>
                                                 </li>
                                                 <li class="nav-item" role="presentation">
@@ -678,57 +678,6 @@ if (isset($_GET['courseID'])) {
                                                 if (activeTab) {
                                                     toggleSortBy(activeTab.getAttribute("href").replace("#", ""));
                                                 }
-                                            });
-                                        </script>
-                                        <!-- Dropdown js -->
-                                        <script>
-                                            document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
-                                                const btn = dropdown.querySelector('.dropdown-btn');
-                                                const list = dropdown.querySelector('.dropdown-list');
-
-                                                btn.addEventListener('click', () => {
-                                                    list.style.display = list.style.display === 'block' ? 'none' : 'block';
-                                                });
-
-                                                list.querySelectorAll('li').forEach(item => {
-                                                    item.addEventListener('click', () => {
-                                                        btn.textContent = item.dataset.value;
-                                                        list.style.display = 'none';
-
-                                                        const todoList = document.getElementById('todo-list');
-                                                        const emptyAssigned = document.getElementById('empty-assigned');
-                                                        const emptyMissing = document.getElementById('empty-missing');
-                                                        const emptyDone = document.getElementById('empty-done');
-                                                        const defaultEmpty = document.querySelector('.empty-state:not(#empty-assigned):not(#empty-missing):not(#empty-done)');
-
-                                                        [emptyAssigned, emptyMissing, emptyDone, defaultEmpty].forEach(el => {
-                                                            if (el) el.classList.add('d-none');
-                                                        });
-
-                                                        if (todoList) todoList.style.display = 'none';
-
-                                                        if (btn.textContent === 'Pending') {
-                                                            emptyAssigned?.classList.remove('d-none');
-                                                        } else if (btn.textContent === 'Missing') {
-                                                            emptyMissing?.classList.remove('d-none');
-                                                        } else if (btn.textContent === 'Done') {
-                                                            emptyDone?.classList.remove('d-none');
-                                                        } else if (btn.textContent === 'All') {
-                                                            if (todoList && todoList.children.length > 0) {
-                                                                todoList.style.display = 'block';
-                                                            } else {
-                                                                defaultEmpty?.classList.remove('d-none');
-                                                            }
-                                                        }
-                                                    });
-                                                });
-
-                                                // Close dropdown if clicked outside
-                                                document.addEventListener('click', (e) => {
-                                                    if (!dropdown.contains(e.target)) {
-                                                        list.style.display = 'none';
-                                                    }
-                                                });
                                             });
                                         </script>
                                     </div>

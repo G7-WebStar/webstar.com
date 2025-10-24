@@ -1,9 +1,10 @@
 <?php
 $fileQuery = "SELECT * FROM files WHERE courseID = '$courseID'";
 $fileResult = executeQuery($fileQuery);
-
-if (mysqli_num_rows($fileResult) > 0):
 ?>
+
+<?php if (mysqli_num_rows($fileResult) > 0): ?>
+
     <!-- Sort By Dropdown (Shown only when there are attachments) -->
     <div class="d-flex align-items-center flex-nowrap mb-1" id="header">
         <div class="d-flex align-items-center flex-nowrap">

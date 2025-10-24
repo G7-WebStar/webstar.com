@@ -1,9 +1,9 @@
 <?php
 $lessonQuery = "SELECT * FROM lessons WHERE courseID = '$courseID'";
 $lessonResult = executeQuery($lessonQuery);
-
-if (mysqli_num_rows($lessonResult) > 0):
 ?>
+
+<?php if (mysqli_num_rows($lessonResult) > 0): ?>
 
     <!-- Sort By Dropdown (only shown if there are lessons) -->
     <div class="d-flex align-items-center flex-nowrap mb-1" id="header">
