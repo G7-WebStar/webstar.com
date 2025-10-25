@@ -26,7 +26,7 @@ include('../shared/assets/database/connect.php');
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
-   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
 
 </head>
 
@@ -50,7 +50,7 @@ include('../shared/assets/database/connect.php');
                     <!-- Navbar for mobile -->
                     <?php include '../shared/components/admin-navbar-for-mobile.php'; ?>
 
-                    
+
                     <div class="container-fluid py-1">
                         <div class="row">
                             <!-- Header Title -->
@@ -113,20 +113,25 @@ include('../shared/assets/database/connect.php');
 
                                 <!-- Add Course Button -->
                                 <div class="col-auto d-none d-lg-block ms-auto">
-                                    <button class="add-course-btn btn btn-primary px-3 py-1 rounded-pill text-reg text-md-14">
-                                        <div style="text-decoration: none; color: var(--black);">
-                                            + Register new instructor
-                                        </div>
-                                    </button>
+                                    <a href="register-instructor.php" style="text-decoration: none;">
+                                        <button class="add-instructor-btn btn btn-primary px-3 py-1 rounded-pill text-reg text-md-14">
+                                            <div style="text-decoration: none; color: var(--black);">
+                                                + Register new instructor
+                                            </div>
+                                        </button>
+                                    </a>
                                 </div>
+
 
                                 <!-- Mobile Button -->
                                 <div class="col-12 d-lg-none d-flex justify-content-center mt-2">
-                                    <button class="add-course-btn btn btn-primary px-3 py-1 rounded-pill text-reg text-md-14">
-                                        <div style="text-decoration: none; color: var(--black);">
-                                            + Register new instructor
-                                        </div>
-                                    </button>
+                                    <a href="register-instructor.php" style="text-decoration: none;">
+                                        <button class="add-instructor-btn btn btn-primary px-3 py-1 rounded-pill text-reg text-md-14">
+                                            <div style="text-decoration: none; color: var(--black);">
+                                                + Register new instructor
+                                            </div>
+                                        </button>
+                                    </a>
                                 </div>
                             </div>
 
