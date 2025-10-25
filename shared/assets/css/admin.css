@@ -10,9 +10,10 @@
 .search-sort-row .mobile-dropdown {
     margin-left: 0.45rem !important;
 }
+
 /* space between Sort and Status */
-.search-sort-row .mobile-dropdown + .mobile-dropdown {
-    margin-left: 1rem !important; 
+.search-sort-row .mobile-dropdown+.mobile-dropdown {
+    margin-left: 1rem !important;
 }
 
 /* Table */
@@ -137,8 +138,46 @@ table.custom-table thead th {
     border: none;
 }
 
+/* Register button */
+.add-instructor-btn {
+    background-color: var(--primaryColor) !important;
+    border: 1px solid var(--black) !important;
+    color: var(--black) !important;
+    font-size: 16px;
+    transition: all 0.2s ease-in-out !important;
+    box-shadow: none !important;
+}
+
+.add-instructor-btn:hover {
+    border-color: var(--black) !important;
+    background-color: var(--primaryColor) !important;
+    color: var(--black) !important;
+}
+
+.add-instructor-btn:focus,
+.add-instructor-btn:focus-visible {
+    background-color: var(--primaryColor) !important;
+    border-color: var(--black) !important;
+    color: var(--black) !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.add-instructor-btn:active {
+    background-color: #e6c85f !important;
+    border-color: var(--black) !important;
+    transform: translateY(1px);
+}
+
+
 .dropdown-list li:hover {
     background-color: var(--primaryColor);
+}
+
+@media (max-width: 1400px) {
+    .add-instructor-btn {
+        font-size: 14px;
+    }
 }
 
 /* Dropdown in small screen */
