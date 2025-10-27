@@ -1,4 +1,5 @@
 <?php
+$activePage = 'todo';
 include('shared/assets/database/connect.php');
 
 include("shared/assets/processes/session-process.php");
@@ -29,6 +30,11 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
     <link rel="stylesheet" href="shared/assets/css/index.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
+
+    <!-- Material Design Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
     <style>
         .choice-selected {
             transition: 0.3s ease-in-out;
@@ -175,6 +181,7 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        //Fetch Questions and Choices from DB
         const questions = [
             <?php
             if (mysqli_num_rows($selectQuestionsResult) > 0) {
@@ -196,6 +203,7 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
                     $countQuestion++;
             ?> {
                         question: "<?php echo $questions['testQuestion']; ?>",
+                        questionID: "<?php echo $questions['testQuestionID']; ?>",
                         answers: [
                             <?php
                             if (mysqli_num_rows($selectChoicesResult) > 0) {
@@ -203,8 +211,7 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
                                 $countChoice = 0;
                                 while ($choices = mysqli_fetch_assoc($selectChoicesResult)) {
                             ?> {
-                                        text: "<?php echo $choices['choiceText']; ?>",
-                                        correct: <?php echo ($questions['correctAnswer'] == $choices['choiceText']) ? "true" : "false"; ?>
+                                        text: "<?php echo $choices['choiceText']; ?>"
                                     }
                                     <?php echo ($countChoice < $totalChoice) ? "," : null; ?>
                             <?php
@@ -220,13 +227,12 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
             ?>
         ];
 
-        console.log(questions);
-
+        //Timer Variables
         let seconds = 600;
         let minutes = seconds / 60;
         let hours = minutes / 60
 
-
+        //Initializes the state of every questions as not yet answered
         let selectedAnswers = new Array(questions.length).fill(null);
 
         const questionContainer = document.getElementById('question-container');
@@ -237,6 +243,7 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
         let score = 0;
 
         let choiceIDs = [];
+        let choiceText = [];
 
         function startQuiz() {
             currentQuestionIndex = 0;
@@ -267,9 +274,10 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
                 choices.appendChild(button);
             });
 
+            //Restores indicators that that question has been answered
             const savedIndex = selectedAnswers[currentQuestionIndex];
             if (savedIndex !== null) {
-                savedChoice = document.getElementById(choiceIDs[savedIndex]);
+                const savedChoice = document.getElementById(choiceIDs[savedIndex]);
                 savedChoice.classList.add('choice-selected');
                 savedChoice.classList.remove('bg-white');
             }
@@ -292,6 +300,7 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
         }
 
         function answerQuestion() {
+            //Checks whether a question has been answered or not
             const hasSelected = choiceIDs.some(choice => {
                 const choiceElement = document.getElementById(choice);
                 return choiceElement.classList.contains('choice-selected');
@@ -305,14 +314,40 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
                 });
                 this.classList.add('choice-selected');
                 this.classList.remove('bg-white');
+
                 const selectedChoiceIndex = choiceIDs.indexOf(this.id);
                 selectedAnswers[currentQuestionIndex] = selectedChoiceIndex;
+
+                //Replaces the answers in the array with new answers
+                const selectedChoice = {
+                    userAnswer: this.innerHTML,
+                    testQuestionID: questions[currentQuestionIndex].questionID
+                };
+
+                choiceText[currentQuestionIndex] = selectedChoice;
             } else {
                 this.classList.add('choice-selected');
                 this.classList.remove('bg-white');
                 const selectedChoiceIndex = choiceIDs.indexOf(this.id);
                 selectedAnswers[currentQuestionIndex] = selectedChoiceIndex;
+
+                //Stores the answers in an array
+                choiceText.push({
+                    userAnswer: this.innerHTML,
+                    testQuestionID: questions[currentQuestionIndex].questionID
+                });
             }
+            console.log(selectedAnswers[currentQuestionIndex]);
+        }
+
+        function submitQuiz() {
+            console.log(choiceText);
+            <?php
+            $submitQuizQuery = "INSERT INTO `testresponses`
+            (`testID`, `testQuestionID`, `userID`, `userAnswer`, `isCorrect`) VALUES 
+            ('[value-1]','[value-2]','$userID','choiceText.userAnswer[0]','[value-5]')";
+            $submitQuizResult = executeQuery($submitQuizQuery);
+            ?>
         }
 
         showQuestion();
