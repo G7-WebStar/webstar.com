@@ -1,0 +1,331 @@
+
+.cardHeader {
+    border-radius: 15px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+}
+
+
+.cardSticky {
+    border-radius: 15px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+    padding: 20px;
+}
+
+.cardFile {
+    border-radius: 10px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+}
+
+
+/* Dropdown container styling */
+.dropdown-container {
+    gap: 16px;
+    margin-top: 40px; 
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 1,
+  'wght' 300,
+  'GRAD' 0,
+  'opsz' 20
+}
+
+/* Add spacing between icon and text in Return All button */
+.btn-return-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px; 
+}
+.btn-return-all .material-symbols-outlined { 
+    line-height: 1; 
+}
+
+/* Submissions list styling */
+.submissions-list {
+    background-color: transparent;
+    border: none;
+}
+
+.submission-item {
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(44, 44, 44, 0.5) !important;
+}
+
+/* Avatar fixes to avoid stretch and keep a perfect circle */
+.submission-item .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex: 0 0 40px; /* prevent flex stretch */
+}
+.submission-item .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.submission-item:hover {
+    background-color: #f8f9fa;
+}
+
+.submission-item:last-child {
+    border-bottom: none !important;
+}
+
+.submission-center {
+    flex: 1 1 auto; 
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+}
+
+.submission-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    min-width: 80px;
+    justify-content: center;
+}
+
+
+/* (Optional) Left spacer no longer used */
+
+/* Badge styling */
+.badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid;
+    font-family: 'Regular', sans-serif;
+}
+
+.badge-pending {
+    background-color: #DFDFDF;
+    border-color: #DFDFDF;
+    color: #2C2C2C;
+}
+
+.badge-submitted {
+    background-color: #C8ECC1;
+    border-color: #C8ECC1;
+    color: #5B6D58;
+}
+
+.badge-missing {
+    background-color: #ECC1C1;
+    border-color: #ECC1C1;
+    color: #6D5858;
+}
+
+.badge-score {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--black);
+    font-family: var(--SemiBold);
+    font-weight: 600;
+}
+
+.badge-time {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--black);
+    font-family: var(--SemiBold);
+    font-weight: 600;
+    font-size: 13px;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* Exam details right card typographic styles */
+.exam-details-title {
+    font-family: 'SemiBold', 'Poppins', sans-serif;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    vertical-align: middle;
+}
+
+.exam-stat-value {
+    font-family: 'SemiBold', 'Poppins', sans-serif;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.exam-stat-label {
+    font-family: 'Regular', 'Poppins', sans-serif;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.submission-stats .stat-value {
+    font-family: 'SemiBold', 'Poppins', sans-serif;
+    font-size: 14px; /* slightly smaller than exam-stat-value (16px) */
+    line-height: 1;
+    letter-spacing: -0.03em;
+    vertical-align: middle;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .cardSticky {
+        margin-top: 20px; 
+    }
+}
+
+/* Space between icon and text */
+.btn-action i {
+    padding-right: 6px; 
+}
+
+
+/* Fixed header and scrollable content */
+.cardHeader {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--pureWhite);
+}
+
+.content-scroll-container {
+    max-height: calc(100vh - 200px); 
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Mobile specific styles */
+@media (max-width: 576px) {
+    .cardHeader {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .mobile-assignment {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        text-align: center;
+    }
+
+    .mobile-top {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        width: 100%;
+    }
+
+    .mobile-top .arrow {
+        position: absolute;
+        left: 0;
+        display: flex;
+        align-items: center;
+        padding-left: 10px;
+    }
+
+    /* Tabs responsiveness (match assess-exam-details) */
+    .tab-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .tab-scroll::-webkit-scrollbar { display: none; }
+    .custom-nav-tabs { justify-content: flex-start; gap: 16px; }
+    .custom-nav-tabs .nav-link {
+        margin-right: 16px;
+        padding: 6px 0 8px 0;
+        font-size: 14px;
+    }
+
+    /* Center filter controls on small screens while keeping styles */
+    .dropdown-container {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px 12px;
+    }
+    .dropdown-container > div {
+        flex: 0 1 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 0 !important;
+    }
+    .dropdown-container .dropdown-custom { max-width: 100%; }
+    .dropdown-container > .btn-return-all {
+        order: 3;
+        display: inline-flex;
+        margin: 7px auto 0; 
+    }
+
+    /* Make badges slightly smaller to avoid crowding */
+    .badge-score { 
+        font-size: 12px; 
+    }
+    .badge-time { 
+        font-size: 12px; 
+    }
+    .badge { 
+        padding: 3px 8px; 
+    }
+
+    /* Slightly smaller avatar on phones (keep proportions, no stretch) */
+    .submission-item .avatar { 
+        width: 37px; 
+        height: 37px; 
+        flex-basis: 37px; 
+    }
+}
+
+@media (max-width: 380px) {
+    /* Extra small phones: further reduce badge sizes */
+    .badge-score { font-size: 11px; }
+    .badge-time { font-size: 11px; }
+    .badge { padding: 2px 6px; }
+}
+
+/* Nav tabs styling (aligned with course-Info.css) */
+.custom-nav-tabs {
+    border-bottom: 1px solid var(--black);
+    gap: 24px;
+}
+.custom-nav-tabs .nav-item { white-space: nowrap; }
+.custom-nav-tabs .nav-link {
+    font-family: var(--SemiBold);
+    color: #2c2c2cbf;
+    border: none;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    font-weight: normal;
+    background-color: transparent !important;
+    padding: 8px 0 10px 0;
+    margin-right: 24px;
+}
+.custom-nav-tabs .nav-link:hover {
+    color: var(--black);
+    text-decoration: none;
+    background-color: transparent !important;
+}
+.custom-nav-tabs .nav-link.active {
+    border-bottom: 3px solid var(--black);
+    color: var(--black);
+    font-weight: bold;
+    background-color: transparent !important;
+}
+

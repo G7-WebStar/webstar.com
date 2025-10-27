@@ -1,0 +1,385 @@
+
+/* ============ Layout: Card shells ============ */
+.cardHeader {
+    border-radius: 15px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+}
+
+
+.cardSticky {
+    border-radius: 15px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+    padding: 20px;
+}
+
+.cardFile {
+    border-radius: 10px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+}
+
+/* Add spacing between icon and text in Return All button */
+.btn-return-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px; 
+}
+.btn-return-all .material-symbols-outlined { 
+    line-height: 1; 
+}
+
+/* Exam details right card typographic styles */
+.exam-details-title {
+    font-family: 'SemiBold', 'Poppins', sans-serif;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    vertical-align: middle;
+}
+
+.exam-stat-value {
+    font-family: 'SemiBold', 'Poppins', sans-serif;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.exam-stat-label {
+    font-family: 'Regular', 'Poppins', sans-serif;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.submission-stats .stat-value {
+    font-family: 'SemiBold', 'Poppins', sans-serif;
+    font-size: 14px; 
+    line-height: 1;
+    letter-spacing: -0.03em;
+    vertical-align: middle;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .cardSticky {
+        margin-top: 20px; 
+    }
+}
+
+.btn-action i {
+    padding-right: 6px; 
+}
+
+
+/* ============ Layout: Scroll header ============ */
+.cardHeader {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--pureWhite);
+}
+
+.content-scroll-container {
+    max-height: calc(100vh - 200px); 
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* ============ Layout: Mobile specific styles ============ */
+@media (max-width: 576px) {
+    .cardHeader {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .mobile-assignment {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        text-align: center;
+    }
+
+    .mobile-top {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        width: 100%;
+    }
+
+    .mobile-top .arrow {
+        position: absolute;
+        left: 0;
+        display: flex;
+        align-items: center;
+        padding-left: 10px;
+    }
+
+    .tab-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .tab-scroll::-webkit-scrollbar { display: none; }
+    .custom-nav-tabs { justify-content: flex-start; gap: 16px; }
+    .custom-nav-tabs .nav-link {
+        margin-right: 16px;
+        padding: 6px 0 8px 0;
+        font-size: 14px;
+    }
+
+    .analytics-metric {
+        margin-bottom: 20px;
+    }
+    
+    .analytics-summary .row .col-12 {
+        margin-bottom: 5px;
+    }
+}
+
+.analytics-summary .row .col-12 {
+    margin-bottom: 15px;
+}
+
+
+/* ============ Components: Nav tabs ============ */
+.custom-nav-tabs {
+    border-bottom: 1px solid var(--black);
+    gap: 24px;
+}
+.custom-nav-tabs .nav-item { white-space: nowrap; }
+.custom-nav-tabs .nav-link {
+    font-family: var(--SemiBold);
+    color: #2c2c2cbf;
+    border: none;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    font-weight: normal;
+    background-color: transparent !important;
+    padding: 8px 0 10px 0;
+    margin-right: 24px;
+}
+.custom-nav-tabs .nav-link:hover {
+    color: var(--black);
+    text-decoration: none;
+    background-color: transparent !important;
+}
+.custom-nav-tabs .nav-link.active {
+    border-bottom: 3px solid var(--black);
+    color: var(--black);
+    font-weight: bold;
+    background-color: transparent !important;
+}
+
+/* ============ Components: Icons ============ */
+/*icon styling*/
+.material-symbols-outlined {
+    font-variation-settings: 
+    'FILL' 1, 
+    'wght' 400, 
+    'GRAD' 0, 
+    'opsz' 48;
+}
+
+.alarm-icon {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+}
+
+
+
+/* ============ Analytics: Typography ============ */
+.analytics-score-value {
+font-family: 'SemiBold', sans-serif;
+  font-weight: 600; 
+  font-size: 28px;
+  line-height: 1; 
+  letter-spacing: -0.03em; 
+  vertical-align: middle;
+  color: var(--black);
+}
+.analytics-score-label {
+    font-family: 'SemiBold', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  vertical-align: middle;
+  color: var(--black);
+}
+.analytics-score-desc {
+    font-family: 'Regular', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-align: center;
+  vertical-align: middle;
+  color: var(--black);
+}
+
+/* ============ Charts: Full Width Container ============ */
+.chart-section {
+    margin-top: 120px !important;
+}
+
+.score-range-chart-full {
+    background-color: var(--pureWhite);
+    border-radius: 7px;
+    border: 1px solid var(--black);
+    padding: 20px;
+    margin-top: 0;
+}
+
+.chart-title h5 {
+    color: var(--black);
+    margin-bottom: 5px;
+}
+
+.chart-title p {
+    color: #666;
+    margin-bottom: 0;
+}
+
+.chart-container-full {
+    position: relative;
+    height: 300px;
+    width: 100%;
+    border-radius: 12px; 
+    overflow: hidden; 
+}
+
+/* ============ Charts: Badges under chart ============ */
+.chart-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.metric-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-family: 'Medium', 'Poppins', sans-serif; 
+    font-size: 14px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    border: 1px solid var(--black);
+}
+
+.badge-blue { background: #C1CDEC; color: #58666D; border-color: #C1CDEC; }
+.badge-green { background: #C8ECC1; color: #5B6D58; border-color: #C8ECC1; }
+.badge-red { background: #ECC1C1; color: #92342D; border-color: #ECC1C1; }
+
+@media (max-width: 576px) {
+    .chart-badges { gap: 8px; }
+    .metric-badge { font-size: 12px; padding: 6px 12px; }
+}
+
+/* Responsive: reduce top gap before chart on small screens */
+@media (max-width: 576px) {
+    .chart-section { margin-top: 50px !important; }
+}
+
+/* ============ Item Analysis: Title & Description ============ */
+.item-analysis { 
+    margin-top: 45px !important; 
+}
+
+.item-analysis .section-title {
+    font-family: 'SemiBold', 'Poppins', sans-serif;
+    font-weight: 200;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    vertical-align: middle;
+    color: var(--black);
+    margin-bottom: 6px;
+}
+.item-analysis .section-desc {
+    font-family: 'Medium', 'Poppins', sans-serif;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    vertical-align: middle;
+    color: var(--black);
+}
+.question-block .question-text {
+    font-family: 'SemiBold', 'Poppins', sans-serif; 
+    font-weight: 200;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    vertical-align: middle;
+    color: var(--black);
+    margin-bottom: 8px;
+}
+.item-divider {
+    border: 0;
+    border-top: 1px solid var(--black); 
+    margin: 14px 0;
+}
+
+/* ============ Item Analysis: Choices ============ */
+.choice-list { margin: 0; padding-left: 18px; }
+.choice-list li {
+    margin-bottom: 4px;
+    font-family: 'Regular', 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.36; 
+    letter-spacing: -0.03em;
+    vertical-align: middle;
+    color: var(--black);
+    list-style-type: disc;
+    list-style-position: outside;
+}
+.choice-list li.choice-ok {
+    color: #51844A;
+    display: list-item; 
+    padding: 0;
+    border-radius: 0;
+    font-family: 'Bold', 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.36;
+    letter-spacing: -0.03em;
+    vertical-align: middle;
+}
+
+.choice-ok {
+    color: #51844A !important;
+    font-family: 'Bold', 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.36;
+    letter-spacing: -0.03em;
+    vertical-align: middle;
+}
+
+.analytics-metric .material-symbols-outlined {
+    font-size: 28px !important;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.analytics-summary > .text-center .material-symbols-outlined {
+    font-size: 28px !important;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.alarm-icon {
+    font-size: 28px !important;
+    line-height: 1;
+    vertical-align: middle;
+}
+

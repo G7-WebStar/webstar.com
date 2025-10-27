@@ -26,6 +26,7 @@ include('../shared/assets/database/connect.php');
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
 
 </head>
 
@@ -49,21 +50,24 @@ include('../shared/assets/database/connect.php');
                     <!-- Navbar for mobile -->
                     <?php include '../shared/components/admin-navbar-for-mobile.php'; ?>
 
-                    <!-- Left side -->
+
                     <div class="container-fluid py-1">
                         <div class="row">
                             <!-- Header Title -->
                             <div class="col-12 mb-3">
-                                <div class="d-flex align-items-center ps-4">
+                                <div class="d-flex align-items-center ps-1">
                                     <div class="text-sbold text-22">Manage instructors</div>
-                                    <img src="../shared/assets/img/explore.png" alt="Folder"
-                                        class="img-fluid rounded-circle ms-3 folder-img" width="26" height="26">
+                                    <span class="material-symbols-outlined ms-3"
+                                        style=" font-size: 30px">
+                                        supervisor_account
+                                    </span>
+
                                     <div class="stats-count text-22 text-bold ms-1">1</div>
                                 </div>
                             </div>
 
                             <!-- Header Section (Search, Sort, Status, Add Button) -->
-                            <div class="row align-items-center g-2 flex-wrap px-2">
+                            <div class="row align-items-center g-2 flex-wrap px-2 search-sort-row">
                                 <!-- Search -->
                                 <div class="col-12 col-lg-4 px-0 px-md-auto">
                                     <div class="search-container d-flex mx-sm-auto">
@@ -78,51 +82,56 @@ include('../shared/assets/database/connect.php');
                                 </div>
 
                                 <!-- Sort By -->
-                                <div class="col-auto ms-2">
+                                <div class="col-auto mobile-dropdown">
                                     <div class="d-flex align-items-center flex-nowrap">
-                                        <span class="dropdown-label me-2 text-reg">Sort by:</span>
-                                        <button class="btn dropdown-toggle dropdown-custom" type="button"
-                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                            <span class="text-reg text-14">Name</span>
-                                        </button>
-                                        <ul class="dropdown-menu text-reg text-14">
-                                            <li><a class="dropdown-item text-reg text-14" href="#">Name</a></li>
-                                            <li><a class="dropdown-item text-reg text-14" href="#">Date</a></li>
-                                        </ul>
+                                        <span class="dropdown-label me-2 text-reg">Sort by</span>
+                                        <div class="custom-dropdown">
+                                            <button class="dropdown-btn text-reg text-14">Newest</button>
+                                            <ul class="dropdown-list text-reg text-14">
+                                                <li data-value="Newest">Newest</li>
+                                                <li data-value="Oldest">Oldest</li>
+                                                <li data-value="Unread">Unread</li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Status -->
-                                <div class="col-auto ms-3">
+                                <div class="col-auto mobile-dropdown">
                                     <div class="d-flex align-items-center flex-nowrap">
-                                        <span class="dropdown-label me-2 text-reg">Status:</span>
-                                        <button class="btn dropdown-toggle dropdown-custom" type="button"
-                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                            <span class="text-reg text-14">Active</span>
-                                        </button>
-                                        <ul class="dropdown-menu text-reg text-14">
-                                            <li><a class="dropdown-item text-reg text-14" href="#">Active</a></li>
-                                            <li><a class="dropdown-item text-reg text-14" href="#">Archived</a></li>
-                                        </ul>
+                                        <span class="dropdown-label me-2 text-reg">Status</span>
+                                        <div class="custom-dropdown">
+                                            <button class="dropdown-btn text-reg text-14">All</button>
+                                            <ul class="dropdown-list text-reg text-14">
+                                                <li data-value="Active">Active</li>
+                                                <li data-value="Created">Created</li>
+                                                <li data-value="Inactive">Inactive</li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Add Course Button -->
                                 <div class="col-auto d-none d-lg-block ms-auto">
-                                    <button class="add-course-btn btn btn-primary px-3 py-1 rounded-pill text-reg text-md-14">
-                                        <div style="text-decoration: none; color: black;">
-                                            + Register new instructor
-                                        </div>
-                                    </button>
+                                    <a href="register-instructor.php" style="text-decoration: none;">
+                                        <button class="add-instructor-btn btn btn-primary px-3 py-1 rounded-pill text-reg text-md-14">
+                                            <div style="text-decoration: none; color: var(--black);">
+                                                + Register new instructor
+                                            </div>
+                                        </button>
+                                    </a>
                                 </div>
+
 
                                 <!-- Mobile Button -->
                                 <div class="col-12 d-lg-none d-flex justify-content-center mt-2">
-                                    <button class="add-course-btn btn btn-primary px-3 py-1 rounded-pill text-reg text-md-14">
-                                        <div style="text-decoration: none; color: black;">
-                                            + Register new instructor
-                                        </div>
-                                    </button>
+                                    <a href="register-instructor.php" style="text-decoration: none;">
+                                        <button class="add-instructor-btn btn btn-primary px-3 py-1 rounded-pill text-reg text-md-14">
+                                            <div style="text-decoration: none; color: var(--black);">
+                                                + Register new instructor
+                                            </div>
+                                        </button>
+                                    </a>
                                 </div>
                             </div>
 
@@ -143,7 +152,7 @@ include('../shared/assets/database/connect.php');
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td>Mark Otto</td>
+                                                <td>Torrillo, Christian James D. </td>
                                                 <td>-</td>
                                                 <td>mark@example.com</td>
                                                 <td>Active</td>
@@ -157,13 +166,13 @@ include('../shared/assets/database/connect.php');
                                                         <ul class="dropdown-menu dropdown-menu-end">
                                                             <li><a class="dropdown-item" href="#">Edit</a></li>
                                                             <li><a class="dropdown-item" href="#">View Profile</a></li>
-                                                            <li><a class="dropdown-item" href="#">Delete</a></li>
+                                                            <li><a class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</a></li>
                                                         </ul>
                                                     </div>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td>Jacob Thornton</td>
+                                                <td>Torrillo, Christian James D. </td>
                                                 <td>-</td>
                                                 <td>jacob@example.com</td>
                                                 <td>Created</td>
@@ -177,13 +186,13 @@ include('../shared/assets/database/connect.php');
                                                         <ul class="dropdown-menu dropdown-menu-end">
                                                             <li><a class="dropdown-item" href="#">Edit</a></li>
                                                             <li><a class="dropdown-item" href="#">View Profile</a></li>
-                                                            <li><a class="dropdown-item" href="#">Delete</a></li>
+                                                            <li><a class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</a></li>
                                                         </ul>
                                                     </div>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td>John Doe</td>
+                                                <td>Torrillo, Christian James D. </td>
                                                 <td>-</td>
                                                 <td>john@example.com</td>
                                                 <td>Inactive</td>
@@ -197,7 +206,7 @@ include('../shared/assets/database/connect.php');
                                                         <ul class="dropdown-menu dropdown-menu-end">
                                                             <li><a class="dropdown-item" href="#">Edit</a></li>
                                                             <li><a class="dropdown-item" href="#">View Profile</a></li>
-                                                            <li><a class="dropdown-item" href="#">Delete</a></li>
+                                                            <li><a class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</a></li>
                                                         </ul>
                                                     </div>
                                                 </td>
@@ -207,7 +216,24 @@ include('../shared/assets/database/connect.php');
                                 </div>
                             </div>
 
-
+                            <!-- Delete Modal-->
+                            <div class="modal" id="deleteModal" tabindex="-1">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="transform: scale(0.8);"></button>
+                                        </div>
+                                        <div class="modal-body d-flex flex-column justify-content-center align-items-center text-center">
+                                            <span class="mt-4 text-bold text-22">This action cannot be undone.</span>
+                                            <span class="mb-4 text-reg text-14">Are you sure you want to delete this item?</span>
+                                        </div>
+                                        <div class="modal-footer text-sbold text-18">
+                                            <button type="button" class="btn rounded-pill px-4" style="background-color: var(--primaryColor); border: 1px solid var(--black);" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="button" class="btn rounded-pill px-4" style="background-color: rgba(255, 80, 80, 1); border: 1px solid var(--black);">Delete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -215,6 +241,32 @@ include('../shared/assets/database/connect.php');
             </div>
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
+            <!-- Dropdown js -->
+            <script>
+                document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+                    const btn = dropdown.querySelector('.dropdown-btn');
+                    const list = dropdown.querySelector('.dropdown-list');
+
+                    btn.addEventListener('click', () => {
+                        list.style.display = list.style.display === 'block' ? 'none' : 'block';
+                    });
+
+                    list.querySelectorAll('li').forEach(item => {
+                        item.addEventListener('click', () => {
+                            btn.textContent = item.dataset.value;
+                            list.style.display = 'none';
+                        });
+                    });
+
+                    // Close dropdown if clicked outside
+                    document.addEventListener('click', (e) => {
+                        if (!dropdown.contains(e.target)) {
+                            list.style.display = 'none';
+                        }
+                    });
+                });
+            </script>
 
 </body>
 

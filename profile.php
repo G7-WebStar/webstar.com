@@ -1,3 +1,52 @@
+<?php
+include('shared/assets/database/connect.php');
+include("shared/assets/processes/session-process.php");
+
+// Get the username from the URL (e.g., profile.php?user=jamesdoe)
+$username = $_GET['user'] ?? null;
+
+// If not provided, show the logged-in user's profile
+if (!$username && isset($_SESSION['userID'])) {
+    $userID = $_SESSION['userID'];
+    $query = "
+        SELECT 
+            users.userName,
+            userinfo.firstName,
+            userinfo.lastName
+        FROM users
+        JOIN userinfo ON users.userID = userinfo.userID
+        WHERE users.userID = '$userID'
+    ";
+} elseif ($username) {
+    // Otherwise, get user by username
+    $escaped = mysqli_real_escape_string($conn, $username);
+    $query = "
+        SELECT 
+            users.userID,
+            users.username,
+            userinfo.firstName,
+            userinfo.lastName
+        FROM users
+        JOIN userinfo ON users.userID = userinfo.userID
+        WHERE users.username = '$escaped'
+    ";
+} else {
+    // No username and no session → redirect to login
+    header("Location: login.php");
+    exit;
+}
+
+$result = mysqli_query($conn, $query);
+$user = mysqli_fetch_assoc($result);
+
+if (!$user) {
+    // Handle invalid username
+    echo "<div style='padding: 40px; text-align: center; color: #999;'>User not found.</div>";
+    exit;
+}
+?>
+
+
 <!doctype html>
 <html lang="en">
 
@@ -97,10 +146,13 @@
                                                     <div class="profile-text mt-3">
                                                         <!-- Name and Username -->
                                                         <div class="div">
-                                                            <div class="user-name text-bold">Christian James D. Torrillo
+                                                            <div class="user-name text-bold">
+                                                                <?= htmlspecialchars($user['firstName'] . ' ' . $user['lastName']) ?>
                                                             </div>
-                                                            <div class="user-username text-med text-muted">@jamesdoe
+                                                            <div class="user-username text-med text-muted">
+                                                                @<?= htmlspecialchars($user['username']) ?>
                                                             </div>
+
                                                             <!-- Bio -->
                                                             <div class="bio mt-4">
                                                                 <div class="text-med text-14">Hi! I’m a web development

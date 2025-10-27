@@ -40,28 +40,27 @@ $announcementQuery = "
 $announcementResult = executeQuery($announcementQuery);
 ?>
 
-<!-- Sort By Dropdown -->
-<div class="d-flex align-items-center flex-nowrap mb-3" id="header">
-    <span class="dropdown-label me-2">Sort by:</span>
-    <button class="btn dropdown-toggle dropdown-custom" type="button"
-        data-bs-toggle="dropdown" aria-expanded="false">
-        <span>Newest</span>
-    </button>
-    <ul class="dropdown-menu">
-        <li><a class="dropdown-item text-reg" href="#">Newest</a></li>
-        <li><a class="dropdown-item text-reg" href="#">Oldest</a></li>
-        <li><a class="dropdown-item text-reg" href="#">Unread first</a></li>
-    </ul>
-</div>
-
-<!-- Announcements Container -->
 <div class="d-flex flex-column flex-nowrap overflow-y-auto overflow-x-hidden" style="max-height: 70vh;">
 
-    <?php
-    if (mysqli_num_rows($announcementResult) > 0) {
-        while ($row = mysqli_fetch_assoc($announcementResult)) {
+    <?php if (mysqli_num_rows($announcementResult) > 0): ?>
 
-            // VARIABLES
+        <!-- Sort By Dropdown -->
+        <div class="d-flex align-items-center flex-nowrap mb-1" id="header">
+            <div class="d-flex align-items-center flex-nowrap">
+                <span class="dropdown-label me-2 text-reg">Sort by</span>
+                <div class="custom-dropdown">
+                    <button class="dropdown-btn text-reg text-14">Newest</button>
+                    <ul class="dropdown-list text-reg text-14">
+                        <li data-value="Newest">Newest</li>
+                        <li data-value="Oldest">Oldest</li>
+                        <li data-value="Unread">Unread</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <?php
+        while ($row = mysqli_fetch_assoc($announcementResult)) {
             $profilePicture = !empty($row['profilePicture'])
                 ? $row['profilePicture']
                 : "shared/assets/img/courseInfo/prof.png";
@@ -76,7 +75,6 @@ $announcementResult = executeQuery($announcementQuery);
             $attachmentsArray = [];
             $linksArray = [];
 
-            // FETCH FILES
             $filesQuery = "SELECT * FROM files WHERE announcementID = '$announcementID'";
             $filesResult = executeQuery($filesQuery);
 
@@ -93,7 +91,7 @@ $announcementResult = executeQuery($announcementQuery);
 
                 $fileTitle = !empty($file['fileTitle']) ? $file['fileTitle'] : '';
             }
-    ?>
+        ?>
 
             <!-- Announcement Card -->
             <div class="announcement-card d-flex align-items-start mb-1">
@@ -225,28 +223,27 @@ $announcementResult = executeQuery($announcementQuery);
                             <?php endforeach; ?>
                         </div>
 
-                        <!-- Footer -->
                         <div class="modal-footer border-top" style="padding-top: 45px;"></div>
                     </div>
                 </div>
             </div>
 
-        <?php
-        } // end while
-    } else {
+        <?php } // end while 
         ?>
 
+    <?php else: ?>
+
         <!-- No Announcements -->
-        <div class="no-announcements text-center">
-            <img src="shared/assets/img/courseInfo/megaphone.png" alt="No Announcements" class="no-announcements-img">
-            <div class="no-announcements-text text-reg text-16">
+        <div class="empty-state text-center">
+            <img src="shared/assets/img/courseInfo/megaphone.png" alt="No Announcements"
+                class="empty-state-img"
+                style="filter: grayscale(100%) brightness(2.8) contrast(0.4) opacity(0.85);">
+            <div class="empty-state-text text-reg text-16">
                 No announcements have been posted yet.
             </div>
         </div>
 
-    <?php
-    }
-    ?>
+    <?php endif; ?>
 </div>
 
 <!-- Toast Container -->

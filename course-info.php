@@ -154,13 +154,14 @@ if (isset($_GET['courseID'])) {
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    
+
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
 
-   
+
 </head>
 
 <body>
@@ -468,10 +469,10 @@ if (isset($_GET['courseID'])) {
                                                     </a>
                                                 </li>
                                                 <li class="nav-item" role="presentation">
-                                                    <a class="nav-link" id="files-tab" data-bs-toggle="tab"
-                                                        href="#files" role="tab" aria-controls="files"
+                                                    <a class="nav-link" id="attachments-tab" data-bs-toggle="tab"
+                                                        href="#attachments" role="tab" aria-controls="attachments"
                                                         aria-selected="false">
-                                                        Files
+                                                        Attachments
                                                     </a>
                                                 </li>
                                                 <li class="nav-item" role="presentation">
@@ -505,35 +506,54 @@ if (isset($_GET['courseID'])) {
                                             </ul>
                                         </div>
 
-                                        <!-- Desktop Tabs -->
-                                        <div class="tab-carousel-wrapper d-none d-md-block">
-                                            <div class="tab-scroll">
-                                                <ul class="nav nav-tabs custom-nav-tabs mb-3 flex-nowrap" id="myTab" role="tablist">
-                                                    <li class="nav-item">
-                                                        <a class="nav-link <?php echo $navState == "active" ? "" : "active"; ?>" id="announcements-tab" data-bs-toggle="tab" href="#announcements" role="tab">Announcements</a>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <a class="nav-link" id="lessons-tab" data-bs-toggle="tab" href="#lessons" role="tab">Lessons</a>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <a class="nav-link" id="todo-tab" data-bs-toggle="tab" href="#todo" role="tab">To-do</a>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <a class="nav-link" id="files-tab" data-bs-toggle="tab" href="#files" role="tab">Files</a>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <a class="nav-link" id="link-tab" data-bs-toggle="tab" href="#link" role="tab">Links</a>
-                                                    </li>
-                                                    <li class="nav-item nav-leaderboard">
-                                                        <a class="nav-link <?php echo $navState == "active" ? "active" : ""; ?>" id="leaderboard-tab" data-bs-toggle="tab" href="#leaderboard" role="tab">Leaderboard</a>
-                                                    </li>
-                                                    <li class="nav-item nav-report">
-                                                        <a class="nav-link" id="report-tab" data-bs-toggle="tab" href="#report" role="tab">Report</a>
-                                                    </li>
-                                                    <li class="nav-item nav-report">
-                                                        <a class="nav-link" id="student-tab" data-bs-toggle="tab" href="#student" role="tab">Students</a>
-                                                    </li>
-                                                </ul>
+                                        <!-- Desktop Tabs with Edge Arrows -->
+                                        <div class="tab-carousel-wrapper d-none d-md-block position-relative">
+
+                                            <div class="d-flex align-items-center position-relative" style="gap: 10px;">
+                                                <!-- Left Arrow -->
+                                                <button id="desktopScrollLeftBtn" class="scroll-arrow-btn d-none" aria-label="Scroll Left"
+                                                    style="background: none; border: none; color: var(--black);">
+                                                    <i class="fa-solid fa-chevron-left"></i>
+                                                </button>
+
+                                                <!-- Scrollable Tabs -->
+                                                <div class="tab-scroll flex-grow-1 overflow-auto" style="scroll-behavior: smooth; white-space: nowrap;">
+                                                    <ul class="nav nav-tabs custom-nav-tabs mb-3 flex-nowrap" id="myTab" role="tablist"
+                                                        style="display: inline-flex; white-space: nowrap;">
+                                                        <li class="nav-item">
+                                                            <a class="nav-link <?php echo $navState == "active" ? "" : "active"; ?>" id="announcements-tab"
+                                                                data-bs-toggle="tab" href="#announcements" role="tab">Announcements</a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a class="nav-link" id="lessons-tab" data-bs-toggle="tab" href="#lessons" role="tab">Lessons</a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a class="nav-link" id="todo-tab" data-bs-toggle="tab" href="#todo" role="tab">To-do</a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a class="nav-link" id="files-tab" data-bs-toggle="tab" href="#files" role="tab">Files</a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a class="nav-link" id="link-tab" data-bs-toggle="tab" href="#link" role="tab">Links</a>
+                                                        </li>
+                                                        <li class="nav-item nav-leaderboard">
+                                                            <a class="nav-link <?php echo $navState == "active" ? "active" : ""; ?>" id="leaderboard-tab"
+                                                                data-bs-toggle="tab" href="#leaderboard" role="tab">Leaderboard</a>
+                                                        </li>
+                                                        <li class="nav-item nav-report">
+                                                            <a class="nav-link" id="report-tab" data-bs-toggle="tab" href="#report" role="tab">Report</a>
+                                                        </li>
+                                                        <li class="nav-item nav-student">
+                                                            <a class="nav-link" id="student-tab" data-bs-toggle="tab" href="#student" role="tab">Students</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                        
+                                                <!-- Right Arrow -->
+                                                <button id="desktopScrollRightBtn" class="scroll-arrow-btn" aria-label="Scroll Right"
+                                                    style="background: none; border: none; color: var(--black);">
+                                                    <i class="fa-solid fa-chevron-right"></i>
+                                                </button>
                                             </div>
                                         </div>
 
@@ -555,9 +575,9 @@ if (isset($_GET['courseID'])) {
                                                 <?php include 'course-info-contents/to-do.php'; ?>
                                             </div>
 
-                                            <!-- Files -->
-                                            <div class="tab-pane fade" id="files" role="tabpanel">
-                                                <?php include 'course-info-contents/files.php'; ?>
+                                            <!-- Attachments -->
+                                            <div class="tab-pane fade" id="attachments" role="tabpanel">
+                                                <?php include 'course-info-contents/attachments.php'; ?>
                                             </div>
 
                                             <!-- Link -->
@@ -678,6 +698,35 @@ if (isset($_GET['courseID'])) {
                                                     toggleSortBy(activeTab.getAttribute("href").replace("#", ""));
                                                 }
                                             });
+                                        </script>
+                                        <!-- JS for Desktop Scroll Buttons -->
+                                        <script>
+                                        document.addEventListener("DOMContentLoaded", function () {
+                                            const desktopTabScroll = document.querySelector(".tab-scroll");
+                                            const desktopScrollLeftBtn = document.getElementById("desktopScrollLeftBtn");
+                                            const desktopScrollRightBtn = document.getElementById("desktopScrollRightBtn");
+                                        
+                                            function updateDesktopArrowVisibility() {
+                                                if (!desktopTabScroll) return;
+                                                desktopScrollLeftBtn.classList.toggle("d-none", desktopTabScroll.scrollLeft === 0);
+                                                desktopScrollRightBtn.classList.toggle(
+                                                    "d-none",
+                                                    desktopTabScroll.scrollLeft + desktopTabScroll.clientWidth >= desktopTabScroll.scrollWidth
+                                                );
+                                            }
+
+                                            desktopScrollLeftBtn.addEventListener("click", () => {
+                                                desktopTabScroll.scrollBy({ left: -150, behavior: "smooth" });
+                                            });
+
+                                            desktopScrollRightBtn.addEventListener("click", () => {
+                                                desktopTabScroll.scrollBy({ left: 150, behavior: "smooth" });
+                                            });
+
+                                            desktopTabScroll.addEventListener("scroll", updateDesktopArrowVisibility);
+
+                                            updateDesktopArrowVisibility(); // Initial check
+                                        });
                                         </script>
                                     </div>
                                 </div>

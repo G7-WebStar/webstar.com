@@ -1,0 +1,153 @@
+.cardHeader {
+    border-radius: 15px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+}
+.cardSticky {
+    border-radius: 15px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+    padding: 20px;
+}
+
+.cardFile {
+    border-radius: 10px;
+    border: 1px solid var(--black);
+    background-color: var(--pureWhite);
+}
+
+.timeline {
+    position: relative;
+}
+
+.timeline-item {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 30px;
+}
+
+.timeline-circle {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.timeline-circle.big {
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--black);
+    margin-left: -4px;
+}
+
+.timeline-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 5px;
+    width: 1px;
+    bottom: -10px;
+    background-color: var(--black);
+}
+
+.button {
+    background-color: var(--pureWhite);
+    border: 1px solid #000;
+    color: #000;
+}
+
+/* Mobile specific styles */
+@media (max-width: 576px) {
+    .cardHeader {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+
+    .mobile-assignment {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        text-align: center;
+    }
+
+    .mobile-top {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        width: 100%;
+    }
+
+    .mobile-top .arrow {
+        position: absolute;
+        left: 0;
+        display: flex;
+        align-items: center;
+        padding-left: 10px;
+    }
+}
+
+/* Rainbow gradient button */
+.button.gradient-btn {
+    background: linear-gradient(90deg,
+            #f9df80 0%,
+            #cde4b1 25%,
+            #b7d8f3 50%,
+            #f1c0c7 100%);
+    color: #000;
+    border: 1px solid #000;
+    transition: 0.3s ease;
+}
+
+/* Hover effect: slight brightening */
+.button.gradient-btn:hover {
+    filter: brightness(1.05);
+    transform: scale(1.02);
+}
+
+/* Modal style */
+.modal-content {
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+    padding: 2rem;
+}
+
+.btn-close {
+    filter: invert(0);
+    opacity: 0.8;
+}
+
+.btn-close:hover {
+    opacity: 1;
+}
+
+.modal-content hr {
+    margin-left: -2rem;
+    margin-right: -2rem;
+    border: none;
+    border-top: 1px solid var(--black);
+}
+
+
+.material-symbols-outlined {
+    font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
+}
+
+/* Hover animation: scale + brightness (no gradient) */
+.button-hover-effect {
+    transition: 0.3s ease;
+}
+
+.button-hover-effect:hover {
+    filter: brightness(1.05);
+    transform: scale(1.02);
+}
