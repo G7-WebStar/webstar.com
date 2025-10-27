@@ -4,6 +4,14 @@ include('shared/assets/database/connect.php');
 
 include("shared/assets/processes/session-process.php");
 
+$submissionValidationQuery = "SELECT * FROM testresponses WHERE testID = 1 AND userID = $userID";
+$submissionValidationResult = executeQuery($submissionValidationQuery);
+
+if (mysqli_num_rows($submissionValidationResult) > 0) {
+    header("Location: index.php");
+    exit;
+}
+
 $selectTestQuery = "SELECT * FROM tests WHERE testID = 1";
 $selectTestResult = executeQuery($selectTestQuery);
 
@@ -341,13 +349,29 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
         }
 
         function submitQuiz() {
-            console.log(choiceText);
-            <?php
-            $submitQuizQuery = "INSERT INTO `testresponses`
-            (`testID`, `testQuestionID`, `userID`, `userAnswer`, `isCorrect`) VALUES 
-            ('[value-1]','[value-2]','$userID','choiceText.userAnswer[0]','[value-5]')";
-            $submitQuizResult = executeQuery($submitQuizQuery);
-            ?>
+            if (choiceText.length >= questions.length) {
+                fetch('shared/assets/processes/submit-test.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            answers: choiceText
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        alert("Quiz submitted successfully!");
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+
+                    window.location.href = 'index.php';
+            } else {
+                console.log("Please answer all items");
+            }
         }
 
         showQuestion();
