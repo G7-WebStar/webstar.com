@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 19, 2025 at 08:02 AM
+-- Generation Time: Oct 27, 2025 at 09:40 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -214,7 +214,7 @@ CREATE TABLE `files` (
 --
 
 INSERT INTO `files` (`fileID`, `courseID`, `userID`, `announcementID`, `lessonID`, `assignmentID`, `fileAttachment`, `fileTitle`, `fileLink`, `uploadedAt`) VALUES
-(1, 1, 1, 1, 1, NULL, 'Web Development Course Material', '', 'https://example.com/lesson1,https://example.com/lesson1.1', '2025-08-30 10:30:00');
+(1, 1, 1, 1, 1, NULL, 'Web Development Course Material', '', 'https://Testple.com/lesson1,https://Testple.com/lesson1.1', '2025-08-30 10:30:00');
 
 -- --------------------------------------------------------
 
@@ -384,6 +384,19 @@ INSERT INTO `scores` (`scoreID`, `userID`, `assignmentID`, `testID`, `score`) VA
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `submissions`
+--
+
+CREATE TABLE `submissions` (
+  `submissionID` int(11) NOT NULL,
+  `assessmentID` int(11) NOT NULL,
+  `scoreID` int(11) NOT NULL,
+  `submittedAt` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `testquestionchoices`
 --
 
@@ -392,6 +405,52 @@ CREATE TABLE `testquestionchoices` (
   `testQuestionID` int(5) NOT NULL,
   `choiceText` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `testquestionchoices`
+--
+
+INSERT INTO `testquestionchoices` (`choiceID`, `testQuestionID`, `choiceText`) VALUES
+(1, 1, '&lt;h3&gt;'),
+(2, 1, '&lt;h6&gt;'),
+(3, 1, '&lt;h1&gt;'),
+(4, 1, '&lt;head&gt;'),
+(5, 2, '&lt;link&gt;'),
+(6, 2, '&lt;a&gt;'),
+(7, 2, '&lt;href&gt;'),
+(8, 2, '&lt;hyper&gt;'),
+(9, 3, 'src'),
+(10, 3, 'href'),
+(11, 3, 'alt'),
+(12, 3, 'path'),
+(13, 4, '&lt;break&gt;'),
+(14, 4, '&lt;br&gt;'),
+(15, 4, '&lt;lb&gt;'),
+(16, 4, '&lt;line&gt;'),
+(17, 5, '&lt;ol&gt;'),
+(18, 5, '&lt;ul&gt;'),
+(19, 5, '&lt;li&gt;'),
+(20, 5, '&lt;list&gt;'),
+(21, 6, 'The title shown inside the page'),
+(22, 6, 'The title shown on the browser tab'),
+(23, 6, 'A tooltip on hover'),
+(24, 6, 'A paragraph heading'),
+(25, 7, '&lt;ol&gt;'),
+(26, 7, '&lt;ul&gt;'),
+(27, 7, '&lt;li&gt;'),
+(28, 7, '&lt;dl&gt;'),
+(29, 8, 'style'),
+(30, 8, 'class'),
+(31, 8, 'font'),
+(32, 8, 'css'),
+(33, 9, '&lt;img&gt;'),
+(34, 9, '&lt;image&gt;'),
+(35, 9, '&lt;pic&gt;'),
+(36, 9, '&lt;src&gt;'),
+(37, 10, '&lt;tr&gt;'),
+(38, 10, '&lt;td&gt;'),
+(39, 10, '&lt;th&gt;'),
+(40, 10, '&lt;table&gt;');
 
 -- --------------------------------------------------------
 
@@ -409,6 +468,22 @@ CREATE TABLE `testquestions` (
   `testQuestionPoints` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `testquestions`
+--
+
+INSERT INTO `testquestions` (`testQuestionID`, `testID`, `testQuestion`, `questionType`, `testQuestionImage`, `correctAnswer`, `testQuestionPoints`) VALUES
+(1, 1, 'Which HTML tag is used to define the largest heading?', 'Multiple Choice', NULL, '&lt;h1&gt;', 100),
+(2, 1, 'Which tag is used to define a hyperlink in HTML?', 'Multiple Choice', NULL, '&lt;a&gt;', 100),
+(3, 1, 'Which HTML attribute specifies an image source?', 'Multiple Choice', NULL, 'src', 100),
+(4, 1, 'Which element is used to insert a line break?', 'Multiple Choice', NULL, '&lt;br&gt;', 100),
+(5, 1, 'Which tag is used to create an unordered list?', 'Multiple Choice', NULL, '&lt;ul&gt;', 100),
+(6, 1, 'What does the &lt;title&gt; tag define?', 'Multiple Choice', NULL, 'The title shown on the browser tab', 100),
+(7, 1, 'Which HTML element is used to display a numbered list?', 'Multiple Choice', NULL, '&lt;ol&gt;', 100),
+(8, 1, 'Which HTML attribute is used to define inline CSS styles?', 'Multiple Choice', NULL, 'style', 100),
+(9, 1, 'What is the correct HTML tag for inserting an image?', 'Multiple Choice', NULL, '&lt;img&gt;', 100),
+(10, 1, 'Which tag is used to create a table row?', 'Multiple Choice', NULL, '&lt;tr&gt;', 100);
+
 -- --------------------------------------------------------
 
 --
@@ -423,6 +498,13 @@ CREATE TABLE `testresponses` (
   `userAnswer` varchar(50) NOT NULL,
   `isCorrect` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `testresponses`
+--
+
+INSERT INTO `testresponses` (`testResponseID`, `testID`, `testQuestionID`, `userID`, `userAnswer`, `isCorrect`) VALUES
+(1, 0, 0, 2, 'choiceText.userAnswer[0]', 0);
 
 -- --------------------------------------------------------
 
@@ -441,6 +523,13 @@ CREATE TABLE `tests` (
   `userSection` varchar(10) NOT NULL,
   `testInstruction` varchar(500) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tests`
+--
+
+INSERT INTO `tests` (`testID`, `lessonID`, `assessmentID`, `testType`, `testTitle`, `generalGuidance`, `testTimelimit`, `userSection`, `testInstruction`) VALUES
+(1, 1, 2, 'Test', 'Test #1', 'Read each question carefully and choose the best answer from the given options. Only one option is correct for each question. Once you move to the next question, you will not be able to return to the previous one, so review your answer before proceeding. The exam will automatically submit when the timer ends. Avoid refreshing or closing the browser during the exam to prevent submission issues.', 600, '2', 'Read each question carefully and choose the best answer from the given options. Only one option is correct for each question. Once you move to the next question, you will not be able to return to the previous one, so review your answer before proceeding. The exam will automatically submit when the timer ends. Avoid refreshing or closing the browser during the exam to prevent submission issues.');
 
 -- --------------------------------------------------------
 
@@ -484,13 +573,13 @@ CREATE TABLE `userinfo` (
   `programID` varchar(50) NOT NULL,
   `gender` varchar(50) NOT NULL,
   `yearLevel` varchar(20) NOT NULL,
-  `yearSection` year(4) NOT NULL,
+  `yearSection` int(11) NOT NULL,
   `schoolEmail` varchar(50) NOT NULL,
   `contactNumber` varchar(20) NOT NULL,
   `facebookLink` text NOT NULL,
   `linkedInLink` text NOT NULL,
   `instagramLink` text NOT NULL,
-  `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
+  `createdAt` datetime NOT NULL,
   `isNewUser` int(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -499,18 +588,18 @@ CREATE TABLE `userinfo` (
 --
 
 INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `middleName`, `lastName`, `studentID`, `programID`, `gender`, `yearLevel`, `yearSection`, `schoolEmail`, `contactNumber`, `facebookLink`, `linkedInLink`, `instagramLink`, `createdAt`, `isNewUser`) VALUES
-(1, 2, 'prof.png', 'Jane', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', '2023', 'jane.smith@university.edu', '+639123456789', 'https://facebook.com/jane.smith', 'https://linkedin.com/in/jane-smith', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
-(2, 1, 'prof.png', 'Chistian James', 'Dom', 'Torillo', '202310002', '1', 'Male', '2', '2023', 'james.dom@university.edu', '+639123456789', 'https://facebook.com/james.dom', 'https://linkedin.com/in/james-dom', 'https://instagram.com/james.dom', '2025-08-30 08:18:53', 1),
-(3, 3, 'prof.png', 'John', 'Cruz', 'Doe', '202310003', '1', 'Male', '2', '2023', 'john.doe@university.edu', '+639123456783', '', '', '', '2025-09-28 11:58:33', 1),
-(4, 4, 'prof.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', '2023', 'michael.lee@school.edu', '09171234567', 'facebook.com/michael.lee', 'linkedin.com/in/michaellee', 'instagram.com/michael.lee', '2025-09-28 20:59:48', 1),
-(5, 5, 'prof.png', 'Sophia', 'B.', 'Garcia', '202310004', '1', 'Female', '2', '2023', 'sophia.garcia@school.edu', '09181234567', 'facebook.com/sophia.garcia', 'linkedin.com/in/sophiagarcia', 'instagram.com/sophia.garcia', '2025-09-28 20:59:48', 1),
-(6, 6, 'prof.png', 'Daniel', 'C.', 'Kim', '202310005', '1', 'Male', '2', '2023', 'daniel.kim@school.edu', '09191234567', 'facebook.com/daniel.kim', 'linkedin.com/in/danielkim', 'instagram.com/daniel.kim', '2025-09-28 20:59:48', 1),
-(7, 7, 'prof.png', 'Olivia', 'D.', 'Brown', '202310006', '1', 'Female', '2', '2023', 'olivia.brown@school.edu', '09201234567', 'facebook.com/olivia.brown', 'linkedin.com/in/oliviabrown', 'instagram.com/olivia.brown', '2025-09-28 20:59:48', 0),
-(8, 8, 'prof.png', 'Ethan', 'E.', 'Wilson', '202310007', '1', 'Male', '2', '2023', 'ethan.wilson@school.edu', '09211234567', 'facebook.com/ethan.wilson', 'linkedin.com/in/ethanwilson', 'instagram.com/ethan.wilson', '2025-09-28 20:59:48', 1),
-(9, 9, 'prof.png', 'Isabella', 'F.', 'Martin', '202310008', '1', 'Female', '2', '2023', 'isabella.martin@school.edu', '09221234567', 'facebook.com/isabella.martin', 'linkedin.com/in/isabellamartin', 'instagram.com/isabella.martin', '2025-09-28 20:59:48', 1),
-(10, 10, 'prof.png', 'Liam', 'G.', 'Torres', '202310009', '1', 'Male', '2', '2023', 'liam.torres@school.edu', '09231234567', 'facebook.com/liam.torres', 'linkedin.com/in/liamtorres', 'instagram.com/liam.torres', '2025-09-28 20:59:48', 1),
-(11, 11, 'prof.png', 'Emma', 'H.', 'Davis', '202310010', '1', 'Female', '2', '2023', 'emma.davis@school.edu', '09241234567', 'facebook.com/emma.davis', 'linkedin.com/in/emmadavis', 'instagram.com/emma.davis', '2025-09-28 20:59:48', 1),
-(12, 12, 'prof.png', 'Chloe', 'I.', 'Nguyen', '202310011', '1', 'Female', '2', '2023', 'chloe.nguyen@school.edu', '09251234567', 'facebook.com/chloe.nguyen', 'linkedin.com/in/chloenguyen', 'instagram.com/chloe.nguyen', '2025-09-28 21:34:51', 1);
+(1, 2, 'prof.png', 'Jane', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 2023, 'jane.smith@university.edu', '+639123456789', 'https://facebook.com/jane.smith', 'https://linkedin.com/in/jane-smith', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
+(2, 1, 'prof.png', 'Chistian James', 'Dom', 'Torillo', '202310002', '1', 'Male', '2', 2023, 'james.dom@university.edu', '+639123456789', 'https://facebook.com/james.dom', 'https://linkedin.com/in/james-dom', 'https://instagram.com/james.dom', '2025-08-30 08:18:53', 1),
+(3, 3, 'prof.png', 'John', 'Cruz', 'Doe', '202310003', '1', 'Male', '2', 2023, 'john.doe@university.edu', '+639123456783', '', '', '', '2025-09-28 11:58:33', 1),
+(4, 4, 'prof.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 2023, 'michael.lee@school.edu', '09171234567', 'facebook.com/michael.lee', 'linkedin.com/in/michaellee', 'instagram.com/michael.lee', '2025-09-28 20:59:48', 1),
+(5, 5, 'prof.png', 'Sophia', 'B.', 'Garcia', '202310004', '1', 'Female', '2', 2023, 'sophia.garcia@school.edu', '09181234567', 'facebook.com/sophia.garcia', 'linkedin.com/in/sophiagarcia', 'instagram.com/sophia.garcia', '2025-09-28 20:59:48', 1),
+(6, 6, 'prof.png', 'Daniel', 'C.', 'Kim', '202310005', '1', 'Male', '2', 2023, 'daniel.kim@school.edu', '09191234567', 'facebook.com/daniel.kim', 'linkedin.com/in/danielkim', 'instagram.com/daniel.kim', '2025-09-28 20:59:48', 1),
+(7, 7, 'prof.png', 'Olivia', 'D.', 'Brown', '202310006', '1', 'Female', '2', 2023, 'olivia.brown@school.edu', '09201234567', 'facebook.com/olivia.brown', 'linkedin.com/in/oliviabrown', 'instagram.com/olivia.brown', '2025-09-28 20:59:48', 0),
+(8, 8, 'prof.png', 'Ethan', 'E.', 'Wilson', '202310007', '1', 'Male', '2', 2023, 'ethan.wilson@school.edu', '09211234567', 'facebook.com/ethan.wilson', 'linkedin.com/in/ethanwilson', 'instagram.com/ethan.wilson', '2025-09-28 20:59:48', 1),
+(9, 9, 'prof.png', 'Isabella', 'F.', 'Martin', '202310008', '1', 'Female', '2', 2023, 'isabella.martin@school.edu', '09221234567', 'facebook.com/isabella.martin', 'linkedin.com/in/isabellamartin', 'instagram.com/isabella.martin', '2025-09-28 20:59:48', 1),
+(10, 10, 'prof.png', 'Liam', 'G.', 'Torres', '202310009', '1', 'Male', '2', 2023, 'liam.torres@school.edu', '09231234567', 'facebook.com/liam.torres', 'linkedin.com/in/liamtorres', 'instagram.com/liam.torres', '2025-09-28 20:59:48', 1),
+(11, 11, 'prof.png', 'Emma', 'H.', 'Davis', '202310010', '1', 'Female', '2', 2023, 'emma.davis@school.edu', '09241234567', 'facebook.com/emma.davis', 'linkedin.com/in/emmadavis', 'instagram.com/emma.davis', '2025-09-28 20:59:48', 1),
+(12, 12, 'prof.png', 'Chloe', 'I.', 'Nguyen', '202310011', '1', 'Female', '2', 2023, 'chloe.nguyen@school.edu', '09251234567', 'facebook.com/chloe.nguyen', 'linkedin.com/in/chloenguyen', 'instagram.com/chloe.nguyen', '2025-09-28 21:34:51', 1);
 
 -- --------------------------------------------------------
 
@@ -522,27 +611,28 @@ CREATE TABLE `users` (
   `userID` int(11) NOT NULL,
   `password` varchar(50) NOT NULL,
   `email` varchar(50) NOT NULL,
-  `role` varchar(8) NOT NULL DEFAULT 'user',
-  `userName` varchar(50) NOT NULL
+  `role` varchar(12) NOT NULL DEFAULT 'user',
+  `userName` varchar(50) NOT NULL,
+  `verificationCode` int(6) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`) VALUES
-(1, 'Password123', 'john.doe@gmail.com', 'admin', 'johndoe'),
-(2, 'Hello@world', 'jane.smith@example.com', 'student', 'janesmith'),
-(3, 'HelloWorld', 'john.doe2@gmail.com', 'user', 'JohnDoe'),
-(4, 'password123', 'michael.lee@example.com', 'student', 'michael_lee'),
-(5, 'securePass!1', 'sophia.garcia@example.com', 'student', 'sophia_garcia'),
-(6, 'helloWorld9', 'daniel.kim@example.com', 'student', 'daniel_kim'),
-(7, 'qwerty2025', 'olivia.brown@example.com', 'student', 'olivia_brown'),
-(8, 'pass4321', 'ethan.wilson@example.com', 'student', 'ethan_wilson'),
-(9, 'abcXYZ987', 'isabella.martin@example.com', 'student', 'isabella_martin'),
-(10, 'myPass!77', 'liam.torres@example.com', 'student', 'liam_torres'),
-(11, 'safeKey555', 'emma.davis@example.com', 'student', 'emma_davis'),
-(12, 'newPass!11', 'chloe.nguyen@example.com', 'student', 'chloe_nguyen');
+INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`, `verificationCode`) VALUES
+(1, 'Password123', 'john.doe@gmail.com', 'admin', 'johndoe', 0),
+(2, 'Hello@world', 'jane.smith@Testple.com', 'student', 'janesmith', 0),
+(3, 'HelloWorld', 'john.doe2@gmail.com', 'user', 'JohnDoe', 0),
+(4, 'password123', 'michael.lee@Testple.com', 'student', 'michael_lee', 0),
+(5, 'securePass!1', 'sophia.garcia@Testple.com', 'student', 'sophia_garcia', 0),
+(6, 'helloWorld9', 'daniel.kim@Testple.com', 'student', 'daniel_kim', 0),
+(7, 'qwerty2025', 'olivia.brown@Testple.com', 'student', 'olivia_brown', 0),
+(8, 'pass4321', 'ethan.wilson@Testple.com', 'student', 'ethan_wilson', 0),
+(9, 'abcXYZ987', 'isabella.martin@Testple.com', 'student', 'isabella_martin', 0),
+(10, 'myPass!77', 'liam.torres@Testple.com', 'student', 'liam_torres', 0),
+(11, 'safeKey555', 'emma.davis@Testple.com', 'student', 'emma_davis', 0),
+(12, 'newPass!11', 'chloe.nguyen@Testple.com', 'student', 'chloe_nguyen', 0);
 
 --
 -- Indexes for dumped tables
@@ -640,6 +730,12 @@ ALTER TABLE `report`
 --
 ALTER TABLE `scores`
   ADD PRIMARY KEY (`scoreID`);
+
+--
+-- Indexes for table `submissions`
+--
+ALTER TABLE `submissions`
+  ADD PRIMARY KEY (`submissionID`);
 
 --
 -- Indexes for table `testquestionchoices`
@@ -778,28 +874,34 @@ ALTER TABLE `scores`
   MODIFY `scoreID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `submissions`
+--
+ALTER TABLE `submissions`
+  MODIFY `submissionID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `testquestionchoices`
 --
 ALTER TABLE `testquestionchoices`
-  MODIFY `choiceID` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `choiceID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `testquestions`
 --
 ALTER TABLE `testquestions`
-  MODIFY `testQuestionID` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `testQuestionID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `testresponses`
 --
 ALTER TABLE `testresponses`
-  MODIFY `testResponseID` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `testResponseID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tests`
 --
 ALTER TABLE `tests`
-  MODIFY `testID` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `testID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `todo`
