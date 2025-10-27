@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 27, 2025 at 09:40 AM
+-- Generation Time: Oct 27, 2025 at 09:50 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -214,7 +214,7 @@ CREATE TABLE `files` (
 --
 
 INSERT INTO `files` (`fileID`, `courseID`, `userID`, `announcementID`, `lessonID`, `assignmentID`, `fileAttachment`, `fileTitle`, `fileLink`, `uploadedAt`) VALUES
-(1, 1, 1, 1, 1, NULL, 'Web Development Course Material', '', 'https://Testple.com/lesson1,https://Testple.com/lesson1.1', '2025-08-30 10:30:00');
+(1, 1, 1, 1, 1, NULL, 'Web Development Course Material', '', 'https://gmail.com/lesson1,https://gmail.com/lesson1.1', '2025-08-30 10:30:00');
 
 -- --------------------------------------------------------
 
@@ -611,7 +611,7 @@ CREATE TABLE `users` (
   `userID` int(11) NOT NULL,
   `password` varchar(50) NOT NULL,
   `email` varchar(50) NOT NULL,
-  `role` varchar(12) NOT NULL DEFAULT 'user',
+  `role` varchar(12) NOT NULL DEFAULT 'student',
   `userName` varchar(50) NOT NULL,
   `verificationCode` int(6) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -622,17 +622,17 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`, `verificationCode`) VALUES
 (1, 'Password123', 'john.doe@gmail.com', 'admin', 'johndoe', 0),
-(2, 'Hello@world', 'jane.smith@Testple.com', 'student', 'janesmith', 0),
+(2, 'Hello@world', 'jane.smith@gmail.com', 'student', 'janesmith', 0),
 (3, 'HelloWorld', 'john.doe2@gmail.com', 'user', 'JohnDoe', 0),
-(4, 'password123', 'michael.lee@Testple.com', 'student', 'michael_lee', 0),
-(5, 'securePass!1', 'sophia.garcia@Testple.com', 'student', 'sophia_garcia', 0),
-(6, 'helloWorld9', 'daniel.kim@Testple.com', 'student', 'daniel_kim', 0),
-(7, 'qwerty2025', 'olivia.brown@Testple.com', 'student', 'olivia_brown', 0),
-(8, 'pass4321', 'ethan.wilson@Testple.com', 'student', 'ethan_wilson', 0),
-(9, 'abcXYZ987', 'isabella.martin@Testple.com', 'student', 'isabella_martin', 0),
-(10, 'myPass!77', 'liam.torres@Testple.com', 'student', 'liam_torres', 0),
-(11, 'safeKey555', 'emma.davis@Testple.com', 'student', 'emma_davis', 0),
-(12, 'newPass!11', 'chloe.nguyen@Testple.com', 'student', 'chloe_nguyen', 0);
+(4, 'password123', 'michael.lee@gmail.com', 'student', 'michael_lee', 0),
+(5, 'securePass!1', 'sophia.garcia@gmail.com', 'student', 'sophia_garcia', 0),
+(6, 'helloWorld9', 'daniel.kim@gmail.com', 'student', 'daniel_kim', 0),
+(7, 'qwerty2025', 'olivia.brown@gmail.com', 'student', 'olivia_brown', 0),
+(8, 'pass4321', 'ethan.wilson@gmail.com', 'student', 'ethan_wilson', 0),
+(9, 'abcXYZ987', 'isabella.martin@gmail.com', 'student', 'isabella_martin', 0),
+(10, 'myPass!77', 'liam.torres@gmail.com', 'student', 'liam_torres', 0),
+(11, 'safeKey555', 'emma.davis@gmail.com', 'student', 'emma_davis', 0),
+(12, 'newPass!11', 'chloe.nguyen@gmail.com', 'student', 'chloe_nguyen', 0);
 
 --
 -- Indexes for dumped tables
