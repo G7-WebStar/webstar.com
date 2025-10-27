@@ -147,8 +147,10 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
                                             </div>
                                         </div>
 
-
-                                        <div class="col-12 col-md-8 h4 text-reg mx-auto mt-4 px-3 px-md-0 text-center text-md-start fs-sm-6" id="choices">
+                                        <div class="row my-0 mx-auto justify-content-center align-content-center" id="img-container">
+                                            <img src="" id="img-question">
+                                        </div>
+                                        <div class="col-12 col-md-8 h5 text-reg mx-auto my-0 px-3 px-md-0 text-center text-md-start fs-sm-6 d-flex justify-content-center flex-column" id="choices">
 
                                         </div>
 
@@ -212,6 +214,8 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
             ?> {
                         question: "<?php echo $questions['testQuestion']; ?>",
                         questionID: "<?php echo $questions['testQuestionID']; ?>",
+                        img: "<?php echo $questions['testQuestionImage']; ?>",
+                        type: "<?php echo $questions['questionType']; ?>",
                         answers: [
                             <?php
                             if (mysqli_num_rows($selectChoicesResult) > 0) {
@@ -245,6 +249,7 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
 
         const questionContainer = document.getElementById('question-container');
         const choices = document.getElementById('choices');
+        const imgContainer = document.getElementById('img-container');
         const questionNumber = document.getElementById('question-number');
 
         let currentQuestionIndex = 0;
@@ -269,30 +274,48 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
             choiceIDs = [];
             questionContainer.innerHTML = currentQuestion.
             question;
-            questionNumber.innerHTML = "Section Name · Question " + questionNo + " of " + totalQuestion
+            questionNumber.innerHTML = "Section Name · Question " + questionNo + " of " + totalQuestion;
 
-            currentQuestion.answers.forEach(answer => {
-                const button = document.createElement('div');
-                button.innerHTML = answer.text;
-                button.classList.add('col-12', 'bg-white', 'border', 'border-black', 'rounded-3', 'my-3', 'p-2', 'text-sbold', 'text-center', 'interactable');
-                button.id = "question" + questionNo + "-choice" + choiceNo;
-                choiceIDs.push(button.id);
-                choiceNo++;
-                button.addEventListener("click", answerQuestion);
-                choices.appendChild(button);
-            });
-
-            //Restores indicators that that question has been answered
-            const savedIndex = selectedAnswers[currentQuestionIndex];
-            if (savedIndex !== null) {
-                const savedChoice = document.getElementById(choiceIDs[savedIndex]);
-                savedChoice.classList.add('choice-selected');
-                savedChoice.classList.remove('bg-white');
+            if (questions[currentQuestionIndex].img == "") {
+                choices.classList.add('mt-4');
+                console.log('mt-3 enabled');
             }
+
+            if (questions[currentQuestionIndex].type == "Multiple Choice") {
+                currentQuestion.answers.forEach(answer => {
+                    const button = document.createElement('div');
+                    button.innerHTML = answer.text;
+                    button.classList.add('col-12', 'bg-white', 'border', 'border-black', 'rounded-3', 'my-2', 'p-2', 'text-sbold', 'text-center', 'interactable');
+                    button.id = "question" + questionNo + "-choice" + choiceNo;
+                    choiceIDs.push(button.id);
+                    choiceNo++;
+                    button.addEventListener("click", answerQuestion);
+                    choices.appendChild(button);
+                });
+
+                //Restores indicators that that question has been answered
+                const savedIndex = selectedAnswers[currentQuestionIndex];
+                if (savedIndex !== null) {
+                    const savedChoice = document.getElementById(choiceIDs[savedIndex]);
+                    savedChoice.classList.add('choice-selected');
+                    savedChoice.classList.remove('bg-white');
+                }
+            } else {
+                choices.innerHTML = `<input type=:"text" placeholder="Answer" class="rounded-3 p-3 text-center border border-black">`;
+            }
+
+            const img = document.getElementById('img-question');
+            imgContainer.style.maxWidth = "30%";
+            img.src = questions[currentQuestionIndex].img;
+            img.style.maxWidth = "auto";
+            img.style.height = "auto";
+            img.style.objectFit = "cover";
+            imgContainer.appendChild(img);
+            img.classList.add('rounded-5', 'my-2');
         }
 
         function nextQuestion() {
-            (currentQuestionIndex + 1 < 10) ? currentQuestionIndex++ : null;
+            (currentQuestionIndex + 1 < questions.length) ? currentQuestionIndex++ : null;
             if ((currentQuestionIndex + 1) <= questions.length) {
                 choices.innerHTML = '';
                 showQuestion();
@@ -368,7 +391,7 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
                         console.error('Error:', error);
                     });
 
-                    window.location.href = 'index.php';
+                window.location.href = 'index.php';
             } else {
                 console.log("Please answer all items");
             }
