@@ -10,12 +10,40 @@ if (!$username && isset($_SESSION['userID'])) {
     $userID = $_SESSION['userID'];
     $query = "
         SELECT 
+            users.userID,
             users.userName,
             userinfo.firstName,
-            userinfo.lastName
+            userinfo.lastName,
+            userinfo.profilePicture,
+            userinfo.schoolEmail,
+            userinfo.facebookLink,
+            userinfo.linkedInLink,
+            userinfo.githubLink,
+            profile.bio,
+            profile.webstars,
+            (
+                SELECT COUNT(*) 
+                FROM enrollments AS e
+                WHERE e.userID = users.userID
+            ) AS totalEnrollments,
+            (
+                SELECT COUNT(*)
+                FROM studentBadges AS sb
+                WHERE sb.userID = users.userID
+            ) AS totalBadges
         FROM users
         JOIN userinfo ON users.userID = userinfo.userID
+        LEFT JOIN profile ON users.userID = profile.userID
+        LEFT JOIN studentBadges AS sb ON users.userID = sb.userID
+        LEFT JOIN badges AS b ON sb.badgeID = b.badgeID
         WHERE users.userID = '$userID'
+    ";
+    $badgeQuery = "
+        SELECT b.badgeName, b.badgeIcon, COUNT(sb.badgeID) AS timesEarned
+        FROM studentBadges AS sb
+        JOIN badges AS b ON sb.badgeID = b.badgeID
+        WHERE sb.userID = '$userID'
+        GROUP BY sb.badgeID
     ";
 } elseif ($username) {
     // Otherwise, get user by username
@@ -23,27 +51,61 @@ if (!$username && isset($_SESSION['userID'])) {
     $query = "
         SELECT 
             users.userID,
-            users.username,
+            users.userName,
             userinfo.firstName,
-            userinfo.lastName
+            userinfo.lastName,
+            userinfo.profilePicture,
+            userinfo.schoolEmail,
+            userinfo.facebookLink,
+            userinfo.linkedInLink,
+            userinfo.githubLink,
+            profile.bio,
+            profile.webstars,
+            (
+                SELECT COUNT(*) 
+                FROM enrollments AS e
+                WHERE e.userID = users.userID
+            ) AS totalEnrollments,
+            (
+                SELECT COUNT(*)
+                FROM studentBadges AS sb
+                WHERE sb.userID = users.userID
+            ) AS totalBadges
         FROM users
         JOIN userinfo ON users.userID = userinfo.userID
-        WHERE users.username = '$escaped'
+        LEFT JOIN profile ON users.userID = profile.userID
+        LEFT JOIN studentBadges AS sb ON users.userID = sb.userID
+        LEFT JOIN badges AS b ON sb.badgeID = b.badgeID
+        WHERE users.userName = '$escaped'
     ";
+    $badgeQuery = "
+    SELECT b.badgeName, b.badgeIcon, COUNT(sb.badgeID) AS timesEarned
+    FROM studentBadges AS sb
+    JOIN badges AS b ON sb.badgeID = b.badgeID
+    JOIN users AS u ON sb.userID = u.userID
+    WHERE u.userName = '$escaped'
+    GROUP BY sb.badgeID
+";
+
 } else {
     // No username and no session → redirect to login
     header("Location: login.php");
     exit;
 }
 
+
 $result = mysqli_query($conn, $query);
 $user = mysqli_fetch_assoc($result);
 
 if (!$user) {
-    // Handle invalid username
-    echo "<div style='padding: 40px; text-align: center; color: #999;'>User not found.</div>";
+    // Redirect to 404 page if user is not found
+    header("Location: 404.php");
     exit;
 }
+
+
+
+
 ?>
 
 
@@ -53,7 +115,7 @@ if (!$user) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@jamesdoe's Webstar Profile</title>
+    <title>@<?= htmlspecialchars($user['userName']) ?>'s Webstar Profile</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
@@ -117,7 +179,7 @@ if (!$user) {
                             <div class="d-flex align-items-center text-decoration-none sticky-header py-4"
                                 id="stickyHeader" style="padding: 14px 18px;">
                                 <div class="rounded-circle me-3 flex-shrink-0 ms-3" style="width: 40px; height: 40px; background-color: #5ba9ff;
-                                background: url('shared/assets/pfp-uploads/pfp.jpg') no-repeat center center;
+                                background: url('shared/assets/pfp-uploads/<?= htmlspecialchars($user['profilePicture']) ?>') no-repeat center center;
                                 background-size: cover;">
                                 </div>
                                 <div class="d-flex flex-column justify-content-center">
@@ -142,7 +204,9 @@ if (!$user) {
 
                                                 <!-- Profile Block -->
                                                 <div class="profile-block px-4">
-                                                    <div class="profile-pic"></div>
+                                                    <div class="profile-pic"
+                                                        style="background: url('shared/assets/pfp-uploads/<?= htmlspecialchars($user['profilePicture']) ?>') center/cover no-repeat white;">
+                                                    </div>
                                                     <div class="profile-text mt-3">
                                                         <!-- Name and Username -->
                                                         <div class="div">
@@ -150,15 +214,13 @@ if (!$user) {
                                                                 <?= htmlspecialchars($user['firstName'] . ' ' . $user['lastName']) ?>
                                                             </div>
                                                             <div class="user-username text-med text-muted">
-                                                                @<?= htmlspecialchars($user['username']) ?>
+                                                                @<?= htmlspecialchars($user['userName']) ?>
                                                             </div>
 
                                                             <!-- Bio -->
                                                             <div class="bio mt-4">
-                                                                <div class="text-med text-14">Hi! I’m a web development
-                                                                    student passionate about building clean, functional,
-                                                                    and user-friendly websites. Always learning, always
-                                                                    building! ⭐
+                                                                <div class="text-med text-14">
+                                                                    <?= htmlspecialchars($user['bio']) ?>
                                                                 </div>
                                                             </div>
                                                             <!-- Stats -->
@@ -166,19 +228,25 @@ if (!$user) {
                                                                 <div
                                                                     class="d-flex justify-content-between align-items-center text-center">
                                                                     <div class="flex-fill text-center mx-1">
-                                                                        <span class="text-16 text-bold">340</span>
+                                                                        <span class="text-16 text-bold">
+                                                                            <?= htmlspecialchars($user['totalBadges']) ?>
+                                                                        </span>
                                                                         <small
                                                                             class="text-med text-muted">badges</small>
                                                                     </div>
 
                                                                     <div class="flex-fill text-center mx-1">
-                                                                        <span class="text-bold">340</span>
+                                                                        <span class="text-bold">
+                                                                            <?= htmlspecialchars($user['totalEnrollments']) ?>
+                                                                        </span>
                                                                         <small class="text-med text-muted">
                                                                             courses</small>
                                                                     </div>
 
                                                                     <div class="flex-fill text-center mx-1">
-                                                                        <span class="text-bold">340</span>
+                                                                        <span class="text-bold">
+                                                                            <?= htmlspecialchars($user['webstars']) ?>
+                                                                        </span>
                                                                         <small
                                                                             class="text-med text-muted">webstars</small>
                                                                     </div>
@@ -187,22 +255,59 @@ if (!$user) {
                                                             <!-- Send an Email -->
                                                             <div
                                                                 class="d-flex justify-content-center align-items-center mt-4">
-                                                                <div class="btn d-flex align-items-center justify-content-center gap-2 rounded-3 text-sbold text-14 m-0"
+                                                                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=<?= htmlspecialchars($user['schoolEmail']) ?>"
+                                                                    target="_blank" rel="noopener noreferrer"
+                                                                    class="btn d-flex align-items-center justify-content-center gap-2 rounded-3 text-sbold text-14 m-0"
                                                                     style="background-color: var(--primaryColor); border: 1px solid var(--black); width: 100%;">
+
                                                                     <span class="material-symbols-rounded">mail</span>
                                                                     <span>Email</span>
-                                                                </div>
+
+                                                                </a>
                                                             </div>
                                                             <!-- Socials -->
                                                             <div class="d-flex justify-content-center align-items-center gap-4 mt-3 text-20 mb-3"
                                                                 style="color: var(--black);">
-                                                                <a href="#" style="color: inherit;"><i
-                                                                        class="fab fa-facebook"></i></a>
-                                                                <a href="#" style="color: inherit;"><i
-                                                                        class="fab fa-github"></i></a>
-                                                                <a href="#" style="color: inherit;"><i
-                                                                        class="fab fa-linkedin"></i></a>
+                                                                <?php if (!empty($user['facebookLink'])):
+                                                                    $facebook = $user['facebookLink'];
+                                                                    if (!str_starts_with($facebook, 'http://') && !str_starts_with($facebook, 'https://')) {
+                                                                        $facebook = 'https://' . $facebook;
+                                                                    }
+                                                                    ?>
+                                                                    <a href="<?= htmlspecialchars($facebook) ?>"
+                                                                        target="_blank" rel="noopener noreferrer"
+                                                                        style="color: inherit;">
+                                                                        <i class="fab fa-facebook"></i>
+                                                                    </a>
+                                                                <?php endif; ?>
+
+                                                                <?php if (!empty($user['githubLink'])):
+                                                                    $github = $user['githubLink'];
+                                                                    if (!str_starts_with($github, 'http://') && !str_starts_with($github, 'https://')) {
+                                                                        $github = 'https://' . $github;
+                                                                    }
+                                                                    ?>
+                                                                    <a href="<?= htmlspecialchars($github) ?>"
+                                                                        target="_blank" rel="noopener noreferrer"
+                                                                        style="color: inherit;">
+                                                                        <i class="fab fa-github"></i>
+                                                                    </a>
+                                                                <?php endif; ?>
+
+                                                                <?php if (!empty($user['linkedInLink'])):
+                                                                    $linkedin = $user['linkedInLink'];
+                                                                    if (!str_starts_with($linkedin, 'http://') && !str_starts_with($linkedin, 'https://')) {
+                                                                        $linkedin = 'https://' . $linkedin;
+                                                                    }
+                                                                    ?>
+                                                                    <a href="<?= htmlspecialchars($linkedin) ?>"
+                                                                        target="_blank" rel="noopener noreferrer"
+                                                                        style="color: inherit;">
+                                                                        <i class="fab fa-linkedin"></i>
+                                                                    </a>
+                                                                <?php endif; ?>
                                                             </div>
+
 
                                                         </div>
                                                     </div>
@@ -254,81 +359,51 @@ if (!$user) {
                                                     <span class="text-sbold">My Badges</span>
                                                 </div>
                                                 <div class="text-bold text-med">
-                                                    3
+                                                    <?= htmlspecialchars($user['totalBadges']) ?>
                                                 </div>
                                             </div>
                                             <!-- My Badges Content -->
                                             <div class="w-100 d-flex justify-content-center">
-                                                <div class="w-100 m-0 p-0 mb-1 "
-                                                    style="max-height:1500px; overflow-y: auto;  margin-right: -10px;">
+                                                <div class="w-100 m-0 p-0 mb-1"
+                                                    style="max-height:1500px; overflow-y: auto; margin-right: -10px;">
                                                     <!-- Badges Card -->
-                                                    <div class="w-100 badge-option rounded-3 d-flex align-items-center p-1 mt-2"
-                                                        style="cursor: pointer; border: 1px solid var(--black);">
-                                                        <img src="shared/assets/img/badge/Badge.png" alt="Badge"
-                                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
-                                                        <div>
-                                                            <div style="line-height: 1.1;">
-                                                                <div class="text-sbold text-14">Ahead of the Curve</div>
-                                                                <div class="text-med text-12">
-                                                                    Received <strong>3</strong> times
+                                                    <?php
+                                                    $badgeResult = mysqli_query($conn, $badgeQuery);
+
+                                                    // Check if there are any badges
+                                                    if (mysqli_num_rows($badgeResult) > 0) {
+                                                        while ($row = mysqli_fetch_assoc($badgeResult)) {
+                                                            ?>
+                                                            <div class="w-100 badge-option rounded-3 d-flex align-items-center p-2 mt-2"
+                                                                style="cursor: pointer; border: 1px solid var(--black);">
+                                                                <img src="shared/assets/img/badge/<?php echo $row['badgeIcon']; ?>"
+                                                                    alt="Badge" style="width: 55px; height: 55px;"
+                                                                    class="mx-1 ms-1 me-2">
+                                                                <div>
+                                                                    <div style="line-height: 1.1;">
+                                                                        <div class="text-sbold text-14">
+                                                                            <?php echo $row['badgeName']; ?>
+                                                                        </div>
+                                                                        <div class="text-med text-12">
+                                                                            Received
+                                                                            <strong><?php echo $row['timesEarned']; ?></strong>
+                                                                            <?php echo $row['timesEarned'] > 1 ? 'times' : 'time'; ?>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="w-100 badge-option rounded-3 d-flex align-items-center p-1 mt-2"
-                                                        style="cursor: pointer; border: 1px solid var(--black);">
-                                                        <img src="shared/assets/img/badge/Badge.png" alt="Badge"
-                                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
-                                                        <div>
-                                                            <div style="line-height: 1.1;">
-                                                                <div class="text-sbold text-14">Ahead of the Curve</div>
-                                                                <div class="text-med text-12">
-                                                                    Received <strong>3</strong> times
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="w-100 badge-option rounded-3 d-flex align-items-center p-1 mt-2"
-                                                        style="cursor: pointer; border: 1px solid var(--black);">
-                                                        <img src="shared/assets/img/badge/Badge.png" alt="Badge"
-                                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
-                                                        <div>
-                                                            <div style="line-height: 1.1;">
-                                                                <div class="text-sbold text-14">Ahead of the Curve</div>
-                                                                <div class="text-med text-12">
-                                                                    Received <strong>3</strong> times
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="w-100 badge-option rounded-3 d-flex align-items-center p-1 mt-2"
-                                                        style="cursor: pointer; border: 1px solid var(--black);">
-                                                        <img src="shared/assets/img/badge/Badge.png" alt="Badge"
-                                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
-                                                        <div>
-                                                            <div style="line-height: 1.1;">
-                                                                <div class="text-sbold text-14">Ahead of the Curve</div>
-                                                                <div class="text-med text-12">
-                                                                    Received <strong>3</strong> times
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="w-100 badge-option rounded-3 d-flex align-items-center p-1 mt-2"
-                                                        style="cursor: pointer; border: 1px solid var(--black);">
-                                                        <img src="shared/assets/img/badge/Badge.png" alt="Badge"
-                                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
-                                                        <div>
-                                                            <div style="line-height: 1.1;">
-                                                                <div class="text-sbold text-14">Ahead of the Curve</div>
-                                                                <div class="text-med text-12">
-                                                                    Received <strong>3</strong> times
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                            <?php
+                                                        }
+                                                    } else {
+                                                        // Display this if no badges
+                                                        echo '<div class="text-center text-med text-14 mt-2">This user has no badges yet.</div>';
+                                                    }
+                                                    ?>
                                                 </div>
                                             </div>
+
+
+
 
                                         </div>
                                     </div>

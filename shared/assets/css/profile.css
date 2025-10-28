@@ -47,7 +47,6 @@ body {
     width: 90px;
     height: 90px;
     border-radius: 15px;
-    background: url('../pfp-uploads/pfp.jpg') center/cover no-repeat white;
     border: 2px solid var(--black);
 }
 
