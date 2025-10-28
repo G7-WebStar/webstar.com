@@ -45,6 +45,33 @@ if (!$username && isset($_SESSION['userID'])) {
         WHERE sb.userID = '$userID'
         GROUP BY sb.badgeID
     ";
+
+    $selectLeaderboardQuery = "SELECT 
+    courses.courseID,
+    courses.courseCode,
+    courses.courseTitle,
+    SUM(leaderboard.xpPoints) AS totalPoints
+    FROM leaderboard
+    INNER JOIN enrollments
+        ON leaderboard.enrollmentID = enrollments.enrollmentID
+    INNER JOIN courses
+	    ON enrollments.courseID = courses.courseID
+    WHERE enrollments.userID = '$userID'
+    GROUP BY courses.courseID, courses.courseCode, courses.courseTitle;
+";
+    $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
+
+    $activitiesQuery = "
+    SELECT 
+        a.description,
+        a.createdAt
+    FROM activities AS a
+    WHERE a.userID = '$userID'
+    ORDER BY a.createdAt DESC
+    LIMIT 10
+";
+    $activitiesResult = executeQuery($activitiesQuery);
+
 } elseif ($username) {
     // Otherwise, get user by username
     $escaped = mysqli_real_escape_string($conn, $username);
@@ -87,12 +114,42 @@ if (!$username && isset($_SESSION['userID'])) {
     GROUP BY sb.badgeID
 ";
 
+    $selectLeaderboardQuery = "
+    SELECT 
+        c.courseID,
+        c.courseCode,
+        c.courseTitle,
+        SUM(l.xpPoints) AS totalPoints
+    FROM leaderboard AS l
+    INNER JOIN enrollments AS e
+        ON l.enrollmentID = e.enrollmentID
+    INNER JOIN courses AS c
+        ON e.courseID = c.courseID
+    INNER JOIN users AS u
+        ON e.userID = u.userID
+    WHERE u.userName = '$escaped'
+    GROUP BY c.courseID, c.courseCode, c.courseTitle
+";
+    $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
+
+    $activitiesQuery = "
+    SELECT 
+        a.description,
+        a.createdAt
+    FROM activities AS a
+    INNER JOIN users AS u
+        ON a.userID = u.userID
+    WHERE u.userName = '$escaped'
+    ORDER BY a.createdAt DESC
+    LIMIT 10
+";
+    $activitiesResult = executeQuery($activitiesQuery);
+
 } else {
     // No username and no session → redirect to login
     header("Location: login.php");
     exit;
 }
-
 
 $result = mysqli_query($conn, $query);
 $user = mysqli_fetch_assoc($result);
@@ -103,11 +160,31 @@ if (!$user) {
     exit;
 }
 
+function getRelativeTime($datetime, $fullDateFallback = true)
+{
+    $now = new DateTime("now", new DateTimeZone('Asia/Manila'));
+    $past = new DateTime($datetime, new DateTimeZone('Asia/Manila'));
+    $diff = $now->getTimestamp() - $past->getTimestamp();
 
+    if ($diff < 0) {
+        $diff = 0;
+    }
 
+    if ($diff < 3600) { // less than 1 hour → minutes
+        $minutes = max(1, floor($diff / 60));
+        return $minutes . 'm ago';
+    } elseif ($diff < 86400) { // less than 1 day → hours
+        $hours = floor($diff / 3600);
+        return $hours . 'h ago';
+    } elseif ($diff < 604800) { // less than 1 week → days
+        $days = floor($diff / 86400);
+        return $days . 'd ago';
+    } else { // older → show full date
+        return $fullDateFallback ? date("F j, Y", strtotime($datetime)) : floor($diff / 604800) . 'w ago';
+    }
+}
 
 ?>
-
 
 <!doctype html>
 <html lang="en">
@@ -152,28 +229,10 @@ if (!$user) {
                     style="background-color: transparent;">
 
                     <!-- Navbar for mobile -->
-                    <nav class="navbar navbar-light px-3 d-md-none">
-                        <div class="container-fluid position-relative">
-
-                            <!-- Toggler -->
-                            <button class="navbar-toggler position-absolute start-0 p-1" type="button"
-                                data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">
-                                <span class="navbar-toggler-icon"></span>
-                            </button>
-
-                            <!-- Logo -->
-                            <a class="navbar-brand mx-auto" href="#">
-                                <img src="shared/assets/img/webstar-logo-black.png" alt="Webstar"
-                                    style="height: 40px; padding-left: 30px">
-                            </a>
-
-                        </div>
-                    </nav>
+                    <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
                     <div class="container-fluid py-3 overflow-y-auto" style="position: relative;">
                         <div class="row g-0 w-100">
-
-
 
                             <!-- Sticky Header -->
                             <div class="d-flex align-items-center text-decoration-none sticky-header py-4"
@@ -183,11 +242,14 @@ if (!$user) {
                                 background-size: cover;">
                                 </div>
                                 <div class="d-flex flex-column justify-content-center">
-                                    <span class="text-sbold">Christian James D. Torrillo</span>
-                                    <small class="text-reg">@jamesdoe</small>
+                                    <span class="text-sbold">
+                                        <?= htmlspecialchars($user['firstName'] . ' ' . $user['lastName']) ?>
+                                    </span>
+                                    <small class="text-reg">
+                                        @<?= htmlspecialchars($user['userName']) ?>
+                                    </small>
                                 </div>
                             </div>
-
 
                             <!-- First Column -->
                             <div class="col-12 col-md-4 first-column d-flex flex-column"
@@ -424,124 +486,53 @@ if (!$user) {
                                                     <span class="text-sbold">My Courses</span>
                                                 </div>
                                                 <div class="text-bold text-med">
-                                                    3
+                                                    <?= htmlspecialchars($user['totalEnrollments']) ?>
                                                 </div>
                                             </div>
                                             <!-- Course Card -->
                                             <div class="w-100 m-0 p-0 mb-1 "
                                                 style="max-height:1500px; overflow-y: auto; margin-right: -10px;">
-                                                <div class="card rounded-3 mb-2"
-                                                    style="border: 1px solid var(--black);">
-                                                    <div class="card-body p-4">
-                                                        <!-- Rank Info -->
-                                                        <div style="display: inline-flex; align-items: center;">
-                                                            <span class="rank-number text-bold text-18">11</span>
-                                                            <span
-                                                                class="text-reg text-12 badge rounded-pill ms-2 learderboard-badge"
-                                                                style="display: inline-flex; align-items: center; gap: 4px;">
-                                                                <i class="fa-solid fa-caret-up"></i>
-                                                                2
-                                                            </span>
-                                                        </div>
+                                                <?php
+                                                if (mysqli_num_rows($selectLeaderboardResult) > 0) {
+                                                    while ($leaderboards = mysqli_fetch_assoc($selectLeaderboardResult)) {
+                                                        ?>
+                                                        <div class="card rounded-3 mb-2"
+                                                            style="border: 1px solid var(--black);">
+                                                            <div class="card-body p-4">
+                                                                <!-- Rank Info -->
+                                                                <div style="display: inline-flex; align-items: center;">
+                                                                    <span class="rank-number text-bold text-18">11</span>
+                                                                    <span
+                                                                        class="text-reg text-12 badge rounded-pill ms-2 learderboard-badge"
+                                                                        style="display: inline-flex; align-items: center; gap: 4px;">
+                                                                        <i class="fa-solid fa-caret-up"></i>
+                                                                        2
+                                                                    </span>
+                                                                </div>
 
-                                                        <!-- Course Info -->
-                                                        <div class="info-block">
-                                                            <div class="comp-code text-sbold text-16">
-                                                                COMP-006</div>
-                                                            <div class="subj-code text-reg text-12 mb-0 text-truncate">
-                                                                Web Development</div>
+                                                                <!-- Course Info -->
+                                                                <div class="info-block">
+                                                                    <div class="comp-code text-sbold text-16">
+                                                                        <?php echo $leaderboards['courseCode']; ?>
+                                                                    </div>
+                                                                    <div class="subj-code text-reg text-12 mb-0 text-truncate">
+                                                                        <?php echo $leaderboards['courseTitle']; ?>
+                                                                    </div>
 
-                                                            <div class="xp-container">
-                                                                <div class="xp-block text-reg text-12 mb-0">
-                                                                    3160 XPs · LV 1</div>
+                                                                    <div class="xp-container">
+                                                                        <div class="xp-block text-reg text-12 mb-0">
+                                                                            <?php echo $leaderboards['totalPoints']; ?> · LV 1
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                                <div class="card rounded-3 mb-2"
-                                                    style="border: 1px solid var(--black);">
-                                                    <div class="card-body p-4">
-                                                        <!-- Rank Info -->
-                                                        <div style="display: inline-flex; align-items: center;">
-                                                            <span class="rank-number text-bold text-18">11</span>
-                                                            <span
-                                                                class="text-reg text-12 badge rounded-pill ms-2 learderboard-badge"
-                                                                style="display: inline-flex; align-items: center; gap: 4px;">
-                                                                <i class="fa-solid fa-caret-up"></i>
-                                                                2
-                                                            </span>
-                                                        </div>
+                                                        <?php
+                                                    }
+                                                } else
+                                                    echo '<div class="text-center text-med text-14 mb-2">This user has no badges yet.</div>';
+                                                ?>
 
-                                                        <!-- Course Info -->
-                                                        <div class="info-block">
-                                                            <div class="comp-code text-sbold text-16">
-                                                                COMP-006</div>
-                                                            <div class="subj-code text-reg text-12 mb-0 text-truncate">
-                                                                Web Development</div>
-
-                                                            <div class="xp-container">
-                                                                <div class="xp-block text-reg text-12 mb-0">
-                                                                    3160 XPs · LV 1</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="card rounded-3 mb-2"
-                                                    style="border: 1px solid var(--black);">
-                                                    <div class="card-body p-4">
-                                                        <!-- Rank Info -->
-                                                        <div style="display: inline-flex; align-items: center;">
-                                                            <span class="rank-number text-bold text-18">11</span>
-                                                            <span
-                                                                class="text-reg text-12 badge rounded-pill ms-2 learderboard-badge"
-                                                                style="display: inline-flex; align-items: center; gap: 4px;">
-                                                                <i class="fa-solid fa-caret-up"></i>
-                                                                2
-                                                            </span>
-                                                        </div>
-
-                                                        <!-- Course Info -->
-                                                        <div class="info-block">
-                                                            <div class="comp-code text-sbold text-16">
-                                                                COMP-006</div>
-                                                            <div class="subj-code text-reg text-12 mb-0 text-truncate">
-                                                                Web Development</div>
-
-                                                            <div class="xp-container">
-                                                                <div class="xp-block text-reg text-12 mb-0">
-                                                                    3160 XPs · LV 1</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="card rounded-3 mb-2"
-                                                    style="border: 1px solid var(--black);">
-                                                    <div class="card-body p-4">
-                                                        <!-- Rank Info -->
-                                                        <div style="display: inline-flex; align-items: center;">
-                                                            <span class="rank-number text-bold text-18">11</span>
-                                                            <span
-                                                                class="text-reg text-12 badge rounded-pill ms-2 learderboard-badge"
-                                                                style="display: inline-flex; align-items: center; gap: 4px;">
-                                                                <i class="fa-solid fa-caret-up"></i>
-                                                                2
-                                                            </span>
-                                                        </div>
-
-                                                        <!-- Course Info -->
-                                                        <div class="info-block">
-                                                            <div class="comp-code text-sbold text-16">
-                                                                COMP-006</div>
-                                                            <div class="subj-code text-reg text-12 mb-0 text-truncate">
-                                                                Web Development</div>
-
-                                                            <div class="xp-container">
-                                                                <div class="xp-block text-reg text-12 mb-0">
-                                                                    3160 XPs · LV 1</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -580,7 +571,7 @@ if (!$user) {
                                             <!-- My Star Card Content -->
                                             <div class="w-100 d-flex justify-content-center m-0 p-0 mb-1">
                                                 <div class="mt-3 rounded-4 p-0"
-                                                    style="border: 1px solid var(--black); max-width: 350px;">
+                                                    style="border: 1px solid var(--black); width: 250px;  aspect-ratio: 1 / 1  !important;">
                                                     <div class="px-4 rounded-4 star-card"
                                                         style="background: linear-gradient(to bottom, #FDDF94, #FFFFFF); max-width: 350px; ">
                                                         <div class="text-center text-12 text-sbold my-4">
@@ -593,16 +584,19 @@ if (!$user) {
                                                             class="d-flex justify-content-center text-decoration-none pb-2">
                                                             <div class="rounded-circle flex-shrink-0 me-2 overflow-hidden"
                                                                 style="width: 40px; height: 40px; border: 1px solid var(--black); box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.8);">
-                                                                <img src="shared/assets/pfp-uploads/pfp.jpg"
+                                                                <img src="shared/assets/pfp-uploads/<?= htmlspecialchars($user['profilePicture']) ?>"
                                                                     style="width: 100%; height: 100%; object-fit: cover;"
                                                                     alt="Profile Picture">
                                                             </div>
 
                                                             <div
                                                                 class="d-flex flex-column justify-content-center text-12">
-                                                                <span class="text-sbold">Christian James D.
-                                                                    Torrillo</span>
-                                                                <small class="text-reg">@jamesdoe</small>
+                                                                <span class="text-sbold">
+                                                                    <?= htmlspecialchars($user['firstName'] . ' ' . $user['lastName']) ?>
+                                                                </span>
+                                                                <small class="text-reg">
+                                                                    @<?= htmlspecialchars($user['userName']) ?>
+                                                                </small>
                                                             </div>
                                                         </div>
                                                         <div
@@ -653,55 +647,35 @@ if (!$user) {
                                                 </span>
                                                 <span class="text-sbold">Recent Activity</span>
                                             </div>
-                                            <div class="w-100 m-0 p-0 mb-1 "
-                                                style="max-height:1500px; overflow-y: auto;  margin-right: -10px;">
-                                                <div class="mb-3">
-                                                    <div class="comp-code text-sbold text-14">
-                                                        Christian James submitted
-                                                        “Activity #1” Quest.</div>
-                                                    <div class="subj-code text-reg text-12 mb-0 text-truncate">
-                                                        2 days ago</div>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <div class="comp-code text-sbold text-14">
-                                                        Christian James submitted
-                                                        “Activity #1” Quest.</div>
-                                                    <div class="subj-code text-reg text-12 mb-0 text-truncate">
-                                                        2 days ago</div>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <div class="comp-code text-sbold text-14">
-                                                        Christian James submitted
-                                                        “Activity #1” Quest.</div>
-                                                    <div class="subj-code text-reg text-12 mb-0 text-truncate">
-                                                        2 days ago</div>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <div class="comp-code text-sbold text-14">
-                                                        Christian James submitted
-                                                        “Activity #1” Quest.</div>
-                                                    <div class="subj-code text-reg text-12 mb-0 text-truncate">
-                                                        2 days ago</div>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <div class="comp-code text-sbold text-14">
-                                                        Christian James submitted
-                                                        “Activity #1” Quest.</div>
-                                                    <div class="subj-code text-reg text-12 mb-0 text-truncate">
-                                                        2 days ago</div>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <div class="comp-code text-sbold text-14">
-                                                        Christian James submitted
-                                                        “Activity #1” Quest.</div>
-                                                    <div class="subj-code text-reg text-12 mb-0 text-truncate">
-                                                        2 days ago</div>
-                                                </div>
-                                            </div>
 
+                                            <div class="w-100 m-0 p-0 mb-1"
+                                                style="max-height:1500px; overflow-y: auto; margin-right: -10px;">
+
+                                                <?php
+                                                if (mysqli_num_rows($activitiesResult) > 0) {
+                                                    while ($activity = mysqli_fetch_assoc($activitiesResult)) {
+                                                        ?>
+                                                        <div class="mb-3">
+                                                            <div class="text-sbold text-14">
+                                                                <?= htmlspecialchars($activity['description']) ?>
+                                                            </div>
+                                                            <div class="text-reg text-12 mb-0 text-truncate">
+                                                                <?= getRelativeTime($activity['createdAt'], true) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <?php
+                                                    }
+                                                } else {
+                                                    echo '<div class="text-center text-med text-14 mb-2">No recent activity yet.</div>';
+                                                }
+                                                ?>
+
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+
 
                             </div>
                         </div>

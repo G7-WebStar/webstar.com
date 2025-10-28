@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 28, 2025 at 03:04 PM
+-- Generation Time: Oct 28, 2025 at 04:01 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,28 @@ SET time_zone = "+00:00";
 --
 -- Database: `webstar`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `activities`
+--
+
+CREATE TABLE `activities` (
+  `activityID` int(11) NOT NULL,
+  `userID` int(11) NOT NULL,
+  `description` text NOT NULL,
+  `createdAt` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `activities`
+--
+
+INSERT INTO `activities` (`activityID`, `userID`, `description`, `createdAt`) VALUES
+(1, 2, 'Christian James submitted “Activity #1” Quest.', '2025-10-22 10:37:06'),
+(2, 2, 'Christian James submitted “Activity #1” Quest.', '2025-10-28 22:37:06'),
+(3, 2, 'Christian James submitted “Activity #1” Quest.', '2025-10-28 22:37:06');
 
 -- --------------------------------------------------------
 
@@ -735,6 +757,13 @@ CREATE TABLE `verification` (
 --
 
 --
+-- Indexes for table `activities`
+--
+ALTER TABLE `activities`
+  ADD PRIMARY KEY (`activityID`),
+  ADD KEY `userID` (`userID`);
+
+--
 -- Indexes for table `admin`
 --
 ALTER TABLE `admin`
@@ -908,6 +937,12 @@ ALTER TABLE `verification`
 --
 
 --
+-- AUTO_INCREMENT for table `activities`
+--
+ALTER TABLE `activities`
+  MODIFY `activityID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
@@ -1072,6 +1107,12 @@ ALTER TABLE `verification`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `activities`
+--
+ALTER TABLE `activities`
+  ADD CONSTRAINT `activities_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`);
 
 --
 -- Constraints for table `profile`
