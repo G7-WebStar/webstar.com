@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 27, 2025 at 09:50 AM
+-- Generation Time: Oct 28, 2025 at 04:01 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,28 @@ SET time_zone = "+00:00";
 --
 -- Database: `webstar`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `activities`
+--
+
+CREATE TABLE `activities` (
+  `activityID` int(11) NOT NULL,
+  `userID` int(11) NOT NULL,
+  `description` text NOT NULL,
+  `createdAt` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `activities`
+--
+
+INSERT INTO `activities` (`activityID`, `userID`, `description`, `createdAt`) VALUES
+(1, 2, 'Christian James submitted “Activity #1” Quest.', '2025-10-22 10:37:06'),
+(2, 2, 'Christian James submitted “Activity #1” Quest.', '2025-10-28 22:37:06'),
+(3, 2, 'Christian James submitted “Activity #1” Quest.', '2025-10-28 22:37:06');
 
 -- --------------------------------------------------------
 
@@ -132,6 +154,47 @@ INSERT INTO `assignments` (`assignmentID`, `assessmentID`, `assignmentDescriptio
 (1, 1, 'Attached is a Google Doc that you can edit.\n\nIn Figma, design a “404 Not Found” page.\n\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\n\nTurn in when done.\n\n', 100),
 (2, 4, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100),
 (3, 2, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `badges`
+--
+
+CREATE TABLE `badges` (
+  `badgeID` int(11) NOT NULL,
+  `badgeName` varchar(100) NOT NULL,
+  `badgeDescription` varchar(255) DEFAULT NULL,
+  `badgeIcon` varchar(255) DEFAULT NULL,
+  `badgeCategory` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `badges`
+--
+
+INSERT INTO `badges` (`badgeID`, `badgeName`, `badgeDescription`, `badgeIcon`, `badgeCategory`) VALUES
+(1, 'Perfect Scorer', 'Awarded to learners who achieved a flawless, 100% score on any test or task — true mastery!', 'perfect_scorer.png', 'Achievement'),
+(2, 'Top Scorer', 'Granted to the learner who outperformed everyone with the highest score in a test or activity.', 'top_scorer.png', 'Achievement'),
+(3, 'Early Finisher', 'Given to those who beat the clock by submitting their task or test at least one day ahead of the deadline.', 'early_finisher.png', 'Achievement'),
+(4, 'First Finisher', 'Presented to the fastest learner who submitted their task or test before anyone else.', 'first_finisher.png', 'Achievement'),
+(5, 'High Achiever', 'Earned by learners who consistently score 90% or higher on any test or task — excellence at its best!', 'high_achiever.png', 'Achievement'),
+(6, 'Quick Thinker', 'Awarded to learners who completed a quiz or exam with impressive speed and accuracy.', 'quick_thinker.png', 'Achievement'),
+(7, 'Leaderboard Legend', 'Crowned to the ultimate top performer who reigned #1 on the leaderboard for the week or course.', 'leaderboard_legend.png', 'Leaderboard'),
+(8, 'Top 3 Titan', 'Bestowed upon learners who claimed a spot in the Top 3 leaderboard — the elite ranks!', 'top_3_titan.png', 'Leaderboard'),
+(9, 'Top 10 Challenger', 'Given to determined learners who earned a place in the Top 10 leaderboard.', 'top_10_challenger.png', 'Leaderboard'),
+(10, 'Elite Performer', 'Celebrating learners who maintained a Top 3 ranking across multiple modules or courses — unstoppable!', 'elite_performer.png', 'Leaderboard'),
+(11, 'Star Performer', 'Awarded to learners who delivered an exceptional performance in a task, activity, or project — a true standout!', 'star_performer.png', 'Recognition'),
+(12, 'Most Improved', 'Given to learners who have shown remarkable growth and steady progress throughout their learning journey.', 'most_improved.png', 'Recognition'),
+(13, 'Exemplary Effort', 'Recognizes learners who consistently demonstrate hard work, perseverance, and dedication — effort that truly shines!', 'exemplary_effort.png', 'Recognition'),
+(14, 'Creative Thinker', 'Granted to learners who showcase originality and creativity in solving problems or completing their work.', 'creative_thinker.png', 'Recognition'),
+(15, 'Insightful Thinker', 'For learners whose answers, reflections, or analyses show impressive depth and understanding.', 'insightful_thinker.png', 'Recognition'),
+(16, 'Well-Documented Work', 'Awarded for submissions that are exceptionally clear, organized, and well-presented — a mark of professionalism!', 'well_documented_work.png', 'Recognition'),
+(17, 'Pixel Perfectionist', 'Awarded to learners who craft layouts with flawless alignment, clean visuals, and pixel-perfect precision.', 'pixel_perfectionist.png', 'Development'),
+(18, 'Function Wizard', 'Bestowed upon learners who write efficient, elegant, and well-structured JavaScript or PHP functions — pure coding magic!', 'function_wizard.png', 'Development'),
+(19, 'Component Crafter', 'Given to learners who build reusable, modular, and well-organized components that make development shine.', 'component_crafter.png', 'Development'),
+(20, 'CSS Sorcerer', 'Recognizes mastery in CSS — for creating stunning, responsive, and creative designs that captivate users.', 'css_sorcerer.png', 'Development'),
+(21, 'UI Enchanter', 'Celebrates learners who bring interfaces to life with smooth interactions, seamless animations, and user-friendly flow.', 'ui_enchanter.png', 'Development');
 
 -- --------------------------------------------------------
 
@@ -321,6 +384,26 @@ INSERT INTO `points` (`pointsID`, `userID`, `sourceType`, `pointsEarned`, `dateE
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `profile`
+--
+
+CREATE TABLE `profile` (
+  `profileID` int(11) NOT NULL,
+  `userID` int(11) NOT NULL,
+  `bio` varchar(255) NOT NULL DEFAULT 'Welcome to my Webstar profile!',
+  `webstars` int(11) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `profile`
+--
+
+INSERT INTO `profile` (`profileID`, `userID`, `bio`, `webstars`) VALUES
+(1, 2, 'Welcome to my Webstar profile!', 0);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `program`
 --
 
@@ -380,6 +463,30 @@ CREATE TABLE `scores` (
 
 INSERT INTO `scores` (`scoreID`, `userID`, `assignmentID`, `testID`, `score`) VALUES
 (1, 2, 1, NULL, 100);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `studentbadges`
+--
+
+CREATE TABLE `studentbadges` (
+  `studentBadgeID` int(11) NOT NULL,
+  `userID` int(11) NOT NULL,
+  `badgeID` int(11) NOT NULL,
+  `courseID` int(11) NOT NULL,
+  `earnedAt` datetime DEFAULT current_timestamp(),
+  `awardedBy` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `studentbadges`
+--
+
+INSERT INTO `studentbadges` (`studentBadgeID`, `userID`, `badgeID`, `courseID`, `earnedAt`, `awardedBy`) VALUES
+(1, 2, 1, 1, '2025-10-28 20:16:06', NULL),
+(2, 2, 2, 1, '2025-10-28 20:16:06', NULL),
+(3, 2, 2, 1, '2025-10-28 20:16:06', NULL);
 
 -- --------------------------------------------------------
 
@@ -576,9 +683,9 @@ CREATE TABLE `userinfo` (
   `yearSection` int(11) NOT NULL,
   `schoolEmail` varchar(50) NOT NULL,
   `contactNumber` varchar(20) NOT NULL,
-  `facebookLink` text NOT NULL,
-  `linkedInLink` text NOT NULL,
-  `instagramLink` text NOT NULL,
+  `facebookLink` text DEFAULT NULL,
+  `linkedInLink` text DEFAULT NULL,
+  `githubLink` text DEFAULT NULL,
   `createdAt` datetime NOT NULL,
   `isNewUser` int(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -587,11 +694,11 @@ CREATE TABLE `userinfo` (
 -- Dumping data for table `userinfo`
 --
 
-INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `middleName`, `lastName`, `studentID`, `programID`, `gender`, `yearLevel`, `yearSection`, `schoolEmail`, `contactNumber`, `facebookLink`, `linkedInLink`, `instagramLink`, `createdAt`, `isNewUser`) VALUES
-(1, 2, 'prof.png', 'Jane', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 2023, 'jane.smith@university.edu', '+639123456789', 'https://facebook.com/jane.smith', 'https://linkedin.com/in/jane-smith', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
+INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `middleName`, `lastName`, `studentID`, `programID`, `gender`, `yearLevel`, `yearSection`, `schoolEmail`, `contactNumber`, `facebookLink`, `linkedInLink`, `githubLink`, `createdAt`, `isNewUser`) VALUES
+(1, 2, 'prof.png', 'Jane', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 2023, 'jane.smith@university.edu', '+639123456789', NULL, NULL, 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
 (2, 1, 'prof.png', 'Chistian James', 'Dom', 'Torillo', '202310002', '1', 'Male', '2', 2023, 'james.dom@university.edu', '+639123456789', 'https://facebook.com/james.dom', 'https://linkedin.com/in/james-dom', 'https://instagram.com/james.dom', '2025-08-30 08:18:53', 1),
 (3, 3, 'prof.png', 'John', 'Cruz', 'Doe', '202310003', '1', 'Male', '2', 2023, 'john.doe@university.edu', '+639123456783', '', '', '', '2025-09-28 11:58:33', 1),
-(4, 4, 'prof.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 2023, 'michael.lee@school.edu', '09171234567', 'facebook.com/michael.lee', 'linkedin.com/in/michaellee', 'instagram.com/michael.lee', '2025-09-28 20:59:48', 1),
+(4, 4, 'prof.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 2023, 'michael.lee@school.edu', '09171234567', NULL, NULL, NULL, '2025-09-28 20:59:48', 0),
 (5, 5, 'prof.png', 'Sophia', 'B.', 'Garcia', '202310004', '1', 'Female', '2', 2023, 'sophia.garcia@school.edu', '09181234567', 'facebook.com/sophia.garcia', 'linkedin.com/in/sophiagarcia', 'instagram.com/sophia.garcia', '2025-09-28 20:59:48', 1),
 (6, 6, 'prof.png', 'Daniel', 'C.', 'Kim', '202310005', '1', 'Male', '2', 2023, 'daniel.kim@school.edu', '09191234567', 'facebook.com/daniel.kim', 'linkedin.com/in/danielkim', 'instagram.com/daniel.kim', '2025-09-28 20:59:48', 1),
 (7, 7, 'prof.png', 'Olivia', 'D.', 'Brown', '202310006', '1', 'Female', '2', 2023, 'olivia.brown@school.edu', '09201234567', 'facebook.com/olivia.brown', 'linkedin.com/in/oliviabrown', 'instagram.com/olivia.brown', '2025-09-28 20:59:48', 0),
@@ -612,31 +719,49 @@ CREATE TABLE `users` (
   `password` varchar(50) NOT NULL,
   `email` varchar(50) NOT NULL,
   `role` varchar(12) NOT NULL DEFAULT 'student',
-  `userName` varchar(50) NOT NULL,
-  `verificationCode` int(6) NOT NULL
+  `userName` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`, `verificationCode`) VALUES
-(1, 'Password123', 'john.doe@gmail.com', 'admin', 'johndoe', 0),
-(2, 'Hello@world', 'jane.smith@gmail.com', 'student', 'janesmith', 0),
-(3, 'HelloWorld', 'john.doe2@gmail.com', 'user', 'JohnDoe', 0),
-(4, 'password123', 'michael.lee@gmail.com', 'student', 'michael_lee', 0),
-(5, 'securePass!1', 'sophia.garcia@gmail.com', 'student', 'sophia_garcia', 0),
-(6, 'helloWorld9', 'daniel.kim@gmail.com', 'student', 'daniel_kim', 0),
-(7, 'qwerty2025', 'olivia.brown@gmail.com', 'student', 'olivia_brown', 0),
-(8, 'pass4321', 'ethan.wilson@gmail.com', 'student', 'ethan_wilson', 0),
-(9, 'abcXYZ987', 'isabella.martin@gmail.com', 'student', 'isabella_martin', 0),
-(10, 'myPass!77', 'liam.torres@gmail.com', 'student', 'liam_torres', 0),
-(11, 'safeKey555', 'emma.davis@gmail.com', 'student', 'emma_davis', 0),
-(12, 'newPass!11', 'chloe.nguyen@gmail.com', 'student', 'chloe_nguyen', 0);
+INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`) VALUES
+(1, 'Password123', 'john.doe@gmail.com', 'admin', 'johndoe'),
+(2, 'Hello@world', 'jane.smith@gmail.com', 'student', 'janesmith'),
+(3, 'HelloWorld', 'john.doe2@gmail.com', 'user', 'JohnDoe'),
+(4, 'password123', 'michael.lee@gmail.com', 'student', 'michael_lee'),
+(5, 'securePass!1', 'sophia.garcia@gmail.com', 'student', 'sophia_garcia'),
+(6, 'helloWorld9', 'daniel.kim@gmail.com', 'student', 'daniel_kim'),
+(7, 'qwerty2025', 'olivia.brown@gmail.com', 'student', 'olivia_brown'),
+(8, 'pass4321', 'ethan.wilson@gmail.com', 'student', 'ethan_wilson'),
+(9, 'abcXYZ987', 'isabella.martin@gmail.com', 'student', 'isabella_martin'),
+(10, 'myPass!77', 'liam.torres@gmail.com', 'student', 'liam_torres'),
+(11, 'safeKey555', 'emma.davis@gmail.com', 'student', 'emma_davis'),
+(12, 'newPass!11', 'chloe.nguyen@gmail.com', 'student', 'chloe_nguyen');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `verification`
+--
+
+CREATE TABLE `verification` (
+  `verificationID` int(11) NOT NULL,
+  `userID` int(11) NOT NULL,
+  `verificationCode` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `activities`
+--
+ALTER TABLE `activities`
+  ADD PRIMARY KEY (`activityID`),
+  ADD KEY `userID` (`userID`);
 
 --
 -- Indexes for table `admin`
@@ -670,6 +795,12 @@ ALTER TABLE `assessments`
 --
 ALTER TABLE `assignments`
   ADD PRIMARY KEY (`assignmentID`);
+
+--
+-- Indexes for table `badges`
+--
+ALTER TABLE `badges`
+  ADD PRIMARY KEY (`badgeID`);
 
 --
 -- Indexes for table `courses`
@@ -714,6 +845,12 @@ ALTER TABLE `points`
   ADD PRIMARY KEY (`pointsID`);
 
 --
+-- Indexes for table `profile`
+--
+ALTER TABLE `profile`
+  ADD PRIMARY KEY (`profileID`);
+
+--
 -- Indexes for table `program`
 --
 ALTER TABLE `program`
@@ -730,6 +867,16 @@ ALTER TABLE `report`
 --
 ALTER TABLE `scores`
   ADD PRIMARY KEY (`scoreID`);
+
+--
+-- Indexes for table `studentbadges`
+--
+ALTER TABLE `studentbadges`
+  ADD PRIMARY KEY (`studentBadgeID`),
+  ADD KEY `userID` (`userID`),
+  ADD KEY `badgeID` (`badgeID`),
+  ADD KEY `courseID` (`courseID`),
+  ADD KEY `awardedBy` (`awardedBy`);
 
 --
 -- Indexes for table `submissions`
@@ -780,8 +927,20 @@ ALTER TABLE `users`
   ADD PRIMARY KEY (`userID`);
 
 --
+-- Indexes for table `verification`
+--
+ALTER TABLE `verification`
+  ADD PRIMARY KEY (`verificationID`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `activities`
+--
+ALTER TABLE `activities`
+  MODIFY `activityID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `admin`
@@ -812,6 +971,12 @@ ALTER TABLE `assessments`
 --
 ALTER TABLE `assignments`
   MODIFY `assignmentID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `badges`
+--
+ALTER TABLE `badges`
+  MODIFY `badgeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `courses`
@@ -856,6 +1021,12 @@ ALTER TABLE `points`
   MODIFY `pointsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `profile`
+--
+ALTER TABLE `profile`
+  MODIFY `profileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `program`
 --
 ALTER TABLE `program`
@@ -872,6 +1043,12 @@ ALTER TABLE `report`
 --
 ALTER TABLE `scores`
   MODIFY `scoreID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `studentbadges`
+--
+ALTER TABLE `studentbadges`
+  MODIFY `studentBadgeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `submissions`
@@ -920,6 +1097,43 @@ ALTER TABLE `userinfo`
 --
 ALTER TABLE `users`
   MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `verification`
+--
+ALTER TABLE `verification`
+  MODIFY `verificationID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `activities`
+--
+ALTER TABLE `activities`
+  ADD CONSTRAINT `activities_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`);
+
+--
+-- Constraints for table `profile`
+--
+ALTER TABLE `profile`
+  ADD CONSTRAINT `profile_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`);
+
+--
+-- Constraints for table `studentbadges`
+--
+ALTER TABLE `studentbadges`
+  ADD CONSTRAINT `studentbadges_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`),
+  ADD CONSTRAINT `studentbadges_ibfk_2` FOREIGN KEY (`badgeID`) REFERENCES `badges` (`badgeID`),
+  ADD CONSTRAINT `studentbadges_ibfk_3` FOREIGN KEY (`courseID`) REFERENCES `courses` (`courseID`),
+  ADD CONSTRAINT `studentbadges_ibfk_4` FOREIGN KEY (`awardedBy`) REFERENCES `users` (`userID`);
+
+--
+-- Constraints for table `verification`
+--
+ALTER TABLE `verification`
+  ADD CONSTRAINT `verification_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
