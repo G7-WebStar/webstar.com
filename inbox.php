@@ -54,7 +54,7 @@ $selectInboxResult = executeQuery($selectInboxQuery);
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
-    
+
     <style>
         @media (min-width: 992px) {
             .responsive-circle {
@@ -85,80 +85,32 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                 <div class="row align-items-center mb-3 text-center text-lg-start">
                                     <!-- Title -->
                                     <div class="col-12 col-lg-auto mb-3 mb-lg-0">
-                                        <h1 class="text-bold text-25 mb-0 mt-4" style="color: var(--black);">My Inbox
+                                        <h1 class="text-sbold text-25 mb-0 mt-2" style="color: var(--black);">My Inbox
                                         </h1>
                                     </div>
 
                                     <!-- Dropdowns-->
-                                    <div class="col-12 col-lg-auto mt-4">
-                                        <div
-                                            class="d-flex flex-nowrap justify-content-center justify-content-lg-start gap-3">
 
-                                            <!-- Sort by dropdown -->
-                                            <div class="d-flex align-items-center flex-nowrap">
-                                                <span class="dropdown-label me-2">Sort by:</span>
-                                                <button class="btn dropdown-toggle dropdown-custom" type="button"
-                                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <span>Newest</span>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item text-reg" href="#">Newest</a></li>
-                                                    <li><a class="dropdown-item text-reg" href="#">Oldest</a></li>
-                                                    <li><a class="dropdown-item text-reg" href="#">Unread first</a></li>
-                                                </ul>
-                                            </div>
-
-                                            <!-- Course dropdown -->
-                                            <div class="d-flex align-items-center flex-nowrap">
-                                                <span class="dropdown-label me-2">Course:</span>
-                                                <button class="btn dropdown-toggle dropdown-custom" type="button"
-                                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <span>All</span>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item text-reg" href="#">All</a></li>
-                                                    <?php
-                                                    if (mysqli_num_rows($selectEnrolledResult) > 0) {
-                                                        while ($inboxSelectTag = mysqli_fetch_assoc($selectEnrolledResult)) {
-                                                    ?>
-                                                            <li><a class="dropdown-item text-reg" href="#"><?php echo $inboxSelectTag['courseCode']; ?></a></li>
-                                                    <?php
-                                                        }
-                                                    }
-                                                    ?>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
 
                                     <!-- Message Content -->
                                     <div class="message-container mt-4 mt-lg-4 pb-4">
                                         <?php
                                         if (mysqli_num_rows($selectInboxResult) > 0) {
                                             while ($inbox = mysqli_fetch_assoc($selectInboxResult)) {
-                                        ?>
-                                                <div class="card mb-3 me-3 w-100 mt-3"
+                                                ?>
+                                                <div class="card mb-1 me-3 w-100 mt-2"
                                                     style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
-                                                    <div class="card-body p-3">
-                                                        <div class="row align-items-start">
-                                                            <!-- Profile Image -->
-                                                            <div
-                                                                class="col-auto mb-3 mb-lg-0 mt-3 mt-lg-2 d-flex justify-content-center justify-content-lg-start ms-3">
-                                                                <div class="avatar-image">
-                                                                    <img src="shared/assets/pfp-uploads/<?php echo $inbox['profPFP']; ?>" alt="" width="40" height="40"
-                                                                        class="rounded-circle responsive-circle ">
-                                                                </div>
-                                                            </div>
-
+                                                    <div class="card-body py-2 px-4 px-md-3">
+                                                        <div class="row align-items-center">
                                                             <!-- Message Text -->
-                                                            <div class="col d-flex flex-column text-start mt-3 mt-lg-2 mb-2">
+                                                            <div class="col d-flex flex-column text-start mt-2 mb-2">
                                                                 <p class="mb-2 text-sbold text-17"
-                                                                    style="color: var(--black); line-height: 140%;">
+                                                                    style="color: var(--black); line-height: 100%;">
                                                                     <?php echo $inbox['messageText'] . " " . $inbox['assessmentTitle']; ?>
                                                                 </p>
                                                                 <small class="text-reg text-12"
-                                                                    style="color: var(--black); opacity: 0.7;">January 12, 2024
+                                                                    style="color: var(--black); line-height: 100%;">January
+                                                                    12, 2024
                                                                     8:00AM</small>
 
                                                                 <!-- Course tag on small screen below message text -->
@@ -172,8 +124,8 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                                             </div>
 
                                                             <!-- Course tag on large screen right side, vertically centered -->
-                                                            <div
-                                                                class="col-auto d-none d-lg-flex justify-content-end align-items-center mt-4">
+                                                            <div class="col-auto d-none d-lg-flex align-items-center"
+                                                                style="display:flex;align-items:center;">
                                                                 <span class="text-reg text-12 badge rounded-pill course-badge"
                                                                     style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
                                                                     <?php echo $inbox['courseCode']; ?>
@@ -184,7 +136,7 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                                     </div>
 
                                                 </div>
-                                        <?php
+                                                <?php
                                             }
                                         }
                                         ?>

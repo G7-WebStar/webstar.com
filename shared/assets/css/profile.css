@@ -151,10 +151,6 @@ body {
         margin-top: -55px;
     }
 
-    .star-card {
-        height: 250px;
-    }
-
     .star-card-row{
         margin-top: 0.5rem !important;
     }
@@ -196,3 +192,5 @@ body {
     }
 
 }
+
+

@@ -83,90 +83,28 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                             <div class="col-12">
 
                                 <!-- Header Section -->
-                                <div class="row align-items-center mb-5 text-center text-lg-start">
+                                <div class="row align-items-center mb-4 text-center text-lg-start">
                                     <!-- Title -->
                                     <div class="col-12 col-lg-auto mb-3 mb-lg-0">
-                                        <h1 class="text-bold text-25 mb-0 mt-4" style="color: var(--black);">My To-do
+                                        <h1 class="text-sbold text-25 mb-0 mt-2" style="color: var(--black);">My To-do
                                         </h1>
-                                    </div>
-
-                                    <div class="col-12 col-lg-auto mt-4">
-                                        <div class="row g-3 justify-content-center justify-content-lg-start">
-
-                                            <!-- Sort by dropdown -->
-                                            <div class="col-6 col-md-auto">
-                                                <div class="d-flex align-items-center flex-nowrap">
-                                                    <span class="dropdown-label me-2">Sort by:</span>
-                                                    <button class="btn dropdown-toggle dropdown-custom" type="button"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <span>Newest</span>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item text-reg" href="#">Newest</a></li>
-                                                        <li><a class="dropdown-item text-reg" href="#">Oldest</a></li>
-                                                        <li><a class="dropdown-item text-reg" href="#">Unread first</a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-
-                                            <!-- Course dropdown -->
-                                            <div class="col-6 col-md-auto">
-                                                <div class="d-flex align-items-center flex-nowrap">
-                                                    <span class="dropdown-label me-2">Course:</span>
-                                                    <button class="btn dropdown-toggle dropdown-custom" type="button"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <span>All</span>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item text-reg" href="#">All</a></li>
-                                                        <?php
-                                                        if (mysqli_num_rows($selectEnrolledResult) > 0) {
-                                                            while ($inboxSelectTag = mysqli_fetch_assoc($selectEnrolledResult)) {
-                                                        ?>
-                                                                <li><a class="dropdown-item text-reg" href="#"><?php echo $inboxSelectTag['courseCode']; ?></a></li>
-                                                        <?php
-                                                            }
-                                                        }
-                                                        ?>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-
-                                            <!-- Status dropdown -->
-                                            <div class="col-6 col-md-auto mx-auto">
-                                                <div class="d-flex align-items-center flex-nowrap">
-                                                    <span class="dropdown-label me-2">Status:</span>
-                                                    <button class="btn dropdown-toggle dropdown-custom" type="button"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <span>Assigned</span>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item text-reg" href="#">Assigned</a></li>
-                                                        <li><a class="dropdown-item text-reg" href="#">Completed</a></li>
-                                                        <li><a class="dropdown-item text-reg" href="#">Overdue</a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Task container -->
-                                <div class="row mb-0 mt-3">
-                                    <div class="col-12 col-md-10">
+                                <div class="row mb-0 mt-0">
+                                    <div class="col-12 col-md-10 mt-3 mx-auto mx-lg-0">
                                         <?php
                                         if (mysqli_num_rows($selectAssessmentResult) > 0) {
                                             while ($todo = mysqli_fetch_assoc($selectAssessmentResult)) {
-                                        ?>
-                                                <div class="todo-card d-flex align-items-stretch mb-2">
+                                                ?>
+                                                <div class="todo-card d-flex align-items-stretch mb-2 mx-auto mx-lg-0">
                                                     <!-- Date -->
-                                                    <div
-                                                        class="date d-flex align-items-center justify-content-center text-sbold text-20">
+                                                    <div class="date d-flex align-items-center justify-content-center text-sbold text-20"
+                                                        style="text-transform:uppercase; background-color: var(--primaryColor)">
                                                         <?php echo $todo['assessmentDeadline']; ?>
                                                     </div>
+
                                                     <!-- Main content -->
                                                     <div class="d-flex flex-grow-1 flex-wrap justify-content-between p-2 w-100">
                                                         <!-- For small screen of main content -->
@@ -177,10 +115,6 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                                             <div class="text-reg text-12">
                                                                 <?php echo $todo['courseCode']; ?>
                                                             </div>
-                                                            <span
-                                                                class="course-badge rounded-pill px-3 text-reg text-12 mt-2 d-inline d-md-none">
-                                                                <?php echo $todo['type']; ?>
-                                                            </span>
 
                                                             <?php
                                                             $type = strtolower(trim($todo['type']));
@@ -194,13 +128,24 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                                             ?>
 
                                                         </div>
-                                                        <!-- Pill and Arrow on Large screen-->
-                                                        <a href="<?php echo $link; ?>" class="text-decoration-none">
-                                                            <i class="fa-solid fa-arrow-right text-reg text-12 pe-2" style="color: var(--black);"></i>
-                                                        </a>
+                                                        <div class="d-flex align-items-center justify-content-center"
+                                                            style="height:100%;">
+                                                            <span
+                                                                class="course-badge rounded-pill px-3 text-reg text-12 d-none d-lg-inline me-3">
+                                                                <?php echo $todo['type']; ?>
+                                                            </span>
+
+                                                            <a href="<?php echo $link; ?>"
+                                                                class="text-decoration-none d-flex align-items-center justify-content-center">
+                                                                <i class="fa-solid fa-arrow-right text-reg text-12 pe-2"
+                                                                    style="color:var(--black);"></i>
+                                                            </a>
+                                                        </div>
+
+
                                                     </div>
                                                 </div>
-                                        <?php
+                                                <?php
                                             }
                                         }
                                         ?>

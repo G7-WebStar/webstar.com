@@ -556,17 +556,19 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                     </span>
                                                     <span class="text-sbold">My Star Card</span>
                                                 </div>
-                                                <div>
-                                                    <button type="button"
-                                                        class="btn btn-sm px-3 rounded-pill text-med text-14"
-                                                        style="background-color: var(--primaryColor); border: 1px solid var(--black);"
-                                                        onclick="exportCardAsJPG()">
-                                                        <div style="display: flex; align-items: center; gap: 5px;">
-                                                            <i class="fa-solid fa-share"></i>
-                                                            <span>Share</span>
-                                                        </div>
-                                                    </button>
-                                                </div>
+                                                <?php if (isset($_SESSION['userID']) && $_SESSION['userID'] == $user['userID']): ?>
+                                                    <div>
+                                                        <button type="button"
+                                                            class="btn btn-sm px-3 rounded-pill text-med text-14"
+                                                            style="background-color: var(--primaryColor); border: 1px solid var(--black);"
+                                                            onclick="exportCardAsJPG()">
+                                                            <div style="display: flex; align-items: center; gap: 5px;">
+                                                                <i class="fa-solid fa-share"></i>
+                                                                <span>Share</span>
+                                                            </div>
+                                                        </button>
+                                                    </div>
+                                                <?php endif; ?>
                                             </div>
                                             <!-- My Star Card Content -->
                                             <div class="w-100 d-flex justify-content-center m-0 p-0 mb-1">
@@ -574,7 +576,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                     style="border: 1px solid var(--black); width: 250px;  aspect-ratio: 1 / 1  !important;">
                                                     <div class="px-4 rounded-4 star-card"
                                                         style="background: linear-gradient(to bottom, #FDDF94, #FFFFFF); max-width: 350px; ">
-                                                        <div class="text-center text-12 text-sbold my-4">
+                                                        <div class="text-center text-12 text-sbold mb-4" style="margin-top: 30px;">
                                                             <span class="me-1">My Week on </span>
                                                             <img src="shared/assets/img/webstar-logo-black.png"
                                                                 style="width: 80px; height: 100%; object-fit: cover; margin-top:-5px"
@@ -605,7 +607,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                             <small class="text-reg text-center">Web
                                                                 Development</small>
                                                         </div>
-                                                        <div class="stats my-3">
+                                                        <div class="stats mt-3 mb-1">
                                                             <div
                                                                 class="d-flex justify-content-between align-items-center text-center">
                                                                 <div class="flex-fill text-center mx-1 text-14">
@@ -625,6 +627,13 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                                     <small
                                                                         class="text-med text-muted text-12">XPs</small>
                                                                 </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="emblem">
+                                                            <div
+                                                                class="h-100 d-flex justify-content-center align-items-center">
+                                                                <img src="shared/assets/img/badge.png" class="img-fluid"
+                                                                    style="max-height: 250px; width: 100%; height: auto; object-fit: contain;">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -732,6 +741,8 @@ function getRelativeTime($datetime, $fullDateFallback = true)
             observer.observe(profileCard);
         }
     </script>
+
+    
 </body>
 
 
