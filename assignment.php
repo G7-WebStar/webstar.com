@@ -71,12 +71,13 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
     <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
-    
+
     <!-- Material Design Icons -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
-   
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
 </head>
 
 <body>
@@ -113,7 +114,9 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
                                     </div>
                                     <div class="col">
                                         <span class="text-sbold text-25"><?php echo $assignmentTitle ?></span>
-                                        <div class="text-reg text-18">Due <?php echo date("M d, Y", strtotime($deadline)); ?></div>
+                                        <div class="text-reg text-18">Due
+                                            <?php echo date("M d, Y", strtotime($deadline)); ?>
+                                        </div>
                                     </div>
                                     <div class="col-auto text-end">
                                         <?php echo $score !== null ? 'Graded' : 'Pending'; ?>
@@ -138,8 +141,12 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
                                         </div>
                                         <div class="title text-sbold text-25"><?php echo $assignmentTitle ?></div>
                                     </div>
-                                    <div class="due text-reg text-18">Due <?php echo date("M d, Y", strtotime($deadline)); ?></div>
-                                    <div class="graded text-reg text-18 mt-4"><?php echo $score !== null ? 'Graded' : 'Pending'; ?></div>
+                                    <div class="due text-reg text-18">Due
+                                        <?php echo date("M d, Y", strtotime($deadline)); ?>
+                                    </div>
+                                    <div class="graded text-reg text-18 mt-4">
+                                        <?php echo $score !== null ? 'Graded' : 'Pending'; ?>
+                                    </div>
                                     <div class="score text-sbold text-25">
                                         <?php
                                         echo $score !== null ? $score : '-';
@@ -155,11 +162,12 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
                             <div class="col-12 col-lg-8">
                                 <div class="p-0 px-lg-5">
                                     <div class="text-sbold text-14 mt-3">Instructions</div>
-                                    <p class="mb-5 mt-3 text-med text-14"><?php echo nl2br($assignmentDescription) ?></p>
+                                    <p class="mb-5 mt-3 text-med text-14"><?php echo nl2br($assignmentDescription) ?>
+                                    </p>
 
                                     <hr>
 
-                                    <div class="text-sbold text-14 mt-4">Attachments</div>
+                                    <div class="text-sbold text-14 mt-4">Task Materials</div>
                                     <?php foreach ($attachmentsArray as $file):
                                         $filePath = "shared/uploads/" . $file;
                                         $fileExt = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
@@ -168,25 +176,30 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
 
                                         // Remove extension from display name
                                         $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
-                                    ?>
-                                        <div class="cardFile my-3 w-lg-25 d-flex align-items-start" style="width:400px; max-width:100%; min-width:310px;">
+                                        ?>
+                                        <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
+                                            style="width:400px; max-width:100%; min-width:310px;">
                                             <i class="px-4 py-3 fa-solid fa-file"></i>
                                             <div class="ms-2">
                                                 <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
-                                                <div class="due text-reg text-14 mb-1"><?php echo $fileExt ?> · <?php echo $fileSizeMB ?></div>
+                                                <div class="due text-reg text-14 mb-1"><?php echo $fileExt ?> ·
+                                                    <?php echo $fileSizeMB ?>
+                                                </div>
                                             </div>
                                         </div>
                                     <?php endforeach; ?>
 
 
                                     <?php foreach ($linksArray as $link): ?>
-                                        <div class="cardFile my-3 w-lg-25 d-flex align-items-start" style="width:400px; max-width:100%; min-width:310px;">
+                                        <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
+                                            style="width:400px; max-width:100%; min-width:310px;">
                                             <i class="px-4 py-3 fa-solid fa-link" style="font-size: 13px;"></i>
                                             <div class="ms-2">
                                                 <!-- temoparary lang ang filename here -->
                                                 <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
                                                 <div class="text-reg link text-12 mt-0">
-                                                    <a href="<?php echo $link ?>" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: var(--black);">
+                                                    <a href="<?php echo $link ?>" target="_blank" rel="noopener noreferrer"
+                                                        style="text-decoration: none; color: var(--black);">
                                                         <?php echo $link ?>
                                                     </a>
                                                 </div>
@@ -196,11 +209,30 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
 
                                     <hr>
 
+                                    <div class="text-sbold text-14 mt-4">Rubric</div>
+                                    <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
+                                        style="width:400px; max-width:100%; min-width:310px; cursor:pointer;"
+                                        data-bs-toggle="modal" data-bs-target="#rubricModal">
+
+                                        <span class="material-symbols-outlined ps-3 pe-2 py-3"
+                                            style="font-variation-settings:'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;">
+                                            rate_review
+                                        </span>
+
+                                        <div class="ms-2">
+                                            <div class="text-sbold text-16 mt-1">Essay Rubric</div>
+                                            <div class="due text-reg text-14 mb-1">20 points</div>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+
                                     <div class="text-sbold text-14 pb-3">Prepared by</div>
                                     <div class="d-flex align-items-center pb-5">
                                         <div class="rounded-circle me-2"
                                             style="width: 50px; height: 50px; background-color: var(--highlight75);">
-                                            <img src="shared/assets/pfp-uploads/<?php echo $profProfile ?>" alt="professor" class="rounded-circle" style="width:50px;height:50px;">
+                                            <img src="shared/assets/pfp-uploads/<?php echo $profProfile ?>"
+                                                alt="professor" class="rounded-circle" style="width:50px;height:50px;">
                                         </div>
                                         <div>
                                             <div class="text-sbold text-14"><?php echo $profName ?></div>
@@ -265,7 +297,219 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="rubricModal" tabindex="-1" aria-labelledby="rubricModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered py-4">
+            <div class="modal-content" style="max-height:450px; overflow:hidden;">
+
+                <!-- HEADER -->
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title text-sbold text-20 ms-3" id="rubricModalLabel">Essay Rubric</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- BODY -->
+                <div class="modal-body" style="overflow-y:auto; scrollbar-width:thin;">
+                    <div class="container text-center px-5">
+
+                        <!-- Section Title -->
+                        <div class="row mb-3">
+                            <div class="col">
+                                <div class="text-sbold text-15" style="color: var(--black);">
+                                    Content Relevance
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Accordion -->
+                        <div id="ratingAccordion" class="row justify-content-center">
+                            <div class="col-12 col-md-10">
+                                <!-- Excellent -->
+                                <div class="mb-2">
+                                    <button
+                                        class="btn w-100 d-flex align-items-center justify-content-center flex-column text-med text-14"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#excellent"
+                                        aria-expanded="false" aria-controls="excellent"
+                                        style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black);">
+
+                                        <div class="d-flex justify-content-between align-items-center w-100 px-3">
+                                            <span class="flex-grow-1 text-center ps-3">Excellent · 5 pts</span>
+                                            <span class="material-symbols-rounded transition">expand_more</span>
+                                        </div>
+
+                                        <div class="collapse w-100 mt-2" id="excellent"
+                                            data-bs-parent="#ratingAccordion">
+                                            <p class="mb-0 px-3 pb-2 text-reg text-14">
+                                                Ideas are insightful, well-developed, and directly address the topic.
+                                            </p>
+                                        </div>
+                                    </button>
+                                </div>
+
+                                <!-- Good -->
+                                <div class="mb-2">
+                                    <button
+                                        class="btn w-100 d-flex align-items-center justify-content-center flex-column text-med text-14"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#good"
+                                        aria-expanded="false" aria-controls="good"
+                                        style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black);">
+
+                                        <div class="d-flex justify-content-between align-items-center w-100 px-3">
+                                            <span class="flex-grow-1 text-center ps-3">Good · 4 pts</span>
+                                            <span class="material-symbols-rounded transition">expand_more</span>
+                                        </div>
+
+                                        <div class="collapse w-100 mt-2" id="good" data-bs-parent="#ratingAccordion">
+                                            <p class="mb-0 px-3 pb-2 text-reg text-14">
+                                                Ideas are clear and relevant but may need further development.
+                                            </p>
+                                        </div>
+                                    </button>
+                                </div>
+
+                                <!-- Fair -->
+                                <div class="mb-2">
+                                    <button
+                                        class="btn w-100 d-flex align-items-center justify-content-center flex-column text-med text-14"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#fair"
+                                        aria-expanded="false" aria-controls="fair"
+                                        style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black);">
+
+                                        <div class="d-flex justify-content-between align-items-center w-100 px-3">
+                                            <span class="flex-grow-1 text-center ps-3">Fair · 3 pts</span>
+                                            <span class="material-symbols-rounded transition">expand_more</span>
+                                        </div>
+
+                                        <div class="collapse w-100 mt-2" id="fair" data-bs-parent="#ratingAccordion">
+                                            <p class="mb-0 px-3 pb-2 text-reg text-14">
+                                                Ideas are limited or partially address the topic.
+                                            </p>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section Title -->
+                        <div class="row mb-3">
+                            <div class="col">
+                                <div class="text-sbold text-15" style="color: var(--black);">
+                                    Content Relevance
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Accordion -->
+                        <div id="ratingAccordion2" class="row justify-content-center">
+                            <div class="col-12 col-md-10">
+                                <!-- Excellent -->
+                                <div class="mb-2">
+                                    <button
+                                        class="btn w-100 d-flex align-items-center justify-content-center flex-column text-med text-14"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#excellent2"
+                                        aria-expanded="false" aria-controls="excellent2"
+                                        style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black);">
+
+                                        <div class="d-flex justify-content-between align-items-center w-100 px-3">
+                                            <span class="flex-grow-1 text-center ps-3">Excellent · 5 pts</span>
+                                            <span class="material-symbols-rounded transition">expand_more</span>
+                                        </div>
+
+                                        <div class="collapse w-100 mt-2" id="excellent2"
+                                            data-bs-parent="#ratingAccordion2">
+                                            <p class="mb-0 px-3 pb-2 text-reg text-14">
+                                                Ideas are insightful, well-developed, and directly address the topic.
+                                            </p>
+                                        </div>
+                                    </button>
+                                </div>
+
+                                <!-- Good -->
+                                <div class="mb-2">
+                                    <button
+                                        class="btn w-100 d-flex align-items-center justify-content-center flex-column text-med text-14"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#good2"
+                                        aria-expanded="false" aria-controls="good2"
+                                        style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black);">
+
+                                        <div class="d-flex justify-content-between align-items-center w-100 px-3">
+                                            <span class="flex-grow-1 text-center ps-3">Good · 4 pts</span>
+                                            <span class="material-symbols-rounded transition">expand_more</span>
+                                        </div>
+
+                                        <div class="collapse w-100 mt-2" id="good2" data-bs-parent="#ratingAccordion2">
+                                            <p class="mb-0 px-3 pb-2 text-reg text-14">
+                                                Ideas are clear and relevant but may need further development.
+                                            </p>
+                                        </div>
+                                    </button>
+                                </div>
+
+                                <!-- Fair -->
+                                <div class="mb-2">
+                                    <button
+                                        class="btn w-100 d-flex align-items-center justify-content-center flex-column text-med text-14"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#fair2"
+                                        aria-expanded="false" aria-controls="fair2"
+                                        style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black);">
+
+                                        <div class="d-flex justify-content-between align-items-center w-100 px-3">
+                                            <span class="flex-grow-1 text-center ps-3">Fair · 3 pts</span>
+                                            <span class="material-symbols-rounded transition">expand_more</span>
+                                        </div>
+
+                                        <div class="collapse w-100 mt-2" id="fair2" data-bs-parent="#ratingAccordion2">
+                                            <p class="mb-0 px-3 pb-2 text-reg text-14">
+                                                Ideas are limited or partially address the topic.
+                                            </p>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="modal-footer">
+                    <div class="container">
+                        <div class="row justify-content-end py-2">
+                            
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const buttons = document.querySelectorAll('[data-bs-toggle="collapse"]');
+
+            buttons.forEach(button => {
+                const target = button.getAttribute('data-bs-target');
+                const icon = button.querySelector('.material-symbols-rounded');
+                const collapse = document.querySelector(target);
+
+                if (collapse && icon) {
+                    collapse.addEventListener('show.bs.collapse', () => {
+                        // Reset all others
+                        buttons.forEach(btn => btn.style.backgroundColor = 'var(--pureWhite)');
+                        document.querySelectorAll('.material-symbols-rounded').forEach(ic => ic.style.transform = 'rotate(0deg)');
+
+                        // Highlight this one
+                        icon.style.transform = 'rotate(180deg)';
+                        icon.style.transition = 'transform 0.3s';
+                        button.style.backgroundColor = 'var(--primaryColor)';
+                    });
+
+                    collapse.addEventListener('hide.bs.collapse', () => {
+                        icon.style.transform = 'rotate(0deg)';
+                        button.style.backgroundColor = 'var(--pureWhite)';
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 28, 2025 at 04:01 PM
+-- Generation Time: Oct 29, 2025 at 06:55 PM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -441,7 +441,18 @@ CREATE TABLE `report` (
 --
 
 INSERT INTO `report` (`reportID`, `enrollmentID`, `totalXP`, `allTimeRank`, `testScorePercent`, `assignmentScorePercent`, `assesmentScorePercent`, `generatedAt`) VALUES
-(1, 1, 4500, 10, 0, 89, 92, '2025-08-30 14:26:32');
+(1, 1, 550, 1, 0, 89, 92, '2025-10-30 00:26:40'),
+(2, 3, 400, 2, 0, 0, 0, '2025-10-30 00:26:40'),
+(3, 8, 221, 3, 0, 0, 0, '2025-10-30 00:26:40'),
+(4, 6, 215, 4, 0, 0, 0, '2025-10-30 00:26:40'),
+(5, 11, 214, 5, 0, 0, 0, '2025-10-30 00:26:40'),
+(6, 10, 195, 6, 0, 0, 0, '2025-10-30 00:26:40'),
+(7, 5, 189, 7, 0, 0, 0, '2025-10-30 00:26:40'),
+(8, 7, 176, 8, 0, 0, 0, '2025-10-30 00:26:40'),
+(9, 9, 167, 9, 0, 0, 0, '2025-10-30 00:26:40'),
+(10, 4, 152, 10, 0, 0, 0, '2025-10-30 00:26:40'),
+(11, 12, 95, 11, 0, 0, 0, '2025-10-30 00:26:40'),
+(12, 2, 450, 1, 0, 0, 0, '2025-10-29 23:08:43');
 
 -- --------------------------------------------------------
 
@@ -463,6 +474,27 @@ CREATE TABLE `scores` (
 
 INSERT INTO `scores` (`scoreID`, `userID`, `assignmentID`, `testID`, `score`) VALUES
 (1, 2, 1, NULL, 100);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `settings`
+--
+
+CREATE TABLE `settings` (
+  `settingsID` int(11) NOT NULL,
+  `userID` int(11) NOT NULL,
+  `courseUpdateEnabled` tinyint(4) NOT NULL,
+  `questDeadlineEnabled` tinyint(4) NOT NULL,
+  `announcementEnabled` tinyint(4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `settings`
+--
+
+INSERT INTO `settings` (`settingsID`, `userID`, `courseUpdateEnabled`, `questDeadlineEnabled`, `announcementEnabled`) VALUES
+(1, 2, 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -848,7 +880,8 @@ ALTER TABLE `points`
 -- Indexes for table `profile`
 --
 ALTER TABLE `profile`
-  ADD PRIMARY KEY (`profileID`);
+  ADD PRIMARY KEY (`profileID`),
+  ADD KEY `profile_ibfk_1` (`userID`);
 
 --
 -- Indexes for table `program`
@@ -867,6 +900,12 @@ ALTER TABLE `report`
 --
 ALTER TABLE `scores`
   ADD PRIMARY KEY (`scoreID`);
+
+--
+-- Indexes for table `settings`
+--
+ALTER TABLE `settings`
+  ADD PRIMARY KEY (`settingsID`);
 
 --
 -- Indexes for table `studentbadges`
@@ -930,7 +969,8 @@ ALTER TABLE `users`
 -- Indexes for table `verification`
 --
 ALTER TABLE `verification`
-  ADD PRIMARY KEY (`verificationID`);
+  ADD PRIMARY KEY (`verificationID`),
+  ADD KEY `verification_ibfk_1` (`userID`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -1036,13 +1076,19 @@ ALTER TABLE `program`
 -- AUTO_INCREMENT for table `report`
 --
 ALTER TABLE `report`
-  MODIFY `reportID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `reportID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `scores`
 --
 ALTER TABLE `scores`
   MODIFY `scoreID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `settings`
+--
+ALTER TABLE `settings`
+  MODIFY `settingsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `studentbadges`
