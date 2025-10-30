@@ -247,6 +247,7 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
         //Initializes the state of every questions as not yet answered
         let selectedAnswers = new Array(questions.length).fill(null);
 
+        //Get IDs of elements
         const questionContainer = document.getElementById('question-container');
         const choices = document.getElementById('choices');
         const imgContainer = document.getElementById('img-container');
@@ -255,9 +256,18 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
         let currentQuestionIndex = 0;
         let score = 0;
 
+        //Arrays used for handling answers
         let choiceIDs = [];
-        let choiceText = [];
 
+        let choiceText = [];
+        questions.forEach(question => {
+            choiceText.push({
+                userAnswer: null,
+                testQuestionID: null
+            });
+        });
+
+        //Starts Quiz
         function startQuiz() {
             currentQuestionIndex = 0;
             score = 0;
@@ -265,6 +275,7 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
             showQuestion();
         }
 
+        //Shows questions
         function showQuestion() {
             let currentQuestion = questions[currentQuestionIndex];
             let questionNo = currentQuestionIndex + 1;
@@ -274,13 +285,15 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
             choiceIDs = [];
             questionContainer.innerHTML = currentQuestion.
             question;
+            //Indicates which question is currently on screen
             questionNumber.innerHTML = "Section Name · Question " + questionNo + " of " + totalQuestion;
 
+            //Adds a margin when there is an img
             if (questions[currentQuestionIndex].img == "") {
                 choices.classList.add('mt-4');
-                console.log('mt-3 enabled');
             }
 
+            //Displays the choices for the current question
             if (questions[currentQuestionIndex].type == "Multiple Choice") {
                 currentQuestion.answers.forEach(answer => {
                     const button = document.createElement('div');
@@ -293,7 +306,7 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
                     choices.appendChild(button);
                 });
 
-                //Restores indicators that that question has been answered
+                //Restores indicators that the current question has been answered
                 const savedIndex = selectedAnswers[currentQuestionIndex];
                 if (savedIndex !== null) {
                     const savedChoice = document.getElementById(choiceIDs[savedIndex]);
@@ -301,9 +314,12 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
                     savedChoice.classList.remove('bg-white');
                 }
             } else {
-                choices.innerHTML = `<input type=:"text" placeholder="Answer" class="rounded-3 p-3 text-center border border-black text-reg" id="input">`;
+                //Displays an input text field if the question is of identification type
+                choices.innerHTML = `<input type="text" placeholder="Answer" class="rounded-3 p-3 text-center border border-black" id="input` + currentQuestionIndex + `">`;
+                document.getElementById('input' + currentQuestionIndex).value = choiceText[currentQuestionIndex].userAnswer;
             }
 
+            //Displays the image if it exists
             const img = document.getElementById('img-question');
             imgContainer.style.maxWidth = "30%";
             img.src = questions[currentQuestionIndex].img;
@@ -315,6 +331,10 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
         }
 
         function nextQuestion() {
+            if (questions[currentQuestionIndex].type == "Identification") {
+                identificationType();
+            }
+
             (currentQuestionIndex + 1 < questions.length) ? currentQuestionIndex++ : null;
             if ((currentQuestionIndex + 1) <= questions.length) {
                 choices.innerHTML = '';
@@ -323,6 +343,10 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
         }
 
         function prevQuestion() {
+            if (questions[currentQuestionIndex].type == "Identification") {
+                identificationType();
+            }
+
             if ((currentQuestionIndex + 1) > 1) {
                 currentQuestionIndex--;
                 choices.innerHTML = '';
@@ -363,16 +387,38 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
                 selectedAnswers[currentQuestionIndex] = selectedChoiceIndex;
 
                 //Stores the answers in an array
-                choiceText.push({
+                const selectedChoice = {
                     userAnswer: this.innerHTML,
                     testQuestionID: questions[currentQuestionIndex].questionID
-                });
+                };
+
+                choiceText[currentQuestionIndex] = selectedChoice;
             }
-            console.log(selectedAnswers[currentQuestionIndex]);
+
+            //console.log(selectedAnswers[currentQuestionIndex]);
+            console.log(choiceText);
+            console.log(currentQuestionIndex);
+        }
+
+        function identificationType() {
+            console.log("Identification Type");
+            console.log(choiceText[currentQuestionIndex]);
+            const inputField = document.getElementById('input' + currentQuestionIndex);
+            const identificationAnswer = {
+                userAnswer: inputField.value,
+                testQuestionID: questions[currentQuestionIndex].questionID
+            };
+            choiceText[currentQuestionIndex] = identificationAnswer;
         }
 
         function submitQuiz() {
-            if (choiceText.length >= questions.length) {
+            if (questions[currentQuestionIndex].type == "Identification") {
+                identificationType();
+            }
+
+            const incomplete = choiceText.some(checkNull => checkNull.userAnswer === null || checkNull.userAnswer === '');
+
+            if (!incomplete) {
                 fetch('shared/assets/processes/submit-test.php', {
                         method: 'POST',
                         headers: {
