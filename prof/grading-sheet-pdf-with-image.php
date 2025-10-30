@@ -244,8 +244,9 @@ if (!empty($fileLinks)) {
                                                     Award badge
                                                 </button>
                                                 <!-- ADD FEEDBACK BUTTON (opens modal) -->
-                                                <button class="btn custom-btn d-flex align-items-center justify-content-center" data-bs-toggle="modal"
-                                                    data-bs-target="#feedbackModal">
+                                                <button
+                                                    class="btn custom-btn d-flex align-items-center justify-content-center"
+                                                    data-bs-toggle="modal" data-bs-target="#feedbackModal">
                                                     <i class="material-symbols-rounded me-2">comment</i> Add feedback
                                                 </button>
                                             </div>
@@ -261,8 +262,9 @@ if (!empty($fileLinks)) {
         <!-- AWARD BADGE MODAL -->
         <div class="modal fade" id="awardBadgeModal" tabindex="-1" aria-labelledby="awardBadgeModalLabel"
             aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered py-4" style="max-width: 700px;  height: 25px;">
-                <div class="modal-content" style="height: 100%;">
+            <div class="modal-dialog modal-dialog-centered" style="max-width:700px;">
+                <div class="modal-content"
+                    style="max-height:80vh; overflow:hidden;">
 
                     <!-- HEADER -->
                     <div class="modal-header">
@@ -271,7 +273,7 @@ if (!empty($fileLinks)) {
                             style="transform: scale(0.8); filter: grayscale(100%);"></button>
                     </div>
 
-                    <div class="modal-body overflow-auto">
+                    <div class="modal-body" style="overflow-y:auto; scrollbar-width:thin;">
                         <p class="mb-3 text-med text-14 ms-3" style="color: var(--black);">
                             Choose a badge to reward and recognize your student’s hard work.
                         </p>

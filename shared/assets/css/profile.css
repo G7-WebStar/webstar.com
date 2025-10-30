@@ -47,7 +47,6 @@ body {
     width: 90px;
     height: 90px;
     border-radius: 15px;
-    background: url('../pfp-uploads/pfp.jpg') center/cover no-repeat white;
     border: 2px solid var(--black);
 }
 
@@ -105,8 +104,8 @@ body {
 }
 
 .star-card {
-    width: 100%;
-    aspect-ratio: 1 / 1;
+    width: 100%  !important;
+    aspect-ratio: 1 / 1  !important;
     align-content: center;
 }
 
@@ -152,10 +151,6 @@ body {
         margin-top: -55px;
     }
 
-    .star-card {
-        height: 250px;
-    }
-
     .star-card-row{
         margin-top: 0.5rem !important;
     }
@@ -197,3 +192,5 @@ body {
     }
 
 }
+
+

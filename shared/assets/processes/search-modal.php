@@ -48,7 +48,7 @@ if (mysqli_num_rows($result) > 0) {
         }
 
         echo '
-    <a href="#" class="d-flex align-items-center text-decoration-none"
+    <a href="profile.php?user=' . urlencode($row['userName']) . '" class="d-flex align-items-center text-decoration-none"
         style="padding: 14px 18px; transition: background 0.2s;">
         <div class="rounded-circle me-3 flex-shrink-0"
             style="width: 40px; height: 40px; background-color: #5ba9ff;

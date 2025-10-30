@@ -301,7 +301,7 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
                     savedChoice.classList.remove('bg-white');
                 }
             } else {
-                choices.innerHTML = `<input type=:"text" placeholder="Answer" class="rounded-3 p-3 text-center border border-black">`;
+                choices.innerHTML = `<input type=:"text" placeholder="Answer" class="rounded-3 p-3 text-center border border-black text-reg" id="input">`;
             }
 
             const img = document.getElementById('img-question');
