@@ -191,3 +191,29 @@
 
 
 }
+
+/* Align Gender, Year, Section properly */
+.align-dropdowns {
+    display: flex;
+    justify-content: space-between;
+}
+
+.align-dropdowns .col-4 {
+    max-width: 150px;
+    flex: 1;
+}
+
+.align-dropdowns .form-select {
+    width: 100%;
+    height: 48px;
+    text-align: start;
+}
+
+.section-floating {
+    height: 48px;
+    line-height: 48px;
+    text-align: start;
+    padding: 0 2.5rem 0 0.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--black);
+}

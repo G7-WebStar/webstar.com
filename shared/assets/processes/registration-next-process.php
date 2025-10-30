@@ -4,10 +4,9 @@ session_start();
 // kapag submit ng finish button
 if (isset($_POST['nextBtn'])) {
     $schoolEmail   = $_POST['schoolEmail'];
-    $contactNumber = $_POST['contactNumber'];
     $facebookLink  = $_POST['facebookLink'];
     $linkedinLink  = $_POST['linkedinLink'];
-    $instagramLink = $_POST['instagramLink'];
+    $githubLink = $_POST['githubLink'];
 
     if (!isset($_SESSION['userID'])) {
         header("Location: registration.php");
@@ -19,10 +18,9 @@ if (isset($_POST['nextBtn'])) {
     // save sa DB
     $nextQuery = "UPDATE userinfo SET 
                     schoolEmail   = '$schoolEmail',
-                    contactNumber = '$contactNumber',
                     facebookLink  = '$facebookLink',
                     linkedinLink  = '$linkedinLink',
-                    instagramLink = '$instagramLink'
+                    githubLink = '$githubLink'
                   WHERE userID = '$userID'";
 
     $nextResult = executeQuery($nextQuery);

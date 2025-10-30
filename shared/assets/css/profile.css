@@ -193,4 +193,43 @@ body {
 
 }
 
+/* Tooltip background + text color */
+.tooltip .tooltip-inner {
+  background-color: #2c2c2c !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+  font-family: var(--Regular);
+  font-size: 12px;
+}
 
+/* Tooltip arrows for all placements (same specificity as Bootstrap) */
+.bs-tooltip-top .tooltip-arrow::before,
+.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
+  border-top-color: #2c2c2c !important;
+}
+
+.bs-tooltip-bottom .tooltip-arrow::before,
+.bs-tooltip-auto[data-popper-placement^=bottom] .tooltip-arrow::before {
+  border-bottom-color: #2c2c2c !important;
+}
+
+.bs-tooltip-start .tooltip-arrow::before,
+.bs-tooltip-auto[data-popper-placement^=left] .tooltip-arrow::before {
+  border-left-color: #2c2c2c !important;
+}
+
+.bs-tooltip-end .tooltip-arrow::before,
+.bs-tooltip-auto[data-popper-placement^=right] .tooltip-arrow::before {
+  border-right-color: #2c2c2c !important;
+}
+
+/* Optional: remove shadow for perfect blending */
+.tooltip.show {
+  box-shadow: none !important;
+  transition-delay: 0.5s, 0s; 
+}
+
+.tooltip.show,
+.tooltip.fade.show {
+  opacity: 1 !important;
+}

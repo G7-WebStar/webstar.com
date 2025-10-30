@@ -19,6 +19,10 @@ if (!$username && isset($_SESSION['userID'])) {
             userinfo.facebookLink,
             userinfo.linkedInLink,
             userinfo.githubLink,
+            userinfo.yearLevel,
+            userinfo.yearSection,
+            userinfo.programID,
+            program.programName,
             profile.bio,
             profile.webstars,
             (
@@ -33,6 +37,7 @@ if (!$username && isset($_SESSION['userID'])) {
             ) AS totalBadges
         FROM users
         JOIN userinfo ON users.userID = userinfo.userID
+        JOIN program ON userinfo.programID = program.programID
         LEFT JOIN profile ON users.userID = profile.userID
         LEFT JOIN studentBadges AS sb ON users.userID = sb.userID
         LEFT JOIN badges AS b ON sb.badgeID = b.badgeID
@@ -86,6 +91,10 @@ if (!$username && isset($_SESSION['userID'])) {
             userinfo.facebookLink,
             userinfo.linkedInLink,
             userinfo.githubLink,
+            userinfo.yearLevel,
+            userinfo.yearSection,
+            userinfo.programID,
+            program.programName,
             profile.bio,
             profile.webstars,
             (
@@ -100,6 +109,7 @@ if (!$username && isset($_SESSION['userID'])) {
             ) AS totalBadges
         FROM users
         JOIN userinfo ON users.userID = userinfo.userID
+        JOIN program ON userinfo.programID = program.programID
         LEFT JOIN profile ON users.userID = profile.userID
         LEFT JOIN studentBadges AS sb ON users.userID = sb.userID
         LEFT JOIN badges AS b ON sb.badgeID = b.badgeID
@@ -278,9 +288,12 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                             <div class="user-username text-med text-muted">
                                                                 @<?= htmlspecialchars($user['userName']) ?>
                                                             </div>
+                                                            <div class="user-username text-med text-muted">
+                                                                <?= htmlspecialchars($user['programName'] . ' ' . $user['yearLevel'] . '-' . $user['yearSection'])?>
+                                                            </div>
 
                                                             <!-- Bio -->
-                                                            <div class="bio mt-4">
+                                                            <div class="bio mt-3">
                                                                 <div class="text-med text-14">
                                                                     <?= htmlspecialchars($user['bio']) ?>
                                                                 </div>
@@ -561,12 +574,15 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                         <button type="button"
                                                             class="btn btn-sm px-3 rounded-pill text-med text-14"
                                                             style="background-color: var(--primaryColor); border: 1px solid var(--black);"
-                                                            onclick="exportCardAsJPG()">
+                                                            onclick="exportCardAsJPG()"
+                                                            title="Download your Star Card and share it with your friends!"
+                                                            data-bs-toggle="tooltip" data-bs-placement="left">
                                                             <div style="display: flex; align-items: center; gap: 5px;">
                                                                 <i class="fa-solid fa-share"></i>
                                                                 <span>Share</span>
                                                             </div>
                                                         </button>
+
                                                     </div>
                                                 <?php endif; ?>
                                             </div>
@@ -576,7 +592,8 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                     style="border: 1px solid var(--black); width: 250px;  aspect-ratio: 1 / 1  !important;">
                                                     <div class="px-4 rounded-4 star-card"
                                                         style="background: linear-gradient(to bottom, #FDDF94, #FFFFFF); max-width: 350px; ">
-                                                        <div class="text-center text-12 text-sbold mb-4" style="margin-top: 30px;">
+                                                        <div class="text-center text-12 text-sbold mb-4"
+                                                            style="margin-top: 30px;">
                                                             <span class="me-1">My Week on </span>
                                                             <img src="shared/assets/img/webstar-logo-black.png"
                                                                 style="width: 80px; height: 100%; object-fit: cover; margin-top:-5px"
@@ -742,7 +759,15 @@ function getRelativeTime($datetime, $fullDateFallback = true)
         }
     </script>
 
-    
+    <script>
+        // Initialize Bootstrap tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    </script>
+
+
 </body>
 
 
