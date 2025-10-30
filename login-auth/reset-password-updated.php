@@ -1,4 +1,6 @@
-
+<?php
+session_start();
+?>
 
 <!doctype html>
 <html lang="en">
@@ -29,8 +31,8 @@
                     <img src="../shared/assets/img/webstar-logo-black.png" class="img-fluid px-3 my-4 logo" width="275px">
                 </div>
 
-                  <!-- Reset Password Heading -->
-                  <div class="container text-center mb-3">
+                <!-- Reset Password Heading -->
+                <div class="container text-center mb-3">
                     <h1 class="reset-password-updated-heading">Password has been updated.</h1>
                 </div>
 
@@ -39,17 +41,28 @@
                     <p class="reset-password--updated-description">You can now use your new password to log in next time.</p>
                 </div>
 
-                 <!-- Lock Image -->
-                 <div class="container text-center mt-4 mb-4">
+                <!-- Lock Image -->
+                <div class="container text-center mt-4 mb-4">
                     <img src="../shared/assets/img/resetPassword/lock.png" class="img-fluid bottom-image" alt="Success" style="max-width: 200px;">
                 </div>
 
                 <!-- Back to Login Redirect -->
                 <div class="container text-center text-small">
-                    <a href="" class="text-decoration-none">
+                    <?php
+                    // Determine redirect URL based on role
+                    $redirectUrl = '../login.php'; // default
+                    if (isset($_SESSION['role'])) {
+                        if ($_SESSION['role'] === 'professor') {
+                            $redirectUrl = '../prof/index.php';
+                        } elseif ($_SESSION['role'] === 'student') {
+                            $redirectUrl = '../index.php';
+                        }
+                    }
+                    ?>
+                    <a href="<?= $redirectUrl ?>" class="text-decoration-none">
                         <span class="back-to-login">
-                            <span class="material-symbols-outlined arrow-back-icon">arrow_back</span>
-                            Back to login
+                            Continue
+                            <span class="material-symbols-outlined arrow-back-icon">arrow_forward</span>
                         </span>
                     </a>
                 </div>

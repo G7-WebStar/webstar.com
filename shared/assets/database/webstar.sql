@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 29, 2025 at 06:55 PM
+-- Generation Time: Oct 30, 2025 at 09:10 AM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -751,38 +751,27 @@ CREATE TABLE `users` (
   `password` varchar(50) NOT NULL,
   `email` varchar(50) NOT NULL,
   `role` varchar(12) NOT NULL DEFAULT 'student',
-  `userName` varchar(50) NOT NULL
+  `userName` varchar(50) NOT NULL,
+  `status` varchar(15) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`) VALUES
-(1, 'Password123', 'john.doe@gmail.com', 'admin', 'johndoe'),
-(2, 'Hello@world', 'jane.smith@gmail.com', 'student', 'janesmith'),
-(3, 'HelloWorld', 'john.doe2@gmail.com', 'user', 'JohnDoe'),
-(4, 'password123', 'michael.lee@gmail.com', 'student', 'michael_lee'),
-(5, 'securePass!1', 'sophia.garcia@gmail.com', 'student', 'sophia_garcia'),
-(6, 'helloWorld9', 'daniel.kim@gmail.com', 'student', 'daniel_kim'),
-(7, 'qwerty2025', 'olivia.brown@gmail.com', 'student', 'olivia_brown'),
-(8, 'pass4321', 'ethan.wilson@gmail.com', 'student', 'ethan_wilson'),
-(9, 'abcXYZ987', 'isabella.martin@gmail.com', 'student', 'isabella_martin'),
-(10, 'myPass!77', 'liam.torres@gmail.com', 'student', 'liam_torres'),
-(11, 'safeKey555', 'emma.davis@gmail.com', 'student', 'emma_davis'),
-(12, 'newPass!11', 'chloe.nguyen@gmail.com', 'student', 'chloe_nguyen');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `verification`
---
-
-CREATE TABLE `verification` (
-  `verificationID` int(11) NOT NULL,
-  `userID` int(11) NOT NULL,
-  `verificationCode` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`, `status`) VALUES
+(1, 'Password123', 'john.doe@gmail.com', 'professor', 'johndoe', NULL),
+(2, 'Hello@world', 'jane.smith@gmail.com', 'student', 'janesmith', NULL),
+(3, 'HelloWorld', 'john.doe2@gmail.com', 'student', 'JohnDoe', NULL),
+(4, 'password123', 'michael.lee@gmail.com', 'student', 'michael_lee', NULL),
+(5, 'securePass!1', 'sophia.garcia@gmail.com', 'student', 'sophia_garcia', NULL),
+(6, 'helloWorld9', 'daniel.kim@gmail.com', 'student', 'daniel_kim', NULL),
+(7, 'qwerty2025', 'olivia.brown@gmail.com', 'student', 'olivia_brown', NULL),
+(8, 'pass4321', 'ethan.wilson@gmail.com', 'student', 'ethan_wilson', NULL),
+(9, 'abcXYZ987', 'isabella.martin@gmail.com', 'student', 'isabella_martin', NULL),
+(10, 'myPass!77', 'liam.torres@gmail.com', 'student', 'liam_torres', NULL),
+(11, 'safeKey555', 'emma.davis@gmail.com', 'student', 'emma_davis', NULL),
+(12, 'newPass!11', 'chloe.nguyen@gmail.com', 'student', 'chloe_nguyen', NULL);
 
 --
 -- Indexes for dumped tables
@@ -966,13 +955,6 @@ ALTER TABLE `users`
   ADD PRIMARY KEY (`userID`);
 
 --
--- Indexes for table `verification`
---
-ALTER TABLE `verification`
-  ADD PRIMARY KEY (`verificationID`),
-  ADD KEY `verification_ibfk_1` (`userID`);
-
---
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -1145,12 +1127,6 @@ ALTER TABLE `users`
   MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
--- AUTO_INCREMENT for table `verification`
---
-ALTER TABLE `verification`
-  MODIFY `verificationID` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- Constraints for dumped tables
 --
 
@@ -1174,12 +1150,6 @@ ALTER TABLE `studentbadges`
   ADD CONSTRAINT `studentbadges_ibfk_2` FOREIGN KEY (`badgeID`) REFERENCES `badges` (`badgeID`),
   ADD CONSTRAINT `studentbadges_ibfk_3` FOREIGN KEY (`courseID`) REFERENCES `courses` (`courseID`),
   ADD CONSTRAINT `studentbadges_ibfk_4` FOREIGN KEY (`awardedBy`) REFERENCES `users` (`userID`);
-
---
--- Constraints for table `verification`
---
-ALTER TABLE `verification`
-  ADD CONSTRAINT `verification_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

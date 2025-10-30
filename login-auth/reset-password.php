@@ -1,3 +1,134 @@
+<?php
+session_start();
+include('../shared/assets/database/connect.php');
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require '../shared/assets/phpmailer/src/Exception.php';
+require '../shared/assets/phpmailer/src/PHPMailer.php';
+require '../shared/assets/phpmailer/src/SMTP.php';
+
+// Define error messages
+$errorMessages = [
+    "mismatch" => "Passwords do not match. Please try again.",
+    "emptyFields" => "Please fill in both password fields.",
+    "updateFail" => "Something went wrong while updating your password. Please try again.",
+];
+
+// For alert handling
+if (isset($_SESSION['alert'])) {
+    $error = $_SESSION['alert'];
+    unset($_SESSION['alert']); // one-time only
+}
+
+if (isset($_POST['reset'])) { // Reset password button
+    $email = $_SESSION['email'] ?? null;
+    $newPassword = trim($_POST['password']);
+    $confirm = trim($_POST['confirmPassword']);
+
+    if (empty($newPassword) || empty($confirm)) {
+        $_SESSION['alert'] = "emptyFields";
+        header("Location: reset-password.php");
+        exit();
+    } elseif ($newPassword !== $confirm) {
+        $_SESSION['alert'] = "mismatch";
+        header("Location: reset-password.php");
+        exit();
+    } else {
+        $roleQuery = "SELECT role FROM users WHERE email = '$email'";
+        $roleResult = executeQuery($roleQuery);
+        $roleRow = mysqli_fetch_assoc($roleResult);
+        $role = $roleRow['role'] ?? null;
+
+        $_SESSION['role'] = $role;
+
+        if ($role === 'professor') {
+            $update = "UPDATE users SET password = '$newPassword', status = 'active' WHERE email = '$email'";
+        } else {
+            $update = "UPDATE users SET password = '$newPassword' WHERE email = '$email'";
+        }
+
+        $result = executeQuery($update);
+
+        if ($result) {
+            $mail = new PHPMailer(true);
+            try {
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = 'learn.webstar@gmail.com';
+                $mail->Password = 'mtls vctd rhai cdem';
+                $mail->SMTPSecure = 'tls';
+                $mail->Port = 587;
+                $mail->AddEmbeddedImage('../shared/assets/img/webstar-logo-black.png', 'logoWebstar');
+
+                $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
+                $mail->addAddress($email);
+                $mail->isHTML(true);
+                $mail->Subject = "Password Reset Successful";
+                $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
+                        <tr>
+                            <td align="center">
+                                <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                                    <tr style="background-color: #FDDF94;">
+                                        <td align="center" style="padding: 20px;">
+                                            <img src="cid:logoWebstar" alt="Webstar Logo" style="height:80px;">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 30px;">
+                                            <p style="font-size:15px; color:#333;">Hi <strong>user</strong>,</p>
+
+                                            <p style="font-size:15px; color:#333;">
+                                                Your password has been successfully reset for <strong>Webstar</strong>.
+                                            </p>
+
+                                            <p style="font-size:15px; color:#333;">
+                                                Your new password has been successfully changed.
+                                            </p>
+
+                                            <p style="font-size:15px; color:#333;">
+                                                If you didn’t request this change, please contact our support team immediately.
+                                            </p>
+
+                                            <p style="font-size:15px; color:#333;">Thank you for keeping your account secure!</p>
+
+                                            <p style="margin-top:30px; color:#333;">
+                                                Warm regards,<br>
+                                                <strong>The Webstar Team</strong><br>
+                                            </p>
+
+                                            <div style="text-align:center; font-size:13px; color:#888; margin-top:20px;">
+                                                Telefax: (043) 784-3812 | learn.webstar@gmail.com
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color:#FDDF94;">
+                                        <td align="center" style="padding:15px; color:black; font-size:13px;">
+                                            © 2025 Webstar. All Rights Reserved.
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </div>';
+                $mail->send();
+            } catch (Exception $e) {
+                // skip email error
+            }
+            header("Location: reset-password-updated.php");
+            exit();
+        } else {
+            $_SESSION['alert'] = "updateFail";
+            header("Location: reset-password.php");
+            exit();
+        }
+    }
+}
+?>
 
 
 <!doctype html>
@@ -22,6 +153,28 @@
 
 
 <body>
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1100;">
+            <div id="successToast"
+                class="toast align-items-center text-bg-success border-0 show"
+                role="alert"
+                aria-live="assertive"
+                aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body text-center">
+                        <i class="fa-solid fa-circle-check me-2"></i>
+                        <?= $_SESSION['success']; ?>
+                    </div>
+                    <button type="button"
+                        class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast"
+                        aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
+
     <div class="container min-vh-100 d-flex justify-content-center align-items-center">
         <div class="row">
             <div class="col-12 col-md-6 col-lg-4 p-3 rounded-4 login-container border-blue mx-auto">
@@ -29,8 +182,8 @@
                     <img src="../shared/assets/img/webstar-logo-black.png" class="img-fluid px-3 my-4 logo" width="275px">
                 </div>
 
-                  <!-- Reset Password Heading -->
-                  <div class="container text-center mb-3">
+                <!-- Reset Password Heading -->
+                <div class="container text-center mb-3">
                     <h1 class="reset-password-heading">Reset password</h1>
                 </div>
 
@@ -68,43 +221,31 @@
                     </div>
                     <br class="mobile-only">
 
-                     <!-- Bootstrap Icons (only include once in your layout) 
-                     <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
-                        <symbol id="exclamation-triangle-fill" viewBox="0 0 16 16">
-                            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 
-                                     1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 
-                                     1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 
-                                     0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 
-                                     5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
-                        </symbol>
-                    </svg> --> 
-
-                    <!-- Error Alert 
-                    <div class="alert alert-danger d-flex align-items-center alert-dismissible fade show custom-alert"
-                        role="alert" id="errorAlert" style="display: none;">
-                        <svg class="bi flex-shrink-0 me-2" width="20" height="20" role="img" aria-label="Danger:">
-                            <use xlink:href="#exclamation-triangle-fill" />
-                        </svg>
-                        <div class="alert-message mx-1">
-                        Pick something new! You’ve already used that password.
-                        </div>
-                    </div> --> 
+                    <!-- Error Message -->
+                    <div class="container login-form py-0">
+                        <?php if (!empty($error) && isset($errorMessages[$error])) { ?>
+                            <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mt-2 mb-0"
+                                role="alert"
+                                style="font-size: 11px; border-radius: 8px; padding: 0.5rem 0.75rem; text-align:left;">
+                                <i class="fa-solid fa-triangle-exclamation me-2" style="font-size: 13px;"></i>
+                                <span class="flex-grow-1"><?= $errorMessages[$error]; ?></span>
+                            </div>
+                        <?php } ?>
+                    </div>
 
                     <!-- Reset Password Button -->
                     <div class="container d-flex justify-content-center">
-                        <button type="submit" name="login"
+                        <button type="submit" name="reset"
                             class="btn btn-reset text-dark rounded-4 px-4 my-md-4 my-3 mx-auto border-blue"
                             style="width: 73%;">
                             Reset password
                         </button>
                     </div>
-
-
                 </form>
 
                 <!-- Back to Login Redirect -->
                 <div class="container text-center text-small">
-                    <a href="" class="text-decoration-none">
+                    <a href="../login.php" class="text-decoration-none">
                         <span class="back-to-login">
                             <span class="material-symbols-outlined arrow-back-icon">arrow_back</span>
                             Back to login
@@ -115,6 +256,19 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Toasts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toastEl = document.getElementById('successToast');
+            if (toastEl) {
+                const toast = new bootstrap.Toast(toastEl, {
+                    delay: 4000
+                });
+                toast.show();
+            }
+        });
+    </script>
     <script>
         function togglePassword(fieldId) {
             var passwordField = document.getElementById(fieldId);
@@ -132,26 +286,6 @@
                 hideIcon.style.display = 'block';
             }
         }
-
-
-        function closeAlert() {
-            document.getElementById('errorModal').style.display = 'none';
-        }
-
-        // modal and button animation
-        // function closeAlert() {
-        //     const modal = document.getElementById('errorModal');
-        //     modal.style.display = 'none';
-        //     document.querySelector('.btn-login').classList.remove('modal-shift');
-        // }
-
-        // Add this when the modal is displayed
-        window.addEventListener('DOMContentLoaded', () => {
-            const modal = document.getElementById('errorModal');
-            if (modal && modal.style.display !== 'none') {
-                document.querySelector('.btn-login').classList.add('modal-shift');
-            }
-        });
     </script>
 </body>
 
