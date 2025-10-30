@@ -69,12 +69,6 @@ include("shared/assets/processes/registration-next-process.php");
                                 <label for="schoolEmail">School Email</label>
                             </div>
 
-                            <!-- Contact Number -->
-                            <div class="form-floating mb-3">
-                                <input type="tel" pattern="\d{11}" class="form-control custom-input" id="contactNumber" name="contactNumber" placeholder="Contact Number" required>
-                                <label for="contactNumber">Contact Number</label>
-                            </div>
-
                             <div class="mb-3 pt-2 text-med text-16 text-center text-md-start" style="color: var(--black);">
                                 Social Media (<i>optional</i>)
                             </div>

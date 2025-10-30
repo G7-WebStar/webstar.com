@@ -54,7 +54,7 @@ include("shared/assets/processes/login-process.php");
                                 <i class="fas fa-eye-slash eye-icon hide" style="display: block;"></i>
                             </button>
                             <div class="forgot-password float-end mt-3">
-                                <a href="#" class="text-decoration-none text-dark highlight text-small">Forgot
+                                <a href="login-auth/forgot-password.php" class="text-decoration-none text-dark highlight text-small">Forgot
                                     Password?</a>
                             </div>
                         </div>
