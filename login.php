@@ -26,7 +26,7 @@ include("shared/assets/processes/login-process.php");
 
 
 <body>
-    <div class="container min-vh-100 d-flex justify-content-center align-items-center">
+    <div class="container min-vh-100 d-flex justify-content-center align-items-center ">
         <div class="row">
             <div class="col-12 col-md-6 col-lg-4 p-3 rounded-4 login-container border-blue mx-auto">
                 <div class="container d-flex justify-content-center py-sm-4 py-3">
@@ -54,7 +54,7 @@ include("shared/assets/processes/login-process.php");
                                 <i class="fas fa-eye-slash eye-icon hide" style="display: block;"></i>
                             </button>
                             <div class="forgot-password float-end mt-3">
-                                <a href="#" class="text-decoration-none text-dark highlight text-small">Forgot
+                                <a href="login-auth/forgot-password.php" class="text-decoration-none text-dark highlight text-small">Forgot
                                     Password?</a>
                             </div>
                         </div>
