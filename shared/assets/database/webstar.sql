@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 30, 2025 at 09:10 AM
+-- Generation Time: Oct 30, 2025 at 01:25 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -277,7 +277,7 @@ CREATE TABLE `files` (
 --
 
 INSERT INTO `files` (`fileID`, `courseID`, `userID`, `announcementID`, `lessonID`, `assignmentID`, `fileAttachment`, `fileTitle`, `fileLink`, `uploadedAt`) VALUES
-(1, 1, 1, 1, 1, NULL, 'Web Development Course Material', '', 'https://gmail.com/lesson1,https://gmail.com/lesson1.1', '2025-08-30 10:30:00');
+(1, 1, 1, 1, 1, NULL, 'Web Development Course Material', 'Web Development', 'https://gmail.com/lesson1,https://gmail.com/lesson1.1', '2025-08-30 10:30:00');
 
 -- --------------------------------------------------------
 
@@ -409,15 +409,25 @@ INSERT INTO `profile` (`profileID`, `userID`, `bio`, `webstars`) VALUES
 
 CREATE TABLE `program` (
   `programID` int(11) NOT NULL,
-  `programName` varchar(100) NOT NULL
+  `programName` varchar(100) NOT NULL,
+  `programInitial` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `program`
 --
 
-INSERT INTO `program` (`programID`, `programName`) VALUES
-(1, 'BSIT');
+INSERT INTO `program` (`programID`, `programName`, `programInitial`) VALUES
+(1, 'Bachelor of Technology and Livelihood Education major in Information and Communication Technology', 'BTLED-ICT'),
+(2, 'Bachelor of Science in Electrical Engineering', 'BSEE'),
+(3, 'Bachelor of Science in Electronics Engineering', 'BSECE'),
+(4, 'Bachelor of Science in Entrepreneurship', 'BSENT'),
+(5, 'Bachelor of Science in Industrial Engineering', 'BSIE'),
+(6, 'Bachelor of Science in Information Technology', 'BSIT'),
+(7, 'Bachelor of Public Administration with specialization in Fiscal Administration', 'BPAFA'),
+(8, 'Bachelor of Science in Psychology', 'BSPSY'),
+(9, 'Diploma in Information Technology', 'DIT'),
+(10, 'Diploma in Office Management Technology - Legal Office Management', 'DOMTLOM');
 
 -- --------------------------------------------------------
 
@@ -441,18 +451,18 @@ CREATE TABLE `report` (
 --
 
 INSERT INTO `report` (`reportID`, `enrollmentID`, `totalXP`, `allTimeRank`, `testScorePercent`, `assignmentScorePercent`, `assesmentScorePercent`, `generatedAt`) VALUES
-(1, 1, 550, 1, 0, 89, 92, '2025-10-30 00:26:40'),
-(2, 3, 400, 2, 0, 0, 0, '2025-10-30 00:26:40'),
-(3, 8, 221, 3, 0, 0, 0, '2025-10-30 00:26:40'),
-(4, 6, 215, 4, 0, 0, 0, '2025-10-30 00:26:40'),
-(5, 11, 214, 5, 0, 0, 0, '2025-10-30 00:26:40'),
-(6, 10, 195, 6, 0, 0, 0, '2025-10-30 00:26:40'),
-(7, 5, 189, 7, 0, 0, 0, '2025-10-30 00:26:40'),
-(8, 7, 176, 8, 0, 0, 0, '2025-10-30 00:26:40'),
-(9, 9, 167, 9, 0, 0, 0, '2025-10-30 00:26:40'),
-(10, 4, 152, 10, 0, 0, 0, '2025-10-30 00:26:40'),
-(11, 12, 95, 11, 0, 0, 0, '2025-10-30 00:26:40'),
-(12, 2, 450, 1, 0, 0, 0, '2025-10-29 23:08:43');
+(1, 1, 550, 1, 0, 89, 92, '2025-10-30 20:24:04'),
+(2, 3, 400, 2, 0, 0, 0, '2025-10-30 20:24:04'),
+(3, 8, 221, 3, 0, 0, 0, '2025-10-30 20:24:04'),
+(4, 6, 215, 4, 0, 0, 0, '2025-10-30 20:24:04'),
+(5, 11, 214, 5, 0, 0, 0, '2025-10-30 20:24:04'),
+(6, 10, 195, 6, 0, 0, 0, '2025-10-30 20:24:04'),
+(7, 5, 189, 7, 0, 0, 0, '2025-10-30 20:24:04'),
+(8, 7, 176, 8, 0, 0, 0, '2025-10-30 20:24:04'),
+(9, 9, 167, 9, 0, 0, 0, '2025-10-30 20:24:04'),
+(10, 4, 152, 10, 0, 0, 0, '2025-10-30 20:24:04'),
+(11, 12, 95, 11, 0, 0, 0, '2025-10-30 20:24:04'),
+(12, 2, 450, 1, 0, 0, 0, '2025-10-30 20:09:29');
 
 -- --------------------------------------------------------
 
@@ -727,18 +737,18 @@ CREATE TABLE `userinfo` (
 --
 
 INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `middleName`, `lastName`, `studentID`, `programID`, `gender`, `yearLevel`, `yearSection`, `schoolEmail`, `contactNumber`, `facebookLink`, `linkedInLink`, `githubLink`, `createdAt`, `isNewUser`) VALUES
-(1, 2, 'prof.png', 'Jane', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 2023, 'jane.smith@university.edu', '+639123456789', NULL, NULL, 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
-(2, 1, 'prof.png', 'Chistian James', 'Dom', 'Torillo', '202310002', '1', 'Male', '2', 2023, 'james.dom@university.edu', '+639123456789', 'https://facebook.com/james.dom', 'https://linkedin.com/in/james-dom', 'https://instagram.com/james.dom', '2025-08-30 08:18:53', 1),
-(3, 3, 'prof.png', 'John', 'Cruz', 'Doe', '202310003', '1', 'Male', '2', 2023, 'john.doe@university.edu', '+639123456783', '', '', '', '2025-09-28 11:58:33', 1),
-(4, 4, 'prof.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 2023, 'michael.lee@school.edu', '09171234567', NULL, NULL, NULL, '2025-09-28 20:59:48', 0),
-(5, 5, 'prof.png', 'Sophia', 'B.', 'Garcia', '202310004', '1', 'Female', '2', 2023, 'sophia.garcia@school.edu', '09181234567', 'facebook.com/sophia.garcia', 'linkedin.com/in/sophiagarcia', 'instagram.com/sophia.garcia', '2025-09-28 20:59:48', 1),
-(6, 6, 'prof.png', 'Daniel', 'C.', 'Kim', '202310005', '1', 'Male', '2', 2023, 'daniel.kim@school.edu', '09191234567', 'facebook.com/daniel.kim', 'linkedin.com/in/danielkim', 'instagram.com/daniel.kim', '2025-09-28 20:59:48', 1),
-(7, 7, 'prof.png', 'Olivia', 'D.', 'Brown', '202310006', '1', 'Female', '2', 2023, 'olivia.brown@school.edu', '09201234567', 'facebook.com/olivia.brown', 'linkedin.com/in/oliviabrown', 'instagram.com/olivia.brown', '2025-09-28 20:59:48', 0),
-(8, 8, 'prof.png', 'Ethan', 'E.', 'Wilson', '202310007', '1', 'Male', '2', 2023, 'ethan.wilson@school.edu', '09211234567', 'facebook.com/ethan.wilson', 'linkedin.com/in/ethanwilson', 'instagram.com/ethan.wilson', '2025-09-28 20:59:48', 1),
-(9, 9, 'prof.png', 'Isabella', 'F.', 'Martin', '202310008', '1', 'Female', '2', 2023, 'isabella.martin@school.edu', '09221234567', 'facebook.com/isabella.martin', 'linkedin.com/in/isabellamartin', 'instagram.com/isabella.martin', '2025-09-28 20:59:48', 1),
-(10, 10, 'prof.png', 'Liam', 'G.', 'Torres', '202310009', '1', 'Male', '2', 2023, 'liam.torres@school.edu', '09231234567', 'facebook.com/liam.torres', 'linkedin.com/in/liamtorres', 'instagram.com/liam.torres', '2025-09-28 20:59:48', 1),
-(11, 11, 'prof.png', 'Emma', 'H.', 'Davis', '202310010', '1', 'Female', '2', 2023, 'emma.davis@school.edu', '09241234567', 'facebook.com/emma.davis', 'linkedin.com/in/emmadavis', 'instagram.com/emma.davis', '2025-09-28 20:59:48', 1),
-(12, 12, 'prof.png', 'Chloe', 'I.', 'Nguyen', '202310011', '1', 'Female', '2', 2023, 'chloe.nguyen@school.edu', '09251234567', 'facebook.com/chloe.nguyen', 'linkedin.com/in/chloenguyen', 'instagram.com/chloe.nguyen', '2025-09-28 21:34:51', 1);
+(1, 2, 'prof.png', 'Jane', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 1, 'jane.smith@university.edu', '+639123456789', NULL, NULL, 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
+(2, 1, 'prof.png', 'Chistian James', 'Dom', 'Torillo', '202310002', '1', 'Male', '2', 1, 'james.dom@university.edu', '+639123456789', 'https://facebook.com/james.dom', 'https://linkedin.com/in/james-dom', 'https://instagram.com/james.dom', '2025-08-30 08:18:53', 1),
+(3, 3, 'prof.png', 'John', 'Cruz', 'Doe', '202310003', '1', 'Male', '2', 1, 'john.doe@university.edu', '+639123456783', '', '', '', '2025-09-28 11:58:33', 1),
+(4, 4, 'prof.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 1, 'michael.lee@school.edu', '09171234567', NULL, NULL, NULL, '2025-09-28 20:59:48', 0),
+(5, 5, 'prof.png', 'Sophia', 'B.', 'Garcia', '202310004', '1', 'Female', '2', 1, 'sophia.garcia@school.edu', '09181234567', 'facebook.com/sophia.garcia', 'linkedin.com/in/sophiagarcia', 'instagram.com/sophia.garcia', '2025-09-28 20:59:48', 1),
+(6, 6, 'prof.png', 'Daniel', 'C.', 'Kim', '202310005', '1', 'Male', '3', 2, 'daniel.kim@school.edu', '09191234567', 'facebook.com/daniel.kim', 'linkedin.com/in/danielkim', 'instagram.com/daniel.kim', '2025-09-28 20:59:48', 1),
+(7, 7, 'prof.png', 'Olivia', 'D.', 'Brown', '202310006', '1', 'Female', '2', 2, 'olivia.brown@school.edu', '09201234567', 'facebook.com/olivia.brown', 'linkedin.com/in/oliviabrown', 'instagram.com/olivia.brown', '2025-09-28 20:59:48', 0),
+(8, 8, 'prof.png', 'Ethan', 'E.', 'Wilson', '202310007', '1', 'Male', '2', 1, 'ethan.wilson@school.edu', '09211234567', 'facebook.com/ethan.wilson', 'linkedin.com/in/ethanwilson', 'instagram.com/ethan.wilson', '2025-09-28 20:59:48', 1),
+(9, 9, 'prof.png', 'Isabella', 'F.', 'Martin', '202310008', '1', 'Female', '2', 1, 'isabella.martin@school.edu', '09221234567', 'facebook.com/isabella.martin', 'linkedin.com/in/isabellamartin', 'instagram.com/isabella.martin', '2025-09-28 20:59:48', 1),
+(10, 10, 'prof.png', 'Liam', 'G.', 'Torres', '202310009', '1', 'Male', '1', 2, 'liam.torres@school.edu', '09231234567', 'facebook.com/liam.torres', 'linkedin.com/in/liamtorres', 'instagram.com/liam.torres', '2025-09-28 20:59:48', 1),
+(11, 11, 'prof.png', 'Emma', 'H.', 'Davis', '202310010', '1', 'Female', '2', 1, 'emma.davis@school.edu', '09241234567', 'facebook.com/emma.davis', 'linkedin.com/in/emmadavis', 'instagram.com/emma.davis', '2025-09-28 20:59:48', 1),
+(12, 12, 'prof.png', 'Chloe', 'I.', 'Nguyen', '202310011', '1', 'Female', '2', 1, 'chloe.nguyen@school.edu', '09251234567', 'facebook.com/chloe.nguyen', 'linkedin.com/in/chloenguyen', 'instagram.com/chloe.nguyen', '2025-09-28 21:34:51', 1);
 
 -- --------------------------------------------------------
 
@@ -1052,7 +1062,7 @@ ALTER TABLE `profile`
 -- AUTO_INCREMENT for table `program`
 --
 ALTER TABLE `program`
-  MODIFY `programID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `programID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `report`

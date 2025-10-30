@@ -85,7 +85,7 @@ include("shared/assets/processes/registration-next-process.php");
                             </div>
 
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control custom-input" id="instagramLink" name="instagramLink" placeholder="Instagram Profile Link">
+                                <input type="text" class="form-control custom-input" id="githubLink" name="githubLink" placeholder="Github Profile Link">
                                 <label for="instagramLink">Github Portfolio Link</label>
                             </div>
                         </div>

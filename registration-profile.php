@@ -120,27 +120,36 @@ include("shared/assets/processes/registration-profile-process.php");
                                     </div>
                                 </div>
 
-                                <!-- Gender & Year -->
-                                <div class="row gx-3 mb-3">
-                                    <div class="col-6 col-sm-6 mb-3" style="max-width: 150px; width: 100%;">
-                                        <select class="form-select" name="gender" id="gender" style="height: 48px; line-height: 48px; text-align: center; padding: 0 3.5rem 0 0.5rem;">
-                                            <option selected disabled style="color: gray;">Gender</option>
+                                <!-- Gender,Year, Section -->
+                                <div class="row gx-2 mb-3 align-dropdowns">
+                                    <div class="col-4 col-sm-4 mb-3">
+                                        <select class="form-select" name="gender" id="gender">
+                                            <option selected disabled>Gender</option>
                                             <option value="Male">Male</option>
                                             <option value="Female">Female</option>
                                             <option value="Other">Other</option>
                                         </select>
                                     </div>
-                                    <div class="col-6 col-sm-6 mb-3" style="max-width: 150px; width: 100%;">
-                                        <select class="form-select" name="yearLevel" id="yearLevel"
-                                            style="height: 48px; line-height: 48px; text-align: center; padding: 0 2.5rem 0 0.5rem;">
-                                            <option selected disabled style="color: gray;">Year Level</option>
-                                            <option value="1st">1st Year</option>
-                                            <option value="2nd">2nd Year</option>
-                                            <option value="3rd">3rd Year</option>
-                                            <option value="4th">4th Year</option>
+                                    <div class="col-4 col-sm-4 mb-3">
+                                        <select class="form-select" name="yearLevel" id="yearLevel">
+                                            <option selected disabled>Year Level</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-4 col-sm-4 mb-3">
+                                        <select class="form-select" name="yearSection" id="yearSection">
+                                            <option selected disabled>Section</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
                                         </select>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
 
