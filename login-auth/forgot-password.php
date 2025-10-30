@@ -41,7 +41,7 @@ if (isset($_POST['send'])) { // Send Code button
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
             $mail->Username = 'learn.webstar@gmail.com';
-            $mail->Password = 'mtls vctd rhai cdem'; // Gmail App Password
+            $mail->Password = 'mtls vctd rhai cdem';
             $mail->SMTPSecure = 'tls';
             $mail->Port = 587;
             $mail->AddEmbeddedImage('../shared/assets/img/webstar-logo-black.png', 'logoWebstar');

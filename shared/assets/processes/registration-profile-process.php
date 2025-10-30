@@ -14,8 +14,7 @@ if (isset($_POST['nextBtn'])) {
     $programID = $_POST['program'];
     $gender = $_POST['gender'];
     $yearLevel = $_POST['yearLevel'];
-
-    $yearSection = date('Y');
+    $yearSection = $_POST['yearSection'];
 
     $htmlfileupload = $_FILES['fileUpload']['name'];
     $htmlfileuploadTMP = $_FILES['fileUpload']['tmp_name'];
