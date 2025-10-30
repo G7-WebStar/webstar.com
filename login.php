@@ -26,11 +26,11 @@ include("shared/assets/processes/login-process.php");
 
 
 <body>
-    <div class="container min-vh-100 d-flex justify-content-center align-items-center">
+    <div class="container min-vh-100 d-flex justify-content-center align-items-center ">
         <div class="row">
             <div class="col-12 col-md-6 col-lg-4 p-3 rounded-4 login-container border-blue mx-auto">
                 <div class="container d-flex justify-content-center py-sm-4 py-3">
-                    <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid px-3 my-4 logo" width="275px">
+                    <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid px-3 mb-4 mb-sm-4 mt-0 mt-sm-4 logo" width="275px">
                 </div>
 
                 <!-- Login Form -->
