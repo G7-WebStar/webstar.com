@@ -22,7 +22,7 @@ if (!$username && isset($_SESSION['userID'])) {
             userinfo.yearLevel,
             userinfo.yearSection,
             userinfo.programID,
-            program.programName,
+            program.programInitial,
             profile.bio,
             profile.webstars,
             (
@@ -94,7 +94,7 @@ if (!$username && isset($_SESSION['userID'])) {
             userinfo.yearLevel,
             userinfo.yearSection,
             userinfo.programID,
-            program.programName,
+            program.programInitial,
             profile.bio,
             profile.webstars,
             (
@@ -289,7 +289,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                                 @<?= htmlspecialchars($user['userName']) ?>
                                                             </div>
                                                             <div class="user-username text-med text-muted">
-                                                                <?= htmlspecialchars($user['programName'] . ' ' . $user['yearLevel'] . '-' . $user['yearSection'])?>
+                                                                <?= htmlspecialchars($user['programInitial'] . ' ' . $user['yearLevel'] . '-' . $user['yearSection'])?>
                                                             </div>
 
                                                             <!-- Bio -->

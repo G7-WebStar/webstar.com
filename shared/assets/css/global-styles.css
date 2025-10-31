@@ -1,38 +1,38 @@
 /* Fonts */
 
 @font-face {
-    font-family: 'Regular';
-    src: url('../font/Poppins-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'Regular';
+  src: url('../font/Poppins-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Medium';
-    src: url('../font/Poppins-Medium.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'Medium';
+  src: url('../font/Poppins-Medium.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'SemiBold';
-    src: url('../font/Poppins-SemiBold.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'SemiBold';
+  src: url('../font/Poppins-SemiBold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Bold';
-    src: url('../font/Poppins-Bold.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'Bold';
+  src: url('../font/Poppins-Bold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Black';
-    src: url('../font/Poppins-Black.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'Black';
+  src: url('../font/Poppins-Black.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 
 .main-container {
@@ -41,28 +41,33 @@
 }
 
 @keyframes fadeInUp {
-  from { opacity: 0;  }
-  to   { opacity: 1;  }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 :root {
-    /* Color Branding */
-    --primaryColor: #FDDF94;
-    --highlight75: #6EBEFF;
-    --highlight50: #9ED3FF;
-    --highlight25: #CFE9FF;
-    --highlight15: #c8ecc1;
-    --dirtyWhite: #FFF9F0;
-    --pureWhite: #FFFFFF;
-    --darkgreen: #5b6558;
-    --black: #2C2C2C;
+  /* Color Branding */
+  --primaryColor: #FDDF94;
+  --highlight75: #6EBEFF;
+  --highlight50: #9ED3FF;
+  --highlight25: #CFE9FF;
+  --highlight15: #c8ecc1;
+  --dirtyWhite: #FFF9F0;
+  --pureWhite: #FFFFFF;
+  --darkgreen: #5b6558;
+  --black: #2C2C2C;
 
-    /* Typography */
-    --Regular: 'Regular';
-    --Medium: 'Medium';
-    --Bold: 'Bold';
-    --SemiBold: 'SemiBold';
-    --Black: 'Black';
+  /* Typography */
+  --Regular: 'Regular';
+  --Medium: 'Medium';
+  --Bold: 'Bold';
+  --SemiBold: 'SemiBold';
+  --Black: 'Black';
 }
 
 /* Font families */
@@ -76,7 +81,7 @@
   font-family: 'Medium', sans-serif;
   letter-spacing: -0.03em;
   color: var(--black);
-  
+
 }
 
 .text-bold {
@@ -98,21 +103,44 @@
 }
 
 /* Font sizes */
-.text-12{ font-size: 12px; }
-.text-14{ font-size: 14px; }
-.text-16{ font-size: 16px; }
-.text-18{ font-size: 18px; }
-.text-20{ font-size: 20px; }
-.text-22{ font-size: 22px; }
-.text-25{ font-size: 25px; }
-.text-30{ font-size: 30px; }
+.text-12 {
+  font-size: 12px;
+}
+
+.text-14 {
+  font-size: 14px;
+}
+
+.text-16 {
+  font-size: 16px;
+}
+
+.text-18 {
+  font-size: 18px;
+}
+
+.text-20 {
+  font-size: 20px;
+}
+
+.text-22 {
+  font-size: 22px;
+}
+
+.text-25 {
+  font-size: 25px;
+}
+
+.text-30 {
+  font-size: 30px;
+}
 
 /* Input other stylings that can be used globally */
 
 /* Course Pill */
 .course-badge {
-    background-color: var(--highlight50);
-    color: var(--black);
+  background-color: var(--highlight50);
+  color: var(--black);
 }
 
 .learderboard-badge {
@@ -122,33 +150,33 @@
 
 /* Dropdown*/
 .dropdown-custom {
-    min-width: auto;
-    height: 25px;
-    border: 1px solid var(--black);
-    border-radius: 25px;
-    background-color: var(--pureWhite);
-    color: var(--black);
-    padding: 0 12px;
-    font-size: 14px;
-    letter-spacing: -0.01em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    cursor: pointer;
+  min-width: auto;
+  height: 25px;
+  border: 1px solid var(--black);
+  border-radius: 25px;
+  background-color: var(--pureWhite);
+  color: var(--black);
+  padding: 0 12px;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .dropdown-custom:hover {
-    background-color: var(--pureWhite);
-    border-color: var(--black);
+  background-color: var(--pureWhite);
+  border-color: var(--black);
 }
 
 .dropdown-custom:focus,
 .dropdown-custom:active,
 .dropdown-custom.show {
-    background-color: var(--pureWhite);
-    border-color: var(--black);
-    outline: none;
+  background-color: var(--pureWhite);
+  border-color: var(--black);
+  outline: none;
 }
 
 /* Dropdown labels */
@@ -166,10 +194,10 @@
 
 /* Dropdown Arrow/Triangle */
 .dropdown-arrow::after {
-    margin-left: 8px;
-    border-top: 4px solid var(--black);
-    border-right: 4px solid transparent;
-    border-left: 4px solid transparent;
+  margin-left: 8px;
+  border-top: 4px solid var(--black);
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
 }
 
 /* To-do */
@@ -203,10 +231,11 @@
 /* Subtle Hover 3D Effect */
 button.btn {
   transition: transform 150ms cubic-bezier(0.25, 0.1, 0.25, 1),
-              box-shadow 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
+    box-shadow 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
   box-shadow: none;
   transform: translateY(0);
 }
+
 button.btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 2px 0 #2c2c2c;
@@ -223,13 +252,34 @@ button.btn:hover {
 
 /* Subtle Hover 3D Effect */
 a.btn {
-  display: inline-block; /* needed for transform */
+  display: inline-block;
+  /* needed for transform */
   transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1),
-              box-shadow 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+    box-shadow 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
   transform: translateY(0);
   box-shadow: none;
 }
+
 a.btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 2px 0 #2c2c2c;
+}
+
+/* Default: Mobile (xs to sm) */
+.create-prof-row {
+  width: 100%;
+}
+
+/* Medium screens (md: ≥768px and <1200px) */
+@media (min-width: 1160px) and (max-width: 1599px) {
+  .create-prof-row {
+    width: 70%;
+  }
+}
+
+/* Large screens (lg: ≥1600px and <2000px) */
+@media (min-width: 1600px) {
+  .create-prof-row {
+    width: 50%;
+  }
 }
