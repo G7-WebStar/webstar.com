@@ -383,7 +383,7 @@ if (isset($_GET['reuse'])) {
                                                 <div id="filePreviewContainer" class="row mb-0"></div>
 
                                                 <!-- Upload buttons -->
-                                                <div class="mt-0 mb-4 text-start text-md-center">
+                                                <div class="mt-0 mb-4 text-start ">
                                                     <input type="file" name="materials[]" class="d-none" id="fileUpload"
                                                         multiple>
                                                     <button type="button"
@@ -477,7 +477,7 @@ if (isset($_GET['reuse'])) {
                                                         </div>
                                                     </div>
                                                     <!-- Buttons -->
-                                                    <div class="mt-2 mb-5 text-start text-md-center">
+                                                    <div class="mt-2 mb-5 text-start">
                                                         <!-- Select Rubric Button -->
                                                         <button type="button"
                                                             class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-2"
