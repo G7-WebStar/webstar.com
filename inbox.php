@@ -138,6 +138,7 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                                 </div>
                                                 <?php
                                             }
+                                        } else {
                                         }
                                         ?>
                                     </div>

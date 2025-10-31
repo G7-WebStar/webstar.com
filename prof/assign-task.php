@@ -554,13 +554,13 @@ if (isset($_GET['fetchTitle'])) {
                                     </span>
                                 </div>
                                 <!-- Select Rubric Button -->
-                                <button type="button" class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14"
+                                <a href="assign-task-create-rubric.php" class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14"
                                     style="background-color: var(--primaryColor); border: 1px solid var(--black);">
                                     <div style="display: flex; align-items: center; gap: 5px;">
                                         <span class="material-symbols-outlined" style="font-size:16px">add_circle</span>
                                         <span>Create</span>
                                     </div>
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>

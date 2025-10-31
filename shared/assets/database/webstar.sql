@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 30, 2025 at 01:25 PM
+-- Generation Time: Oct 30, 2025 at 06:51 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -120,18 +120,19 @@ CREATE TABLE `assessments` (
   `type` enum('Task','Test') DEFAULT 'Task',
   `deadline` date NOT NULL,
   `deadlineEnabled` tinyint(1) NOT NULL DEFAULT 0,
-  `createdAt` datetime DEFAULT current_timestamp()
+  `createdAt` datetime DEFAULT current_timestamp(),
+  `rubricID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `assessments`
 --
 
-INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `about`, `type`, `deadline`, `deadlineEnabled`, `createdAt`) VALUES
-(1, 1, 'Activity #1', 'Review CSS Grid and Flexbox', 'Task', '2025-10-15', 0, '2025-09-09 23:00:15'),
-(2, 1, 'Test #1', 'Review CSS Grid and Flexbox', 'Test', '2025-11-06', 0, '2025-09-04 22:00:15'),
-(3, 2, 'Activity #2', 'Review CSS Grid and Flexbox', 'Task', '2025-10-23', 0, '2025-10-22 22:00:15'),
-(4, 2, 'Activity #1', 'Review CSS Grid and Flexbox', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15');
+INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `about`, `type`, `deadline`, `deadlineEnabled`, `createdAt`, `rubricID`) VALUES
+(1, 1, 'Activity #1', 'Review CSS Grid and Flexbox', 'Task', '2025-10-15', 0, '2025-09-09 23:00:15', NULL),
+(2, 1, 'Test #1', 'Review CSS Grid and Flexbox', 'Test', '2025-11-06', 0, '2025-09-04 22:00:15', NULL),
+(3, 2, 'Activity #2', 'Review CSS Grid and Flexbox', 'Task', '2025-10-23', 0, '2025-10-22 22:00:15', NULL),
+(4, 2, 'Activity #1', 'Review CSS Grid and Flexbox', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15', NULL);
 
 -- --------------------------------------------------------
 
@@ -221,6 +222,19 @@ CREATE TABLE `courses` (
 INSERT INTO `courses` (`courseID`, `userID`, `courseCode`, `courseTitle`, `courseImage`, `yearSection`, `schedule`, `isActive`, `code`) VALUES
 (1, 1, 'WEBDEV101', 'Web Development', 'webdev.jpg', '2', 'MWF 10:00–11:30AM', 'Yes', 'WD-2A-2025'),
 (2, 1, 'WEBDEV102', 'Web Development 2', 'webdev.jpg', '2', 'MWF 01:00–02:30AM', 'Yes', 'WD-2B-2025');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `criteria`
+--
+
+CREATE TABLE `criteria` (
+  `criterionID` int(11) NOT NULL,
+  `rubricID` int(11) NOT NULL,
+  `criteriaTitle` varchar(100) NOT NULL,
+  `criteriaDescription` varchar(500) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -363,6 +377,20 @@ INSERT INTO `lessons` (`lessonID`, `courseID`, `lessonTitle`, `lessonDescription
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `level`
+--
+
+CREATE TABLE `level` (
+  `levelID` int(11) NOT NULL,
+  `criterionID` int(11) NOT NULL,
+  `levelTitle` varchar(100) NOT NULL,
+  `levelDescription` varchar(500) NOT NULL,
+  `points` decimal(5,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `points`
 --
 
@@ -451,18 +479,29 @@ CREATE TABLE `report` (
 --
 
 INSERT INTO `report` (`reportID`, `enrollmentID`, `totalXP`, `allTimeRank`, `testScorePercent`, `assignmentScorePercent`, `assesmentScorePercent`, `generatedAt`) VALUES
-(1, 1, 550, 1, 0, 89, 92, '2025-10-30 20:24:04'),
-(2, 3, 400, 2, 0, 0, 0, '2025-10-30 20:24:04'),
-(3, 8, 221, 3, 0, 0, 0, '2025-10-30 20:24:04'),
-(4, 6, 215, 4, 0, 0, 0, '2025-10-30 20:24:04'),
-(5, 11, 214, 5, 0, 0, 0, '2025-10-30 20:24:04'),
-(6, 10, 195, 6, 0, 0, 0, '2025-10-30 20:24:04'),
-(7, 5, 189, 7, 0, 0, 0, '2025-10-30 20:24:04'),
-(8, 7, 176, 8, 0, 0, 0, '2025-10-30 20:24:04'),
-(9, 9, 167, 9, 0, 0, 0, '2025-10-30 20:24:04'),
-(10, 4, 152, 10, 0, 0, 0, '2025-10-30 20:24:04'),
-(11, 12, 95, 11, 0, 0, 0, '2025-10-30 20:24:04'),
+(1, 1, 550, 1, 0, 89, 92, '2025-10-31 01:47:23'),
+(2, 3, 400, 2, 0, 0, 0, '2025-10-31 01:47:23'),
+(3, 8, 221, 3, 0, 0, 0, '2025-10-31 01:47:23'),
+(4, 6, 215, 4, 0, 0, 0, '2025-10-31 01:47:23'),
+(5, 11, 214, 5, 0, 0, 0, '2025-10-31 01:47:23'),
+(6, 10, 195, 6, 0, 0, 0, '2025-10-31 01:47:23'),
+(7, 5, 189, 7, 0, 0, 0, '2025-10-31 01:47:23'),
+(8, 7, 176, 8, 0, 0, 0, '2025-10-31 01:47:23'),
+(9, 9, 167, 9, 0, 0, 0, '2025-10-31 01:47:23'),
+(10, 4, 152, 10, 0, 0, 0, '2025-10-31 01:47:23'),
+(11, 12, 95, 11, 0, 0, 0, '2025-10-31 01:47:23'),
 (12, 2, 450, 1, 0, 0, 0, '2025-10-30 20:09:29');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `rubric`
+--
+
+CREATE TABLE `rubric` (
+  `rubricID` int(11) NOT NULL,
+  `rubricTitle` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -739,7 +778,7 @@ CREATE TABLE `userinfo` (
 INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `middleName`, `lastName`, `studentID`, `programID`, `gender`, `yearLevel`, `yearSection`, `schoolEmail`, `contactNumber`, `facebookLink`, `linkedInLink`, `githubLink`, `createdAt`, `isNewUser`) VALUES
 (1, 2, 'prof.png', 'Jane', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 1, 'jane.smith@university.edu', '+639123456789', NULL, NULL, 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
 (2, 1, 'prof.png', 'Chistian James', 'Dom', 'Torillo', '202310002', '1', 'Male', '2', 1, 'james.dom@university.edu', '+639123456789', 'https://facebook.com/james.dom', 'https://linkedin.com/in/james-dom', 'https://instagram.com/james.dom', '2025-08-30 08:18:53', 1),
-(3, 3, 'prof.png', 'John', 'Cruz', 'Doe', '202310003', '1', 'Male', '2', 1, 'john.doe@university.edu', '+639123456783', '', '', '', '2025-09-28 11:58:33', 1),
+(3, 3, 'prof.png', 'John', 'Cruz', 'Doe', '202310003', '1', 'Male', '2', 1, 'john.doe@university.edu', '+639123456783', '', '', '', '2025-09-28 11:58:33', 0),
 (4, 4, 'prof.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 1, 'michael.lee@school.edu', '09171234567', NULL, NULL, NULL, '2025-09-28 20:59:48', 0),
 (5, 5, 'prof.png', 'Sophia', 'B.', 'Garcia', '202310004', '1', 'Female', '2', 1, 'sophia.garcia@school.edu', '09181234567', 'facebook.com/sophia.garcia', 'linkedin.com/in/sophiagarcia', 'instagram.com/sophia.garcia', '2025-09-28 20:59:48', 1),
 (6, 6, 'prof.png', 'Daniel', 'C.', 'Kim', '202310005', '1', 'Male', '3', 2, 'daniel.kim@school.edu', '09191234567', 'facebook.com/daniel.kim', 'linkedin.com/in/danielkim', 'instagram.com/daniel.kim', '2025-09-28 20:59:48', 1),
@@ -840,6 +879,12 @@ ALTER TABLE `courses`
   ADD PRIMARY KEY (`courseID`);
 
 --
+-- Indexes for table `criteria`
+--
+ALTER TABLE `criteria`
+  ADD PRIMARY KEY (`criterionID`);
+
+--
 -- Indexes for table `enrollments`
 --
 ALTER TABLE `enrollments`
@@ -870,6 +915,12 @@ ALTER TABLE `lessons`
   ADD PRIMARY KEY (`lessonID`);
 
 --
+-- Indexes for table `level`
+--
+ALTER TABLE `level`
+  ADD PRIMARY KEY (`levelID`);
+
+--
 -- Indexes for table `points`
 --
 ALTER TABLE `points`
@@ -893,6 +944,12 @@ ALTER TABLE `program`
 --
 ALTER TABLE `report`
   ADD PRIMARY KEY (`reportID`);
+
+--
+-- Indexes for table `rubric`
+--
+ALTER TABLE `rubric`
+  ADD PRIMARY KEY (`rubricID`);
 
 --
 -- Indexes for table `scores`
@@ -1017,6 +1074,12 @@ ALTER TABLE `courses`
   MODIFY `courseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `criteria`
+--
+ALTER TABLE `criteria`
+  MODIFY `criterionID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `enrollments`
 --
 ALTER TABLE `enrollments`
@@ -1047,6 +1110,12 @@ ALTER TABLE `lessons`
   MODIFY `lessonID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `level`
+--
+ALTER TABLE `level`
+  MODIFY `levelID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `points`
 --
 ALTER TABLE `points`
@@ -1069,6 +1138,12 @@ ALTER TABLE `program`
 --
 ALTER TABLE `report`
   MODIFY `reportID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `rubric`
+--
+ALTER TABLE `rubric`
+  MODIFY `rubricID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `scores`

@@ -79,6 +79,11 @@
     margin-left: calc(62% - 185px); /* aligns with 62% divider end */
 }
 
+/* Total points label spacing next to Criteria button */
+.total-points-label {
+    margin-left: calc(62% - 220px); 
+}
+
 /* Criterion Description Card - matching image design */
 .criterion-description-card {
     width: 711px;
@@ -176,6 +181,13 @@
         max-width: 95%;
         padding-left: 10px;
         width: 120px;
+    }
+    
+    /* Total points label - responsive spacing on small screens */
+    .total-points-label {
+        float: right;
+        margin-left: 0 !important; 
+        margin-top: 5px;
     }
     
     /* Section divider - full width on mobile */
