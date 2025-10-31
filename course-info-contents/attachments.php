@@ -1,29 +1,55 @@
 <?php
-$fileQuery = "SELECT * FROM files WHERE courseID = '$courseID'";
+$sortAttachment = $_POST['sortAttachment'] ?? 'Newest';
+
+switch ($sortAttachment) {
+    case 'Oldest':
+        $attachmentOrderBy = "uploadedAt ASC";
+        break;
+
+    default: // Newest
+        $attachmentOrderBy = "uploadedAt DESC";
+        break;
+}
+
+
+$fileQuery = "SELECT * FROM files WHERE courseID = '$courseID' ORDER BY $attachmentOrderBy";
 $fileResult = executeQuery($fileQuery);
+
+// Check if there is at least one file with a non-empty title
+$hasFiles = false;
+while ($file = mysqli_fetch_assoc($fileResult)) {
+    if (!empty($file['fileAttachment'])) {
+        $hasFiles = true;
+        break;
+    }
+}
+
+// Reset pointer to start of result set
+mysqli_data_seek($fileResult, 0);
 ?>
 
-<?php if (mysqli_num_rows($fileResult) > 0): ?>
+<?php if ($hasFiles): ?>
 
     <!-- Sort By Dropdown (Shown only when there are attachments) -->
-    <div class="d-flex align-items-center flex-nowrap mb-1" id="header">
+    <div class="d-flex align-items-center flex-nowrap mb-1">
         <div class="d-flex align-items-center flex-nowrap">
-            <span class="dropdown-label me-2 text-reg">Sort by</span>
-            <div class="custom-dropdown">
-                <button class="dropdown-btn text-reg text-14">Newest</button>
-                <ul class="dropdown-list text-reg text-14">
-                    <li data-value="Newest">Newest</li>
-                    <li data-value="Oldest">Oldest</li>
-                    <li data-value="Unread">Unread</li>
-                </ul>
-            </div>
+            <span class="dropdown-label me-2 text-reg text-14">Sort by</span>
+            <form method="POST">
+                <input type="hidden" name="activeTab" value="attachments">
+                <select class="select-modern text-reg text-14" name="sortAttachment" onchange="this.form.submit()">
+                    <option value="Newest" <?php echo ($sortAttachment == 'Newest') ? 'selected' : ''; ?>>Newest</option>
+                    <option value="Oldest" <?php echo ($sortAttachment == 'Oldest') ? 'selected' : ''; ?>>Oldest</option>
+                </select>
+            </form>
         </div>
     </div>
 
     <!-- Attachments List -->
-    <div class="d-flex flex-column flex-nowrap overflow-y-auto overflow-x-hidden"
-        style="max-height: 70vh;">
+    <div class="d-flex flex-column flex-nowrap overflow-x-hidden">
         <?php while ($file = mysqli_fetch_assoc($fileResult)): ?>
+            <?php if (empty($file['fileAttachment'])) continue; // skip empty titles 
+            ?>
+
             <?php
             $filePath = $file['fileLink'];
             if (!preg_match('/^https?:\/\//', $filePath)) {

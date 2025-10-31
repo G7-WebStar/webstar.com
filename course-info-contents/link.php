@@ -1,32 +1,56 @@
 <?php
-$fileQuery = "SELECT * FROM files WHERE courseID = '$courseID'";
+$sortLink = $_POST['sortLink'] ?? 'Newest';
+
+switch ($sortLink) {
+    case 'Oldest':
+        $linkOrderBy = "uploadedAt ASC";
+        break;
+
+    default: // Newest
+        $linkOrderBy = "uploadedAt DESC";
+        break;
+}
+
+
+$fileQuery = "SELECT * FROM files WHERE courseID = '$courseID' ORDER BY $linkOrderBy";
 $fileResult = executeQuery($fileQuery);
+
+// Check if there is at least one valid link with title and link
+$hasLinks = false;
+while ($file = mysqli_fetch_assoc($fileResult)) {
+    if (!empty($file['fileTitle']) && !empty($file['fileLink'])) {
+        $hasLinks = true;
+        break;
+    }
+}
+
+// Reset pointer to start of result set
+mysqli_data_seek($fileResult, 0);
 ?>
 
-<?php if (mysqli_num_rows($fileResult) > 0): ?>
+<?php if ($hasLinks): ?>
     <!-- Sort By Dropdown (Shown only when there are files) -->
     <div class="d-flex align-items-center flex-nowrap mb-1" id="header">
         <div class="d-flex align-items-center flex-nowrap">
-            <span class="dropdown-label me-2 text-reg">Sort by</span>
-            <div class="custom-dropdown">
-                <button class="dropdown-btn text-reg text-14">Newest</button>
-                <ul class="dropdown-list text-reg text-14">
-                    <li data-value="Newest">Newest</li>
-                    <li data-value="Oldest">Oldest</li>
-                    <li data-value="Unread">Unread</li>
-                </ul>
-            </div>
+            <span class="dropdown-label me-2 text-reg text-14">Sort by</span>
+            <form method="POST">
+                <input type="hidden" name="activeTab" value="link">
+                <select class="select-modern text-reg text-14" name="sortLink" onchange="this.form.submit()">
+                    <option value="Newest" <?php echo ($sortLink == 'Newest') ? 'selected' : ''; ?>>Newest</option>
+                    <option value="Oldest" <?php echo ($sortLink == 'Oldest') ? 'selected' : ''; ?>>Oldest</option>
+                </select>
+            </form>
         </div>
     </div>
 
     <!-- Files list -->
-    <div class="d-flex flex-column flex-nowrap overflow-y-auto overflow-x-hidden"
-        style="max-height: 70vh;">
+    <div class="d-flex flex-column flex-nowrap overflow-x-hidden">
         <?php while ($file = mysqli_fetch_assoc($fileResult)): ?>
             <?php
-            // Get link and title
             $fileLink = $file['fileLink'];
             $fileTitle = $file['fileTitle'];
+
+            if (empty($fileTitle) || empty($fileLink)) continue;
             ?>
             <div class="row mb-0 mt-2">
                 <div class="col">

@@ -1,5 +1,12 @@
 <?php
+// Check for empty state
+$hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0 
+    || mysqli_num_rows($selectTopTwoToThreeResult) > 0
+    || mysqli_num_rows($selectTopFourToTenResult) > 0
+    || mysqli_num_rows($selectPlacementResult) > 0;
+
 ?>
+<?php if ($hasLeaderboardResults): ?>
 <div class="container-fluid">
     <div class="row align-items-center justify-content-center flex-column flex-md-row">
         <div class="col-8 col-sm-6 col-md-12 col-lg-6 d-flex search-container mb-2 mb-lg-0">
@@ -9,12 +16,13 @@
             </button>
         </div>
         <div class="col-6 d-flex justify-content-center justify-content-lg-start align-items-center">
-            <span class="dropdown-label me-2">View by:</span>
+            <span class="dropdown-label me-2 text-reg text-14">View by:</span>
             <form method="POST">
-                <select class="dropdown-custom" name="dateFilter" onchange="this.form.submit()">
-                    <option value="Monthly" <?php echo $dateFilter == 'Monthly' ? 'selected' : '';?> class="dropdown-item text-reg">Monthly</option>
-                    <option value="Weekly" <?php echo ($dateFilter == 'Weekly' || empty($dateFilter)) ? 'selected' : '';?> class="dropdown-item text-reg">Weekly</option>
-                    <option value="Daily" <?php echo $dateFilter == 'Daily' ? 'selected' : '';?> class="dropdown-item text-reg">Daily</option>
+                <input type="hidden" name="activeTab" value="leaderboard">
+                <select class="select-modern text-reg text-14" name="dateFilter" onchange="this.form.submit()">
+                    <option value="Monthly" <?php echo $dateFilter == 'Monthly' ? 'selected' : ''; ?> class="dropdown-item text-reg">Monthly</option>
+                    <option value="Weekly" <?php echo ($dateFilter == 'Weekly' || empty($dateFilter)) ? 'selected' : ''; ?> class="dropdown-item text-reg">Weekly</option>
+                    <option value="Daily" <?php echo $dateFilter == 'Daily' ? 'selected' : ''; ?> class="dropdown-item text-reg">Daily</option>
                 </select>
             </form>
         </div>
@@ -190,3 +198,13 @@
         ?>
     </div>
 </div>
+<?php else: ?>
+    <!-- EMPTY STATE -->
+    <div class="container text-center py-5">
+        <img src="shared/assets/img/courseInfo/trophy.png" alt="No Stars" class="empty-state-img mb-3" style="max-width:150px;">
+        <div class="empty-state-text text-reg text-16 d-flex flex-column align-items-center">
+            <p class="text-med mb-1">No stars shining yet!</p>
+            <p class="text-reg">Earn XP from quests to climb the leaderboard</p>
+        </div>
+    </div>
+<?php endif; ?>

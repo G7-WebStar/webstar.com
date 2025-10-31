@@ -14,6 +14,23 @@ if (isset($_POST['announcementID'])) {
     }
 }
 
+// Sort
+$sortBy = $_POST['sortBy'] ?? 'Newest';
+
+switch ($sortBy) {
+    case 'Oldest':
+        $orderBy = "a.announcementDate ASC, a.announcementTime ASC";
+        break;
+
+    case 'Unread':
+        $orderBy = "isUserNoted ASC, a.announcementDate DESC, a.announcementTime DESC";
+        break;
+
+    default: // Newest
+        $orderBy = "a.announcementDate DESC, a.announcementTime DESC";
+        break;
+}
+
 // FETCH ANNOUNCEMENTS
 $announcementQuery = "
     SELECT 
@@ -34,7 +51,7 @@ $announcementQuery = "
     LEFT JOIN announcementNotes n ON a.announcementID = n.announcementID 
     WHERE a.courseID = '$courseID'
     GROUP BY a.announcementID
-    ORDER BY a.announcementDate DESC, a.announcementTime DESC
+    ORDER BY $orderBy
 ";
 
 $announcementResult = executeQuery($announcementQuery);
@@ -45,17 +62,18 @@ $announcementResult = executeQuery($announcementQuery);
     <?php if (mysqli_num_rows($announcementResult) > 0): ?>
 
         <!-- Sort By Dropdown -->
-        <div class="d-flex align-items-center flex-nowrap mb-1" id="header">
-            <div class="d-flex align-items-center flex-nowrap">
-                <span class="dropdown-label me-2 text-reg">Sort by</span>
-                <div class="custom-dropdown">
-                    <button class="dropdown-btn text-reg text-14">Newest</button>
-                    <ul class="dropdown-list text-reg text-14">
-                        <li data-value="Newest">Newest</li>
-                        <li data-value="Oldest">Oldest</li>
-                        <li data-value="Unread">Unread</li>
-                    </ul>
-                </div>
+        <div class="d-flex align-items-center flex-wrap mb-1" id="header">
+            <div class="d-flex align-items-center flex-wrap">
+                <span class="dropdown-label me-2 text-reg text-14">Sort by</span>
+                <form method="POST">
+                    <input type="hidden" name="activeTab" value="announcements">
+                    <select class="select-modern text-reg text-14" name="sortBy" onchange="this.form.submit()">
+                        <option value="Newest" <?php echo ($sortBy == 'Newest') ? 'selected' : ''; ?>>Newest</option>
+                        <option value="Oldest" <?php echo ($sortBy == 'Oldest') ? 'selected' : ''; ?>>Oldest</option>
+                        <option value="Unread" <?php echo ($sortBy == 'Unread') ? 'selected' : ''; ?>>Unread</option>
+                    </select>
+                </form>
+
             </div>
         </div>
 
@@ -91,7 +109,7 @@ $announcementResult = executeQuery($announcementQuery);
 
                 $fileTitle = !empty($file['fileTitle']) ? $file['fileTitle'] : '';
             }
-            ?>
+        ?>
 
             <!-- Announcement Card -->
             <div class="announcement-card d-flex align-items-start mb-1">
@@ -181,10 +199,10 @@ $announcementResult = executeQuery($announcementQuery);
                                 $fileSize = (file_exists("shared/assets/files/" . $file)) ? filesize("shared/assets/files/" . $file) : 0;
                                 $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
                                 $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
-                                ?>
+                            ?>
                                 <a href="<?php echo $filePath; ?>" class="text-decoration-none d-block mb-2"
                                     style="color: var(--black);" <?php if (!preg_match('/^https?:\/\//', $filePath)): ?>
-                                        download="<?php echo htmlspecialchars($file); ?>" <?php endif; ?>>
+                                    download="<?php echo htmlspecialchars($file); ?>" <?php endif; ?>>
                                     <div class="cardFile d-flex align-items-start w-100" style="cursor:pointer;">
                                         <i class="px-4 py-3 fa-solid fa-file"></i>
                                         <div class="ms-2">
@@ -231,7 +249,7 @@ $announcementResult = executeQuery($announcementQuery);
 <!-- Toast Script -->
 <script>
     document.querySelectorAll('input[name="noted"]').forEach(checkbox => {
-        checkbox.addEventListener('change', function (e) {
+        checkbox.addEventListener('change', function(e) {
             e.preventDefault();
 
             const form = this.closest('form');
@@ -245,28 +263,26 @@ $announcementResult = executeQuery($announcementQuery);
             });
 
             const alert = document.createElement("div");
-            alert.className = `alert alert-dismissible mb-2 text-center d-flex align-items-center justify-content-center shadow-lg text-reg text-16 ${isChecked ? 'alert-success' : 'alert-danger'
-                }`;
+            alert.className = `
+                alert mb-2 shadow-lg text-reg text-12
+                d-flex align-items-center justify-content-center gap-2
+                ${isChecked ? 'alert-success' : 'alert-danger'}
+            `;
             alert.role = "alert";
             alert.style.transition = "opacity 2s ease";
             alert.style.opacity = "1";
 
             alert.innerHTML = `
-            <i class="bi ${isChecked ? 'bi-check-circle-fill' : 'bi-x-circle-fill'} me-2 fs-6"></i>
-            <span>${isChecked ? 'Marked as Noted' : 'Removed from Noted'}</span>
-            <button type="button" class="btn-close ms-2" aria-label="Close"></button>
-        `;
+                <i class="bi ${isChecked ? 'bi-check-circle-fill' : 'bi-x-circle-fill'} fs-6"></i>
+                <span>${isChecked ? 'Marked as Noted' : 'Removed from Noted'}</span>
+            `;
 
             container.appendChild(alert);
 
             setTimeout(() => {
                 alert.style.opacity = "0";
                 setTimeout(() => alert.remove(), 2000);
-            }, 15000);
-
-            alert.querySelector('.btn-close').addEventListener('click', () => {
-                alert.remove();
-            });
+            }, 3000);
         });
     });
 </script>
