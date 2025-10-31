@@ -1,32 +1,59 @@
 <?php
-$lessonQuery = "SELECT * FROM lessons WHERE courseID = '$courseID'";
+// LESSON SORTING BACKEND (NO UNREAD — only createdAt)
+$sortLesson = $_POST['sortLesson'] ?? 'Newest';
+
+switch ($sortLesson) {
+    case 'Oldest':
+        $lessonOrderBy = "createdAt ASC";
+        break;
+
+    default: // Newest
+        $lessonOrderBy = "createdAt DESC";
+        break;
+}
+
+
+$lessonQuery = "SELECT * FROM lessons WHERE courseID = '$courseID' ORDER BY $lessonOrderBy";
 $lessonResult = executeQuery($lessonQuery);
+
+// Check if there is at least one lesson with a valid title
+$hasLessons = false;
+while ($lesson = mysqli_fetch_assoc($lessonResult)) {
+    if (!empty($lesson['lessonTitle'])) {
+        $hasLessons = true;
+        break;
+    }
+}
+
+// Reset pointer to start of result set
+mysqli_data_seek($lessonResult, 0);
 ?>
 
-<?php if (mysqli_num_rows($lessonResult) > 0): ?>
+<?php if ($hasLessons): ?>
 
     <!-- Sort By Dropdown (only shown if there are lessons) -->
-    <div class="d-flex align-items-center flex-nowrap mb-1" id="header">
+    <div class="d-flex align-items-center flex-nowrap mb-1">
         <div class="d-flex align-items-center flex-nowrap">
-            <span class="dropdown-label me-2 text-reg">Sort by</span>
-            <div class="custom-dropdown">
-                <button class="dropdown-btn text-reg text-14">Newest</button>
-                <ul class="dropdown-list text-reg text-14">
-                    <li data-value="Newest">Newest</li>
-                    <li data-value="Oldest">Oldest</li>
-                    <li data-value="Unread">Unread</li>
-                </ul>
-            </div>
+            <span class="dropdown-label me-2 text-reg text-14">Sort by</span>
+            <form method="POST">
+                <input type="hidden" name="activeTab" value="lessons">
+                <select class="select-modern text-reg text-14" name="sortLesson" onchange="this.form.submit()">
+                    <option value="Newest" <?php echo ($sortLesson == 'Newest') ? 'selected' : ''; ?>>Newest</option>
+                    <option value="Oldest" <?php echo ($sortLesson == 'Oldest') ? 'selected' : ''; ?>>Oldest</option>
+                </select>
+            </form>
+
         </div>
     </div>
 
     <!-- Lessons List -->
-    <div class="d-flex flex-column flex-nowrap overflow-y-auto overflow-x-hidden"
-        style="max-height: 70vh;">
+    <div class="d-flex flex-column flex-nowrap overflow-x-hidden">
         <?php
         while ($lesson = mysqli_fetch_assoc($lessonResult)) {
             $lessonID = $lesson['lessonID'];
             $lessonTitle = $lesson['lessonTitle'];
+
+            if (empty($lessonTitle)) continue; // skip lessons with empty title
 
             $fileQuery = "SELECT * FROM files WHERE lessonID = '$lessonID'";
             $fileResult = executeQuery($fileQuery);
@@ -66,7 +93,7 @@ $lessonResult = executeQuery($lessonQuery);
 
                                     <div>
                                         <div class="text-sbold text-16 py-1" style="line-height: 1;">
-                                            <?php echo $lessonTitle ?>
+                                            <?php echo htmlspecialchars($lessonTitle); ?>
                                         </div>
                                         <div class="text-reg text-12" style="line-height: 1;">
                                             <?php echo $fileCount . " file" . ($fileCount != 1 ? "s" : "") . " · " . $linkCount . " link" . ($linkCount != 1 ? "s" : ""); ?>

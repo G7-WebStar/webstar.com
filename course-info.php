@@ -1,5 +1,7 @@
 <?php
 $activePage = 'courseInfo';
+$activeTab = $_POST['activeTab'] ?? 'announcements';
+
 
 include("shared/assets/database/connect.php");
 include("shared/assets/processes/session-process.php");
@@ -24,6 +26,48 @@ if (isset($_GET['courseID'])) {
 ";
     $selectCourseResult = executeQuery($selectCourseQuery);
 
+    // Sort Todo
+    $sortTodo = $_POST['sortTodo'] ?? 'Newest';
+    $statusFilter = $_POST['statusFilter'] ?? 'All';
+
+    // Sort by
+    switch ($sortTodo) {
+        case 'Oldest':
+            $todoOrderBy = "assessments.deadline ASC";
+            break;
+
+        case 'Missing':
+            $todoOrderBy = "assessments.deadline DESC";
+            break;
+
+        default:
+            $todoOrderBy = "assessments.deadline DESC";
+            break;
+    }
+
+    // Status Todo
+    switch ($statusFilter) {
+        case 'Pending':
+            $todoWhereStatus = "AND todo.status = 'Pending'";
+            break;
+
+        case 'Missing':
+            $todoWhereStatus = "AND todo.status = 'Missing'";
+            break;
+
+        case 'Done':
+            $todoWhereStatus = "AND todo.status IN ('Graded', 'Submitted')";
+            break;
+
+        default: 
+            $todoWhereStatus = "";
+            break;
+    }
+
+    if ($sortTodo === 'Missing') {
+        $todoWhereStatus = "AND todo.status = 'Missing'";
+    }
+
     $selectAssessmentQuery = "SELECT
     tests.testID,
     assignments.assignmentID,
@@ -42,8 +86,9 @@ if (isset($_GET['courseID'])) {
     	ON assignments.assessmentID = todo.assessmentID
     LEFT JOIN tests
         ON tests.assessmentID = todo.assessmentID
-    WHERE todo.userID = '$userID' AND todo.status = 'Pending' AND courses.courseID = '$courseID'
-    ORDER BY assessments.assessmentID DESC
+    WHERE todo.userID = '$userID' 
+    AND courses.courseID = '$courseID' $todoWhereStatus
+    ORDER BY $todoOrderBy
 ";
     $selectAssessmentResult = executeQuery($selectAssessmentQuery);
 
@@ -194,7 +239,7 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
                                     <?php
                                     if (mysqli_num_rows($selectCourseResult) > 0) {
                                         while ($courses = mysqli_fetch_assoc($selectCourseResult)) {
-                                            ?>
+                                    ?>
 
                                             <!-- Mobile Dropdown Course Card -->
                                             <div class="course-card-mobile d-block d-md-none w-100">
@@ -282,7 +327,7 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
                                                                         if (mysqli_num_rows($selectLeaderboardResult) > 0) {
                                                                             mysqli_data_seek($selectLeaderboardResult, 0);
                                                                             while ($points = mysqli_fetch_assoc($selectLeaderboardResult)) {
-                                                                                ?>
+                                                                        ?>
                                                                                 <div class="d-flex align-items-center">
                                                                                     <img class="me-1" src="shared/assets/img/xp.png"
                                                                                         alt="Description of Image" width="15">
@@ -291,7 +336,7 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
                                                                                         XPs</span>
                                                                                 </div>
 
-                                                                                <?php
+                                                                        <?php
                                                                             }
                                                                         }
                                                                         ?>
@@ -335,7 +380,7 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
                                                                     <?php if (mysqli_num_rows($selectLimitAssessmentResult) > 0) {
                                                                         mysqli_data_seek($selectLimitAssessmentResult, 0);
                                                                         while ($activities = mysqli_fetch_assoc($selectLimitAssessmentResult)) {
-                                                                            ?>
+                                                                    ?>
                                                                             <div
                                                                                 class="todo-card-course-info d-flex align-items-stretch rounded-2 mt-2 w-100">
                                                                                 <div class="date-section text-sbold text-14 px-3"
@@ -370,7 +415,7 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
-                                                                            <?php
+                                                                    <?php
                                                                         }
                                                                     } ?>
                                                                 </div>
@@ -453,7 +498,7 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
                                                                 if (mysqli_num_rows($selectLeaderboardResult) > 0) {
                                                                     mysqli_data_seek($selectLeaderboardResult, 0);
                                                                     while ($points = mysqli_fetch_assoc($selectLeaderboardResult)) {
-                                                                        ?>
+                                                                ?>
                                                                         <div class="d-flex align-items-center">
                                                                             <img class="me-1" src="shared/assets/img/xp.png"
                                                                                 alt="Description of Image" width="15">
@@ -461,7 +506,7 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
                                                                                 XPs</span>
                                                                         </div>
 
-                                                                        <?php
+                                                                <?php
                                                                     }
                                                                 }
                                                                 ?>
@@ -505,7 +550,7 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
                                                             <?php if (mysqli_num_rows($selectLimitAssessmentResult) > 0) {
                                                                 mysqli_data_seek($selectLimitAssessmentResult, 0);
                                                                 while ($activities = mysqli_fetch_assoc($selectLimitAssessmentResult)) {
-                                                                    ?>
+                                                            ?>
                                                                     <div
                                                                         class="todo-card-course-info d-flex align-items-stretch rounded-2 mt-2 w-100">
                                                                         <div class="date-section text-sbold text-14 px-3"
@@ -529,20 +574,20 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    <?php
+                                                            <?php
                                                                 }
                                                             } ?>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <?php
+                                        <?php
                                         }
                                     } else { ?>
                                         <script>
                                             window.location.href = "404.php"
                                         </script>
-                                        <?php
+                                    <?php
                                     }
                                     ?>
                                 </div>
@@ -565,34 +610,45 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
                                                     <ul class="nav custom-nav-tabs flex-nowrap w-100" id="myTab"
                                                         role="tablist"
                                                         style="display: inline-flex; white-space: nowrap; justify-content: space-between;">
-                                                        <li class="nav-item"><a
-                                                                class="nav-link text-14 <?php echo $navState == 'active' ? '' : 'active'; ?>"
-                                                                id="announcements-tab" data-bs-toggle="tab"
-                                                                href="#announcements" role="tab">Announcements</a></li>
-                                                        <li class="nav-item"><a class="nav-link text-14"
-                                                                id="lessons-tab" data-bs-toggle="tab" href="#lessons"
-                                                                role="tab">Lessons</a></li>
-                                                        <li class="nav-item"><a class="nav-link text-14" id="todo-tab"
-                                                                data-bs-toggle="tab" href="#todo" role="tab">To-do</a>
+                                                        <li class="nav-item">
+                                                            <a class="nav-link text-14 <?php echo ($activeTab == 'announcements') ? 'active' : ''; ?>"
+                                                                data-bs-toggle="tab" href="#announcements">Announcements</a>
                                                         </li>
-                                                        <li class="nav-item"><a class="nav-link text-14"
-                                                                id="attachments-tab" data-bs-toggle="tab"
-                                                                href="#attachments" role="tab">Files</a></li>
-                                                        <li class="nav-item"><a class="nav-link text-14" id="link-tab"
-                                                                data-bs-toggle="tab" href="#link" role="tab">Links</a>
+
+                                                        <li class="nav-item">
+                                                            <a class="nav-link text-14 <?php echo ($activeTab == 'lessons') ? 'active' : ''; ?>"
+                                                                data-bs-toggle="tab" href="#lessons">Lessons</a>
                                                         </li>
-                                                        <li class="nav-item nav-leaderboard"><a
-                                                                class="nav-link text-14 <?php echo $navState == 'active' ? 'active' : ''; ?>"
-                                                                id="leaderboard-tab" data-bs-toggle="tab"
-                                                                href="#leaderboard" role="tab">Leaderboard</a></li>
-                                                        <li class="nav-item nav-report"><a class="nav-link text-14"
-                                                                id="report-tab" data-bs-toggle="tab" href="#report"
-                                                                role="tab">Report</a></li>
-                                                        <li class="nav-item nav-student"
-                                                            style="margin-right: 0px !important;"><a
-                                                                class="nav-link text-14" id="student-tab"
-                                                                data-bs-toggle="tab" href="#student"
-                                                                role="tab">Students</a></li>
+
+                                                        <li class="nav-item">
+                                                            <a class="nav-link text-14 <?php echo ($activeTab == 'todo') ? 'active' : ''; ?>"
+                                                                data-bs-toggle="tab" href="#todo">To-do</a>
+                                                        </li>
+
+                                                        <li class="nav-item">
+                                                            <a class="nav-link text-14 <?php echo ($activeTab == 'attachments') ? 'active' : ''; ?>"
+                                                                data-bs-toggle="tab" href="#attachments">Files</a>
+                                                        </li>
+
+                                                        <li class="nav-item">
+                                                            <a class="nav-link text-14 <?php echo ($activeTab == 'link') ? 'active' : ''; ?>"
+                                                                data-bs-toggle="tab" href="#link">Links</a>
+                                                        </li>
+
+                                                        <li class="nav-item nav-leaderboard">
+                                                            <a class="nav-link text-14 <?php echo ($activeTab == 'leaderboard') ? 'active' : ''; ?>"
+                                                                data-bs-toggle="tab" href="#leaderboard">Leaderboard</a>
+                                                        </li>
+
+                                                        <li class="nav-item nav-report">
+                                                            <a class="nav-link text-14 <?php echo ($activeTab == 'report') ? 'active' : ''; ?>"
+                                                                data-bs-toggle="tab" href="#report">Report</a>
+                                                        </li>
+
+                                                        <li class="nav-item nav-student">
+                                                            <a class="nav-link text-14 <?php echo ($activeTab == 'student') ? 'active' : ''; ?>"
+                                                                data-bs-toggle="tab" href="#student">Students</a>
+                                                        </li>
                                                     </ul>
                                                 </div>
 
@@ -610,47 +666,54 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
                                         <div class="tab-content mt-3" id="myTabContent">
 
                                             <!-- Announcements -->
-                                            <div class="tab-pane fade <?php echo $navState == "active" ? "" : "show active"; ?>"
+                                            <div class="tab-pane fade <?php echo ($activeTab == 'announcements') ? 'show active' : ''; ?>"
                                                 id="announcements" role="tabpanel">
                                                 <?php include 'course-info-contents/announcements.php'; ?>
                                             </div>
 
                                             <!-- Lessons -->
-                                            <div class="tab-pane fade" id="lessons" role="tabpanel">
+                                            <div class="tab-pane fade <?php echo ($activeTab == 'lessons') ? 'show active' : ''; ?>"
+                                                id="lessons" role="tabpanel">
                                                 <?php include 'course-info-contents/lessons.php'; ?>
                                             </div>
 
                                             <!-- To-do -->
-                                            <div class="tab-pane fade" id="todo" role="tabpanel">
+                                            <div class="tab-pane fade <?php echo ($activeTab == 'todo') ? 'show active' : ''; ?>"
+                                                id="todo" role="tabpanel">
                                                 <?php include 'course-info-contents/to-do.php'; ?>
                                             </div>
 
                                             <!-- Attachments -->
-                                            <div class="tab-pane fade" id="attachments" role="tabpanel">
+                                            <div class="tab-pane fade <?php echo ($activeTab == 'attachments') ? 'show active' : ''; ?>"
+                                                id="attachments" role="tabpanel">
                                                 <?php include 'course-info-contents/attachments.php'; ?>
                                             </div>
 
-                                            <!-- Link -->
-                                            <div class="tab-pane fade" id="link" role="tabpanel">
+                                            <!-- Links -->
+                                            <div class="tab-pane fade <?php echo ($activeTab == 'link') ? 'show active' : ''; ?>"
+                                                id="link" role="tabpanel">
                                                 <?php include 'course-info-contents/link.php'; ?>
                                             </div>
 
                                             <!-- Leaderboard -->
-                                            <div class="tab-pane fade <?php echo $navState == "active" ? "show active" : ""; ?>"
+                                            <div class="tab-pane fade <?php echo ($activeTab == 'leaderboard') ? 'show active' : ''; ?>"
                                                 id="leaderboard" role="tabpanel">
                                                 <?php include 'course-info-contents/leaderboard.php'; ?>
                                             </div>
 
                                             <!-- Report -->
-                                            <div class="tab-pane fade" id="report" role="tabpanel">
+                                            <div class="tab-pane fade <?php echo ($activeTab == 'report') ? 'show active' : ''; ?>"
+                                                id="report" role="tabpanel">
                                                 <?php include 'course-info-contents/report.php'; ?>
                                             </div>
 
-                                            <!-- Student -->
-                                            <div class="tab-pane fade" id="student" role="tabpanel">
+                                            <!-- Students -->
+                                            <div class="tab-pane fade <?php echo ($activeTab == 'student') ? 'show active' : ''; ?>"
+                                                id="student" role="tabpanel">
                                                 <?php include 'course-info-contents/student.php'; ?>
                                             </div>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -663,7 +726,7 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const tabContainer = document.getElementById('mobileTabScroll');
             const scrollLeftBtn = document.getElementById('scrollLeftBtn');
             const scrollRightBtn = document.getElementById('scrollRightBtn');
@@ -694,7 +757,7 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
             updateArrowVisibility(); // Initial check
         });
 
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             // Select all headers with collapse triggers
             const headers = document.querySelectorAll('.course-card-mobile [data-bs-toggle="collapse"]');
 
@@ -705,23 +768,22 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
 
                 if (!collapseEl) return;
 
-                collapseEl.addEventListener("show.bs.collapse", function () {
+                collapseEl.addEventListener("show.bs.collapse", function() {
                     icon.classList.remove("fa-chevron-down");
                     icon.classList.add("fa-chevron-up");
                 });
 
-                collapseEl.addEventListener("hide.bs.collapse", function () {
+                collapseEl.addEventListener("hide.bs.collapse", function() {
                     icon.classList.remove("fa-chevron-up");
                     icon.classList.add("fa-chevron-down");
                 });
             });
         });
-
     </script>
 
     <!-- JS for Desktop Scroll Buttons -->
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const desktopTabScroll = document.querySelector(".tab-scroll");
             const desktopScrollLeftBtn = document.getElementById("desktopScrollLeftBtn");
             const desktopScrollRightBtn = document.getElementById("desktopScrollRightBtn");
@@ -736,11 +798,17 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
             }
 
             desktopScrollLeftBtn.addEventListener("click", () => {
-                desktopTabScroll.scrollBy({ left: -150, behavior: "smooth" });
+                desktopTabScroll.scrollBy({
+                    left: -150,
+                    behavior: "smooth"
+                });
             });
 
             desktopScrollRightBtn.addEventListener("click", () => {
-                desktopTabScroll.scrollBy({ left: 150, behavior: "smooth" });
+                desktopTabScroll.scrollBy({
+                    left: 150,
+                    behavior: "smooth"
+                });
             });
 
             desktopTabScroll.addEventListener("scroll", updateDesktopArrowVisibility);
@@ -750,7 +818,7 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
 
         // JS For Course Card Sticky
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const courseCardDesktop = document.querySelector('.course-card-desktop');
 
             if (courseCardDesktop) {
@@ -771,7 +839,6 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
                 }
             }
         });
-
     </script>
 
 
