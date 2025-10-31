@@ -2,12 +2,75 @@ body {
     background-color: #fdf7ed;
 }
 
+.main-container {
+    opacity: 1;
+    animation: none;
+}
+
+.tab-carousel-wrapper {
+    position: relative;
+}
+
+/* Left and Right Arrows */
+.scroll-arrow-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--dirtyWhite) !important;
+    border: none;
+    color: var(--black);
+    box-shadow: 0 2px 6px var(--dirtyWhite);
+    width: 34px;
+    z-index: 2;
+}
+
+/* Position the arrows */
+#desktopScrollLeftBtn {
+    left: -10px;
+}
+
+#desktopScrollRightBtn {
+    right: -10px;
+}
+
+/* NavTabs Mobile Handling */
+
+@media (max-width: 767px) {
+    .custom-nav-tabs .nav-item {
+        flex: 0 0 auto !important;
+        /* Don't stretch */
+        width: auto !important;
+        /* Allow natural width */
+        text-align: center;
+        scroll-snap-align: start;
+        margin-right: 20px;
+    }
+}
+
+/* Remove the hovers */
+button.btn,
+a.btn {
+    transition: none !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+button.btn:hover,
+a.btn:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+
 .course-card {
-    max-width: 350px;
     background-color: white;
     border-radius: 15px;
     padding: 1.5rem;
-    border: 1px solid #ddd;
+}
+
+.course-card-desktop {
+    background: linear-gradient(to bottom, #FDDF94, #FFFFFF);
+    border-radius: 15px;
 }
 
 .course-image {
@@ -34,7 +97,6 @@ body {
 .class-standing,
 .todo-box {
     border: 1px solid var(--black);
-    border-radius: 15px;
     padding: 0.75rem 1rem;
 }
 
@@ -114,13 +176,13 @@ body {
 
 .date-section {
     position: relative;
+    background-color: var(--primaryColor);
 }
 
-.todo-card {
+.todo-card-course-info {
     background-color: var(--pureWhite);
     border: 1px solid var(--black);
     overflow: hidden;
-    max-width: 605px;
 }
 
 .date {
@@ -604,5 +666,58 @@ body {
     .dropdown-btn {
         font-size: 13px;
         padding: 5px 12px;
+    }
+}
+
+/* 
+::-webkit-scrollbar {
+    width: 8px; 
+    height: 8px; 
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--black);
+    border-radius: 10px;
+    border: 2px solid transparent; 
+    margin:10px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+ */
+
+ /* Sticky Nav Tabs */
+.tab-carousel-wrapper {
+    position: sticky;
+    top: -20px;
+    z-index: 10;
+    background: var(--dirtyWhite);
+}
+
+.tab-section {
+    min-height: 100vh;
+}
+
+ /* Truncating To-do Cards */
+.truncate {
+    width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+ /* Truncating To-do Cards for Larger Screens*/
+@media (min-width: 1600px) and (max-width: 1999px) {
+    .truncate {
+        width: 200px; 
+    }
+}
+
+@media (min-width: 2000px) {
+    .truncate {
+        width: 300px; 
     }
 }
