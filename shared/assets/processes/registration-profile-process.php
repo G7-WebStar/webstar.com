@@ -9,7 +9,7 @@ if (isset($_POST['nextBtn'])) {
     $firstName = $_POST['firstName'];
     $middleName = $_POST['middleName'];
     $lastName = $_POST['lastName'];
-    $userName = $_POST['userName'];
+    $userName = strtolower ($_POST['userName']);
     $studentID = strtoupper($_POST['studentID']);
     $programID = $_POST['program'];
     $gender = $_POST['gender'];

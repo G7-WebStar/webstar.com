@@ -34,7 +34,7 @@ if (isset($_POST['signUpBtn'])) {
     // Check if password mismatch
     if (mysqli_num_rows($checkEmailResult) > 0) {
         $_SESSION['alert'] = 'emailExists';
-    } elseif (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*\W).{8,}$/', $password)) {
+    } elseif (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{8,}$/', $password)) {
         $_SESSION['alert'] = 'invalidPasswordFormat';
     } elseif ($password !== $confirmPassword) {
         $_SESSION['alert'] = 'passwordMismatch';
