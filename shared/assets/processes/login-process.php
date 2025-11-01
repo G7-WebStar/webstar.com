@@ -2,6 +2,7 @@
 session_start();
 
 $login_error = false; // default
+$email_not_found = false;  // Email/username not found
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     $conn = new mysqli("localhost", "root", "", "webstar");
@@ -10,20 +11,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
         die("Connection failed: " . $conn->connect_error);
     }
 
-    $email = trim($_POST['email']);
+    $loginInput = trim($_POST['loginInput']); // email or username
     $password = $_POST['password'];
 
-    $stmt = $conn->prepare("SELECT userID, role, password FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
+    // Check if loginInput matches email OR userName
+    $stmt = $conn->prepare("SELECT userID, role, password, email FROM users WHERE email = ? OR userName = ?");
+    $stmt->bind_param("ss", $loginInput, $loginInput);
     $stmt->execute();
     $stmt->store_result();
 
     if ($stmt->num_rows > 0) {
-        $stmt->bind_result($userID, $role, $dbPassword);
+        $stmt->bind_result($userID, $role, $dbPassword, $emailFromDB);
         $stmt->fetch();
 
-        if (password_verify($password, $dbPassword) || $password === $dbPassword) {
-            $_SESSION['email'] = $email;
+        if ($password === $dbPassword || password_verify($password, $dbPassword)) {
+            // Store session using email from DB
+            $_SESSION['email'] = $emailFromDB;
             $_SESSION['userID'] = $userID;
             $_SESSION['role'] = $role;
 
@@ -54,9 +57,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
             $login_error = true;
         }
     } else {
-        $login_error = true;
+        $email_not_found = true;
     }
 
     $stmt->close();
     $conn->close();
 }
+?>
