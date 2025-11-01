@@ -36,7 +36,7 @@ include("shared/assets/processes/login-process.php");
                 <!-- Login Form -->
                 <form method="POST" action="">
                     <div class="container login-form py-md-2">
-                        <div class="form-floating">
+                        <div class="form-floating mb-2">
                             <input type="text" name="loginInput" class="input-style form-control rounded-4 border-blue"
                                 id="floatingInput" placeholder="Email or Username" required
                                 value="<?php echo isset($_POST['loginInput']) ? htmlspecialchars($_POST['loginInput']) : ''; ?>">
@@ -44,18 +44,18 @@ include("shared/assets/processes/login-process.php");
                                 <div class="px-2">Email or Username</div>
                             </label>
                         </div>
-                        <div class="form-floating pt-2 pt-md-3 pb-md-4 pb-2 position-relative">
+                        <div class="form-floating pb-md-4 pb-2 position-relative">
                             <input type="password" name="password" class="form-control rounded-4 border-blue"
                                 id="password" style="padding-left: 20px;" placeholder="Password" required>
                             <label for="password">
-                                <div class="pt-2 pt-md-3 px-2">Password</div>
+                                <div class="px-2">Password</div>
                             </label>
                             <button type="button" class="password-toggle-btn" onclick="togglePassword('password')">
-                                <i class="fas fa-eye eye-icon show" style="display: none;"></i>
+                                <i class="fas fa-eye eye-icon show hide-icon" style="display: none;"></i>
                                 <i class="fas fa-eye-slash eye-icon hide" style="display: block;"></i>
                             </button>
                             <div class="forgot-password float-end mt-3">
-                                <a href="login-auth/forgot-password.php" class="text-decoration-none text-dark highlight text-small">Forgot
+                                <a href="login-auth/forgot-password.php" class="text-decoration-none text-dark highlight text-small text-reg">Forgot
                                     Password?</a>
                             </div>
                         </div>
@@ -80,7 +80,7 @@ include("shared/assets/processes/login-process.php");
                             <svg class="bi flex-shrink-0 me-2" width="20" height="20" role="img" aria-label="Danger:">
                                 <use xlink:href="#exclamation-triangle-fill" />
                             </svg>
-                            <div class="alert-message mx-1">
+                            <div class="alert-message mx-1 text-reg">
                                 Oops! Email or password incorrect.
                             </div>
                         </div>
@@ -103,7 +103,7 @@ include("shared/assets/processes/login-process.php");
                             <svg class="bi flex-shrink-0 me-2" width="20" height="20" role="img" aria-label="Danger:">
                                 <use xlink:href="#exclamation-triangle-fill" />
                             </svg>
-                            <div class="alert-message mx-1">
+                            <div class="alert-message mx-1 text-reg">
                                 Email not found. Please check your email.
                             </div>
                         </div>
@@ -114,8 +114,7 @@ include("shared/assets/processes/login-process.php");
                     <!-- Login Button -->
                     <div class="container d-flex justify-content-center">
                         <button type="submit" name="login"
-                            class="btn btn-login text-dark rounded-4 px-4 my-md-4 my-3 mx-auto border-blue"
-                            style="width: 73%;">
+                            class="btn btn-login text-dark rounded-4 px-4 my-md-4 my-3 mx-auto border-blue text-reg">
                             Sign in
                         </button>
                     </div>
@@ -126,8 +125,8 @@ include("shared/assets/processes/login-process.php");
                 <!-- Registration Redirect -->
                 <div class="container text-center text-small">
                     <a href="registration.php" class="text-decoration-none">
-                        <span class="text-dark">Don't have an account? </span>
-                        <span class="fw-bold text-dark highlight">Sign up</span>
+                        <span class="text-dark text-reg">Don't have an account? </span>
+                        <span class="fw-bold text-dark highlight text-reg">Sign up</span>
                     </a>
                 </div>
             </div>
