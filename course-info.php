@@ -182,6 +182,22 @@ if (isset($_GET['courseID'])) {
 $courseCodeResult = executeQuery("SELECT courseCode FROM courses WHERE courseID = '$courseID' LIMIT 1");
 $courseCode = mysqli_fetch_assoc($courseCodeResult);
 
+$userID = $_SESSION['userID'];
+
+$query = "
+    SELECT userinfo.profilePicture
+    FROM userinfo
+    JOIN users ON userinfo.userID = users.userID
+    WHERE users.userID = '$userID';
+";
+
+$result = mysqli_query($conn, $query);
+if (!$result) {
+    die("Query failed: " . mysqli_error($conn));
+}
+
+$user = mysqli_fetch_assoc($result);
+
 ?>
 
 <!doctype html>
@@ -230,6 +246,58 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
 
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
+                    <!-- Bottom Navbar -->
+                    <nav class="navbar fixed-bottom border-top d-block d-md-none"
+                        style="background-color:white; height: 80px;">
+                        <div class="container d-flex justify-content-around pb-1">
+
+                            <!-- Home -->
+                            <button class="btn d-flex flex-column align-items-center">
+                                <span class="material-symbols-rounded" style="font-size:20px">
+                                    dashboard
+                                </span>
+                                <span class="text-med text-12">Home</span>
+                            </button>
+
+                            <!-- Courses -->
+                            <button class="btn d-flex flex-column align-items-center"
+                                style="background-color:var(--primaryColor); border: 1px solid var(--black);">
+                                <span class="material-symbols-rounded" style="font-size:20px">
+                                    folder
+                                </span>
+                                <small class="text-med text-12">Courses</small>
+                            </button>
+
+                            <!-- To-do -->
+                            <button class="btn d-flex flex-column align-items-center">
+                                <span class="material-symbols-rounded" style="font-size:20px">
+                                    extension
+                                </span>
+                                <small class="text-med text-12">Quests</small>
+                            </button>
+
+                            <!-- Inbox -->
+                            <button class="btn d-flex flex-column align-items-center">
+                                <i class="bi bi-inbox-fill d-flex align-items-center justify-content-center"
+                                    style="font-size:25px; width:20px; height:20px: color: var(--black); margin-top: -3px;"></i>
+                                <small class="text-med text-12" style="margin-top: -2px;">Inbox</small>
+                            </button>
+
+                            <!-- Profile -->
+                            <button class="btn d-flex flex-column align-items-center">
+                                <div class="d-flex flex-column align-items-center text-decoration-none sticky-header"
+                                    id="stickyHeader">
+                                    <div class="rounded-circle mb-2" style="width: 18px; height: 18px; background-color: #5ba9ff;
+            background: url('shared/assets/pfp-uploads/<?= htmlspecialchars($user['profilePicture']) ?>') no-repeat center center;
+            background-size: cover;">
+                                    </div>
+                                    <small class="text-med text-12" style="margin-top: -7px;">Profile</small>
+                                </div>
+                            </button>
+
+
+                        </div>
+                    </nav>
                     <div class="container-fluid py-3 overflow-y-auto" style="white-space: nowrap; ">
                         <div class="row d-flex justify-content-center">
                             <div class="row mt-0">
@@ -258,9 +326,12 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
                                                             style="cursor: pointer;"></div>
 
                                                         <div class="text-center flex-grow-1">
-                                                            <h5 class="text-bold mb-1"><?php echo $courses['courseCode']; ?>
+                                                            <h5 class="text-bold mb-1" style="line-height:1;">
+                                                                <?php echo $courses['courseCode']; ?>
                                                             </h5>
-                                                            <p class="text-reg mb-0"><?php echo $courses['courseTitle']; ?></p>
+                                                            <p class="text-reg mb-0" style="line-height:1;">
+                                                                <?php echo $courses['courseTitle']; ?>
+                                                            </p>
                                                         </div>
 
                                                         <i
@@ -282,12 +353,12 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
 
                                                             <!-- Prof -->
                                                             <div class="d-flex align-items-center text-decoration-none">
-                                                                <div class="rounded-circle me-2 flex-shrink-0" style="width: 30px; height: 30px; background-color: #5ba9ff;
+                                                                <div class="rounded-circle me-2 flex-shrink-0" style="width: 25px; height: 25px; background-color: #5ba9ff;
                                                     background: url('shared/assets/pfp-uploads/<?php echo $courses['profPFP']; ?>') no-repeat center center;
                                                     background-size: cover;">
                                                                 </div>
                                                                 <div class="d-flex flex-column justify-content-center">
-                                                                    <span class="text-sbold text-14" style="line-height: 1.2">
+                                                                    <span class="text-sbold text-12" style="line-height: 1.2">
                                                                         <?php echo $courses['profFirstName'] . " " . $courses['profMiddleName'] . " " . $courses['profLastName']; ?>
                                                                     </span>
                                                                     <small class="text-reg text-12" style="line-height: 1.2">
@@ -299,12 +370,12 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
                                                             <!-- Sched -->
                                                             <div class="d-flex align-items-center text-decoration-none mt-3">
                                                                 <span
-                                                                    class="material-symbols-outlined me-1 text-center d-flex align-items-center"
-                                                                    style="width: 30px; height: 30px;">
+                                                                    class="material-symbols-outlined text-center d-flex align-items-center"
+                                                                    style="width: 10px; height: 10px; margin-right: 23px;">
                                                                     calendar_today
                                                                 </span>
                                                                 <div class="d-flex flex-column justify-content-center">
-                                                                    <span class="text-reg text-14">
+                                                                    <span class="text-reg text-12">
                                                                         <span class="me-1 text-med">Thursdays</span> 8AM - 10AM
                                                                     </span>
                                                                 </div>
@@ -313,8 +384,8 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
                                                             <!-- Class Standing -->
                                                             <div class="row mb-3 mt-3">
                                                                 <div class="col">
-                                                                    <label class="text-med text-14 mb-1">Class Standing</label>
-                                                                    <div class="class-standing text-14 d-flex justify-content-between align-items-center rounded-3 mt-2"
+                                                                    <label class="text-med text-12">Class Standing</label>
+                                                                    <div class="class-standing text-12 d-flex justify-content-between align-items-center rounded-3 mt-2"
                                                                         style="background-color:white">
                                                                         <span class="material-symbols-outlined"
                                                                             style="font-size:20px">
@@ -348,8 +419,8 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
                                                             <!-- Level -->
                                                             <div class="row mb-3 mt-3">
                                                                 <div class="col">
-                                                                    <label class="text-med text-14 mb-1">Level</label>
-                                                                    <div class="class-standing text-14 align-items-center rounded-3 p-3 mt-2"
+                                                                    <label class="text-med text-12">Level</label>
+                                                                    <div class="class-standing text-12 align-items-center rounded-3 p-3 mt-2"
                                                                         style="background-color:white">
                                                                         <div class="d-flex justify-content-between py-1">
                                                                             <span class="text-sbold">
@@ -376,14 +447,14 @@ $courseCode = mysqli_fetch_assoc($courseCodeResult);
                                                             <!-- Quests -->
                                                             <div class="row mb-3 mt-3">
                                                                 <div class="col">
-                                                                    <label class="text-med text-14 mb-1">Quests</label>
+                                                                    <label class="text-med text-12">Quests</label>
                                                                     <?php if (mysqli_num_rows($selectLimitAssessmentResult) > 0) {
                                                                         mysqli_data_seek($selectLimitAssessmentResult, 0);
                                                                         while ($activities = mysqli_fetch_assoc($selectLimitAssessmentResult)) {
                                                                     ?>
                                                                             <div
                                                                                 class="todo-card-course-info d-flex align-items-stretch rounded-2 mt-2 w-100">
-                                                                                <div class="date-section text-sbold text-14 px-3"
+                                                                                <div class="date-section text-sbold text-12 px-3"
                                                                                     style="text-transform:uppercase; ">
                                                                                     <?php echo $activities['assessmentDeadline']; ?>
                                                                                 </div>
