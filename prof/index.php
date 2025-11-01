@@ -40,8 +40,7 @@ $activeAssessmentsTabQuery = "SELECT
 assessments.type, 
 courses.courseID, 
 assessments.assessmentID, 
-assessments.assessmentTitle, 
-assessments.about,
+assessments.assessmentTitle,
 courses.courseCode, 
 DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline 
 FROM assignments
