@@ -211,6 +211,7 @@ include("../shared/assets/processes/prof-session-process.php");
                                                 aria-hidden="true">add_circle</span>
                                             Criteria
                                         </button>
+                                        <span class="text-med text-16 total-points-label">Total Points: 10</span>
                                     </div>
                                 </div>
 

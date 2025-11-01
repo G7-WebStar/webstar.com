@@ -1,0 +1,455 @@
+/* ===============================
+   BASE STYLES
+   =============================== */
+body {
+    background: linear-gradient(to top, #FFFFFF, var(--primaryColor), #fff8eb);
+    color: var(--black);
+    overflow-x: hidden;
+}
+
+/* ===============================
+   NAVBAR
+   =============================== */
+.navbar {
+    background-color: transparent;
+    padding: 1.2rem 6%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: #1d1d1d;
+    display: flex;
+    align-items: center;
+}
+
+.nav-link {
+    color: #333 !important;
+    font-weight: 500;
+    margin: 0 18px;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-register {
+    background-color: var(--primaryColor);
+    color: var(--white);
+    font-size: 22px;
+    font-family: var(--SemiBold);
+}
+
+.btn-register:hover {
+    background-color: var(--primaryColor);
+}
+
+.button {
+    background-color: var(--pureWhite);
+    border: 1px solid var(--black);
+    color: var(--black);
+}
+
+/* ===============================
+   HERO SECTION
+   =============================== */
+.hero-section {
+    text-align: center;
+    padding: 80px 20px;
+    position: relative;
+}
+
+.hero-section .intro {
+    overflow: hidden;
+    font-size: 100px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.hero-section .intro span {
+    font-style: italic;
+    font-weight: 400;
+}
+
+.hero-section p {
+    margin-top: 20px;
+    font-size: 1rem;
+    color: #444;
+}
+
+/* Desktop hero images */
+.hero-img-left,
+.hero-img-right {
+    position: absolute;
+    width: 150px;
+}
+
+.hero-img-left {
+    top: 80px;
+    left: 10%;
+}
+
+.hero-img-right {
+    top: 100px;
+    right: 10%;
+}
+
+/* ===============================
+   ABOUT SECTION
+   =============================== */
+.about-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 100px 15px;
+    color: #2b2b2b;
+}
+
+.about-img-left {
+    margin-left: 3rem;
+}
+
+.about-text {
+    max-width: 55%;
+    text-align: right;
+    margin-right: 3rem;
+}
+
+/* ===============================
+   FEATURES SECTION
+   =============================== */
+.features-section {
+    color: #fff;
+    padding: 100px 0;
+    position: relative;
+}
+
+.features-section h2 {
+    text-align: center;
+    font-weight: 700;
+    font-size: 2.5rem;
+    color: var(--black);
+}
+
+.features-section p.subtitle {
+    text-align: center;
+    max-width: 700px;
+    margin: 15px auto 50px;
+    color: var(--black);
+}
+
+.carousel-wrapper {
+    display: flex;
+    width: max-content;
+    animation: scroll 25s linear infinite;
+}
+
+@keyframes scroll {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.feature-card {
+    background: linear-gradient(to top, white, #ffe8b0);
+    color: var(--black);
+    border-radius: 12px;
+    padding: 25px;
+    width: 280px;
+    margin: 0 15px;
+    flex-shrink: 0;
+    text-align: left;
+}
+
+.feature-card img {
+    display: block;
+    /* ensures it behaves as a block element */
+    margin: 0 auto;
+    /* centers horizontally */
+    max-width: 120px;
+    /* make image bigger */
+    height: auto;
+    /* maintain aspect ratio */
+}
+
+.feature-card h5 {
+    font-weight: 700;
+    font-size: 1.1rem;
+    /* margin-bottom: 10px; */
+
+    min-height: 60px;
+    /* adjust depending on your layout */
+    /* display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center; */
+
+}
+
+.feature-card p {
+    font-size: 0.9rem;
+    color: var(--black);
+}
+
+/* ===============================
+   TEAM SECTION
+   =============================== */
+.team-section {
+    text-align: center;
+    padding: 100px 15px;
+}
+
+.team-section h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.team-section p {
+    color: #333;
+    margin-bottom: 50px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.team-card {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    height: 460px;
+    background-color: #000;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.team-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.team-card img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+.team-overlay {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 40%;
+    background: linear-gradient(to top, rgba(255, 230, 150, 0.95), rgba(255, 230, 150, 0));
+    z-index: 2;
+}
+
+.team-info {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 3;
+}
+
+.role-badge {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    border: 1px solid var(--black);
+    transform: translateX(-50%);
+    background: var(--primaryColor);
+    color: var(--black);
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    z-index: 3;
+    white-space: nowrap;
+}
+
+.team-info strong {
+    display: block;
+    color: var(--black);
+    font-size: 1.1rem;
+    margin-top: 5px;
+}
+
+.team-info p {
+    margin: 0;
+    color: var(--black);
+}
+
+/* ===============================
+   FOOTER
+   =============================== */
+footer {
+    text-align: center;
+    padding: 40px 0;
+    font-size: 0.9rem;
+    color: #555;
+    background: #fff;
+}
+
+/* ===============================
+   RESPONSIVE STYLES
+   =============================== */
+@media (max-width: 992px) {
+    .hero-section h1 {
+        font-size: 2.2rem;
+    }
+}
+
+@media (min-width: 992px) {
+    .hero-img-left {
+        width: 550px;
+        top: 60px;
+        left: 1%;
+    }
+
+    .hero-img-right {
+        width: 550px;
+        top: -80px;
+        right: 6%;
+    }
+
+    .about-img-left {
+        width: 230px;
+        top: 100px;
+        left: 8%;
+    }
+}
+
+@media (max-width: 991.98px) {
+
+    .offcanvas-start,
+    .offcanvas-body,
+    .offcanvas-body .navbar-nav {
+        padding-left: 0 !important;
+        margin-left: 0 !important;
+    }
+}
+
+/* ===============================
+   MOBILE HERO ONLY
+   =============================== */
+.mobile-hero {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .desktop-hero {
+        display: none !important;
+    }
+
+    .mobile-hero {
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .mobile-hero h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 15px;
+    }
+
+    .mobile-hero h1 span {
+        font-style: italic;
+        font-weight: 400;
+    }
+
+    .mobile-hero p {
+        font-size: 1rem;
+        margin-bottom: 40px;
+        color: #333;
+        max-width: 340px;
+    }
+
+    .mobile-hero .hero-images {
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        position: relative;
+    }
+
+    .mobile-hero .hero-images img {
+        width: 100%;
+        max-width: 350px;
+        height: auto;
+    }
+
+    .mobile-hero .folder-img {
+        transform: translateY(-90px) translateX(90px);
+    }
+
+    .mobile-hero .rocket-img {
+        transform: translateY(60px) translateX(-90px);
+    }
+}
+
+/* .contact-section {
+  background: linear-gradient(to bottom, #ffe59a, #fff1c1);
+} */
+
+.contact-section h2 {
+    color: #222;
+    font-size: 2.2rem;
+}
+
+.contact-btn {
+    background-color: var(--pureWhite);
+    border: 1px solid var(--black);
+    color: var(--black);
+}
+
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none !important;
+    }
+}
+
+/* Footer Contact Section - Mobile Adjustments */
+@media (max-width: 768px) {
+    .contact-info {
+        padding: 40px 15px !important;
+    }
+
+    .contact-info .btn {
+        font-size: 14px !important;
+        padding: 4px 10px !important;
+    }
+
+    .contact-info strong {
+        font-size: 14px !important;
+    }
+
+    .contact-info div {
+        font-size: 14px !important;
+        line-height: 1.4;
+    }
+}
+
+/* Make toggler button and icon smaller */
+.navbar-toggler {
+    width: 40px !important;
+    height: 40px !important;
+    border: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+}
+
+.navbar-toggler .navbar-toggler-icon {
+    background-size: 20px 20px !important;
+}

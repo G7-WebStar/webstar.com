@@ -147,6 +147,7 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                                 </div>
                                                 <?php
                                             }
+                                        } else {
                                         }
                                         ?>
                                     </div>

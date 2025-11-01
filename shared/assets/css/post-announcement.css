@@ -3,12 +3,11 @@
     border: 1px solid var(--black);
     border-radius: 15px;
     width: 100%;
-    max-width: 700px;
+    /* max-width: 700px; */
 }
 
 #editor {
     height: 250px;
-    padding: 10px;
     border: none;
 }
 
