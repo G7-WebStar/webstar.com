@@ -12,7 +12,7 @@ if (mysqli_num_rows($submissionValidationResult) > 0) {
     exit;
 }
 
-$selectTestQuery = "SELECT * FROM tests WHERE testID = 1";
+$selectTestQuery = "SELECT generalGuidance FROM tests WHERE testID = 1";
 $selectTestResult = executeQuery($selectTestQuery);
 
 $selectQuestionsQuery = "SELECT 
@@ -140,10 +140,20 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
                                     <div class="col-12 d-flex flex-column flex-grow-1">
                                         <div class="question-container">
                                             <div class="h2 text-reg text-center mt-4 fs-sm-6" id="question-number">
-                                                Section Name · Question 1 of 20
+                                                <div class="text-sbold">
+                                                    Instructions
+                                                </div>
                                             </div>
                                             <div class="h2 text-sbold text-center mt-4 fs-sm-6" id="question-container">
-
+                                                <div class="col-12 col-md-8 h4 text-reg mx-auto mt-4 px-3 px-md-0 text-center text-md-start fs-sm-6">
+                                                    <?php
+                                                    if (mysqli_num_rows($selectTestResult) > 0) {
+                                                        while ($guideLines = mysqli_fetch_assoc($selectTestResult)) {
+                                                            echo $guideLines['generalGuidance'];
+                                                        }
+                                                    }
+                                                    ?>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -155,25 +165,11 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
                                         </div>
 
                                         <div class="mt-auto text-sbold">
-                                            <div class="d-flex justify-content-center justify-content-md-around align-items-center mb-4 gap-3 gap-md-0 mt-5">
-
-                                                <div class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable"
-                                                    style="background-color: var(--primaryColor);" onclick="prevQuestion();">
-                                                    <i class="fa-solid fs-6 fa-arrow-left text-reg" style="color: var(--black);"></i>
-                                                    <span class="m-0 fs-sm-6">Prev</span>
-                                                </div>
-
+                                            <div class="d-flex justify-content-center justify-content-md-around align-items-center mb-4 gap-3 gap-md-0 mt-5" id="buttonSection">
                                                 <div class="btn d-flex align-items-center justify-content-center border border-black rounded-5 px-sm-4 py-sm-2 interactable"
-                                                    style="background-color: var(--primaryColor);" onclick="submitQuiz();">
-                                                    <span class="m-0 fs-sm-6">Submit</span>
+                                                    style="background-color: var(--primaryColor);" onclick="startQuiz();">
+                                                    <span class="m-0 fs-sm-6">Start</span>
                                                 </div>
-
-                                                <div class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable"
-                                                    style="background-color: var(--primaryColor);" onclick="nextQuestion();">
-                                                    <span class="m-0 fs-sm-6">Next</span>
-                                                    <i class="fa-solid fs-6 fa-arrow-right text-reg" style="color: var(--black);"></i>
-                                                </div>
-
                                             </div>
                                         </div>
 
@@ -240,9 +236,24 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
         ];
 
         //Timer Variables
-        let seconds = 600;
-        let minutes = seconds / 60;
-        let hours = minutes / 60
+        let seconds = 60;
+
+        function timer() {
+            console.log(seconds);
+            seconds -= 1;
+            if (seconds < 0) {
+                clearInterval(interval);
+                console.log("Time's up!");
+                identificationType();
+                choiceText.forEach(unanswered => {
+                    if (unanswered.userAnswer == null) {
+                        unanswered.userAnswer = "No Answer";
+                    }
+                    console.log(choiceText);
+                });
+                submitQuiz();
+            }
+        }
 
         //Initializes the state of every questions as not yet answered
         let selectedAnswers = new Array(questions.length).fill(null);
@@ -259,20 +270,40 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
         //Arrays used for handling answers
         let choiceIDs = [];
 
+        let ID = 1;
         let choiceText = [];
         questions.forEach(question => {
             choiceText.push({
                 userAnswer: null,
-                testQuestionID: null
+                testQuestionID: ID
             });
+            ID++;
         });
 
         //Starts Quiz
         function startQuiz() {
             currentQuestionIndex = 0;
-            score = 0;
-            nextButton.innerHTML = "Next";
+            let interval = setInterval(timer, 1000);
             showQuestion();
+
+            const buttonSection = document.getElementById('buttonSection');
+            buttonSection.innerHTML = `         
+             <div class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable"
+                 style="background-color: var(--primaryColor);" onclick="prevQuestion();">
+                     <i class="fa-solid fs-6 fa-arrow-left text-reg" style="color: var(--black);"></i>
+                         <span class="m-0 fs-sm-6">Prev</span>
+             </div>
+ 
+             <div class="btn d-flex align-items-center justify-content-center border border-black rounded-5 px-sm-4 py-sm-2 interactable"
+                 style="background-color: var(--primaryColor);" onclick="submitQuiz();">
+                 <span class="m-0 fs-sm-6">Submit</span>
+             </div>
+ 
+             <div class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable"
+                 style="background-color: var(--primaryColor);" onclick="nextQuestion();">
+                 <span class="m-0 fs-sm-6">Next</span>
+                 <i class="fa-solid fs-6 fa-arrow-right text-reg" style="color: var(--black);"></i>
+             </div>`;
         }
 
         //Shows questions
@@ -442,8 +473,6 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
                 console.log("Please answer all items");
             }
         }
-
-        showQuestion();
     </script>
 </body>
 
