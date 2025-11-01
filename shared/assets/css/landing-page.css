@@ -55,20 +55,22 @@ body {
    =============================== */
 .hero-section {
     text-align: center;
-    padding: 80px 20px;
+    padding: 0px 20px 50px 20px;
     position: relative;
+    margin-top: -10px;
 }
 
 .hero-section .intro {
-    overflow: hidden;
+    /* overflow: hidden; */
     font-size: 100px;
-    font-weight: 700;
-    line-height: 1.2;
+    font-family: 'SemiBold', sans-serif;
+    line-height: 75px;
+    letter-spacing: -0.2rem;
 }
 
 .hero-section .intro span {
     font-style: italic;
-    font-weight: 400;
+    font-family: 'SemiBold', sans-serif;
 }
 
 .hero-section p {
@@ -81,16 +83,15 @@ body {
 .hero-img-left,
 .hero-img-right {
     position: absolute;
-    width: 150px;
 }
 
 .hero-img-left {
-    top: 80px;
+    top: -100px!important;
     left: 10%;
 }
 
 .hero-img-right {
-    top: 100px;
+    top: -220px !important;
     right: 10%;
 }
 

@@ -27,12 +27,12 @@
     <!-- Hero Section -->
     <!-- Desktop Hero (hidden on mobile) -->
     <section class="hero-section desktop-hero">
-      <img src="shared/assets/img/folder1.png" class="hero-img-left" alt="Folder Icon">
-      <div class="intro"><span>where</span><br>education<br><span>meets</span><br>exploration</div>
+      <img src="shared/assets/img/folder1.png" style="width:450px" class="hero-img-left" alt="Folder Icon">
+      <div class="intro"><span style="font-size:80px!important;">where</span><br>education<br><span style="font-size:80px!important;">meets</span><br>exploration</div>
     </section>
     <section class="hero-section desktop-hero">
-      <img src="shared/assets/img/rocket.png" class="hero-img-right" alt="Rocket Icon">
-      <div class="text-30">Turn every lesson into a quest and every<br> achievement into progress with Webstar!</div>
+      <img src="shared/assets/img/rocket.png" style="width:450px" class="hero-img-right" alt="Rocket Icon">
+      <div class="text-18 mt-5 text-med" style="line-height:1.1">Turn every lesson into a quest and every <br> achievement into progress with Webstar!</div>
     </section>
 
     <!-- Mobile Hero (Only visible on mobile) -->
