@@ -74,7 +74,6 @@ if (isset($_GET['courseID'])) {
     assessments.*,
     assessments.assessmentTitle AS assessmentTitle,
     todo.*,
-    todo.title AS todoTitle,
     courses.courseCode,
     DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline
     FROM assessments
@@ -279,7 +278,7 @@ $user = mysqli_fetch_assoc($result);
                             <!-- Inbox -->
                             <button class="btn d-flex flex-column align-items-center">
                                 <i class="bi bi-inbox-fill d-flex align-items-center justify-content-center"
-                                    style="font-size:25px; width:20px; height:20px: color: var(--black); margin-top: -3px;"></i>
+                                    style="font-size:25px; width:20px; height:20px; color: var(--black); margin-top: -3px;"></i>
                                 <small class="text-med text-12" style="margin-top: -2px;">Inbox</small>
                             </button>
 
