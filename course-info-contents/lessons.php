@@ -34,10 +34,10 @@ mysqli_data_seek($lessonResult, 0);
     <!-- Sort By Dropdown (only shown if there are lessons) -->
     <div class="d-flex align-items-center flex-nowrap mb-1">
         <div class="d-flex align-items-center flex-nowrap">
-            <span class="dropdown-label me-2 text-reg text-14">Sort by</span>
+            <span class="dropdown-label me-2 text-reg text-12">Sort by</span>
             <form method="POST">
                 <input type="hidden" name="activeTab" value="lessons">
-                <select class="select-modern text-reg text-14" name="sortLesson" onchange="this.form.submit()">
+                <select class="select-modern text-reg text-12" name="sortLesson" onchange="this.form.submit()">
                     <option value="Newest" <?php echo ($sortLesson == 'Newest') ? 'selected' : ''; ?>>Newest</option>
                     <option value="Oldest" <?php echo ($sortLesson == 'Oldest') ? 'selected' : ''; ?>>Oldest</option>
                 </select>

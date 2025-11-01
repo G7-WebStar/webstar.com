@@ -32,10 +32,10 @@ mysqli_data_seek($fileResult, 0);
     <!-- Sort By Dropdown (Shown only when there are files) -->
     <div class="d-flex align-items-center flex-nowrap mb-1" id="header">
         <div class="d-flex align-items-center flex-nowrap">
-            <span class="dropdown-label me-2 text-reg text-14">Sort by</span>
+            <span class="dropdown-label me-2 text-reg text-12">Sort by</span>
             <form method="POST">
                 <input type="hidden" name="activeTab" value="link">
-                <select class="select-modern text-reg text-14" name="sortLink" onchange="this.form.submit()">
+                <select class="select-modern text-reg text-12" name="sortLink" onchange="this.form.submit()">
                     <option value="Newest" <?php echo ($sortLink == 'Newest') ? 'selected' : ''; ?>>Newest</option>
                     <option value="Oldest" <?php echo ($sortLink == 'Oldest') ? 'selected' : ''; ?>>Oldest</option>
                 </select>

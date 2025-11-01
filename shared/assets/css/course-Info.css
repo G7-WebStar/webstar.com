@@ -161,7 +161,7 @@ a.btn:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 55px;
+    width: 75px;
 }
 
 /* AYI */
@@ -325,14 +325,14 @@ a.btn:hover {
 /* Filter Dropdown */
 .select-modern {
     background-color: #fff;
-    border: 1px solid #000;
+    border: 1px solid var(--black);
     /* black border */
     border-radius: 25px;
-    padding: 3px 14px;
-    font-size: 14px;
+    padding: 4px 14px;
+    font-size: 12px;
     font-weight: 500;
-    color: #333;
-    min-width: 110px;
+    color: var(--black);
+    min-width: 95px;
     cursor: pointer;
     outline: none;
     appearance: none;
@@ -341,8 +341,8 @@ a.btn:hover {
     -moz-appearance: none;
     position: relative;
     background-image:
-        linear-gradient(45deg, transparent 50%, #000 50%),
-        linear-gradient(135deg, #000 50%, transparent 50%);
+        linear-gradient(45deg, transparent 50%, var(--black) 50%),
+        linear-gradient(135deg, var(--black) 50%, transparent 50%);
     background-position: calc(100% - 15px) calc(50% - 2px),
         calc(100% - 10px) calc(50% - 2px);
     background-size: 5px 5px, 5px 5px;
@@ -353,19 +353,19 @@ a.btn:hover {
 .select-modern:hover,
 .select-modern:focus {
     background-color: #fff;
-    border: 1px solid #000;
+    border: 1px solid var(--black);
 }
 
 .dropdown-label {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 500;
-    color: #000;
+    color: var(--black);
 }
 
 /* Fix for Firefox text alignment */
 select.select-modern option {
     background-color: #fff;
-    color: #000;
+    color: var(--black);
 }
 
 @media (max-width: 768px) {
@@ -472,7 +472,7 @@ select.select-modern option {
     border: none;
     cursor: pointer;
     font-size: 18px;
-    color: #333;
+    color: var(--black);
 }
 
 /* Ranking Text Size */
@@ -588,7 +588,7 @@ select.select-modern option {
     border-radius: 25px;
     padding: 6px 14px;
     font-size: 14px;
-    color: #333;
+    color: var(--black);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -636,7 +636,7 @@ select.select-modern option {
     display: block;
     padding: 6px 14px;
     font-size: 14px;
-    color: #333;
+    color: var(--black);
     text-decoration: none;
     transition: background-color 0.2s ease;
 }
