@@ -323,81 +323,71 @@ a.btn:hover {
 }
 
 /* Filter Dropdown */
-/* Sort dropdown */
-.custom-dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-/* Dropdown Button */
-.dropdown-btn {
-    background-color: var(--pureWhite);
-    border: 1px solid var(--black) !important;
+.select-modern {
+    background-color: #fff;
+    border: 1px solid #000;
+    /* black border */
     border-radius: 25px;
-    padding: 3px 14px !important;
+    padding: 3px 14px;
     font-size: 14px;
     font-weight: 500;
+    color: #333;
+    min-width: 110px;
     cursor: pointer;
-    min-width: 110px !important;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    outline: none;
+    appearance: none;
+    /* remove native arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
     position: relative;
+    background-image:
+        linear-gradient(45deg, transparent 50%, #000 50%),
+        linear-gradient(135deg, #000 50%, transparent 50%);
+    background-position: calc(100% - 15px) calc(50% - 2px),
+        calc(100% - 10px) calc(50% - 2px);
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    transition: all 0.2s ease;
 }
 
-.dropdown-btn::after {
-    content: '';
-    display: inline-block;
-    width: 0;
-    height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 5px solid #000;
-    margin-left: 8px;
-}
-
-/* Dropdown list */
-.dropdown-list {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    margin-top: 8px;
-    padding: 0;
-    list-style: none;
-    border: 1px solid #000;
-    border-radius: 15px;
+.select-modern:hover,
+.select-modern:focus {
     background-color: #fff;
-    width: 100%;
-    display: none;
-    z-index: 100;
-    overflow: hidden;
+    border: 1px solid #000;
 }
 
-/* Items */
-.dropdown-list li {
-    padding: 8px 16px;
-    cursor: pointer;
-    border: none;
+.dropdown-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #000;
 }
 
-.dropdown-list li:hover {
-    background-color: var(--primaryColor);
+/* Fix for Firefox text alignment */
+select.select-modern option {
+    background-color: #fff;
+    color: #000;
 }
 
+@media (max-width: 768px) {
+    #header {
+        flex-wrap: nowrap;
+    }
 
-/* Dropdown in small screen */
-@media (max-width: 991.98px) {
-    .custom-dropdown .dropdown-btn {
-        min-width: 90px;
+    #header .select-modern {
         padding: 4px 12px;
-        font-size: 13px;
+        min-width: 90px;
+        font-size: 12px;
     }
 
-    .mobile-dropdown {
-        margin-left: 0.5rem;
+    #header .dropdown-label {
+        font-size: 12px;
+        margin-right: 4px;
+    }
+
+    #header>div {
+        margin-right: 2px;
     }
 }
-
 
 /* neil again */
 @media (max-width: 767.98px) {
@@ -688,7 +678,7 @@ a.btn:hover {
 }
  */
 
- /* Sticky Nav Tabs */
+/* Sticky Nav Tabs */
 .tab-carousel-wrapper {
     position: sticky;
     top: -20px;
@@ -700,7 +690,7 @@ a.btn:hover {
     min-height: 100vh;
 }
 
- /* Truncating To-do Cards */
+/* Truncating To-do Cards */
 .truncate {
     width: 100px;
     overflow: hidden;
@@ -709,15 +699,15 @@ a.btn:hover {
     max-width: 100%;
 }
 
- /* Truncating To-do Cards for Larger Screens*/
+/* Truncating To-do Cards for Larger Screens*/
 @media (min-width: 1600px) and (max-width: 1999px) {
     .truncate {
-        width: 200px; 
+        width: 200px;
     }
 }
 
 @media (min-width: 2000px) {
     .truncate {
-        width: 300px; 
+        width: 300px;
     }
 }
