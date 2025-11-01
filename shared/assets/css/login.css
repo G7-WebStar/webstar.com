@@ -12,7 +12,7 @@ body {
 .password-toggle-btn {
     position: absolute;
     right: 12px;
-    top: 50%;
+    top: 35%;
     transform: translateY(-50%);
     background: none;
     border: none;
@@ -23,6 +23,12 @@ body {
 
 .password-toggle-btn:hover {
     color: var(--primaryColor);
+}
+
+@media (max-width: 767px) {
+    .password-toggle-btn {
+        top: 45%; 
+    }
 }
 
 /*Border Color*/
@@ -43,6 +49,7 @@ body {
     color: var(--white);
     font-size: 22px;
     font-family: var(--SemiBold);
+    width: 75% !important;
 }
 
 .btn-login:hover {
@@ -113,6 +120,10 @@ body {
 
     .login-form {
         max-width: 100% !important;
+    }
+
+    .btn-login {
+         width: 360px !important;
     }
 }
 
@@ -190,7 +201,6 @@ body {
         background-color: #f5cf86 !important;
         border-radius: 13px !important;
         font-weight: 600;
-        width: 100% !important;
     }
 
 
