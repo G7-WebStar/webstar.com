@@ -38,9 +38,9 @@ if (isset($_POST['save_lesson'])) {
 
             // 2. Insert into tests (hindi na kasama ang deadline dito)
             $testQuery = "INSERT INTO tests 
-                (courseID, userID, assessmentID, testTitle, generalGuidance, testTimeLimit, userSection, testInstruction, testType) 
+                (courseID, userID, assessmentID, generalGuidance, testTimeLimit, userSection, testInstruction, testType) 
                 VALUES 
-                ('$assessmentID', '$title', '$generalGuidance', 
+                ('$assessmentID', '$generalGuidance', 
                 '$testTimeLimit', '$userSection', '$testInstruction', '$testType')";
 
             executeQuery($testQuery);

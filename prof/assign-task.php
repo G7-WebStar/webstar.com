@@ -1,6 +1,7 @@
 <?php $activePage = 'assign-task'; ?>
 <?php
 include('../shared/assets/database/connect.php');
+date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
 
 $course = "SELECT courseID, courseCode 

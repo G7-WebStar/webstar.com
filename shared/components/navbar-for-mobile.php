@@ -1,4 +1,4 @@
-<nav class="navbar navbar-light px-3 d-md-none">
+<nav class="navbar navbar-light px-3 pb-3 d-md-none">
     <div class="container-fluid position-relative">
 
         <!-- Toggler -->
@@ -9,9 +9,10 @@
 
         <!-- Logo -->
         <a class="navbar-brand mx-auto" href="#">
-            <img src="shared/assets/img/webstar-logo-black.png" alt="Webstar" style="height: 35px;">
+            <img src="shared/assets/img/webstar-logo-black.png" alt="Webstar" style="height: 25px;">
         </a>
 
 
     </div>
+    
 </nav>
