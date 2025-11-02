@@ -29,7 +29,7 @@ include("../shared/assets/processes/prof-session-process.php");
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
-    
+
 </head>
 
 <body>
@@ -212,10 +212,19 @@ include("../shared/assets/processes/prof-session-process.php");
                                                 aria-hidden="true">add_circle</span>
                                             Criteria
                                         </button>
-                                         <span class="text-med text-16 total-points-label">Total Points: 10</span>
+                                        <span class="text-med text-16 total-points-label">Total Points: 10</span>
                                     </div>
                                 </div>
 
+                                <div class="row">
+                                    <div class="col-12">
+                                        <button type="button"
+                                            class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 d-inline-flex align-items-center criteria-add-btn"
+                                            style="background-color: var(--primaryColor); border: 1px solid var(--black); margin-right: auto;">
+                                            Create
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

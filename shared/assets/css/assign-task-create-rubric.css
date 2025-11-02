@@ -84,6 +84,12 @@
     margin-left: calc(62% - 220px); 
 }
 
+/* Criteria Add Button */
+.criteria-add-btn {
+    margin-left: calc(62% - 93px) !important;
+    margin-top: 40px;
+}
+
 /* Criterion Description Card - matching image design */
 .criterion-description-card {
     width: 711px;
@@ -188,6 +194,11 @@
         float: right;
         margin-left: 0 !important; 
         margin-top: 5px;
+    }
+    
+    /* Criteria button - reset left margin on small screens */
+    .criteria-add-btn {
+        margin-left: calc(100% - 93px) !important;
     }
     
     /* Section divider - full width on mobile */
