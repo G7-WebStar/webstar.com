@@ -100,7 +100,8 @@ $_SESSION['TodoNewCount'] = $newTodoCount;
             <div class="card border-0 sidebar mx-2 p-2 overflow-y-auto" style="width: 220px;">
                 <!-- Logo -->
                 <div class="d-flex justify-content-center">
-                    <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid px-3" style="padding-top:2rem; padding-bottom:2rem"width="180px;">
+                    <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid px-3"
+                        style="padding-top:2rem; padding-bottom:2rem" width="180px;">
                 </div>
 
                 <!-- Navigation -->
@@ -187,38 +188,47 @@ $_SESSION['TodoNewCount'] = $newTodoCount;
 
 
 
+                <!-- User Dropdown -->
                 <div class="dropdown mt-auto p-4">
                     <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
                         data-bs-toggle="dropdown" aria-expanded="false">
                         <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="32"
                             height="32" class="rounded-circle me-2">
-                        <strong
-                            class="text-dark text-med text-16 px-1"><?php echo isset($_SESSION['userName']) ? htmlspecialchars($_SESSION['userName']) : 'jamesdoe'; ?></strong>
+                        <strong class="text-dark text-med text-16 px-1">
+                            <?php echo isset($_SESSION['userName']) ? htmlspecialchars($_SESSION['userName']) : 'jamesdoe'; ?>
+                        </strong>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end text-small shadow">
-                        <li class="ms-3 my-1" style="font-family: var(--Bold);"><i
-                                class="fa-solid fa-gear me-2"></i>Settings</li>
-                        <li><a class="dropdown-item" style="font-family: var(--Regular);"
-                                href="termsAndConditions.php">Terms &
-                                Conditions</a></li>
-                        <li><a class="dropdown-item" style="font-family: var(--Regular);"
-                                href="changepassword.php">Change
-                                Password</a></li>
-                        <li><a class="dropdown-item" style="font-family: var(--Regular);" href="faqs.php">FAQs</a>
+
+                    <ul class="dropdown-menu dropdown-menu-end text-small shadow"
+                        style="margin-top: 8px; transform: none !important; --bs-dropdown-link-active-bg: transparent; --bs-dropdown-link-active-color: inherit;">
+
+                        <!-- Settings -->
+                        <li style="margin-bottom:6px;">
+                            <a class="dropdown-item d-flex align-items-center text-med text-14" href="settings.php">
+                                <span class="material-symbols-rounded me-2" style="font-size:18px;">settings</span>
+                                Settings
+                            </a>
                         </li>
-                        <li><a class="dropdown-item" style="font-family: var(--Regular);" href="feedback.php">Send
-                                Feedback</a></li>
-                        <hr class="dropdown-divider">
-                        <li><a class="dropdown-item" style="font-family: var(--Bold);" href="profile.php"><i
-                                    class="fa-solid fa-user me-2"></i>My Profile</a></li>
+
+                        <!-- Profile -->
+                        <li style="margin-bottom:6px;">
+                            <a class="dropdown-item d-flex align-items-center text-med text-14" href="profile.php">
+                                <span class="material-symbols-rounded me-2" style="font-size:18px;">person</span>
+                                My Profile
+                            </a>
+                        </li>
+
+                        <!-- Sign Out -->
                         <li>
-                            <hr class="dropdown-divider">
+                            <a class="dropdown-item d-flex align-items-center text-med text-14" href="login.php"
+                                style="color:var(--highlight);">
+                                <span class="material-symbols-rounded me-2" style="font-size:18px;">logout</span>
+                                Sign Out
+                            </a>
                         </li>
-                        <li><a class="dropdown-item" style="font-family: var(--Bold); color:var(--highlight)"
-                                href="login.php"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign
-                                out</a></li>
                     </ul>
                 </div>
+
 
             </div>
         </div>
