@@ -264,7 +264,12 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
         ];
 
         //Timer Variables
-        let seconds = 3600;
+        <?php
+        $timeLimitQuery = "SELECT testTimelimit FROM tests WHERE testID = $testID";
+        $timeLimitResult = executeQuery($timeLimitQuery);
+        $timeLimit = mysqli_fetch_assoc($timeLimitResult);
+        ?>
+        let seconds = <?php echo $timeLimit['testTimelimit']; ?>;
         let timerHtml = document.getElementById('timer');
         let interval;
 
