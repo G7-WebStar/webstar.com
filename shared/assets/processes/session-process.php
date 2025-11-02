@@ -8,7 +8,12 @@ if (isset($_SESSION['userID'])) {
     exit();
 }
 
-if ($_SESSION['role'] != 'student' && $_SESSION['role'] == 'admin') {
+if ($_SESSION['role'] != 'student' && $_SESSION['role'] == 'professor') {
     header("Location: prof/index.php");
+    exit();
+}
+
+if (($_SESSION['role'] != 'student' && $_SESSION['role'] != 'professor') && $_SESSION['role'] == 'admin') {
+    header("Location: admin/index.php");
     exit();
 }
