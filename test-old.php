@@ -41,7 +41,7 @@ include("shared/assets/processes/session-process.php");
                     <!-- Navbar for mobile -->
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-1 overflow-y-auto d-flex flex-column h-100">
+                    <div class="container-fluid py-1 overflow-y-auto d-flex flex-column h-100 row-padding-top">
                         <div class="row flex-grow-1">
                             <div class="col-12 d-flex flex-column h-100">
 

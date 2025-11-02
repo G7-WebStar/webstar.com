@@ -285,3 +285,13 @@ a.btn:hover {
     width: 50%;
   }
 }
+
+.row-padding-top {
+  margin-top: 0px !important; /* Default for md and up */
+}
+
+@media (max-width: 767.98px) {
+  .row-padding-top {
+    margin-top: 60px !important; /* Mobile only */
+  }
+}

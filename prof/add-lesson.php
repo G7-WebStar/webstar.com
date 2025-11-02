@@ -153,7 +153,7 @@ if (isset($_GET['fetchTitle'])) {
                     <!-- Navbar (mobile) -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
                         <div class="row">
                             <div class="col-12">
                                 <!-- Header -->

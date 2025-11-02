@@ -272,7 +272,7 @@ $user = mysqli_fetch_assoc($result);
                         <div class="container d-flex justify-content-around pb-1">
 
                             <!-- Home -->
-                            <button class="btn d-flex flex-column align-items-center">
+                            <button class="btn d-flex flex-column align-items-center" style="border: 0px!important;">
                                 <span class="material-symbols-rounded" style="font-size:20px">
                                     dashboard
                                 </span>
@@ -289,7 +289,7 @@ $user = mysqli_fetch_assoc($result);
                             </button>
 
                             <!-- To-do -->
-                            <button class="btn d-flex flex-column align-items-center">
+                            <button class="btn d-flex flex-column align-items-center" style="border: 0px!important;">
                                 <span class="material-symbols-rounded" style="font-size:20px">
                                     extension
                                 </span>
@@ -297,13 +297,13 @@ $user = mysqli_fetch_assoc($result);
                             </button>
 
                             <!-- Inbox -->
-                            <button class="btn d-flex flex-column align-items-center">
+                            <button class="btn d-flex flex-column align-items-center" style="border: 0px!important;">
                                 <i class="bi bi-inbox-fill" style="font-size:25px; color:var(--black); margin-top: -10px;"></i>
                                 <small class="text-med text-12" style="margin-top: -8px;">Inbox</small>
                             </button>
 
                             <!-- More -->
-                            <button class="btn d-flex flex-column align-items-center">
+                            <button class="btn d-flex flex-column align-items-center" style="border: 0px!important;">
                                 <span class="material-symbols-rounded" style="font-size:20px">
                                     dehaze
                                 </span>
@@ -313,7 +313,7 @@ $user = mysqli_fetch_assoc($result);
 
                         </div>
                     </nav>
-                    <div class="container-fluid py-3 overflow-y-auto" style="white-space: nowrap; ">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top" style="white-space: nowrap; ">
                         <div class="row d-flex justify-content-center">
                             <div class="row mt-0">
 

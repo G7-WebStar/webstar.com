@@ -78,7 +78,7 @@ $courses = executeQuery($course);
                     <!-- Navbar (mobile) -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
                         <div class="row m-4 justify-content-center">
 
                             <div class="row header-section align-items-center justify-content-center">

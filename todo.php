@@ -97,7 +97,7 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                     <!-- Navbar for mobile -->
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
                         <div class="row">
                             <div class="col-12">
 
