@@ -298,22 +298,16 @@ $user = mysqli_fetch_assoc($result);
 
                             <!-- Inbox -->
                             <button class="btn d-flex flex-column align-items-center">
-                                <span class="material-symbols-rounded" style="font-size:20px">
-                                    search
-                                </span>
-                                <small class="text-med text-12">Search</small>
+                                <i class="bi bi-inbox-fill" style="font-size:25px; color:var(--black); margin-top: -10px;"></i>
+                                <small class="text-med text-12" style="margin-top: -8px;">Inbox</small>
                             </button>
 
-                            <!-- Profile -->
+                            <!-- More -->
                             <button class="btn d-flex flex-column align-items-center">
-                                <div class="d-flex flex-column align-items-center text-decoration-none sticky-header"
-                                    id="stickyHeader">
-                                    <div class="rounded-circle mb-2" style="width: 18px; height: 18px; background-color: #5ba9ff;
-            background: url('shared/assets/pfp-uploads/<?= htmlspecialchars($user['profilePicture']) ?>') no-repeat center center;
-            background-size: cover;">
-                                    </div>
-                                    <small class="text-med text-12" style="margin-top: -7px;">Profile</small>
-                                </div>
+                                <span class="material-symbols-rounded" style="font-size:20px">
+                                    dehaze
+                                </span>
+                                <small class="text-med text-12">More</small>
                             </button>
 
 

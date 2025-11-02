@@ -100,7 +100,7 @@ $_SESSION['TodoNewCount'] = $newTodoCount;
             <div class="card border-0 sidebar mx-2 p-2 overflow-y-auto" style="width: 220px;">
                 <!-- Logo -->
                 <div class="d-flex justify-content-center">
-                    <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid pt-5 pb-5 px-3" width="180px;">
+                    <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid px-3" style="padding-top:2rem; padding-bottom:2rem"width="180px;">
                 </div>
 
                 <!-- Navigation -->
@@ -109,15 +109,16 @@ $_SESSION['TodoNewCount'] = $newTodoCount;
                     <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'home') ? 'selected-box' : ''; ?>"
                         data-page="home">
                         <img src="shared/assets/img/dashboard.png" class="img-fluid" style="width: 30px; height: 30px;">
-                        <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'home') ? 'selected' : ''; ?>"
-                            href="index.php"><strong>Home</strong></a>
+                        <a class="nav-link p-0 text-med text-18 ps-2 <?php echo ($activePage == 'home') ? 'selected' : ''; ?>"
+                            href="index.php" style="text-decoration: none; color:var(--black)"><strong>Home</strong></a>
                     </li>
 
                     <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'course') ? 'selected-box' : ''; ?>"
                         data-page="course">
                         <img src="shared/assets/img/courses.png" class="img-fluid" style="width: 30px; height: 30px;">
-                        <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'course') ? 'selected' : ''; ?>"
-                            href="course.php"><strong>Courses</strong></a>
+                        <a class="nav-link p-0 text-med text-18 ps-2 <?php echo ($activePage == 'course') ? 'selected' : ''; ?>"
+                            href="course.php"
+                            style="text-decoration: none; color:var(--black)"><strong>Courses</strong></a>
                     </li>
 
                     <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'inbox') ? 'selected-box' : ''; ?>"
@@ -125,8 +126,9 @@ $_SESSION['TodoNewCount'] = $newTodoCount;
                         <div style="position: relative;">
                             <img src="shared/assets/img/inbox.png" class="img-fluid" style="width: 30px; height: 30px;">
                         </div>
-                        <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'inbox') ? 'inbox' : ''; ?>"
-                            href="inbox.php"><strong>Inbox</strong></a>
+                        <a class="nav-link p-0 text-med text-18 ps-2 <?php echo ($activePage == 'inbox') ? 'inbox' : ''; ?>"
+                            href="inbox.php"
+                            style="text-decoration: none; color:var(--black)"><strong>Inbox</strong></a>
                         <?php
                         $displayInbox = isset($unreadInboxCount) && is_numeric($unreadInboxCount)
                             ? (int) $unreadInboxCount
@@ -141,8 +143,8 @@ $_SESSION['TodoNewCount'] = $newTodoCount;
                     <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'todo') ? 'selected-box' : ''; ?>"
                         data-page="shop">
                         <img src="shared/assets/img/todo.png" class="img-fluid" style="width: 30px; height: 30px;">
-                        <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'todo') ? 'selected' : ''; ?>"
-                            href="todo.php"><strong>To-do</strong></a>
+                        <a class="nav-link p-0 text-med text-18 ps-2 <?php echo ($activePage == 'todo') ? 'selected' : ''; ?>"
+                            href="todo.php" style="text-decoration: none; color:var(--black)"><strong>To-do</strong></a>
                         <?php $displayTodo = isset($newTodoCount) ? (int) $newTodoCount : (isset($_SESSION['TodoNewCount']) ? (int) $_SESSION['TodoNewCount'] : 0);
                         if ($displayTodo > 0) { ?>
                             <span class="badge-container ms-auto me-1">
@@ -154,8 +156,8 @@ $_SESSION['TodoNewCount'] = $newTodoCount;
                     <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'explore') ? 'selected-box' : ''; ?>"
                         data-page="explore" data-bs-toggle="modal" data-bs-target="#searchModal">
                         <img src="shared/assets/img/explore.png" class="img-fluid" style="width: 30px; height: 30px;">
-                        <a href="#"
-                            class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'explore') ? 'selected' : ''; ?>">
+                        <a href="#" style="text-decoration: none; color:var(--black)"
+                            class="nav-link p-0 text-med text-18 ps-2 <?php echo ($activePage == 'explore') ? 'selected' : ''; ?>">
                             <strong>Explore</strong></a>
                     </li>
 
@@ -163,9 +165,22 @@ $_SESSION['TodoNewCount'] = $newTodoCount;
                     <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'shop') ? 'selected-box' : ''; ?>"
                         data-page="shop">
                         <img src="shared/assets/img/shop.png" class="img-fluid" style="width: 30px; height: 30px;">
-                        <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'shop') ? 'selected' : ''; ?>"
-                            href="shop.php"><strong>Shop</strong></a>
+                        <a class="nav-link p-0 text-med text-18 ps-2 <?php echo ($activePage == 'shop') ? 'selected' : ''; ?>"
+                            href="shop.php" style="text-decoration: none; color:var(--black)"><strong>Shop</strong></a>
                     </li>
+
+                    <div class="mt-1 end-0 mt-2 mx-3 mb-2 p-2 d-flex align-items-center">
+                        <img class="me-2" src="shared/assets/img/webstar.png" alt="Description of Image" width="30">
+                        <div class="d-flex flex-column align-items-start ps-2" style="line-height: 1.2;">
+                            <a class="text-med text-18" style="text-decoration: none;">
+                                <strong>1260</strong>
+                            </a>
+                            <a class="text-med text-14" style="text-decoration: none;">
+                                Webstars
+                            </a>
+                        </div>
+                    </div>
+
 
                 </ul>
 
