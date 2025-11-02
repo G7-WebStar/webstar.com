@@ -156,9 +156,8 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                                                 Quiz #1
                                             </div>
                                         </div>
-                                        <div class="h2 mt-3 mt-md-0 mb-0 text-center text-md-end">
-                                            <i class="bi bi-clock fa-xs me-2" style="color: var(--black);"></i>
-                                            10:00
+                                        <div class="h2 mt-3 mt-md-0 mb-0 text-center text-md-end" id="timer">
+
                                         </div>
                                     </div>
                                 </div>
@@ -265,12 +264,57 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
         ];
 
         //Timer Variables
-        let seconds = 60;
+        let seconds = 3600;
+        let timerHtml = document.getElementById('timer');
         let interval;
 
+        //Format time
+        function formatTime(sec) {
+            let days = Math.floor(sec / 86400)
+            let hours = Math.floor(sec / 3600);
+            let minutes = Math.floor(sec / 60);
+            let secondsTime = sec % 60;
+
+            if (days < 10) {
+                days = "0" + days;
+            }
+
+            if (hours < 10) {
+                hours = "0" + hours;
+            } else if (hours >= 24) {
+                hours = hours % 24;
+                if ((hours % 24) < 10) {
+                    hours = "0" + hours % 24;
+                }
+            }
+
+            if (minutes < 10) {
+                minutes = "0" + minutes;
+            } else if (minutes >= 60) {
+                minutes = minutes % 60;
+                if ((minutes % 60) < 10) {
+                    minutes = "0" + (minutes % 60);
+                }
+            }
+
+            if (secondsTime < 10) {
+                secondsTime = "0" + secondsTime;
+            }
+
+            //Return results
+            if (sec < 86400 && sec >= 3600) {
+                return time = hours + ":" + minutes + ":" + secondsTime;
+            } else if (sec < 3600) {
+                return time = minutes + ":" + secondsTime;
+            } else {
+                return time = days + ":" + hours + ":" + minutes + ":" + secondsTime;
+            }
+        }
+
+        timerHtml.innerHTML = `<i class="bi bi-clock fa-xs me-2" style="color: var(--black);"></i>` + formatTime(seconds);
+
         function timer() {
-            console.log(seconds);
-            seconds -= 1;
+            seconds--;
             if (seconds < 0) {
                 clearInterval(interval);
                 console.log("Time's up!");
@@ -283,6 +327,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                 });
                 submitQuiz();
             }
+            timerHtml.innerHTML = `<i class="bi bi-clock fa-xs me-2" style="color: var(--black);"></i>` + formatTime(seconds);
         }
 
         //Initializes the state of every questions as not yet answered
@@ -313,9 +358,10 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
         //Starts Quiz
         function startQuiz() {
             currentQuestionIndex = 0;
-            let interval = setInterval(timer, 1000);
+            interval = setInterval(timer, 1000);
             showQuestion();
 
+            //Shows navigation buttons for the quiz
             const buttonSection = document.getElementById('buttonSection');
             buttonSection.innerHTML = `         
              <div class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable"
@@ -480,7 +526,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             const incomplete = choiceText.some(checkNull => checkNull.userAnswer === null || checkNull.userAnswer === '');
 
             if (!incomplete) {
-                fetch('shared/assets/processes/submit-test.php', {
+                fetch('shared/assets/processes/submit-test.php?testID=' + <?php echo $testID; ?>, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -502,21 +548,6 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             } else {
                 console.log("Please answer all items");
             }
-
-            <?php
-            $updateTodoStatusQuery = "UPDATE todo
-                                      INNER JOIN assessments
-                                      	ON todo.assessmentID = assessments.assessmentID
-                                      INNER JOIN courses
-                                      	ON assessments.courseID = courses.courseID
-                                      LEFT JOIN assignments
-                                      	ON assignments.assessmentID = todo.assessmentID
-                                      LEFT JOIN tests
-                                      	ON tests.assessmentID = todo.assessmentID
-                                      SET todo.status ='Submitted' 
-                                      WHERE todo.userID = '$userID' AND todo.status = 'Pending' AND assessments.type = 'Test' AND tests.testID = '$testID'";
-            $updateTodoStatusResult = executeQuery($updateTodoStatusQuery);
-            ?>
         }
     </script>
 </body>

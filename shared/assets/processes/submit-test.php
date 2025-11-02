@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $correctAnswer;
         if (mysqli_num_rows($correctAnswerResult) > 0) {
             $correctAnswerRow = mysqli_fetch_assoc($correctAnswerResult);
-                $correctAnswer = $correctAnswerRow['correctAnswer'];
+            $correctAnswer = $correctAnswerRow['correctAnswer'];
         }
         $testID = 1;
         $userAnswer = $answer['userAnswer'];
@@ -24,4 +24,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     echo json_encode(["status" => "success"]);
+
+    $updateTodoStatusQuery = "UPDATE todo
+                                      INNER JOIN assessments
+                                      	ON todo.assessmentID = assessments.assessmentID
+                                      INNER JOIN courses
+                                      	ON assessments.courseID = courses.courseID
+                                      LEFT JOIN assignments
+                                      	ON assignments.assessmentID = todo.assessmentID
+                                      LEFT JOIN tests
+                                      	ON tests.assessmentID = todo.assessmentID
+                                      SET todo.status ='Submitted' 
+                                      WHERE todo.userID = '$userID' AND todo.status = 'Pending' AND assessments.type = 'Test' AND tests.testID = '$testID'";
+    $updateTodoStatusResult = executeQuery($updateTodoStatusQuery);
 }
