@@ -246,8 +246,8 @@ if (isset($_GET['reuse'])) {
                     <!-- Navbar (mobile) -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto">
-                        <div class="create-prof-row row-padding-top">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
+                        <div class="create-prof-row">
                             <div class="col-12">
                                 <!-- Header -->
                                 <div class="row mb-3 align-items-center">

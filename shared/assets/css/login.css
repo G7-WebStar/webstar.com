@@ -7,6 +7,13 @@ body {
     height: 628px;
     width: 595px;
     background-color: var(--white);
+    margin-top: 0px!important;
+}
+
+@media (max-width: 767.98px) {
+  .login-container{
+    margin-top: -100px!important;
+  }
 }
 
 .password-toggle-btn {
@@ -25,11 +32,26 @@ body {
     color: var(--primaryColor);
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
     .password-toggle-btn {
         top: 45%; 
     }
+
+    .custom-alert{
+        width: 70% !important;
+    }
 }
+
+@media (max-width: 430px) {
+    .password-toggle-btn {
+        top: 45%; 
+    }
+
+    .custom-alert{
+        width: 93% !important;
+    }
+}
+
 
 /*Border Color*/
 .border-blue {
@@ -105,7 +127,7 @@ body {
     }
 
     .logo {
-        width: 235px;
+        width: 265px !important;
     }
 
     .text-small {
@@ -133,7 +155,7 @@ body {
     }
 
     .logo {
-        width: 220px;
+        width: 280px!important;
     }
 }
 
@@ -230,5 +252,8 @@ body {
 @media (max-width: 768px) {
     .mobile-only {
         display: block;
+    }
+    .logo {
+        width: 295px !important;
     }
 }

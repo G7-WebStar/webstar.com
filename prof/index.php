@@ -185,8 +185,8 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                     <!-- Navbar for mobile -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-1 overflow-y-auto">
-                        <div class="row row-padding-top">
+                    <div class="container-fluid py-1 overflow-y-auto row-padding-top">
+                        <div class="row">
                             <!-- Left side -->
                             <div class="container-fluid py-1 overflow-y-auto">
                                 <div class="row">

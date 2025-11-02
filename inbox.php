@@ -71,8 +71,8 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                     style="background-color: transparent;">
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto">
-                        <div class="row row-padding-top">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
+                        <div class="row">
                             <div class="col-12">
 
                                 <!-- Header Section -->

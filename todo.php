@@ -97,12 +97,12 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                     <!-- Navbar for mobile -->
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
                         <div class="row">
                             <div class="col-12">
 
                                 <!-- Header Section -->
-                                <div class="row align-items-center mb-3 text-center text-lg-start row-padding-top">
+                                <div class="row align-items-center mb-3 text-center text-lg-start">
                                     <!-- Title -->
                                     <div class="col-12 col-lg-auto mb-3 mb-lg-0">
                                         <h1 class="text-sbold text-25 mb-0 mt-2" style="color: var(--black);">My To-do

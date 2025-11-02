@@ -144,7 +144,7 @@
                         </div>
                     </nav>
 
-                    <div class="container-fluid py-3 overflow-y-auto" style="position: relative;">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top" style="position: relative;">
                         <div class="row g-0 w-100">
                             <!-- CALENDAR -->
                             <div id="kt_docs_fullcalendar_basic"></div>

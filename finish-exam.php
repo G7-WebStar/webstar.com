@@ -34,8 +34,8 @@ $activePage = 'finish-exam';
                     style="background-color: transparent;">
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto">
-                        <div class="row mb-3 row-padding-top">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
+                        <div class="row mb-3">
                             <div class="col-12 cardHeader p-3 mb-4">
 
                                 <!-- DESKTOP VIEW -->

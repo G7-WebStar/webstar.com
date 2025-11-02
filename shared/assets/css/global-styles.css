@@ -287,11 +287,11 @@ a.btn:hover {
 }
 
 .row-padding-top {
-  padding-top: 0px !important; /* Default for md and up */
+  margin-top: 0px !important; /* Default for md and up */
 }
 
 @media (max-width: 767.98px) {
   .row-padding-top {
-    padding-top: 60px !important; /* Mobile only */
+    margin-top: 60px !important; /* Mobile only */
   }
 }

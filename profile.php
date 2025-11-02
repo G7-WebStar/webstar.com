@@ -241,8 +241,8 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                     <!-- Navbar for mobile -->
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto" style="position: relative;">
-                        <div class="row g-0 w-100 row-padding-top">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top" style="position: relative;">
+                        <div class="row g-0 w-100">
 
                             <!-- Sticky Header -->
                             <div class="d-flex align-items-center text-decoration-none sticky-header py-4"

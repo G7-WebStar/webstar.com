@@ -313,9 +313,9 @@ $user = mysqli_fetch_assoc($result);
 
                         </div>
                     </nav>
-                    <div class="container-fluid py-3 overflow-y-auto" style="white-space: nowrap; ">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top" style="white-space: nowrap; ">
                         <div class="row d-flex justify-content-center">
-                            <div class="row mt-0 row-padding-top">
+                            <div class="row mt-0">
 
                                 <!-- LEFT: Course Card -->
                                 <div class="col-md-4">
