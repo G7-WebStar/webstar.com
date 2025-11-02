@@ -253,7 +253,7 @@ $user = mysqli_fetch_assoc($result);
 
 <body>
     <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center p-0 p-md-3"
-        style="height:100vh; background-color:var(--black); overflow:hidden;">
+        style="background-color: var(--black);">
 
         <div class="row w-100">
 
