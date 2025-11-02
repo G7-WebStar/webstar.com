@@ -330,8 +330,8 @@
 /* Mobile responsive layout */
 @media (max-width: 768px) {
     .d-flex.align-items-center {
-        flex-direction: column;
-        gap: 15px;
+        /* flex-direction: column;
+        gap: 15px; */
         align-items: center;
     }
 

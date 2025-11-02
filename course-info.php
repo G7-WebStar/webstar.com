@@ -265,54 +265,7 @@ $user = mysqli_fetch_assoc($result);
                     style="background-color: transparent;">
 
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
-
-                    <!-- Bottom Navbar -->
-                    <nav class="navbar fixed-bottom border-top d-block d-md-none"
-                        style="background-color:white; height: 80px;">
-                        <div class="container d-flex justify-content-around pb-1">
-
-                            <!-- Home -->
-                            <button class="btn d-flex flex-column align-items-center" style="border: 0px!important;">
-                                <span class="material-symbols-rounded" style="font-size:20px">
-                                    dashboard
-                                </span>
-                                <span class="text-med text-12">Home</span>
-                            </button>
-
-                            <!-- Courses -->
-                            <button class="btn d-flex flex-column align-items-center"
-                                style="background-color:var(--primaryColor); border: 1px solid var(--black);">
-                                <span class="material-symbols-rounded" style="font-size:20px">
-                                    folder
-                                </span>
-                                <small class="text-med text-12">Courses</small>
-                            </button>
-
-                            <!-- To-do -->
-                            <button class="btn d-flex flex-column align-items-center" style="border: 0px!important;">
-                                <span class="material-symbols-rounded" style="font-size:20px">
-                                    extension
-                                </span>
-                                <small class="text-med text-12">Quests</small>
-                            </button>
-
-                            <!-- Inbox -->
-                            <button class="btn d-flex flex-column align-items-center" style="border: 0px!important;">
-                                <i class="bi bi-inbox-fill" style="font-size:25px; color:var(--black); margin-top: -10px;"></i>
-                                <small class="text-med text-12" style="margin-top: -8px;">Inbox</small>
-                            </button>
-
-                            <!-- More -->
-                            <button class="btn d-flex flex-column align-items-center" style="border: 0px!important;">
-                                <span class="material-symbols-rounded" style="font-size:20px">
-                                    dehaze
-                                </span>
-                                <small class="text-med text-12">More</small>
-                            </button>
-
-
-                        </div>
-                    </nav>
+                    
                     <div class="container-fluid py-3 overflow-y-auto row-padding-top" style="white-space: nowrap; ">
                         <div class="row d-flex justify-content-center">
                             <div class="row mt-0">

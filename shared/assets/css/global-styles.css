@@ -158,7 +158,7 @@
   color: var(--black);
   padding: 0 12px;
   font-size: 14px;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.03em;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -181,7 +181,7 @@
 
 /* Dropdown labels */
 .dropdown-label {
-  letter-spacing: -0.01em;
+  letter-spacing: -0.03em;
   font-size: 14px;
   white-space: nowrap;
 }
@@ -189,7 +189,7 @@
 /* Dropdown menu items */
 .dropdown-item {
   font-size: 14px;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.03em;
 }
 
 /* Dropdown Arrow/Triangle */
@@ -294,4 +294,16 @@ a.btn:hover {
   .row-padding-top {
     margin-top: 60px !important; /* Mobile only */
   }
+}
+
+.dropdown-menu {
+  --bs-dropdown-link-active-bg: var(--primaryColor) !important;
+  --bs-dropdown-link-active-color: #fff !important;
+}
+
+/* Remove Bootstrap blue/white active styles in dropdowns */
+.dropdown-menu .dropdown-item:active,
+.dropdown-menu .dropdown-item:focus,
+.dropdown-menu .dropdown-item.show {
+  color: var(--black) !important; /* or your preferred text color */
 }

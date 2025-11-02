@@ -173,7 +173,7 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
 
 
                                 <!-- Task container -->
-                                <div class="row mb-0 mt-0">
+                                <div class="row mb-0 mt-0 mx-auto">
                                     <div class="col-12 col-md-10 mt-5 mx-auto mx-lg-0">
                                         <?php
                                         if (mysqli_num_rows($selectAssessmentResult) > 0) {
@@ -199,10 +199,10 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                                         <div class="d-flex flex-grow-1 flex-wrap justify-content-between p-2 w-100">
                                                             <!-- For small screen of main content -->
                                                             <div class="px-3 py-0">
-                                                                <div class="text-sbold text-16">
+                                                                <div class="text-sbold text-16 text-start">
                                                                     <?php echo $todo['assessmentTitle']; ?>
                                                                 </div>
-                                                                <div class="text-reg text-12">
+                                                                <div class="text-reg text-12 text-start">
                                                                     <?php echo $todo['courseCode']; ?>
                                                                 </div>
                                                             </div>
