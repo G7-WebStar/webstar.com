@@ -17,7 +17,7 @@
 
 <body>
     <div class="container text-center">
-        <div class="row">
+        <div class="row row-padding-top">
             <div class="col-6 mx-auto my-auto">
                 <div class="h1">
                     404 Page

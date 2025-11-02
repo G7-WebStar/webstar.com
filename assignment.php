@@ -101,7 +101,7 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
                     <div class="container-fluid py-3 overflow-y-auto">
-                        <div class="row mb-3">
+                        <div class="row mb-3 row-padding-top">
                             <div class="col-12 cardHeader p-3 mb-4">
 
                                 <!-- DESKTOP VIEW -->

@@ -158,7 +158,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
                     <div class="container-fluid py-1 overflow-y-auto">
-                        <div class="row">
+                        <div class="row row-padding-top">
                             <!-- PUT CONTENT HERE -->
                             <?php
                             if (mysqli_num_rows($selectEnrolledResult) > 0) {

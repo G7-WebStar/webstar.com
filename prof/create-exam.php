@@ -151,7 +151,7 @@ if (isset($_POST['save_lesson'])) {
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
                     <div class="container-fluid py-3 overflow-y-auto">
-                        <div class="row">
+                        <div class="row row-padding-top">
                             <div class="col-12">
                                 <!-- Header -->
                                 <div class="row mb-3 align-items-center">

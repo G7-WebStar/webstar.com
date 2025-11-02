@@ -91,7 +91,7 @@ if (isset($_POST['access_code'])) {
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
                     <div class="container-fluid py-1 overflow-y-auto">
-                        <div class="row">
+                        <div class="row row-padding-top">
                             <div class="col-12 d-flex justify-content-center align-items-center" style="min-height: 60vh;">
                                 <div class="text-center">
                                     <img src="shared/assets/img/courseJoin/folder-dynamic-color.png" alt="Course Enrollment" class="course-join-image">

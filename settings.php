@@ -55,7 +55,7 @@ if (isset($_POST['activeTab'])) {
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
                     <div class="container-fluid py-3 overflow-y-auto">
-                        <div class="row mb-3">
+                        <div class="row mb-3 row-padding-top">
                             <div class="row mt-0">
                                 <!-- Title -->
                                 <div class="col-12 col-lg-auto mb-3 mb-lg-0">

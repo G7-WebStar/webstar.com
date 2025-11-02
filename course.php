@@ -81,7 +81,7 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
                     <div class="container-fluid py-3 overflow-y-auto">
-                        <div class="row m-4 justify-content-center">
+                        <div class="row m-4 justify-content-center row-padding-top">
 
                             <div class="row header-section align-items-center justify-content-center">
                                 <!-- Start of Header Section -->

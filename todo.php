@@ -102,7 +102,7 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                             <div class="col-12">
 
                                 <!-- Header Section -->
-                                <div class="row align-items-center mb-3 text-center text-lg-start">
+                                <div class="row align-items-center mb-3 text-center text-lg-start row-padding-top">
                                     <!-- Title -->
                                     <div class="col-12 col-lg-auto mb-3 mb-lg-0">
                                         <h1 class="text-sbold text-25 mb-0 mt-2" style="color: var(--black);">My To-do

@@ -48,7 +48,7 @@ include("shared/assets/processes/session-process.php");
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
                     <div class="container-fluid py-3 overflow-y-auto">
-                        <div class="row">
+                        <div class="row row-padding-top">
                             <div class="col-12">
 
                                 <div class="d-flex align-items-center">

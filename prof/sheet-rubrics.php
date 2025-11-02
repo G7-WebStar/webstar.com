@@ -80,7 +80,7 @@ if (!empty($fileLinks)) {
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
                     <div class="container-fluid py-3 overflow-y-auto">
-                        <div class="row mb-3">
+                        <div class="row mb-3 row-padding-top">
                             <div class="col-12 cardHeader p-3 mb-4">
                                 <div
                                     class="row desktop-header d-none d-sm-flex align-items-center justify-content-between">
