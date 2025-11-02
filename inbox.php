@@ -47,6 +47,8 @@ $selectInboxResult = executeQuery($selectInboxQuery);
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="shared/assets/css/global-styles.css" />
     <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css" />
+    <link rel="stylesheet" href="shared/assets/css/inbox.css" />
+    <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
     <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png" />
 
@@ -55,14 +57,6 @@ $selectInboxResult = executeQuery($selectInboxQuery);
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
 
-    <style>
-        @media (min-width: 992px) {
-            .responsive-circle {
-                width: 45.52px !important;
-                height: 45.52px !important;
-            }
-        }
-    </style>
 </head>
 
 <body>
@@ -90,7 +84,52 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                     </div>
 
                                     <!-- Dropdowns-->
+                                     
+                                <!-- Sort By -->
+                                <div class="col-auto mobile-dropdown">
+                                    <div class="d-flex align-items-center flex-nowrap mt-2">
+                                        <span class="dropdown-label me-2 text-reg">Sort by</span>
+                                        <div class="custom-dropdown">
+                                            <button class="dropdown-btn text-reg text-14">Newest</button>
+                                            <ul class="dropdown-list text-reg text-14">
+                                                <li data-value="Newest">Newest</li>
+                                                <li data-value="Oldest">Oldest</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
 
+                                <!-- Course -->
+                                <div class="col-auto mobile-dropdown">
+                                    <div class="d-flex align-items-center flex-nowrap mt-2">
+                                        <span class="dropdown-label me-2 text-reg">Courses</span>
+                                        <div class="custom-dropdown">
+                                            <button class="dropdown-btn text-reg text-14">All</button>
+                                            <ul class="dropdown-list text-reg text-14">
+                                                <li data-value="All">All</li>
+                                                <li data-value="Courses">Courses</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Type -->
+                                <div class="col-auto mobile-dropdown">
+                                    <div class="d-flex align-items-center flex-nowrap mt-2">
+                                        <span class="dropdown-label me-2 text-reg">Type</span>
+                                        <div class="custom-dropdown">
+                                            <button class="dropdown-btn text-reg text-14">All</button>
+                                            <ul class="dropdown-list text-reg text-14">
+                                                <li data-value="All">All</li>
+                                                <li data-value="Course Updates">Course Updates</li>
+                                                <li data-value="Badge Updates">Badge Updates</li>
+                                                <li data-value="Leaderboard Updates">Leaderboard Updates</li>
+                                                <li data-value="Level Updates">Level Updates</li>
+                                                <li data-value="Submission Updates">Submission Updates</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
 
                                     <!-- Message Content -->
                                     <div class="message-container mt-4 mt-lg-4 pb-4">
@@ -158,6 +197,32 @@ $selectInboxResult = executeQuery($selectInboxQuery);
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
+     <!-- Dropdown js -->
+     <script>
+                document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+                    const btn = dropdown.querySelector('.dropdown-btn');
+                    const list = dropdown.querySelector('.dropdown-list');
+
+                    btn.addEventListener('click', () => {
+                        list.style.display = list.style.display === 'block' ? 'none' : 'block';
+                    });
+
+                    list.querySelectorAll('li').forEach(item => {
+                        item.addEventListener('click', () => {
+                            btn.textContent = item.dataset.value;
+                            list.style.display = 'none';
+                        });
+                    });
+
+                    // Close dropdown if clicked outside
+                    document.addEventListener('click', (e) => {
+                        if (!dropdown.contains(e.target)) {
+                            list.style.display = 'none';
+                        }
+                    });
+                });
+            </script>
 </body>
 
 </html>

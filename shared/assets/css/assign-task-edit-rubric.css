@@ -30,12 +30,12 @@
 .section-divider {
     border: 0;
     border-top: 1px solid var(--black);
-    opacity: 1; 
+    opacity: 1;
     margin-top: 15px;
     margin-bottom: 15px;
     width: 62%;
 }
- 
+
 /* Remove button styling */
 .card-remove-btn {
     background: transparent !important;
@@ -54,20 +54,20 @@
 }
 
 .material-symbols-outlined {
-  font-variation-settings:
-  'FILL' 0,
-  'wght' 400,
-  'GRAD' 0,
-  'opsz' 24
+    font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
 }
 
 /* Material Symbols add_circle icon styling */
 .btn .material-symbols-outlined {
-  font-variation-settings:
-  'FILL' 0,
-  'wght' 400,
-  'GRAD' 0,
-  'opsz' 20
+    font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 20
 }
 
 .criterion-remove-btn {
@@ -76,29 +76,37 @@
     color: var(--black) !important;
     width: 32px;
     height: 32px;
-    margin-left: calc(62% - 185px); /* aligns with 62% divider end */
+    margin-left: calc(62% - 185px);
+    /* aligns with 62% divider end */
 }
 
 /* Total points label spacing next to Criteria button */
 .total-points-label {
-    margin-left: calc(62% - 220px); 
+    margin-left: calc(62% - 220px);
+}
+
+/* Criteria Add Button */
+.criteria-add-btn {
+    margin-left: calc(62% - 93px) !important;
+    margin-top: 40px;
 }
 
 /* Criterion Description Card - matching image design */
 .criterion-description-card {
     width: 711px;
-    min-height: 300px; 
+    min-height: 300px;
     border: 1px solid var(--black);
-    border-radius: 15px; 
+    border-radius: 15px;
     background: var(--pureWhite);
     position: relative;
     padding: 10px;
 }
 
 .level-title,
-.level-description{
+.level-description {
     width: 610px;
-    margin: 0 auto; /* centers the form horizontally */
+    margin: 0 auto;
+    /* centers the form horizontally */
 }
 
 .level-title .form-control,
@@ -124,7 +132,8 @@
     font-style: italic;
     font-size: 14px;
     line-height: 21px;
-    letter-spacing: -0.03em; /* -3% */
+    letter-spacing: -0.03em;
+    /* -3% */
     width: 136px;
     height: 21px;
     color: var(--black);
@@ -132,7 +141,7 @@
     padding-left: 23px;
 }
 
-.points-label{
+.points-label {
     width: 130px;
 }
 
@@ -153,6 +162,7 @@
 
 /* Responsive Design for Small Screens */
 @media (max-width: 768px) {
+
     /* Form containers - make them responsive */
     .create-rubric-form,
     .criteria-title,
@@ -160,21 +170,21 @@
         width: 100%;
         max-width: 100%;
     }
-    
+
     /* Criterion description card - responsive width */
     .criterion-description-card {
         width: 100%;
         max-width: 100%;
         min-height: 290px;
     }
-    
+
     /* Level forms - responsive width */
     .level-title,
     .level-description {
         width: 95%;
         max-width: 95%;
     }
-    
+
     /* Points label - responsive width */
     .points-label {
         width: 95%;
@@ -186,51 +196,57 @@
     /* Total points label - responsive spacing on small screens */
     .total-points-label {
         float: right;
-        margin-left: 0 !important; 
+        margin-left: 0 !important;
         margin-top: 5px;
     }
-    
+
+    /* Criteria Add Button */
+    .criteria-add-btn {
+        margin-left: calc(62% - 93px) !important;
+        margin-top: 40px;
+    }
+
     /* Section divider - full width on mobile */
     .section-divider {
         width: 100%;
     }
-    
+
+    /* Criteria button - reset left margin on small screens */
+    .criteria-add-btn {
+        margin-left: calc(100% - 94px) !important;
+    }
+
     /* Criterion remove button - keep same positioning as large screen */
     .criterion-remove-btn {
         margin-left: calc(100% - 185px);
     }
-    
+
     /* Card remove button - adjust positioning for mobile */
     .card-remove-btn {
         top: 24px;
         right: 2px;
         z-index: 10;
     }
-    
+
     /* Input padding adjustments for mobile */
     .form-control {
         padding: 12px 16px !important;
     }
-    
+
     /* Container padding adjustments */
     .container-fluid {
         padding-left: 15px !important;
         padding-right: 15px !important;
     }
 
-     /* Header margin adjustment for mobile */
-     .row.mb-3.align-items-center {
+    /* Header margin adjustment for mobile */
+    .row.mb-3.align-items-center {
         justify-content: center;
         margin-right: 25px;
     }
-    
+
     /* Arrow gap adjustment for mobile */
     .row.mb-3.align-items-center .col-auto {
-       justify-content: flex-start;
+        justify-content: flex-start;
     }
 }
-
-
-
-
-

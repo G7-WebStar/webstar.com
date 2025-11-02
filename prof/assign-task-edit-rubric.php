@@ -215,6 +215,15 @@ include("../shared/assets/processes/prof-session-process.php");
                                     </div>
                                 </div>
 
+                                <div class="row">
+                                    <div class="col-12">
+                                        <button type="button"
+                                            class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 d-inline-flex align-items-center criteria-add-btn"
+                                            style="background-color: var(--primaryColor); border: 1px solid var(--black); margin-right: auto;">
+                                            Create
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

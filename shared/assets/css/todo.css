@@ -1,0 +1,141 @@
+
+/* Sort dropdown */
+.custom-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown Button */
+.dropdown-btn {
+    background-color: var(--pureWhite);
+    border: 1px solid var(--black);
+    border-radius: 25px;
+    padding: 3px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    min-width: 120px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.dropdown-btn::after {
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #000;
+    margin-left: 8px;
+}
+
+/* Dropdown list */
+.dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 8px;
+    padding: 0;
+    list-style: none;
+    border: 1px solid #000;
+    border-radius: 15px;
+    background-color: #fff;
+    width: 100%;
+    display: none;
+    z-index: 100;
+    overflow: hidden;
+}
+
+/* Items */
+.dropdown-list li {
+    padding: 8px 16px;
+    cursor: pointer;
+    border: none;
+}
+
+/* Empty state */
+.empty-state {
+    min-height: 300px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.empty-state img {
+    max-width: 280px;
+    width: 100%;
+    height: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Ensure centering on small screens */
+@media (max-width: 575.98px) {
+    .empty-state {
+        width: 100%;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    .empty-state img {
+        max-width: 280px;
+        width: 100%;
+        margin-left: 13px;
+    }
+}
+
+/* Dropdown responsive styles */
+@media (max-width: 768px) {
+    .custom-dropdown .dropdown-btn {
+        min-width: 90px;
+        padding: 4px 12px;
+        font-size: 12px;
+       justify-content:center !important;
+    }
+
+    .dropdown-label {
+        font-size: 12px;
+        margin-right: 4px;
+    }
+
+    .mobile-dropdown {
+        margin-left: 0.5rem;
+    }
+
+    .dropdown-list li {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .custom-dropdown .dropdown-btn {
+        min-width: 80px;
+        padding: 3px 10px;
+        font-size: 11px;
+        justify-content: center !important;
+    }
+
+    .dropdown-label {
+        font-size: 11px;
+        margin-right: 3px;
+    }
+
+    .mobile-dropdown {
+        margin-left: 0.25rem;
+    }
+
+    .dropdown-list {
+        margin-top: 6px;
+    }
+
+    .dropdown-list li {
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+}
+
