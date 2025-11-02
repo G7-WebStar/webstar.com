@@ -234,11 +234,13 @@ button.btn {
     box-shadow 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
   box-shadow: none;
   transform: translateY(0);
+  border: 1px solid var(--black);
 }
 
 button.btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 0 #2c2c2c;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 2px 0 #2c2c2c !important;
+  border: 1px solid var(--black);
 }
 
 /* Removing bootstrap default styling */

@@ -251,7 +251,7 @@ if (isset($_GET['reuse'])) {
                             <div class="col-12">
                                 <!-- Header -->
                                 <div class="row mb-3 align-items-center">
-                                    
+
                                     <!-- Back Arrow -->
                                     <div class="col-auto d-none d-md-block">
                                         <a href="javascript:history.back()" class="text-decoration-none">
@@ -326,7 +326,8 @@ if (isset($_GET['reuse'])) {
                                                     <input type="datetime-local"
                                                         class="form-control textbox text-reg text-16 me-0 me-md-2"
                                                         name="deadline"
-                                                        value="<?php echo isset($reusedData['deadline']) ? date('Y-m-d\TH:i', strtotime($reusedData['deadline'])) : ''; ?>">
+                                                        value="<?php echo isset($reusedData['deadline']) ? date('Y-m-d\TH:i', strtotime($reusedData['deadline'])) : ''; ?>"
+                                                        required>
                                                 </div>
                                             </div>
 
