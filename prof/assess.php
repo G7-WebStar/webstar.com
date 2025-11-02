@@ -177,6 +177,7 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                 <?php
                                 $chartsIDs = [];
                                 if (mysqli_num_rows($assessmentsResult) > 0) {
+                                    mysqli_data_seek($assessmentsResult, 0);
                                     $i = 1;
                                     while ($assessments = mysqli_fetch_assoc($assessmentsResult)) {
                                         $chartsIDs[] = "chart$i";

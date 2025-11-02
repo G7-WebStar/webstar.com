@@ -13,7 +13,7 @@ if (mysqli_num_rows($submissionValidationResult) > 0) {
     exit();
 }
 
-$selectTestQuery = "SELECT generalGuidance FROM tests WHERE testID = $testID";
+$selectTestQuery = "SELECT testTitle, generalGuidance FROM tests WHERE testID = $testID";
 $selectTestResult = executeQuery($selectTestQuery);
 
 $selectQuestionsQuery = "SELECT 
@@ -152,9 +152,13 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                                         <div class="d-flex flex-row align-items-center mb-0">
                                             <i class="d-none d-md-block announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 me-3"
                                                 style="color: var(--black);"></i>
-                                            <div class="text-center text-md-auto h2 m-0">
-                                                Quiz #1
-                                            </div>
+                                            <?php
+                                            if (mysqli_num_rows($selectTestResult) > 0) {
+                                                while ($guideLines = mysqli_fetch_assoc($selectTestResult)) {
+                                            ?>
+                                                    <div class="text-center text-md-auto h2 m-0">
+                                                        <?php echo $guideLines['testTitle']; ?>
+                                                    </div>
                                         </div>
                                         <div class="h2 mt-3 mt-md-0 mb-0 text-center text-md-end" id="timer">
 
@@ -174,13 +178,11 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                                             </div>
                                             <div class="h2 text-sbold text-center mt-4 fs-sm-6" id="question-container">
                                                 <div class="col-12 col-md-8 h4 text-reg mx-auto mt-4 px-3 px-md-0 text-center text-md-start fs-sm-6">
-                                                    <?php
-                                                    if (mysqli_num_rows($selectTestResult) > 0) {
-                                                        while ($guideLines = mysqli_fetch_assoc($selectTestResult)) {
-                                                            echo $guideLines['generalGuidance'];
-                                                        }
-                                                    }
-                                                    ?>
+                                                    <?php echo $guideLines['generalGuidance']; ?>
+                                            <?php
+                                                }
+                                            }
+                                            ?>
                                                 </div>
                                             </div>
                                         </div>
