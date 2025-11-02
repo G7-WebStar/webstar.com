@@ -13,14 +13,13 @@ if (isset($_POST['save_lesson'])) {
     $title = $_POST['lessonTitle'];
     $content = $_POST['lessonContent'];
     $createdAt = date("Y-m-d H:i:s");
-    $updatedAt = date("Y-m-d H:i:s");
 
     if (!empty($_POST['courses'])) {
         foreach ($_POST['courses'] as $selectedCourseID) {
             $lessons = "INSERT INTO lessons 
-            (courseID, lessonTitle, lessonDescription, createdAt, updatedAt) 
+            (courseID, lessonTitle, lessonDescription, createdAt) 
             VALUES 
-            ('$selectedCourseID', '$title', '$content', '$createdAt', '$updatedAt')";
+            ('$selectedCourseID', '$title', '$content', '$createdAt')";
             executeQuery($lessons);
 
             // Get the actual last inserted ID from MySQL

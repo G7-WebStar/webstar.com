@@ -14,11 +14,8 @@ if (isset($_POST['save_lesson'])) {
     $generalGuidance = $_POST['generalGuidance'];
     $testDeadline = !empty($_POST['deadline']) ? $_POST['deadline'] : null;
     $testTimeLimit = !empty($_POST['testTimeLimit']) ? $_POST['testTimeLimit'] : null;
-    $userSection = $_POST['userSection'] ?? '';
-    $testInstruction = $_POST['testInstruction'] ?? '';
     $testType = $_POST['testType'];
     $createdAt = date("Y-m-d H:i:s");
-
     $deadlineEnabled = isset($_POST['stopSubmissions']) ? 1 : 0;
 
     if (!empty($_POST['courses'])) {
@@ -38,10 +35,9 @@ if (isset($_POST['save_lesson'])) {
 
             // 2. Insert into tests (hindi na kasama ang deadline dito)
             $testQuery = "INSERT INTO tests 
-                (courseID, userID, assessmentID, testTitle, generalGuidance, testTimeLimit, userSection, testInstruction, testType) 
+                (assessmentID, generalGuidance, testTimeLimit) 
                 VALUES 
-                ('$assessmentID', '$title', '$generalGuidance', 
-                '$testTimeLimit', '$userSection', '$testInstruction', '$testType')";
+                ('$assessmentID', '$generalGuidance', '$testTimeLimit')";
 
             executeQuery($testQuery);
 
@@ -131,7 +127,7 @@ if (isset($_POST['save_lesson'])) {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
-    
+
 </head>
 
 <body>
@@ -174,7 +170,7 @@ if (isset($_POST['save_lesson'])) {
                                 <form action="" method="POST" enctype="multipart/form-data">
 
                                     <!-- Hidden input for test type -->
-                                    <input type="hidden" name="testType" value="exam">
+                                    <input type="hidden" name="testType" value="test">
 
                                     <div class="row">
                                         <div class="col-12 pt-3 mb-3">
@@ -227,7 +223,7 @@ if (isset($_POST['save_lesson'])) {
                                                     Time Limit (minutes)
                                                 </label>
                                                 <span class="fst-italic text-reg text-12">Optional.</span>
-                                                <input type="number" name="testTimeLimit" class="form-control textbox text-reg text-14"
+                                                <input type="number" name="testTimeLimit" class="form-control textbox text-reg text-14" required
                                                     style="max-width: 320px;" placeholder="100" />
                                             </div>
                                         </div>
@@ -256,31 +252,6 @@ if (isset($_POST['save_lesson'])) {
                                         </div>
                                     </div>
                                     <!-- Templates -->
-                                    <template id="sectionTemplate">
-                                        <div class="row section-block">
-                                            <div class="col-12 pt-3 mb-3">
-                                                <div
-                                                    class="form-control textbox p-3 text-reg text-14 text-muted position-relative">
-
-                                                    <!-- Delete Button (styled like Multiple Choice buttons) -->
-                                                    <button type="button" class="delete-template"
-                                                        style="position: absolute; top: 5px; right: 1px; background: none; border: none; color: var(--black); cursor: pointer;">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-
-                                                    <input type="text"
-                                                        name="userSection" class="form-control textbox1 mb-1 p-2 text-reg text-14 text-muted"
-                                                        placeholder="Section Name" required>
-
-                                                    <input type="text"
-                                                        name="testInstruction" class="form-control textbox1 p-2 text-reg text-14 text-muted"
-                                                        placeholder="Instructions" required>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </template>
-
-
                                     <template id="identificationTemplate">
                                         <div class="row position-relative">
                                             <div class="col-12 mb-3">
@@ -435,11 +406,6 @@ if (isset($_POST['save_lesson'])) {
                                     <!-- Buttons -->
                                     <div class="row mt-2">
                                         <div class="col-12 mb-3">
-                                            <button type="button" id="addSection" class="btn text-reg rounded-pill ms-1"
-                                                style="background-color: var(--primaryColor); width: 180px;">
-                                                <i class="fas fa-users me-2"></i> Section
-                                            </button>
-
                                             <button type="button" id="addMultipleChoice"
                                                 class="btn text-reg rounded-pill ms-1"
                                                 style="background-color: var(--primaryColor); width: 180px;">
@@ -533,6 +499,7 @@ if (isset($_POST['save_lesson'])) {
     <!-- Quill JS -->
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script>
+        // Quill Editor
         var quill = new Quill('#editor', {
             theme: 'snow',
             placeholder: 'Test General Guidelines',
@@ -564,55 +531,40 @@ if (isset($_POST['save_lesson'])) {
             let plainText = quill.getText().trim();
             document.getElementById("generalGuidance").value = plainText;
 
-            //Validation for multiple choice
             let valid = true;
             let message = "";
 
-            document.querySelectorAll(".multiple-choice-item").forEach((mc) => {
+            // Multiple Choice Validation
+            document.querySelectorAll(".multiple-choice-item").forEach(mc => {
+                if (!mc.offsetParent) return;
                 const radios = mc.querySelectorAll("input[type='radio']");
-                let oneChecked = false;
+                let oneChecked = Array.from(radios).some(r => r.checked);
 
-                radios.forEach(r => {
-                    if (r.checked) oneChecked = true;
-                });
-
+                const innerCard = mc.querySelector(".textbox, .card, .form-control");
                 if (!oneChecked) {
                     valid = false;
-                    message = "Choose the correct answers for all multiple choice questions.";
-
-                    const innerCard = mc.querySelector(".textbox, .card, .form-control");
-                    if (innerCard) {
-                        innerCard.style.border = "2px solid red";
-                    }
+                    if (!message) message = "Choose the correct answers for all multiple choice questions.";
+                    if (innerCard) innerCard.style.border = "2px solid red";
                 } else {
-                    const innerCard = mc.querySelector(".textbox, .card, .form-control");
-                    if (innerCard) {
-                        innerCard.style.border = "";
-                    }
+                    if (innerCard) innerCard.style.border = "";
                 }
 
-
-                //REMOVE EMPTY CHOICES before submit
+                // Remove empty choices
                 mc.querySelectorAll("input.choice-input").forEach(input => {
-                    if (input.value.trim() === "") {
-                        input.closest(".form-check")?.remove();
-                    }
+                    if (!input.value.trim()) input.closest(".form-check")?.remove();
                 });
             });
 
-            //Validation for Identification
-            document.querySelectorAll(".textbox").forEach((idBox) => {
-                if (idBox.querySelector("input[type='hidden'][name*='questionType']")?.value.toLowerCase() === "identification") {
-                    const answers = idBox.querySelectorAll("input[name*='correctAnswer']");
-                    let hasAnswer = false;
-
-                    answers.forEach(a => {
-                        if (a.value.trim() !== "") hasAnswer = true;
-                    });
-
+            // Identification Validation
+            document.querySelectorAll(".textbox").forEach(idBox => {
+                if (!idBox.offsetParent) return;
+                const type = idBox.querySelector("input[type='hidden'][name*='questionType']")?.value.toLowerCase();
+                if (type === "identification") {
+                    const answers = Array.from(idBox.querySelectorAll("input[name*='correctAnswer']"));
+                    const hasAnswer = answers.some(a => a.value.trim() !== "");
                     if (!hasAnswer) {
                         valid = false;
-                        message = "Provide at least one correct answer for all identification questions.";
+                        if (!message) message = "Provide at least one correct answer for all identification questions.";
                         idBox.style.border = "2px solid red";
                     } else {
                         idBox.style.border = "";
@@ -620,6 +572,7 @@ if (isset($_POST['save_lesson'])) {
                 }
             });
 
+            // Deadline Validation
             const deadlineInput = document.querySelector('input[name="deadline"]');
             if (deadlineInput) {
                 const deadlineValue = new Date(deadlineInput.value);
@@ -628,28 +581,27 @@ if (isset($_POST['save_lesson'])) {
 
                 if (!deadlineInput.value || deadlineValue < now) {
                     valid = false;
-                    message = "Please set the deadline to a future date or time within today.";
+                    if (!message) message = "Please set the deadline to a future date or time within today.";
                     deadlineInput.style.border = "2px solid red";
                 } else {
                     deadlineInput.style.border = "";
                 }
             }
 
-            // Validation for selected courses
+            // Selected Courses Validation
             const checkedCourses = document.querySelectorAll('.course-checkbox:checked');
             if (checkedCourses.length === 0) {
                 valid = false;
-                message = "Please select at least one course before submitting.";
+                if (!message) message = "Please select at least one course before submitting.";
             }
 
             if (!valid) {
                 e.preventDefault();
                 showAlert(message);
             }
-
         });
 
-        //Function to show Bootstrap alert (with icon)
+        // Show Alert
         function showAlert(message) {
             const container = document.getElementById("toastContainer");
 
@@ -664,34 +616,21 @@ if (isset($_POST['save_lesson'])) {
 
             container.appendChild(alert);
 
-            // Auto-remove after 4 seconds
             setTimeout(() => {
                 alert.classList.remove("show");
                 alert.classList.add("fade");
                 setTimeout(() => alert.remove(), 500);
             }, 4000);
         }
-    </script>
 
-    <!-- Section -->
-    <script>
-        document.getElementById("addSection").addEventListener("click", () => {
-            const clone = document.getElementById("sectionTemplate").content.cloneNode(true);
-            mainContainer.appendChild(clone);
-        });
-    </script>
-
-    <!-- Identification -->
-    <script>
-        let questionCount = 0; // global counter for all questions
+        // Identification / Multiple Choice Management
+        let questionCount = 0;
         const mainContainer = document.getElementById("allQuestionsContainer");
 
         function renumberQuestions() {
             const allQuestions = mainContainer.querySelectorAll(".textbox");
             let count = 0;
-
-            allQuestions.forEach((q) => {
-                // Section wala nito, pero Identification at MC meron
+            allQuestions.forEach(q => {
                 const hidden = q.querySelector("input[type='hidden'][name*='questionType']");
                 if (hidden) {
                     count++;
@@ -701,23 +640,16 @@ if (isset($_POST['save_lesson'])) {
             });
         }
 
-
+        // Add Identification
         document.getElementById("addIdentification").addEventListener("click", () => {
             const clone = document.getElementById("identificationTemplate").content.cloneNode(true);
-
-            // update the number inside the span
             const numberSpan = clone.querySelector(".input-group-text");
             if (numberSpan) numberSpan.textContent = mainContainer.querySelectorAll(".textbox").length + 1;
 
-
-            // Update all input names to use correct question index
             clone.querySelectorAll("input, textarea, select").forEach(input => {
-                if (input.name) {
-                    input.name = input.name.replace(/\[\d+\]/, `[${questionCount}]`);
-                }
+                if (input.name) input.name = input.name.replace(/\[\d+\]/, `[${questionCount}]`);
             });
 
-            // 🔹 ADD THIS
             const fileInput = clone.querySelector(".image-upload");
             if (fileInput) fileInput.name = `fileUpload[${questionCount}]`;
 
@@ -731,8 +663,6 @@ if (isset($_POST['save_lesson'])) {
             if (e.target.closest(".add-answer-btn")) {
                 const button = e.target.closest(".add-answer-btn");
                 const container = button.closest(".answers-scroll").querySelector(".answers-container");
-
-                // Find the question index
                 const questionBox = button.closest(".textbox");
                 const questionIndexInput = questionBox.querySelector("input[type='hidden'][name*='questionType']");
                 const questionIndex = questionIndexInput.name.match(/questions\[(\d+)\]/)[1];
@@ -745,7 +675,7 @@ if (isset($_POST['save_lesson'])) {
                 input.placeholder = "Answer";
                 input.classList.add("border", "rounded", "p-2");
                 input.style.width = "120px";
-                input.name = `questions[${questionIndex}][correctAnswer][]`; // <-- important
+                input.name = `questions[${questionIndex}][correctAnswer][]`;
 
                 const removeBtn = document.createElement("button");
                 removeBtn.type = "button";
@@ -754,49 +684,41 @@ if (isset($_POST['save_lesson'])) {
 
                 wrapper.appendChild(input);
                 wrapper.appendChild(removeBtn);
-
                 container.appendChild(wrapper);
-                container.scrollLeft = container.scrollWidth; // scroll to end
+                container.scrollLeft = container.scrollWidth;
             }
         });
 
-        // 🔹 Handle delete (for Identification & Multiple Choice blocks)
+        // Single Delete Handler for All Blocks
         document.addEventListener("click", function(e) {
-            if (e.target.closest(".delete-template")) {
-                const block = e.target.closest(".row, .multiple-choice-item, .textbox");
-                if (block) {
-                    block.remove();
-                    renumberQuestions();
-                }
-            }
-        });
-    </script>
+            const delBtn = e.target.closest(".delete-template");
+            if (!delBtn) return;
 
-    <!-- Multiple Choice -->
-    <script>
-        // Add Multiple Choice Question
+            const block = delBtn.closest(".textbox, .multiple-choice-item, .row");
+            if (block) block.remove();
+
+            renumberQuestions();
+            updateTotalPoints();
+        });
+
+        // Multiple Choice
         document.getElementById("addMultipleChoice").addEventListener("click", () => {
             const clone = document.getElementById("multipleChoiceTemplate").content.cloneNode(true);
-
-            // Update question number
             const numberSpan = clone.querySelector(".question-number");
             if (numberSpan) numberSpan.textContent = mainContainer.querySelectorAll(".textbox").length + 1;
 
-            // Update all input/select/textarea names (except hidden questionType)
             clone.querySelectorAll("input, select, textarea").forEach(input => {
                 if (input.name && !input.name.includes("questionType")) {
                     input.name = input.name.replace(/\[\d+\]/g, `[${questionCount}]`);
                 }
             });
 
-            // 🔹 Update hidden questionType AFTER all others
             const hiddenType = clone.querySelector("input[type='hidden'][name*='questionType']");
             if (hiddenType) {
                 hiddenType.name = `questions[${questionCount}][questionType]`;
                 hiddenType.value = "Multiple Choice";
             }
 
-            // Update file input
             const fileInput = clone.querySelector(".image-upload");
             if (fileInput) fileInput.name = `fileUpload[${questionCount}]`;
 
@@ -805,20 +727,15 @@ if (isset($_POST['save_lesson'])) {
             renumberQuestions();
         });
 
-        // Use event delegation for adding choices dynamically
+        // Add Multiple Choice Choices
         document.getElementById("allQuestionsContainer").addEventListener("click", function(e) {
             if (e.target.closest(".add-radio-btn")) {
                 const button = e.target.closest(".add-radio-btn");
                 const container = button.closest(".multiple-choice-item").querySelector(".radio-choices-container");
-
-                // 🚨 Limit to 4 choices
                 const existingChoices = container.querySelectorAll(".form-check").length;
-                if (existingChoices >= 4) {
-                    return;
-                }
+                if (existingChoices >= 4) return;
 
                 const questionIndex = button.closest(".multiple-choice-item").querySelector("input[type='hidden']").name.match(/\d+/)[0];
-
                 const newChoice = document.createElement("div");
                 newChoice.classList.add("form-check", "text-start", "d-flex", "align-items-center", "mb-2", "position-relative");
 
@@ -826,7 +743,7 @@ if (isset($_POST['save_lesson'])) {
                 radio.type = "radio";
                 radio.classList.add("form-check-input", "me-2");
                 radio.name = `questions[${questionIndex}][correctAnswer]`;
-                radio.value = ""; // will follow text input
+                radio.value = "";
 
                 const input = document.createElement("input");
                 input.type = "text";
@@ -863,15 +780,12 @@ if (isset($_POST['save_lesson'])) {
                 container.appendChild(newChoice);
             }
         });
-    </script>
 
-    <!-- Toggle Image Container -->
-    <script>
+        // Toggle Image Container
         document.addEventListener("click", function(e) {
             if (e.target.closest(".image-icon")) {
                 const card = e.target.closest(".textbox");
                 const imageContainer = card.querySelector(".image-container");
-
                 if (imageContainer.style.display === "none" || imageContainer.style.display === "") {
                     imageContainer.style.display = "block";
                 } else {
@@ -879,113 +793,59 @@ if (isset($_POST['save_lesson'])) {
                 }
             }
         });
-    </script>
 
-    <!-- Image Upload -->
-    <script>
-        // Function to bind upload logic to an image + input
+        // Image Upload
         function bindImageUpload(img) {
-            const fileInput = img.nextElementSibling; // hidden input
-
-            // Open file dialog when image is clicked
-            img.addEventListener("click", () => {
-                fileInput.click();
-            });
-
-            // Show uploaded image instantly
+            const fileInput = img.nextElementSibling;
+            img.addEventListener("click", () => fileInput.click());
             fileInput.addEventListener("change", () => {
                 if (fileInput.files && fileInput.files[0]) {
                     const reader = new FileReader();
-                    reader.onload = e => {
-                        img.src = e.target.result;
-                    };
+                    reader.onload = e => img.src = e.target.result;
                     reader.readAsDataURL(fileInput.files[0]);
                 }
             });
         }
 
-        // Run once for existing .question-image
         document.querySelectorAll(".question-image").forEach(img => bindImageUpload(img));
 
-        // Also re-run whenever a new block is added
         const observer = new MutationObserver(() => {
             document.querySelectorAll(".question-image").forEach(img => {
                 if (!img.dataset.bound) {
                     bindImageUpload(img);
-                    img.dataset.bound = "true"; // prevent duplicate bindings
+                    img.dataset.bound = "true";
                 }
             });
         });
 
-        // Watch the main container for newly added elements
-        observer.observe(document.getElementById("allQuestionsContainer"), {
+        observer.observe(mainContainer, {
             childList: true,
             subtree: true
         });
-    </script>
 
-    <script>
-        document.addEventListener("click", function(e) {
-            if (e.target.closest(".delete-template")) {
-                const block = e.target.closest(".row");
-                if (block) block.remove();
-            }
-        });
-    </script>
-    <script>
-        // Delete only the image container
-        document.addEventListener("click", function(e) {
-            if (e.target.closest(".delete-image")) {
-                const imageContainer = e.target.closest(".image-container");
-                if (imageContainer) {
-                    imageContainer.remove();
-                }
-            }
-        });
-    </script>
-    <script>
-        // Delete only the clicked template instance
-        document.addEventListener("click", function(e) {
-            if (e.target.closest(".delete-template")) {
-                const templateBox = e.target.closest(".multiple-choice-item");
-                if (templateBox) {
-                    templateBox.remove();
-                }
-            }
-        });
-    </script>
-
-    <script>
+        // Update Total Points
         function updateTotalPoints() {
             let total = 0;
-
-            // Identification and Multiple Choice points
             document.querySelectorAll('#allQuestionsContainer input[type="number"]').forEach(input => {
                 const val = parseInt(input.value);
                 if (!isNaN(val)) total += val;
             });
 
-            // Update all Total Points labels
             document.querySelectorAll('label[for="TotalPoints"]').forEach(label => {
                 label.textContent = `Total Points: ${total}`;
             });
         }
 
-        // Update on input change
-        document.getElementById('allQuestionsContainer').addEventListener('input', function(e) {
-            if (e.target.type === "number") {
-                updateTotalPoints();
-            }
+        mainContainer.addEventListener('input', function(e) {
+            if (e.target.type === "number") updateTotalPoints();
         });
 
-        // Observer for newly added questions
         const totalPointsObserver = new MutationObserver(() => updateTotalPoints());
-        totalPointsObserver.observe(document.getElementById('allQuestionsContainer'), {
+        totalPointsObserver.observe(mainContainer, {
             childList: true,
             subtree: true
         });
 
-        // Initialize on page load
         updateTotalPoints();
     </script>
 

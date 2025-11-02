@@ -17,7 +17,6 @@ $selectAssessmentQuery = "SELECT
     assessments.*,
     assessments.assessmentTitle AS assessmentTitle,
     todo.*,
-    todo.title AS todoTitle,
     courses.courseCode,
     DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline
     FROM assessments

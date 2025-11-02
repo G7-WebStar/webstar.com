@@ -197,6 +197,11 @@ include("shared/assets/processes/registration-profile-process.php");
         studentIDInput.addEventListener('input', () => {
             studentIDInput.value = studentIDInput.value.toUpperCase();
         });
+        // Auto-lowercase username while typing
+        const usernameInput = document.getElementById('userName');
+        usernameInput.addEventListener('input', () => {
+            usernameInput.value = usernameInput.value.toLowerCase();
+        });
 
         // Trigger file input when button is clicked
         uploadBtn.addEventListener('click', () => {
