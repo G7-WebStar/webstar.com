@@ -14,7 +14,6 @@
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
-    min-width: 120px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -43,7 +42,6 @@
     border: 1px solid #000;
     border-radius: 15px;
     background-color: #fff;
-    width: 100%;
     display: none;
     z-index: 100;
     overflow: hidden;
@@ -71,6 +69,25 @@
     display: block;
     margin-left: auto;
     margin-right: auto;
+}
+
+/* Empty state texts */
+.empty-state .empty-text {
+    font-family: 'SemiBold', sans-serif;
+    font-size: 20px;
+    line-height: 100%;
+    letter-spacing: -0.03em; /* ~ -3% */
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.empty-state .empty-subtext {
+    font-family: 'Regular', sans-serif;
+    font-size: 20px;
+    line-height: 100%;
+    letter-spacing: -0.03em; /* ~ -3% */
+    text-align: center;
+    display: block;
 }
 
 /* Ensure centering on small screens */

@@ -97,7 +97,7 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                     <!-- Navbar for mobile -->
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
+                    <div class="container-fluid py-3 row-padding-top">
                         <div class="row">
                             <div class="col-12">
 
@@ -256,6 +256,28 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                             <div
                                                 class="empty-state text-center py-5 d-flex flex-column align-items-center justify-content-center mx-auto">
                                                 <img src="<?php echo $emptyImage; ?>" alt="Empty state">
+                                                <?php if ($statusFilter == 'Missing') { ?>
+                                                    <div class="mt-3 text-center empty-text">
+                                                        No missing quests.
+                                                    </div>
+                                                    <span class="empty-subtext">
+                                                        You’re right on track, adventurer!
+                                                    </span>
+                                                <?php } elseif ($statusFilter == 'Done') { ?>
+                                                    <div class="mt-3 text-center empty-text">
+                                                        You haven’t submitted any quests yet.
+                                                    </div>
+                                                    <span class="empty-subtext">
+                                                        Complete one to earn XPs!
+                                                    </span>
+                                                <?php } else { ?>
+                                                    <div class="mt-3 text-center empty-text">
+                                                        No quests have been assigned yet.
+                                                    </div>
+                                                    <span class="empty-subtext">
+                                                        Your next adventure awaits!
+                                                    </span>
+                                                <?php } ?>
                                             </div>
                                             <?php
                                         }

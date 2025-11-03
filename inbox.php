@@ -71,7 +71,7 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                     style="background-color: transparent;">
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
+                    <div class="container-fluid py-3 row-padding-top">
                         <div class="row">
                             <div class="col-12">
                                 <!-- Header Section -->
@@ -195,6 +195,13 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                                 <?php
                                             }
                                         } else {
+                                            ?>
+                                            <div
+                                                class="empty-state text-center py-5 d-flex flex-column align-items-center justify-content-center mx-auto">
+                                                <img src="shared/assets/img/empty/inbox.png" alt="Empty state">
+                                                <div class="text-center empty-text">Your inbox is empty.</div>
+                                            </div>
+                                            <?php
                                         }
                                         ?>
                                     </div>

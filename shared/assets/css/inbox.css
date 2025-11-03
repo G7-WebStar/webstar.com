@@ -14,7 +14,6 @@
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
-    min-width: 120px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -43,7 +42,6 @@
     border: 1px solid #000;
     border-radius: 15px;
     background-color: #fff;
-    width: 100%;
     display: none;
     z-index: 100;
     overflow: hidden;
@@ -54,6 +52,33 @@
     padding: 8px 16px;
     cursor: pointer;
     border: none;
+}
+
+/* Empty state */
+.empty-state {
+    min-height: 300px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.empty-state img {
+    max-width: 280px;
+    width: 100%;
+    height: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Empty state texts*/
+.empty-state .empty-text {
+    font-family: 'Regular', sans-serif;
+    font-size: 20px;
+    line-height: 100%;
+    letter-spacing: -0.03em;
+    text-align: center;
+    margin-top: 12px;
 }
 
 @media (max-width: 768px) {
