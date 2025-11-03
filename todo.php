@@ -246,11 +246,11 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                                 <?php
                                             }
                                         } else {
-                                            $emptyImage = "shared/assets/img/empty/todo.png";
+                                            $emptyImage = "shared/assets/img/courseInfo/puzzle.png";
                                             if ($statusFilter == 'Missing') {
-                                                $emptyImage = "shared/assets/img/empty/quest.png";
+                                                $emptyImage = "shared/assets/img/courseInfo/thumbs-up.png";
                                             } elseif ($statusFilter == 'Done') {
-                                                $emptyImage = "shared/assets/img/empty/folder.png";
+                                                $emptyImage = "shared/assets/img/courseInfo/file.png";
                                             }
                                             ?>
                                             <div
@@ -310,7 +310,15 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
 
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    list.style.display = list.style.display === 'block' ? 'none' : 'block';
+                    const isOpen = list.style.display === 'block';
+                    // Close all other dropdown lists
+                    document.querySelectorAll('.custom-dropdown .dropdown-list').forEach(otherList => {
+                        if (otherList !== list) {
+                            otherList.style.display = 'none';
+                        }
+                    });
+                    // Toggle current
+                    list.style.display = isOpen ? 'none' : 'block';
                 });
 
                 list.querySelectorAll('li').forEach(item => {
