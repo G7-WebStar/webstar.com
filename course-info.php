@@ -13,9 +13,7 @@ if (isset($_GET['courseID'])) {
    	profInfo.firstName AS profFirstName,
     profInfo.middleName AS profMiddleName,
     profInfo.lastName AS profLastName,
-    profInfo.profilePicture AS profPFP,
-    SUBSTRING_INDEX(courses.schedule, ' ', 1)  AS courseDays,
-    SUBSTRING_INDEX(courses.schedule, ' ', -1) AS courseTime
+    profInfo.profilePicture AS profPFP
     FROM courses
     INNER JOIN userinfo AS profInfo
     	ON courses.userID = profInfo.userID
@@ -314,9 +312,9 @@ $user = mysqli_fetch_assoc($result);
                                                             <!-- Course Image -->
                                                             <div class="course-image w-100 mb-3 mt-1"
                                                                 style="position: relative; overflow: hidden; border-radius: 10px; min-height: 150px; background-color:var(--primaryColor)">
-                                                                <!-- <img src="shared/assets/img/home/<?php echo $courses['courseImage']; ?>"
+                                                                <img src="shared/assets/img/course-images/<?php echo $courses['courseImage']; ?>"
                                                             alt="Course Image"
-                                                            style="width: 100%; height: 100%; object-fit: cover;"> -->
+                                                            style="width: 100%; height: 100%; object-fit: cover;">
                                                             </div>
 
                                                             <!-- Prof -->
@@ -480,9 +478,9 @@ $user = mysqli_fetch_assoc($result);
                                                     <!-- Course Image -->
                                                     <div class="course-image w-100 mb-3"
                                                         style="position: relative; overflow: hidden; border-radius: 10px; min-height: 150px; background-color:var(--primaryColor)">
-                                                        <!-- <img src="shared/assets/img/home/<?php echo $courses['courseImage']; ?>"
+                                                        <img src="shared/assets/img/course-images/<?php echo $courses['courseImage']; ?>"
                                                             alt="Course Image"
-                                                            style="width: 100%; height: 100%; object-fit: cover;"> -->
+                                                            style="width: 100%; height: 100%; object-fit: cover;">
                                                     </div>
 
                                                     <!-- Course Info -->

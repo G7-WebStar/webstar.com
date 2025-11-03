@@ -99,8 +99,8 @@ FROM users u
 JOIN userinfo ui ON u.userID = ui.userID
 WHERE u.userID = $userID";
 
-$result = executeQuery($usernameAndProfilePictureQuery);
-$user = mysqli_fetch_assoc($result);
+$usernameAndProfilePictureResult = executeQuery($usernameAndProfilePictureQuery);
+$userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
 ?>
 
 <div class="col-auto d-none d-md-block">
@@ -196,17 +196,14 @@ $user = mysqli_fetch_assoc($result);
 
                 </ul>
 
-
-
-
                 <!-- User Dropdown -->
                 <div class="dropdown mt-auto p-4">
                     <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
                         data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="shared/assets/pfp-uploads/<?php echo $user['profilePicture']?>" alt="" width="32"
+                        <img src="shared/assets/pfp-uploads/<?php echo $userInformation['profilePicture']?>" alt="" width="32"
                             height="32" class="rounded-circle me-2">
                         <strong class="text-dark text-med text-16 px-1">
-                            <?php echo $user['userName']?>
+                            <?php echo $userInformation['userName']?>
                         </strong>
                     </a>
 
