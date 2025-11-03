@@ -33,7 +33,7 @@
     opacity: 1; 
     margin-top: 15px;
     margin-bottom: 15px;
-    width: 62%;
+    width: 710px; /* match form width for consistent alignment on zoom */
 }
  
 /* Remove button styling */
@@ -76,17 +76,17 @@
     color: var(--black) !important;
     width: 32px;
     height: 32px;
-    margin-left: calc(62% - 185px); /* aligns with 62% divider end */
+    margin-left: 525px; /* align with 710px form width (710 - 185) */
 }
 
 /* Total points label spacing next to Criteria button */
 .total-points-label {
-    margin-left: calc(62% - 220px); 
+    margin-left: 490px; /* align with 710px form width (710 - 220) */
 }
 
 /* Criteria Add Button */
 .criteria-add-btn {
-    margin-left: calc(62% - 93px) !important;
+    margin-left: 617px !important; /* align with 710px form width (710 - 93) */
     margin-top: 40px;
 }
 
