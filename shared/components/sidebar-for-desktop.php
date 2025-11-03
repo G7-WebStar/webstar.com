@@ -99,7 +99,7 @@ FROM users u
 JOIN userinfo ui ON u.userID = ui.userID
 WHERE u.userID = $userID";
 
-$result = executeQuery($usernameAndProfilePictureQuery); // use only this
+$result = executeQuery($usernameAndProfilePictureQuery);
 $user = mysqli_fetch_assoc($result);
 ?>
 
@@ -203,10 +203,10 @@ $user = mysqli_fetch_assoc($result);
                 <div class="dropdown mt-auto p-4">
                     <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
                         data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="32"
+                        <img src="shared/assets/pfp-uploads/<?php echo $user['profilePicture']?>" alt="" width="32"
                             height="32" class="rounded-circle me-2">
                         <strong class="text-dark text-med text-16 px-1">
-                            <?php echo isset($_SESSION['userName']) ? htmlspecialchars($_SESSION['userName']) : 'jamesdoe'; ?>
+                            <?php echo $user['userName']?>
                         </strong>
                     </a>
 
