@@ -129,23 +129,107 @@ if (isset($_POST['createCourse'])) {
             object-fit: cover;
         }
 
-        /* Default: Mobile (xs to sm) */
-        .create-prof-row {
-            width: 100%;
+        /* Default Create Existing Course Button Styles */
+        .create-ex-course {
+            width: 100% !important;
+            margin-top: 10px !important;
         }
 
-        /* Medium screens (md: ≥768px and <1200px) */
-        @media (min-width: 1160px) and (max-width: 1599px) {
-            .create-prof-row {
+        /* Create Existing Course Button Styles for bigger screens*/
+        @media (min-width: 1090px) {
+            .create-ex-course {
+                width: auto !important;
+                margin-top: 0px !important;
+            }
+        }
+
+        .sched-desktop {
+            display: none;
+        }
+
+        .sched-mobile {
+            display: block
+        }
+
+        /* Close Button Default Styles */
+        .remove-row {
+            margin-top: 38px !important;
+        }
+
+        /* Medium Screen */
+        @media (min-width: 768px) {
+            .schedule-col {
                 width: 100%;
             }
 
+            .sched-mobile {
+                display: block;
+            }
+
+            .sched-desktop {
+                display: none;
+            }
+
+            .class-sched-col {
+                width: 80%;
+            }
+
+            .start-time-col {
+                width: 80%;
+            }
+
+            .end-time-col {
+                width: 70%;
+            }
+
+            .remove-row {
+                margin-top: 38px !important;
+            }
         }
 
-        /* Large screens (lg: ≥1600px and <2000px) */
-        @media (min-width: 1600px) {
+        /* Medium - Larger Screen */
+        @media (min-width: 1135px) {
+            .sched-mobile {
+                display: none;
+            }
+
+            .sched-desktop {
+                display: block;
+            }
+
+            .class-sched-col {
+                width: 25%;
+            }
+
+            .start-time-col {
+                width: 33.33333333%;
+            }
+
+            .end-time-col {
+                width: 33.33333333%;
+            }
+
+            .remove-row {
+                margin-top: 7.5px !important;
+            }
+        }
+
+        /* Create Prof Row Default Styles */
+        .create-prof-row {
+            width: 100% !important;
+        }
+
+        /* Medium screens */
+        @media (min-width: 768px) and (max-width: 1159px) {
             .create-prof-row {
-                width: 70%;
+                width: 100% !important;
+            }
+        }
+
+        /* Medium - Larger screens */
+        @media (min-width: 1160px) {
+            .create-prof-row {
+                width: 80% !important;
             }
         }
 
@@ -234,9 +318,10 @@ if (isset($_POST['createCourse'])) {
                         <div class="create-prof-row" style="margin-bottom: 100px;">
                             <div class="col-12">
                                 <!-- Header -->
-                                <div class="row mb-3 align-items-center">
-                                    <div class="col-8 m-0 p-0">
-                                        <div class="row m-0 p-0">
+                                <div
+                                    class="row mb-3 justify-content-center justify-content-md-start align-items-center">
+                                    <div class="col-8 m-0 p-0 create-prof-row">
+                                        <div class="row m-0 p-0 justify-content-center align-items-center">
                                             <!-- Back Arrow -->
                                             <div class="col-auto d-none d-md-block">
                                                 <a href="javascript:history.back()" class="text-decoration-none">
@@ -252,9 +337,9 @@ if (isset($_POST['createCourse'])) {
 
                                             <!-- Create an existing course Button -->
                                             <div
-                                                class="col-12 col-md-auto text-center d-flex d-md-block justify-content-center justify-content-md-end mt-3 mt-md-0">
+                                                class="col-12 col-md-auto create-ex-course text-center d-flex d-md-block justify-content-center justify-content-md-end mt-3 mt-md-0">
                                                 <button type="button"
-                                                    class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-1 d-flex align-items-center gap-2"
+                                                    class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 my-1 d-flex align-items-center gap-2"
                                                     style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);"
                                                     data-bs-toggle="modal" data-bs-target="#reuseTaskModal">
                                                     <span class="material-symbols-rounded"
@@ -270,7 +355,7 @@ if (isset($_POST['createCourse'])) {
                                 <form action="" method="POST" enctype="multipart/form-data">
                                     <div class="row">
                                         <!-- Course Information -->
-                                        <div class="col-12 col-md-8 pt-3">
+                                        <div class="col-12 col-md-8 pt-3 create-prof-row">
                                             <label for="taskInfo" class="form-label text-med text-16">Course
                                                 Information</label>
                                             <input type="text"
@@ -280,19 +365,17 @@ if (isset($_POST['createCourse'])) {
                                                 required>
                                             <input type="text"
                                                 class="form-control textbox mb-2 px-3 py-2 text-reg text-16"
-                                                id="taskInfo" name="courseCode"
-                                                placeholder="Course Code *"
+                                                id="taskInfo" name="courseCode" placeholder="Course Code *"
                                                 value="<?php echo isset($reusedData) ? htmlspecialchars($reusedData['assessmentTitle']) : ''; ?>"
                                                 required>
                                             <input type="text"
                                                 class="form-control textbox mb-2 px-3 py-2 text-reg text-16"
-                                                id="taskInfo" name="section"
-                                                placeholder="Section *"
+                                                id="taskInfo" name="section" placeholder="Section *"
                                                 value="<?php echo isset($reusedData) ? htmlspecialchars($reusedData['assessmentTitle']) : ''; ?>"
                                                 required>
                                         </div>
                                         <!-- Course Image -->
-                                        <div class="col-8 pt-3">
+                                        <div class="col-8 pt-3 create-prof-row">
                                             <div class="text-med text-16">
                                                 <div style="margin-bottom:.5rem">Course Image</div>
                                                 <div class="course-image-upload">
@@ -323,30 +406,29 @@ if (isset($_POST['createCourse'])) {
                                             </div>
                                         </div>
                                         <!-- Class Schedule Labels for Desktop-->
-                                        <div class="row p-0 m-0 mt-5 c">
+                                        <div class="row p-0 m-0 mt-5">
                                             <div class="col-12 col-md-3">
                                                 <label for="dropdown-btn"
-                                                    class="form-label text-med d-none d-md-block">Class
+                                                    class="form-label text-med sched-desktop">Class
                                                     Schedule *</label>
                                             </div>
-                                            <div class="col-12 col-md-2">
-                                                <label for="timeInput"
-                                                    class="form-label text-med d-none d-md-block">Start
+                                            <div class="col-12 col-md-4">
+                                                <label for="timeInput" class="form-label text-med sched-desktop">Start
                                                     Time *</label>
                                             </div>
-                                            <div class="col-12 col-md-2">
-                                                <label for="timeInput" class="form-label text-med d-none d-md-block">End
+                                            <div class="col-12 col-md-4">
+                                                <label for="timeInput" class="form-label text-med sched-desktop">End
                                                     Time *</label>
                                             </div>
                                         </div>
                                         <!-- Class Schedule Input -->
                                         <div id="schedule-wrapper">
                                             <div class="row text-16 text-reg schedule-row">
-                                                <div class="col-12 col-md-3">
+                                                <div class="col-12 col-md-3 class-sched-col">
                                                     <label for="dropdown-btn"
-                                                        class="form-label text-med d-block d-md-none">Class
-                                                        Schedule *</label>
-                                                    <div class="custom-dropdown day-select mb-2">
+                                                        class="form-label text-med sched-mobile">Class Schedule
+                                                        *</label>
+                                                    <div class="custom-dropdown day-select mb-3">
                                                         <div class="dropdown-btn" id="dayDropdownBtn"
                                                             data-value="Monday">Monday</div>
                                                         <ul class="dropdown-list py-1" id="dayDropdownList">
@@ -360,29 +442,31 @@ if (isset($_POST['createCourse'])) {
                                                         </ul>
                                                     </div>
                                                 </div>
+
                                                 <!-- Start Time -->
-                                                <div class="col-12 col-md-2">
+                                                <div class="col-12 col-md-4 start-time-col">
                                                     <div class="mb-3">
                                                         <label for="timeInput"
-                                                            class="form-label text-med d-block d-md-none">Start
-                                                            Time *</label>
+                                                            class="form-label text-med sched-mobile">Start Time
+                                                            *</label>
                                                         <input type="time" class="form-control start-time"
                                                             id="timeInput" name="startTime[]" required>
                                                     </div>
-
                                                 </div>
+
                                                 <!-- End Time -->
-                                                <div class="col-12 col-md-2">
+                                                <div class="col-10 col-md-4 end-time-col">
                                                     <div class="mb-3">
                                                         <label for="timeInput"
-                                                            class="form-label text-med d-block d-md-none">End
-                                                            Time *</label>
+                                                            class="form-label text-med sched-mobile">End Time
+                                                            *</label>
                                                         <input type="time" class="form-control end-time" id="timeInput"
                                                             name="endTime[]" required>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+
                                         <div class="row">
                                             <div class="text-med text-12 mt-1 mb-3"
                                                 style="color: var(--black); text-align: start;">
@@ -405,10 +489,10 @@ if (isset($_POST['createCourse'])) {
                                             </div>
                                         </div>
                                         <!-- Create Course Button -->
-                                        <div class="col-8 mt-5">
+                                        <div class="col-8 mt-5 w-100 d-flex justify-content-center">
                                             <div class="col-12 col-md-auto mt-3 mt-md-0 text-center w-100">
                                                 <button type="submit" name="createCourse"
-                                                    class="px-5 py-2 rounded-5 text-sbold text-md-14 mt-4 mt-md-0"
+                                                    class="px-4 py-2 rounded-5 text-sbold text-md-14 mt-4 mt-md-0"
                                                     style="background-color: var(--primaryColor); border: 1px solid var(--black);">
                                                     <?php echo isset($reusedData) ? 'Recreate Course' : 'Create'; ?>
                                                 </button>
@@ -506,7 +590,7 @@ if (isset($_POST['createCourse'])) {
                 if (oldRemove) oldRemove.parentElement.remove();
 
                 const removeCol = document.createElement('div');
-                removeCol.className = 'col-12 col-md-1 text-end';
+                removeCol.className = 'col-2 col-md-1 text-end';
                 const removeIcon = document.createElement('span');
                 removeIcon.className = 'material-symbols-rounded remove-row';
                 removeIcon.textContent = 'close';
@@ -559,7 +643,6 @@ if (isset($_POST['createCourse'])) {
                     profilePreview.src = e.target.result;
                 }
                 reader.readAsDataURL(file);
-
             }
         });
 

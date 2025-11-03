@@ -269,7 +269,7 @@ if (isset($_GET['reuse'])) {
                                     <div
                                         class="col-12 col-md-auto text-center d-flex d-md-block justify-content-center justify-content-md-end mt-3 mt-md-0">
                                         <button type="button"
-                                            class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-1 d-flex align-items-center gap-2"
+                                            class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 my-1 d-flex align-items-center gap-2"
                                             style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);"
                                             data-bs-toggle="modal" data-bs-target="#reuseTaskModal">
                                             <span class="material-symbols-rounded"
