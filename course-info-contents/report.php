@@ -10,7 +10,7 @@ if (isset($userID)) {
         userInfo.yearLevel,
         userInfo.yearSection,
         userInfo.profilePicture,
-        program.programName,
+        program.programInitial,
         enrollments.enrollmentID
     FROM users
     INNER JOIN userInfo ON users.userID = userInfo.userID
@@ -128,7 +128,7 @@ if (isset($userID)) {
                         <div class="text-med text-muted text-12">@<?php echo $student['userName']; ?></div>
                         <div class="text-med text-12"><?php echo $student['studentID']; ?></div>
                         <div class="text-med text-12">
-                            <?php echo $student['programName'] . ' ' . $student['yearLevel'] . '-' . $student['yearSection']; ?>
+                            <?php echo $student['programInitial'] . ' ' . $student['yearLevel'] . '-' . $student['yearSection']; ?>
                         </div>
                     <?php else: ?>
                         <div class="text-bold text-18">No student data found.</div>

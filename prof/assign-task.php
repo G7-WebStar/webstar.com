@@ -311,7 +311,7 @@ if (isset($_GET['reuse'])) {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <input type="hidden" name="assignmentContent" id="task">
+                                            <input type="hidden" name="assignmentContent" id="task" >
                                         </div>
                                     </div>
 
@@ -731,9 +731,6 @@ if (isset($_GET['reuse'])) {
     </div>
 
     <!-- Quill JS -->
-
-
-
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script>
 
@@ -767,13 +764,28 @@ if (isset($_GET['reuse'])) {
         });
 
         // Sync Quill content to hidden input before form submit
-        document.querySelector('form').addEventListener('submit', function () {
+        document.querySelector('form').addEventListener('submit', function (e) {
+            let text = quill.getText().trim(); // plain text
             let html = quill.root.innerHTML;
+            const taskInput = document.querySelector('#task');
+
+            // Convert Quill HTML
             html = html.replace(/<p>/g, '').replace(/<\/p>/g, '<br>');
             html = html.replace(/<li>/g, '• ').replace(/<\/li>/g, '<br>');
             html = html.replace(/<\/?(ul|ol)>/g, '');
             html = html.replace(/(<br>)+$/g, '');
-            document.querySelector('#task').value = html.trim();
+            taskInput.value = html.trim();
+
+            // Validation for task instructions
+            if (text.length === 0) {
+                e.preventDefault();
+                quill.root.focus();
+                taskInput.setCustomValidity('Please fill out this field.');
+                taskInput.reportValidity();
+                return false;
+            } else {
+                taskInput.setCustomValidity('');
+            }
         });
 
         // Ensure at least one course is selected

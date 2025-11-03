@@ -1,6 +1,6 @@
-<div class="container mt-3">
+<div class="container">
     <div class="row mb-3">
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-6 mb-2 d-flex flex-column flex-md-row align-items-start align-items-md-center">
             <div class="text-bold text-20">
                 Frequently Asked Questions
             </div>
