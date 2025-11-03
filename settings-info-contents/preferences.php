@@ -1,7 +1,28 @@
 <?php
+// --- Ensure all students have default settings ---
+executeQuery("
+    INSERT INTO settings (userID, courseUpdateEnabled, questDeadlineEnabled, announcementEnabled)
+    SELECT userID, 0, 0, 0
+    FROM users
+    WHERE role = 'student'
+    AND userID NOT IN (SELECT userID FROM settings)
+");
+
+// --- Fetch user settings ---
 $result = executeQuery("SELECT * FROM settings WHERE userID = '$userID'");
 $settings = mysqli_fetch_assoc($result);
 
+// --- If the user has no settings yet (failsafe for non-students) ---
+if (!$settings) {
+    executeQuery("
+        INSERT INTO settings (userID, courseUpdateEnabled, questDeadlineEnabled, announcementEnabled)
+        VALUES ('$userID', 0, 0, 0)
+    ");
+    $result = executeQuery("SELECT * FROM settings WHERE userID = '$userID'");
+    $settings = mysqli_fetch_assoc($result);
+}
+
+// --- Handle save action ---
 if (isset($_POST['save'])) {
     $courseUpdateEnabled = isset($_POST['courseUpdateEnabled']) ? 1 : 0;
     $questDeadlineEnabled = isset($_POST['questDeadlineEnabled']) ? 1 : 0;
@@ -15,18 +36,21 @@ if (isset($_POST['save'])) {
         WHERE userID = '$userID'
     ");
 
+    // Refresh settings after update
     $result = executeQuery("SELECT * FROM settings WHERE userID = '$userID'");
     $settings = mysqli_fetch_assoc($result);
 }
 ?>
 
-<div class="container mt-3">
+
+<div class="container">
     <form method="POST">
         <input type="hidden" name="activeTab" value="preferences">
         <div class="row mb-3">
             <div class="col-12 col-md-6 mb-2 d-flex align-items-center">
                 <div class="text-bold text-20 mb-0">Email Notification</div>
-                <button type="submit" name="save" class="btn rounded-5 text-reg text-12 ms-3" style="background-color: var(--primaryColor); border: 1px solid var(--black);">
+                <button type="submit" name="save" class="btn rounded-5 text-reg text-12 ms-3"
+                    style="background-color: var(--primaryColor); border: 1px solid var(--black);">
                     Save changes
                 </button>
             </div>
@@ -41,8 +65,12 @@ if (isset($_POST['save'])) {
                 <div class="d-flex flex-column">
                     <div class="d-flex align-items-center mb-1 flex-wrap">
                         <div class="form-check form-switch m-0 me-2 d-flex align-items-center">
-                            <input class="form-check-input" type="checkbox" name="courseUpdateEnabled" id="courseUpdatesToggle" style="margin-top: 0;"
-                                <?php if ($settings['courseUpdateEnabled']) echo 'checked'; ?>>
+                            <input class="form-check-input" type="checkbox" name="courseUpdateEnabled"
+                                id="courseUpdatesToggle"
+                                style="margin-top: 0; background-color: <?php echo $settings['courseUpdateEnabled'] ? 'var(--black)' : 'var(--gray)'; ?>; border-color: <?php echo $settings['courseUpdateEnabled'] ? 'var(--black)' : 'var(--gray)'; ?>;"
+                                onchange="this.style.backgroundColor = this.checked ? 'var(--black)' : 'var(--gray)'; this.style.borderColor = this.checked ? 'var(--black)' : 'var(--gray)';"
+                                <?php if ($settings['courseUpdateEnabled'])
+                                    echo 'checked'; ?>>
                         </div>
                         <label for="courseUpdatesToggle" class="toggle text-sbold text-16 mb-0">Course Updates</label>
                     </div>
@@ -58,8 +86,11 @@ if (isset($_POST['save'])) {
             <div class="col d-flex flex-column">
                 <div class="d-flex align-items-center mb-1 flex-wrap">
                     <div class="form-check form-switch m-0 me-2 d-flex align-items-center">
-                        <input class="form-check-input" type="checkbox" name="questDeadlineEnabled" id="questsToggle" style="margin-top: 0;"
-                            <?php if ($settings['questDeadlineEnabled']) echo 'checked'; ?>>
+                        <input class="form-check-input" type="checkbox" name="questDeadlineEnabled" id="questsToggle"
+                            style="margin-top: 0; background-color: <?php echo $settings['questDeadlineEnabled'] ? 'var(--black)' : 'var(--gray)'; ?>; border-color: <?php echo $settings['questDeadlineEnabled'] ? 'var(--black)' : 'var(--gray)'; ?>;"
+                            onchange="this.style.backgroundColor = this.checked ? 'var(--black)' : 'var(--gray)'; this.style.borderColor = this.checked ? 'var(--black)' : 'var(--gray)';"
+                            <?php if ($settings['questDeadlineEnabled'])
+                                echo 'checked'; ?>>
                     </div>
                     <label for="questsToggle" class="toggle text-sbold text-16 mb-0">Quests and Deadlines</label>
                 </div>
@@ -74,8 +105,12 @@ if (isset($_POST['save'])) {
             <div class="col d-flex flex-column">
                 <div class="d-flex align-items-center mb-1 flex-wrap">
                     <div class="form-check form-switch m-0 me-2 d-flex align-items-center">
-                        <input class="form-check-input" type="checkbox" name="announcementEnabled" id="announcementsToggle" style="margin-top: 0;"
-                            <?php if ($settings['announcementEnabled']) echo 'checked'; ?>>
+                        <input class="form-check-input" type="checkbox" name="announcementEnabled"
+                            id="announcementsToggle"
+                            style="margin-top: 0; background-color: <?php echo $settings['announcementEnabled'] ? 'var(--black)' : 'var(--gray)'; ?>; border-color: <?php echo $settings['announcementEnabled'] ? 'var(--black)' : 'var(--gray)'; ?>;"
+                            onchange="this.style.backgroundColor = this.checked ? 'var(--black)' : 'var(--gray)'; this.style.borderColor = this.checked ? 'var(--black)' : 'var(--gray)';"
+                            <?php if ($settings['announcementEnabled'])
+                                echo 'checked'; ?>>
                     </div>
                     <label for="announcementsToggle" class="toggle text-sbold text-16 mb-0">Announcements</label>
                 </div>
