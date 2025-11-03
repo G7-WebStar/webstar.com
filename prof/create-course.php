@@ -3,6 +3,76 @@
 include('../shared/assets/database/connect.php');
 date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
+
+if (isset($_POST['createCourse'])) {
+    $courseTitle = $_POST['courseTitle'];
+    $courseCode = strtoupper($_POST['courseCode']); // convert to uppercase
+    $section = strtoupper($_POST['section']);
+    $userID = $_SESSION['userID'];
+
+    // handle image
+    $courseImage = '';
+    if (isset($_FILES['fileUpload']) && $_FILES['fileUpload']['error'] === 0) {
+        $courseImage = $_FILES['fileUpload']['name'];
+        $tmpFile = $_FILES['fileUpload']['tmp_name'];
+        $folder = "../shared/assets/img/course-images/";
+        move_uploaded_file($tmpFile, $folder . $courseImage);
+    }
+
+    // Generate unique 6-character access code
+    function generateAccessCode($length = 6)
+    {
+        $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomCode = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomCode .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomCode;
+    }
+
+    do {
+        $accessCode = generateAccessCode(6); // random 6-character alphanumeric
+        $checkCodeQuery = "SELECT * FROM courses WHERE code = '$accessCode'";
+        $codeExists = executeQuery($checkCodeQuery);
+    } while (mysqli_num_rows($codeExists) > 0);
+
+
+    $insertCourse = "
+        INSERT INTO courses (userID, courseTitle, courseCode, section, courseImage, code)
+        VALUES ('$userID', '$courseTitle', '$courseCode', '$section', '$courseImage', '$accessCode')
+    ";
+    $courseResult = executeQuery($insertCourse);
+
+    if ($courseResult) {
+        $courseID = mysqli_insert_id($conn);
+
+        // Insert schedule
+        $days = $_POST['selectedDay'] ?? [];
+        $startTimes = $_POST['startTime'] ?? [];
+        $endTimes = $_POST['endTime'] ?? [];
+
+        for ($i = 0; $i < count($days); $i++) {
+            $day = mysqli_real_escape_string($conn, $days[$i]);
+            $start = mysqli_real_escape_string($conn, $startTimes[$i]);
+            $end = mysqli_real_escape_string($conn, $endTimes[$i]);
+
+            if (!empty($day) && !empty($start) && !empty($end)) {
+                $insertSchedule = "
+                    INSERT INTO courseschedule (courseID, day, startTime, endTime, createdAt)
+                    VALUES ('$courseID', '$day', '$start', '$end', NOW())
+                ";
+                executeQuery($insertSchedule);
+            }
+        }
+
+        header("Location: courses.php");
+        exit();
+    } else {
+        echo "<script>alert('Error creating course. Please try again.');</script>";
+    }
+}
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -67,8 +137,9 @@ include("../shared/assets/processes/prof-session-process.php");
         /* Medium screens (md: ≥768px and <1200px) */
         @media (min-width: 1160px) and (max-width: 1599px) {
             .create-prof-row {
-                width: 90%;
+                width: 100%;
             }
+
         }
 
         /* Large screens (lg: ≥1600px and <2000px) */
@@ -131,6 +202,11 @@ include("../shared/assets/processes/prof-session-process.php");
             border: 1px solid var(--black);
             border-radius: 10px;
         }
+
+        .remove-row {
+            user-select: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -159,71 +235,78 @@ include("../shared/assets/processes/prof-session-process.php");
                             <div class="col-12">
                                 <!-- Header -->
                                 <div class="row mb-3 align-items-center">
+                                    <div class="col-8 m-0 p-0">
+                                        <div class="row m-0 p-0">
+                                            <!-- Back Arrow -->
+                                            <div class="col-auto d-none d-md-block">
+                                                <a href="javascript:history.back()" class="text-decoration-none">
+                                                    <i class="fa-solid fa-arrow-left text-reg text-16"
+                                                        style="color: var(--black);"></i>
+                                                </a>
+                                            </div>
 
-                                    <!-- Back Arrow -->
-                                    <div class="col-auto d-none d-md-block">
-                                        <a href="javascript:history.back()" class="text-decoration-none">
-                                            <i class="fa-solid fa-arrow-left text-reg text-16"
-                                                style="color: var(--black);"></i>
-                                        </a>
-                                    </div>
+                                            <!-- Page Title -->
+                                            <div class="col text-center text-md-start">
+                                                <span class="text-sbold text-20">Create Course</span>
+                                            </div>
 
-                                    <!-- Page Title -->
-                                    <div class="col text-center text-md-start">
-                                        <span class="text-sbold text-20">Create Course</span>
-                                    </div>
-
-                                    <!-- Assign Existing Task Button -->
-                                    <div
-                                        class="col-12 col-md-auto text-center d-flex d-md-block justify-content-center justify-content-md-end mt-3 mt-md-0">
-                                        <button type="button"
-                                            class="btn btn-sm me-4 px-3 py-1 rounded-pill text-reg text-md-14 mt-1 d-flex align-items-center gap-2"
-                                            style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);"
-                                            data-bs-toggle="modal" data-bs-target="#reuseTaskModal">
-                                            <span class="material-symbols-rounded" style="font-size:16px">folder</span>
-                                            <span>Create an existing course</span>
-                                        </button>
+                                            <!-- Create an existing course Button -->
+                                            <div
+                                                class="col-12 col-md-auto text-center d-flex d-md-block justify-content-center justify-content-md-end mt-3 mt-md-0">
+                                                <button type="button"
+                                                    class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-1 d-flex align-items-center gap-2"
+                                                    style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);"
+                                                    data-bs-toggle="modal" data-bs-target="#reuseTaskModal">
+                                                    <span class="material-symbols-rounded"
+                                                        style="font-size:16px">folder</span>
+                                                    <span>Create an existing course</span>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-
 
                                 <!-- Form starts -->
                                 <form action="" method="POST" enctype="multipart/form-data">
                                     <div class="row">
+                                        <!-- Course Information -->
                                         <div class="col-12 col-md-8 pt-3">
                                             <label for="taskInfo" class="form-label text-med text-16">Course
                                                 Information</label>
                                             <input type="text"
                                                 class="form-control textbox mb-2 px-3 py-2 text-reg text-16"
-                                                id="taskInfo" name="assignmentTitle" placeholder="Course Title *"
+                                                id="taskInfo" name="courseTitle" placeholder="Course Title *"
                                                 value="<?php echo isset($reusedData) ? htmlspecialchars($reusedData['assessmentTitle']) : ''; ?>"
                                                 required>
                                             <input type="text"
                                                 class="form-control textbox mb-2 px-3 py-2 text-reg text-16"
-                                                id="taskInfo" name="assignmentTitle" placeholder="Course Code *"
+                                                id="taskInfo" name="courseCode"
+                                                placeholder="Course Code *"
                                                 value="<?php echo isset($reusedData) ? htmlspecialchars($reusedData['assessmentTitle']) : ''; ?>"
                                                 required>
                                             <input type="text"
                                                 class="form-control textbox mb-2 px-3 py-2 text-reg text-16"
-                                                id="taskInfo" name="assignmentTitle" placeholder="Section *"
+                                                id="taskInfo" name="section"
+                                                placeholder="Section *"
                                                 value="<?php echo isset($reusedData) ? htmlspecialchars($reusedData['assessmentTitle']) : ''; ?>"
                                                 required>
                                         </div>
-                                        <div class="col-12 col-md-4 pt-3">
+                                        <!-- Course Image -->
+                                        <div class="col-8 pt-3">
                                             <div class="text-med text-16">
-                                                <div style="margin-bottom:.6rem">Course Image</div>
-                                                <div class="course-image-upload pe-4">
-                                                    <div class="image-preview-wrapper rounded-4">
-                                                        <img id="imagePreview" />
+                                                <div style="margin-bottom:.5rem">Course Image</div>
+                                                <div class="course-image-upload">
+                                                    <div class="image-preview-wrapper rounded-4 mb-3">
+                                                        <img id="profilePreview" />
                                                     </div>
                                                     <input type="file" id="fileInput" name="fileUpload"
-                                                        class="form-control" accept=".png, .jpg, .jpeg" required
+                                                        class="form-control" accept=".png, .jpg, .jpeg"
                                                         style="display:none;">
-                                                    <div class="text-med text-12 mt-2 w-100 text-center"
-                                                        style="color: var(--black); text-align: center;">
-                                                        Upload a JPG, JPEG, or PNG file, <br>up to 10 MB in size.
+                                                    <div class="text-med text-12 mt-3"
+                                                        style="color: var(--black); text-align: start;">
+                                                        Upload a JPG, JPEG, or PNG file, up to 10 MB in size.
                                                     </div>
-                                                    <div class="w-100 d-flex justify-content-center">
+                                                    <div class="d-flex justify-content-start">
                                                         <button type="button"
                                                             class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-3"
                                                             style="background-color: var(--primaryColor); border: 1px solid var(--black);"
@@ -239,91 +322,99 @@ include("../shared/assets/processes/prof-session-process.php");
                                                 </div>
                                             </div>
                                         </div>
-                                </form>
-                                <div class="row p-0 m-0 mt-5 c">
-                                    <div class="col-12 col-md-3">
-                                        <label for="dropdown-btn" class="form-label text-med d-none d-md-block">Class
-                                            Schedule</label>
-                                    </div>
-                                    <div class="col-12 col-md-4">
-                                        <label for="timeInput" class="form-label text-med d-none d-md-block">Start
-                                            Time</label>
-                                    </div>
-                                    <div class="col-12 col-md-4">
-                                        <label for="timeInput" class="form-label text-med d-none d-md-block">End
-                                            Time</label>
-                                    </div>
-                                </div>
-                                <div id="schedule-wrapper">
-                                    <div class="row text-16 text-reg schedule-row">
-                                        <div class="col-12 col-md-3">
-                                            <label for="dropdown-btn"
-                                                class="form-label text-med d-block d-md-none">Class
-                                                Schedule</label>
-                                            <div class="custom-dropdown day-select mb-3">
-                                                <div class="dropdown-btn" id="dayDropdownBtn">Select Day</div>
-                                                <ul class="dropdown-list" id="dayDropdownList">
-                                                    <li data-value="Monday">Monday</li>
-                                                    <li data-value="Tuesday">Tuesday</li>
-                                                    <li data-value="Wednesday">Wednesday</li>
-                                                    <li data-value="Thursday">Thursday</li>
-                                                    <li data-value="Friday">Friday</li>
-                                                    <li data-value="Saturday">Saturday</li>
-                                                    <li data-value="Sunday">Sunday</li>
-                                                </ul>
+                                        <!-- Class Schedule Labels for Desktop-->
+                                        <div class="row p-0 m-0 mt-5 c">
+                                            <div class="col-12 col-md-3">
+                                                <label for="dropdown-btn"
+                                                    class="form-label text-med d-none d-md-block">Class
+                                                    Schedule *</label>
                                             </div>
-                                        </div>
-                                        <div class="col-12 col-md-4">
-                                            <div class="mb-3">
+                                            <div class="col-12 col-md-2">
                                                 <label for="timeInput"
-                                                    class="form-label text-med d-block d-md-none">Start
-                                                    Time</label>
-                                                <input type="time" class="form-control start-time" id="timeInput">
+                                                    class="form-label text-med d-none d-md-block">Start
+                                                    Time *</label>
                                             </div>
-
-                                        </div>
-                                        <div class="col-12 col-md-4">
-                                            <div class="mb-3">
-                                                <label for="timeInput" class="form-label text-med d-block d-md-none">End
-                                                    Time</label>
-                                                <input type="time" class="form-control end-time" id="timeInput">
+                                            <div class="col-12 col-md-2">
+                                                <label for="timeInput" class="form-label text-med d-none d-md-block">End
+                                                    Time *</label>
                                             </div>
-
                                         </div>
-                                        <div class="col-12 col-md-1">
-                                            <span class="material-symbols-rounded remove-row"
-                                                style="font-size:24px; cursor:pointer; margin-top:5px">
-                                                close
-                                            </span>
-                                        </div>
+                                        <!-- Class Schedule Input -->
+                                        <div id="schedule-wrapper">
+                                            <div class="row text-16 text-reg schedule-row">
+                                                <div class="col-12 col-md-3">
+                                                    <label for="dropdown-btn"
+                                                        class="form-label text-med d-block d-md-none">Class
+                                                        Schedule *</label>
+                                                    <div class="custom-dropdown day-select mb-2">
+                                                        <div class="dropdown-btn" id="dayDropdownBtn"
+                                                            data-value="Monday">Monday</div>
+                                                        <ul class="dropdown-list py-1" id="dayDropdownList">
+                                                            <li data-value="Monday">Monday</li>
+                                                            <li data-value="Tuesday">Tuesday</li>
+                                                            <li data-value="Wednesday">Wednesday</li>
+                                                            <li data-value="Thursday">Thursday</li>
+                                                            <li data-value="Friday">Friday</li>
+                                                            <li data-value="Saturday">Saturday</li>
+                                                            <li data-value="Sunday">Sunday</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <!-- Start Time -->
+                                                <div class="col-12 col-md-2">
+                                                    <div class="mb-3">
+                                                        <label for="timeInput"
+                                                            class="form-label text-med d-block d-md-none">Start
+                                                            Time *</label>
+                                                        <input type="time" class="form-control start-time"
+                                                            id="timeInput" name="startTime[]" required>
+                                                    </div>
 
-
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="w-100 d-flex justify-content-start">
-                                        <button type="button"
-                                            class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14"
-                                            style="background-color: var(--primaryColor); border: 1px solid var(--black);">
-                                            <div style="display: flex; align-items: center; gap: 5px;"
-                                                id="add-schedule">
-                                                <span class="material-symbols-rounded" style="font-size:16px"></span>
-                                                <span>+ Add Schedule Date</span>
+                                                </div>
+                                                <!-- End Time -->
+                                                <div class="col-12 col-md-2">
+                                                    <div class="mb-3">
+                                                        <label for="timeInput"
+                                                            class="form-label text-med d-block d-md-none">End
+                                                            Time *</label>
+                                                        <input type="time" class="form-control end-time" id="timeInput"
+                                                            name="endTime[]" required>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="row mt-5">
-                                    <div class="col-12 col-md-auto mt-3 mt-md-0 text-center w-100">
-                                        <button type="submit" name="saveAssignment"
-                                            class="px-4 py-2 rounded-pill text-sbold text-md-14 mt-4 mt-md-0"
-                                            style="background-color: var(--primaryColor); border: 1px solid var(--black);">
-                                            <?php echo isset($reusedData) ? 'Recreate Course' : 'Create'; ?>
-                                        </button>
-
-                                    </div>
-                                </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="text-med text-12 mt-1 mb-3"
+                                                style="color: var(--black); text-align: start;">
+                                                Maximum of 3 schedule dates allowed.
+                                            </div>
+                                        </div>
+                                        <!-- Add Schedule Date -->
+                                        <div class="row">
+                                            <div class="w-100 d-flex justify-content-start">
+                                                <button type="button"
+                                                    class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14"
+                                                    style="background-color: var(--primaryColor); border: 1px solid var(--black);">
+                                                    <div style="display: flex; align-items: center; gap: 5px;"
+                                                        id="add-schedule">
+                                                        <span class="material-symbols-rounded"
+                                                            style="font-size:16px"></span>
+                                                        <span>+ Add Schedule Date</span>
+                                                    </div>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <!-- Create Course Button -->
+                                        <div class="col-8 mt-5">
+                                            <div class="col-12 col-md-auto mt-3 mt-md-0 text-center w-100">
+                                                <button type="submit" name="createCourse"
+                                                    class="px-5 py-2 rounded-5 text-sbold text-md-14 mt-4 mt-md-0"
+                                                    style="background-color: var(--primaryColor); border: 1px solid var(--black);">
+                                                    <?php echo isset($reusedData) ? 'Recreate Course' : 'Create'; ?>
+                                                </button>
+                                            </div>
+                                        </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -333,87 +424,146 @@ include("../shared/assets/processes/prof-session-process.php");
     </div>
 
     <script>
-        const dropdownBtn = document.getElementById('dayDropdownBtn');
-        const dropdownList = document.getElementById('dayDropdownList');
+        document.addEventListener("DOMContentLoaded", function () {
+            const wrapper = document.getElementById('schedule-wrapper');
+            const addBtn = document.getElementById('add-schedule');
+            const maxRows = 3;
 
-        // Toggle dropdown
-        dropdownBtn.addEventListener('click', () => {
-            dropdownList.style.display = dropdownList.style.display === 'block' ? 'none' : 'block';
-        });
+            function initDropdown(dropdown) {
+                const dropdownBtn = dropdown.querySelector('.dropdown-btn');
 
-        // Select item
-        dropdownList.querySelectorAll('li').forEach(item => {
-            item.addEventListener('click', () => {
-                dropdownBtn.textContent = item.textContent;
-                dropdownList.style.display = 'none';
-            });
-        });
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!dropdownBtn.contains(e.target) && !dropdownList.contains(e.target)) {
-                dropdownList.style.display = 'none';
-            }
-        });
-    </script>
-
-    <script>
-        const wrapper = document.getElementById('schedule-wrapper');
-        const addBtn = document.getElementById('add-schedule');
-        const maxRows = 3;
-
-        addBtn.addEventListener('click', () => {
-            const currentRows = wrapper.querySelectorAll('.schedule-row').length;
-            if (currentRows >= maxRows) return; // Stop if already 3
-
-            // Clone the first row
-            const firstRow = wrapper.querySelector('.schedule-row');
-            const newRow = firstRow.cloneNode(true);
-
-            // Clear inputs
-            newRow.querySelector('.dropdown-btn').textContent = 'Select Day';
-            newRow.querySelector('.start-time').value = '';
-            newRow.querySelector('.end-time').value = '';
-
-            wrapper.appendChild(newRow);
-
-            // Make the dropdown in the new row work
-            const dropdownBtn = newRow.querySelector('.dropdown-btn');
-            const dropdownList = newRow.querySelector('.dropdown-list');
-
-            dropdownBtn.addEventListener('click', () => {
-                dropdownList.style.display = dropdownList.style.display === 'block' ? 'none' : 'block';
-            });
-
-            dropdownList.querySelectorAll('li').forEach(item => {
-                item.addEventListener('click', () => {
-                    dropdownBtn.textContent = item.textContent;
-                    dropdownList.style.display = 'none';
-                });
-            });
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!dropdownBtn.contains(e.target) && !dropdownList.contains(e.target)) {
-                    dropdownList.style.display = 'none';
+                // Ensure a hidden input exists for this dropdown
+                let hiddenInput = dropdown.querySelector('input[name="selectedDay[]"]');
+                if (!hiddenInput) {
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'selectedDay[]';
+                    hiddenInput.value = dropdownBtn.textContent.trim(); // default value
+                    dropdown.appendChild(hiddenInput);
                 }
-            });
 
-            function attachRemoveBtn(row) {
-                const btn = row.querySelector('.remove-row');
-                if (btn) {
-                    btn.addEventListener('click', () => {
+                dropdownBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const list = dropdown.querySelector('.dropdown-list');
+                    list.style.display = list.style.display === 'block' ? 'none' : 'block';
+                });
+
+                dropdown.querySelectorAll('.dropdown-list li').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const selectedValue = item.getAttribute('data-value');
+                        dropdownBtn.textContent = selectedValue;
+                        hiddenInput.value = selectedValue; // update hidden input
+                        dropdown.querySelector('.dropdown-list').style.display = 'none';
+                    });
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!dropdown.contains(e.target)) {
+                        dropdown.querySelector('.dropdown-list').style.display = 'none';
+                    }
+                });
+            }
+
+            function attachRemove(row) {
+                const removeIcon = row.querySelector('.remove-row');
+                if (removeIcon) {
+                    removeIcon.addEventListener('click', () => {
                         row.remove();
                     });
                 }
             }
 
-            // Initialize for existing rows
-            wrapper.querySelectorAll('.schedule-row').forEach(attachRemoveBtn);
+            // Initialize existing dropdowns
+            document.querySelectorAll('.custom-dropdown').forEach(initDropdown);
 
+            // Add new schedule row
+            addBtn.addEventListener('click', () => {
+                const currentRows = wrapper.querySelectorAll('.schedule-row').length;
+                if (currentRows >= maxRows) return;
+
+                const firstRow = wrapper.querySelector('.schedule-row');
+                const newRow = firstRow.cloneNode(true);
+
+                const dropdownBtn = newRow.querySelector('.dropdown-btn');
+                dropdownBtn.textContent = 'Monday';
+
+                // Remove old input if exists
+                const oldInput = newRow.querySelector('input[name="selectedDay[]"]');
+                if (oldInput) oldInput.remove();
+
+                // Add new hidden input with default value
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'selectedDay[]';
+                input.value = 'Monday';
+                newRow.querySelector('.custom-dropdown').appendChild(input);
+
+                newRow.querySelector('.start-time').value = '';
+                newRow.querySelector('.end-time').value = '';
+
+                // Remove old remove button if exists
+                const oldRemove = newRow.querySelector('.remove-row');
+                if (oldRemove) oldRemove.parentElement.remove();
+
+                const removeCol = document.createElement('div');
+                removeCol.className = 'col-12 col-md-1 text-end';
+                const removeIcon = document.createElement('span');
+                removeIcon.className = 'material-symbols-rounded remove-row';
+                removeIcon.textContent = 'close';
+                removeIcon.style.cssText = 'font-size:24px; cursor:pointer; margin-top:5px; user-select:none !important;';
+                removeCol.appendChild(removeIcon);
+                newRow.appendChild(removeCol);
+
+                wrapper.appendChild(newRow);
+
+                initDropdown(newRow.querySelector('.custom-dropdown'));
+                attachRemove(newRow);
+            });
         });
+
     </script>
 
+    <script>
+        // File validation and preview
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const profilePreview = document.getElementById('profilePreview');
+
+        // Trigger file input when button is clicked
+        uploadBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (file) {
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                const maxSize = 10 * 1024 * 1024; // 10 MB
+
+                if (!allowedTypes.includes(file.type)) {
+                    alert('Invalid file type. Only JPG, JPEG, and PNG are allowed.');
+                    fileInput.value = '';
+                    profilePreview.src = 'https://via.placeholder.com/150';
+                    return;
+                }
+
+                if (file.size > maxSize) {
+                    alert('File is too large. Maximum size is 10 MB.');
+                    fileInput.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = e => {
+                    // Append timestamp to force browser to reload
+                    profilePreview.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+
+            }
+        });
+
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 

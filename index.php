@@ -15,7 +15,6 @@ $selectEnrolledQuery = "SELECT
     courses.courseCode,
     courses.courseTitle,
     courses.courseImage,
-    courses.schedule,
     (SELECT COUNT(*) 
      FROM enrollments AS e
      WHERE e.userID = enrollments.userID) AS totalEnrollments
@@ -206,7 +205,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                     <!-- Card 1 -->
                                                                     <div class="card custom-course-card">
                                                                         <a href="course-info.php?courseID=<?php echo $enrolledSubjects['courseID']; ?>" class="text-decoration-none text-black">
-                                                                            <img src="shared/assets/img/home/<?php echo $enrolledSubjects['courseImage']; ?>" class="card-img-top" alt="...">
+                                                                            <img src="shared/assets/img/course-images/<?php echo $enrolledSubjects['courseImage']; ?>" class="card-img-top" alt="...">
                                                                             <div class="card-body px-3 py-2">
                                                                                 <div class="text-sbold text-16"><?php echo $enrolledSubjects['courseCode']; ?></div>
                                                                                 <p class="text-reg text-14 mb-0"><?php echo $enrolledSubjects['courseTitle']; ?></p>

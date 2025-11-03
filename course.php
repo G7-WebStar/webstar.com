@@ -8,9 +8,7 @@ $selectCourseQuery = "SELECT
    	profInfo.firstName AS profFirstName,
     profInfo.middleName AS profMiddleName,
     profInfo.lastName AS profLastName,
-    profInfo.profilePicture AS profPFP,
-    SUBSTRING_INDEX(courses.schedule, ' ', 1)  AS courseDays,
-    SUBSTRING_INDEX(courses.schedule, ' ', -1) AS courseTime
+    profInfo.profilePicture AS profPFP
     FROM courses
     INNER JOIN userinfo AS profInfo
     	ON courses.userID = profInfo.userID
@@ -164,7 +162,7 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                                             <div class="col-12 col-lg-6 col-xl-4 mt-4">
                                                 <div class="card border border-black rounded-4">
                                                     <a href="course-info.php?courseID=<?php echo $courses['courseID']; ?>">
-                                                        <img src="shared/assets/img/home/<?php echo $courses['courseImage']; ?>"
+                                                        <img src="shared/assets/img/course-images/<?php echo $courses['courseImage']; ?>"
                                                             class="card-img-top object-fit-cover rounded-top-4" alt="..."
                                                             style="background-color: #FDDF94; height: 190px;">
                                                     </a>

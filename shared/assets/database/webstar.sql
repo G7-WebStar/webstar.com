@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 03, 2025 at 04:36 AM
+-- Generation Time: Nov 03, 2025 at 11:08 AM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -194,20 +194,43 @@ CREATE TABLE `courses` (
   `courseCode` varchar(50) NOT NULL,
   `courseTitle` varchar(255) NOT NULL,
   `courseImage` varchar(255) NOT NULL,
-  `schedule` varchar(255) NOT NULL,
-  `isActive` varchar(3) NOT NULL DEFAULT 'Yes',
+  `isActive` int(3) NOT NULL DEFAULT 1,
   `code` varchar(20) NOT NULL,
-  `yearSection` int(11) DEFAULT NULL,
-  `yearLevel` int(11) DEFAULT NULL
+  `section` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `courses`
 --
 
-INSERT INTO `courses` (`courseID`, `userID`, `courseCode`, `courseTitle`, `courseImage`, `schedule`, `isActive`, `code`, `yearSection`, `yearLevel`) VALUES
-(1, 1, 'COMP-006', 'Web Development', 'webdev.jpg', 'MWF 10:00–11:30AM', 'Yes', 'WD-2A-2025', 2, 2),
-(2, 1, 'GEED-007', 'Web Development 2', 'webdev.jpg', 'MWF 01:00–02:30AM', 'Yes', 'WD-2B-2025', 2, 2);
+INSERT INTO `courses` (`courseID`, `userID`, `courseCode`, `courseTitle`, `courseImage`, `isActive`, `code`, `section`) VALUES
+(1, 1, 'COMP-006', 'Web Development', 'webdev.jpg', 1, '123456', 'BSIT 4-1'),
+(2, 1, 'GEED-007', 'Web Development 2', 'webdev.jpg', 1, '789ABC', 'BSIT 4-1'),
+(3, 1, 'MM-102', 'Multimedia', '72793b45-c2cc-4ad2-ad29-5b395ca0c24d.jpg', 1, '1Z8AQ8', 'BSIT 4-1');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `courseschedule`
+--
+
+CREATE TABLE `courseschedule` (
+  `courseScheduleID` int(11) NOT NULL,
+  `courseID` int(11) NOT NULL,
+  `day` varchar(20) NOT NULL,
+  `startTime` time NOT NULL,
+  `endTime` time NOT NULL,
+  `createdAt` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `courseschedule`
+--
+
+INSERT INTO `courseschedule` (`courseScheduleID`, `courseID`, `day`, `startTime`, `endTime`, `createdAt`) VALUES
+(1, 3, 'Monday', '18:06:00', '06:06:00', '2025-11-03 18:07:13'),
+(2, 3, 'Monday', '18:07:00', '19:07:00', '2025-11-03 18:07:13'),
+(3, 3, 'Monday', '18:08:00', '20:07:00', '2025-11-03 18:07:13');
 
 -- --------------------------------------------------------
 
@@ -251,7 +274,8 @@ INSERT INTO `enrollments` (`enrollmentID`, `userID`, `courseID`, `yearSection`) 
 (9, 9, 1, 2023),
 (10, 10, 1, 2023),
 (11, 11, 1, 2023),
-(12, 12, 1, 2023);
+(12, 12, 1, 2023),
+(13, 2, 3, 1);
 
 -- --------------------------------------------------------
 
@@ -730,7 +754,7 @@ CREATE TABLE `todo` (
   `todoID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
   `assessmentID` int(11) NOT NULL,
-  `status` varchar(20) NOT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'Pending',
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp(),
   `isRead` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -757,12 +781,12 @@ CREATE TABLE `userinfo` (
   `firstName` varchar(50) NOT NULL,
   `middleName` varchar(50) NOT NULL,
   `lastName` varchar(50) NOT NULL,
-  `studentID` varchar(50) NOT NULL,
+  `studentID` varchar(50) DEFAULT NULL,
   `programID` varchar(50) NOT NULL,
   `gender` varchar(50) NOT NULL,
   `yearLevel` varchar(20) NOT NULL,
   `yearSection` int(11) NOT NULL,
-  `schoolEmail` varchar(50) NOT NULL,
+  `schoolEmail` varchar(50) DEFAULT NULL,
   `facebookLink` text DEFAULT NULL,
   `linkedInLink` text DEFAULT NULL,
   `githubLink` text DEFAULT NULL,
@@ -786,7 +810,14 @@ INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `
 (9, 9, 'prof.png', 'Isabella', 'F.', 'Martin', '202310008', '1', 'Female', '2', 1, 'isabella.martin@school.edu', 'facebook.com/isabella.martin', 'linkedin.com/in/isabellamartin', 'instagram.com/isabella.martin', '2025-09-28 20:59:48', 1),
 (10, 10, 'prof.png', 'Liam', 'G.', 'Torres', '202310009', '1', 'Male', '1', 2, 'liam.torres@school.edu', 'facebook.com/liam.torres', 'linkedin.com/in/liamtorres', 'instagram.com/liam.torres', '2025-09-28 20:59:48', 1),
 (11, 11, 'prof.png', 'Emma', 'H.', 'Davis', '202310010', '1', 'Female', '2', 1, 'emma.davis@school.edu', 'facebook.com/emma.davis', 'linkedin.com/in/emmadavis', 'instagram.com/emma.davis', '2025-09-28 20:59:48', 1),
-(12, 12, 'prof.png', 'Chloe', 'I.', 'Nguyen', '202310011', '1', 'Female', '2', 1, 'chloe.nguyen@school.edu', 'facebook.com/chloe.nguyen', 'linkedin.com/in/chloenguyen', 'instagram.com/chloe.nguyen', '2025-09-28 21:34:51', 1);
+(12, 12, 'prof.png', 'Chloe', 'I.', 'Nguyen', '202310011', '1', 'Female', '2', 1, 'chloe.nguyen@school.edu', 'facebook.com/chloe.nguyen', 'linkedin.com/in/chloenguyen', 'instagram.com/chloe.nguyen', '2025-09-28 21:34:51', 1),
+(13, 18, 'default.png', 'Admin', '', 'User', NULL, '6', '', '4', 4, 'admin@example.com', NULL, NULL, NULL, '2025-11-03 17:57:47', 1),
+(14, 19, 'default.png', 'Christian James', '', 'Torrillo', NULL, '6', '', '4', 1, 'christian@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1),
+(15, 20, 'default.png', 'Ayisha Sofhia', '', 'Estoque', NULL, '6', '', '4', 1, 'ayisha@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1),
+(16, 21, 'default.png', 'Marielle Alyssa', '', 'Cato', NULL, '6', '', '4', 1, 'marielle@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1),
+(17, 22, 'default.png', 'Neil Jeferson', '', 'Vergara', NULL, '6', '', '4', 1, 'neil@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1),
+(18, 23, 'default.png', 'Shane Rhyder', '', 'Silverio', NULL, '6', '', '4', 1, 'shane@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 11),
+(19, 24, 'default.png', 'Kimberly Joan', '', 'Palla', NULL, '6', '', '4', 1, 'kimberly@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1);
 
 -- --------------------------------------------------------
 
@@ -800,7 +831,7 @@ CREATE TABLE `users` (
   `email` varchar(50) NOT NULL,
   `role` varchar(12) NOT NULL DEFAULT 'student',
   `userName` varchar(50) NOT NULL,
-  `status` varchar(15) DEFAULT NULL
+  `status` varchar(15) DEFAULT 'Active'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -808,18 +839,25 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`, `status`) VALUES
-(1, 'Password123', 'john.doe@gmail.com', 'professor', 'johndoe', NULL),
-(2, 'Hello@world', 'jane.smith@gmail.com', 'student', 'janesmith', NULL),
-(3, 'HelloWorld', 'john.doe2@gmail.com', 'student', 'JohnDoe', NULL),
-(4, 'password123', 'michael.lee@gmail.com', 'student', 'michael_lee', NULL),
-(5, 'securePass!1', 'sophia.garcia@gmail.com', 'student', 'sophia_garcia', NULL),
-(6, 'helloWorld9', 'daniel.kim@gmail.com', 'student', 'daniel_kim', NULL),
-(7, 'qwerty2025', 'olivia.brown@gmail.com', 'student', 'olivia_brown', NULL),
-(8, 'pass4321', 'ethan.wilson@gmail.com', 'student', 'ethan_wilson', NULL),
-(9, 'abcXYZ987', 'isabella.martin@gmail.com', 'student', 'isabella_martin', NULL),
-(10, 'myPass!77', 'liam.torres@gmail.com', 'student', 'liam_torres', NULL),
-(11, 'safeKey555', 'emma.davis@gmail.com', 'student', 'emma_davis', NULL),
-(12, 'newPass!11', 'chloe.nguyen@gmail.com', 'student', 'chloe_nguyen', NULL);
+(1, 'Password123', 'john.doe@gmail.com', 'professor', 'johndoe', 'Active'),
+(2, 'Hello@world', 'jane.smith@gmail.com', 'student', 'janesmith', 'Active'),
+(3, 'HelloWorld', 'john.doe2@gmail.com', 'student', 'JohnDoe', 'Active'),
+(4, 'password123', 'michael.lee@gmail.com', 'student', 'michael_lee', 'Active'),
+(5, 'securePass!1', 'sophia.garcia@gmail.com', 'student', 'sophia_garcia', 'Active'),
+(6, 'helloWorld9', 'daniel.kim@gmail.com', 'student', 'daniel_kim', 'Active'),
+(7, 'qwerty2025', 'olivia.brown@gmail.com', 'student', 'olivia_brown', 'Active'),
+(8, 'pass4321', 'ethan.wilson@gmail.com', 'student', 'ethan_wilson', 'Active'),
+(9, 'abcXYZ987', 'isabella.martin@gmail.com', 'student', 'isabella_martin', 'Active'),
+(10, 'myPass!77', 'liam.torres@gmail.com', 'student', 'liam_torres', 'Active'),
+(11, 'safeKey555', 'emma.davis@gmail.com', 'student', 'emma_davis', 'Active'),
+(12, 'newPass!11', 'chloe.nguyen@gmail.com', 'student', 'chloe_nguyen', 'Active'),
+(18, 'adminpassword', 'admin@example.com', 'admin', 'Administrator', 'active'),
+(19, 'devpassword1', 'christian@example.com', 'developer', 'christianjamss', 'active'),
+(20, 'devpassword2', 'ayisha@example.com', 'developer', 'ayishaestoque', 'active'),
+(21, 'devpassword3', 'marielle@example.com', 'developer', 'mariellecato', 'active'),
+(22, 'devpassword4', 'neil@example.com', 'developer', 'neilvergara', 'active'),
+(23, 'devpassword5', 'shane@example.com', 'developer', 'shanesilverio', 'active'),
+(24, 'devpassword6', 'kimberly@example.com', 'developer', 'kimberlypalla', 'active');
 
 --
 -- Indexes for dumped tables
@@ -870,6 +908,12 @@ ALTER TABLE `badges`
 --
 ALTER TABLE `courses`
   ADD PRIMARY KEY (`courseID`);
+
+--
+-- Indexes for table `courseschedule`
+--
+ALTER TABLE `courseschedule`
+  ADD PRIMARY KEY (`courseScheduleID`);
 
 --
 -- Indexes for table `criteria`
@@ -1063,7 +1107,13 @@ ALTER TABLE `badges`
 -- AUTO_INCREMENT for table `courses`
 --
 ALTER TABLE `courses`
-  MODIFY `courseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `courseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `courseschedule`
+--
+ALTER TABLE `courseschedule`
+  MODIFY `courseScheduleID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `criteria`
@@ -1075,7 +1125,7 @@ ALTER TABLE `criteria`
 -- AUTO_INCREMENT for table `enrollments`
 --
 ALTER TABLE `enrollments`
-  MODIFY `enrollmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `enrollmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `feedback`
@@ -1201,13 +1251,13 @@ ALTER TABLE `todo`
 -- AUTO_INCREMENT for table `userinfo`
 --
 ALTER TABLE `userinfo`
-  MODIFY `userInfoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `userInfoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- Constraints for dumped tables

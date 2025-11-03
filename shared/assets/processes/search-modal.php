@@ -17,7 +17,7 @@ $query = "
         u.role
     FROM users AS u
     INNER JOIN userinfo AS i ON u.userID = i.userID
-    WHERE (u.role = 'student' OR u.role = 'instructor' OR u.role = 'developer')
+    WHERE (u.role = 'student' OR u.role = 'professor' OR u.role = 'developer')
       AND (
           u.userName LIKE '%$escaped%' OR
           i.firstName LIKE '%$escaped%' OR
@@ -36,7 +36,7 @@ if (!$result) {
 if (mysqli_num_rows($result) > 0) {
     while ($row = mysqli_fetch_assoc($result)) {
         $roleBadge = '';
-        if ($row['role'] === 'instructor') {
+        if ($row['role'] === 'professor') {
             $roleBadge = '<span style="background-color: #b3d4ff; color: #0a3d91; font-size: 0.75rem; 
     padding: 2px 8px; border-radius: 12px; margin-left: 8px;">Instructor</span>';
         } elseif ($row['role'] === 'student') {
