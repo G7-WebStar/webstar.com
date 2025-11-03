@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 01, 2025 at 11:37 AM
+-- Generation Time: Nov 03, 2025 at 04:36 AM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -111,7 +111,10 @@ INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `type`
 (1, 1, 'Activity #1', 'Task', '2025-10-15', 0, '2025-09-09 23:00:15'),
 (2, 1, 'Test #1', 'Test', '2025-11-06', 0, '2025-09-04 22:00:15'),
 (3, 2, 'Activity #2', 'Task', '2025-10-23', 0, '2025-10-22 22:00:15'),
-(4, 2, 'Activity #1', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15');
+(4, 2, 'Activity #1', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15'),
+(5, 1, 'asdasd', 'Task', '2025-11-08', 0, '2025-11-03 10:36:42'),
+(6, 1, 'fsfdsfds', 'Test', '2025-11-15', 0, '2025-11-03 03:53:07'),
+(7, 1, 'sadsaf', 'Task', '2025-11-21', 0, '2025-11-03 10:56:27');
 
 -- --------------------------------------------------------
 
@@ -134,7 +137,9 @@ CREATE TABLE `assignments` (
 INSERT INTO `assignments` (`assignmentID`, `assessmentID`, `assignmentDescription`, `assignmentPoints`, `rubricID`) VALUES
 (1, 1, 'Attached is a Google Doc that you can edit.\n\nIn Figma, design a “404 Not Found” page.\n\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\n\nTurn in when done.\n\n', 100, NULL),
 (2, 4, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100, NULL),
-(3, 2, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100, NULL);
+(3, 2, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100, NULL),
+(4, 5, '', 0, NULL),
+(5, 7, '', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -247,6 +252,20 @@ INSERT INTO `enrollments` (`enrollmentID`, `userID`, `courseID`, `yearSection`) 
 (10, 10, 1, 2023),
 (11, 11, 1, 2023),
 (12, 12, 1, 2023);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `feedback`
+--
+
+CREATE TABLE `feedback` (
+  `feedbackID` int(11) NOT NULL,
+  `senderID` int(11) NOT NULL,
+  `receiverID` int(11) NOT NULL,
+  `message` text NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -453,17 +472,17 @@ CREATE TABLE `report` (
 --
 
 INSERT INTO `report` (`reportID`, `enrollmentID`, `totalXP`, `allTimeRank`, `generatedAt`) VALUES
-(1, 1, 550, 1, '2025-11-01 17:39:34'),
-(2, 3, 400, 2, '2025-11-01 17:39:34'),
-(3, 8, 221, 3, '2025-11-01 17:39:34'),
-(4, 6, 215, 4, '2025-11-01 17:39:34'),
-(5, 11, 214, 5, '2025-11-01 17:39:34'),
-(6, 10, 195, 6, '2025-11-01 17:39:34'),
-(7, 5, 189, 7, '2025-11-01 17:39:34'),
-(8, 7, 176, 8, '2025-11-01 17:39:35'),
-(9, 9, 167, 9, '2025-11-01 17:39:35'),
-(10, 4, 152, 10, '2025-11-01 17:39:35'),
-(11, 12, 95, 11, '2025-11-01 17:39:35'),
+(1, 1, 550, 1, '2025-11-03 11:24:33'),
+(2, 3, 400, 2, '2025-11-03 11:24:33'),
+(3, 8, 221, 3, '2025-11-03 11:24:33'),
+(4, 6, 215, 4, '2025-11-03 11:24:33'),
+(5, 11, 214, 5, '2025-11-03 11:24:33'),
+(6, 10, 195, 6, '2025-11-03 11:24:33'),
+(7, 5, 189, 7, '2025-11-03 11:24:33'),
+(8, 7, 176, 8, '2025-11-03 11:24:33'),
+(9, 9, 167, 9, '2025-11-03 11:24:33'),
+(10, 4, 152, 10, '2025-11-03 11:24:33'),
+(11, 12, 95, 11, '2025-11-03 11:24:33'),
 (12, 2, 450, 1, '2025-11-01 12:05:23');
 
 -- --------------------------------------------------------
@@ -520,7 +539,17 @@ CREATE TABLE `settings` (
 --
 
 INSERT INTO `settings` (`settingsID`, `userID`, `courseUpdateEnabled`, `questDeadlineEnabled`, `announcementEnabled`) VALUES
-(1, 2, 1, 1, 1);
+(1, 2, 1, 1, 1),
+(3, 3, 0, 0, 0),
+(4, 4, 0, 0, 0),
+(5, 5, 0, 0, 0),
+(6, 6, 0, 0, 0),
+(7, 7, 0, 0, 0),
+(8, 8, 0, 0, 0),
+(9, 9, 0, 0, 0),
+(10, 10, 0, 0, 0),
+(11, 11, 0, 0, 0),
+(12, 12, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -688,7 +717,8 @@ CREATE TABLE `tests` (
 --
 
 INSERT INTO `tests` (`testID`, `assessmentID`, `generalGuidance`, `testTimelimit`) VALUES
-(1, 2, 'Read each question carefully and choose the best answer from the given options. Only one option is correct for each question. Once you move to the next question, you will not be able to return to the previous one, so review your answer before proceeding. The exam will automatically submit when the timer ends. Avoid refreshing or closing the browser during the exam to prevent submission issues.', 600);
+(1, 2, 'Read each question carefully and choose the best answer from the given options. Only one option is correct for each question. Once you move to the next question, you will not be able to return to the previous one, so review your answer before proceeding. The exam will automatically submit when the timer ends. Avoid refreshing or closing the browser during the exam to prevent submission issues.', 600),
+(2, 6, '', 12);
 
 -- --------------------------------------------------------
 
@@ -750,7 +780,7 @@ INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `
 (3, 3, 'prof.png', 'John', 'Cruz', 'Doe', '202310003', '1', 'Male', '2', 1, 'john.doe@university.edu', '', '', '', '2025-09-28 11:58:33', 0),
 (4, 4, 'prof.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 1, 'michael.lee@school.edu', NULL, NULL, NULL, '2025-09-28 20:59:48', 0),
 (5, 5, 'prof.png', 'Sophia', 'B.', 'Garcia', '202310004', '1', 'Female', '2', 1, 'sophia.garcia@school.edu', 'facebook.com/sophia.garcia', 'linkedin.com/in/sophiagarcia', 'instagram.com/sophia.garcia', '2025-09-28 20:59:48', 1),
-(6, 6, 'prof.png', 'Daniel', 'C.', 'Kim', '202310005', '1', 'Male', '3', 2, 'daniel.kim@school.edu', 'facebook.com/daniel.kim', 'linkedin.com/in/danielkim', 'instagram.com/daniel.kim', '2025-09-28 20:59:48', 1),
+(6, 6, 'prof.png', 'Daniel', 'C.', 'Kim', '202310005', '1', 'Male', '3', 2, 'daniel.kim@school.edu', 'facebook.com/daniel.kim', 'linkedin.com/in/danielkim', 'instagram.com/daniel.kim', '2025-09-28 20:59:48', 0),
 (7, 7, 'prof.png', 'Olivia', 'D.', 'Brown', '202310006', '1', 'Female', '2', 2, 'olivia.brown@school.edu', 'facebook.com/olivia.brown', 'linkedin.com/in/oliviabrown', 'instagram.com/olivia.brown', '2025-09-28 20:59:48', 0),
 (8, 8, 'prof.png', 'Ethan', 'E.', 'Wilson', '202310007', '1', 'Male', '2', 1, 'ethan.wilson@school.edu', 'facebook.com/ethan.wilson', 'linkedin.com/in/ethanwilson', 'instagram.com/ethan.wilson', '2025-09-28 20:59:48', 1),
 (9, 9, 'prof.png', 'Isabella', 'F.', 'Martin', '202310008', '1', 'Female', '2', 1, 'isabella.martin@school.edu', 'facebook.com/isabella.martin', 'linkedin.com/in/isabellamartin', 'instagram.com/isabella.martin', '2025-09-28 20:59:48', 1),
@@ -852,6 +882,12 @@ ALTER TABLE `criteria`
 --
 ALTER TABLE `enrollments`
   ADD PRIMARY KEY (`enrollmentID`);
+
+--
+-- Indexes for table `feedback`
+--
+ALTER TABLE `feedback`
+  ADD PRIMARY KEY (`feedbackID`);
 
 --
 -- Indexes for table `files`
@@ -1009,13 +1045,13 @@ ALTER TABLE `announcements`
 -- AUTO_INCREMENT for table `assessments`
 --
 ALTER TABLE `assessments`
-  MODIFY `assessmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `assessmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `assignments`
 --
 ALTER TABLE `assignments`
-  MODIFY `assignmentID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `assignmentID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `badges`
@@ -1040,6 +1076,12 @@ ALTER TABLE `criteria`
 --
 ALTER TABLE `enrollments`
   MODIFY `enrollmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `feedback`
+--
+ALTER TABLE `feedback`
+  MODIFY `feedbackID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `files`
@@ -1111,7 +1153,7 @@ ALTER TABLE `scores`
 -- AUTO_INCREMENT for table `settings`
 --
 ALTER TABLE `settings`
-  MODIFY `settingsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `settingsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `studentbadges`
@@ -1147,7 +1189,7 @@ ALTER TABLE `testresponses`
 -- AUTO_INCREMENT for table `tests`
 --
 ALTER TABLE `tests`
-  MODIFY `testID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `testID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `todo`
@@ -1165,7 +1207,7 @@ ALTER TABLE `userinfo`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Constraints for dumped tables

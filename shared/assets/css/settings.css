@@ -1,0 +1,172 @@
+.main-container {
+    opacity: 1;
+    animation: none;
+}
+
+.settings-header-wrapper {
+    position: sticky;
+    top: 0; /* stick at the very top of its container */
+    z-index: 100; /* make sure it stays above other content */
+    background-color: var(--dirtyWhite); /* match your theme */
+}
+
+/* Left and Right Arrows */
+.scroll-arrow-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--dirtyWhite) !important;
+    border: none;
+    color: var(--black);
+    box-shadow: 0 2px 6px var(--dirtyWhite);
+    width: 34px;
+    z-index: 2;
+}
+
+/* Position the arrows */
+#desktopScrollLeftBtn {
+    left: -10px;
+}
+
+#desktopScrollRightBtn {
+    right: -10px;
+}
+
+/* NavTabs Mobile Handling */
+
+@media (max-width: 767px) {
+    .custom-nav-tabs .nav-item {
+        flex: 0 0 auto !important;
+        /* Don't stretch */
+        width: auto !important;
+        /* Allow natural width */
+        text-align: center;
+        scroll-snap-align: start;
+        margin-right: 20px;
+    }
+}
+
+.custom-nav-tabs .nav-link {
+    font-family: var(--SemiBold);
+    color: #2c2c2cbf;
+    border: none;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    font-weight: normal;
+    background-color: transparent !important;
+    /* ensure no background on default */
+}
+
+.custom-nav-tabs .nav-link:hover {
+    color: var(--black);
+    text-decoration: none;
+    background-color: transparent !important;
+    /* ensure no background on hover */
+}
+
+.custom-nav-tabs .nav-link.active {
+    border-bottom: 3px solid var(--black);
+    color: var(--black);
+    font-weight: bold;
+    background-color: transparent !important;
+    /* remove white background on active */
+}
+
+/* neil again */
+@media (max-width: 767.98px) {
+    .custom-nav-tabs {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        scroll-snap-type: x mandatory;
+    }
+
+    .custom-nav-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .custom-nav-tabs .nav-item {
+        flex: 0 0 auto;
+        width: calc(100% / 3);
+        text-align: center;
+        scroll-snap-align: start;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .custom-nav-tabs .nav-link {
+        font-size: 12px !important;
+        padding: 10px 1px;
+        /* Tweak if needed */
+    }
+}
+
+@media (max-width: 767.98px) {
+    .tab-carousel-wrapper {
+        position: relative;
+    }
+
+    .scroll-arrow-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 2;
+        background: transparent;
+        border: none;
+        padding: 0;
+    }
+
+
+    .scroll-arrow-btn i {
+        font-size: 16px;
+        color: var(--black);
+    }
+
+    #scrollLeftBtn {
+        left: -10px;
+    }
+
+    #scrollRightBtn {
+        right: -10px;
+    }
+}
+
+.tab-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+
+    -webkit-overflow-scrolling: touch;
+    /* smooth scroll on mobile */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.tab-scroll::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Edge */
+}
+
+.tab-scroll .nav-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    /* prevents wrapping */
+}
+
+.tab-scroll .nav-item {
+    flex: 0 0 auto;
+    /* keeps items from shrinking */
+}
+
+/* Sticky Nav Tabs */
+.tab-carousel-wrapper {
+    position: relative; /* relative inside sticky wrapper */
+    z-index: 10;
+    background: var(--dirtyWhite);
+}
+
+.tab-section {
+    min-height: 100vh;
+}

@@ -17,12 +17,13 @@ if (isset($_POST['activeTab'])) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Webstar | Settings</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="shared/assets/css/global-styles.css">
     <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
-    <link rel="stylesheet" href="shared/assets/css/course-Info.css">
+    <link rel="stylesheet" href="shared/assets/css/settings.css">
+    <link rel="stylesheet" href="shared/assets/css/registration-profile.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
@@ -54,145 +55,113 @@ if (isset($_POST['activeTab'])) {
                     <!-- Navbar for mobile -->
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
-                        <div class="row mb-3">
-                            <div class="row mt-0">
+                    <div class="container-fluid overflow-y-auto row-padding-top">
+
+                        <!-- Sticky Header: Title + Tabs -->
+                        <div class="settings-header-wrapper my-3">
+                            <div class="row align-items-center">
                                 <!-- Title -->
-                                <div class="col-12 col-lg-auto mb-3 mb-lg-0">
+                                <div class="col-12 col-lg-auto">
                                     <div class="text-bold text-30">Settings</div>
                                 </div>
 
-                                <!-- RIGHT: Tabs and Content -->
-                                <div class="col-md-8 mt-1">
-                                    <div class="tab-section">
-                                        <!-- Desktop Tabs -->
-                                        <div
-                                            class="tab-carousel-wrapper d-none d-md-block position-relative w-100 ms-0 me-0 pe-0">
-                                            <div class="d-flex align-items-center position-relative w-100"
-                                                style="gap: 10px; padding: 0; margin: 0;">
-                                                <!-- Scrollable Tabs -->
-                                                <div class="tab-scroll flex-grow-1 overflow-visible"
-                                                    style="white-space: normal;">
-                                                    <ul class="nav nav-tabs custom-nav-tabs mb-3 flex-nowrap" id="myTab"
-                                                        role="tablist" style="display: inline-flex; white-space: nowrap;">
-
-                                                        <li class="nav-item">
-                                                            <a class="nav-link <?php if ($activeTab == 'edit-profile') echo 'active'; ?>"
-                                                                id="edit-profile-tab" data-bs-toggle="tab"
-                                                                href="#edit-profile" role="tab">Edit Profile</a>
-                                                        </li>
-                                                        <li class="nav-item">
-                                                            <a class="nav-link <?php if ($activeTab == 'customization') echo 'active'; ?>"
-                                                                id="customization-tab" data-bs-toggle="tab"
-                                                                href="#customization" role="tab">Customization</a>
-                                                        </li>
-                                                        <li class="nav-item">
-                                                            <a class="nav-link <?php if ($activeTab == 'my-star-card') echo 'active'; ?>"
-                                                                id="my-star-card-tab" data-bs-toggle="tab"
-                                                                href="#my-star-card" role="tab">My Star Card</a>
-                                                        </li>
-                                                        <li class="nav-item">
-                                                            <a class="nav-link <?php if ($activeTab == 'support') echo 'active'; ?>"
-                                                                id="support-tab" data-bs-toggle="tab" href="#support"
-                                                                role="tab">Support</a>
-                                                        </li>
-                                                        <li class="nav-item">
-                                                            <a class="nav-link <?php if ($activeTab == 'send-feedback') echo 'active'; ?>"
-                                                                id="send-feedback-tab" data-bs-toggle="tab"
-                                                                href="#send-feedback" role="tab">Send Feedback</a>
-                                                        </li>
-                                                        <li class="nav-item nav-student">
-                                                            <a class="nav-link <?php if ($activeTab == 'preferences') echo 'active'; ?>"
-                                                                id="preferences-tab" data-bs-toggle="tab"
-                                                                href="#preferences" role="tab">Preferences</a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Mobile Tabs -->
-                                        <div class="tab-carousel-wrapper position-relative d-md-none">
-                                            <button id="scrollLeftBtn" class="scroll-arrow-btn start-0 d-none"
+                                <!-- Tabs -->
+                                <div class="col">
+                                    <div class="tab-carousel-wrapper mt-lg-1 mt-0">
+                                        <div class="d-flex align-items-center" style="width: 100%;">
+                                            <!-- Left Arrow -->
+                                            <button id="settingsScrollLeftBtn" class="scroll-arrow-btn d-none"
                                                 aria-label="Scroll Left">
                                                 <i class="fa-solid fa-chevron-left"></i>
                                             </button>
-                                            <button id="scrollRightBtn" class="scroll-arrow-btn end-0"
+
+                                            <!-- Scrollable Tabs -->
+                                            <div class="tab-scroll flex-grow-1 overflow-auto nav-tabs"
+                                                style="scroll-behavior: smooth; white-space: nowrap;">
+                                                <ul class="nav custom-nav-tabs flex-nowrap w-100" id="settingsTab"
+                                                    role="tablist"
+                                                    style="display: inline-flex; white-space: nowrap; justify-content: space-between;">
+                                                    <li class="nav-item">
+                                                        <a class="nav-link text-14 <?php echo ($activeTab == 'edit-profile') ? 'active' : ''; ?>"
+                                                            data-bs-toggle="tab" href="#edit-profile">Edit Profile</a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link text-14 <?php echo ($activeTab == 'customization') ? 'active' : ''; ?>"
+                                                            data-bs-toggle="tab" href="#customization">Customization</a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link text-14 <?php echo ($activeTab == 'my-star-card') ? 'active' : ''; ?>"
+                                                            data-bs-toggle="tab" href="#my-star-card">My Star Card</a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link text-14 <?php echo ($activeTab == 'support') ? 'active' : ''; ?>"
+                                                            data-bs-toggle="tab" href="#support">Support</a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link text-14 <?php echo ($activeTab == 'send-feedback') ? 'active' : ''; ?>"
+                                                            data-bs-toggle="tab" href="#send-feedback">Send Feedback</a>
+                                                    </li>
+                                                    <li class="nav-item nav-student">
+                                                        <a class="nav-link text-14 <?php echo ($activeTab == 'preferences') ? 'active' : ''; ?>"
+                                                            data-bs-toggle="tab" href="#preferences">Preferences</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                            <!-- Right Arrow -->
+                                            <button id="settingsScrollRightBtn" class="scroll-arrow-btn"
                                                 aria-label="Scroll Right">
                                                 <i class="fa-solid fa-chevron-right"></i>
                                             </button>
-
-                                            <ul class="nav nav-tabs custom-nav-tabs mb-3" id="mobileTabScroll"
-                                                role="tablist">
-                                                <li class="nav-item me-3" role="presentation">
-                                                    <a class="nav-link <?php if ($activeTab == 'edit-profile') echo 'active'; ?>"
-                                                        id="edit-profile-tab" data-bs-toggle="tab"
-                                                        href="#edit-profile" role="tab">Edit Profile</a>
-                                                </li>
-                                                <li class="nav-item" role="presentation">
-                                                    <a class="nav-link <?php if ($activeTab == 'customization') echo 'active'; ?>"
-                                                        id="customization-tab" data-bs-toggle="tab"
-                                                        href="#customization" role="tab">Customization</a>
-                                                </li>
-                                                <li class="nav-item" role="presentation">
-                                                    <a class="nav-link <?php if ($activeTab == 'my-star-card') echo 'active'; ?>"
-                                                        id="my-star-card-tab" data-bs-toggle="tab"
-                                                        href="#my-star-card" role="tab">My Star Card</a>
-                                                </li>
-                                                <li class="nav-item" role="presentation">
-                                                    <a class="nav-link <?php if ($activeTab == 'support') echo 'active'; ?>"
-                                                        id="support-tab" data-bs-toggle="tab" href="#support"
-                                                        role="tab">Support</a>
-                                                </li>
-                                                <li class="nav-item" role="presentation">
-                                                    <a class="nav-link <?php if ($activeTab == 'send-feedback') echo 'active'; ?>"
-                                                        id="send-feedback-tab" data-bs-toggle="tab"
-                                                        href="#send-feedback" role="tab">Send Feedback</a>
-                                                </li>
-                                                <li class="nav-item nav-report" role="presentation">
-                                                    <a class="nav-link <?php if ($activeTab == 'preferences') echo 'active'; ?>"
-                                                        id="preferences-tab" data-bs-toggle="tab" href="#preferences"
-                                                        role="tab">Preferences</a>
-                                                </li>
-                                            </ul>
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Tab Content -->
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="tab-content" id="myTabContent">
-                                            <div class="tab-pane fade <?php if ($activeTab == 'edit-profile') echo 'show active'; ?>"
-                                                id="edit-profile" role="tabpanel">
-                                                <?php include 'settings-info-contents/edit-profile.php'; ?>
-                                            </div>
-                                            <div class="tab-pane fade <?php if ($activeTab == 'customization') echo 'show active'; ?>"
-                                                id="customization" role="tabpanel">
-                                                <?php include 'settings-info-contents/customization.php'; ?>
-                                            </div>
-                                            <div class="tab-pane fade <?php if ($activeTab == 'my-star-card') echo 'show active'; ?>"
-                                                id="my-star-card" role="tabpanel">
-                                                <?php include 'settings-info-contents/my-star-card.php'; ?>
-                                            </div>
-                                            <div class="tab-pane fade <?php if ($activeTab == 'support') echo 'show active'; ?>"
-                                                id="support" role="tabpanel">
-                                                <?php include 'settings-info-contents/support.php'; ?>
-                                            </div>
-                                            <div class="tab-pane fade <?php if ($activeTab == 'send-feedback') echo 'show active'; ?>"
-                                                id="send-feedback" role="tabpanel">
-                                                <?php include 'settings-info-contents/send-feedback.php'; ?>
-                                            </div>
-                                            <div class="tab-pane fade <?php if ($activeTab == 'preferences') echo 'show active'; ?>"
-                                                id="preferences" role="tabpanel">
-                                                <?php include 'settings-info-contents/preferences.php'; ?>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
                             </div>
                         </div>
+
+                        <!-- TAB CONTENT BELOW -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="tab-content" id="settingsTabContent">
+                                    <!-- Edit Profile -->
+                                    <div class="tab-pane fade <?php echo ($activeTab == 'edit-profile') ? 'show active' : ''; ?>"
+                                        id="edit-profile" role="tabpanel">
+                                        <?php include 'settings-info-contents/edit-profile.php'; ?>
+                                    </div>
+
+                                    <!-- Customization -->
+                                    <div class="tab-pane fade <?php echo ($activeTab == 'customization') ? 'show active' : ''; ?>"
+                                        id="customization" role="tabpanel">
+                                        <?php include 'settings-info-contents/customization.php'; ?>
+                                    </div>
+
+                                    <!-- My Star Card -->
+                                    <div class="tab-pane fade <?php echo ($activeTab == 'my-star-card') ? 'show active' : ''; ?>"
+                                        id="my-star-card" role="tabpanel">
+                                        <?php include 'settings-info-contents/my-star-card.php'; ?>
+                                    </div>
+
+                                    <!-- Support -->
+                                    <div class="tab-pane fade <?php echo ($activeTab == 'support') ? 'show active' : ''; ?>"
+                                        id="support" role="tabpanel">
+                                        <?php include 'settings-info-contents/support.php'; ?>
+                                    </div>
+
+                                    <!-- Send Feedback -->
+                                    <div class="tab-pane fade <?php echo ($activeTab == 'send-feedback') ? 'show active' : ''; ?>"
+                                        id="send-feedback" role="tabpanel">
+                                        <?php include 'settings-info-contents/send-feedback.php'; ?>
+                                    </div>
+
+                                    <!-- Preferences -->
+                                    <div class="tab-pane fade <?php echo ($activeTab == 'preferences') ? 'show active' : ''; ?>"
+                                        id="preferences" role="tabpanel">
+                                        <?php include 'settings-info-contents/preferences.php'; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                 </div>
@@ -206,27 +175,35 @@ if (isset($_POST['activeTab'])) {
     <!-- JS for Mobile Scroll Buttons -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const tabContainer = document.getElementById('mobileTabScroll');
-            const scrollLeftBtn = document.getElementById('scrollLeftBtn');
-            const scrollRightBtn = document.getElementById('scrollRightBtn');
+            const scrollContainer = document.querySelector(".tab-scroll");
+            const leftBtn = document.getElementById("settingsScrollLeftBtn");
+            const rightBtn = document.getElementById("settingsScrollRightBtn");
 
             function updateArrowVisibility() {
-                if (!tabContainer) return;
-                scrollLeftBtn.classList.toggle('d-none', tabContainer.scrollLeft === 0);
-                scrollRightBtn.classList.toggle('d-none', tabContainer.scrollLeft + tabContainer.clientWidth >= tabContainer.scrollWidth);
+                if (!scrollContainer) return;
+
+                leftBtn.classList.toggle("d-none", scrollContainer.scrollLeft <= 0);
+
+                const atFarRight =
+                    scrollContainer.scrollLeft + scrollContainer.clientWidth >= scrollContainer.scrollWidth - 2;
+
+                rightBtn.classList.toggle("d-none", atFarRight);
             }
 
-            scrollLeftBtn.addEventListener('click', () => {
-                tabContainer.scrollBy({ left: -100, behavior: 'smooth' });
+            leftBtn.addEventListener("click", () => {
+                scrollContainer.scrollBy({ left: -150, behavior: "smooth" });
             });
 
-            scrollRightBtn.addEventListener('click', () => {
-                tabContainer.scrollBy({ left: 100, behavior: 'smooth' });
+            rightBtn.addEventListener("click", () => {
+                scrollContainer.scrollBy({ left: 150, behavior: "smooth" });
             });
 
-            tabContainer.addEventListener('scroll', updateArrowVisibility);
-            updateArrowVisibility();
+            scrollContainer.addEventListener("scroll", updateArrowVisibility);
+            window.addEventListener("resize", updateArrowVisibility);
+
+            setTimeout(updateArrowVisibility, 200);
         });
     </script>
 </body>
+
 </html>
