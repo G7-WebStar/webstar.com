@@ -74,65 +74,82 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                     <div class="container-fluid py-3 overflow-y-auto row-padding-top">
                         <div class="row">
                             <div class="col-12">
-
                                 <!-- Header Section -->
-                                <div class="row align-items-center mb-3 text-center text-lg-start">
-                                    <!-- Title -->
-                                    <div class="col-12 col-lg-auto mb-3 mb-lg-0">
-                                        <h1 class="text-sbold text-25 mb-0 mt-2" style="color: var(--black);">My Inbox
+                                <div class="row align-items-center mb-3 text-center text-md-start">
+                                    <div class="col-12 col-md-auto text-center text-md-start position-relative">
+                                        <h1 class="text-sbold text-25 my-2" style="color: var(--black);">My Inbox
                                         </h1>
+
+                                        <!-- Filter Icon (mobile only) -->
+                                        <span id="filterToggle"
+                                            class="position-absolute end-0 top-50 translate-middle-y d-md-none px-2"
+                                            role="button" tabindex="0" aria-label="Show filters"
+                                            style="cursor: pointer; user-select: none; ">
+                                            <span class="material-symbols-rounded"
+                                                style="font-size: 30px; color: var(--black);">
+                                                tune
+                                            </span>
+                                        </span>
+
                                     </div>
 
-                                    <!-- Dropdowns-->
-                                     
-                                <!-- Sort By -->
-                                <div class="col-auto mobile-dropdown">
-                                    <div class="d-flex align-items-center flex-nowrap mt-2">
-                                        <span class="dropdown-label me-2 text-reg">Sort by</span>
-                                        <div class="custom-dropdown">
-                                            <button class="dropdown-btn text-reg text-14">Newest</button>
-                                            <ul class="dropdown-list text-reg text-14">
-                                                <li data-value="Newest">Newest</li>
-                                                <li data-value="Oldest">Oldest</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
+                                    <!-- Dropdowns -->
+                                    <div class="col-12 col-md-auto d-flex flex-wrap justify-content-center justify-content-md-start gap-3 mt-2 mt-md-0 d-none d-md-flex"
+                                        style="row-gap: 0!important;" id="mobileFilters">
 
-                                <!-- Course -->
-                                <div class="col-auto mobile-dropdown">
-                                    <div class="d-flex align-items-center flex-nowrap mt-2">
-                                        <span class="dropdown-label me-2 text-reg">Courses</span>
-                                        <div class="custom-dropdown">
-                                            <button class="dropdown-btn text-reg text-14">All</button>
-                                            <ul class="dropdown-list text-reg text-14">
-                                                <li data-value="All">All</li>
-                                                <li data-value="Courses">Courses</li>
-                                            </ul>
+                                        <!-- Sort By -->
+                                        <div class="col-auto mobile-dropdown p-0">
+                                            <div class="d-flex align-items-center flex-nowrap my-2">
+                                                <span class="dropdown-label me-2 text-reg">Sort by</span>
+                                                <div class="custom-dropdown">
+                                                    <button class="dropdown-btn text-reg text-14">Newest</button>
+                                                    <ul class="dropdown-list text-reg text-14">
+                                                        <li data-value="Newest">Newest</li>
+                                                        <li data-value="Oldest">Oldest</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
 
-                                <!-- Type -->
-                                <div class="col-auto mobile-dropdown">
-                                    <div class="d-flex align-items-center flex-nowrap mt-2">
-                                        <span class="dropdown-label me-2 text-reg">Type</span>
-                                        <div class="custom-dropdown">
-                                            <button class="dropdown-btn text-reg text-14">All</button>
-                                            <ul class="dropdown-list text-reg text-14">
-                                                <li data-value="All">All</li>
-                                                <li data-value="Course Updates">Course Updates</li>
-                                                <li data-value="Badge Updates">Badge Updates</li>
-                                                <li data-value="Leaderboard Updates">Leaderboard Updates</li>
-                                                <li data-value="Level Updates">Level Updates</li>
-                                                <li data-value="Submission Updates">Submission Updates</li>
-                                            </ul>
+                                        <!-- Course -->
+                                        <div class="col-auto mobile-dropdown p-0">
+                                            <div class="d-flex align-items-center flex-nowrap my-2">
+                                                <span class="dropdown-label me-2 text-reg">Courses</span>
+                                                <div class="custom-dropdown">
+                                                    <button class="dropdown-btn text-reg text-14">All</button>
+                                                    <ul class="dropdown-list text-reg text-14">
+                                                        <li data-value="All">All</li>
+                                                        <li data-value="Courses">Courses</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
                                         </div>
+
+                                        <!-- Type -->
+                                        <div class="col-auto mobile-dropdown p-0">
+                                            <div class="d-flex align-items-center flex-nowrap my-2">
+                                                <span class="dropdown-label me-2 text-reg">Type</span>
+                                                <div class="custom-dropdown">
+                                                    <button class="dropdown-btn text-reg text-14">All</button>
+                                                    <ul class="dropdown-list text-reg text-14">
+                                                        <li data-value="All">All</li>
+                                                        <li data-value="Course Updates">Course Updates</li>
+                                                        <li data-value="Badge Updates">Badge Updates</li>
+                                                        <li data-value="Leaderboard Updates">Leaderboard Updates
+                                                        </li>
+                                                        <li data-value="Level Updates">Level Updates</li>
+                                                        <li data-value="Submission Updates">Submission Updates</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
-                                </div>
+
+
 
                                     <!-- Message Content -->
-                                    <div class="message-container mt-4 mt-lg-4 pb-4">
+                                    <div class="message-container mt-3 pb-4">
                                         <?php
                                         if (mysqli_num_rows($selectInboxResult) > 0) {
                                             while ($inbox = mysqli_fetch_assoc($selectInboxResult)) {
@@ -143,7 +160,7 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                                         <div class="row align-items-center">
                                                             <!-- Message Text -->
                                                             <div class="col d-flex flex-column text-start mt-2 mb-2">
-                                                                <p class="mb-2 text-sbold text-17"
+                                                                <p class="mb-2 text-sbold text-17 message-text"
                                                                     style="color: var(--black); line-height: 100%;">
                                                                     <?php echo $inbox['messageText'] . " " . $inbox['assessmentTitle']; ?>
                                                                 </p>
@@ -198,31 +215,39 @@ $selectInboxResult = executeQuery($selectInboxQuery);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
-     <!-- Dropdown js -->
-     <script>
-                document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
-                    const btn = dropdown.querySelector('.dropdown-btn');
-                    const list = dropdown.querySelector('.dropdown-list');
 
-                    btn.addEventListener('click', () => {
-                        list.style.display = list.style.display === 'block' ? 'none' : 'block';
-                    });
+    <!-- Filters Toggle -->
+    <script>
+        document.getElementById("filterToggle").addEventListener("click", () => {
+            document.getElementById("mobileFilters").classList.toggle("d-none");
+        });
+    </script>
 
-                    list.querySelectorAll('li').forEach(item => {
-                        item.addEventListener('click', () => {
-                            btn.textContent = item.dataset.value;
-                            list.style.display = 'none';
-                        });
-                    });
+    <!-- Dropdown js -->
+    <script>
+        document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+            const btn = dropdown.querySelector('.dropdown-btn');
+            const list = dropdown.querySelector('.dropdown-list');
 
-                    // Close dropdown if clicked outside
-                    document.addEventListener('click', (e) => {
-                        if (!dropdown.contains(e.target)) {
-                            list.style.display = 'none';
-                        }
-                    });
+            btn.addEventListener('click', () => {
+                list.style.display = list.style.display === 'block' ? 'none' : 'block';
+            });
+
+            list.querySelectorAll('li').forEach(item => {
+                item.addEventListener('click', () => {
+                    btn.textContent = item.dataset.value;
+                    list.style.display = 'none';
                 });
-            </script>
+            });
+
+            // Close dropdown if clicked outside
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target)) {
+                    list.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

@@ -102,79 +102,97 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                             <div class="col-12">
 
                                 <!-- Header Section -->
-                                <div class="row align-items-center mb-3 text-center text-lg-start">
-                                    <!-- Title -->
-                                    <div class="col-12 col-lg-auto mb-3 mb-lg-0">
-                                        <h1 class="text-sbold text-25 mb-0 mt-2" style="color: var(--black);">My To-do
+                                <div class="row align-items-center text-center text-md-start">
+                                    <div class="col-12 col-md-auto text-center text-md-start position-relative">
+                                        <h1 class="text-sbold text-25 my-2" style="color: var(--black);">My Quests
                                         </h1>
+
+                                        <!-- Filter Icon (mobile only) -->
+                                        <span id="filterToggle"
+                                            class="position-absolute end-0 top-50 translate-middle-y d-md-none px-2"
+                                            role="button" tabindex="0" aria-label="Show filters"
+                                            style="cursor: pointer; user-select: none;">
+                                            <span class="material-symbols-rounded"
+                                                style="font-size: 30px; color: var(--black);">
+                                                tune
+                                            </span>
+                                        </span>
                                     </div>
 
+                                    <!-- Dropdowns -->
+                                    <div class="col-12 col-md-auto d-flex flex-wrap justify-content-center justify-content-md-start gap-3 mt-2 mt-md-0 d-none d-md-flex"
+                                        style="row-gap: 0!important;" id="mobileFilters">
 
-                                <!--Dropdowns-->
-                                  <!-- Sort By -->
-                                <div class="col-auto mobile-dropdown">
-                                    <div class="d-flex align-items-center flex-nowrap mt-2">
-                                        <span class="dropdown-label me-2 text-reg">Sort by</span>
-                                        <div class="custom-dropdown" data-filter="sortBy">
-                                            <button class="dropdown-btn text-reg text-14" data-current="<?php echo $sortBy; ?>">
-                                                <?php echo $sortBy; ?>
-                                            </button>
-                                            <ul class="dropdown-list text-reg text-14">
-                                                <li data-value="Newest">Newest</li>
-                                                <li data-value="Oldest">Oldest</li>
-                                            </ul>
+                                        <!-- Sort By -->
+                                        <div class="col-auto mobile-dropdown p-0">
+                                            <div class="d-flex align-items-center flex-nowrap my-2">
+                                                <span class="dropdown-label me-2 text-reg">Sort by</span>
+                                                <div class="custom-dropdown" data-filter="sortBy">
+                                                    <button class="dropdown-btn text-reg text-14"
+                                                        data-current="<?php echo $sortBy; ?>">
+                                                        <?php echo $sortBy; ?>
+                                                    </button>
+                                                    <ul class="dropdown-list text-reg text-14">
+                                                        <li data-value="Newest">Newest</li>
+                                                        <li data-value="Oldest">Oldest</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
 
-                                <!-- Course -->
-                                <div class="col-auto mobile-dropdown">
-                                    <div class="d-flex align-items-center flex-nowrap mt-2">
-                                        <span class="dropdown-label me-2 text-reg">Courses</span>
-                                        <div class="custom-dropdown" data-filter="course">
-                                            <button class="dropdown-btn text-reg text-14" data-current="<?php echo $courseFilter; ?>">
-                                                <?php echo $courseFilter; ?>
-                                            </button>
-                                            <ul class="dropdown-list text-reg text-14">
-                                                <li data-value="All">All</li>
-                                                <?php
-                                                if ($selectEnrolledResult && mysqli_num_rows($selectEnrolledResult) > 0) {
-                                                    while ($course = mysqli_fetch_assoc($selectEnrolledResult)) {
-                                                        ?>
-                                                        <li data-value="<?php echo $course['courseCode']; ?>">
-                                                            <?php echo $course['courseCode']; ?>
-                                                        </li>
+                                        <!-- Course -->
+                                        <div class="col-auto mobile-dropdown p-0">
+                                            <div class="d-flex align-items-center flex-nowrap my-2">
+                                                <span class="dropdown-label me-2 text-reg">Courses</span>
+                                                <div class="custom-dropdown" data-filter="course">
+                                                    <button class="dropdown-btn text-reg text-14"
+                                                        data-current="<?php echo $courseFilter; ?>">
+                                                        <?php echo $courseFilter; ?>
+                                                    </button>
+                                                    <ul class="dropdown-list text-reg text-14">
+                                                        <li data-value="All">All</li>
                                                         <?php
-                                                    }
-                                                }
-                                                ?>
-                                            </ul>
+                                                        if ($selectEnrolledResult && mysqli_num_rows($selectEnrolledResult) > 0) {
+                                                            while ($course = mysqli_fetch_assoc($selectEnrolledResult)) {
+                                                                ?>
+                                                                <li data-value="<?php echo $course['courseCode']; ?>">
+                                                                    <?php echo $course['courseCode']; ?>
+                                                                </li>
+                                                                <?php
+                                                            }
+                                                        }
+                                                        ?>
+                                                    </ul>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
 
-                                <!-- Status -->
-                                <div class="col-auto mobile-dropdown">
-                                    <div class="d-flex align-items-center flex-nowrap mt-2">
-                                        <span class="dropdown-label me-2 text-reg">Status</span>
-                                        <div class="custom-dropdown" data-filter="status">
-                                            <button class="dropdown-btn text-reg text-14" data-current="<?php echo $statusFilter; ?>">
-                                                <?php echo $statusFilter; ?>
-                                            </button>
-                                            <ul class="dropdown-list text-reg text-14">
-                                                <li data-value="All">All</li>
-                                                <li data-value="Pending">Pending</li>
-                                                <li data-value="Missing">Missing</li>
-                                                <li data-value="Done">Done</li>
-                                            </ul>
+                                        <!-- Status -->
+                                        <div class="col-auto mobile-dropdown p-0">
+                                            <div class="d-flex align-items-center flex-nowrap my-2">
+                                                <span class="dropdown-label me-2 text-reg">Status</span>
+                                                <div class="custom-dropdown" data-filter="status">
+                                                    <button class="dropdown-btn text-reg text-14"
+                                                        data-current="<?php echo $statusFilter; ?>">
+                                                        <?php echo $statusFilter; ?>
+                                                    </button>
+                                                    <ul class="dropdown-list text-reg text-14">
+                                                        <li data-value="All">All</li>
+                                                        <li data-value="Pending">Pending</li>
+                                                        <li data-value="Missing">Missing</li>
+                                                        <li data-value="Done">Done</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
 
+                                    </div>
+
+                                </div>
 
                                 <!-- Task container -->
-                                <div class="row mb-0 mt-0 mx-auto">
-                                    <div class="col-12 col-md-10 mt-5 mx-auto mx-lg-0">
+                                <div class="row mb-0 mt-2 mx-auto">
+                                    <div class="col-12 col-md-10 mt-3 mx-auto mx-md-0 p-0">
                                         <?php
                                         if (mysqli_num_rows($selectAssessmentResult) > 0) {
                                             while ($todo = mysqli_fetch_assoc($selectAssessmentResult)) {
@@ -187,8 +205,10 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                                     $link = "test.php?testID=" . $todo['testID'];
                                                 }
                                                 ?>
-                                                <a href="<?php echo $link; ?>" class="text-decoration-none" style="display: block;">
-                                                    <div class="todo-card d-flex align-items-stretch mb-2 mx-auto mx-lg-0" style="cursor: pointer;">
+                                                <a href="<?php echo $link; ?>" class="text-decoration-none"
+                                                    style="display: block;">
+                                                    <div class="todo-card d-flex align-items-stretch mb-2 mx-auto mx-lg-0"
+                                                        style="cursor: pointer;">
                                                         <!-- Date -->
                                                         <div class="date d-flex align-items-center justify-content-center text-sbold text-20"
                                                             style="text-transform:uppercase; background-color: var(--primaryColor)">
@@ -196,10 +216,11 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                                         </div>
 
                                                         <!-- Main content -->
-                                                        <div class="d-flex flex-grow-1 flex-wrap justify-content-between p-2 w-100">
+                                                        <div
+                                                            class="d-flex flex-grow-1 flex-wrap justify-content-between p-2 w-100">
                                                             <!-- For small screen of main content -->
                                                             <div class="px-3 py-0">
-                                                                <div class="text-sbold text-16 text-start">
+                                                                <div class="text-sbold text-16 text-start assessment-title">
                                                                     <?php echo $todo['assessmentTitle']; ?>
                                                                 </div>
                                                                 <div class="text-reg text-12 text-start">
@@ -219,23 +240,21 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                                                 </div>
                                                             </div>
 
-
                                                         </div>
                                                     </div>
                                                 </a>
                                                 <?php
                                             }
                                         } else {
-                                            // Determine empty state image and message based on status filter
                                             $emptyImage = "shared/assets/img/empty/todo.png";
-
                                             if ($statusFilter == 'Missing') {
                                                 $emptyImage = "shared/assets/img/empty/quest.png";
                                             } elseif ($statusFilter == 'Done') {
                                                 $emptyImage = "shared/assets/img/empty/folder.png";
                                             }
                                             ?>
-                                            <div class="empty-state text-center py-5 d-flex flex-column align-items-center justify-content-center mx-auto">
+                                            <div
+                                                class="empty-state text-center py-5 d-flex flex-column align-items-center justify-content-center mx-auto">
                                                 <img src="<?php echo $emptyImage; ?>" alt="Empty state">
                                             </div>
                                             <?php
@@ -243,49 +262,57 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                         ?>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-     <!-- Dropdown js -->
-     <script>
-                document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
-                    const btn = dropdown.querySelector('.dropdown-btn');
-                    const list = dropdown.querySelector('.dropdown-list');
-                    const filterType = dropdown.getAttribute('data-filter');
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Filters Toggle -->
+        <script>
+            document.getElementById("filterToggle").addEventListener("click", () => {
+                document.getElementById("mobileFilters").classList.toggle("d-none");
+            });
+        </script>
 
-                    btn.addEventListener('click', (e) => {
+        <!-- Dropdown js -->
+        <script>
+            document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+                const btn = dropdown.querySelector('.dropdown-btn');
+                const list = dropdown.querySelector('.dropdown-list');
+                const filterType = dropdown.getAttribute('data-filter');
+
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    list.style.display = list.style.display === 'block' ? 'none' : 'block';
+                });
+
+                list.querySelectorAll('li').forEach(item => {
+                    item.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        list.style.display = list.style.display === 'block' ? 'none' : 'block';
-                    });
+                        const selectedValue = item.dataset.value;
+                        btn.textContent = selectedValue;
+                        list.style.display = 'none';
 
-                    list.querySelectorAll('li').forEach(item => {
-                        item.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            const selectedValue = item.dataset.value;
-                            btn.textContent = selectedValue;
-                            list.style.display = 'none';
-                            
-                            // Update URL with new filter value
-                            const urlParams = new URLSearchParams(window.location.search);
-                            urlParams.set(filterType, selectedValue);
-                            window.location.search = urlParams.toString();
-                        });
-                    });
-
-                    // Close dropdown if clicked outside
-                    document.addEventListener('click', (e) => {
-                        if (!dropdown.contains(e.target)) {
-                            list.style.display = 'none';
-                        }
+                        // Update URL with new filter value
+                        const urlParams = new URLSearchParams(window.location.search);
+                        urlParams.set(filterType, selectedValue);
+                        window.location.search = urlParams.toString();
                     });
                 });
-            </script>
+
+                // Close dropdown if clicked outside
+                document.addEventListener('click', (e) => {
+                    if (!dropdown.contains(e.target)) {
+                        list.style.display = 'none';
+                    }
+                });
+            });
+        </script>
 
 </body>
 

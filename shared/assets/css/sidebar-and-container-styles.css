@@ -75,6 +75,10 @@ body {
   border: 1px solid var(--black) !important;
 }
 
+.selected-nav-item:hover{
+  background-color: var(--primaryColor)!important;
+}
+
 /* Cancel out the global button hover effect for nav buttons */
 .nav-btn-navbar {
   transition: none !important;
@@ -100,7 +104,6 @@ button.nav-btn-navbar:hover {
   background-color: white;
   box-shadow: none !important;
 }
-
 
 
 /* Make toggler button and icon smaller */

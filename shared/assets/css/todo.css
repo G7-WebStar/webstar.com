@@ -89,53 +89,9 @@
 }
 
 /* Dropdown responsive styles */
-@media (max-width: 768px) {
-    .custom-dropdown .dropdown-btn {
-        min-width: 90px;
-        padding: 4px 12px;
-        font-size: 12px;
-       justify-content:center !important;
+ @media (max-width: 768px) {
+    .assessment-title{
+        font-size: 14px !important;
     }
-
-    .dropdown-label {
-        font-size: 12px;
-        margin-right: 4px;
-    }
-
-    .mobile-dropdown {
-        margin-left: 0.5rem;
-    }
-
-    .dropdown-list li {
-        padding: 6px 12px;
-        font-size: 12px;
-    }
-}
-
-@media (max-width: 576px) {
-    .custom-dropdown .dropdown-btn {
-        min-width: 80px;
-        padding: 3px 10px;
-        font-size: 11px;
-        justify-content: center !important;
-    }
-
-    .dropdown-label {
-        font-size: 11px;
-        margin-right: 3px;
-    }
-
-    .mobile-dropdown {
-        margin-left: 0.25rem;
-    }
-
-    .dropdown-list {
-        margin-top: 6px;
-    }
-
-    .dropdown-list li {
-        padding: 5px 10px;
-        font-size: 11px;
-    }
-}
+} 
 
