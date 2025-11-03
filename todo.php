@@ -296,10 +296,21 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Filters Toggle -->
         <script>
-            document.getElementById("filterToggle").addEventListener("click", () => {
-                document.getElementById("mobileFilters").classList.toggle("d-none");
+            const filterToggle = document.getElementById("filterToggle");
+            const mobileFilters = document.getElementById("mobileFilters");
+
+            // Restore previous state from localStorage
+            if (localStorage.getItem("filtersVisible") === "true") {
+                mobileFilters.classList.remove("d-none");
+            }
+
+            filterToggle.addEventListener("click", () => {
+                const isVisible = !mobileFilters.classList.contains("d-none");
+                mobileFilters.classList.toggle("d-none");
+                localStorage.setItem("filtersVisible", !isVisible);
             });
         </script>
+
 
         <!-- Dropdown js -->
         <script>
