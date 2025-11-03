@@ -11,7 +11,7 @@ GROUP BY courses.userID;";
 $profInfoResult = executeQuery($profInfoQuery);
 
 $courses = [];
-$result = executeQuery("SELECT * FROM courses WHERE userID = '$userID' AND isActive = 'Yes' ORDER BY courseID DESC");
+$result = executeQuery("SELECT * FROM courses WHERE userID = '$userID' AND isActive = '1' ORDER BY courseID DESC");
 if ($result && mysqli_num_rows($result) > 0) {
     while ($row = mysqli_fetch_assoc($result)) {
         $courseID = $row['courseID'];
@@ -103,14 +103,14 @@ $studentsTaughtResult = executeQuery($studentsTaughtQuery);
 
 $coursesQuery = "SELECT COUNT(*) AS activeCourses FROM courses WHERE userID = '$userID'";
 $coursesResult = executeQuery($coursesQuery);
-$activeCoursesQuery = $coursesQuery .= " AND isActive = 'Yes'";
+$activeCoursesQuery = $coursesQuery .= " AND isActive = '1'";
 $activeCoursesResult = executeQuery($activeCoursesQuery);
 
 $countAssessmentsQuery = "SELECT 
 COUNT(*) AS activeAssessments FROM assessments
 INNER JOIN courses
 	ON assessments.courseID = courses.courseID
-WHERE courses.userID = $userID AND assessments.deadline > CURRENT_DATE AND courses.isActive = 'Yes';
+WHERE courses.userID = $userID AND assessments.deadline > CURRENT_DATE AND courses.isActive = '1';
 ";
 $countAssessmentsResult = executeQuery($countAssessmentsQuery);
 
@@ -423,7 +423,7 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                                     $yearSection = ($course['yearSection'] ?? '');
                                                                     $schedule = ($course['schedule'] ?? '');
                                                                     $imageFile = trim((string) ($course['courseImage'] ?? ''));
-                                                                    $imagePath = "../shared/assets/img/home/" . $imageFile;
+                                                                    $imagePath = "../shared/assets/img/course-images/" . $imageFile;
                                                                     $fallbackImage = "../shared/assets/img/home/webdev.jpg";
                                                                 ?>
                                                                     <div class="card custom-course-card">
