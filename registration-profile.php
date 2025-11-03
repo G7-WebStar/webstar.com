@@ -168,7 +168,7 @@ include("shared/assets/processes/registration-profile-process.php");
                             <input type="file" id="fileInput" name="fileUpload" class="form-control"
                                 accept=".png, .jpg, .jpeg" required style="display:none;">
 
-                            <button type="button" class="text-med text-12 btn btn-upload mt-1" id="uploadBtn">Upload Photo</button>
+                            <button type="button" class="text-reg text-14 btn btn-upload mt-1" id="uploadBtn">Upload Photo</button>
 
                             <div class="d-flex justify-content-start justify-content-md-center w-100 mt-5">
                                 <button type="submit" name="nextBtn" class="next-btn d-flex align-items-center gap-2 text-med text-14"
