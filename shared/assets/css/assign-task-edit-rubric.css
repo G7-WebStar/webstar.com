@@ -81,7 +81,7 @@
 
 /* Total points label spacing next to Criteria button */
 .total-points-label {
-    margin-left: 490px; /* align with 710px form width (710 - 220) */
+    margin-left: 485px; /* align with 710px form width (710 - 220) */
 }
 
 /* Criteria Add Button */

@@ -162,6 +162,58 @@ if (isset($_GET['reuse'])) {
     }
 }
 
+// Fetch latest rubric for current user to display in the rubric card
+// Detect if totalPoints column exists to avoid SQL errors on older DBs
+$hasTotalPoints = false;
+$colCheck = executeQuery("SHOW COLUMNS FROM rubric LIKE 'totalPoints'");
+if ($colCheck && $colCheck->num_rows > 0) { $hasTotalPoints = true; }
+
+$rubricInfo = null;
+$selectedRubricID = isset($_GET['selectedRubricID']) ? intval($_GET['selectedRubricID']) : 0;
+if ($selectedRubricID > 0) {
+    $tpSelect = $hasTotalPoints ? "IFNULL(r.totalPoints, 0) AS totalPoints" : "0 AS totalPoints";
+    $tpGroup  = $hasTotalPoints ? ", r.totalPoints" : "";
+    $rubricQuery = "SELECT r.rubricID, r.rubricTitle, r.rubricType, $tpSelect, COUNT(c.criterionID) AS criteriaCount
+                    FROM rubric r
+                    LEFT JOIN criteria c ON c.rubricID = r.rubricID
+                    WHERE r.userID = '$userID' AND r.rubricID = '$selectedRubricID'
+                    GROUP BY r.rubricID, r.rubricTitle, r.rubricType$tpGroup
+                    LIMIT 1";
+    $rubricRes = executeQuery($rubricQuery);
+    if ($rubricRes && $rubricRes->num_rows > 0) {
+        $rubricInfo = $rubricRes->fetch_assoc();
+    }
+} else {
+    $tpSelect = $hasTotalPoints ? "IFNULL(r.totalPoints, 0) AS totalPoints" : "0 AS totalPoints";
+    $tpGroup  = $hasTotalPoints ? ", r.totalPoints" : "";
+    $rubricQuery = "SELECT r.rubricID, r.rubricTitle, r.rubricType, $tpSelect, COUNT(c.criterionID) AS criteriaCount
+                    FROM rubric r
+                    LEFT JOIN criteria c ON c.rubricID = r.rubricID
+                    WHERE r.userID = '$userID'
+                    GROUP BY r.rubricID, r.rubricTitle, r.rubricType$tpGroup
+                    ORDER BY r.rubricID DESC
+                    LIMIT 1";
+    $rubricRes = executeQuery($rubricQuery);
+    if ($rubricRes && $rubricRes->num_rows > 0) {
+        $rubricInfo = $rubricRes->fetch_assoc();
+    }
+}
+
+// Fetch all rubrics for modal list
+$rubricsList = [];
+$tpSelectList = $hasTotalPoints ? "IFNULL(r.totalPoints,0) AS totalPoints" : "0 AS totalPoints";
+$tpGroupList  = $hasTotalPoints ? ", r.totalPoints" : "";
+$rubricsQuery = "SELECT r.rubricID, r.rubricTitle, r.rubricType, $tpSelectList, COUNT(c.criterionID) AS criteriaCount
+                 FROM rubric r
+                 LEFT JOIN criteria c ON c.rubricID = r.rubricID
+                 WHERE r.userID = '$userID'
+                 GROUP BY r.rubricID, r.rubricTitle, r.rubricType$tpGroupList
+                 ORDER BY r.rubricID DESC";
+$rubricsRes = executeQuery($rubricsQuery);
+if ($rubricsRes && $rubricsRes->num_rows > 0) {
+    while ($row = $rubricsRes->fetch_assoc()) { $rubricsList[] = $row; }
+}
+
 
 ?>
 <!doctype html>
@@ -446,7 +498,7 @@ if (isset($_GET['reuse'])) {
                                                     </div>
 
 
-                                                    <div class="row mb-0 mt-3">
+                                                    <div class="row mb-0 mt-3" <?php echo $rubricInfo ? '' : 'style="display:none;"'; ?>>
                                                         <div class="col-12">
                                                             <!-- Rubric Card -->
                                                             <div
@@ -462,11 +514,11 @@ if (isset($_GET['reuse'])) {
                                                                         <div>
                                                                             <div class="text-sbold text-16"
                                                                                 style="line-height: 1.5;">
-                                                                                Essay Rubric
+                                                                                <?php echo $rubricInfo ? ($rubricInfo['rubricTitle']) : ''; ?>
                                                                             </div>
                                                                             <div class="text-reg text-12 text-break"
                                                                                 style="line-height: 1.5;">
-                                                                                20 Points · 2 Criteria
+                                                                                <?php if ($rubricInfo) { echo ($rubricInfo['totalPoints']) . ' Points · ' . intval($rubricInfo['criteriaCount']) . ' Criteria'; } ?>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -583,51 +635,35 @@ if (isset($_GET['reuse'])) {
                         <div class="card rounded-3 mb-2 border-0">
                             <div class="card-body p-0">
                                 <!-- OPTIONS -->
-                                <div class="rubric-option rounded-3 d-flex align-items-center justify-content-between mb-2"
-                                    style="cursor: pointer; background-color: var(--pureWhite); border: 1px solid var(--black);">
-                                    <div
-                                        style="line-height: 1.5; padding-left:15px; padding-right:15px; padding-top:10px; padding-bottom:10px">
-                                        <div class="text-sbold text-14">Essay Rubric</div>
-                                        <div class="text-med text-12">
-                                            20 Points · 2 Criteria
+                                <?php if (!empty($rubricsList)) { foreach ($rubricsList as $rub) { ?>
+                                    <div class="rubric-option rounded-3 d-flex align-items-center justify-content-between mb-2"
+                                        style="cursor: pointer; background-color: var(--pureWhite); border: 1px solid var(--black);"
+                                        data-rubric-id="<?php echo $rub['rubricID']; ?>"
+                                        data-rubric-title="<?php echo htmlspecialchars($rub['rubricTitle']); ?>"
+                                        data-rubric-points="<?php echo $rub['totalPoints']; ?>"
+                                        data-rubric-criteria="<?php echo (int)$rub['criteriaCount']; ?>">
+                                        <div
+                                            style="line-height: 1.5; padding-left:15px; padding-right:15px; padding-top:10px; padding-bottom:10px">
+                                            <div class="text-sbold text-14"><?php echo $rub['rubricTitle']; ?></div>
+                                            <div class="text-med text-12">
+                                                <?php echo $rub['totalPoints']; ?> Points · <?php echo (int)$rub['criteriaCount']; ?> Criteria
+                                            </div>
                                         </div>
+                                        <?php if (($rub['rubricType'] ?? '') === 'Created') { ?>
+                                            <a href="edit-rubric.php?rubricID=<?php echo $rub['rubricID']; ?>" class="text-decoration-none"
+                                               onclick="event.stopPropagation();">
+                                                <span class="material-symbols-rounded"
+                                                    style="font-variation-settings: 'FILL' 1; padding-right:15px; color: var(--black);">
+                                                    edit
+                                                </span>
+                                            </a>
+                                        <?php } ?>
                                     </div>
-                                    <span class="material-symbols-rounded"
-                                        style="font-variation-settings: 'FILL' 1; padding-right:15px">
-                                        edit
-                                    </span>
-                                </div>
-                                <div class="rubric-option rounded-3 d-flex align-items-center justify-content-between mb-2"
-                                    style="cursor: pointer; background-color: var(--primaryColor); border: 1px solid var(--black);">
-                                    <div
-                                        style="line-height: 1.5; padding-left:15px; padding-right:15px; padding-top:10px; padding-bottom:10px">
-                                        <div class="text-sbold text-14">Essay Rubric</div>
-                                        <div class="text-med text-12">
-                                            20 Points · 2 Criteria
-                                        </div>
-                                    </div>
-                                    <span class="material-symbols-rounded"
-                                        style="font-variation-settings: 'FILL' 1; padding-right:15px">
-                                        edit
-                                    </span>
-                                </div>
-
-                                <div class="rubric-option rounded-3 d-flex align-items-center justify-content-between mb-2"
-                                    style="cursor: pointer; background-color: var(--pureWhite); border: 1px solid var(--black);">
-                                    <div
-                                        style="line-height: 1.5; padding-left:15px; padding-right:15px; padding-top:10px; padding-bottom:10px">
-                                        <div class="text-sbold text-14">Essay Rubric</div>
-                                        <div class="text-med text-12">
-                                            20 Points · 2 Criteria
-                                        </div>
-                                    </div>
-                                    <span class="material-symbols-rounded"
-                                        style="font-variation-settings: 'FILL' 1; padding-right:15px">
-                                        edit
-                                    </span>
-                                </div>
+                                <?php } } else { ?>
+                                    <div class="text-muted text-reg text-14 px-3 py-2">No rubrics found. Create one.</div>
+                                <?php } ?>
                                 <!-- Select Rubric Button -->
-                                <a href="assign-task-create-rubric.php"
+                                <a href="create-rubric.php"
                                     class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14"
                                     style="background-color: var(--primaryColor); border: 1px solid var(--black);">
                                     <div style="display: flex; align-items: center; gap: 5px;">
@@ -644,7 +680,7 @@ if (isset($_GET['reuse'])) {
                 <div class="modal-footer border-top flex-shrink-0">
 
                     <!-- BUTTON -->
-                    <button type="submit" class="btn rounded-5 px-4 text-sbold text-14 me-3"
+                    <button type="button" id="confirmRubricBtn" class="btn rounded-5 px-4 text-sbold text-14 me-3"
                         style="background-color: var(--primaryColor); border: 1px solid var(--black);">
                         Select
                     </button>
@@ -963,3 +999,103 @@ if (isset($_GET['reuse'])) {
 </body>
 
 </html>
+<script>
+    // Auto-open rubric modal when returning from create-rubric
+    (function(){
+        function openRubricModal(){
+            var modalEl = document.getElementById('selectRubricModal');
+            if (!modalEl) return;
+            var modal = new bootstrap.Modal(modalEl);
+            // slight delay to ensure layout ready
+            setTimeout(function(){ modal.show(); }, 50);
+        }
+        function needsOpen(){
+            try {
+                var params = new URLSearchParams(window.location.search);
+                if (params.get('openRubric') === '1') return true;
+            } catch(e) {}
+            // also support hash trigger
+            if (window.location.hash === '#openRubric') return true;
+            return false;
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function(){ if (needsOpen()) openRubricModal(); });
+        } else {
+            if (needsOpen()) openRubricModal();
+        }
+    })();
+    // If a rubric was just created/selected via URL param, ensure the card shows and persist show state
+    (function(){
+        try {
+            var params = new URLSearchParams(window.location.search);
+            var sel = params.get('selectedRubricID');
+            if (sel) {
+                var cardRow = document.querySelector('.row.mb-0.mt-3');
+                if (cardRow) cardRow.style.display = '';
+                try { localStorage.setItem('rubricCardHidden','0'); } catch(e) {}
+            }
+        } catch(e) {}
+    })();
+    var selectedRubric = null;
+    // Hide card on load if previously closed
+    (function(){
+        try {
+            var hidden = localStorage.getItem('rubricCardHidden');
+            if (hidden === '1') {
+                var cardRow = document.querySelector('.row.mb-0.mt-3');
+                if (cardRow) cardRow.style.display = 'none';
+            }
+        } catch (e) {}
+    })();
+
+    // Click on a rubric option: highlight and store selection
+    document.addEventListener('click', function(e){
+        var opt = e.target.closest && e.target.closest('.rubric-option');
+        if (!opt) return;
+
+        // Clear previous highlight
+        document.querySelectorAll('.rubric-option').forEach(function(el){
+            el.style.backgroundColor = 'var(--pureWhite)';
+        });
+        // Highlight selected (yellow)
+        opt.style.backgroundColor = 'var(--primaryColor)';
+
+        selectedRubric = {
+            id: opt.getAttribute('data-rubric-id'),
+            title: opt.getAttribute('data-rubric-title'),
+            points: opt.getAttribute('data-rubric-points'),
+            criteria: opt.getAttribute('data-rubric-criteria')
+        };
+    });
+
+    // Confirm selection: apply to card and close modal
+    document.addEventListener('click', function(e){
+        var btn = e.target.closest && e.target.closest('#confirmRubricBtn');
+        if (!btn) return;
+        if (!selectedRubric) return;
+
+        var cardRow = document.querySelector('.row.mb-0.mt-3');
+        if (cardRow) cardRow.style.display = '';
+        var titleEl = document.querySelector('.materials-card .text-sbold.text-16');
+        var metaEl = document.querySelector('.materials-card .text-reg.text-12');
+        if (titleEl) titleEl.textContent = selectedRubric.title;
+        if (metaEl) metaEl.textContent = selectedRubric.points + ' Points · ' + selectedRubric.criteria + ' Criteria';
+
+        var modalEl = document.getElementById('selectRubricModal');
+        if (modalEl) {
+            var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            modal.hide();
+        }
+        try { localStorage.setItem('rubricCardHidden','0'); } catch(e) {}
+    });
+
+    // X/close on rubric card hides the card
+    document.addEventListener('click', function(e){
+        var closeIcon = e.target.closest && e.target.closest('.materials-card .material-symbols-outlined');
+        if (closeIcon) {
+            var cardRow = closeIcon.closest('.row.mb-0.mt-3');
+            if (cardRow) cardRow.style.display = 'none';
+            try { localStorage.setItem('rubricCardHidden','1'); } catch(e) {}
+        }
+    });
+</script>
