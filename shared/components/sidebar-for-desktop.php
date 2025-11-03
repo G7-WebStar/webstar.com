@@ -90,7 +90,17 @@ if ($userId !== null) {
 $_SESSION['InboxCount'] = $unreadInboxCount;
 $_SESSION['TodoNewCount'] = $newTodoCount;
 
+// Get username and pfp
 
+$userID = $_SESSION['userID'];
+
+$usernameAndProfilePictureQuery = "SELECT u.userName, ui.profilePicture
+FROM users u
+JOIN userinfo ui ON u.userID = ui.userID
+WHERE u.userID = $userID";
+
+$result = executeQuery($usernameAndProfilePictureQuery); // use only this
+$user = mysqli_fetch_assoc($result);
 ?>
 
 <div class="col-auto d-none d-md-block">
@@ -145,7 +155,8 @@ $_SESSION['TodoNewCount'] = $newTodoCount;
                         data-page="shop">
                         <img src="shared/assets/img/todo.png" class="img-fluid" style="width: 30px; height: 30px;">
                         <a class="nav-link p-0 text-med text-18 ps-2 <?php echo ($activePage == 'todo') ? 'selected' : ''; ?>"
-                            href="todo.php" style="text-decoration: none; color:var(--black)"><strong>To-do</strong></a>
+                            href="todo.php"
+                            style="text-decoration: none; color:var(--black)"><strong>Quests</strong></a>
                         <?php $displayTodo = isset($newTodoCount) ? (int) $newTodoCount : (isset($_SESSION['TodoNewCount']) ? (int) $_SESSION['TodoNewCount'] : 0);
                         if ($displayTodo > 0) { ?>
                             <span class="badge-container ms-auto me-1">
