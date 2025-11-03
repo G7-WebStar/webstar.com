@@ -54,7 +54,7 @@
 
 .btn-upload {
     width: 120px;
-    border-radius: 15px;
+    border-radius: 25px;
     background-color: var(--primaryColor);
     border: 1px solid var(--black);
     color: var(--black);
