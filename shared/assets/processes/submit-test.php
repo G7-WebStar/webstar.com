@@ -25,6 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     echo json_encode(["status" => "success"]);
 
+    //Indicates in the DB that the test has been submitted and determines the amount of time to answer and submit the test
+    $timeSpent = $data['timeSpent'];
     $updateTodoStatusQuery = "UPDATE todo
                                       INNER JOIN assessments
                                       	ON todo.assessmentID = assessments.assessmentID
@@ -34,7 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                       	ON assignments.assessmentID = todo.assessmentID
                                       LEFT JOIN tests
                                       	ON tests.assessmentID = todo.assessmentID
-                                      SET todo.status ='Submitted' 
+                                      SET todo.status ='Submitted',
+                                          todo.timeSpent = '$timeSpent',
+                                          todo.updatedAt = CURRENT_TIMESTAMP
                                       WHERE todo.userID = '$userID' AND todo.status = 'Pending' AND assessments.type = 'Test' AND tests.testID = '$testID'";
     $updateTodoStatusResult = executeQuery($updateTodoStatusQuery);
 }

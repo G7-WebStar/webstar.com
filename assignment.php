@@ -247,11 +247,23 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
                                 <div class="cardSticky position-sticky" style="top: 20px;">
                                     <div class="p-2">
                                         <div class="text-sbold text-16">My work</div>
-                                        <div class="cardFile text-sbold text-16 my-3">
-                                            <i class="p-3 fa-solid fa-file"></i> Submission
+                                        <div
+                                            class="cardFile text-sbold text-16 my-3 d-flex align-items-center justify-content-between">
+                                            <!-- Left: File Icon and Name -->
+                                            <div class="d-flex align-items-center">
+                                                <span class="material-symbols-outlined p-2 pe-2"
+                                                    style="font-variation-settings:'FILL' 1;">draft</span>
+                                                <span class="ms-2">Submission</span>
+                                            </div>
+
+                                            <!-- Right: Close Button -->
+                                            <button type="button" class="border-0 bg-transparent mt-2"
+                                                aria-label="Close" onclick="removeFileCard(this)">
+                                                <span class="material-symbols-outlined">close</span>
+                                            </button>
                                         </div>
 
-                                        <div class="text-sbold text-16">Status</div>
+                                        <div class="text-sbold text-16 mt-3">Status</div>
                                         <ul class="timeline list-unstyled small my-3">
                                             <li class="timeline-item">
                                                 <div class="timeline-circle bg-dark"></div>
@@ -278,11 +290,38 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
                                             </li>
                                         </ul>
 
-                                        <div class="d-flex gap-2 pt-3">
-                                            <button class="button px-3 py-1 flex-fill rounded-pill text-reg text-md-14">
-                                                + Attach Files
-                                            </button>
-                                            <button class="button px-3 py-1 flex-fill rounded-pill text-reg text-md-14"
+                                        <div class="mt-0 mb-4 d-flex flex-column align-items-center">
+                                            <!-- Hidden File Input -->
+                                            <input type="file" name="materials[]" class="d-none" id="fileUpload"
+                                                multiple>
+
+                                            <!-- Top Buttons: File & Link -->
+                                            <div class="d-flex gap-2 mb-3">
+                                                <button type="button"
+                                                    class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14"
+                                                    style="border: 1px solid var(--black);"
+                                                    onclick="document.getElementById('fileUpload').click();">
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <span class="material-symbols-outlined"
+                                                            style="font-size:20px">upload</span>
+                                                        <span>File</span>
+                                                    </div>
+                                                </button>
+
+                                                <button type="button"
+                                                    class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14"
+                                                    style="border: 1px solid var(--black);">
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <span class="material-symbols-rounded"
+                                                            style="font-size:20px">link</span>
+                                                        <span>Link</span>
+                                                    </div>
+                                                </button>
+                                            </div>
+
+                                            <!-- Full-width Turn In Button -->
+                                            <button type="button"
+                                                class="btn px-4 py-2 text-reg text-md-14 rounded-4 w-75"
                                                 style="background-color: var(--primaryColor);">
                                                 Turn In
                                             </button>
@@ -472,7 +511,7 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
                 <div class="modal-footer">
                     <div class="container">
                         <div class="row justify-content-end py-2">
-                            
+
                         </div>
                     </div>
                 </div>
@@ -509,6 +548,12 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
                 }
             });
         });
+        function removeFileCard(button) {
+            const card = button.closest('.cardFile'); // get the parent card
+            if (card) {
+                card.remove(); // remove it from the DOM
+            }
+        }
     </script>
 </body>
 

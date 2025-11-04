@@ -3,6 +3,75 @@
 include("../shared/assets/database/connect.php");
 include("../shared/assets/processes/prof-session-process.php");
 ?>
+<?php
+// Load rubric data for edit
+$rubricID = isset($_GET['rubricID']) ? intval($_GET['rubricID']) : 0;
+$rubricTitle = '';
+$totalPoints = 0;
+$criterionID = 0; $criteriaTitle = ''; $criteriaDescription = '';
+$levelID = 0; $levelTitle = ''; $levelDescription = ''; $points = 0;
+
+if ($rubricID > 0) {
+    $rubSql = "SELECT rubricTitle, IFNULL(totalPoints,0) AS totalPoints FROM rubric WHERE rubricID='$rubricID' AND userID='$userID' LIMIT 1";
+    $rub = executeQuery($rubSql);
+    if ($rub && $rub->num_rows > 0) {
+        $r = $rub->fetch_assoc();
+        $rubricTitle = $r['rubricTitle'];
+        $totalPoints = (float)$r['totalPoints'];
+    }
+
+    $critSql = "SELECT criterionID, criteriaTitle, criteriaDescription FROM criteria WHERE rubricID='$rubricID' ORDER BY criterionID ASC LIMIT 1";
+    $crit = executeQuery($critSql);
+    if ($crit && $crit->num_rows > 0) {
+        $c = $crit->fetch_assoc();
+        $criterionID = intval($c['criterionID']);
+        $criteriaTitle = $c['criteriaTitle'];
+        $criteriaDescription = $c['criteriaDescription'];
+    }
+
+    if ($criterionID > 0) {
+        $lvlSql = "SELECT levelID, levelTitle, levelDescription, points FROM level WHERE criterionID='$criterionID' ORDER BY levelID ASC LIMIT 1";
+        $lvl = executeQuery($lvlSql);
+        if ($lvl && $lvl->num_rows > 0) {
+            $l = $lvl->fetch_assoc();
+            $levelID = intval($l['levelID']);
+            $levelTitle = $l['levelTitle'];
+            $levelDescription = $l['levelDescription'];
+            $points = (float)$l['points'];
+        }
+    }
+}
+
+// Handle update (hidden form submission)
+if (isset($_POST['update_rubric'])) {
+    $rubricID = intval($_POST['rubricID']);
+    $criterionID = intval($_POST['criterionID']);
+    $levelID = intval($_POST['levelID']);
+
+    $rubricTitle = mysqli_real_escape_string($conn, $_POST['rubricTitle'] ?? '');
+    $criteriaTitle = mysqli_real_escape_string($conn, $_POST['criteriaTitle'] ?? '');
+    $criteriaDescription = mysqli_real_escape_string($conn, $_POST['criteriaDescription'] ?? '');
+    $levelTitle = mysqli_real_escape_string($conn, $_POST['levelTitle'] ?? '');
+    $levelDescription = mysqli_real_escape_string($conn, $_POST['levelDescription'] ?? '');
+    $points = isset($_POST['points']) && $_POST['points'] !== '' ? floatval($_POST['points']) : 0;
+
+    $qr = "UPDATE rubric SET rubricTitle='$rubricTitle', totalPoints='$points' WHERE rubricID='$rubricID' AND userID='$userID'";
+    executeQuery($qr);
+
+    if ($criterionID > 0) {
+        $qc = "UPDATE criteria SET criteriaTitle='$criteriaTitle', criteriaDescription='$criteriaDescription' WHERE criterionID='$criterionID'";
+        executeQuery($qc);
+    }
+
+    if ($levelID > 0) {
+        $ql = "UPDATE level SET levelTitle='$levelTitle', levelDescription='$levelDescription', points='$points' WHERE levelID='$levelID'";
+        executeQuery($ql);
+    }
+
+    header('Location: assign-task.php');
+    exit;
+}
+?>
 
 <!doctype html>
 <html lang="en">
@@ -58,7 +127,7 @@ include("../shared/assets/processes/prof-session-process.php");
                                 <!-- Header -->
                                 <div class="row mb-3 align-items-center">
                                     <div class="col-auto">
-                                        <a href="#" class="text-decoration-none">
+                                        <a href="assign-task.php" class="text-decoration-none">
                                             <i class="fa-solid fa-arrow-left text-reg text-16"
                                                 style="color: var(--black);"></i>
                                         </a>
@@ -74,7 +143,7 @@ include("../shared/assets/processes/prof-session-process.php");
                                         <div class="col-12 pt-3 mb-2">
                                             <label for="rubricInfo" class="form-label text-med text-16">Rubric
                                                 Information</label>
-                                            <input type="text"
+                                            <input type="text" value="<?php echo htmlspecialchars($rubricTitle); ?>"
                                                 class="form-control textbox mb-3 p-3 text-reg text-14 text-muted"
                                                 id="rubricInfo" aria-describedby="rubricInfo"
                                                 placeholder="Rubric Title">
@@ -115,7 +184,7 @@ include("../shared/assets/processes/prof-session-process.php");
                                         <div class="col-12 pt-2 mb-2">
                                             <label for="criteriaTitle" class="form-label text-med text-16">Criteria
                                                 Title</label>
-                                            <input type="text"
+                                            <input type="text" value="<?php echo htmlspecialchars($criteriaTitle); ?>"
                                                 class="form-control textbox mb-1 p-3 text-reg text-14 text-muted"
                                                 id="criteriaTitle" aria-describedby="criteriaTitle"
                                                 placeholder="Criteria Title">
@@ -127,7 +196,7 @@ include("../shared/assets/processes/prof-session-process.php");
                                 <form class="criterion-description">
                                     <div class="row">
                                         <div class="col-12 pt-2 mb-2">
-                                            <input type="text"
+                                            <input type="text" value="<?php echo htmlspecialchars($criteriaDescription); ?>"
                                                 class="form-control textbox mb-2 p-3 text-reg text-14 text-muted"
                                                 id="criterionDescription" aria-describedby="criterionDescription"
                                                 placeholder="Criterion Description">
@@ -145,7 +214,7 @@ include("../shared/assets/processes/prof-session-process.php");
                                                 <form class="level-title">
                                                     <div class="row">
                                                         <div class="col-12 pt-2 mb-2">
-                                                            <input type="text"
+                                                            <input type="text" value="<?php echo htmlspecialchars($levelTitle); ?>"
                                                                 class="form-control textbox mb-1 p-3 text-reg text-14 text-muted"
                                                                 id="levelTitle" aria-describedby="levelTitle"
                                                                 placeholder="Level Title">
@@ -163,7 +232,7 @@ include("../shared/assets/processes/prof-session-process.php");
                                                 <form class="level-description">
                                                     <div class="row">
                                                         <div class="col-12 pt-2 mb-2">
-                                                            <input type="text"
+                                                            <input type="text" value="<?php echo htmlspecialchars($levelDescription); ?>"
                                                                 class="form-control textbox mb-1 p-3 text-reg text-14 text-muted"
                                                                 id="levelDescription"
                                                                 aria-describedby="levelDescription"
@@ -177,7 +246,7 @@ include("../shared/assets/processes/prof-session-process.php");
                                                     <div class="row">
                                                         <div class="col-12 pt-2 mb-3">
                                                             <label for="criteriaTitle" class="form-label">Points</label>
-                                                            <input type="text"
+                                                            <input type="text" value="<?php echo htmlspecialchars($points); ?>"
                                                                 class="form-control textbox mb-1 p-3 text-reg text-14 text-muted"
                                                                 id="pointsLabel" aria-describedby="pointsLabel"
                                                                 placeholder="1">
@@ -211,16 +280,16 @@ include("../shared/assets/processes/prof-session-process.php");
                                                 aria-hidden="true">add_circle</span>
                                             Criteria
                                         </button>
-                                        <span class="text-med text-16 total-points-label">Total Points: 10</span>
+                                        <span class="text-med text-16 total-points-label">Total Points: <?php echo (float)$totalPoints; ?></span>
                                     </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-12">
-                                        <button type="button"
+                                        <button type="button" id="updateBtn"
                                             class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 d-inline-flex align-items-center criteria-add-btn"
                                             style="background-color: var(--primaryColor); border: 1px solid var(--black); margin-right: auto;">
-                                            Create
+                                            Update
                                         </button>
                                     </div>
                                 </div>
@@ -233,6 +302,34 @@ include("../shared/assets/processes/prof-session-process.php");
 
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+        <form method="POST" id="hiddenEditPost" style="display:none;">
+            <input type="hidden" name="update_rubric" value="1">
+            <input type="hidden" name="rubricID" value="<?php echo $rubricID; ?>">
+            <input type="hidden" name="criterionID" value="<?php echo $criterionID; ?>">
+            <input type="hidden" name="levelID" value="<?php echo $levelID; ?>">
+            <input type="hidden" name="rubricTitle" id="post_rubricTitle">
+            <input type="hidden" name="criteriaTitle" id="post_criteriaTitle">
+            <input type="hidden" name="criteriaDescription" id="post_criteriaDescription">
+            <input type="hidden" name="levelTitle" id="post_levelTitle">
+            <input type="hidden" name="levelDescription" id="post_levelDescription">
+            <input type="hidden" name="points" id="post_points">
+        </form>
+        <script>
+            (function(){
+                var btn = document.getElementById('updateBtn');
+                if (!btn) return;
+                btn.addEventListener('click', function(){
+                    var get = function(id){ var el = document.getElementById(id); return el && el.value ? el.value.trim() : ''; };
+                    document.getElementById('post_rubricTitle').value = get('rubricInfo');
+                    document.getElementById('post_criteriaTitle').value = get('criteriaTitle');
+                    document.getElementById('post_criteriaDescription').value = get('criterionDescription');
+                    document.getElementById('post_levelTitle').value = get('levelTitle');
+                    document.getElementById('post_levelDescription').value = get('levelDescription');
+                    document.getElementById('post_points').value = get('pointsLabel');
+                    document.getElementById('hiddenEditPost').submit();
+                });
+            })();
+        </script>
 
 </body>
 

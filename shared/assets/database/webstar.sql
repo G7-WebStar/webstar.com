@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 03, 2025 at 11:08 AM
+-- Generation Time: Nov 03, 2025 at 04:12 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -245,6 +245,15 @@ CREATE TABLE `criteria` (
   `criteriaDescription` varchar(500) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `criteria`
+--
+
+INSERT INTO `criteria` (`criterionID`, `rubricID`, `criteriaTitle`, `criteriaDescription`) VALUES
+(1, 1, 'Voice, Style, and Imagery', 'Assesses the development of a distinct and compelling writer\'s voice, the effectiveness of word choice (diction), and the use of sensory details and figurative language (imagery) to create a vivid experience for the reader.'),
+(2, 1, 'Narrative Structure and Pacing', 'Assesses the effective management of the plot (beginning, rising action, climax, resolution), character development (if applicable), and the manipulation of time and speed (pacing) to build tension and interest.'),
+(3, 2, 'Participation and Initiative', 'Assesses the student\'s level of engagement, attendance at meetings, willingness to take on tasks, and proactive approach to contributing ideas and effort to the team\'s goals.');
+
 -- --------------------------------------------------------
 
 --
@@ -408,6 +417,15 @@ CREATE TABLE `level` (
   `points` decimal(5,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `level`
+--
+
+INSERT INTO `level` (`levelID`, `criterionID`, `levelTitle`, `levelDescription`, `points`) VALUES
+(1, 1, 'Exemplary (A)', 'The writing demonstrates a unique, sophisticated, and memorable voice. Imagery is fresh, powerful, and deeply evocative, seamlessly integrating figurative language (metaphor, simile) that enriches the meaning. Diction is precise and masterful.', 30.00),
+(2, 2, 'Exemplary (A)', 'The structure is innovative and perfectly paced, maintaining tension and emotional resonance throughout. Characters (if present) are complex and fully realized, undergoing believable development. The ending is highly satisfying and meaningful.', 50.00),
+(3, 3, 'Exemplary (A)', 'Is a driving force in the group; consistently attends and is highly prepared for all meetings. Proactively seeks out complex tasks and offers creative solutions, motivating others to contribute effectively.', 50.00);
+
 -- --------------------------------------------------------
 
 --
@@ -519,8 +537,17 @@ CREATE TABLE `rubric` (
   `rubricID` int(11) NOT NULL,
   `rubricTitle` varchar(100) NOT NULL,
   `rubricType` varchar(20) NOT NULL,
-  `userID` int(11) DEFAULT NULL
+  `userID` int(11) DEFAULT NULL,
+  `totalPoints` int(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `rubric`
+--
+
+INSERT INTO `rubric` (`rubricID`, `rubricTitle`, `rubricType`, `userID`, `totalPoints`) VALUES
+(1, 'Creative Writing Assessment', 'Created', 1, 80),
+(2, 'Group Collaboration and Contribution', 'Preset', 1, 50);
 
 -- --------------------------------------------------------
 
@@ -1119,7 +1146,7 @@ ALTER TABLE `courseschedule`
 -- AUTO_INCREMENT for table `criteria`
 --
 ALTER TABLE `criteria`
-  MODIFY `criterionID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `criterionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `enrollments`
@@ -1161,7 +1188,7 @@ ALTER TABLE `lessons`
 -- AUTO_INCREMENT for table `level`
 --
 ALTER TABLE `level`
-  MODIFY `levelID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `levelID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `points`
@@ -1191,7 +1218,7 @@ ALTER TABLE `report`
 -- AUTO_INCREMENT for table `rubric`
 --
 ALTER TABLE `rubric`
-  MODIFY `rubricID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `rubricID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `scores`
