@@ -293,7 +293,7 @@ a.btn:hover {
 @media (max-width: 767.98px) {
   .row-padding-top {
     margin-top: 60px !important; /* Mobile only */
-    margin-bottom: 90px !important; /* Mobile only */
+    margin-bottom: 0px !important; /* Mobile only */
   }
 }
 

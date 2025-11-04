@@ -1,40 +1,100 @@
+<?php
+include('shared/assets/database/connect.php');
+include("shared/assets/processes/session-process.php");
+
+$userID = $_SESSION['userID'] ?? 2;
+
+// ---  Get Assessments (Deadlines)
+$assessmentsQuery = "
+SELECT a.assessmentTitle, a.deadline, c.courseCode
+FROM assessments a
+JOIN courses c ON a.courseID = c.courseID
+JOIN enrollments e ON c.courseID = e.courseID
+WHERE e.userID = ? AND c.isActive = 1
+";
+$stmt1 = $conn->prepare($assessmentsQuery);
+$stmt1->bind_param('i', $userID);
+$stmt1->execute();
+$assessmentsResult = $stmt1->get_result();
+$assessments = $assessmentsResult->fetch_all(MYSQLI_ASSOC);
+
+// ---  Get Course Schedules
+$schedulesQuery = "
+SELECT cs.day, cs.startTime, cs.endTime, c.courseTitle
+FROM courseschedule cs
+JOIN courses c ON cs.courseID = c.courseID
+JOIN enrollments e ON c.courseID = e.courseID
+WHERE e.userID = ? AND c.isActive = 1
+";
+$stmt2 = $conn->prepare($schedulesQuery);
+$stmt2->bind_param('i', $userID);
+$stmt2->execute();
+$schedulesResult = $stmt2->get_result();
+$schedules = $schedulesResult->fetch_all(MYSQLI_ASSOC);
+
+// ---  Build Events
+$events = [];
+
+foreach ($assessments as $a) {
+    $events[] = [
+        'title' => $a['assessmentTitle'] . " · " . $a['courseCode'],
+        'start' => $a['deadline'],
+        'backgroundColor' => 'var(--primaryColor)', // Blueish background for schedules
+        'borderColor' => 'var(--primaryColor)',
+        'textColor' => 'var(--black)',
+
+    ];
+}
+
+$dayMap = [
+    'Sunday' => 0,
+    'Monday' => 1,
+    'Tuesday' => 2,
+    'Wednesday' => 3,
+    'Thursday' => 4,
+    'Friday' => 5,
+    'Saturday' => 6
+];
+
+foreach ($schedules as $s) {
+    $events[] = [
+        'title' => $s['courseTitle'] . ' ' . $s['startTime'] . '-' . $s['endTime'], // show time in title
+        'daysOfWeek' => [$dayMap[$s['day']]], // keep recurring
+        'allDay' => true, // makes it a pill instead of a dot
+        'backgroundColor' => 'var(--primaryColor)',
+        'borderColor' => 'var(--primaryColor)',
+        'textColor' => 'var(--black)'
+    ];
+}
+
+$eventsJson = json_encode($events);
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Calendar Demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Calendar</title>
 
-    <!-- FullCalendar CSS -->
+    <!-- FullCalendar -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 
     <!-- jQuery + Moment -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
-
-    <!-- FullCalendar JS -->
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 
     <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Icons and Fonts -->
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
-        rel="stylesheet" />
 
-    <!-- Global and Layout Styles -->
+    <!-- Global Styles -->
     <link rel="stylesheet" href="shared/assets/css/global-styles.css">
     <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
     <link rel="stylesheet" href="shared/assets/css/calendar.css">
-
 
     <style>
         body {
@@ -44,68 +104,85 @@
 
         a {
             text-decoration: none !important;
+            color: var(--black) !important;
         }
 
         #kt_docs_fullcalendar_basic {
             width: 100%;
             max-width: 100%;
-            /* remove fixed limit */
             margin: 0 auto;
             min-height: 500px;
         }
 
         .fc-toolbar-title {
             font-family: var(--SemiBold) !important;
+            letter-spacing: -0.03em !important;
         }
 
         .fc-scroller {
             overflow: hidden !important;
         }
 
-        .fc .fc-button-primary {
-            background-color: var(--black) !important;
+        /* Make buttons smaller on mobile */
+        @media (max-width: 768px) {
+            .fc .fc-toolbar.fc-header-toolbar {
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+
+            .fc-toolbar-title {
+                font-size: 1.2rem !important;
+            }
         }
 
-        a {
-            color: var(--black) !important;
-        }
-
-        .fc-daygrid-event-dot {
-            border-color: var(--black) !important;
-        }
-
-        .fc-event-title-container {
-            background-color: var(--primaryColor) !important;
-            border-color: var(--primaryColor) !important;
-        }
-
-        .fc-event-title {
-            color: var(--black) !important;
-        }
-
-        .fc-event-main {
-            background-color: var(--primaryColor) !important;
-        }
-
-        /* Remove background and border from all FullCalendar events */
-
-        .fc-daygrid-event,
-        .fc-h-event {
-            background-color: var(--primaryColor) !important;
-            border-color: var(--primaryColor) !important;
-        }
-
+        .fc-event-title,
         .fc-event-time {
             color: var(--black) !important;
         }
 
-        .fc-list-event-dot {
-            border-color: var(--black) !important;
+        /* Shrink day cells on mobile for better fit */
+        @media (max-width: 500px) {
+            .fc-daygrid-day-number {
+                font-size: 0.8rem;
+            }
 
+            .fc-daygrid-event {
+                font-size: 0.75rem;
+                padding: 2px 4px;
+            }
         }
 
-        .fc-theme-standard .fc-list-day-cushion {
-            background-color: color-mix(in srgb, var(--primaryColor) 50%, transparent);
+        /* FullCalendar arrow buttons */
+        .fc .fc-prev-button,
+        .fc .fc-next-button {
+            background-color: transparent;
+            /* pastel blue background */
+            color: var(---black);
+            /* arrow color */
+            border-radius: 8px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease;
+        }
+
+        /* Remove all hover, focus, active effects */
+        .fc .fc-prev-button:hover,
+        .fc .fc-next-button:hover,
+        .fc .fc-today-button:hover,
+        .fc .fc-prev-button:focus,
+        .fc .fc-next-button:focus,
+        .fc .fc-today-button:focus,
+        .fc .fc-prev-button:active,
+        .fc .fc-next-button:active,
+        .fc .fc-today-button:active {
+            background-color: transparent !important;
+            color: var(--black) !important;
+            box-shadow: none !important;
+            outline: none !important;
+            transform: none !important;
+            /* remove click “shift” */
         }
     </style>
 </head>
@@ -122,78 +199,137 @@
             <!-- Sidebar Column (fixed on desktop) -->
             <?php include 'shared/components/sidebar-for-desktop.php'; ?>
 
-            <!-- Main Container Column -->
+            <!-- Main Container Column-->
             <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-0 p-md-4 overflow-y-auto">
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
 
                     <!-- Navbar for mobile -->
-                    <nav class="navbar navbar-light px-3 d-md-none">
-                        <div class="container-fluid position-relative">
-                            <!-- Toggler -->
-                            <button class="navbar-toggler position-absolute start-0 p-1" type="button"
-                                data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">
-                                <span class="navbar-toggler-icon"></span>
-                            </button>
-
-                            <!-- Logo -->
-                            <a class="navbar-brand mx-auto" href="#">
-                                <img src="shared/assets/img/webstar-logo-black.png" alt="Webstar"
-                                    style="height: 40px; padding-left: 30px">
-                            </a>
-                        </div>
-                    </nav>
-
-                    <div class="container-fluid py-3 overflow-y-auto row-padding-top" style="position: relative;">
-                        <div class="row g-0 w-100">
-                            <!-- CALENDAR -->
+                    <?php include 'shared/components/navbar-for-mobile.php'; ?>
+                    <div class="container-fluid overflow-y-auto row-padding-top" style="position: relative;">
+                        <div class="row g-0 w-100 mt-4 mt-md-0">
                             <div id="kt_docs_fullcalendar_basic"></div>
                         </div>
                     </div>
+
                 </div>
+
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const todayDate = moment().startOf('day');
-            const YM = todayDate.format('YYYY-MM');
-            const TODAY = todayDate.format('YYYY-MM-DD');
-            const TOMORROW = todayDate.clone().add(1, 'day').format('YYYY-MM-DD');
-
+        document.addEventListener('DOMContentLoaded', function () {
             const calendarEl = document.getElementById('kt_docs_fullcalendar_basic');
-            const calendar = new FullCalendar.Calendar(calendarEl, {
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
-                },
-                initialView: 'dayGridMonth',
-                editable: false, // disables both dragging and resizing
-                initialDate: TODAY,
-                nowIndicator: true,
-                navLinks: true,
-                dayMaxEvents: true,
-                height: "auto",
-                aspectRatio: 1.5, // makes it scale based on width
-                events: [
-                    { title: 'All Day Event', start: YM + '-01', className: "fc-event-danger" },
-                    { title: 'Meeting', start: TODAY + 'T10:30:00', end: TODAY + 'T12:30:00' },
-                    { title: 'Lunch', start: TODAY + 'T12:00:00' },
-                    { title: 'Birthday Party', start: TOMORROW + 'T07:00:00', className: "fc-event-primary" },
-                    { title: 'Click for Google', url: 'https://google.com/', start: YM + '-28' }
-                ],
-            });
 
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                events: <?php echo $eventsJson; ?>,
+                // Format event time as AM/PM
+    eventTimeFormat: {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true // <-- this makes it AM/PM
+    },
+                headerToolbar: {
+                    left: 'prev',      // Previous button on the left
+                    center: 'title',   // Month title in center
+                    right: 'next'      // Next button on the right
+                },
+                initialView: 'dayGridMonth', // Show monthly view
+                // Show all events without collapsing into "+N more"
+                dayMaxEventRows: true, // allows multiple rows of events
+                dayMaxEvents: false,   // prevents the "+N more" collapse
+
+                // Optional styling
+                height: "auto",
+
+                eventDidMount: function (info) {
+                    // Make event cursor a pointer
+                    info.el.style.cursor = 'pointer';
+
+                    // Remove default title tooltip
+                    info.el.removeAttribute('title');
+
+                    info.el.addEventListener('click', function (e) {
+                        e.stopPropagation();
+
+                        // Remove existing tooltips
+                        document.querySelectorAll('.fc-tooltip').forEach(t => t.remove());
+
+                        // Create custom tooltip
+                        const tooltip = document.createElement('div');
+                        tooltip.className = 'fc-tooltip';
+                        tooltip.textContent = info.event.title;
+
+                        // Tooltip styling
+                        Object.assign(tooltip.style, {
+                            position: 'absolute',
+                            backgroundColor: 'var(--pureWhite)',
+                            color: 'var(--black)',
+                            border: '1px solid var(--black)',
+                            padding: '8px 5px',
+                            borderRadius: '5px',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                            fontSize: '14px',
+                            zIndex: 9999,
+                            whiteSpace: 'nowrap',
+                            pointerEvents: 'none',
+                            transition: 'opacity 0.2s',
+                            opacity: 0
+                        });
+
+                        document.body.appendChild(tooltip);
+
+                        const rect = info.el.getBoundingClientRect();
+                        const scrollTop = window.scrollY;
+                        const scrollLeft = window.scrollX;
+
+                        // Position above the event
+                        let top = rect.top + scrollTop - tooltip.offsetHeight - 8;
+                        let left = rect.left + scrollLeft + rect.width / 2 - tooltip.offsetWidth / 2;
+
+                        // Flip below if near top
+                        if (top < scrollTop + 10) {
+                            top = rect.bottom + scrollTop + 8;
+                        }
+
+                        // Prevent overflow
+                        if (left + tooltip.offsetWidth > scrollLeft + window.innerWidth - 10) {
+                            left = scrollLeft + window.innerWidth - tooltip.offsetWidth - 10;
+                        }
+                        if (left < scrollLeft + 10) {
+                            left = scrollLeft + 10;
+                        }
+
+                        tooltip.style.top = top + 'px';
+                        tooltip.style.left = left + 'px';
+                        tooltip.style.opacity = 1;
+
+                        // Remove tooltip on next click anywhere
+                        const removeTooltip = () => {
+                            tooltip.remove();
+                            document.removeEventListener('click', removeTooltip);
+                        };
+                        setTimeout(() => {
+                            document.addEventListener('click', removeTooltip);
+                        }, 0);
+                    });
+                }
+            });
             calendar.render();
 
-            // Re-render on window resize for responsiveness
-            window.addEventListener('resize', () => {
+            // Force FullCalendar to recalc sizes after a small delay
+            setTimeout(() => {
                 calendar.updateSize();
-            });
+            }, 100);
         });
+
     </script>
+
 </body>
 
 </html>

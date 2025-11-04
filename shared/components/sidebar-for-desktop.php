@@ -218,6 +218,14 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                             </a>
                         </li>
 
+                        <!-- Settings -->
+                        <li style="margin-bottom:6px;">
+                            <a class="dropdown-item d-flex align-items-center text-med text-14" href="calendar.php">
+                                <span class="material-symbols-rounded me-2" style="font-size:18px;">calendar_month</span>
+                                Calendar
+                            </a>
+                        </li>
+
                         <!-- Profile -->
                         <li style="margin-bottom:6px;">
                             <a class="dropdown-item d-flex align-items-center text-med text-14" href="profile.php">
@@ -254,7 +262,7 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                 <input type="text" id="searchInput" class="form-control rounded-pill pt-3 pb-3"
                     placeholder="Search students & professors"
                     style="border: 1.5px solid #2c2c2c; padding-right: 5rem; padding-left: 27px;">
-                <span class="material-symbols-outlined pe-3" style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%);
+                <span class="material-symbols-rounded pe-3" style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%);
           color: #2c2c2c; font-size: 24px;">search</span>
             </form>
 
