@@ -13,7 +13,10 @@ if (mysqli_num_rows($submissionValidationResult) > 0) {
     exit();
 }
 
-$selectTestQuery = "SELECT testTitle, generalGuidance FROM tests WHERE testID = $testID";
+$selectTestQuery = "SELECT assessmentTitle, generalGuidance FROM tests 
+                    INNER JOIN assessments
+                        ON tests.assessmentID = assessments.assessmentID
+                    WHERE testID = $testID";
 $selectTestResult = executeQuery($selectTestQuery);
 
 $selectQuestionsQuery = "SELECT 
@@ -24,31 +27,16 @@ INNER JOIN testquestions
 WHERE tests.testID = $testID";
 $selectQuestionsResult = executeQuery($selectQuestionsQuery);
 
-$validateTestIDQuery = "SELECT
-    tests.testID,
-	assignments.assignmentID,
-    assessments.*,
-    assessments.assessmentTitle AS assessmentTitle,
-    todo.*,
-    todo.title AS todoTitle,
-    courses.courseCode,
-    DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline
-    FROM assessments
-    INNER JOIN courses
-        ON assessments.courseID = courses.courseID
-    INNER JOIN todo
-    	ON assessments.assessmentID = todo.assessmentID
-    LEFT JOIN assignments
-    	ON assignments.assessmentID = todo.assessmentID
-    LEFT JOIN tests
-        ON tests.assessmentID = todo.assessmentID
-    WHERE todo.userID = '$userID' AND todo.status = 'Pending' AND assessments.type = 'Test' AND tests.testID = '$testID'
-    GROUP BY assignments.assignmentID
-    ORDER BY todo.assessmentID DESC";
+$validateTestIDQuery = "SELECT 
+                        todo.* 
+                        FROM todo 
+                        INNER JOIN tests 
+                        ON todo.assessmentID = tests.assessmentID 
+                        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = 'Pending';";
 $validateTestIDResult = executeQuery($validateTestIDQuery);
 
 if (mysqli_num_rows($validateTestIDResult) <= 0) {
-    header("Location: 404.php");
+    header("Location: index.php");
     exit();
 }
 ?>
@@ -120,7 +108,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
     </style>
 </head>
 
-<body>
+<body oncopy="return false" onpaste="return false" oncut="return false" oncontextmenu="return false" onselectstart="return false" >
     <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center p-0 p-md-3"
         style="background-color: var(--black);">
 
@@ -157,7 +145,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                                                 while ($guideLines = mysqli_fetch_assoc($selectTestResult)) {
                                             ?>
                                                     <div class="text-center text-md-auto h2 m-0">
-                                                        <?php echo $guideLines['testTitle']; ?>
+                                                        <?php echo $guideLines['assessmentTitle']; ?>
                                                     </div>
                                         </div>
                                         <div class="h2 mt-3 mt-md-0 mb-0 text-center text-md-end" id="timer">
@@ -530,6 +518,8 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                 identificationType();
             }
 
+            let timeSpent = <?php echo $timeLimit['testTimelimit']; ?> - seconds;
+
             const incomplete = choiceText.some(checkNull => checkNull.userAnswer === null || checkNull.userAnswer === '');
 
             if (!incomplete) {
@@ -539,7 +529,8 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            answers: choiceText
+                            answers: choiceText,
+                            timeSpent: timeSpent
                         })
                     })
                     .then(response => response.json())
@@ -555,6 +546,8 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             } else {
                 console.log("Please answer all items");
             }
+
+            console.log(timeSpent);
         }
     </script>
 </body>
