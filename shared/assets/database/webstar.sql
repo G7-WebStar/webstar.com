@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 03, 2025 at 04:12 PM
+-- Generation Time: Nov 04, 2025 at 12:14 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -514,17 +514,17 @@ CREATE TABLE `report` (
 --
 
 INSERT INTO `report` (`reportID`, `enrollmentID`, `totalXP`, `allTimeRank`, `generatedAt`) VALUES
-(1, 1, 550, 1, '2025-11-03 11:24:33'),
-(2, 3, 400, 2, '2025-11-03 11:24:33'),
-(3, 8, 221, 3, '2025-11-03 11:24:33'),
-(4, 6, 215, 4, '2025-11-03 11:24:33'),
-(5, 11, 214, 5, '2025-11-03 11:24:33'),
-(6, 10, 195, 6, '2025-11-03 11:24:33'),
-(7, 5, 189, 7, '2025-11-03 11:24:33'),
-(8, 7, 176, 8, '2025-11-03 11:24:33'),
-(9, 9, 167, 9, '2025-11-03 11:24:33'),
-(10, 4, 152, 10, '2025-11-03 11:24:33'),
-(11, 12, 95, 11, '2025-11-03 11:24:33'),
+(1, 1, 550, 1, '2025-11-04 18:15:01'),
+(2, 3, 400, 2, '2025-11-04 18:15:01'),
+(3, 8, 221, 3, '2025-11-04 18:15:01'),
+(4, 6, 215, 4, '2025-11-04 18:15:01'),
+(5, 11, 214, 5, '2025-11-04 18:15:02'),
+(6, 10, 195, 6, '2025-11-04 18:15:02'),
+(7, 5, 189, 7, '2025-11-04 18:15:02'),
+(8, 7, 176, 8, '2025-11-04 18:15:02'),
+(9, 9, 167, 9, '2025-11-04 18:15:02'),
+(10, 4, 152, 10, '2025-11-04 18:15:02'),
+(11, 12, 95, 11, '2025-11-04 18:15:02'),
 (12, 2, 450, 1, '2025-11-01 12:05:23');
 
 -- --------------------------------------------------------
@@ -743,13 +743,6 @@ CREATE TABLE `testresponses` (
   `isCorrect` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `testresponses`
---
-
-INSERT INTO `testresponses` (`testResponseID`, `testID`, `testQuestionID`, `userID`, `userAnswer`, `isCorrect`) VALUES
-(1, 0, 0, 2, 'choiceText.userAnswer[0]', 0);
-
 -- --------------------------------------------------------
 
 --
@@ -768,7 +761,7 @@ CREATE TABLE `tests` (
 --
 
 INSERT INTO `tests` (`testID`, `assessmentID`, `generalGuidance`, `testTimelimit`) VALUES
-(1, 2, 'Read each question carefully and choose the best answer from the given options. Only one option is correct for each question. Once you move to the next question, you will not be able to return to the previous one, so review your answer before proceeding. The exam will automatically submit when the timer ends. Avoid refreshing or closing the browser during the exam to prevent submission issues.', 600),
+(1, 2, 'Read each question carefully and choose the best answer from the given options. Only one option is correct for each question. Once you move to the next question, you will not be able to return to the previous one, so review your answer before proceeding. The exam will automatically submit when the timer ends. Avoid refreshing or closing the browser during the exam to prevent submission issues.', 1200),
 (2, 6, '', 12);
 
 -- --------------------------------------------------------
@@ -783,17 +776,18 @@ CREATE TABLE `todo` (
   `assessmentID` int(11) NOT NULL,
   `status` varchar(20) NOT NULL DEFAULT 'Pending',
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `isRead` tinyint(1) DEFAULT 0
+  `isRead` tinyint(1) DEFAULT 0,
+  `timeSpent` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `todo`
 --
 
-INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `status`, `updatedAt`, `isRead`) VALUES
-(1, 2, 1, 'Graded', '2025-10-12 19:00:00', 1),
-(2, 2, 4, 'Pending', '2025-10-29 09:00:00', 1),
-(3, 2, 2, 'Pending', '2025-10-29 09:00:00', 1);
+INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `status`, `updatedAt`, `isRead`, `timeSpent`) VALUES
+(1, 2, 1, 'Graded', '2025-10-12 19:00:00', 1, 0),
+(2, 2, 4, 'Pending', '2025-10-29 09:00:00', 1, 0),
+(3, 2, 2, 'Pending', '2025-11-04 18:16:16', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -1260,7 +1254,7 @@ ALTER TABLE `testquestions`
 -- AUTO_INCREMENT for table `testresponses`
 --
 ALTER TABLE `testresponses`
-  MODIFY `testResponseID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `testResponseID` int(5) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tests`
