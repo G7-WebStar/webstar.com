@@ -109,7 +109,7 @@ $announcementResult = executeQuery($announcementQuery);
 
                 $fileTitle = !empty($file['fileTitle']) ? $file['fileTitle'] : '';
             }
-        ?>
+            ?>
 
             <!-- Announcement Card -->
             <div class="announcement-card d-flex align-items-start mb-1">
@@ -149,7 +149,8 @@ $announcementResult = executeQuery($announcementQuery);
                     <div class="form-check d-none d-md-flex align-items-center mt-4" style="gap: 20px;">
                         <form method="POST">
                             <input type="hidden" name="announcementID" value="<?php echo $announcementID; ?>">
-                            <input class="form-check-input" type="checkbox" name="noted" style="margin-top:0;" <?php echo $isChecked; ?>>
+                            <input class="form-check-input" type="checkbox" name="noted" onchange="this.form.submit()"
+                                style="margin-top:0;" <?php echo $isChecked; ?>>
 
                             <label class="form-check-label text-med text-12 mb-0"
                                 style="color: var(--black); position: relative; top: -5px;">
@@ -199,10 +200,10 @@ $announcementResult = executeQuery($announcementQuery);
                                 $fileSize = (file_exists("shared/assets/files/" . $file)) ? filesize("shared/assets/files/" . $file) : 0;
                                 $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
                                 $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
-                            ?>
+                                ?>
                                 <a href="<?php echo $filePath; ?>" class="text-decoration-none d-block mb-2"
                                     style="color: var(--black);" <?php if (!preg_match('/^https?:\/\//', $filePath)): ?>
-                                    download="<?php echo htmlspecialchars($file); ?>" <?php endif; ?>>
+                                        download="<?php echo htmlspecialchars($file); ?>" <?php endif; ?>>
                                     <div class="cardFile d-flex align-items-start w-100" style="cursor:pointer;">
                                         <i class="px-4 py-3 fa-solid fa-file"></i>
                                         <div class="ms-2">
@@ -238,51 +239,84 @@ $announcementResult = executeQuery($announcementQuery);
         </div>
 
     <?php endif; ?>
+    <?php
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['announcementID'])) {
+        $toastMessage = isset($_POST['noted'])
+            ? 'Marked as Noted'
+            : 'Removed from Noted';
+        $toastType = isset($_POST['noted'])
+            ? 'alert-success'
+            : 'alert-danger';
+        ?>
+        <script>
+            window.addEventListener('DOMContentLoaded', () => {
+                const container = document.getElementById("toastContainer");
+                const alert = document.createElement("div");
+                alert.className = `alert mb-2 shadow-lg text-med text-12
+        d-flex align-items-center justify-content-center gap-2 px-3 py-2 <?php echo $toastType; ?>`;
+                alert.role = "alert";
+                alert.innerHTML = `
+        <i class="bi <?php echo ($toastType === 'alert-success') ? 'bi-check-circle-fill' : 'bi-x-circle-fill'; ?> fs-6"></i>
+        <span><?php echo $toastMessage; ?></span>
+    `;
+                container.appendChild(alert);
+                setTimeout(() => {
+                    alert.style.opacity = "0";
+                    setTimeout(() => alert.remove(), 2000);
+                }, 3000);
+            });
+        </script>
+    <?php } ?>
+
 </div>
 
 <!-- Toast Container -->
 <div id="toastContainer"
-    class="position-absolute top-0 start-50 translate-middle-x p-3 d-flex flex-column align-items-center"
+    class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
     style="z-index:1100; pointer-events:none;">
 </div>
 
 <!-- Toast Script -->
 <script>
     document.querySelectorAll('input[name="noted"]').forEach(checkbox => {
-        checkbox.addEventListener('change', function(e) {
-            e.preventDefault();
+        checkbox.addEventListener('change', function (e) {
+            // e.preventDefault();
 
             const form = this.closest('form');
             const formData = new FormData(form);
             const isChecked = this.checked;
             const container = document.getElementById("toastContainer");
 
-            fetch(form.action || window.location.href, {
-                method: "POST",
-                body: formData
+            // fetch(form.action || window.location.href, {
+            //     method: "POST",
+            //     body: formData
+            // });
+
+            checkbox.addEventListener('change', function () {
+                this.closest('form').submit();
             });
 
-            const alert = document.createElement("div");
-            alert.className = `
-                alert mb-2 shadow-lg text-reg text-12
-                d-flex align-items-center justify-content-center gap-2
-                ${isChecked ? 'alert-success' : 'alert-danger'}
-            `;
-            alert.role = "alert";
-            alert.style.transition = "opacity 2s ease";
-            alert.style.opacity = "1";
+            // const alert = document.createElement("div");
+            // alert.className = `
+            //     alert mb-2 shadow-lg text-med text-12
+            //     d-flex align-items-center justify-content-center gap-2 px-3 py-2
+            //     ${isChecked ? 'alert-success' : 'alert-danger'}
+            // `;
+            // alert.role = "alert";
+            // alert.style.transition = "opacity 2s ease";
+            // alert.style.opacity = "1";
 
-            alert.innerHTML = `
-                <i class="bi ${isChecked ? 'bi-check-circle-fill' : 'bi-x-circle-fill'} fs-6"></i>
-                <span>${isChecked ? 'Marked as Noted' : 'Removed from Noted'}</span>
-            `;
+            // alert.innerHTML = `
+            //     <i class="bi ${isChecked ? 'bi-check-circle-fill' : 'bi-x-circle-fill'} fs-6"></i>
+            //     <span>${isChecked ? 'Marked as Noted' : 'Removed from Noted'}</span>
+            // `;
 
-            container.appendChild(alert);
+            // container.appendChild(alert);
 
-            setTimeout(() => {
-                alert.style.opacity = "0";
-                setTimeout(() => alert.remove(), 2000);
-            }, 3000);
+            // setTimeout(() => {
+            //     alert.style.opacity = "0";
+            //     setTimeout(() => alert.remove(), 2000);
+            // }, 3000);
         });
     });
 </script>

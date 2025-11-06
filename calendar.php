@@ -75,7 +75,9 @@ $eventsJson = json_encode($events);
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Calendar</title>
+    <title>Calendar ✦ Webstar</title>
+    <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
+
 
     <!-- FullCalendar -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
@@ -218,7 +220,7 @@ $eventsJson = json_encode($events);
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
 
     <script>
@@ -229,11 +231,11 @@ $eventsJson = json_encode($events);
                 initialView: 'dayGridMonth',
                 events: <?php echo $eventsJson; ?>,
                 // Format event time as AM/PM
-    eventTimeFormat: {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true // <-- this makes it AM/PM
-    },
+                eventTimeFormat: {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true // <-- this makes it AM/PM
+                },
                 headerToolbar: {
                     left: 'prev',      // Previous button on the left
                     center: 'title',   // Month title in center
