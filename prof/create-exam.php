@@ -1,4 +1,3 @@
-create-exam
 <?php
 $activePage = 'create-exam';
 
