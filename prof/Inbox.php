@@ -1,6 +1,6 @@
 <?php $activePage = 'inbox';
-include('shared/assets/database/connect.php');
-include("shared/assets/processes/session-process.php");
+include('../shared/assets/database/connect.php');
+include("../shared/assets/processes/prof-session-process.php");
 
 $selectEnrolledQuery = "SELECT
 courses.courseCode
@@ -45,12 +45,12 @@ $selectInboxResult = executeQuery($selectInboxQuery);
     <title>Webstar | Prof Inbox</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="shared/assets/css/global-styles.css" />
-    <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css" />
-    <link rel="stylesheet" href="shared/assets/css/inbox.css" />
-    <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css" />
+    <link rel="stylesheet" href="../shared/assets/css/global-styles.css" />
+    <link rel="stylesheet" href="../shared/assets/css/sidebar-and-container-styles.css" />
+    <link rel="stylesheet" href="../shared/assets/css/inbox.css" />
+    <link rel="stylesheet" href="../shared/assets/css/sidebar-and-container-styles.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
-    <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png" />
+    <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png" />
 
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
@@ -71,15 +71,15 @@ $selectInboxResult = executeQuery($selectInboxQuery);
     <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center p-0 p-md-3"
         style="background-color: var(--black);">
         <div class="row w-100">
-            <?php include 'shared/components/sidebar-for-mobile.php'; ?>
-            <?php include 'shared/components/sidebar-for-desktop.php'; ?>
+            <?php include '../shared/components/prof-sidebar-for-mobile.php'; ?>
+            <?php include '../shared/components/prof-sidebar-for-desktop.php'; ?>
 
             <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-md-4 overflow-y-auto">
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
-                    <?php include 'shared/components/navbar-for-mobile.php'; ?>
+                    <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
+                    <div class="container-fluid py-3 row-padding-top">
                         <div class="row">
                             <div class="col-12">
 
@@ -188,6 +188,13 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                                 <?php
                                             }
                                         } else {
+                                            ?>
+                                            <!-- Empty State -->
+                                            <div class="d-flex flex-column justify-content-center align-items-center">
+                                                <img src="../shared/assets/img/empty/inbox.png" width="100">
+                                                <div class="text-center text-14 text-reg mt-1">Your inbox is empty!</div>
+                                            </div>
+                                            <?php
                                         }
                                         ?>
                                     </div>
