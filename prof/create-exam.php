@@ -33,7 +33,17 @@ if (isset($_POST['save_lesson'])) {
             // Kunin ang bagong assessmentID
             $assessmentID = mysqli_insert_id($conn);
 
-            // 2. Insert into tests (hindi na kasama ang deadline dito)
+            // Insert todo for each enrolled student
+            $studentsQuery = "SELECT userID FROM enrollments WHERE courseID = '$courseID'";
+            $studentsResult = executeQuery($studentsQuery);
+
+            while ($student = mysqli_fetch_assoc($studentsResult)) {
+                $userID = $student['userID'];
+                $todoQuery = "INSERT INTO todo (userID, assessmentID, status) 
+                  VALUES ('$userID', '$assessmentID', 'Pending')";
+                executeQuery($todoQuery);
+            }
+
             $testQuery = "INSERT INTO tests 
                 (assessmentID, generalGuidance, testTimeLimit) 
                 VALUES 
@@ -64,7 +74,6 @@ if (isset($_POST['save_lesson'])) {
                             mkdir($uploadFolder, 0777, true);
                         }
 
-                        // Unique filename
                         $newFileName = time() . "_" . basename($fileName);
                         $destination = $uploadFolder . $newFileName;
 
@@ -73,7 +82,6 @@ if (isset($_POST['save_lesson'])) {
                         }
                     }
 
-                    // ✅ Insert test question
                     $testQuestionQuery = "INSERT INTO testQuestions 
                         (testID, testQuestion, questionType, testQuestionPoints, correctAnswer, testQuestionImage)
                         VALUES 
@@ -84,7 +92,6 @@ if (isset($_POST['save_lesson'])) {
                     // Kunin bagong testQuestionID
                     $testQuestionID = mysqli_insert_id($conn);
 
-                    // ✅ If Multiple Choice → insert choices
                     if ($questionType === "Multiple Choice" && !empty($question['choices'])) {
                         foreach ($question['choices'] as $choiceText) {
                             $choiceText = mysqli_real_escape_string($conn, $choiceText);
@@ -299,7 +306,7 @@ if (isset($_POST['save_lesson'])) {
                                                         <div class="col-auto text-center me-4 flex-shrink-0">
                                                             <div class="text-reg mb-1">Points</div>
                                                             <input type="number" name="questions[0][testQuestionPoints]" class="border rounded p-2"
-                                                                placeholder="1" min="1"
+                                                                placeholder="0" min="0" required
                                                                 style="width: 60px; text-align: center;">
                                                         </div>
 
@@ -390,7 +397,7 @@ if (isset($_POST['save_lesson'])) {
                                                         <div class="text-center me-4">
                                                             <div class="text-reg mb-1">Points</div>
                                                             <input type="number" name="questions[0][testQuestionPoints]" class="border rounded p-2"
-                                                                placeholder="1" min="1"
+                                                                placeholder="0" min="0" required
                                                                 style="width: 60px; text-align: center;">
                                                         </div>
                                                     </div>
@@ -398,7 +405,6 @@ if (isset($_POST['save_lesson'])) {
                                             </div>
                                         </div>
                                     </template>
-
 
                                     <!-- Master Container -->
                                     <div id="allQuestionsContainer"></div>
@@ -478,23 +484,19 @@ if (isset($_POST['save_lesson'])) {
                                             </button>
                                         </div>
                                     </div>
-
                                 </form>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Alert Container (Centered Top in main container) -->
+                <!-- Alert Container Toasts -->
                 <div id="toastContainer"
-                    class="position-absolute top-0 start-50 translate-middle-x p-3 d-flex flex-column align-items-center"
+                    class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1  d-flex flex-column align-items-center"
                     style="z-index:1100; pointer-events:none;">
                 </div>
-
             </div>
         </div>
     </div>
-    </div>
-
 
     <!-- Quill JS -->
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
@@ -508,7 +510,7 @@ if (isset($_POST['save_lesson'])) {
             }
         });
 
-        const maxWords = 120;
+        const maxWords = 200;
         const counter = document.getElementById("word-counter");
 
         quill.on('text-change', function() {
@@ -529,7 +531,18 @@ if (isset($_POST['save_lesson'])) {
         form.addEventListener("submit", function(e) {
             // --- Quill ---
             let plainText = quill.getText().trim();
-            document.getElementById("generalGuidance").value = plainText;
+            const guidelinesInput = document.getElementById("generalGuidance"); // hidden input
+            guidelinesInput.value = plainText;
+
+            if (plainText.length === 0) {
+                e.preventDefault();
+                quill.root.focus(); // focus editor
+                guidelinesInput.setCustomValidity('Please fill out this field.');
+                guidelinesInput.reportValidity();
+                return false;
+            } else {
+                guidelinesInput.setCustomValidity('');
+            }
 
             let valid = true;
             let message = "";
@@ -606,12 +619,10 @@ if (isset($_POST['save_lesson'])) {
             const container = document.getElementById("toastContainer");
 
             const alert = document.createElement("div");
-            alert.className = "alert alert-danger alert-dismissible fade show mb-2 text-center d-flex align-items-center justify-content-center shadow-lg text-reg text-16";
-            alert.role = "alert";
+            alert.className = "alert alert-danger fade show mb-2 text-center d-flex align-items-center justify-content-center shadow-lg px-3 py-2 text-reg text-14";
             alert.innerHTML = `
-            <i class="bi bi-exclamation-triangle-fill me-2 fs-6"></i>
+            <i class="bi bi-x-circle-fill me-2 fs-6"></i>
             <span>${message}</span>
-            <button type="button" class="btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
         `;
 
             container.appendChild(alert);
@@ -799,13 +810,47 @@ if (isset($_POST['save_lesson'])) {
             const fileInput = img.nextElementSibling;
             img.addEventListener("click", () => fileInput.click());
             fileInput.addEventListener("change", () => {
-                if (fileInput.files && fileInput.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = e => img.src = e.target.result;
-                    reader.readAsDataURL(fileInput.files[0]);
+                const file = fileInput.files[0];
+                if (!file) return;
+
+                const allowed = ["image/jpeg", "image/png", "image/jpg"];
+                const maxSize = 5 * 1024 * 1024;
+
+                // validate before preview
+                if (!allowed.includes(file.type)) {
+                    showAlert("Only JPG, JPEG, and PNG image formats are allowed.");
+                    fileInput.value = ""; 
+                    return; 
                 }
+
+                if (file.size > maxSize) {
+                    showAlert("Maximum file size is 5MB.");
+                    fileInput.value = "";
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = e => img.src = e.target.result;
+                reader.readAsDataURL(file);
             });
+
         }
+
+        document.addEventListener("click", function(e) {
+            const delImgBtn = e.target.closest(".delete-image");
+            if (!delImgBtn) return;
+
+            const container = delImgBtn.closest(".image-container");
+            if (!container) return;
+
+            // Reset preview
+            const img = container.querySelector(".question-image");
+            const fileInput = container.querySelector(".image-upload");
+
+            img.src = "";
+            fileInput.value = "";
+            container.style.display = "none"; // hide again
+        });
 
         document.querySelectorAll(".question-image").forEach(img => bindImageUpload(img));
 
@@ -848,8 +893,6 @@ if (isset($_POST['save_lesson'])) {
 
         updateTotalPoints();
     </script>
-
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>

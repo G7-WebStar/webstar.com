@@ -10,60 +10,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     header('Content-Type: application/json');
     $action = $_POST['action'];
 
-    if ($action === 'save_criterion') {
+    // New: create entire rubric atomically only when Create is clicked
+    if ($action === 'create_full') {
         $rubricTitle = isset($_POST['rubricTitle']) ? $_POST['rubricTitle'] : '';
-        $rubricType = 'Created';
-        $criteriaTitle = isset($_POST['criteriaTitle']) ? $_POST['criteriaTitle'] : '';
-        $criteriaDescription = isset($_POST['criteriaDescription']) ? $_POST['criteriaDescription'] : '';
-        $levelsPayload = isset($_POST['levelsPayload']) ? $_POST['levelsPayload'] : '[]';
-        $levels = json_decode($levelsPayload, true);
+        $criteriaPayload = isset($_POST['criteriaPayload']) ? $_POST['criteriaPayload'] : '[]';
+        $criteriaList = json_decode($criteriaPayload, true);
 
-        if (!isset($_SESSION)) { session_start(); }
-        $currentRubricID = isset($_SESSION['currentRubricID']) ? intval($_SESSION['currentRubricID']) : 0;
+        if ($rubricTitle === '') { echo '{"success":false,"message":"Missing rubric title"}'; exit; }
 
-        if ($currentRubricID <= 0) {
-            if ($rubricTitle === '') { echo json_encode(['success'=>false,'message'=>'Missing rubric title']); exit; }
-            $rubricTitleEsc = mysqli_real_escape_string($conn, $rubricTitle);
-            $rubricTypeEsc = mysqli_real_escape_string($conn, $rubricType);
-            $rq = "INSERT INTO rubric (rubricTitle, rubricType, userID, totalPoints) VALUES ('$rubricTitleEsc', '$rubricTypeEsc', '$userID', 0)";
-            if (!executeQuery($rq)) { echo json_encode(['success'=>false,'message'=>'Failed to create rubric']); exit; }
-            $currentRubricID = mysqli_insert_id($conn);
-            $_SESSION['currentRubricID'] = $currentRubricID;
-        }
+        $rubricTitleEsc = mysqli_real_escape_string($conn, $rubricTitle);
+        $createRubricSql = "INSERT INTO rubric (rubricTitle, rubricType, userID, totalPoints) VALUES ('$rubricTitleEsc', 'Created', '$userID', 0)";
+        if (!executeQuery($createRubricSql)) { echo '{"success":false,"message":"Failed to create rubric"}'; exit; }
+        $newRubricID = mysqli_insert_id($conn);
 
-        $cTitleEsc = mysqli_real_escape_string($conn, $criteriaTitle);
-        $cDescEsc  = mysqli_real_escape_string($conn, $criteriaDescription);
-        $cq = "INSERT INTO criteria (rubricID, criteriaTitle, criteriaDescription) VALUES ('$currentRubricID', '$cTitleEsc', '$cDescEsc')";
-        if (!executeQuery($cq)) { echo json_encode(['success'=>false,'message'=>'Failed to save criteria']); exit; }
-        $criterionID = mysqli_insert_id($conn);
+        $totalCalculated = 0;
+        if (is_array($criteriaList)) {
+            for ($i = 0; $i < count($criteriaList); $i++) {
+                $crit = $criteriaList[$i];
+                $critTitle = isset($crit['criteriaTitle']) ? mysqli_real_escape_string($conn, $crit['criteriaTitle']) : '';
+                $critDesc  = isset($crit['criteriaDescription']) ? mysqli_real_escape_string($conn, $crit['criteriaDescription']) : '';
+                $insertCritSql = "INSERT INTO criteria (rubricID, criteriaTitle, criteriaDescription) VALUES ('$newRubricID', '$critTitle', '$critDesc')";
+                executeQuery($insertCritSql);
+                $newCriterionID = mysqli_insert_id($conn);
 
-        if (is_array($levels)) {
-            foreach ($levels as $lvl) {
-                $lTitle = isset($lvl['levelTitle']) ? mysqli_real_escape_string($conn, $lvl['levelTitle']) : '';
-                $lDesc  = isset($lvl['levelDescription']) ? mysqli_real_escape_string($conn, $lvl['levelDescription']) : '';
-                $lPts   = isset($lvl['points']) && $lvl['points'] !== '' ? floatval($lvl['points']) : 0;
-                $lq = "INSERT INTO level (criterionID, levelTitle, levelDescription, points) VALUES ('$criterionID', '$lTitle', '$lDesc', '$lPts')";
-                executeQuery($lq);
+                $levels = isset($crit['levels']) && is_array($crit['levels']) ? $crit['levels'] : [];
+                $maxForCriterion = 0;
+                for ($j = 0; $j < count($levels); $j++) {
+                    $lvl = $levels[$j];
+                    $lvlTitle = isset($lvl['levelTitle']) ? mysqli_real_escape_string($conn, $lvl['levelTitle']) : '';
+                    $lvlDesc  = isset($lvl['levelDescription']) ? mysqli_real_escape_string($conn, $lvl['levelDescription']) : '';
+                    $lvlPts   = isset($lvl['points']) && $lvl['points'] !== '' ? floatval($lvl['points']) : 0;
+                    if ($lvlPts > $maxForCriterion) { $maxForCriterion = $lvlPts; }
+                    $insertLvlSql = "INSERT INTO level (criterionID, levelTitle, levelDescription, points) VALUES ('$newCriterionID', '$lvlTitle', '$lvlDesc', '$lvlPts')";
+                    executeQuery($insertLvlSql);
+                }
+                $totalCalculated += $maxForCriterion;
             }
         }
 
-        echo json_encode(['success'=>true,'rubricID'=>$currentRubricID,'criterionID'=>$criterionID]);
+        $updateRubricTotalSql = "UPDATE rubric SET totalPoints = '$totalCalculated' WHERE rubricID = '$newRubricID' AND userID = '$userID'";
+        executeQuery($updateRubricTotalSql);
+
+        echo '{"success":true,"rubricID":' . $newRubricID . '}';
         exit;
     }
 
     if ($action === 'update_total') {
-        $total = isset($_POST['totalPoints']) ? floatval($_POST['totalPoints']) : 0;
         if (!isset($_SESSION)) { session_start(); }
         $currentRubricID = isset($_SESSION['currentRubricID']) ? intval($_SESSION['currentRubricID']) : 0;
         if ($currentRubricID > 0) {
-            $uq = "UPDATE rubric SET totalPoints = '$total' WHERE rubricID = '$currentRubricID' AND userID = '$userID'";
-            executeQuery($uq);
-            // clear current rubric session after finalize
+            // Calculate total points server-side by summing max points from all criteria
+            $totalCalculated = 0;
+            $criteriaSql = "SELECT criterionID FROM criteria WHERE rubricID = '$currentRubricID'";
+            $criteriaResult = executeQuery($criteriaSql);
+            if ($criteriaResult && $criteriaResult->num_rows > 0) {
+                while ($criteriaRow = $criteriaResult->fetch_assoc()) {
+                    $criterionId = intval($criteriaRow['criterionID']);
+                    $maxPointsSql = "SELECT MAX(points) AS maxPoints FROM level WHERE criterionID = '$criterionId'";
+                    $maxPointsResult = executeQuery($maxPointsSql);
+                    if ($maxPointsResult && $maxPointsResult->num_rows > 0) {
+                        $maxRow = $maxPointsResult->fetch_assoc();
+                        $maxPts = isset($maxRow['maxPoints']) ? floatval($maxRow['maxPoints']) : 0;
+                        $totalCalculated += $maxPts;
+                    }
+                }
+            }
+            $updateQuery = "UPDATE rubric SET totalPoints = '$totalCalculated' WHERE rubricID = '$currentRubricID' AND userID = '$userID'";
+            executeQuery($updateQuery);
+            // respond with rubricID so client can redirect
+            echo '{"success":true,"rubricID":' . $currentRubricID . '}';
+            // clear current rubric session after respond
             unset($_SESSION['currentRubricID']);
-            echo json_encode(['success'=>true]);
             exit;
         }
-        echo json_encode(['success'=>false]);
+        echo '{"success":false}';
         exit;
     }
 }
@@ -347,6 +367,12 @@ if (isset($_POST['save_rubric'])) {
                                         </button>
                                     </div>
                                 </div>
+
+                                <!-- Toast Container -->
+                                <div id="toastContainer"
+                                    class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+                                    style="z-index:1100; pointer-events:none;">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -371,13 +397,12 @@ if (isset($_POST['save_rubric'])) {
 
         <script>
             (function() {
-                var createBtn = document.querySelector('.criteria-add-btn');
-                var addLevelBtns = document.getElementsByClassName('add-level-btn');
-                var addCriteriaBtn = document.getElementById('addCriteriaBtn');
-                var singleCriterionWrapper = document.querySelector('.criterion-wrapper');
+                var createButton = document.querySelector('.criteria-add-btn');
+                var addCriteriaButton = document.getElementById('addCriteriaBtn');
+                var criteriaList = document.getElementById('criteriaList');
+                var currentCriterionWrapper = document.querySelector('.criterion-wrapper');
                 var criterionIndex = 1;
-                var previousCriterionMaxes = [];
-                if (!createBtn) return;
+                if (!createButton) return;
 
                 function showAlert(message) {
                     var container = document.getElementById('toastContainer');
@@ -399,36 +424,61 @@ if (isset($_POST['save_rubric'])) {
                     }, 4000);
                 }
 
-                function getValue(id) {
+                function showSuccessToast(message) {
+                    var container = document.getElementById('toastContainer');
+                    if (!container) return;
+
+                    var alertEl = document.createElement('div');
+                    alertEl.className = 'alert alert-success mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2';
+                    alertEl.role = 'alert';
+                    alertEl.style.transition = 'opacity 2s ease';
+                    alertEl.style.opacity = '1';
+                    alertEl.innerHTML = '<i class="bi bi-check-circle-fill fs-6"></i>' +
+                        '<span>' + message + '</span>';
+
+                    container.appendChild(alertEl);
+
+                    setTimeout(function() {
+                        alertEl.style.opacity = '0';
+                        setTimeout(function() { alertEl.remove(); }, 2000);
+                    }, 3000);
+                }
+
+                function getInputValueById(id) {
                     var el = document.getElementById(id);
                     return el && el.value ? el.value.trim() : '';
                 }
 
-                function setBorder(id, hasError) {
-                    var el = document.getElementById(id);
-                    if (!el) return;
-                    el.style.border = hasError ? '2px solid red' : '';
+                // Helper: get the last criterion wrapper
+                function getLastCriterionWrapper() {
+                    var wrappers = document.querySelectorAll('.criterion-wrapper');
+                    if (!wrappers || wrappers.length === 0) return null;
+                    return wrappers[wrappers.length - 1];
                 }
 
-                // Add Level: clone the first level card and append to container
+                // Add Level: always append to bottom-most criterion's levels container
                 function bindLevelButtons(scope) {
                     var buttons = (scope || document).getElementsByClassName('add-level-btn');
                     for (var i = 0; i < buttons.length; i++) {
                         buttons[i].onclick = function() {
-                            // find nearest criterion wrapper
-                            var wrapper = this.closest ? this.closest('.criterion-wrapper') : null;
-                            if (!wrapper) return;
+                            var wrapper = getLastCriterionWrapper();
+                            if (!wrapper) {
+                                criterionIndex = 1;
+                                var created = createCriterionWrapper(criterionIndex);
+                                if (created && criteriaList) {
+                                    criteriaList.appendChild(created);
+                                    wrapper = created;
+                                    currentCriterionWrapper = created;
+                                } else {
+                                    return;
+                                }
+                            }
                             var container = wrapper.querySelector('.levelsContainer');
-                            if (!container) return;
-                            var firstCard = container.querySelector('.criterion-description-card');
+                            var firstCard = container ? container.querySelector('.criterion-description-card') : null;
                             if (!firstCard) return;
-
                             var clone = firstCard.cloneNode(true);
                             var inputs = clone.querySelectorAll('input');
-                            for (var j = 0; j < inputs.length; j++) {
-                                inputs[j].value = '';
-                                inputs[j].style.border = '';
-                            }
+                            for (var j = 0; j < inputs.length; j++) { inputs[j].value = ''; inputs[j].style.border = ''; }
                             container.appendChild(clone);
                             updateCriterionPoints(wrapper);
                             updateTotalPoints();
@@ -437,72 +487,51 @@ if (isset($_POST['save_rubric'])) {
                 }
                 bindLevelButtons();
 
-                // Criteria button: save current criterion+levels to DB, then switch to next criterion session
-                if (addCriteriaBtn) {
-                    addCriteriaBtn.addEventListener('click', function() {
-                        if (!singleCriterionWrapper) return;
-                        // Collect current inputs
-                        var rubricTitle = getValue('rubricInfo');
-                        var cTitle = getValue('criteriaTitle');
-                        var cDesc = getValue('criterionDescription');
-                        var levels = (function(){
-                            var arr = [];
-                            var cards = singleCriterionWrapper.querySelectorAll('.criterion-description-card');
-                            for (var i = 0; i < cards.length; i++) {
-                                var t = cards[i].querySelector('#levelTitle');
-                                var d = cards[i].querySelector('#levelDescription');
-                                var p = cards[i].querySelector('#pointsLabel');
-                                arr.push({ levelTitle: t ? t.value.trim() : '', levelDescription: d ? d.value.trim() : '', points: p ? p.value.trim() : '' });
-                            }
-                            return arr;
-                        })();
+                // Create a fresh criterion wrapper based on the first one
+                function createCriterionWrapper(index) {
+                    var base = document.querySelector('.criterion-wrapper');
+                    if (!base) return null;
+                    var wrapper = base.cloneNode(true);
 
-                        if (!rubricTitle || !cTitle || !cDesc) {
-                            var focusEl = !rubricTitle ? document.getElementById('rubricInfo') : (!cTitle ? document.getElementById('criteriaTitle') : document.getElementById('criterionDescription'));
-                            if (focusEl && focusEl.reportValidity) focusEl.reportValidity();
-                            return;
+                    // Clear all inputs inside the clone
+                    var inputs = wrapper.querySelectorAll('input');
+                    for (var i = 0; i < inputs.length; i++) { inputs[i].value = ''; inputs[i].style.border = ''; }
+
+                    // Keep only the first level card
+                    var levelsContainer = wrapper.querySelector('.levelsContainer');
+                    if (levelsContainer) {
+                        var cards = levelsContainer.querySelectorAll('.criterion-description-card');
+                        for (var k = 1; k < cards.length; k++) { cards[k].parentNode.removeChild(cards[k]); }
+                    }
+
+                    // Update header and index
+                    wrapper.dataset.index = String(index);
+                    var header = wrapper.querySelector('.criterion-header-points');
+                    if (header) header.textContent = 'Criterion ' + index + ' · 0 Points';
+
+                    // Re-bind level add buttons for this wrapper
+                    bindLevelButtons(wrapper);
+
+                    return wrapper;
+                }
+
+                // Ensure initial wrapper has index 1
+                if (currentCriterionWrapper) {
+                    currentCriterionWrapper.dataset.index = '1';
+                }
+
+                // Criteria button: only append a new criterion form locally (no DB save)
+                if (addCriteriaButton) {
+                    addCriteriaButton.addEventListener('click', function() {
+                        // Append a new blank criterion at the bottom
+                        criterionIndex += 1;
+                        var newWrapper = createCriterionWrapper(criterionIndex);
+                        if (newWrapper && criteriaList) {
+                            criteriaList.appendChild(newWrapper);
+                            currentCriterionWrapper = newWrapper;
+                            updateTotalPoints();
+                            if (newWrapper.scrollIntoView) newWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         }
-
-                        // Save to server via AJAX
-                        var xhr = new XMLHttpRequest();
-                        xhr.open('POST', window.location.href, true);
-                        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                        var payload = 'action=save_criterion' +
-                                      '&rubricTitle=' + encodeURIComponent(rubricTitle) +
-                                      '&rubricType=' + encodeURIComponent('Created') +
-                                      '&criteriaTitle=' + encodeURIComponent(cTitle) +
-                                      '&criteriaDescription=' + encodeURIComponent(cDesc) +
-                                      '&levelsPayload=' + encodeURIComponent(JSON.stringify(levels));
-                        xhr.onreadystatechange = function() {
-                            if (xhr.readyState === 4) {
-                                try { var data = JSON.parse(xhr.responseText); } catch (e) { data = null; }
-                                if (!data || !data.success) { showAlert('Failed to save criterion.'); return; }
-
-                                // Save current criterion's max points
-                                var currentMax = updateCriterionPoints(singleCriterionWrapper);
-                                previousCriterionMaxes.push(currentMax);
-
-                                // Next criterion index
-                                criterionIndex += 1;
-
-                                // Clear inputs
-                                var inputs = singleCriterionWrapper.querySelectorAll('input');
-                                for (var i = 0; i < inputs.length; i++) { inputs[i].value = ''; inputs[i].style.border = ''; }
-
-                                // Keep only first level card
-                                var levelsContainer = singleCriterionWrapper.querySelector('.levelsContainer');
-                                if (levelsContainer) {
-                                    var cards = levelsContainer.querySelectorAll('.criterion-description-card');
-                                    for (var k = 1; k < cards.length; k++) { cards[k].parentNode.removeChild(cards[k]); }
-                                }
-
-                                // Reset header and totals
-                                var header = singleCriterionWrapper.querySelector('.criterion-header-points');
-                                if (header) header.textContent = 'Criterion ' + criterionIndex + ' · 0 Points';
-                                updateTotalPoints();
-                            }
-                        };
-                        xhr.send(payload);
                     });
                 }
 
@@ -526,11 +555,33 @@ if (isset($_POST['save_rubric'])) {
                 }
                 attachRemoveHandler();
 
+                // Remove an entire criterion (if more than 1)
+                document.addEventListener('click', function(e) {
+                    var rbtn = e.target && (e.target.closest ? e.target.closest('.criterion-remove-btn') : null);
+                    if (!rbtn) return;
+                    var wrap = rbtn.closest ? rbtn.closest('.criterion-wrapper') : null;
+                    if (!wrap) return;
+                    var all = document.querySelectorAll('.criterion-wrapper');
+                    if (all.length <= 1) return; // keep at least one
+                    wrap.parentNode.removeChild(wrap);
+                    // Re-index remaining criteria headers
+                    var remaining = document.querySelectorAll('.criterion-wrapper');
+                    criterionIndex = remaining.length;
+                    for (var i = 0; i < remaining.length; i++) {
+                        remaining[i].dataset.index = String(i + 1);
+                        var h = remaining[i].querySelector('.criterion-header-points');
+                        if (h) {
+                            var maxPts = calculateCriterionMax(remaining[i]);
+                            h.textContent = 'Criterion ' + (i + 1) + ' · ' + maxPts + ' Points';
+                        }
+                    }
+                    // Adjust current wrapper pointer to last
+                    currentCriterionWrapper = remaining[remaining.length - 1];
+                    updateTotalPoints();
+                });
+
                 // Update points helpers
-                function parsePoints(val) {
-                    var n = parseFloat(val);
-                    return isNaN(n) ? 0 : n;
-                }
+                function parsePoints(val) { var n = parseFloat(val); return isNaN(n) ? 0 : n; }
 
                 function updateCriterionPoints(wrapper) {
                     if (!wrapper) return;
@@ -541,14 +592,26 @@ if (isset($_POST['save_rubric'])) {
                         if (v > max) max = v;
                     }
                     var header = wrapper.querySelector('.criterion-header-points');
-                    if (header) header.textContent = 'Criterion ' + criterionIndex + ' · ' + max + ' Points';
+                    var idx = wrapper.dataset && wrapper.dataset.index ? wrapper.dataset.index : '1';
+                    if (header) header.textContent = 'Criterion ' + idx + ' · ' + max + ' Points';
+                    return max;
+                }
+
+                function calculateCriterionMax(wrapper) {
+                    if (!wrapper) return 0;
+                    var pointsInputs = wrapper.getElementsByClassName('level-points');
+                    var max = 0;
+                    for (var i = 0; i < pointsInputs.length; i++) {
+                        var v = parsePoints(pointsInputs[i].value);
+                        if (v > max) max = v;
+                    }
                     return max;
                 }
 
                 function getTotalPoints() {
                     var total = 0;
-                    for (var i = 0; i < previousCriterionMaxes.length; i++) total += previousCriterionMaxes[i];
-                    total += updateCriterionPoints(singleCriterionWrapper);
+                    var wrappers = document.querySelectorAll('.criterion-wrapper');
+                    for (var i = 0; i < wrappers.length; i++) total += calculateCriterionMax(wrappers[i]);
                     return total;
                 }
 
@@ -568,11 +631,11 @@ if (isset($_POST['save_rubric'])) {
                     }
                 });
 
-                createBtn.addEventListener('click', function() {
-                    var rubricTitle = getValue('rubricInfo');
-                    var criteriaTitle = getValue('criteriaTitle');
-                    var criteriaDescription = getValue('criterionDescription');
-                    var points = getValue('pointsLabel');
+                createButton.addEventListener('click', function() {
+                    var rubricTitle = getInputValueById('rubricInfo');
+                    var criteriaTitle = getInputValueById('criteriaTitle');
+                    var criteriaDescription = getInputValueById('criterionDescription');
+                    var points = getInputValueById('pointsLabel');
 
                     // Use native HTML5 validation bubbles (like Assign Task)
                     // Validate top-level fields
@@ -607,23 +670,56 @@ if (isset($_POST['save_rubric'])) {
                         }
                     }
 
-                    // Populate hidden form and submit
-                    document.getElementById('post_rubricTitle').value = rubricTitle;
-                    document.getElementById('post_rubricType').value = 'Task';
-                    document.getElementById('post_criteriaTitle').value = criteriaTitle;
-                    document.getElementById('post_criteriaDescription').value = criteriaDescription;
-                    // For now, submit only the first level (server supports single level)
-                    var firstLevel = document.querySelector('#criteriaList .levelsContainer .criterion-description-card');
-                    var firstTitle = firstLevel ? firstLevel.querySelector('#levelTitle') : null;
-                    var firstDesc = firstLevel ? firstLevel.querySelector('#levelDescription') : null;
-                    var firstPointsInput = firstLevel ? firstLevel.querySelector('#pointsLabel') : null;
-                    document.getElementById('post_levelTitle').value = firstTitle ? firstTitle.value : '';
-                    document.getElementById('post_levelDescription').value = firstDesc ? firstDesc.value : '';
-                    // Store rubric total points and level points separately
-                    document.getElementById('post_rubricTotalPoints').value = getTotalPoints();
-                    document.getElementById('post_points').value = firstPointsInput && firstPointsInput.value ? firstPointsInput.value : '0';
+                    // Helper to finalize rubric and redirect
+                function finalizeRubric() {
+                    // Gather all criteria and levels from the UI
+                    var allCriteria = [];
+                    var wrappers = document.querySelectorAll('.criterion-wrapper');
+                    for (var i = 0; i < wrappers.length; i++) {
+                        var cTitleEl = wrappers[i].querySelector('#criteriaTitle');
+                        var cDescEl = wrappers[i].querySelector('#criterionDescription');
+                        var cTitle = cTitleEl ? cTitleEl.value.trim() : '';
+                        var cDesc = cDescEl ? cDescEl.value.trim() : '';
+                        var levelsArr = [];
+                        var cards = wrappers[i].querySelectorAll('.criterion-description-card');
+                        for (var j = 0; j < cards.length; j++) {
+                            var t = cards[j].querySelector('#levelTitle');
+                            var d = cards[j].querySelector('#levelDescription');
+                            var p = cards[j].querySelector('#pointsLabel');
+                            levelsArr.push({ levelTitle: t ? t.value.trim() : '', levelDescription: d ? d.value.trim() : '', points: p ? p.value.trim() : '' });
+                        }
+                        allCriteria.push({ criteriaTitle: cTitle, criteriaDescription: cDesc, levels: levelsArr });
+                    }
 
-                    document.getElementById('post_submit').click();
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', window.location.href, true);
+                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                    var createPayload = 'action=create_full' +
+                                        '&rubricTitle=' + encodeURIComponent(rubricTitle) +
+                                        '&criteriaPayload=' + encodeURIComponent(JSON.stringify(allCriteria));
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4) {
+                            var resp = null;
+                            try { resp = JSON.parse(xhr.responseText); } catch (e) {
+                                showAlert('Failed to create rubric: Invalid server response.');
+                                return;
+                            }
+                            if (resp && resp.success && resp.rubricID) {
+                                showSuccessToast('Rubric successfully created');
+                                setTimeout(function() {
+                                    window.location.href = 'assign-task.php?selectedRubricID=' + encodeURIComponent(resp.rubricID);
+                                }, 1500);
+                                return;
+                            }
+                            var errorMsg = (resp && resp.message) ? resp.message : 'Failed to create rubric.';
+                            showAlert(errorMsg);
+                        }
+                    };
+                    xhr.send(createPayload);
+                }
+
+                    // Directly finalize (no incremental save)
+                    finalizeRubric();
                 });
                 // Ensure default Total Points shows 0 on first load
                 updateTotalPoints();
@@ -646,17 +742,47 @@ if (isset($_POST['save_rubric'])) {
                     // Reset header and counters
                     var header = document.querySelector('.criterion-header-points');
                     if (header) header.textContent = 'Criterion 1 · 0 Points';
-                    previousCriterionMaxes = [];
                     criterionIndex = 1;
+                    if (currentCriterionWrapper) currentCriterionWrapper.dataset.index = '1';
                     updateTotalPoints();
                 })();
             })();
         </script>
 
-        <!-- Alert Container (Centered Top) -->
-        <div id="toastContainer"
-            class="position-absolute top-0 start-50 translate-middle-x p-3 d-flex flex-column align-items-center"
-            style="z-index:1100; pointer-events:none;"></div>
+        <!-- Toast Script -->
+        <script>
+            document.querySelectorAll('input[name="noted"]').forEach(function(checkbox) {
+                checkbox.addEventListener('change', function(e) {
+                    e.preventDefault();
+
+                    var form = this.closest('form');
+                    var formData = new FormData(form);
+                    var isChecked = this.checked;
+                    var container = document.getElementById("toastContainer");
+
+                    fetch(form.action || window.location.href, {
+                        method: "POST",
+                        body: formData
+                    });
+
+                    var alert = document.createElement("div");
+                    alert.className = 'alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 ' + (isChecked ? 'alert-success' : 'alert-danger');
+                    alert.role = "alert";
+                    alert.style.transition = "opacity 2s ease";
+                    alert.style.opacity = "1";
+
+                    alert.innerHTML = '<i class="bi ' + (isChecked ? 'bi-check-circle-fill' : 'bi-x-circle-fill') + ' fs-6"></i>' +
+                        '<span>' + (isChecked ? 'Marked as Noted' : 'Removed from Noted') + '</span>';
+
+                    container.appendChild(alert);
+
+                    setTimeout(function() {
+                        alert.style.opacity = "0";
+                        setTimeout(function() { alert.remove(); }, 2000);
+                    }, 3000);
+                });
+            });
+        </script>
 
 </body>
 

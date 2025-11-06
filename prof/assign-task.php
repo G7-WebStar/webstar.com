@@ -183,20 +183,6 @@ if ($selectedRubricID > 0) {
     if ($rubricRes && $rubricRes->num_rows > 0) {
         $rubricInfo = $rubricRes->fetch_assoc();
     }
-} else {
-    $tpSelect = $hasTotalPoints ? "IFNULL(r.totalPoints, 0) AS totalPoints" : "0 AS totalPoints";
-    $tpGroup  = $hasTotalPoints ? ", r.totalPoints" : "";
-    $rubricQuery = "SELECT r.rubricID, r.rubricTitle, r.rubricType, $tpSelect, COUNT(c.criterionID) AS criteriaCount
-                    FROM rubric r
-                    LEFT JOIN criteria c ON c.rubricID = r.rubricID
-                    WHERE r.userID = '$userID'
-                    GROUP BY r.rubricID, r.rubricTitle, r.rubricType$tpGroup
-                    ORDER BY r.rubricID DESC
-                    LIMIT 1";
-    $rubricRes = executeQuery($rubricQuery);
-    if ($rubricRes && $rubricRes->num_rows > 0) {
-        $rubricInfo = $rubricRes->fetch_assoc();
-    }
 }
 
 // Fetch all rubrics for modal list
@@ -530,6 +516,16 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <?php if ($rubricInfo) { ?>
+                                                    <script>
+                                                        (function(){
+                                                            try {
+                                                                var ptsInput = document.querySelector('input[name="points"]');
+                                                                if (ptsInput) { ptsInput.value = '<?php echo (float)$rubricInfo['totalPoints']; ?>'; }
+                                                            } catch (e) {}
+                                                        })();
+                                                    </script>
+                                                    <?php } ?>
                                                     <!-- Buttons -->
                                                     <div class="mt-2 mb-5 text-start">
                                                         <!-- Select Rubric Button -->
@@ -1081,6 +1077,12 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
         if (titleEl) titleEl.textContent = selectedRubric.title;
         if (metaEl) metaEl.textContent = selectedRubric.points + ' Points · ' + selectedRubric.criteria + ' Criteria';
 
+        // Also reflect total points into the Points input field
+        try {
+            var ptsInput = document.querySelector('input[name="points"]');
+            if (ptsInput) ptsInput.value = selectedRubric.points;
+        } catch (e) {}
+
         var modalEl = document.getElementById('selectRubricModal');
         if (modalEl) {
             var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
@@ -1098,4 +1100,330 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
             try { localStorage.setItem('rubricCardHidden','1'); } catch(e) {}
         }
     });
+</script>
+<script>
+    // Persist Assign Task form fields using localStorage so input survives navigating away and back
+    (function(){
+        var STORAGE_KEY = 'assignTaskDraft_v1';
+        var NAVIGATION_FLAG = 'assignTaskNavigatedAway_v1';
+
+        function getElementById(id) { return document.getElementById(id); }
+
+        function getDeadlineInput() { return document.querySelector('input[name="deadline"]'); }
+        function getPointsInput() { return document.querySelector('input[name="points"]'); }
+
+        function getSelectedCourseIds() {
+            var selectedIds = [];
+            var courseCheckboxes = document.querySelectorAll('.course-checkbox');
+            for (var i = 0; i < courseCheckboxes.length; i++) {
+                if (courseCheckboxes[i].checked) selectedIds.push(courseCheckboxes[i].value);
+            }
+            return selectedIds;
+        }
+
+        function getCurrentLinks() {
+            var links = [];
+            var hiddenLinkInputs = document.querySelectorAll('#filePreviewContainer input.link-hidden');
+            for (var i = 0; i < hiddenLinkInputs.length; i++) {
+                var value = hiddenLinkInputs[i].value;
+                if (value && value.trim() !== '') links.push(value.trim());
+            }
+            return links;
+        }
+
+        function saveDraftToStorage() {
+            try {
+                var titleInput = getElementById('taskInfo');
+                var deadlineInput = getDeadlineInput();
+                var pointsInput = getPointsInput();
+                var stopCheckbox = getElementById('stopSubmissions');
+                var draft = {
+                    assignmentTitle: titleInput ? titleInput.value : '',
+                    assignmentContentHtml: (typeof quill !== 'undefined' ? quill.root.innerHTML : ''),
+                    deadline: deadlineInput ? deadlineInput.value : '',
+                    points: pointsInput ? pointsInput.value : '',
+                    stopSubmissions: stopCheckbox ? !!stopCheckbox.checked : false,
+                    courses: getSelectedCourseIds(),
+                    links: getCurrentLinks()
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+            } catch (e) {}
+        }
+
+        function clearDraftInStorage() {
+            try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+        }
+
+        function appendLinkPreview(linkValue) {
+            var container = document.getElementById('filePreviewContainer');
+            if (!container || !linkValue) return;
+            var uniqueId = Date.now() + Math.floor(Math.random() * 1000);
+            var domain = '';
+            try { var urlObj = new URL(linkValue); domain = urlObj.hostname; } catch (e) { domain = linkValue; }
+            var faviconUrl = 'https://www.google.com/s2/favicons?sz=64&domain=' + domain;
+            var html = '' +
+                '<div class="col-12 my-1" data-id="' + uniqueId + '">' +
+                '  <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">' +
+                '    <div class="d-flex w-100 align-items-center justify-content-between">' +
+                '      <div class="d-flex align-items-center flex-grow-1">' +
+                '        <div class="mx-3 d-flex align-items-center">' +
+                '          <img src="' + faviconUrl + '" alt="' + domain + ' Icon" onerror="this.onerror=null;this.src=\'../shared/assets/img/web.png\';" style="width: 30px; height: 30px;">' +
+                '        </div>' +
+                '        <div>' +
+                '          <div id="title-' + uniqueId + '" class="text-sbold text-16" style="line-height: 1.5;">' + linkValue + '</div>' +
+                '          <div class="text-reg text-12 text-break" style="line-height: 1.5;"><a href="' + linkValue + '" target="_blank">' + linkValue + '</a></div>' +
+                '        </div>' +
+                '      </div>' +
+                '      <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">' +
+                '        <span class="material-symbols-outlined">close</span>' +
+                '      </div>' +
+                '    </div>' +
+                '  </div>' +
+                '  <input type="hidden" name="links[]" value="' + linkValue + '" class="link-hidden">' +
+                '</div>';
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function hasUserEnteredData(draft) {
+            if (!draft) return false;
+            var title = draft.assignmentTitle ? draft.assignmentTitle.trim() : '';
+            if (title !== '') return true;
+            var content = draft.assignmentContentHtml ? draft.assignmentContentHtml.trim() : '';
+            if (content !== '' && content !== '<p><br></p>' && content !== '<p></p>') return true;
+            var deadline = draft.deadline ? draft.deadline.trim() : '';
+            if (deadline !== '') return true;
+            var points = draft.points ? draft.points.trim() : '';
+            if (points !== '') return true;
+            if (draft.stopSubmissions === true) return true;
+            if (draft.courses && Array.isArray(draft.courses) && draft.courses.length > 0) return true;
+            if (draft.links && Array.isArray(draft.links) && draft.links.length > 0) return true;
+            return false;
+        }
+
+        function clearAllFormFields() {
+            try {
+                var titleInput = getElementById('taskInfo');
+                if (titleInput) titleInput.value = '';
+                var deadlineInput = getDeadlineInput();
+                if (deadlineInput) deadlineInput.value = '';
+                var pointsInput = getPointsInput();
+                if (pointsInput) pointsInput.value = '';
+                var stopCheckbox = getElementById('stopSubmissions');
+                if (stopCheckbox) stopCheckbox.checked = false;
+                var courseCheckboxes = document.querySelectorAll('.course-checkbox');
+                for (var i = 0; i < courseCheckboxes.length; i++) courseCheckboxes[i].checked = false;
+                var container = document.getElementById('filePreviewContainer');
+                if (container) container.innerHTML = '';
+                if (typeof quill !== 'undefined' && quill.root) {
+                    quill.root.innerHTML = '';
+                }
+            } catch (e) {}
+        }
+
+        function restoreDraftFromStorage() {
+            var raw = null;
+            try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) {}
+            if (!raw) {
+                clearAllFormFields();
+                return;
+            }
+            var draft = null;
+            try { draft = JSON.parse(raw); } catch (e) { 
+                draft = null;
+                clearDraftInStorage();
+                clearAllFormFields();
+                return;
+            }
+            if (!draft) {
+                clearAllFormFields();
+                return;
+            }
+
+            // Only restore if there's actual user-entered data (not just empty defaults)
+            if (!hasUserEnteredData(draft)) {
+                clearDraftInStorage();
+                clearAllFormFields();
+                return;
+            }
+
+            try {
+                var titleInput = getElementById('taskInfo');
+                if (titleInput) titleInput.value = draft.assignmentTitle || '';
+
+                if (typeof quill !== 'undefined' && draft.assignmentContentHtml) {
+                    var contentHtml = draft.assignmentContentHtml;
+                    if (contentHtml && contentHtml.trim() !== '' && contentHtml !== '<p><br></p>') {
+                        quill.root.innerHTML = contentHtml;
+                    }
+                }
+
+                var deadlineInput = getDeadlineInput();
+                if (deadlineInput) deadlineInput.value = draft.deadline || '';
+
+                var pointsInput = getPointsInput();
+                if (pointsInput) pointsInput.value = draft.points || '';
+
+                var stopCheckbox = getElementById('stopSubmissions');
+                if (stopCheckbox) stopCheckbox.checked = !!draft.stopSubmissions;
+
+                var courseCheckboxes = document.querySelectorAll('.course-checkbox');
+                var selectedMap = {};
+                var i;
+                if (draft.courses && draft.courses.length) {
+                    for (i = 0; i < draft.courses.length; i++) selectedMap[String(draft.courses[i])] = true;
+                }
+                for (i = 0; i < courseCheckboxes.length; i++) {
+                    var value = String(courseCheckboxes[i].value);
+                    courseCheckboxes[i].checked = !!selectedMap[value];
+                }
+
+                if (draft.links && draft.links.length) {
+                    for (i = 0; i < draft.links.length; i++) appendLinkPreview(draft.links[i]);
+                }
+            } catch (e) {}
+        }
+
+        function bindDraftPersistenceListeners() {
+            var form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('input', function(){ saveDraftToStorage(); });
+                form.addEventListener('change', function(){ saveDraftToStorage(); });
+                form.addEventListener('submit', function(){ 
+                    clearDraftInStorage(); 
+                    clearNavigationFlag(); 
+                });
+            }
+            try {
+                if (typeof quill !== 'undefined') {
+                    quill.on('text-change', function(){ saveDraftToStorage(); });
+                }
+            } catch (e) {}
+            document.addEventListener('click', function(event){
+                var isAddLink = event.target && event.target.id === 'addLinkBtn';
+                var isDelete = event.target && (event.target.closest ? event.target.closest('.delete-file') : null);
+                if (isAddLink || isDelete) { setTimeout(function(){ saveDraftToStorage(); }, 0); }
+            });
+        }
+
+        function setNavigationFlag() {
+            try { localStorage.setItem(NAVIGATION_FLAG, '1'); } catch (e) {}
+        }
+
+        function clearNavigationFlag() {
+            try { localStorage.removeItem(NAVIGATION_FLAG); } catch (e) {}
+        }
+
+        function hasNavigatedAway() {
+            try {
+                var flag = localStorage.getItem(NAVIGATION_FLAG);
+                return flag === '1';
+            } catch (e) { return false; }
+        }
+
+        function checkAndClearOrRestore() {
+            try {
+                var params = new URLSearchParams(window.location.search);
+                var hasReuse = params.get('reuse');
+                if (hasReuse) {
+                    clearDraftInStorage();
+                    clearNavigationFlag();
+                    bindDraftPersistenceListeners();
+                    return;
+                }
+
+                var hasSelectedRubric = params.get('selectedRubricID');
+                var shouldRestore = hasNavigatedAway() || hasSelectedRubric;
+
+                if (!shouldRestore) {
+                    clearNavigationFlag();
+                    clearAllFormFields();
+                    bindDraftPersistenceListeners();
+                    return;
+                }
+
+                clearNavigationFlag();
+
+                var raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) {
+                    bindDraftPersistenceListeners();
+                    return;
+                }
+
+                var draft = null;
+                try { draft = JSON.parse(raw); } catch (e) { 
+                    clearDraftInStorage();
+                    bindDraftPersistenceListeners();
+                    return;
+                }
+
+                if (!draft) {
+                    bindDraftPersistenceListeners();
+                    return;
+                }
+
+                if (!hasUserEnteredData(draft)) {
+                    clearDraftInStorage();
+                    bindDraftPersistenceListeners();
+                    return;
+                }
+
+                restoreDraftFromStorage();
+                bindDraftPersistenceListeners();
+            } catch (e) {
+                bindDraftPersistenceListeners();
+            }
+        }
+
+        function bindNavigationAwayListeners() {
+            document.addEventListener('click', function(event) {
+                var link = event.target.closest ? event.target.closest('a') : null;
+                if (!link || !link.href) return;
+                var href = link.href;
+                if (href.indexOf('create-rubric.php') !== -1 || href.indexOf('edit-rubric.php') !== -1) {
+                    setNavigationFlag();
+                }
+            }, true);
+            
+            function bindEditLinks() {
+                var editLinks = document.querySelectorAll('a[href*="edit-rubric.php"]');
+                for (var i = 0; i < editLinks.length; i++) {
+                    var link = editLinks[i];
+                    if (link.dataset.navFlagSet) continue;
+                    link.dataset.navFlagSet = '1';
+                    link.addEventListener('click', function() {
+                        setNavigationFlag();
+                    });
+                }
+            }
+            
+            bindEditLinks();
+            
+            var modalEl = document.getElementById('selectRubricModal');
+            if (modalEl) {
+                modalEl.addEventListener('shown.bs.modal', function() {
+                    setTimeout(bindEditLinks, 100);
+                });
+            }
+        }
+
+        function initializeDraftPersistenceWithCleanStart() {
+            bindNavigationAwayListeners();
+            
+            function attemptCheck() {
+                if (typeof quill !== 'undefined' && quill.root) {
+                    checkAndClearOrRestore();
+                } else {
+                    setTimeout(attemptCheck, 100);
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function(){ attemptCheck(); });
+            } else {
+                attemptCheck();
+            }
+        }
+
+        initializeDraftPersistenceWithCleanStart();
+    })();
 </script>

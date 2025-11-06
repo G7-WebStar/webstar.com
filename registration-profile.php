@@ -4,8 +4,6 @@ include("shared/assets/database/connect.php");
 include("shared/assets/processes/registration-profile-process.php");
 ?>
 
-
-
 <!doctype html>
 <html lang="en">
 
@@ -18,6 +16,8 @@ include("shared/assets/processes/registration-profile-process.php");
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="shared/assets/css/global-styles.css">
     <link rel="stylesheet" href="shared/assets/css/registration-profile.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
@@ -67,13 +67,13 @@ include("shared/assets/processes/registration-profile-process.php");
                                 <div class="row mb-3 gx-3">
                                     <div class="col">
                                         <div class="form-floating">
-                                            <input type="text" name="firstName" class="form-control" id="firstName" placeholder=" ">
+                                            <input type="text" name="firstName" class="form-control" id="firstName" placeholder="" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')">
                                             <label for="firstName">First Name</label>
                                         </div>
                                     </div>
                                     <div class="col">
                                         <div class="form-floating">
-                                            <input type="text" name="middleName" class="form-control" id="middleName" placeholder=" ">
+                                            <input type="text" name="middleName" class="form-control" id="middleName" placeholder="" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')">
                                             <label for="middleName">Middle Name</label>
                                         </div>
                                     </div>
@@ -83,13 +83,13 @@ include("shared/assets/processes/registration-profile-process.php");
                                 <div class="row mb-3 gx-3">
                                     <div class="col">
                                         <div class="form-floating">
-                                            <input type="text" name="lastName" class="form-control" id="lastName" placeholder="Last Name">
+                                            <input type="text" name="lastName" class="form-control" id="lastName" placeholder="Last Name" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')">
                                             <label for="lastName">Last Name</label>
                                         </div>
                                     </div>
                                     <div class="col">
                                         <div class="form-floating">
-                                            <input type="text" name="userName" class="form-control" id="userName" placeholder="Username">
+                                            <input type="text" name="userName" class="form-control" id="userName" placeholder="Username" maxlength="30" pattern="^[^\s.]+$">
                                             <label for="userName">Username</label>
                                         </div>
                                     </div>
@@ -181,8 +181,12 @@ include("shared/assets/processes/registration-profile-process.php");
                     </div>
                 </form>
             </div>
-
         </div>
+    </div>
+    <!-- Toast Container -->
+    <div id="toastContainer"
+        class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center text-med text-14"
+        style="z-index:1100; pointer-events:none;">
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
@@ -191,48 +195,77 @@ include("shared/assets/processes/registration-profile-process.php");
         const fileInput = document.getElementById('fileInput');
         const uploadBtn = document.getElementById('uploadBtn');
         const profilePreview = document.getElementById('profilePreview');
+        const usernameInput = document.getElementById('userName');
+        const toastContainer = document.getElementById('toastContainer');
         const studentIDInput = document.getElementById('studentID');
 
-        // Auto-capitalize Student No. while typing
         studentIDInput.addEventListener('input', () => {
             studentIDInput.value = studentIDInput.value.toUpperCase();
         });
-        // Auto-lowercase username while typing
-        const usernameInput = document.getElementById('userName');
+
+        // Auto-lowercase username and remove spaces/dots
         usernameInput.addEventListener('input', () => {
-            usernameInput.value = usernameInput.value.toLowerCase();
+            usernameInput.value = usernameInput.value.toLowerCase().replace(/[\s.]/g, '');
         });
 
-        // Trigger file input when button is clicked
+        // Trigger file input
         uploadBtn.addEventListener('click', () => {
             fileInput.click();
         });
+
+        // Function to show toast with icon
+        function showToast(message, type = 'success') {
+            const alert = document.createElement('div');
+            alert.className = `alert mb-2 shadow-lg d-flex align-items-center gap-2 px-3 py-2 ${type === 'success' ? 'alert-success' : 'alert-danger'}`;
+            alert.style.transition = "opacity 0.5s ease";
+            alert.style.opacity = "1";
+
+            // Add icon using Bootstrap icons
+            const icon = document.createElement('i');
+            icon.className = `bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'} fs-6`;
+            icon.setAttribute('role', 'img');
+            icon.style.color = 'black';
+
+            const text = document.createElement('div');
+            text.className = 'text-med text-12';
+            text.innerText = message;
+
+            alert.appendChild(icon);
+            alert.appendChild(text);
+            toastContainer.appendChild(alert);
+
+            setTimeout(() => {
+                alert.style.opacity = "0";
+                setTimeout(() => alert.remove(), 500);
+            }, 3000);
+        }
 
         // File validation and preview
         fileInput.addEventListener('change', () => {
             const file = fileInput.files[0];
             if (file) {
                 const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-                const maxSize = 5 * 1024 * 1024;
+                const maxSize = 5 * 1024 * 1024; // 5 MB
 
                 if (!allowedTypes.includes(file.type)) {
-                    alert('Invalid file type. Only JPG, JPEG, and PNG are allowed.');
                     fileInput.value = '';
                     profilePreview.src = 'https://via.placeholder.com/150';
+                    showToast('Invalid file type. Only JPG, JPEG, and PNG are allowed.', 'danger');
                     return;
                 }
 
                 if (file.size > maxSize) {
-                    alert('File is too large. Maximum size is 5 MB.');
                     fileInput.value = '';
                     profilePreview.src = 'https://via.placeholder.com/150';
+                    showToast('File is too large. Maximum size is 5 MB.', 'danger');
                     return;
                 }
 
                 const reader = new FileReader();
                 reader.onload = e => {
                     profilePreview.src = e.target.result;
-                }
+                    showToast('Image uploaded successfully!', 'success');
+                };
                 reader.readAsDataURL(file);
             }
         });

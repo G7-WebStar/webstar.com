@@ -8,37 +8,21 @@ include("../shared/assets/processes/prof-session-process.php");
 $rubricID = isset($_GET['rubricID']) ? intval($_GET['rubricID']) : 0;
 $rubricTitle = '';
 $totalPoints = 0;
-$criterionID = 0; $criteriaTitle = ''; $criteriaDescription = '';
-$levelID = 0; $levelTitle = ''; $levelDescription = ''; $points = 0;
+$hasCriteria = false;
 
 if ($rubricID > 0) {
-    $rubSql = "SELECT rubricTitle, IFNULL(totalPoints,0) AS totalPoints FROM rubric WHERE rubricID='$rubricID' AND userID='$userID' LIMIT 1";
-    $rub = executeQuery($rubSql);
-    if ($rub && $rub->num_rows > 0) {
-        $r = $rub->fetch_assoc();
-        $rubricTitle = $r['rubricTitle'];
-        $totalPoints = (float)$r['totalPoints'];
+    $rubricSql = "SELECT rubricTitle, IFNULL(totalPoints,0) AS totalPoints FROM rubric WHERE rubricID='$rubricID' AND userID='$userID' LIMIT 1";
+    $rubricResult = executeQuery($rubricSql);
+    if ($rubricResult && $rubricResult->num_rows > 0) {
+        $rubricRow = $rubricResult->fetch_assoc();
+        $rubricTitle = $rubricRow['rubricTitle'];
+        $totalPoints = (float)$rubricRow['totalPoints'];
     }
 
-    $critSql = "SELECT criterionID, criteriaTitle, criteriaDescription FROM criteria WHERE rubricID='$rubricID' ORDER BY criterionID ASC LIMIT 1";
-    $crit = executeQuery($critSql);
-    if ($crit && $crit->num_rows > 0) {
-        $c = $crit->fetch_assoc();
-        $criterionID = intval($c['criterionID']);
-        $criteriaTitle = $c['criteriaTitle'];
-        $criteriaDescription = $c['criteriaDescription'];
-    }
-
-    if ($criterionID > 0) {
-        $lvlSql = "SELECT levelID, levelTitle, levelDescription, points FROM level WHERE criterionID='$criterionID' ORDER BY levelID ASC LIMIT 1";
-        $lvl = executeQuery($lvlSql);
-        if ($lvl && $lvl->num_rows > 0) {
-            $l = $lvl->fetch_assoc();
-            $levelID = intval($l['levelID']);
-            $levelTitle = $l['levelTitle'];
-            $levelDescription = $l['levelDescription'];
-            $points = (float)$l['points'];
-        }
+    $criteriaSql = "SELECT criterionID, criteriaTitle, criteriaDescription FROM criteria WHERE rubricID='$rubricID' ORDER BY criterionID ASC";
+    $criteriaResult = executeQuery($criteriaSql);
+    if ($criteriaResult && $criteriaResult->num_rows > 0) {
+        $hasCriteria = true;
     }
 }
 
@@ -55,20 +39,58 @@ if (isset($_POST['update_rubric'])) {
     $levelDescription = mysqli_real_escape_string($conn, $_POST['levelDescription'] ?? '');
     $points = isset($_POST['points']) && $_POST['points'] !== '' ? floatval($_POST['points']) : 0;
 
-    $qr = "UPDATE rubric SET rubricTitle='$rubricTitle', totalPoints='$points' WHERE rubricID='$rubricID' AND userID='$userID'";
-    executeQuery($qr);
-
     if ($criterionID > 0) {
-        $qc = "UPDATE criteria SET criteriaTitle='$criteriaTitle', criteriaDescription='$criteriaDescription' WHERE criterionID='$criterionID'";
-        executeQuery($qc);
+        $updateCriteriaQuery = "UPDATE criteria SET criteriaTitle='$criteriaTitle', criteriaDescription='$criteriaDescription' WHERE criterionID='$criterionID'";
+        executeQuery($updateCriteriaQuery);
     }
 
     if ($levelID > 0) {
-        $ql = "UPDATE level SET levelTitle='$levelTitle', levelDescription='$levelDescription', points='$points' WHERE levelID='$levelID'";
-        executeQuery($ql);
+        $updateLevelQuery = "UPDATE level SET levelTitle='$levelTitle', levelDescription='$levelDescription', points='$points' WHERE levelID='$levelID'";
+        executeQuery($updateLevelQuery);
     }
 
-    header('Location: assign-task.php');
+    // Bulk update levels from submitted JSON (if provided)
+    if (isset($_POST['allLevelsData']) && $_POST['allLevelsData'] !== '') {
+        $json = $_POST['allLevelsData'];
+        $levelItems = json_decode($json, true);
+        if (is_array($levelItems)) {
+            for ($i = 0; $i < count($levelItems); $i++) {
+                $item = $levelItems[$i];
+                // Defensive reads
+                $postedLevelId = isset($item['levelID']) ? intval($item['levelID']) : 0;
+                $postedCriterionId = isset($item['criterionID']) ? intval($item['criterionID']) : 0;
+                $postedLevelTitle = mysqli_real_escape_string($conn, isset($item['levelTitle']) ? $item['levelTitle'] : '');
+                $postedLevelDescription = mysqli_real_escape_string($conn, isset($item['levelDescription']) ? $item['levelDescription'] : '');
+                $postedPoints = isset($item['points']) ? floatval($item['points']) : 0;
+                if ($postedLevelId > 0) {
+                    $bulkUpdateLevelQuery = "UPDATE level SET levelTitle='$postedLevelTitle', levelDescription='$postedLevelDescription', points='$postedPoints' WHERE levelID='$postedLevelId'";
+                    executeQuery($bulkUpdateLevelQuery);
+                }
+            }
+        }
+    }
+
+    // Recalculate total points for the rubric from DB: sum of max points per criterion
+    $totalCalculated = 0;
+    $criteriaCalculationSql = "SELECT criterionID FROM criteria WHERE rubricID='$rubricID'";
+    $criteriaCalculationResult = executeQuery($criteriaCalculationSql);
+    if ($criteriaCalculationResult && $criteriaCalculationResult->num_rows > 0) {
+        while ($criteriaCalculationRow = $criteriaCalculationResult->fetch_assoc()) {
+            $criterionIdForCalculation = intval($criteriaCalculationRow['criterionID']);
+            $maxPointsSql = "SELECT MAX(points) AS maxPoints FROM level WHERE criterionID='$criterionIdForCalculation'";
+            $maxPointsResult = executeQuery($maxPointsSql);
+            if ($maxPointsResult && $maxPointsResult->num_rows > 0) {
+                $maxPointsRow = $maxPointsResult->fetch_assoc();
+                $maxPointsValue = isset($maxPointsRow['maxPoints']) ? floatval($maxPointsRow['maxPoints']) : 0;
+                $totalCalculated += $maxPointsValue;
+            }
+        }
+    }
+
+    $updateRubricQuery = "UPDATE rubric SET rubricTitle='$rubricTitle', totalPoints='$totalCalculated' WHERE rubricID='$rubricID' AND userID='$userID'";
+    executeQuery($updateRubricQuery);
+
+    header('Location: assign-task.php?selectedRubricID=' . $rubricID);
     exit;
 }
 ?>
@@ -160,19 +182,48 @@ if (isset($_POST['update_rubric'])) {
                                     </div>
                                 </div>
 
-                                <!-- Criterion-->
+                                <div id="criteriaList">
+                                <?php
+                                $computedTotal = 0;
+                                if ($hasCriteria && $rubricID > 0) {
+                                    $criteriaSql = "SELECT criterionID, criteriaTitle, criteriaDescription FROM criteria WHERE rubricID='$rubricID' ORDER BY criterionID ASC";
+                                    $criteriaResult = executeQuery($criteriaSql);
+                                    $criterionIndex = 0;
+                                    if ($criteriaResult && $criteriaResult->num_rows > 0) {
+                                        while ($criteriaRow = $criteriaResult->fetch_assoc()) {
+                                            $criterionIndex++;
+                                            $criterionId = intval($criteriaRow['criterionID']);
+                                            $criteriaTitleValue = $criteriaRow['criteriaTitle'];
+                                            $criteriaDescriptionValue = $criteriaRow['criteriaDescription'];
+                                            
+        	                                // Fetch levels once: collect rows and compute max points
+                                            $levelRows = [];
+                                            $maxPointsForCriterion = 0;
+                                            $levelsSql = "SELECT levelID, levelTitle, levelDescription, points FROM level WHERE criterionID='$criterionId' ORDER BY levelID ASC";
+                                            $levelsResult = executeQuery($levelsSql);
+                                            if ($levelsResult && $levelsResult->num_rows > 0) {
+                                                while ($levelRow = $levelsResult->fetch_assoc()) {
+                                                    $levelIdVal = intval($levelRow['levelID']);
+                                                    $levelTitleVal = $levelRow['levelTitle'];
+                                                    $levelDescVal = $levelRow['levelDescription'];
+                                                    $levelPointsVal = isset($levelRow['points']) ? floatval($levelRow['points']) : 0;
+                                                    if ($levelPointsVal > $maxPointsForCriterion) {
+                                                        $maxPointsForCriterion = $levelPointsVal;
+                                                    }
+                                                    // store as numeric array to avoid associative arrow syntax
+                                                    $levelRows[] = [$levelIdVal, $levelTitleVal, $levelDescVal, $levelPointsVal];
+                                                }
+                                            }
+                                            $computedTotal += $maxPointsForCriterion;
+                                ?>
+                                <div class="criterion-wrapper" data-index="<?php echo $criterionIndex; ?>" data-criterion-id="<?php echo $criterionId; ?>">
                                 <div class="row">
                                     <div class="col-12 pt-0 mb-2">
                                         <div class="d-flex align-items-center">
-                                            <span class="form-label text-med text-16 m-0">Criterion 1 · 20
-                                                Points</span>
-                                            <div class="flex" style="border-top: 1px solid transparent;">
-                                            </div>
-                                            <button type="button" class="criterion-remove-btn"
-                                                aria-label="Remove criterion">
-                                                <span class="material-symbols-outlined">
-                                                    close
-                                                </span>
+                                                <span class="form-label text-med text-16 m-0 criterion-header-points">Criterion <?php echo $criterionIndex; ?> · <?php echo $maxPointsForCriterion; ?> Points</span>
+                                                <div class="flex" style="border-top: 1px solid transparent;"></div>
+                                                <button type="button" class="criterion-remove-btn" aria-label="Remove criterion">
+                                                    <span class="material-symbols-outlined">close</span>
                                             </button>
                                         </div>
                                     </div>
@@ -182,12 +233,8 @@ if (isset($_POST['update_rubric'])) {
                                 <form class="criteria-title">
                                     <div class="row">
                                         <div class="col-12 pt-2 mb-2">
-                                            <label for="criteriaTitle" class="form-label text-med text-16">Criteria
-                                                Title</label>
-                                            <input type="text" value="<?php echo htmlspecialchars($criteriaTitle); ?>"
-                                                class="form-control textbox mb-1 p-3 text-reg text-14 text-muted"
-                                                id="criteriaTitle" aria-describedby="criteriaTitle"
-                                                placeholder="Criteria Title">
+                                                <label for="criteriaTitle" class="form-label text-med text-16">Criteria Title</label>
+                                                <input type="text" value="<?php echo htmlspecialchars($criteriaTitleValue); ?>" class="form-control textbox mb-1 p-3 text-reg text-14 text-muted" id="criteriaTitle" aria-describedby="criteriaTitle" placeholder="Criteria Title">
                                         </div>
                                     </div>
                                 </form>
@@ -196,60 +243,157 @@ if (isset($_POST['update_rubric'])) {
                                 <form class="criterion-description">
                                     <div class="row">
                                         <div class="col-12 pt-2 mb-2">
-                                            <input type="text" value="<?php echo htmlspecialchars($criteriaDescription); ?>"
-                                                class="form-control textbox mb-2 p-3 text-reg text-14 text-muted"
-                                                id="criterionDescription" aria-describedby="criterionDescription"
-                                                placeholder="Criterion Description">
+                                                <input type="text" value="<?php echo htmlspecialchars($criteriaDescriptionValue); ?>" class="form-control textbox mb-2 p-3 text-reg text-14 text-muted" id="criterionDescription" aria-describedby="criterionDescription" placeholder="Criterion Description">
                                         </div>
                                     </div>
                                 </form>
 
-                                <!-- Criterion Description Card -->
+                                    <!-- Levels container -->
+                                    <div class="row">
+                                        <div class="col-12 pt-1 levelsContainer">
+                                        <?php 
+                                        if (!empty($levelRows)) {
+                                            for ($i = 0; $i < count($levelRows); $i++) {
+                                                $levelId = $levelRows[$i][0];
+                                                $levelTitleValue = $levelRows[$i][1];
+                                                $levelDescriptionValue = $levelRows[$i][2];
+                                                $levelPointsValue = $levelRows[$i][3];
+                                        ?>
+                                            <div class="criterion-description-card mb-3" data-level-id="<?php echo $levelId; ?>">
+                                                <div class="card-body">
+                                                    <form class="level-title">
+                                                        <div class="row">
+                                                            <div class="col-12 pt-2 mb-2">
+                                                                <input type="text" value="<?php echo htmlspecialchars($levelTitleValue); ?>" class="form-control textbox mb-1 p-3 text-reg text-14 text-muted" id="levelTitle" aria-describedby="levelTitle" placeholder="Level Title">
+                                                                <button type="button" class="card-remove-btn" aria-label="Remove criterion">
+                                                                    <span class="material-symbols-outlined">close</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                    <form class="level-description">
+                                                        <div class="row">
+                                                            <div class="col-12 pt-2 mb-2">
+                                                                <input type="text" value="<?php echo htmlspecialchars($levelDescriptionValue); ?>" class="form-control textbox mb-1 p-3 text-reg text-14 text-muted" id="levelDescription" aria-describedby="levelDescription" placeholder="Level Description">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                    <form class="points-label">
                                 <div class="row">
-                                    <div class="col-12 pt-1">
-                                        <div class="criterion-description-card">
+                                                            <div class="col-12 pt-2 mb-3">
+                                                                <label for="criteriaTitle" class="form-label">Points</label>
+                                                                <input type="text" value="<?php echo htmlspecialchars($levelPointsValue); ?>" class="form-control textbox mb-1 p-3 text-reg text-14 text-muted level-points" id="pointsLabel" aria-describedby="pointsLabel" placeholder="0">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        <?php 
+                                            }
+                                        } else { 
+                                        ?>
+                                            <div class="criterion-description-card mb-3">
                                             <div class="card-body">
+                                                    <form class="level-title">
+                                                        <div class="row">
+                                                            <div class="col-12 pt-2 mb-2">
+                                                                <input type="text" value="" class="form-control textbox mb-1 p-3 text-reg text-14 text-muted" id="levelTitle" aria-describedby="levelTitle" placeholder="Level Title">
+                                                                <button type="button" class="card-remove-btn" aria-label="Remove criterion">
+                                                                    <span class="material-symbols-outlined">close</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                    <form class="level-description">
+                                                        <div class="row">
+                                                            <div class="col-12 pt-2 mb-2">
+                                                                <input type="text" value="" class="form-control textbox mb-1 p-3 text-reg text-14 text-muted" id="levelDescription" aria-describedby="levelDescription" placeholder="Level Description">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                    <form class="points-label">
+                                                        <div class="row">
+                                                            <div class="col-12 pt-2 mb-3">
+                                                                <label for="criteriaTitle" class="form-label">Points</label>
+                                                                <input type="text" value="0" class="form-control textbox mb-1 p-3 text-reg text-14 text-muted level-points" id="pointsLabel" aria-describedby="pointsLabel" placeholder="0">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        <?php } ?>
+                                        </div>
+                                    </div>
 
-                                                <!-- Level Title -->
+                                    <div class="row">
+                                        <div class="col-12 pt-3">
+                                            <button type="button" class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-2 d-inline-flex align-items-center add-level-btn" style="background-color: var(--primaryColor); border: 1px solid var(--black); margin-left: 0; margin-right: auto;">
+                                                <span class="material-symbols-outlined me-1" aria-hidden="true">add_circle</span>
+                                                Level
+                                            </button>
+                                            <hr class="section-divider mt-3 mb-3">
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php 
+                                        }
+                                    }
+                                } else { 
+                                ?>
+                                <!-- No criteria: render one empty criterion like create page -->
+                                <div class="criterion-wrapper" data-index="1">
+                                    <div class="row">
+                                        <div class="col-12 pt-0 mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <span class="form-label text-med text-16 m-0 criterion-header-points">Criterion 1 · 0 Points</span>
+                                                <div class="flex" style="border-top: 1px solid transparent;"></div>
+                                                <button type="button" class="criterion-remove-btn" aria-label="Remove criterion">
+                                                    <span class="material-symbols-outlined">close</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <form class="criteria-title">
+                                        <div class="row">
+                                            <div class="col-12 pt-2 mb-2">
+                                                <label for="criteriaTitle" class="form-label text-med text-16">Criteria Title</label>
+                                                <input type="text" value="" class="form-control textbox mb-1 p-3 text-reg text-14 text-muted" id="criteriaTitle" aria-describedby="criteriaTitle" placeholder="Criteria Title">
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <form class="criterion-description">
+                                        <div class="row">
+                                            <div class="col-12 pt-2 mb-2">
+                                                <input type="text" value="" class="form-control textbox mb-2 p-3 text-reg text-14 text-muted" id="criterionDescription" aria-describedby="criterionDescription" placeholder="Criterion Description">
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <div class="row">
+                                        <div class="col-12 pt-1 levelsContainer">
+                                            <div class="criterion-description-card mb-3">
+                                                <div class="card-body">
                                                 <form class="level-title">
                                                     <div class="row">
                                                         <div class="col-12 pt-2 mb-2">
-                                                            <input type="text" value="<?php echo htmlspecialchars($levelTitle); ?>"
-                                                                class="form-control textbox mb-1 p-3 text-reg text-14 text-muted"
-                                                                id="levelTitle" aria-describedby="levelTitle"
-                                                                placeholder="Level Title">
-                                                            <button type="button" class="card-remove-btn"
-                                                                aria-label="Remove criterion">
-                                                                <span class="material-symbols-outlined">
-                                                                    close
-                                                                </span>
+                                                                <input type="text" value="" class="form-control textbox mb-1 p-3 text-reg text-14 text-muted" id="levelTitle" aria-describedby="levelTitle" placeholder="Level Title">
+                                                                <button type="button" class="card-remove-btn" aria-label="Remove criterion">
+                                                                    <span class="material-symbols-outlined">close</span>
                                                             </button>
                                                         </div>
                                                     </div>
                                                 </form>
-
-                                                <!-- Level Description -->
                                                 <form class="level-description">
                                                     <div class="row">
                                                         <div class="col-12 pt-2 mb-2">
-                                                            <input type="text" value="<?php echo htmlspecialchars($levelDescription); ?>"
-                                                                class="form-control textbox mb-1 p-3 text-reg text-14 text-muted"
-                                                                id="levelDescription"
-                                                                aria-describedby="levelDescription"
-                                                                placeholder="Level Description">
+                                                                <input type="text" value="" class="form-control textbox mb-1 p-3 text-reg text-14 text-muted" id="levelDescription" aria-describedby="levelDescription" placeholder="Level Description">
                                                         </div>
                                                     </div>
                                                 </form>
-
-                                                <!-- Points Label -->
                                                 <form class="points-label">
                                                     <div class="row">
                                                         <div class="col-12 pt-2 mb-3">
                                                             <label for="criteriaTitle" class="form-label">Points</label>
-                                                            <input type="text" value="<?php echo htmlspecialchars($points); ?>"
-                                                                class="form-control textbox mb-1 p-3 text-reg text-14 text-muted"
-                                                                id="pointsLabel" aria-describedby="pointsLabel"
-                                                                placeholder="1">
+                                                                <input type="text" value="0" class="form-control textbox mb-1 p-3 text-reg text-14 text-muted level-points" id="pointsLabel" aria-describedby="pointsLabel" placeholder="0">
                                                         </div>
                                                     </div>
                                                 </form>
@@ -257,30 +401,29 @@ if (isset($_POST['update_rubric'])) {
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="row">
                                     <div class="col-12 pt-3">
-                                        <button type="button"
-                                            class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-2 d-inline-flex align-items-center"
-                                            style="background-color: var(--primaryColor); border: 1px solid var(--black); margin-left: 0; margin-right: auto;">
-                                            <span class="material-symbols-outlined me-1"
-                                                aria-hidden="true">add_circle</span>
+                                            <button type="button" class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-2 d-inline-flex align-items-center add-level-btn" style="background-color: var(--primaryColor); border: 1px solid var(--black); margin-left: 0; margin-right: auto;">
+                                                <span class="material-symbols-outlined me-1" aria-hidden="true">add_circle</span>
                                             Level
                                         </button>
                                         <hr class="section-divider mt-3 mb-3">
                                     </div>
+                                    </div>
+                                </div>
+                                <?php } ?>
                                 </div>
 
+                                <!-- Add Criteria Button -->
                                 <div class="row">
                                     <div class="col-12">
-                                        <button type="button"
+                                        <button type="button" id="addCriteriaBtn"
                                             class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 d-inline-flex align-items-center"
                                             style="background-color: var(--primaryColor); border: 1px solid var(--black); margin-left: 0; margin-right: auto;">
-                                            <span class="material-symbols-outlined me-1"
-                                                aria-hidden="true">add_circle</span>
+                                            <span class="material-symbols-outlined me-1" aria-hidden="true">add_circle</span>
                                             Criteria
                                         </button>
-                                        <span class="text-med text-16 total-points-label">Total Points: <?php echo (float)$totalPoints; ?></span>
+                                        <span class="text-med text-16 total-points-label">Total Points: <?php echo (float)($computedTotal > 0 ? $computedTotal : $totalPoints); ?></span>
                                     </div>
                                 </div>
 
@@ -292,6 +435,12 @@ if (isset($_POST['update_rubric'])) {
                                             Update
                                         </button>
                                     </div>
+                                </div>
+
+                                <!-- Toast Container -->
+                                <div id="toastContainer"
+                                    class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+                                    style="z-index:1100; pointer-events:none;">
                                 </div>
                             </div>
                         </div>
@@ -313,9 +462,50 @@ if (isset($_POST['update_rubric'])) {
             <input type="hidden" name="levelTitle" id="post_levelTitle">
             <input type="hidden" name="levelDescription" id="post_levelDescription">
             <input type="hidden" name="points" id="post_points">
+            <input type="hidden" name="allLevelsData" id="post_allLevelsData">
         </form>
         <script>
             (function(){
+                function showAlert(message) {
+                    var container = document.getElementById('toastContainer');
+                    if (!container) return alert(message);
+
+                    var alertEl = document.createElement('div');
+                    alertEl.className = 'alert alert-danger alert-dismissible fade show mb-2 text-center d-flex align-items-center justify-content-center shadow-lg text-reg text-16';
+                    alertEl.role = 'alert';
+                    alertEl.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2 fs-6"></i>' +
+                        '<span>' + message + '</span>' +
+                        '<button type="button" class="btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>';
+
+                    container.appendChild(alertEl);
+
+                    setTimeout(function() {
+                        alertEl.classList.remove('show');
+                        alertEl.classList.add('fade');
+                        setTimeout(function() { if (alertEl && alertEl.parentNode) alertEl.parentNode.removeChild(alertEl); }, 500);
+                    }, 4000);
+                }
+
+                function showSuccessToast(message) {
+                    var container = document.getElementById('toastContainer');
+                    if (!container) return;
+
+                    var alertEl = document.createElement('div');
+                    alertEl.className = 'alert alert-success mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2';
+                    alertEl.role = 'alert';
+                    alertEl.style.transition = 'opacity 2s ease';
+                    alertEl.style.opacity = '1';
+                    alertEl.innerHTML = '<i class="bi bi-check-circle-fill fs-6"></i>' +
+                        '<span>' + message + '</span>';
+
+                    container.appendChild(alertEl);
+
+                    setTimeout(function() {
+                        alertEl.style.opacity = '0';
+                        setTimeout(function() { alertEl.remove(); }, 2000);
+                    }, 3000);
+                }
+
                 var btn = document.getElementById('updateBtn');
                 if (!btn) return;
                 btn.addEventListener('click', function(){
@@ -326,8 +516,156 @@ if (isset($_POST['update_rubric'])) {
                     document.getElementById('post_levelTitle').value = get('levelTitle');
                     document.getElementById('post_levelDescription').value = get('levelDescription');
                     document.getElementById('post_points').value = get('pointsLabel');
-                    document.getElementById('hiddenEditPost').submit();
+
+                    // Collect all level edits across all criteria
+                    var levelsData = [];
+                    var wrappers = document.querySelectorAll('.criterion-wrapper');
+                    for (var i = 0; i < wrappers.length; i++){
+                        var criterionIdAttr = wrappers[i].getAttribute('data-criterion-id');
+                        var criterionIdVal = criterionIdAttr ? parseInt(criterionIdAttr, 10) : 0;
+                        var levelCards = wrappers[i].querySelectorAll('.criterion-description-card');
+                        for (var j = 0; j < levelCards.length; j++){
+                            var levelIdAttr = levelCards[j].getAttribute('data-level-id');
+                            var levelIdVal = levelIdAttr ? parseInt(levelIdAttr, 10) : 0;
+                            var titleInput = levelCards[j].querySelector('#levelTitle');
+                            var descInput = levelCards[j].querySelector('#levelDescription');
+                            var pointsInput = levelCards[j].querySelector('.level-points');
+                            var titleVal = titleInput && titleInput.value ? titleInput.value.trim() : '';
+                            var descVal = descInput && descInput.value ? descInput.value.trim() : '';
+                            var pts = pointsInput && pointsInput.value ? parseFloat(pointsInput.value) : 0;
+                            if (isNaN(pts)) { pts = 0; }
+                            levelsData.push({ criterionID: criterionIdVal, levelID: levelIdVal, levelTitle: titleVal, levelDescription: descVal, points: pts });
+                        }
+                    }
+                    try { document.getElementById('post_allLevelsData').value = JSON.stringify(levelsData); } catch (e) { document.getElementById('post_allLevelsData').value = '[]'; }
+
+                    // Submit via AJAX instead of form submission
+                    var form = document.getElementById('hiddenEditPost');
+                    var formData = new FormData(form);
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', window.location.href, true);
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4) {
+                            if (xhr.status === 200 || xhr.status === 302) {
+                                // Success - show toast then redirect
+                                var rubricIDInput = form.querySelector('input[name="rubricID"]');
+                                var rubricID = rubricIDInput ? rubricIDInput.value : '';
+                                showSuccessToast('Rubric successfully updated');
+                                setTimeout(function() {
+                                    window.location.href = 'assign-task.php?selectedRubricID=' + encodeURIComponent(rubricID);
+                                }, 1500);
+                            } else {
+                                showAlert('Failed to update rubric.');
+                            }
+                        }
+                    };
+                    xhr.send(formData);
                 });
+            })();
+        </script>
+
+        <script>
+            (function(){
+                function parsePoints(val){ var n = parseFloat(val); return isNaN(n) ? 0 : n; }
+                function calculateCriterionMax(wrapper){
+                    if (!wrapper) return 0;
+                    var inputs = wrapper.getElementsByClassName('level-points');
+                    var max = 0;
+                    for (var i = 0; i < inputs.length; i++) { var v = parsePoints(inputs[i].value); if (v > max) max = v; }
+                    return max;
+                }
+                function updateCriterionHeader(wrapper){
+                    if (!wrapper) return 0;
+                    var max = calculateCriterionMax(wrapper);
+                    var header = wrapper.querySelector('.criterion-header-points');
+                    var idx = wrapper.dataset && wrapper.dataset.index ? wrapper.dataset.index : '1';
+                    if (header) header.textContent = 'Criterion ' + idx + ' · ' + max + ' Points';
+                    return max;
+                }
+                function updateTotal(){
+                    var total = 0;
+                    var wrappers = document.querySelectorAll('.criterion-wrapper');
+                    for (var i = 0; i < wrappers.length; i++) total += calculateCriterionMax(wrappers[i]);
+                    var lbl = document.querySelector('.total-points-label');
+                    if (lbl) lbl.textContent = 'Total Points: ' + total;
+                }
+                document.addEventListener('input', function(e){
+                    if (e.target && e.target.classList && e.target.classList.contains('level-points')){
+                        var wrap = e.target.closest ? e.target.closest('.criterion-wrapper') : null;
+                        updateCriterionHeader(wrap);
+                        updateTotal();
+                    }
+                });
+                document.addEventListener('click', function(e){
+                    var btn = e.target && (e.target.closest ? e.target.closest('.card-remove-btn') : null);
+                    if (!btn) return;
+                    var card = btn.closest ? btn.closest('.criterion-description-card') : null;
+                    if (!card) return;
+                    var wrap = btn.closest ? btn.closest('.criterion-wrapper') : null;
+                    var container = wrap ? wrap.querySelector('.levelsContainer') : null;
+                    if (!container) return;
+                    var total = container.querySelectorAll('.criterion-description-card').length;
+                    if (total > 1) {
+                        card.parentNode.removeChild(card);
+                        updateCriterionHeader(wrap);
+                        updateTotal();
+                    }
+                });
+                function bindLevelButtons(scope){
+                    var buttons = (scope || document).getElementsByClassName('add-level-btn');
+                    for (var i = 0; i < buttons.length; i++){
+                        buttons[i].onclick = function(){
+                            var wrap = this.closest ? this.closest('.criterion-wrapper') : null;
+                            if (!wrap) return;
+                            var container = wrap.querySelector('.levelsContainer');
+                            var firstCard = container ? container.querySelector('.criterion-description-card') : null;
+                            if (!firstCard) return;
+                            var clone = firstCard.cloneNode(true);
+                            var inputs = clone.querySelectorAll('input');
+                            for (var j = 0; j < inputs.length; j++) { inputs[j].value = ''; inputs[j].style.border = ''; }
+                            container.appendChild(clone);
+                            updateCriterionHeader(wrap);
+                            updateTotal();
+                        };
+                    }
+                }
+                bindLevelButtons();
+                // Add criteria button handler
+                (function(){
+                    var btn = document.getElementById('addCriteriaBtn');
+                    if (!btn) return;
+                    btn.addEventListener('click', function(){
+                        var list = document.getElementById('criteriaList');
+                        if (!list) return;
+                        var wrappers = list.querySelectorAll('.criterion-wrapper');
+                        var nextIndex = wrappers.length + 1;
+                        // clone first wrapper as template
+                        var base = wrappers.length > 0 ? wrappers[0] : null;
+                        if (!base) return;
+                        var wrapper = base.cloneNode(true);
+                        // clear inputs
+                        var inputs = wrapper.querySelectorAll('input');
+                        for (var i = 0; i < inputs.length; i++) { inputs[i].value = ''; inputs[i].style.border = ''; }
+                        // keep only first level card
+                        var levelsContainer = wrapper.querySelector('.levelsContainer');
+                        if (levelsContainer) {
+                            var cards = levelsContainer.querySelectorAll('.criterion-description-card');
+                            for (var k = 1; k < cards.length; k++) { cards[k].parentNode.removeChild(cards[k]); }
+                        }
+                        wrapper.dataset.index = String(nextIndex);
+                        var header = wrapper.querySelector('.criterion-header-points');
+                        if (header) header.textContent = 'Criterion ' + nextIndex + ' · 0 Points';
+                        bindLevelButtons(wrapper);
+                        list.appendChild(wrapper);
+                        updateTotal();
+                        if (wrapper.scrollIntoView) wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
+                })();
+                (function init(){
+                    var wrappers = document.querySelectorAll('.criterion-wrapper');
+                    for (var i = 0; i < wrappers.length; i++) updateCriterionHeader(wrappers[i]);
+                    updateTotal();
+                })();
             })();
         </script>
 
