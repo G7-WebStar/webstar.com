@@ -5,6 +5,11 @@ include('shared/assets/database/connect.php');
 include("shared/assets/processes/session-process.php");
 $testID = $_GET['testID'];
 
+if ($testID == null) {
+    header("Location: 404.php");
+    exit();
+}
+
 $submissionValidationQuery = "SELECT * FROM testresponses WHERE testID = $testID AND userID = $userID";
 $submissionValidationResult = executeQuery($submissionValidationQuery);
 
@@ -253,8 +258,8 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             ?>
         ];
 
-        let savedChoiceText = JSON.parse(localStorage.getItem("choiceText<?php echo $testID; ?>")) || [];
-        let savedSelectedAnswers = JSON.parse(localStorage.getItem("selectedAnswers<?php echo $testID; ?>")) || [];
+        let savedChoiceText = JSON.parse(localStorage.getItem("choiceText<?php echo $testID; ?>"));
+        let savedSelectedAnswers = JSON.parse(localStorage.getItem("selectedAnswers<?php echo $testID; ?>"));
         let savedRemainingTime = localStorage.getItem("remainingTime<?php echo $testID; ?>");
 
         //Timer Variables
@@ -416,7 +421,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             if (questions[currentQuestionIndex].type == "Multiple Choice") {
                 currentQuestion.answers.forEach(answer => {
                     const button = document.createElement('div');
-                    button.innerHTML = answer.text;
+                    button.textContent = answer.text;
                     button.classList.add('col-12', 'bg-white', 'border', 'border-black', 'rounded-3', 'my-2', 'p-2', 'text-sbold', 'text-center', 'interactable');
                     button.id = "question" + questionNo + "-choice" + choiceNo;
                     choiceIDs.push(button.id);
@@ -494,7 +499,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
 
                 //Replaces the answers in the array with new answers
                 const selectedChoice = {
-                    userAnswer: this.innerHTML,
+                    userAnswer: this.textContent,
                     testQuestionID: questions[currentQuestionIndex].questionID
                 };
 
@@ -507,7 +512,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
 
                 //Stores the answers in an array
                 const selectedChoice = {
-                    userAnswer: this.innerHTML,
+                    userAnswer: this.textContent,
                     testQuestionID: questions[currentQuestionIndex].questionID
                 };
 
@@ -527,7 +532,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             console.log(choiceText[currentQuestionIndex]);
             const inputField = document.getElementById('input' + currentQuestionIndex);
             const identificationAnswer = {
-                userAnswer: inputField.value,
+                userAnswer: inputField.value.trim(),
                 testQuestionID: questions[currentQuestionIndex].questionID
             };
             choiceText[currentQuestionIndex] = identificationAnswer;

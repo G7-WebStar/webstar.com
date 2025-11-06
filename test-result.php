@@ -4,14 +4,21 @@ include('shared/assets/database/connect.php');
 
 include("shared/assets/processes/session-process.php");
 $testID = $_GET['testID'];
-
-$submissionValidationQuery = "SELECT * FROM testresponses WHERE testID = $testID AND userID = $userID";
-$submissionValidationResult = executeQuery($submissionValidationQuery);
-
-if (mysqli_num_rows($submissionValidationResult) > 0) {
-    header("Location: index.php");
+if ($testID == null) {
+    header("Location: 404.php");
     exit();
 }
+
+$scoresQuery = "SELECT * FROM testresponses WHERE testID = $testID AND userID = $userID";
+$scoresResult = executeQuery($scoresQuery);
+$scoresArray = [];
+if (mysqli_num_rows($scoresResult) > 0) {
+    while ($scoresRow = mysqli_fetch_assoc($scoresResult)) {
+        $scoresArray[] = ["userAnswer" => $scoresRow['userAnswer'], "isCorrect" => $scoresRow['isCorrect']];
+    }
+}
+
+$scoresRow = mysqli_fetch_assoc($scoresResult);
 
 $selectTestQuery = "SELECT assessmentTitle, generalGuidance FROM tests 
                     INNER JOIN assessments
@@ -20,24 +27,34 @@ $selectTestQuery = "SELECT assessmentTitle, generalGuidance FROM tests
 $selectTestResult = executeQuery($selectTestQuery);
 
 $selectQuestionsQuery = "SELECT 
-testquestions.* 
+testquestions.*
 FROM tests 
 INNER JOIN testquestions 
     ON tests.testID = testquestions.testID 
 WHERE tests.testID = $testID";
 $selectQuestionsResult = executeQuery($selectQuestionsQuery);
-
+$todoStatus = 'Submitted';
 $validateTestIDQuery = "SELECT 
                         todo.* 
                         FROM todo 
                         INNER JOIN tests 
                         ON todo.assessmentID = tests.assessmentID 
-                        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = 'Pending';";
+                        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = '$todoStatus';";
 $validateTestIDResult = executeQuery($validateTestIDQuery);
 
 if (mysqli_num_rows($validateTestIDResult) <= 0) {
-    header("Location: index.php");
-    exit();
+    $todoStatus = 'Pending';
+    $checkStatusQuery = "SELECT 
+                        todo.* 
+                        FROM todo 
+                        INNER JOIN tests 
+                        ON todo.assessmentID = tests.assessmentID 
+                        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = '$todoStatus';";
+    $checkStatusResult = executeQuery($checkStatusQuery);
+    if (mysqli_num_rows($checkStatusResult) > 0) {
+        header("Location: test.php?testID=" . $testID);
+        exit();
+    }
 }
 ?>
 <!doctype html>
@@ -75,6 +92,14 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             background-color: var(--highlight75) !important;
         }
 
+        .bg-correct {
+            background-color: var(--highlight15) !important;
+        }
+
+        .bg-wrong {
+            background-color: #ecc1c1ff;
+        }
+
         @media screen and (max-width: 767px) {
             .fs-sm-6 {
                 font-size: 1rem !important;
@@ -92,6 +117,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
 
         ::-webkit-scrollbar-thumb {
             background: var(--primaryColor);
+            /* Your accent color */
             border-radius: 10px;
             border: 2px solid var(--dirtyWhite);
         }
@@ -112,18 +138,26 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
         style="background-color: var(--black);">
 
         <div class="row w-100 m-0">
+
+            <!-- Sidebar (only shows on mobile) -->
             <?php include 'shared/components/sidebar-for-mobile.php'; ?>
+
+            <!-- Sidebar Column (fixed on desktop) -->
             <?php include 'shared/components/sidebar-for-desktop.php'; ?>
 
+            <!-- Main Container Column -->
             <div class="col-12 col-md main-container m-0 p-0 mx-0 mx-md-2 p-md-4 overflow-auto">
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
+
+                    <!-- Navbar for mobile -->
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
                     <div class="container-fluid py-1 overflow-y-auto d-flex flex-column h-100 row-padding-top">
                         <div class="row flex-grow-1">
                             <div class="col-12 d-flex flex-column h-100">
 
+                                <!-- Quiz Nav -->
                                 <div class="row bg-white border border-black rounded-4 my-3 text-sbold mx-0 mx-md-1">
                                     <i class="d-block d-md-none announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 mt-3 me-3"
                                         style="color: var(--black);"></i>
@@ -138,54 +172,68 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                                                     <div class="text-center text-md-auto h2 m-0">
                                                         <?php echo $guideLines['assessmentTitle']; ?>
                                                     </div>
+                                            <?php
+                                                }
+                                            } ?>
                                         </div>
-                                        <div class="h2 mt-3 mt-md-0 mb-0 text-center text-md-end" id="timer"></div>
+                                        <div class="h2 mt-3 mt-md-0 mb-0 text-center text-md-end" id="timer">
+
+                                        </div>
                                     </div>
                                 </div>
+                                <!-- End of Quiz Nav -->
 
+                                <!-- Content -->
                                 <div class="row flex-grow-1">
                                     <div class="col-12 d-flex flex-column flex-grow-1">
                                         <div class="question-container">
                                             <div class="h2 text-reg text-center mt-4 fs-sm-6" id="question-number">
-                                                <div class="text-sbold">Instructions</div>
+                                                <div class="text-sbold">
+
+                                                </div>
                                             </div>
                                             <div class="h2 text-sbold text-center mt-4 fs-sm-6" id="question-container">
-                                                <div class="col-12 col-md-8 h4 text-reg mx-auto mt-4 px-3 px-md-0 text-center text-md-start fs-sm-6">
-                                                    <?php echo $guideLines['generalGuidance']; ?>
-                                            <?php
-                                                }
-                                            }
-                                            ?>
-                                                </div>
+
                                             </div>
                                         </div>
 
                                         <div class="row my-0 mx-auto justify-content-center align-content-center" id="img-container">
                                             <img src="" id="img-question">
                                         </div>
-                                        <div class="col-12 col-md-8 h5 text-reg mx-auto my-0 px-3 px-md-0 text-center text-md-start fs-sm-6 d-flex justify-content-center flex-column" id="choices"></div>
+                                        <div class="col-12 col-md-8 h5 text-reg mx-auto my-0 px-3 px-md-0 text-center text-md-start fs-sm-6 d-flex justify-content-center flex-column" id="choices">
+                                        </div>
 
                                         <div class="mt-auto text-sbold">
                                             <div class="d-flex justify-content-center justify-content-md-around align-items-center mb-4 gap-3 gap-md-0 mt-5" id="buttonSection">
-                                                <div class="btn d-flex align-items-center justify-content-center border border-black rounded-5 px-sm-4 py-sm-2 interactable"
-                                                    style="background-color: var(--primaryColor);" onclick="startQuiz();">
-                                                    <span class="m-0 fs-sm-6">Start</span>
+                                                <div class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable"
+                                                    style="background-color: var(--primaryColor);" onclick="prevQuestion();">
+                                                    <i class="fa-solid fs-6 fa-arrow-left text-reg" style="color: var(--black);"></i>
+                                                    <span class="m-0 fs-sm-6">Prev</span>
+                                                </div>
+
+                                                <div class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable"
+                                                    style="background-color: var(--primaryColor);" onclick="nextQuestion();">
+                                                    <span class="m-0 fs-sm-6">Next</span>
+                                                    <i class="fa-solid fs-6 fa-arrow-right text-reg" style="color: var(--black);"></i>
                                                 </div>
                                             </div>
                                         </div>
 
                                     </div>
                                 </div>
+                                <!-- End Content -->
+
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> <!-- End Card -->
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        //Fetch Questions and Choices from DB
         const questions = [
             <?php
             if (mysqli_num_rows($selectQuestionsResult) > 0) {
@@ -210,6 +258,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                         questionID: "<?php echo $questions['testQuestionID']; ?>",
                         img: "<?php echo $questions['testQuestionImage']; ?>",
                         type: "<?php echo $questions['questionType']; ?>",
+                        correctAnswer: "<?php echo $questions['correctAnswer'] ?>",
                         answers: [
                             <?php
                             if (mysqli_num_rows($selectChoicesResult) > 0) {
@@ -233,166 +282,84 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             ?>
         ];
 
-        <?php
-        $timeLimitQuery = "SELECT testTimelimit FROM tests WHERE testID = $testID";
-        $timeLimitResult = executeQuery($timeLimitQuery);
-        $timeLimit = mysqli_fetch_assoc($timeLimitResult);
-        ?>
-        let seconds = <?php echo $timeLimit['testTimelimit']; ?>;
-        let timerHtml = document.getElementById('timer');
-        let interval;
-
-        function formatTime(sec) {
-            let days = Math.floor(sec / 86400)
-            let hours = Math.floor(sec / 3600);
-            let minutes = Math.floor(sec / 60);
-            let secondsTime = sec % 60;
-
-            if (days < 10) days = "0" + days;
-            if (hours < 10) hours = "0" + hours;
-            else if (hours >= 24) {
-                hours = hours % 24;
-                if ((hours % 24) < 10) hours = "0" + hours % 24;
-            }
-            if (minutes < 10) minutes = "0" + minutes;
-            else if (minutes >= 60) {
-                minutes = minutes % 60;
-                if ((minutes % 60) < 10) minutes = "0" + (minutes % 60);
-            }
-            if (secondsTime < 10) secondsTime = "0" + secondsTime;
-
-            if (sec < 86400 && sec >= 3600) {
-                return time = hours + ":" + minutes + ":" + secondsTime;
-            } else if (sec < 3600) {
-                return time = minutes + ":" + secondsTime;
-            } else {
-                return time = days + ":" + hours + ":" + minutes + ":" + secondsTime;
-            }
-        }
-
-        timerHtml.innerHTML = `<i class="bi bi-clock fa-xs me-2" style="color: var(--black);"></i>` + formatTime(seconds);
-
-        function timer() {
-            seconds--;
-            if (seconds < 0) {
-                clearInterval(interval);
-                identificationType();
-                choiceText.forEach(unanswered => {
-                    if (unanswered.userAnswer == null) {
-                        unanswered.userAnswer = "No Answer";
-                    }
-                });
-                submitQuiz();
-            }
-
-            // 🟩 ADDED: Save remaining time
-            localStorage.setItem("remainingTime_<?php echo $testID; ?>", seconds);
-
-            timerHtml.innerHTML = `<i class="bi bi-clock fa-xs me-2" style="color: var(--black);"></i>` + formatTime(seconds);
-        }
-
-        let selectedAnswers = new Array(questions.length).fill(null);
+        //Get IDs of elements
         const questionContainer = document.getElementById('question-container');
         const choices = document.getElementById('choices');
         const imgContainer = document.getElementById('img-container');
         const questionNumber = document.getElementById('question-number');
+
         let currentQuestionIndex = 0;
         let score = 0;
+        let isCorrectArray = <?php echo json_encode($scoresArray); ?>;
+
+        //Arrays used for handling answers
         let choiceIDs = [];
-        let ID = 1;
-        let choiceText = [];
-        questions.forEach(question => {
-            choiceText.push({
-                userAnswer: null,
-                testQuestionID: ID
-            });
-            ID++;
-        });
 
-        // 🟩 ADDED: Restore from localStorage if exists
-        window.addEventListener("load", function() {
-            const savedAnswers = localStorage.getItem("choiceText_<?php echo $testID; ?>");
-            const savedTime = localStorage.getItem("remainingTime_<?php echo $testID; ?>");
-            if (savedAnswers) {
-                choiceText = JSON.parse(savedAnswers);
-            }
-            if (savedTime) {
-                seconds = parseInt(savedTime);
-            }
-        });
-
-        function startQuiz() {
-            currentQuestionIndex = 0;
-            interval = setInterval(timer, 1000);
-            showQuestion();
-            const buttonSection = document.getElementById('buttonSection');
-            buttonSection.innerHTML = `         
-             <div class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable"
-                 style="background-color: var(--primaryColor);" onclick="prevQuestion();">
-                     <i class="fa-solid fs-6 fa-arrow-left text-reg" style="color: var(--black);"></i>
-                         <span class="m-0 fs-sm-6">Prev</span>
-             </div>
- 
-             <div class="btn d-flex align-items-center justify-content-center border border-black rounded-5 px-sm-4 py-sm-2 interactable"
-                 style="background-color: var(--primaryColor);" onclick="submitQuiz();">
-                 <span class="m-0 fs-sm-6">Submit</span>
-             </div>
- 
-             <div class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable"
-                 style="background-color: var(--primaryColor);" onclick="nextQuestion();">
-                 <span class="m-0 fs-sm-6">Next</span>
-                 <i class="fa-solid fs-6 fa-arrow-right text-reg" style="color: var(--black);"></i>
-             </div>`;
+        //Prevents strings turning into HTML special entities
+        function encodeHTML(str) {
+            let txt = document.createElement("textarea");
+            txt.textContent = str;
+            return txt.innerHTML;
         }
 
+        //Shows questions
         function showQuestion() {
             let currentQuestion = questions[currentQuestionIndex];
             let questionNo = currentQuestionIndex + 1;
             let totalQuestion = questions.length;
             let choiceNo = 1;
+
+            console.log(isCorrectArray);
             choiceIDs = [];
-            questionContainer.innerHTML = currentQuestion.question;
+            questionContainer.innerHTML = currentQuestion.
+            question;
+            //Indicates which question is currently on screen
             questionNumber.innerHTML = "Section Name · Question " + questionNo + " of " + totalQuestion;
 
+            //Adds a margin when there is an img
             if (questions[currentQuestionIndex].img == "") {
                 choices.classList.add('mt-4');
             }
 
+            //Displays the choices for the current question
             if (questions[currentQuestionIndex].type == "Multiple Choice") {
                 currentQuestion.answers.forEach(answer => {
                     const button = document.createElement('div');
-                    button.innerHTML = answer.text;
-                    button.classList.add('col-12', 'bg-white', 'border', 'border-black', 'rounded-3', 'my-2', 'p-2', 'text-sbold', 'text-center', 'interactable');
+                    button.textContent = answer.text;
+                    button.classList.add('col-12', 'bg-white', 'border', 'border-black', 'rounded-3', 'my-2', 'p-2', 'text-sbold', 'text-center');
+                    if (currentQuestion.correctAnswer == button.textContent) {
+                        button.classList.add('bg-correct');
+                        button.classList.remove('bg-white');
+                    }
+
+                    if ((button.textContent == isCorrectArray[currentQuestionIndex].userAnswer) && (isCorrectArray[currentQuestionIndex].isCorrect == 0)) {
+                        button.classList.add('bg-wrong');
+                        button.classList.remove('bg-white');
+                    }
                     button.id = "question" + questionNo + "-choice" + choiceNo;
                     choiceIDs.push(button.id);
                     choiceNo++;
-                    button.addEventListener("click", answerQuestion);
                     choices.appendChild(button);
                 });
 
-                const savedIndex = selectedAnswers[currentQuestionIndex];
-                if (savedIndex !== null) {
-                    const savedChoice = document.getElementById(choiceIDs[savedIndex]);
-                    if (savedChoice) {
-                        savedChoice.classList.add('choice-selected');
-                        savedChoice.classList.remove('bg-white');
-                    }
-                }
-
-                // 🟩 ADDED: Restore choice visually if userAnswer exists
-                if (choiceText[currentQuestionIndex].userAnswer) {
-                    const savedChoice = Array.from(choices.children).find(btn => btn.innerHTML === choiceText[currentQuestionIndex].userAnswer);
-                    if (savedChoice) {
-                        savedChoice.classList.add('choice-selected');
-                        savedChoice.classList.remove('bg-white');
-                    }
-                }
-
             } else {
-                choices.innerHTML = `<input type="text" placeholder="Answer" class="rounded-3 p-3 text-center border border-black" id="input` + currentQuestionIndex + `">`;
-                document.getElementById('input' + currentQuestionIndex).value = choiceText[currentQuestionIndex].userAnswer || '';
+                //Displays an input text field if the question is of identification type
+                choices.innerHTML = `<input disabled type="text" placeholder="Answer" class="rounded-3 p-3 text-center border border-black" id="input` + currentQuestionIndex + `">`;
+                let textValue = document.getElementById('input' + currentQuestionIndex)
+                textValue.value = isCorrectArray[currentQuestionIndex].userAnswer;
+                correctIdentification = document.createElement('div');
+                correctIdentification.id = "identificationCorrection" + questionNo;
+                correctIdentification.classList.add('mt-3', 'text-sbold', 'text-center');
+                correctIdentification.innerHTML = "Correct Answer: " + encodeHTML(questions[currentQuestionIndex].correctAnswer);
+                choices.appendChild(correctIdentification);
+                if (isCorrectArray[currentQuestionIndex].isCorrect == 1) {
+                    textValue.classList.add('bg-correct');
+                } else {
+                    textValue.classList.add('bg-wrong');
+                }
             }
 
+            //Displays the image if it exists
             const img = document.getElementById('img-question');
             imgContainer.style.maxWidth = "30%";
             img.src = questions[currentQuestionIndex].img;
@@ -401,10 +368,11 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             img.style.objectFit = "cover";
             imgContainer.appendChild(img);
             img.classList.add('rounded-5', 'my-2');
+
+
         }
 
         function nextQuestion() {
-            if (questions[currentQuestionIndex].type == "Identification") identificationType();
             (currentQuestionIndex + 1 < questions.length) ? currentQuestionIndex++ : null;
             if ((currentQuestionIndex + 1) <= questions.length) {
                 choices.innerHTML = '';
@@ -413,7 +381,6 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
         }
 
         function prevQuestion() {
-            if (questions[currentQuestionIndex].type == "Identification") identificationType();
             if ((currentQuestionIndex + 1) > 1) {
                 currentQuestionIndex--;
                 choices.innerHTML = '';
@@ -421,91 +388,8 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             }
         }
 
-        function answerQuestion() {
-            const hasSelected = choiceIDs.some(choice => {
-                const choiceElement = document.getElementById(choice);
-                return choiceElement.classList.contains('choice-selected');
-            });
-
-            if (hasSelected) {
-                choiceIDs.forEach(choiceID => {
-                    const clearChoice = document.getElementById(choiceID);
-                    clearChoice.classList.remove('choice-selected');
-                    clearChoice.classList.add('bg-white');
-                });
-                this.classList.add('choice-selected');
-                this.classList.remove('bg-white');
-
-                const selectedChoiceIndex = choiceIDs.indexOf(this.id);
-                selectedAnswers[currentQuestionIndex] = selectedChoiceIndex;
-
-                const selectedChoice = {
-                    userAnswer: this.innerHTML,
-                    testQuestionID: questions[currentQuestionIndex].questionID
-                };
-
-                choiceText[currentQuestionIndex] = selectedChoice;
-            } else {
-                this.classList.add('choice-selected');
-                this.classList.remove('bg-white');
-                const selectedChoiceIndex = choiceIDs.indexOf(this.id);
-                selectedAnswers[currentQuestionIndex] = selectedChoiceIndex;
-
-                const selectedChoice = {
-                    userAnswer: this.innerHTML,
-                    testQuestionID: questions[currentQuestionIndex].questionID
-                };
-
-                choiceText[currentQuestionIndex] = selectedChoice;
-            }
-
-            // 🟩 ADDED: Save answers to localStorage
-            localStorage.setItem("choiceText_<?php echo $testID; ?>", JSON.stringify(choiceText));
-        }
-
-        function identificationType() {
-            const inputField = document.getElementById('input' + currentQuestionIndex);
-            const identificationAnswer = {
-                userAnswer: inputField.value,
-                testQuestionID: questions[currentQuestionIndex].questionID
-            };
-            choiceText[currentQuestionIndex] = identificationAnswer;
-
-            // 🟩 ADDED: Save answers to localStorage
-            localStorage.setItem("choiceText_<?php echo $testID; ?>", JSON.stringify(choiceText));
-        }
-
-        function submitQuiz() {
-            if (questions[currentQuestionIndex].type == "Identification") identificationType();
-            let timeSpent = <?php echo $timeLimit['testTimelimit']; ?> - seconds;
-            const incomplete = choiceText.some(checkNull => checkNull.userAnswer === null || checkNull.userAnswer === '');
-            if (!incomplete) {
-                fetch('shared/assets/processes/submit-test.php?testID=' + <?php echo $testID; ?>, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            answers: choiceText,
-                            timeSpent: timeSpent
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data);
-                        alert("Quiz submitted successfully!");
-                        // 🟩 ADDED: Clear localStorage on submit
-                        localStorage.removeItem("choiceText_<?php echo $testID; ?>");
-                        localStorage.removeItem("remainingTime_<?php echo $testID; ?>");
-                        window.location.href = 'index.php';
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-            } else {
-                console.log("Please answer all items");
-            }
-        }
+        showQuestion();
+        console.log(questions);
     </script>
 </body>
 
