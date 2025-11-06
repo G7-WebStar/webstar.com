@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 04, 2025 at 12:14 PM
+-- Generation Time: Nov 06, 2025 at 11:07 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -61,7 +61,7 @@ CREATE TABLE `announcementnotes` (
 --
 
 INSERT INTO `announcementnotes` (`noteID`, `announcementID`, `userID`, `notedAt`) VALUES
-(1, 1, 2, '2025-09-04 21:31:28');
+(4, 1, 2, '2025-11-06 12:27:25');
 
 -- --------------------------------------------------------
 
@@ -185,6 +185,50 @@ INSERT INTO `badges` (`badgeID`, `badgeName`, `badgeDescription`, `badgeIcon`, `
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `colortheme`
+--
+
+CREATE TABLE `colortheme` (
+  `colorThemeID` int(11) NOT NULL,
+  `themeName` varchar(100) NOT NULL,
+  `hexCode` varchar(10) NOT NULL,
+  `description` text NOT NULL,
+  `price` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `colortheme`
+--
+
+INSERT INTO `colortheme` (`colorThemeID`, `themeName`, `hexCode`, `description`, `price`) VALUES
+(1, 'Sunny Glow', '#FDDC94', 'Warm primary accent.', 100),
+(2, 'Peachy Cream', '#FFE1D6', 'Soft and gentle peach.', 150),
+(3, 'Rosy Blush', '#FFC4C4', 'Soft pink, friendly tone.', 150),
+(4, 'Lavender Mist', '#FFD1FF', 'Soft purple elegance.', 150),
+(5, 'Mint Breeze', '#D1FFD6', 'Fresh subtle green.', 100),
+(6, 'Sky Whisper', '#C6E2FF', 'Calm airy blue.', 100),
+(7, 'Apricot Cream', '#FFE5B4', 'Warm muted orange.', 100),
+(8, 'Soft Sage', '#B8CBB8', 'Gentle muted green.', 50),
+(9, 'Muted Teal', '#8FBAC8', 'Soft muted teal.', 50),
+(10, 'Dusty Lavender', '#C9B8D6', 'Muted purple tone.', 50),
+(11, 'Warm Taupe', '#D6C1B3', 'Soft neutral brownish tone.', 50),
+(12, 'Pale Coral', '#FFCCC4', 'Soft coral accent.', 50),
+(13, 'Creamy Almond', '#FFE6CC', 'Soft creamy beige.', 50),
+(14, 'Aqua Mist', '#B3FFEC', 'Relaxing soft cyan.', 100),
+(15, 'Lilac Whisper', '#E5D4FF', 'Soft delicate lilac.', 150),
+(16, 'Buttercream', '#FFF3CC', 'Gentle yellowish cream.', 150),
+(17, 'Powder Blue', '#DCEEFF', 'Soft blue for calm vibes.', 100),
+(18, 'Peach Fizz', '#FFD8B8', 'Light and cheerful peach.', 100),
+(19, 'Seafoam', '#C4FFE1', 'Soft refreshing greenish-blue.', 100),
+(20, 'Blush Pink', '#FFD9E1', 'Tender pink for subtle warmth.', 150),
+(21, 'Soft Lemon', '#FFF9CC', 'Delicate pastel yellow.', 150),
+(22, 'Lilac Glow', '#EED6FF', 'Mild lilac accent.', 100),
+(23, 'Powder Peach', '#FFE6D9', 'Soft, neutral peach.', 100),
+(24, 'Misty Aqua', '#CCF7FF', 'Gentle airy blue-green.', 100);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `courses`
 --
 
@@ -235,6 +279,64 @@ INSERT INTO `courseschedule` (`courseScheduleID`, `courseID`, `day`, `startTime`
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `coverimage`
+--
+
+CREATE TABLE `coverimage` (
+  `coverImageID` int(11) NOT NULL,
+  `title` varchar(100) NOT NULL,
+  `imagePath` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `price` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `coverimage`
+--
+
+INSERT INTO `coverimage` (`coverImageID`, `title`, `imagePath`, `description`, `price`) VALUES
+(1, 'Soft Yellow Plain', '1.png', 'A gentle yellow background that brings warmth and positivity — simple, bright, and easy on the eyes.', 0),
+(2, 'Light Green Stripes', '2.png', 'Fresh green stripes that make everything feel calm and natural, like a spring morning.', 50),
+(3, 'Yellow Grid', '3.png', 'Clean, geometric lines for a tidy and upbeat vibe.', 50),
+(4, 'Green Checkered Pattern', '4.png', 'A cozy green checkerboard that feels like a picnic under the trees.', 50),
+(5, 'Blue Lined Pattern', '5.png', 'Soft blue lines for a relaxed, classic look that keeps things organized.', 50),
+(6, 'Red Diagonal Stripes', '6.png', 'Bold red stripes that bring energy and movement to your layout.', 50),
+(7, 'Blue Pinstripe Pattern', '7.png', 'Sleek, professional, and timeless — perfect for anyone who likes order with style.', 50),
+(8, 'Red Checkered Pattern', '8.png', 'Playful and lively, like an afternoon spent with friends and laughter.', 50),
+(9, 'Light Purple Texture', '9.png', 'Gentle lavender tones that give your space a dreamy, creative feel.', 50),
+(10, 'Blue Geometric Lines', '10.png', 'Structured and modern — for planners who like clean, minimal aesthetics.', 50),
+(11, 'Yellow Gingham Pattern', '11.png', 'Sunny and cheerful, this pattern adds instant brightness to any page.', 50),
+(12, 'Pink Plaid Pattern', '12.png', 'Soft, friendly, and charming — a gentle pink that feels welcoming and fun.', 50),
+(13, 'Green and White Stripes', '13.png', 'Balanced and refreshing — a simple design that keeps things light.', 50),
+(14, 'Red Picnic Pattern', '14.png', 'Classic red checks that remind you of summer afternoons and happy breaks.', 50),
+(15, 'Brown Checkered Pattern', '15.png', 'Warm and earthy — perfect for those who prefer grounded tones.', 50),
+(16, 'Light Blue Check Pattern', '16.png', 'Cool and breezy, like clear skies on a quiet day.', 50),
+(17, 'Blue Duck Pattern', '17.png', 'Tiny ducks swimming across a bright blue background — cheerful, quirky, and full of charm.', 100),
+(18, 'Dark Teal Spaceships', '18.png', 'Playful little UFOs drifting in deep space — for the dreamers and explorers.', 100),
+(19, 'Green Mushroom Pattern', '19.png', 'Cute mushrooms sprouting across a green field — a cozy, game-like atmosphere.', 100),
+(20, 'Gray Scratch Texture', '20.png', 'A rough silver texture that gives off an edgy, modern vibe.', 150),
+(21, 'Blue City Silhouette', '21.png', 'A skyline at sunrise — simple, clean, and full of quiet ambition.', 200),
+(22, 'Purple Fantasy Skyline', '22.png', 'A whimsical cityscape that feels straight out of a storybook.', 200),
+(23, 'Orange Desert Scene', '23.png', 'Warm canyon tones that radiate adventure and wanderlust.', 200),
+(24, 'Purple City at Dusk', '24.png', 'Cool purple skies over a glowing city — mysterious and modern.', 200),
+(25, 'Colorful Confetti Pattern', '25.png', 'Bright and fun — perfect for celebrating progress and small wins.', 150),
+(26, 'Green Star Pattern', '26.png', 'Neon stars twinkling on a dark background — energetic and playful.', 250),
+(27, 'White Star Pattern', '27.png', 'A soft night sky scattered with gentle stars — peaceful and subtle.', 250),
+(28, 'Comic Cat Scene', '28.png', 'A hand-drawn lineup of sleepy cats doing cute things — simple joy in every glance.', 300),
+(29, 'Golden Starburst', '29.png', 'A glowing gold design that shines like confidence itself.', 400),
+(30, 'Green Laser Grid', '30.png', 'Futuristic green beams crisscrossing — sharp, fast, and full of energy.', 400),
+(31, 'KOLORCOASTER', '31.png', 'A vivid wave of color and motion, inspired by Maki’s KOLORCOASTER— a rush of rhythm, light, and feeling that never stops moving.', 450),
+(32, 'Purple Energy Core', '32.png', 'Radiant light bursting from the center — calm strength meets inner focus.', 400),
+(33, 'Pink Heart Glow', '33.png', 'Soft pink energy swirling with warmth — for expressive, kind-hearted players.', 400),
+(34, 'Green Energy Stream', '34.png', 'Waves of vibrant light in motion — smooth, lively, and futuristic.', 400),
+(35, 'Blue Triangle Tunnel', '35.png', 'A sharp geometric tunnel leading into the future — sleek and mesmerizing.', 400),
+(36, 'Blue Light Tunnel', '36.png', 'Deep blues and glowing lines that pull you into a world of motion.', 400),
+(37, 'Purple Energy Burst', '37.png', 'Powerful violet streaks exploding with energy — bold, fast, and dramatic.', 400),
+(38, 'Purple Nebula', '38.png', 'A calm cosmic swirl — mysterious, vast, and quietly beautiful.', 400);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `criteria`
 --
 
@@ -253,6 +355,34 @@ INSERT INTO `criteria` (`criterionID`, `rubricID`, `criteriaTitle`, `criteriaDes
 (1, 1, 'Voice, Style, and Imagery', 'Assesses the development of a distinct and compelling writer\'s voice, the effectiveness of word choice (diction), and the use of sensory details and figurative language (imagery) to create a vivid experience for the reader.'),
 (2, 1, 'Narrative Structure and Pacing', 'Assesses the effective management of the plot (beginning, rising action, climax, resolution), character development (if applicable), and the manipulation of time and speed (pacing) to build tension and interest.'),
 (3, 2, 'Participation and Initiative', 'Assesses the student\'s level of engagement, attendance at meetings, willingness to take on tasks, and proactive approach to contributing ideas and effort to the team\'s goals.');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `emblem`
+--
+
+CREATE TABLE `emblem` (
+  `emblemID` int(11) NOT NULL,
+  `emblemName` varchar(100) NOT NULL,
+  `emblemPath` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `price` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `emblem`
+--
+
+INSERT INTO `emblem` (`emblemID`, `emblemName`, `emblemPath`, `description`, `price`) VALUES
+(1, 'Webstar', 'default.png', 'Show your pride in Webstar University.', 0),
+(2, 'Webstar University', 'webstar_u.png', 'Show your pride in Webstar University.', 50),
+(3, 'Crammers Club', 'crammers_club.png', 'For those who hustle and cram like pros.', 450),
+(4, 'Mula S\'ayo, Para sa Bayan', 'mula_sayo.png', 'Gagamitin ang karunungan mula sa\'yo, para sa bayan', 300),
+(5, 'Computer Society', 'comsoc.png', 'Sumusulong, Lumalaban!', 250),
+(6, 'BSIT-Log', 'bsitlog.png', 'BSITlogs, mag-ingay!', 250),
+(7, 'Y2K BSIT', 'bsit.png', 'Y2K emblem for BSIT members!', 250),
+(8, 'Iskolar ng Bayan', 'iskolar_ng_bayan.png', 'Ngayon ay lumalaban!', 400);
 
 -- --------------------------------------------------------
 
@@ -429,23 +559,33 @@ INSERT INTO `level` (`levelID`, `criterionID`, `levelTitle`, `levelDescription`,
 -- --------------------------------------------------------
 
 --
--- Table structure for table `points`
+-- Table structure for table `myitems`
 --
 
-CREATE TABLE `points` (
-  `pointsID` int(11) NOT NULL,
+CREATE TABLE `myitems` (
+  `myItemID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
-  `sourceType` varchar(50) NOT NULL,
-  `pointsEarned` int(100) NOT NULL,
-  `dateEarned` datetime NOT NULL
+  `emblemID` int(11) DEFAULT NULL,
+  `coverImageID` int(11) DEFAULT NULL,
+  `colorThemeID` int(11) DEFAULT NULL,
+  `dateAcquired` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `points`
+-- Dumping data for table `myitems`
 --
 
-INSERT INTO `points` (`pointsID`, `userID`, `sourceType`, `pointsEarned`, `dateEarned`) VALUES
-(1, 2, 'Test', 50, '2025-08-30 08:28:27');
+INSERT INTO `myitems` (`myItemID`, `userID`, `emblemID`, `coverImageID`, `colorThemeID`, `dateAcquired`) VALUES
+(1, 2, NULL, 1, NULL, '2025-11-06 15:53:54'),
+(131, 2, 1, NULL, NULL, '2025-11-06 15:53:54'),
+(132, 2, NULL, NULL, 1, '2025-11-06 15:53:54'),
+(152, 4, 1, NULL, NULL, '2025-11-06 17:43:05'),
+(153, 4, NULL, NULL, 13, '2025-11-06 17:43:17'),
+(154, 4, NULL, NULL, 2, '2025-11-06 17:43:26'),
+(155, 4, NULL, 14, NULL, '2025-11-06 17:43:34'),
+(156, 4, 2, NULL, NULL, '2025-11-06 17:43:39'),
+(157, 2, NULL, NULL, 2, '2025-11-06 17:46:35'),
+(158, 2, NULL, NULL, 3, '2025-11-06 17:56:42');
 
 -- --------------------------------------------------------
 
@@ -457,15 +597,19 @@ CREATE TABLE `profile` (
   `profileID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
   `bio` varchar(255) NOT NULL DEFAULT 'Welcome to my Webstar profile!',
-  `webstars` int(11) DEFAULT 0
+  `webstars` int(11) DEFAULT 0,
+  `emblemID` int(11) NOT NULL DEFAULT 1,
+  `coverImageID` int(11) NOT NULL DEFAULT 1,
+  `colorThemeID` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `profile`
 --
 
-INSERT INTO `profile` (`profileID`, `userID`, `bio`, `webstars`) VALUES
-(1, 2, 'Welcome to my Webstar profile!', 0);
+INSERT INTO `profile` (`profileID`, `userID`, `bio`, `webstars`, `emblemID`, `coverImageID`, `colorThemeID`) VALUES
+(1, 2, 'Welcome to my Webstar profile!', 5599, 1, 1, 1),
+(2, 4, 'Welcome to my Webstar profile!', 700, 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -514,18 +658,18 @@ CREATE TABLE `report` (
 --
 
 INSERT INTO `report` (`reportID`, `enrollmentID`, `totalXP`, `allTimeRank`, `generatedAt`) VALUES
-(1, 1, 550, 1, '2025-11-04 18:15:01'),
-(2, 3, 400, 2, '2025-11-04 18:15:01'),
-(3, 8, 221, 3, '2025-11-04 18:15:01'),
-(4, 6, 215, 4, '2025-11-04 18:15:01'),
-(5, 11, 214, 5, '2025-11-04 18:15:02'),
-(6, 10, 195, 6, '2025-11-04 18:15:02'),
-(7, 5, 189, 7, '2025-11-04 18:15:02'),
-(8, 7, 176, 8, '2025-11-04 18:15:02'),
-(9, 9, 167, 9, '2025-11-04 18:15:02'),
-(10, 4, 152, 10, '2025-11-04 18:15:02'),
-(11, 12, 95, 11, '2025-11-04 18:15:02'),
-(12, 2, 450, 1, '2025-11-01 12:05:23');
+(1, 1, 550, 1, '2025-11-06 15:50:35'),
+(2, 3, 400, 2, '2025-11-06 15:50:35'),
+(3, 8, 221, 3, '2025-11-06 15:50:35'),
+(4, 6, 215, 4, '2025-11-06 15:50:35'),
+(5, 11, 214, 5, '2025-11-06 15:50:35'),
+(6, 10, 195, 6, '2025-11-06 15:50:35'),
+(7, 5, 189, 7, '2025-11-06 15:50:35'),
+(8, 7, 176, 8, '2025-11-06 15:50:35'),
+(9, 9, 167, 9, '2025-11-06 15:50:35'),
+(10, 4, 152, 10, '2025-11-06 15:50:35'),
+(11, 12, 95, 11, '2025-11-06 15:50:36'),
+(12, 2, 450, 1, '2025-11-06 15:51:29');
 
 -- --------------------------------------------------------
 
@@ -777,7 +921,7 @@ CREATE TABLE `todo` (
   `status` varchar(20) NOT NULL DEFAULT 'Pending',
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp(),
   `isRead` tinyint(1) DEFAULT 0,
-  `timeSpent` int(11) NOT NULL
+  `timeSpent` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -785,8 +929,8 @@ CREATE TABLE `todo` (
 --
 
 INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `status`, `updatedAt`, `isRead`, `timeSpent`) VALUES
-(1, 2, 1, 'Graded', '2025-10-12 19:00:00', 1, 0),
-(2, 2, 4, 'Pending', '2025-10-29 09:00:00', 1, 0),
+(1, 2, 1, 'Graded', '2025-10-12 19:00:00', 1, NULL),
+(2, 2, 4, 'Pending', '2025-10-29 09:00:00', 1, NULL),
 (3, 2, 2, 'Pending', '2025-11-04 18:16:16', 1, 0);
 
 -- --------------------------------------------------------
@@ -880,6 +1024,27 @@ INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`, `status`
 (23, 'devpassword5', 'shane@example.com', 'developer', 'shanesilverio', 'active'),
 (24, 'devpassword6', 'kimberly@example.com', 'developer', 'kimberlypalla', 'active');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `webstars`
+--
+
+CREATE TABLE `webstars` (
+  `webstarsID` int(11) NOT NULL,
+  `userID` int(11) NOT NULL,
+  `sourceType` varchar(50) NOT NULL,
+  `pointsChanged` int(100) NOT NULL,
+  `dateEarned` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `webstars`
+--
+
+INSERT INTO `webstars` (`webstarsID`, `userID`, `sourceType`, `pointsChanged`, `dateEarned`) VALUES
+(22, 2, 'Shop Purchase', -150, '2025-11-06 17:56:42');
+
 --
 -- Indexes for dumped tables
 --
@@ -925,6 +1090,12 @@ ALTER TABLE `badges`
   ADD PRIMARY KEY (`badgeID`);
 
 --
+-- Indexes for table `colortheme`
+--
+ALTER TABLE `colortheme`
+  ADD PRIMARY KEY (`colorThemeID`);
+
+--
 -- Indexes for table `courses`
 --
 ALTER TABLE `courses`
@@ -937,10 +1108,22 @@ ALTER TABLE `courseschedule`
   ADD PRIMARY KEY (`courseScheduleID`);
 
 --
+-- Indexes for table `coverimage`
+--
+ALTER TABLE `coverimage`
+  ADD PRIMARY KEY (`coverImageID`);
+
+--
 -- Indexes for table `criteria`
 --
 ALTER TABLE `criteria`
   ADD PRIMARY KEY (`criterionID`);
+
+--
+-- Indexes for table `emblem`
+--
+ALTER TABLE `emblem`
+  ADD PRIMARY KEY (`emblemID`);
 
 --
 -- Indexes for table `enrollments`
@@ -985,10 +1168,13 @@ ALTER TABLE `level`
   ADD PRIMARY KEY (`levelID`);
 
 --
--- Indexes for table `points`
+-- Indexes for table `myitems`
 --
-ALTER TABLE `points`
-  ADD PRIMARY KEY (`pointsID`);
+ALTER TABLE `myitems`
+  ADD PRIMARY KEY (`myItemID`),
+  ADD UNIQUE KEY `userID` (`userID`,`coverImageID`),
+  ADD UNIQUE KEY `userID_2` (`userID`,`emblemID`),
+  ADD UNIQUE KEY `userID_3` (`userID`,`colorThemeID`);
 
 --
 -- Indexes for table `profile`
@@ -1085,6 +1271,12 @@ ALTER TABLE `users`
   ADD PRIMARY KEY (`userID`);
 
 --
+-- Indexes for table `webstars`
+--
+ALTER TABLE `webstars`
+  ADD PRIMARY KEY (`webstarsID`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -1098,7 +1290,7 @@ ALTER TABLE `activities`
 -- AUTO_INCREMENT for table `announcementnotes`
 --
 ALTER TABLE `announcementnotes`
-  MODIFY `noteID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `noteID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `announcements`
@@ -1125,6 +1317,12 @@ ALTER TABLE `badges`
   MODIFY `badgeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
+-- AUTO_INCREMENT for table `colortheme`
+--
+ALTER TABLE `colortheme`
+  MODIFY `colorThemeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
+
+--
 -- AUTO_INCREMENT for table `courses`
 --
 ALTER TABLE `courses`
@@ -1137,10 +1335,22 @@ ALTER TABLE `courseschedule`
   MODIFY `courseScheduleID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT for table `coverimage`
+--
+ALTER TABLE `coverimage`
+  MODIFY `coverImageID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+
+--
 -- AUTO_INCREMENT for table `criteria`
 --
 ALTER TABLE `criteria`
   MODIFY `criterionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `emblem`
+--
+ALTER TABLE `emblem`
+  MODIFY `emblemID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `enrollments`
@@ -1185,16 +1395,16 @@ ALTER TABLE `level`
   MODIFY `levelID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT for table `points`
+-- AUTO_INCREMENT for table `myitems`
 --
-ALTER TABLE `points`
-  MODIFY `pointsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+ALTER TABLE `myitems`
+  MODIFY `myItemID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=161;
 
 --
 -- AUTO_INCREMENT for table `profile`
 --
 ALTER TABLE `profile`
-  MODIFY `profileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `profileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `program`
@@ -1279,6 +1489,12 @@ ALTER TABLE `userinfo`
 --
 ALTER TABLE `users`
   MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+
+--
+-- AUTO_INCREMENT for table `webstars`
+--
+ALTER TABLE `webstars`
+  MODIFY `webstarsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- Constraints for dumped tables
