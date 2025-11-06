@@ -191,8 +191,8 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                 </div>
 
                                 <!-- Task container -->
-                                <div class="row mb-0 mt-2 mx-auto">
-                                    <div class="col-12 col-md-10 mt-3 mx-auto mx-md-0 p-0">
+                                <div class="row mb-0 mt-2 mx-auto <?php echo (mysqli_num_rows($selectAssessmentResult) == 0) ? 'empty-todo-container' : ''; ?>">
+                                    <div class="col-12 col-md-10 mt-3 mx-auto mx-md-0 p-0 <?php echo (mysqli_num_rows($selectAssessmentResult) == 0) ? 'empty-todo-column' : ''; ?>">
                                         <?php
                                         if (mysqli_num_rows($selectAssessmentResult) > 0) {
                                             while ($todo = mysqli_fetch_assoc($selectAssessmentResult)) {
@@ -246,38 +246,25 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                                 <?php
                                             }
                                         } else {
-                                            $emptyImage = "shared/assets/img/courseInfo/puzzle.png";
+                                            $emptyImage = "shared/assets/img/empty/todo.png";
+                                            $emptyText1 = "No quests have been assigned yet.";
+                                            $emptyText2 = "Your next adventure awaits!";
+                                            
                                             if ($statusFilter == 'Missing') {
-                                                $emptyImage = "shared/assets/img/courseInfo/thumbs-up.png";
+                                                $emptyImage = "shared/assets/img/empty/quest.png";
+                                                $emptyText1 = "No missing quests.";
+                                                $emptyText2 = "You're right on track, adventurer!";
                                             } elseif ($statusFilter == 'Done') {
-                                                $emptyImage = "shared/assets/img/courseInfo/file.png";
+                                                $emptyImage = "shared/assets/img/empty/folder.png";
+                                                $emptyText1 = "You haven't submitted any quests yet.";
+                                                $emptyText2 = "Complete one to earn XPs!";
                                             }
                                             ?>
-                                            <div
-                                                class="empty-state text-center py-5 d-flex flex-column align-items-center justify-content-center mx-auto">
-                                                <img src="<?php echo $emptyImage; ?>" alt="Empty state">
-                                                <?php if ($statusFilter == 'Missing') { ?>
-                                                    <div class="mt-3 text-center empty-text">
-                                                        No missing quests.
-                                                    </div>
-                                                    <span class="empty-subtext">
-                                                        You’re right on track, adventurer!
-                                                    </span>
-                                                <?php } elseif ($statusFilter == 'Done') { ?>
-                                                    <div class="mt-3 text-center empty-text">
-                                                        You haven’t submitted any quests yet.
-                                                    </div>
-                                                    <span class="empty-subtext">
-                                                        Complete one to earn XPs!
-                                                    </span>
-                                                <?php } else { ?>
-                                                    <div class="mt-3 text-center empty-text">
-                                                        No quests have been assigned yet.
-                                                    </div>
-                                                    <span class="empty-subtext">
-                                                        Your next adventure awaits!
-                                                    </span>
-                                                <?php } ?>
+                                            <!-- Empty State -->
+                                            <div class="d-flex flex-column justify-content-center align-items-center todo-empty-state">
+                                                <img src="<?php echo $emptyImage; ?>" width="100" alt="Empty state" class="mb-1">
+                                                <div class="text-center text-14 text-med mt-1"><?php echo $emptyText1; ?></div>
+                                                <div class="text-center text-14 text-reg mt-1"><?php echo $emptyText2; ?></div>
                                             </div>
                                             <?php
                                         }

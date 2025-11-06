@@ -66,31 +66,18 @@
     border: none;
     text-align: start;
 }
+
 /* Empty state */
-.empty-state {
-    min-height: 300px;
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
+.message-container:has(.inbox-empty-state) {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
 
-.empty-state img {
-    max-width: 280px;
-    width: 100%;
-    height: auto;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* Empty state texts*/
-.empty-state .empty-text {
-    font-family: 'Regular', sans-serif;
-    font-size: 20px;
-    line-height: 100%;
-    letter-spacing: -0.03em;
-    text-align: center;
-    margin-top: 12px;
+.inbox-empty-state {
+    margin: 0;
 }
 
 @media (max-width: 768px) {

@@ -196,10 +196,10 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                             }
                                         } else {
                                             ?>
-                                            <div
-                                                class="empty-state text-center py-5 d-flex flex-column align-items-center justify-content-center mx-auto">
-                                                <img src="shared/assets/img/empty/inbox.png" alt="Empty state">
-                                                <div class="text-center empty-text">Your inbox is empty.</div>
+                                            <!-- Empty State -->
+                                            <div class="d-flex flex-column justify-content-center align-items-center inbox-empty-state">
+                                                <img src="shared/assets/img/empty/inbox.png" width="100" class="mb-1">
+                                                <div class="text-center text-14 text-reg mt-1">Your inbox is empty!</div>
                                             </div>
                                             <?php
                                         }
