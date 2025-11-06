@@ -510,7 +510,7 @@ if (isset($_POST['save_lesson'])) {
             }
         });
 
-        const maxWords = 120;
+        const maxWords = 200;
         const counter = document.getElementById("word-counter");
 
         quill.on('text-change', function() {
@@ -810,13 +810,47 @@ if (isset($_POST['save_lesson'])) {
             const fileInput = img.nextElementSibling;
             img.addEventListener("click", () => fileInput.click());
             fileInput.addEventListener("change", () => {
-                if (fileInput.files && fileInput.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = e => img.src = e.target.result;
-                    reader.readAsDataURL(fileInput.files[0]);
+                const file = fileInput.files[0];
+                if (!file) return;
+
+                const allowed = ["image/jpeg", "image/png", "image/jpg"];
+                const maxSize = 5 * 1024 * 1024;
+
+                // validate before preview
+                if (!allowed.includes(file.type)) {
+                    showAlert("Only JPG, JPEG, and PNG image formats are allowed.");
+                    fileInput.value = ""; 
+                    return; 
                 }
+
+                if (file.size > maxSize) {
+                    showAlert("Maximum file size is 5MB.");
+                    fileInput.value = "";
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = e => img.src = e.target.result;
+                reader.readAsDataURL(file);
             });
+
         }
+
+        document.addEventListener("click", function(e) {
+            const delImgBtn = e.target.closest(".delete-image");
+            if (!delImgBtn) return;
+
+            const container = delImgBtn.closest(".image-container");
+            if (!container) return;
+
+            // Reset preview
+            const img = container.querySelector(".question-image");
+            const fileInput = container.querySelector(".image-upload");
+
+            img.src = "";
+            fileInput.value = "";
+            container.style.display = "none"; // hide again
+        });
 
         document.querySelectorAll(".question-image").forEach(img => bindImageUpload(img));
 
