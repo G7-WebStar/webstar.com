@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 06, 2025 at 11:07 AM
+-- Generation Time: Nov 07, 2025 at 01:42 AM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -111,10 +111,7 @@ INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `type`
 (1, 1, 'Activity #1', 'Task', '2025-10-15', 0, '2025-09-09 23:00:15'),
 (2, 1, 'Test #1', 'Test', '2025-11-06', 0, '2025-09-04 22:00:15'),
 (3, 2, 'Activity #2', 'Task', '2025-10-23', 0, '2025-10-22 22:00:15'),
-(4, 2, 'Activity #1', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15'),
-(5, 1, 'asdasd', 'Task', '2025-11-08', 0, '2025-11-03 10:36:42'),
-(6, 1, 'fsfdsfds', 'Test', '2025-11-15', 0, '2025-11-03 03:53:07'),
-(7, 1, 'sadsaf', 'Task', '2025-11-21', 0, '2025-11-03 10:56:27');
+(4, 2, 'Activity #1', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15');
 
 -- --------------------------------------------------------
 
@@ -137,9 +134,7 @@ CREATE TABLE `assignments` (
 INSERT INTO `assignments` (`assignmentID`, `assessmentID`, `assignmentDescription`, `assignmentPoints`, `rubricID`) VALUES
 (1, 1, 'Attached is a Google Doc that you can edit.\n\nIn Figma, design a “404 Not Found” page.\n\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\n\nTurn in when done.\n\n', 100, NULL),
 (2, 4, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100, NULL),
-(3, 2, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100, NULL),
-(4, 5, '', 0, NULL),
-(5, 7, '', 0, NULL);
+(3, 2, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100, NULL);
 
 -- --------------------------------------------------------
 
@@ -443,6 +438,7 @@ CREATE TABLE `files` (
   `announcementID` int(5) DEFAULT NULL,
   `lessonID` int(5) DEFAULT NULL,
   `assignmentID` int(5) DEFAULT NULL,
+  `submissionID` int(11) DEFAULT NULL,
   `fileAttachment` varchar(255) NOT NULL,
   `fileTitle` varchar(50) NOT NULL,
   `fileLink` varchar(100) NOT NULL,
@@ -453,8 +449,11 @@ CREATE TABLE `files` (
 -- Dumping data for table `files`
 --
 
-INSERT INTO `files` (`fileID`, `courseID`, `userID`, `announcementID`, `lessonID`, `assignmentID`, `fileAttachment`, `fileTitle`, `fileLink`, `uploadedAt`) VALUES
-(1, 1, 1, 1, 1, NULL, 'Web Development Course Material', 'Web Development', 'https://gmail.com/lesson1,https://gmail.com/lesson1.1', '2025-08-30 10:30:00');
+INSERT INTO `files` (`fileID`, `courseID`, `userID`, `announcementID`, `lessonID`, `assignmentID`, `submissionID`, `fileAttachment`, `fileTitle`, `fileLink`, `uploadedAt`) VALUES
+(1, 1, 1, 1, 1, NULL, NULL, 'Web Development Course Material', 'Web Development', 'https://gmail.com/lesson1,https://gmail.com/lesson1.1', '2025-08-30 10:30:00'),
+(24, 1, 2, NULL, NULL, NULL, 9, 'STS_Lesson3_Summary.pdf', '', '', '2025-11-07 03:55:54'),
+(26, 1, 2, NULL, NULL, NULL, 9, 'STS_L3.pdf', '', '', '2025-11-07 03:55:54'),
+(27, 1, 2, NULL, NULL, NULL, 9, 'SPIC_LESSONS.pdf', '', '', '2025-11-07 04:00:50');
 
 -- --------------------------------------------------------
 
@@ -658,17 +657,17 @@ CREATE TABLE `report` (
 --
 
 INSERT INTO `report` (`reportID`, `enrollmentID`, `totalXP`, `allTimeRank`, `generatedAt`) VALUES
-(1, 1, 550, 1, '2025-11-06 15:50:35'),
-(2, 3, 400, 2, '2025-11-06 15:50:35'),
-(3, 8, 221, 3, '2025-11-06 15:50:35'),
-(4, 6, 215, 4, '2025-11-06 15:50:35'),
-(5, 11, 214, 5, '2025-11-06 15:50:35'),
-(6, 10, 195, 6, '2025-11-06 15:50:35'),
-(7, 5, 189, 7, '2025-11-06 15:50:35'),
-(8, 7, 176, 8, '2025-11-06 15:50:35'),
-(9, 9, 167, 9, '2025-11-06 15:50:35'),
-(10, 4, 152, 10, '2025-11-06 15:50:35'),
-(11, 12, 95, 11, '2025-11-06 15:50:36'),
+(1, 1, 550, 1, '2025-11-07 08:30:53'),
+(2, 3, 400, 2, '2025-11-07 08:30:53'),
+(3, 8, 221, 3, '2025-11-07 08:30:53'),
+(4, 6, 215, 4, '2025-11-07 08:30:53'),
+(5, 11, 214, 5, '2025-11-07 08:30:54'),
+(6, 10, 195, 6, '2025-11-07 08:30:54'),
+(7, 5, 189, 7, '2025-11-07 08:30:54'),
+(8, 7, 176, 8, '2025-11-07 08:30:54'),
+(9, 9, 167, 9, '2025-11-07 08:30:54'),
+(10, 4, 152, 10, '2025-11-07 08:30:54'),
+(11, 12, 95, 11, '2025-11-07 08:30:54'),
 (12, 2, 450, 1, '2025-11-06 15:51:29');
 
 -- --------------------------------------------------------
@@ -705,15 +704,9 @@ CREATE TABLE `scores` (
   `assignmentID` int(5) DEFAULT NULL,
   `testID` int(5) DEFAULT NULL,
   `score` int(5) NOT NULL,
-  `feedback` varchar(255) DEFAULT NULL
+  `feedback` varchar(255) DEFAULT NULL,
+  `gradedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `scores`
---
-
-INSERT INTO `scores` (`scoreID`, `userID`, `assignmentID`, `testID`, `score`, `feedback`) VALUES
-(1, 2, 1, NULL, 100, NULL);
 
 -- --------------------------------------------------------
 
@@ -777,9 +770,11 @@ INSERT INTO `studentbadges` (`studentBadgeID`, `userID`, `badgeID`, `courseID`, 
 
 CREATE TABLE `submissions` (
   `submissionID` int(11) NOT NULL,
+  `userID` int(11) NOT NULL,
   `assessmentID` int(11) NOT NULL,
-  `scoreID` int(11) NOT NULL,
-  `submittedAt` datetime NOT NULL DEFAULT current_timestamp()
+  `scoreID` int(11) DEFAULT NULL,
+  `submittedAt` datetime NOT NULL DEFAULT current_timestamp(),
+  `isSubmitted` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -929,7 +924,7 @@ CREATE TABLE `todo` (
 --
 
 INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `status`, `updatedAt`, `isRead`, `timeSpent`) VALUES
-(1, 2, 1, 'Graded', '2025-10-12 19:00:00', 1, NULL),
+(1, 2, 1, 'Missing', '2025-11-07 08:30:03', 0, NULL),
 (2, 2, 4, 'Pending', '2025-10-29 09:00:00', 1, NULL),
 (3, 2, 2, 'Pending', '2025-11-04 18:16:16', 1, 0);
 
@@ -964,7 +959,7 @@ CREATE TABLE `userinfo` (
 --
 
 INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `middleName`, `lastName`, `studentID`, `programID`, `gender`, `yearLevel`, `yearSection`, `schoolEmail`, `facebookLink`, `linkedInLink`, `githubLink`, `createdAt`, `isNewUser`) VALUES
-(1, 2, 'prof.png', 'Jane', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 1, 'jane.smith@university.edu', NULL, NULL, 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
+(1, 2, 'prof.png', 'Jane', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 1, 'jane.smith@university.edu', '', '', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
 (2, 1, 'prof.png', 'Christopher Jay', '', 'De Claro', '202310002', '1', 'Male', '2', 1, 'james.dom@university.edu', 'https://facebook.com/james.dom', 'https://linkedin.com/in/james-dom', 'https://instagram.com/james.dom', '2025-08-30 08:18:53', 1),
 (3, 3, 'prof.png', 'John', 'Cruz', 'Doe', '202310003', '1', 'Male', '2', 1, 'john.doe@university.edu', '', '', '', '2025-09-28 11:58:33', 0),
 (4, 4, 'prof.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 1, 'michael.lee@school.edu', NULL, NULL, NULL, '2025-09-28 20:59:48', 0),
@@ -1302,13 +1297,13 @@ ALTER TABLE `announcements`
 -- AUTO_INCREMENT for table `assessments`
 --
 ALTER TABLE `assessments`
-  MODIFY `assessmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `assessmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `assignments`
 --
 ALTER TABLE `assignments`
-  MODIFY `assignmentID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `assignmentID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `badges`
@@ -1368,7 +1363,7 @@ ALTER TABLE `feedback`
 -- AUTO_INCREMENT for table `files`
 --
 ALTER TABLE `files`
-  MODIFY `fileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `fileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `inbox`
@@ -1446,7 +1441,7 @@ ALTER TABLE `studentbadges`
 -- AUTO_INCREMENT for table `submissions`
 --
 ALTER TABLE `submissions`
-  MODIFY `submissionID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `submissionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `testquestionchoices`
@@ -1476,7 +1471,7 @@ ALTER TABLE `tests`
 -- AUTO_INCREMENT for table `todo`
 --
 ALTER TABLE `todo`
-  MODIFY `todoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `todoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `userinfo`

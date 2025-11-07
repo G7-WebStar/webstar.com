@@ -44,13 +44,13 @@ if (isset($_POST['save'])) {
 
 
 <div class="container">
-    <form method="POST">
+    <form id="notificationForm" method="POST">
         <input type="hidden" name="activeTab" value="preferences">
         <div class="row mb-3">
             <div class="col-12 col-md-6 mb-2 d-flex align-items-center">
                 <div class="text-bold text-20 mb-0">Email Notification</div>
-                <button type="submit" name="save" class="btn rounded-5 text-reg text-12 ms-3"
-                    style="background-color: var(--primaryColor); border: 1px solid var(--black);">
+                <button type="submit" name="save" id="saveBtn" class="btn rounded-5 text-reg text-12 ms-3"
+                    style="background-color: var(--primaryColor); border: 1px solid var(--black); display:none;">
                     Save changes
                 </button>
             </div>
@@ -121,3 +121,22 @@ if (isset($_POST['save'])) {
         </div>
     </form>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('notificationForm');
+        const saveBtn = document.getElementById('saveBtn');
+        const toggles = form.querySelectorAll('.form-check-input');
+
+        // Save initial states
+        const initialStates = {};
+        toggles.forEach(t => initialStates[t.name] = t.checked);
+
+        // Check for changes
+        toggles.forEach(t => {
+            t.addEventListener('change', () => {
+                const changed = Array.from(toggles).some(x => x.checked !== initialStates[x.name]);
+                saveBtn.style.display = changed ? 'inline-block' : 'none';
+            });
+        });
+    });
+</script>
