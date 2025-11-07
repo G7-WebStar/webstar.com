@@ -120,7 +120,7 @@ if (isset($_POST['saveChanges'])) {
             <!-- Upload Profile Picture for mobile only -->
             <div class="ms-4 d-block d-md-none mb-3 d-flex flex-column align-items-center text-center">
                 <div class="profile-pic mb-2">
-                    <img id="profilePreview"
+                    <img id="profilePreviewMobile"
                         src="<?php echo !empty($profilePicture) ? 'shared/assets/pfp-uploads/' . $profilePicture : 'https://via.placeholder.com/150'; ?>"
                         alt="Profile Picture" class="img-fluid">
                 </div>
@@ -130,7 +130,7 @@ if (isset($_POST['saveChanges'])) {
                 </p>
 
                 <input type="file" id="fileInputMobile" name="fileUploadMobile" class="form-control"
-                    accept=".png, .jpg, .jpeg" required style="display:none;">
+                    accept=".png, .jpg, .jpeg" style="display:none;">
                 <button type="button" class="text-med text-12 btn btn-upload mt-2" id="uploadBtnMobile">
                     Upload Photo
                 </button>
@@ -310,9 +310,9 @@ if (isset($_POST['saveChanges'])) {
                 <div class="col-12 col-md-4 d-none d-md-flex flex-column align-items-center ps-md-3 px-3 mb-4"
                     style="margin-top:-60px;">
                     <div class="profile-pic">
-                        <img id="profilePreview"
+                        <img id="profilePreviewDesktop"
                             src="<?php echo !empty($profilePicture) ? 'shared/assets/pfp-uploads/' . $profilePicture : 'https://via.placeholder.com/150'; ?>"
-                            style="width:150px;height:150px;object-fit:cover;" alt="Profile Picture">
+                            alt="Profile Picture">
                     </div>
                     <p class="text-med text-12 mt-2" style="color:var(--black); text-align:center; max-width:150px;">
                         Upload a JPG, PNG, or GIF file, up to 5 MB in size.</p>
@@ -343,39 +343,46 @@ if (isset($_POST['saveChanges'])) {
 <script>
     const fileInput = document.getElementById('fileInput');
     const uploadBtn = document.getElementById('uploadBtn');
-    const profilePreview = document.getElementById('profilePreview');
     const fileInputMobile = document.getElementById('fileInputMobile');
     const uploadBtnMobile = document.getElementById('uploadBtnMobile');
+    const profilePreviewDesktop = document.getElementById('profilePreviewDesktop');
     const profilePreviewMobile = document.getElementById('profilePreviewMobile');
     const saveBtn = document.getElementById('saveChangesBtn');
 
-    function showSaveButton() { saveBtn.style.display = 'inline-block'; }
+    function showSaveButton() {
+        saveBtn.style.display = 'inline-block';
+    }
 
-    // Desktop upload
+    // 🖥️ Desktop upload
     uploadBtn.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', () => {
         const file = fileInput.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = e => profilePreview.src = e.target.result;
+            reader.onload = e => (profilePreviewDesktop.src = e.target.result);
             reader.readAsDataURL(file);
             showSaveButton();
         }
     });
 
-    // Mobile upload
-    uploadBtnMobile.addEventListener('click', () => fileInputMobile.click());
+    // 📱 Mobile upload (FIXED)
+    uploadBtnMobile.addEventListener('click', () => {
+        // Make file upload required ONLY when user actually chooses a file
+        fileInputMobile.required = false; // ensure it won't block the form
+        fileInputMobile.click();
+    });
+
     fileInputMobile.addEventListener('change', () => {
         const file = fileInputMobile.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = e => profilePreviewMobile.src = e.target.result;
+            reader.onload = e => (profilePreviewMobile.src = e.target.result);
             reader.readAsDataURL(file);
             showSaveButton();
         }
     });
 
-    // Show save button on any change
+    // Show save button on any change in inputs/selects
     document.querySelectorAll('#registrationForm input, #registrationForm select').forEach(el => {
         el.addEventListener('input', showSaveButton);
         el.addEventListener('change', showSaveButton);
