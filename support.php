@@ -1,7 +1,7 @@
-<?php $activePage = 'feedback'; ?>
+<?php $activePage = 'support'; ?>
 <?php
-include('../shared/assets/database/connect.php');
-// include("../shared/assets/processes/prof-session-process.php");
+include('shared/assets/database/connect.php');
+include("shared/assets/processes/session-process.php");
 
 ?>
 
@@ -11,24 +11,22 @@ include('../shared/assets/database/connect.php');
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | Feedback</title>
+    <title>Support ✦ Webstar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
-    <link rel="stylesheet" href="../shared/assets/css/global-styles.css">
-    <link rel="stylesheet" href="../shared/assets/css/sidebar-and-container-styles.css">
-    <link rel="stylesheet" href="../shared/assets/css/course.css">
-    <link rel="stylesheet" href="../shared/assets/css/admin.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
+    <link rel="stylesheet" href="shared/assets/css/global-styles.css">
+    <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
+    <link rel="stylesheet" href="shared/assets/css/settings.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
     <!-- Material Design Icons -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:FILL@1" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
-        rel="stylesheet" />
-
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
 </head>
 
 <body>
@@ -49,13 +47,166 @@ include('../shared/assets/database/connect.php');
                                 <!-- Header Section -->
                                 <div class="row align-items-center mb-3 text-center text-md-start">
                                     <div class="col-12 col-md-auto text-center text-md-start position-relative">
-                                        <h1 class="text-sbold text-25 my-2" style="color: var(--black);">My Inbox
+                                        <h1 class="text-sbold text-25 my-2" style="color: var(--black);">Support
                                         </h1>
                                     </div>
 
                                     <!-- Message Content -->
                                     <div class="message-container mt-3 pb-4">
+                                        <div id="ratingAccordion">
+                                            <!-- Question 1 -->
+                                            <div class="row">
+                                                <div class="col-12 col-md-8 mb-2">
+                                                    <button
+                                                        class="btn w-100 d-flex flex-column align-items-start text-med text-14"
+                                                        type="button" data-bs-toggle="collapse" data-bs-target="#first"
+                                                        aria-expanded="false" aria-controls="first"
+                                                        style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black); text-align: left; white-space: normal; word-wrap: break-word;">
 
+                                                        <div class="d-flex w-100 align-items-center">
+                                                            <span class="flex-grow-1 text-start text-16 text-sbold">What
+                                                                is Webstar?</span>
+                                                            <span
+                                                                class="material-symbols-rounded transition">expand_more</span>
+                                                        </div>
+
+                                                        <div class="collapse w-100" id="first"
+                                                            data-bs-parent="#ratingAccordion">
+                                                            <p class="mb-0 text-reg text-14 text-start pe-4 pb-2"
+                                                                style="white-space: normal; word-wrap: break-word;">
+                                                                Webstar is an interactive online learning platform
+                                                                designed to help users explore courses,
+                                                                track their progress, and earn points through engaging
+                                                                activities. It focuses on making
+                                                                learning fun, structured, and community-driven.
+                                                            </p>
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- Question 2 -->
+                                            <div class="row">
+                                                <div class="col-12 col-md-8 mb-2">
+                                                    <button
+                                                        class="btn w-100 d-flex flex-column align-items-start text-med text-14"
+                                                        type="button" data-bs-toggle="collapse" data-bs-target="#second"
+                                                        aria-expanded="false" aria-controls="second"
+                                                        style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black); text-align: left; white-space: normal; word-wrap: break-word;">
+
+                                                        <div class="d-flex w-100 align-items-center">
+                                                            <span class="flex-grow-1 text-start text-16 text-sbold">How
+                                                                do I join a course?</span>
+                                                            <span
+                                                                class="material-symbols-rounded transition">expand_more</span>
+                                                        </div>
+
+                                                        <div class="collapse w-100" id="second"
+                                                            data-bs-parent="#ratingAccordion">
+                                                            <p class="mb-0 text-reg text-14 text-start pe-4 pb-2"
+                                                                style="white-space: normal; word-wrap: break-word;">
+                                                                After logging in, go to the “Courses” tab and select
+                                                                “Join Course.” Enter the course code
+                                                                provided by your instructor to enroll.
+                                                            </p>
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- Question 3 -->
+                                            <div class="row">
+                                                <div class="col-12 col-md-8 mb-2">
+                                                    <button
+                                                        class="btn w-100 d-flex flex-column align-items-start text-med text-14"
+                                                        type="button" data-bs-toggle="collapse" data-bs-target="#third"
+                                                        aria-expanded="false" aria-controls="third"
+                                                        style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black); text-align: left; white-space: normal; word-wrap: break-word;">
+
+                                                        <div class="d-flex w-100 align-items-center">
+                                                            <span class="flex-grow-1 text-start text-16 text-sbold">How
+                                                                can I earn XP?</span>
+                                                            <span
+                                                                class="material-symbols-rounded transition">expand_more</span>
+                                                        </div>
+
+                                                        <div class="collapse w-100" id="third"
+                                                            data-bs-parent="#ratingAccordion">
+                                                            <p class="mb-0 text-reg text-14 text-start pe-4 pb-2"
+                                                                style="white-space: normal; word-wrap: break-word;">
+                                                                XP (Experience Points) are earned by completing lessons,
+                                                                quizzes, and challenges. The more
+                                                                consistent your activity, the faster you level up and
+                                                                unlock new learning features or
+                                                                rewards.
+                                                            </p>
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- Question 4 -->
+                                            <div class="row">
+                                                <div class="col-12 col-md-8 mb-2">
+                                                    <button
+                                                        class="btn w-100 d-flex flex-column align-items-start text-med text-14"
+                                                        type="button" data-bs-toggle="collapse" data-bs-target="#fourth"
+                                                        aria-expanded="false" aria-controls="fourth"
+                                                        style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black); text-align: left; white-space: normal; word-wrap: break-word;">
+
+                                                        <div class="d-flex w-100 align-items-center">
+                                                            <span class="flex-grow-1 text-start text-16 text-sbold">I
+                                                                forgot my password, what should I
+                                                                do?</span>
+                                                            <span
+                                                                class="material-symbols-rounded transition">expand_more</span>
+                                                        </div>
+
+                                                        <div class="collapse w-100" id="fourth"
+                                                            data-bs-parent="#ratingAccordion">
+                                                            <p class="mb-0 text-reg text-14 text-start pe-4 pb-2"
+                                                                style="white-space: normal; word-wrap: break-word;">
+                                                                If you forgot your password, click “Forgot Password” on
+                                                                the login page. Enter your
+                                                                registered email address and follow the reset
+                                                                instructions sent to your inbox. You can then
+                                                                create a new password to access your account.
+                                                            </p>
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-3">
+                                                <div class="col-12 col-md-6">
+                                                    <div class="text-sbold text-16">
+                                                        Contact us
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <div class="col-12 col-md-6 mt-1">
+                                                    <div
+                                                        class="d-flex align-items-center justify-content-center justify-content-md-start text-med text-16">
+                                                        <span class="material-symbols-rounded me-1"
+                                                            style="font-size: 20px; vertical-align: middle;">
+                                                            mail
+                                                        </span>
+                                                        <span>learn.webstar@gmail.com</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12 col-md-6">
+                                                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=learn.webstar@gmail.com"
+                                                        class="btn rounded-5 text-med text-12 px-4"
+                                                        style="background-color: var(--primaryColor); border: 1px solid var(--black);"
+                                                        target="_blank">
+                                                        Send us an email
+                                                    </a>
+
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -74,27 +225,31 @@ include('../shared/assets/database/connect.php');
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Dropdown js -->
     <script>
-        document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
-            const btn = dropdown.querySelector('.dropdown-btn');
-            const list = dropdown.querySelector('.dropdown-list');
+        document.addEventListener('DOMContentLoaded', function () {
+            const buttons = document.querySelectorAll('[data-bs-toggle="collapse"]');
 
-            btn.addEventListener('click', () => {
-                list.style.display = list.style.display === 'block' ? 'none' : 'block';
-            });
+            buttons.forEach(button => {
+                const target = button.getAttribute('data-bs-target');
+                const icon = button.querySelector('.material-symbols-rounded');
+                const collapse = document.querySelector(target);
 
-            list.querySelectorAll('li').forEach(item => {
-                item.addEventListener('click', () => {
-                    btn.textContent = item.dataset.value;
-                    list.style.display = 'none';
-                });
-            });
+                if (collapse && icon) {
+                    collapse.addEventListener('show.bs.collapse', () => {
+                        // Reset all others
+                        buttons.forEach(btn => btn.style.backgroundColor = 'var(--pureWhite)');
+                        document.querySelectorAll('.material-symbols-rounded').forEach(ic => ic.style.transform = 'rotate(0deg)');
 
-            // Close dropdown if clicked outside
-            document.addEventListener('click', (e) => {
-                if (!dropdown.contains(e.target)) {
-                    list.style.display = 'none';
+                        // Highlight this one
+                        icon.style.transform = 'rotate(180deg)';
+                        icon.style.transition = 'transform 0.3s';
+                        button.style.backgroundColor = 'var(--primaryColor)';
+                    });
+
+                    collapse.addEventListener('hide.bs.collapse', () => {
+                        icon.style.transform = 'rotate(0deg)';
+                        button.style.backgroundColor = 'var(--pureWhite)';
+                    });
                 }
             });
         });

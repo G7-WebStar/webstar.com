@@ -225,6 +225,14 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                             </a>
                         </li>
 
+                        <!-- Support -->
+                        <li style="margin-bottom:6px;">
+                            <a class="dropdown-item d-flex align-items-center text-med text-14" href="support.php">
+                                <span class="material-symbols-rounded me-2" style="font-size:18px;">contact_support</span>
+                                Support
+                            </a>
+                        </li>
+
                         <!-- Settings -->
                         <li style="margin-bottom:6px;">
                             <a class="dropdown-item d-flex align-items-center text-med text-14" href="calendar.php">

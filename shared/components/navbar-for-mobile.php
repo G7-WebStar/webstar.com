@@ -76,7 +76,8 @@ $webstars = mysqli_fetch_assoc($webstarsResult);
       <i class="bi bi-inbox-fill" style="font-size:25px; color:var(--black); margin-top:-10px;"></i>
       <small class="text-med text-12" style="margin-top:-8px;">Inbox</small>
       <span
-        class="mt-1 position-absolute top-0 start-100 z-3 translate-middle badge rounded-pill bg-danger text-reg text-white" style="color:white!important;">
+        class="mt-1 position-absolute top-0 start-100 z-3 translate-middle badge rounded-pill bg-danger text-reg text-white"
+        style="color:white!important;">
         10
       </span>
     </a>
@@ -100,6 +101,14 @@ $webstars = mysqli_fetch_assoc($webstarsResult);
           <a class="dropdown-item d-flex align-items-center text-med text-14" href="settings.php">
             <span class="material-symbols-rounded me-2" style="font-size:18px;">settings</span>
             Settings
+          </a>
+        </li>
+
+        <!-- Support -->
+        <li style="margin-bottom:6px;">
+          <a class="dropdown-item d-flex align-items-center text-med text-14" href="support.php">
+            <span class="material-symbols-rounded me-2" style="font-size:18px;">contact_support</span>
+            Support
           </a>
         </li>
 
