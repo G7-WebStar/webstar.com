@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $correctAnswerRow = mysqli_fetch_assoc($correctAnswerResult);
             $correctAnswer = $correctAnswerRow['correctAnswer'];
         }
-        $testID = 1;
+        $testID = $_GET['testID'];
         $userAnswer = $answer['userAnswer'];
         $userID = $userID; // from session
         $isCorrect = ($userAnswer == $correctAnswer) ? 1 : 0;
