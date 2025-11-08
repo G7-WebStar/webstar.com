@@ -288,6 +288,7 @@ if ($colCheck && $colCheck->num_rows > 0) {
 $rubricsList = [];
 $tpSelectList = $hasTotalPoints ? "IFNULL(r.totalPoints,0) AS totalPoints" : "0 AS totalPoints";
 $tpGroupList = $hasTotalPoints ? ", r.totalPoints" : "";
+$tpGroupList = $hasTotalPoints ? ", r.totalPoints" : "";
 $rubricsQuery = "SELECT r.rubricID, r.rubricTitle, r.rubricType, $tpSelectList, COUNT(c.criterionID) AS criteriaCount
                  FROM rubric r
                  LEFT JOIN criteria c ON c.rubricID = r.rubricID
@@ -458,6 +459,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                     </div>
                                                 </div>
                                             </div>
+                                            <input type="hidden" name="assignmentContent" id="task">
                                             <input type="hidden" name="assignmentContent" id="task">
                                         </div>
                                     </div>
@@ -1258,22 +1260,28 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
     // Auto-open rubric modal when returning from create-rubric
     (function () {
         function openRubricModal() {
+    (function () {
+        function openRubricModal() {
             var modalEl = document.getElementById('selectRubricModal');
             if (!modalEl) return;
             var modal = new bootstrap.Modal(modalEl);
             // slight delay to ensure layout ready
             setTimeout(function () { modal.show(); }, 50);
+            setTimeout(function () { modal.show(); }, 50);
         }
+        function needsOpen() {
         function needsOpen() {
             try {
                 var params = new URLSearchParams(window.location.search);
                 if (params.get('openRubric') === '1') return true;
+            } catch (e) { }
             } catch (e) { }
             // also support hash trigger
             if (window.location.hash === '#openRubric') return true;
             return false;
         }
         if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function () { if (needsOpen()) openRubricModal(); });
             document.addEventListener('DOMContentLoaded', function () { if (needsOpen()) openRubricModal(); });
         } else {
             if (needsOpen()) openRubricModal();
@@ -1316,10 +1324,12 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 
     // Click on a rubric option: highlight and store selection
     document.addEventListener('click', function (e) {
+    document.addEventListener('click', function (e) {
         var opt = e.target.closest && e.target.closest('.rubric-option');
         if (!opt) return;
 
         // Clear previous highlight
+        document.querySelectorAll('.rubric-option').forEach(function (el) {
         document.querySelectorAll('.rubric-option').forEach(function (el) {
             el.style.backgroundColor = 'var(--pureWhite)';
         });
@@ -1335,6 +1345,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
     });
 
     // Confirm selection: apply to card and close modal
+    document.addEventListener('click', function (e) {
     document.addEventListener('click', function (e) {
         var btn = e.target.closest && e.target.closest('#confirmRubricBtn');
         if (!btn) return;
@@ -1392,6 +1403,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 <script>
     // Persist Assign Task form fields using localStorage so input survives navigating away and back
     (function () {
+    (function () {
         var STORAGE_KEY = 'assignTaskDraft_v1';
         var NAVIGATION_FLAG = 'assignTaskNavigatedAway_v1';
 
@@ -1436,9 +1448,11 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                 };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
             } catch (e) { }
+            } catch (e) { }
         }
 
         function clearDraftInStorage() {
+            try { localStorage.removeItem(STORAGE_KEY); } catch (e) { }
             try { localStorage.removeItem(STORAGE_KEY); } catch (e) { }
         }
 
@@ -1506,16 +1520,19 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                     quill.root.innerHTML = '';
                 }
             } catch (e) { }
+            } catch (e) { }
         }
 
         function restoreDraftFromStorage() {
             var raw = null;
+            try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { }
             try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { }
             if (!raw) {
                 clearAllFormFields();
                 return;
             }
             var draft = null;
+            try { draft = JSON.parse(raw); } catch (e) {
             try { draft = JSON.parse(raw); } catch (e) {
                 draft = null;
                 clearDraftInStorage();
@@ -1569,6 +1586,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                     for (i = 0; i < draft.links.length; i++) appendLinkPreview(draft.links[i]);
                 }
             } catch (e) { }
+            } catch (e) { }
         }
 
         function bindDraftPersistenceListeners() {
@@ -1579,25 +1597,36 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                 form.addEventListener('submit', function () {
                     clearDraftInStorage();
                     clearNavigationFlag();
+                form.addEventListener('input', function () { saveDraftToStorage(); });
+                form.addEventListener('change', function () { saveDraftToStorage(); });
+                form.addEventListener('submit', function () {
+                    clearDraftInStorage();
+                    clearNavigationFlag();
                 });
             }
             try {
                 if (typeof quill !== 'undefined') {
                     quill.on('text-change', function () { saveDraftToStorage(); });
+                    quill.on('text-change', function () { saveDraftToStorage(); });
                 }
+            } catch (e) { }
+            document.addEventListener('click', function (event) {
             } catch (e) { }
             document.addEventListener('click', function (event) {
                 var isAddLink = event.target && event.target.id === 'addLinkBtn';
                 var isDelete = event.target && (event.target.closest ? event.target.closest('.delete-file') : null);
+                if (isAddLink || isDelete) { setTimeout(function () { saveDraftToStorage(); }, 0); }
                 if (isAddLink || isDelete) { setTimeout(function () { saveDraftToStorage(); }, 0); }
             });
         }
 
         function setNavigationFlag() {
             try { localStorage.setItem(NAVIGATION_FLAG, '1'); } catch (e) { }
+            try { localStorage.setItem(NAVIGATION_FLAG, '1'); } catch (e) { }
         }
 
         function clearNavigationFlag() {
+            try { localStorage.removeItem(NAVIGATION_FLAG); } catch (e) { }
             try { localStorage.removeItem(NAVIGATION_FLAG); } catch (e) { }
         }
 
@@ -1639,6 +1668,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 
                 var draft = null;
                 try { draft = JSON.parse(raw); } catch (e) {
+                try { draft = JSON.parse(raw); } catch (e) {
                     clearDraftInStorage();
                     bindDraftPersistenceListeners();
                     return;
@@ -1664,6 +1694,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 
         function bindNavigationAwayListeners() {
             document.addEventListener('click', function (event) {
+            document.addEventListener('click', function (event) {
                 var link = event.target.closest ? event.target.closest('a') : null;
                 if (!link || !link.href) return;
                 var href = link.href;
@@ -1672,6 +1703,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                 }
             }, true);
 
+
             function bindEditLinks() {
                 var editLinks = document.querySelectorAll('a[href*="edit-rubric.php"]');
                 for (var i = 0; i < editLinks.length; i++) {
@@ -1679,15 +1711,19 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                     if (link.dataset.navFlagSet) continue;
                     link.dataset.navFlagSet = '1';
                     link.addEventListener('click', function () {
+                    link.addEventListener('click', function () {
                         setNavigationFlag();
                     });
                 }
             }
 
+
             bindEditLinks();
+
 
             var modalEl = document.getElementById('selectRubricModal');
             if (modalEl) {
+                modalEl.addEventListener('shown.bs.modal', function () {
                 modalEl.addEventListener('shown.bs.modal', function () {
                     setTimeout(bindEditLinks, 100);
                 });
@@ -1696,6 +1732,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 
         function initializeDraftPersistenceWithCleanStart() {
             bindNavigationAwayListeners();
+
 
             function attemptCheck() {
                 if (typeof quill !== 'undefined' && quill.root) {
@@ -1706,6 +1743,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
             }
 
             if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function () { attemptCheck(); });
                 document.addEventListener('DOMContentLoaded', function () { attemptCheck(); });
             } else {
                 attemptCheck();
