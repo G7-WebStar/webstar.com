@@ -99,6 +99,27 @@
                 </button>
             </div>
         </div>
+
+        <!-- Question 4 -->
+        <div class="row">
+            <div class="col-12 col-md-8 mb-2">
+                <button class="btn w-100 d-flex flex-column align-items-start text-med text-14" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#third" aria-expanded="false" aria-controls="fourth"
+                    style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black); text-align: left; white-space: normal; word-wrap: break-word;">
+
+                    <div class="d-flex w-100 align-items-center">
+                        <span class="flex-grow-1 text-start text-16 text-sbold">How do I assign a task?</span>
+                        <span class="material-symbols-rounded transition">expand_more</span>
+                    </div>
+
+                    <div class="collapse w-100" id="fourth" data-bs-parent="#ratingAccordion">
+                        <p class="mb-0 text-reg text-14 text-start pe-4 pb-2" style="white-space: normal; word-wrap: break-word;">
+                            To assign a task, click the <strong>< Assign an existing task ></Assign></strong> button.
+                        </p>
+                    </div>
+                </button>
+            </div>
+        </div>
     </div>
 
     <div class="row mt-5">

@@ -229,7 +229,7 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                         data-bs-toggle="dropdown" aria-expanded="false">
                                                         + Create
                                                     </button>
-                                                    <ul class="dropdown-menu shadow "
+                                                    <ul class="dropdown-menu shadow text-med"
                                                         aria-labelledby="dropdownMenuButtonMobile">
                                                         <li><a class="dropdown-item d-flex align-items-center mt-1"
                                                                 href="#">
@@ -267,35 +267,35 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                         aria-expanded="false">
                                                         + Create
                                                     </button>
-                                                    <ul class="dropdown-menu dropdown-menu-end shadow "
+                                                    <ul class="dropdown-menu dropdown-menu-end shadow text-med"
                                                         aria-labelledby="dropdownMenuButton">
                                                         <li>
                                                             <a class="dropdown-item d-flex align-items-center mt-1"
-                                                                href="#">
+                                                                href="create-course.php">
                                                                 <img src="../shared/assets/img/profIndex/file.png"
                                                                     class="me-2" alt="icon"> Create course
                                                             </a>
                                                         </li>
                                                         <li>
-                                                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                                            <a class="dropdown-item d-flex align-items-center" href="post-announcement.php">
                                                                 <img src="../shared/assets/img/profIndex/announcement.png"
                                                                     class="me-2" alt="icon"> Post announcement
                                                             </a>
                                                         </li>
                                                         <li>
-                                                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                                            <a class="dropdown-item d-flex align-items-center" href="add-lesson.php">
                                                                 <img src="../shared/assets/img/profIndex/uploadLesson.png"
-                                                                    class="me-2" alt="icon"> Upload lesson
+                                                                    class="me-2" alt="icon"> Add lesson
                                                             </a>
                                                         </li>
                                                         <li>
-                                                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                                            <a class="dropdown-item d-flex align-items-center" href="create-exam.php">
                                                                 <img src="../shared/assets/img/profIndex/createExam.png"
                                                                     class="me-2" alt="icon"> Create exam
                                                             </a>
                                                         </li>
                                                         <li>
-                                                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                                            <a class="dropdown-item d-flex align-items-center" href="assign-task.php">
                                                                 <img src="../shared/assets/img/profIndex/assignTask.png"
                                                                     class="me-2" alt="icon"> Assign task
                                                             </a>

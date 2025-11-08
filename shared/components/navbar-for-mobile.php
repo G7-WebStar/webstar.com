@@ -76,7 +76,7 @@ $webstars = mysqli_fetch_assoc($webstarsResult);
       <i class="bi bi-inbox-fill" style="font-size:25px; color:var(--black); margin-top:-10px;"></i>
       <small class="text-med text-12" style="margin-top:-8px;">Inbox</small>
       <span
-        class="mt-1 position-absolute top-0 start-100 z-3 translate-middle badge rounded-pill bg-danger text-reg text-white">
+        class="mt-1 position-absolute top-0 start-100 z-3 translate-middle badge rounded-pill bg-danger text-reg text-white" style="color:white!important;">
         10
       </span>
     </a>
