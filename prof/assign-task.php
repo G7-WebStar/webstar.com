@@ -31,23 +31,44 @@ if (isset($_POST['saveAssignment'])) {
             // Retrieve assessmentID based on unique data
             $assessmentID = mysqli_insert_id($conn);
 
-            // Insert into assignments (linked to assessmentID)
+            // Insert todo for each enrolled student
+            $studentsQuery = "SELECT userID FROM enrollments WHERE courseID = '$selectedCourseID'";
+            $studentsResult = executeQuery($studentsQuery);
+
+            if (mysqli_num_rows($studentsResult) > 0) {
+                while ($student = mysqli_fetch_assoc($studentsResult)) {
+                    $studentID = $student['userID'];
+                    $insertTodo = "INSERT INTO todo 
+            (userID, assessmentID, status, isRead)
+            VALUES 
+            ('$studentID', '$assessmentID', 'Pending', 0)";
+                    $result = executeQuery($insertTodo);
+                    if (!$result) {
+                        echo "Error inserting todo for student $studentID: " . mysqli_error($conn) . "<br>";
+                    }
+                }
+            }
+
+            /// Insert into assignments (linked to assessmentID)
             $insertAssignment = "INSERT INTO assignments 
-            (assessmentID,  assignmentDescription, assignmentPoints)
+            (assessmentID, assignmentDescription, assignmentPoints)
             VALUES 
             ('$assessmentID', '$content', '$assignmentPoints')";
             executeQuery($insertAssignment);
 
-            // Get assignmentID right after inserting into assignments
+            // Try to get the inserted assignment ID
             $assignmentID = mysqli_insert_id($conn);
 
-            // Then insert into todo
-            $insertTodo = "INSERT INTO todo 
-            (userID, assessmentID, title, status, isRead)
-            VALUES 
-            ('$userID', '$assessmentID', '$title', 'Pending',  0)";
-            executeQuery($insertTodo);
-
+            // Fallback in case mysqli_insert_id returns 0
+            if (!$assignmentID || $assignmentID == 0) {
+                $getAssignment = "SELECT assignmentID FROM assignments 
+                      WHERE assessmentID = '$assessmentID' 
+                      ORDER BY assignmentID DESC LIMIT 1";
+                $result = executeQuery($getAssignment);
+                if ($row = mysqli_fetch_assoc($result)) {
+                    $assignmentID = $row['assignmentID'];
+                }
+            }
 
             // Handle file uploads
             if (!empty($_FILES['materials']['name'][0])) {
@@ -166,13 +187,15 @@ if (isset($_GET['reuse'])) {
 // Detect if totalPoints column exists to avoid SQL errors on older DBs
 $hasTotalPoints = false;
 $colCheck = executeQuery("SHOW COLUMNS FROM rubric LIKE 'totalPoints'");
-if ($colCheck && $colCheck->num_rows > 0) { $hasTotalPoints = true; }
+if ($colCheck && $colCheck->num_rows > 0) {
+    $hasTotalPoints = true;
+}
 
 $rubricInfo = null;
 $selectedRubricID = isset($_GET['selectedRubricID']) ? intval($_GET['selectedRubricID']) : 0;
 if ($selectedRubricID > 0) {
     $tpSelect = $hasTotalPoints ? "IFNULL(r.totalPoints, 0) AS totalPoints" : "0 AS totalPoints";
-    $tpGroup  = $hasTotalPoints ? ", r.totalPoints" : "";
+    $tpGroup = $hasTotalPoints ? ", r.totalPoints" : "";
     $rubricQuery = "SELECT r.rubricID, r.rubricTitle, r.rubricType, $tpSelect, COUNT(c.criterionID) AS criteriaCount
                     FROM rubric r
                     LEFT JOIN criteria c ON c.rubricID = r.rubricID
@@ -188,7 +211,7 @@ if ($selectedRubricID > 0) {
 // Fetch all rubrics for modal list
 $rubricsList = [];
 $tpSelectList = $hasTotalPoints ? "IFNULL(r.totalPoints,0) AS totalPoints" : "0 AS totalPoints";
-$tpGroupList  = $hasTotalPoints ? ", r.totalPoints" : "";
+$tpGroupList = $hasTotalPoints ? ", r.totalPoints" : "";
 $rubricsQuery = "SELECT r.rubricID, r.rubricTitle, r.rubricType, $tpSelectList, COUNT(c.criterionID) AS criteriaCount
                  FROM rubric r
                  LEFT JOIN criteria c ON c.rubricID = r.rubricID
@@ -197,7 +220,9 @@ $rubricsQuery = "SELECT r.rubricID, r.rubricTitle, r.rubricType, $tpSelectList, 
                  ORDER BY r.rubricID DESC";
 $rubricsRes = executeQuery($rubricsQuery);
 if ($rubricsRes && $rubricsRes->num_rows > 0) {
-    while ($row = $rubricsRes->fetch_assoc()) { $rubricsList[] = $row; }
+    while ($row = $rubricsRes->fetch_assoc()) {
+        $rubricsList[] = $row;
+    }
 }
 
 
@@ -349,7 +374,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <input type="hidden" name="assignmentContent" id="task" >
+                                            <input type="hidden" name="assignmentContent" id="task">
                                         </div>
                                     </div>
 
@@ -504,7 +529,9 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                                             </div>
                                                                             <div class="text-reg text-12 text-break"
                                                                                 style="line-height: 1.5;">
-                                                                                <?php if ($rubricInfo) { echo ($rubricInfo['totalPoints']) . ' Points · ' . intval($rubricInfo['criteriaCount']) . ' Criteria'; } ?>
+                                                                                <?php if ($rubricInfo) {
+                                                                                    echo ($rubricInfo['totalPoints']) . ' Points · ' . intval($rubricInfo['criteriaCount']) . ' Criteria';
+                                                                                } ?>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -517,14 +544,14 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                         </div>
                                                     </div>
                                                     <?php if ($rubricInfo) { ?>
-                                                    <script>
-                                                        (function(){
-                                                            try {
-                                                                var ptsInput = document.querySelector('input[name="points"]');
-                                                                if (ptsInput) { ptsInput.value = '<?php echo (float)$rubricInfo['totalPoints']; ?>'; }
-                                                            } catch (e) {}
-                                                        })();
-                                                    </script>
+                                                        <script>
+                                                            (function () {
+                                                                try {
+                                                                    var ptsInput = document.querySelector('input[name="points"]');
+                                                                    if (ptsInput) { ptsInput.value = '<?php echo (float) $rubricInfo['totalPoints']; ?>'; }
+                                                                } catch (e) { }
+                                                            })();
+                                                        </script>
                                                     <?php } ?>
                                                     <!-- Buttons -->
                                                     <div class="mt-2 mb-5 text-start">
@@ -631,31 +658,34 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                         <div class="card rounded-3 mb-2 border-0">
                             <div class="card-body p-0">
                                 <!-- OPTIONS -->
-                                <?php if (!empty($rubricsList)) { foreach ($rubricsList as $rub) { ?>
-                                    <div class="rubric-option rounded-3 d-flex align-items-center justify-content-between mb-2"
-                                        style="cursor: pointer; background-color: var(--pureWhite); border: 1px solid var(--black);"
-                                        data-rubric-id="<?php echo $rub['rubricID']; ?>"
-                                        data-rubric-title="<?php echo htmlspecialchars($rub['rubricTitle']); ?>"
-                                        data-rubric-points="<?php echo $rub['totalPoints']; ?>"
-                                        data-rubric-criteria="<?php echo (int)$rub['criteriaCount']; ?>">
-                                        <div
-                                            style="line-height: 1.5; padding-left:15px; padding-right:15px; padding-top:10px; padding-bottom:10px">
-                                            <div class="text-sbold text-14"><?php echo $rub['rubricTitle']; ?></div>
-                                            <div class="text-med text-12">
-                                                <?php echo $rub['totalPoints']; ?> Points · <?php echo (int)$rub['criteriaCount']; ?> Criteria
+                                <?php if (!empty($rubricsList)) {
+                                    foreach ($rubricsList as $rub) { ?>
+                                        <div class="rubric-option rounded-3 d-flex align-items-center justify-content-between mb-2"
+                                            style="cursor: pointer; background-color: var(--pureWhite); border: 1px solid var(--black);"
+                                            data-rubric-id="<?php echo $rub['rubricID']; ?>"
+                                            data-rubric-title="<?php echo htmlspecialchars($rub['rubricTitle']); ?>"
+                                            data-rubric-points="<?php echo $rub['totalPoints']; ?>"
+                                            data-rubric-criteria="<?php echo (int) $rub['criteriaCount']; ?>">
+                                            <div
+                                                style="line-height: 1.5; padding-left:15px; padding-right:15px; padding-top:10px; padding-bottom:10px">
+                                                <div class="text-sbold text-14"><?php echo $rub['rubricTitle']; ?></div>
+                                                <div class="text-med text-12">
+                                                    <?php echo $rub['totalPoints']; ?> Points ·
+                                                    <?php echo (int) $rub['criteriaCount']; ?> Criteria
+                                                </div>
                                             </div>
+                                            <?php if (($rub['rubricType'] ?? '') === 'Created') { ?>
+                                                <a href="edit-rubric.php?rubricID=<?php echo $rub['rubricID']; ?>"
+                                                    class="text-decoration-none" onclick="event.stopPropagation();">
+                                                    <span class="material-symbols-rounded"
+                                                        style="font-variation-settings: 'FILL' 1; padding-right:15px; color: var(--black);">
+                                                        edit
+                                                    </span>
+                                                </a>
+                                            <?php } ?>
                                         </div>
-                                        <?php if (($rub['rubricType'] ?? '') === 'Created') { ?>
-                                            <a href="edit-rubric.php?rubricID=<?php echo $rub['rubricID']; ?>" class="text-decoration-none"
-                                               onclick="event.stopPropagation();">
-                                                <span class="material-symbols-rounded"
-                                                    style="font-variation-settings: 'FILL' 1; padding-right:15px; color: var(--black);">
-                                                    edit
-                                                </span>
-                                            </a>
-                                        <?php } ?>
-                                    </div>
-                                <?php } } else { ?>
+                                    <?php }
+                                } else { ?>
                                     <div class="text-muted text-reg text-14 px-3 py-2">No rubrics found. Create one.</div>
                                 <?php } ?>
                                 <!-- Select Rubric Button -->
@@ -997,60 +1027,60 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 </html>
 <script>
     // Auto-open rubric modal when returning from create-rubric
-    (function(){
-        function openRubricModal(){
+    (function () {
+        function openRubricModal() {
             var modalEl = document.getElementById('selectRubricModal');
             if (!modalEl) return;
             var modal = new bootstrap.Modal(modalEl);
             // slight delay to ensure layout ready
-            setTimeout(function(){ modal.show(); }, 50);
+            setTimeout(function () { modal.show(); }, 50);
         }
-        function needsOpen(){
+        function needsOpen() {
             try {
                 var params = new URLSearchParams(window.location.search);
                 if (params.get('openRubric') === '1') return true;
-            } catch(e) {}
+            } catch (e) { }
             // also support hash trigger
             if (window.location.hash === '#openRubric') return true;
             return false;
         }
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function(){ if (needsOpen()) openRubricModal(); });
+            document.addEventListener('DOMContentLoaded', function () { if (needsOpen()) openRubricModal(); });
         } else {
             if (needsOpen()) openRubricModal();
         }
     })();
     // If a rubric was just created/selected via URL param, ensure the card shows and persist show state
-    (function(){
+    (function () {
         try {
             var params = new URLSearchParams(window.location.search);
             var sel = params.get('selectedRubricID');
             if (sel) {
                 var cardRow = document.querySelector('.row.mb-0.mt-3');
                 if (cardRow) cardRow.style.display = '';
-                try { localStorage.setItem('rubricCardHidden','0'); } catch(e) {}
+                try { localStorage.setItem('rubricCardHidden', '0'); } catch (e) { }
             }
-        } catch(e) {}
+        } catch (e) { }
     })();
     var selectedRubric = null;
     // Hide card on load if previously closed
-    (function(){
+    (function () {
         try {
             var hidden = localStorage.getItem('rubricCardHidden');
             if (hidden === '1') {
                 var cardRow = document.querySelector('.row.mb-0.mt-3');
                 if (cardRow) cardRow.style.display = 'none';
             }
-        } catch (e) {}
+        } catch (e) { }
     })();
 
     // Click on a rubric option: highlight and store selection
-    document.addEventListener('click', function(e){
+    document.addEventListener('click', function (e) {
         var opt = e.target.closest && e.target.closest('.rubric-option');
         if (!opt) return;
 
         // Clear previous highlight
-        document.querySelectorAll('.rubric-option').forEach(function(el){
+        document.querySelectorAll('.rubric-option').forEach(function (el) {
             el.style.backgroundColor = 'var(--pureWhite)';
         });
         // Highlight selected (yellow)
@@ -1065,7 +1095,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
     });
 
     // Confirm selection: apply to card and close modal
-    document.addEventListener('click', function(e){
+    document.addEventListener('click', function (e) {
         var btn = e.target.closest && e.target.closest('#confirmRubricBtn');
         if (!btn) return;
         if (!selectedRubric) return;
@@ -1081,29 +1111,29 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
         try {
             var ptsInput = document.querySelector('input[name="points"]');
             if (ptsInput) ptsInput.value = selectedRubric.points;
-        } catch (e) {}
+        } catch (e) { }
 
         var modalEl = document.getElementById('selectRubricModal');
         if (modalEl) {
             var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
             modal.hide();
         }
-        try { localStorage.setItem('rubricCardHidden','0'); } catch(e) {}
+        try { localStorage.setItem('rubricCardHidden', '0'); } catch (e) { }
     });
 
     // X/close on rubric card hides the card
-    document.addEventListener('click', function(e){
+    document.addEventListener('click', function (e) {
         var closeIcon = e.target.closest && e.target.closest('.materials-card .material-symbols-outlined');
         if (closeIcon) {
             var cardRow = closeIcon.closest('.row.mb-0.mt-3');
             if (cardRow) cardRow.style.display = 'none';
-            try { localStorage.setItem('rubricCardHidden','1'); } catch(e) {}
+            try { localStorage.setItem('rubricCardHidden', '1'); } catch (e) { }
         }
     });
 </script>
 <script>
     // Persist Assign Task form fields using localStorage so input survives navigating away and back
-    (function(){
+    (function () {
         var STORAGE_KEY = 'assignTaskDraft_v1';
         var NAVIGATION_FLAG = 'assignTaskNavigatedAway_v1';
 
@@ -1147,11 +1177,11 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                     links: getCurrentLinks()
                 };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
-            } catch (e) {}
+            } catch (e) { }
         }
 
         function clearDraftInStorage() {
-            try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+            try { localStorage.removeItem(STORAGE_KEY); } catch (e) { }
         }
 
         function appendLinkPreview(linkValue) {
@@ -1217,18 +1247,18 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                 if (typeof quill !== 'undefined' && quill.root) {
                     quill.root.innerHTML = '';
                 }
-            } catch (e) {}
+            } catch (e) { }
         }
 
         function restoreDraftFromStorage() {
             var raw = null;
-            try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) {}
+            try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { }
             if (!raw) {
                 clearAllFormFields();
                 return;
             }
             var draft = null;
-            try { draft = JSON.parse(raw); } catch (e) { 
+            try { draft = JSON.parse(raw); } catch (e) {
                 draft = null;
                 clearDraftInStorage();
                 clearAllFormFields();
@@ -1280,37 +1310,37 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                 if (draft.links && draft.links.length) {
                     for (i = 0; i < draft.links.length; i++) appendLinkPreview(draft.links[i]);
                 }
-            } catch (e) {}
+            } catch (e) { }
         }
 
         function bindDraftPersistenceListeners() {
             var form = document.querySelector('form');
             if (form) {
-                form.addEventListener('input', function(){ saveDraftToStorage(); });
-                form.addEventListener('change', function(){ saveDraftToStorage(); });
-                form.addEventListener('submit', function(){ 
-                    clearDraftInStorage(); 
-                    clearNavigationFlag(); 
+                form.addEventListener('input', function () { saveDraftToStorage(); });
+                form.addEventListener('change', function () { saveDraftToStorage(); });
+                form.addEventListener('submit', function () {
+                    clearDraftInStorage();
+                    clearNavigationFlag();
                 });
             }
             try {
                 if (typeof quill !== 'undefined') {
-                    quill.on('text-change', function(){ saveDraftToStorage(); });
+                    quill.on('text-change', function () { saveDraftToStorage(); });
                 }
-            } catch (e) {}
-            document.addEventListener('click', function(event){
+            } catch (e) { }
+            document.addEventListener('click', function (event) {
                 var isAddLink = event.target && event.target.id === 'addLinkBtn';
                 var isDelete = event.target && (event.target.closest ? event.target.closest('.delete-file') : null);
-                if (isAddLink || isDelete) { setTimeout(function(){ saveDraftToStorage(); }, 0); }
+                if (isAddLink || isDelete) { setTimeout(function () { saveDraftToStorage(); }, 0); }
             });
         }
 
         function setNavigationFlag() {
-            try { localStorage.setItem(NAVIGATION_FLAG, '1'); } catch (e) {}
+            try { localStorage.setItem(NAVIGATION_FLAG, '1'); } catch (e) { }
         }
 
         function clearNavigationFlag() {
-            try { localStorage.removeItem(NAVIGATION_FLAG); } catch (e) {}
+            try { localStorage.removeItem(NAVIGATION_FLAG); } catch (e) { }
         }
 
         function hasNavigatedAway() {
@@ -1350,7 +1380,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                 }
 
                 var draft = null;
-                try { draft = JSON.parse(raw); } catch (e) { 
+                try { draft = JSON.parse(raw); } catch (e) {
                     clearDraftInStorage();
                     bindDraftPersistenceListeners();
                     return;
@@ -1375,7 +1405,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
         }
 
         function bindNavigationAwayListeners() {
-            document.addEventListener('click', function(event) {
+            document.addEventListener('click', function (event) {
                 var link = event.target.closest ? event.target.closest('a') : null;
                 if (!link || !link.href) return;
                 var href = link.href;
@@ -1383,24 +1413,24 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                     setNavigationFlag();
                 }
             }, true);
-            
+
             function bindEditLinks() {
                 var editLinks = document.querySelectorAll('a[href*="edit-rubric.php"]');
                 for (var i = 0; i < editLinks.length; i++) {
                     var link = editLinks[i];
                     if (link.dataset.navFlagSet) continue;
                     link.dataset.navFlagSet = '1';
-                    link.addEventListener('click', function() {
+                    link.addEventListener('click', function () {
                         setNavigationFlag();
                     });
                 }
             }
-            
+
             bindEditLinks();
-            
+
             var modalEl = document.getElementById('selectRubricModal');
             if (modalEl) {
-                modalEl.addEventListener('shown.bs.modal', function() {
+                modalEl.addEventListener('shown.bs.modal', function () {
                     setTimeout(bindEditLinks, 100);
                 });
             }
@@ -1408,7 +1438,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 
         function initializeDraftPersistenceWithCleanStart() {
             bindNavigationAwayListeners();
-            
+
             function attemptCheck() {
                 if (typeof quill !== 'undefined' && quill.root) {
                     checkAndClearOrRestore();
@@ -1418,7 +1448,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
             }
 
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', function(){ attemptCheck(); });
+                document.addEventListener('DOMContentLoaded', function () { attemptCheck(); });
             } else {
                 attemptCheck();
             }

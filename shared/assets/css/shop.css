@@ -1,34 +1,35 @@
 .custom-nav-tabs .nav-link {
-    font-family: var(--SemiBold);
-    color: var(--black);
-    opacity: 0.75;
-    border: none;
-    border-bottom: 3px solid transparent;
-    transition: all 0.3s ease;
-    font-weight: normal;
+    font-family: var(--SemiBold) !important;
+    color: var(--black) !important;
+    opacity: 0.75 !important;
+    border: none !important;
+    border-bottom: 3px solid transparent !important;
+    transition: all 0.3s ease !important;
+    font-weight: normal !important;
     background-color: transparent !important;
-    white-space: nowrap;
+    white-space: nowrap !important;
+    font-size: 14px !important;
 }
 
 .custom-nav-tabs .nav-link:hover {
-    color: var(--black);
-    text-decoration: none;
+    color: var(--black) !important;
+    text-decoration: none !important;
     background-color: transparent !important;
+    font-size: 14px !important;
 }
 
 .custom-nav-tabs .nav-link.active {
-    border-bottom: 3px solid var(--black);
-    color: var(--black);
-    font-weight: bold;
+    border-bottom: 3px solid var(--black) !important;
+    color: var(--black) !important;
     background-color: transparent !important;
-    opacity: 1;
+    opacity: 1 !important;
 }
 
 /* Tab container for horizontal scrolling */
 .tab-container {
     position: relative;
     overflow: hidden;
-    margin-left: 45px; 
+    margin-left: 45px;
 }
 
 .tab-scroll-container {
@@ -92,17 +93,21 @@
         scroll-snap-align: start;
     }
 
-    .custom-nav-tabs .nav-link {
+    .custom-nav-tabs .nav-link .nav-link.active {
         font-size: 12px !important;
         padding: 10px 8px;
         white-space: nowrap;
+    }
+
+    .custom-nav-tabs .nav-link:hover {
+        font-size: 12px !important;
     }
 
     .tab-container {
         position: relative;
         display: flex;
         justify-content: center;
-        margin-left:0%;
+        margin-left: 0%;
     }
 
     .tab-scroll-container {
@@ -134,15 +139,12 @@
 
 .customCard {
     width: 100%;
-    max-width: 220px;
-    height: 270px;
     border: 1px solid var(--black);
-    border-radius: 15px;
+    border-radius: 10px;
     display: inline-block;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     background-color: var(--primaryColor);
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
 .cardItem {
@@ -155,8 +157,9 @@
 }
 
 .shopCardImage {
-    width: 100% !important;
-    height: 227px !important;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
     object-fit: cover;
     border: none;
     border-bottom: 1px solid var(--black);
@@ -171,8 +174,8 @@
     background-color: var(--pureWhite);
     display: flex;
     flex-direction: column;
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 
 .cardTitle {
@@ -187,9 +190,6 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    font-family: var(--Regular);
-    font-size: 18px;
-    font-weight: normal;
     color: var(--black);
     line-height: 1.3;
 }
@@ -224,26 +224,9 @@
     margin-top: 10px;
 }
 
-.description {
-    font-family: 'Regular', sans-serif;
-    font-size: 14px;
-    color: var(--black);
-}
-
-.modal-content .title span,
-.modal-content .title i {
-    font-family: 'Bold', sans-serif;
-    font-size: 22px;
-    color: var(--black);
-    font-weight: bold;
-}
-
-.modal-content .title .bi-star-fill {
-    color: var(--black) !important;
-}
 
 .modalButton {
-    background: #F6D97A;
+    background: var(--primaryColor);
     color: var(--black);
     border: 1px solid var(--black);
     border-radius: 9px;
@@ -252,9 +235,12 @@
 }
 
 .modalButton:active,
-.modalButton:focus {
+.modalButton:focus,
+.modalButton:hover {
     box-shadow: none;
     outline: none;
+    color: var(--black) !important;
+    background: var(--primaryColor) !important;
 }
 
 /* Modal dividers */
@@ -269,14 +255,6 @@
     margin-right: 0 !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
-}
-
-/* Modal title styling */
-.modalTitle {
-    font-family: 'Bold', sans-serif;
-    font-size: 24px;
-    color: var(--black);
-    font-weight: bold;
 }
 
 /* Bootstrap modal structure styling */
@@ -327,8 +305,40 @@
     margin-right: 0;
 }
 
+.card-wrapper {
+    max-width: 400px !important;
+}
+
 /* Mobile responsive layout */
 @media (max-width: 768px) {
+    .shop-container {
+        padding-bottom: 100px !important;
+    }
+
+    .cardTitle {
+        font-size: 14px !important;
+    }
+
+    .cardPrice {
+        font-size: 14px !important;
+    }
+
+    .modalTitle {
+        font-size: 14px !important;
+    }
+
+    .description {
+        font-size: 14px !important;
+    }
+
+    .modal-price {
+        font-size: 14px !important;
+    }
+
+    .modal-coin {
+        width: 16px;
+    }
+
     .d-flex.align-items-center {
         /* flex-direction: column;
         gap: 15px; */
@@ -343,34 +353,69 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 0 20px;
-    }
-    
-    .card-wrapper {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-    }
-    
-    .customCard {
-        width: 237px;
-        height: 326px;
-        margin-top: 25px;
-    }
-    
-    .shopCardImage {
-        height: 227px !important;
     }
 
     /* Shop title mobile styling */
     .shop-title {
-        font-size: 24px !important;
-        padding: 10px 0;
         width: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-top: 15px;
-        margin-bottom: 20px;
+    }
+}
+
+
+@media (max-width: 999px) {
+
+    /* Center the title and add bottom margin */
+    .shop-title {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+        /* adjust as needed */
+        margin-top: 5px;
+    }
+}
+
+.settings-header-wrapper {
+    position: sticky;
+    top: -18px !important;
+    /* stick at the very top of its container */
+    z-index: 100;
+    /* make sure it stays above other content */
+    background-color: var(--dirtyWhite);
+    /* match your theme */
+    padding: 0px !important;
+    margin: 0px !important;
+}
+
+.tab-carousel-wrapper {
+    margin-top: -3px;
+}
+
+.tab-scroll {
+    margin-bottom: 0px !important;
+}
+
+.tab-fade {
+    animation: fadeIn 0.4s ease;
+}
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (min-width: 768px) {
+
+    /* Bootstrap desktop breakpoint */
+    .shop-container {
+        margin-top: 7px !important;
     }
 }

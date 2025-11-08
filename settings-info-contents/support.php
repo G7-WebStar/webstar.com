@@ -20,8 +20,8 @@
                         <span class="material-symbols-rounded transition">expand_more</span>
                     </div>
 
-                    <div class="collapse w-100 pe-4 pb-2" id="first" data-bs-parent="#ratingAccordion">
-                        <p class="mb-0 text-reg text-14 text-start" style="white-space: normal; word-wrap: break-word;">
+                    <div class="collapse w-100" id="first" data-bs-parent="#ratingAccordion">
+                        <p class="mb-0 text-reg text-14 text-start pe-4 pb-2" style="white-space: normal; word-wrap: break-word;">
                             Webstar is an interactive online learning platform designed to help users explore courses,
                             track their progress, and earn points through engaging activities. It focuses on making
                             learning fun, structured, and community-driven.
@@ -43,8 +43,8 @@
                         <span class="material-symbols-rounded transition">expand_more</span>
                     </div>
 
-                    <div class="collapse w-100 pe-4 pb-2" id="second" data-bs-parent="#ratingAccordion">
-                        <p class="mb-0 text-reg text-14 text-start" style="white-space: normal; word-wrap: break-word;">
+                    <div class="collapse w-100" id="second" data-bs-parent="#ratingAccordion">
+                        <p class="mb-0 text-reg text-14 text-start pe-4 pb-2" style="white-space: normal; word-wrap: break-word;">
                             After logging in, go to the “Courses” tab and select “Join Course.” Enter the course code
                             provided by your instructor to enroll.
                         </p>
@@ -65,8 +65,8 @@
                         <span class="material-symbols-rounded transition">expand_more</span>
                     </div>
 
-                    <div class="collapse w-100 pe-4 pb-2" id="third" data-bs-parent="#ratingAccordion">
-                        <p class="mb-0 text-reg text-14 text-start" style="white-space: normal; word-wrap: break-word;">
+                    <div class="collapse w-100" id="third" data-bs-parent="#ratingAccordion">
+                        <p class="mb-0 text-reg text-14 text-start pe-4 pb-2" style="white-space: normal; word-wrap: break-word;">
                             XP (Experience Points) are earned by completing lessons, quizzes, and challenges. The more
                             consistent your activity, the faster you level up and unlock new learning features or
                             rewards.
@@ -89,8 +89,8 @@
                         <span class="material-symbols-rounded transition">expand_more</span>
                     </div>
 
-                    <div class="collapse w-100 pe-4 pb-2" id="fourth" data-bs-parent="#ratingAccordion">
-                        <p class="mb-0 text-reg text-14 text-start" style="white-space: normal; word-wrap: break-word;">
+                    <div class="collapse w-100" id="fourth" data-bs-parent="#ratingAccordion">
+                        <p class="mb-0 text-reg text-14 text-start pe-4 pb-2" style="white-space: normal; word-wrap: break-word;">
                             If you forgot your password, click “Forgot Password” on the login page. Enter your
                             registered email address and follow the reset instructions sent to your inbox. You can then
                             create a new password to access your account.

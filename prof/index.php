@@ -43,23 +43,26 @@ assessments.assessmentID,
 assessments.assessmentTitle,
 courses.courseCode, 
 DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline 
-FROM assignments
-INNER JOIN assessments
-	ON assignments.assessmentID = assessments.assessmentID
+FROM assessments
 INNER JOIN courses
 	ON assessments.courseID = courses.courseID
+INNER JOIN todo
+    ON todo.assessmentID = assessments.assessmentID
 WHERE assessments.deadline > CURRENT_DATE
 ";
 $activeAssessmentsTabResult = executeQuery($activeAssessmentsTabQuery);
 if ($activeAssessmentsTabResult && mysqli_num_rows($activeAssessmentsTabResult) > 0) {
     while ($rowAssessment = mysqli_fetch_assoc($activeAssessmentsTabResult)) {
         $assessmentCourseID = $rowAssessment['courseID'];
+        $assessmentID = $rowAssessment['assessmentID'];
 
         $countStudentAssessmentQuery = "SELECT COUNT(*) AS courseStudents
                                         FROM enrollments
                                         INNER JOIN courses
 	                                        ON courses.courseID = enrollments.courseID
-                                        WHERE courses.userID = '$userID' AND enrollments.courseID = '$assessmentCourseID';";
+                                        INNER JOIN assessments
+                                            ON assessments.courseID = courses.courseID
+                                        WHERE courses.userID = '$userID' AND enrollments.courseID = '$assessmentCourseID' AND assessments.assessmentID = '$assessmentID';";
         $countStudentAssessmentResult = executeQuery($countStudentAssessmentQuery);
 
         $studentAssessmentCount = 0;
@@ -70,11 +73,7 @@ if ($activeAssessmentsTabResult && mysqli_num_rows($activeAssessmentsTabResult) 
         }
 
         $countSubmittedQuery = "SELECT COUNT(*) AS submittedTodo FROM todo 
-                                INNER JOIN assessments
-	                                ON todo.assessmentID = assessments.assessmentID
-                                INNER JOIN courses
-	                                ON assessments.courseID = courses.courseID
-                                WHERE courses.userID = '$userID' AND assessments.courseID = '$assessmentCourseID' AND todo.status = 'Graded' OR todo.status = 'Submitted'";
+                                WHERE assessmentID = '$assessmentID' AND (status = 'Graded' OR status = 'Submitted')";
         $countSubmittedResult = executeQuery($countSubmittedQuery);
 
         $submittedTodoCount = 0;
@@ -530,8 +529,7 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                                             <div class="text-reg text-12 mt-2"
                                                                                 style="color: var(--black);">
                                                                                 <span class="text-sbold"><?php echo $submittedTodo ?></span> of <?php echo $courseStudents ?>
-                                                                                students
-                                                                                submitted<br>
+                                                                                students submitted<br>
                                                                                 <span class="text-reg">Due <?php echo $assessmentDeadline ?></span>
                                                                             </div>
 

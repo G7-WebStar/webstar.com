@@ -41,6 +41,10 @@
     border: 1px solid var(--black);
     margin-left: -4px;
 }
+.timeline-content{
+    margin-top: -10px;
+    margin-left: 10px;
+}
 
 .timeline-item:not(:last-child)::after {
     content: '';

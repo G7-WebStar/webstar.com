@@ -94,13 +94,20 @@ $_SESSION['TodoNewCount'] = $newTodoCount;
 
 $userID = $_SESSION['userID'];
 
-$usernameAndProfilePictureQuery = "SELECT u.userName, ui.profilePicture
+$usernameAndProfilePictureQuery = "
+SELECT 
+    u.userName, 
+    ui.profilePicture,
+    p.webstars
 FROM users u
 JOIN userinfo ui ON u.userID = ui.userID
-WHERE u.userID = $userID";
+JOIN profile p ON u.userID = p.userID
+WHERE u.userID = $userID
+";
 
 $usernameAndProfilePictureResult = executeQuery($usernameAndProfilePictureQuery);
 $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
+
 ?>
 
 <div class="col-auto d-none d-md-block">
@@ -185,7 +192,7 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                         <img class="me-2" src="shared/assets/img/webstar.png" alt="Description of Image" width="30">
                         <div class="d-flex flex-column align-items-start ps-2" style="line-height: 1.2;">
                             <a class="text-med text-18" style="text-decoration: none;">
-                                <strong>1260</strong>
+                                <strong><?php echo $userInformation['webstars'] ?></strong>
                             </a>
                             <a class="text-med text-14" style="text-decoration: none;">
                                 Webstars
@@ -200,10 +207,10 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                 <div class="dropdown mt-auto p-4">
                     <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
                         data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="shared/assets/pfp-uploads/<?php echo $userInformation['profilePicture']?>" alt="" width="32"
-                            height="32" class="rounded-circle me-2">
+                        <img src="shared/assets/pfp-uploads/<?php echo $userInformation['profilePicture'] ?>" alt=""
+                            width="32" height="32" class="rounded-circle me-2">
                         <strong class="text-dark text-med text-16 px-1">
-                            <?php echo $userInformation['userName']?>
+                            <?php echo $userInformation['userName'] ?>
                         </strong>
                     </a>
 
@@ -215,6 +222,15 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                             <a class="dropdown-item d-flex align-items-center text-med text-14" href="settings.php">
                                 <span class="material-symbols-rounded me-2" style="font-size:18px;">settings</span>
                                 Settings
+                            </a>
+                        </li>
+
+                        <!-- Settings -->
+                        <li style="margin-bottom:6px;">
+                            <a class="dropdown-item d-flex align-items-center text-med text-14" href="calendar.php">
+                                <span class="material-symbols-rounded me-2"
+                                    style="font-size:18px;">calendar_month</span>
+                                Calendar
                             </a>
                         </li>
 
@@ -254,7 +270,7 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                 <input type="text" id="searchInput" class="form-control rounded-pill pt-3 pb-3"
                     placeholder="Search students & professors"
                     style="border: 1.5px solid #2c2c2c; padding-right: 5rem; padding-left: 27px;">
-                <span class="material-symbols-outlined pe-3" style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%);
+                <span class="material-symbols-rounded pe-3" style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%);
           color: #2c2c2c; font-size: 24px;">search</span>
             </form>
 

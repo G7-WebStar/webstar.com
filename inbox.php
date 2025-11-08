@@ -223,22 +223,39 @@ $selectInboxResult = executeQuery($selectInboxQuery);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
 
-    <!-- Filters Toggle -->
     <script>
-        const filterToggle = document.getElementById("filterToggle");
-        const mobileFilters = document.getElementById("mobileFilters");
+        document.addEventListener("DOMContentLoaded", function () {
+            const filterToggle = document.getElementById("filterToggle");
+            const mobileFilters = document.getElementById("mobileFilters");
+            const icon = filterToggle.querySelector(".material-symbols-rounded");
 
-        // Restore previous state from localStorage
-        if (localStorage.getItem("filtersVisible") === "true") {
-            mobileFilters.classList.remove("d-none");
-        }
+            // Unique key per page
+            const storageKey = "filtersVisible_" + "<?php echo $activePage; ?>";
 
-        filterToggle.addEventListener("click", () => {
-            const isVisible = !mobileFilters.classList.contains("d-none");
-            mobileFilters.classList.toggle("d-none");
-            localStorage.setItem("filtersVisible", !isVisible);
+            // Restore previous state
+            if (localStorage.getItem(storageKey) === "true") {
+                mobileFilters.classList.remove("d-none");
+                filterToggle.classList.add("active");
+                icon.textContent = "close";
+            }
+
+            filterToggle.addEventListener("click", () => {
+                const isVisible = !mobileFilters.classList.contains("d-none");
+
+                // Toggle panel
+                mobileFilters.classList.toggle("d-none");
+
+                // Toggle icon
+                filterToggle.classList.toggle("active");
+                icon.textContent = filterToggle.classList.contains("active") ? "close" : "tune";
+
+                // Save state
+                localStorage.setItem(storageKey, !isVisible);
+            });
         });
     </script>
+
+
 
 
     <!-- Dropdown js -->
