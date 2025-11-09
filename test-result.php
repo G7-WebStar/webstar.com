@@ -163,8 +163,8 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                                         style="color: var(--black);"></i>
                                     <div class="quiz-nav col-12 d-flex flex-column flex-md-row align-items-center justify-content-between my-2 px-3 px-md-5 py-2 py-md-3">
                                         <div class="d-flex flex-row align-items-center mb-0">
-                                            <i class="d-none d-md-block announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 me-3"
-                                                style="color: var(--black);"></i>
+                                            <a href="todo.php" class="text-decoration-none"><i class="d-none d-md-block announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 me-3"
+                                                    style="color: var(--black);"></i></a>
                                             <?php
                                             if (mysqli_num_rows($selectTestResult) > 0) {
                                                 while ($guideLines = mysqli_fetch_assoc($selectTestResult)) {
@@ -205,17 +205,17 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
 
                                         <div class="mt-auto text-sbold">
                                             <div class="d-flex justify-content-center justify-content-md-around align-items-center mb-4 gap-3 gap-md-0 mt-5" id="buttonSection">
-                                                <div class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable"
+                                                <button class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable" id="prevBtn"
                                                     style="background-color: var(--primaryColor);" onclick="prevQuestion();">
                                                     <i class="fa-solid fs-6 fa-arrow-left text-reg" style="color: var(--black);"></i>
                                                     <span class="m-0 fs-sm-6">Prev</span>
-                                                </div>
+                                                </button>
 
-                                                <div class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable"
+                                                <button class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable" id="nextBtn"
                                                     style="background-color: var(--primaryColor);" onclick="nextQuestion();">
                                                     <span class="m-0 fs-sm-6">Next</span>
                                                     <i class="fa-solid fs-6 fa-arrow-right text-reg" style="color: var(--black);"></i>
-                                                </div>
+                                                </button>
                                             </div>
                                         </div>
 
@@ -316,6 +316,17 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             //Indicates which question is currently on screen
             questionNumber.innerHTML = "Section Name · Question " + questionNo + " of " + totalQuestion;
 
+            //Disables pagination buttons if there are no content on the next page
+            if (currentQuestionIndex == 0) {
+                document.getElementById('prevBtn').classList.remove('interactable');
+                document.getElementById('prevBtn').disabled = true;
+            }
+
+            if (currentQuestionIndex == questions.length - 1) {
+                document.getElementById('nextBtn').classList.remove('interactable');
+                document.getElementById('nextBtn').disabled = true;
+            }
+
             //Adds a margin when there is an img
             if (questions[currentQuestionIndex].img == "") {
                 choices.classList.add('mt-4');
@@ -373,6 +384,11 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
         }
 
         function nextQuestion() {
+            if (currentQuestionIndex == 0) {
+                document.getElementById('prevBtn').classList.add('interactable');
+                document.getElementById('prevBtn').disabled = false;
+            }
+
             (currentQuestionIndex + 1 < questions.length) ? currentQuestionIndex++ : null;
             if ((currentQuestionIndex + 1) <= questions.length) {
                 choices.innerHTML = '';
@@ -381,6 +397,11 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
         }
 
         function prevQuestion() {
+            if (currentQuestionIndex == questions.length - 1) {
+                document.getElementById('nextBtn').classList.add('interactable');
+                document.getElementById('nextBtn').disabled = false;
+            }
+
             if ((currentQuestionIndex + 1) > 1) {
                 currentQuestionIndex--;
                 choices.innerHTML = '';

@@ -9,36 +9,29 @@ assessments.assessmentTitle,
 courses.courseID,
 courses.courseCode, 
 courses.courseTitle, 
+assessments.assessmentID,
 DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline
 FROM assessments
 INNER JOIN courses
 	ON assessments.courseID = courses.courseID
-WHERE courses.userID = $userID AND courses.isActive = 'Yes'";
+WHERE courses.userID = $userID AND courses.isActive = '1'";
 $assessmentsResult = executeQuery($assessmentsQuery);
-
 if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
     while ($rowAssessment = mysqli_fetch_assoc($assessmentsResult)) {
         $assessmentCourseID = $rowAssessment['courseID'];
+        $assessmentID = $rowAssessment['assessmentID'];
 
-        $countStudentAssessmentQuery = "SELECT COUNT(*) AS courseStudents
-                                        FROM enrollments
-                                        INNER JOIN courses
-	                                        ON courses.courseID = enrollments.courseID
-                                        WHERE courses.userID = '$userID' AND enrollments.courseID = '$assessmentCourseID';";
-        $countStudentAssessmentResult = executeQuery($countStudentAssessmentQuery);
-
-        if (mysqli_num_rows($countStudentAssessmentResult) > 0) {
-            $countRowAssessment = mysqli_fetch_assoc($countStudentAssessmentResult);
-            $studentAssessmentCount = $countRowAssessment['courseStudents'];
-        }
+        $countPendingQuery = "SELECT COUNT(*) AS pending FROM todo 
+                                WHERE assessmentID = '$assessmentID' AND status = 'Pending'";
+        $countPendingResult = executeQuery($countPendingQuery);
 
         $countSubmittedQuery = "SELECT COUNT(*) AS submittedTodo FROM todo 
-                                INNER JOIN assessments
-	                                ON todo.assessmentID = assessments.assessmentID
-                                INNER JOIN courses
-	                                ON assessments.courseID = courses.courseID
-                                WHERE courses.userID = '$userID' AND assessments.courseID = '$assessmentCourseID' AND todo.status = 'Graded' OR todo.status = 'Submitted'";
+                                WHERE assessmentID = '$assessmentID' AND status = 'Submitted'";
         $countSubmittedResult = executeQuery($countSubmittedQuery);
+
+        $countGradedQuery = "SELECT COUNT(*) AS graded FROM todo 
+                                WHERE assessmentID = '$assessmentID' AND status = 'Graded'";
+        $countGradedResult = executeQuery($countGradedQuery);
 
         $submittedTodoCount = 0;
 
@@ -47,8 +40,23 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
             $submittedTodoCount = $countRowSubmitted['submittedTodo'];
         }
 
-        $rowAssessment['courseStudents'] = $studentAssessmentCount;
+        $gradedTodoCount = 0;
+
+        if (mysqli_num_rows($countGradedResult) > 0) {
+            $countRowGraded = mysqli_fetch_assoc($countGradedResult);
+            $gradedTodoCount = $countRowGraded['graded'];
+        }
+
+        $pendingTodoCount = 0;
+
+        if (mysqli_num_rows($countPendingResult) > 0) {
+            $countRowPending = mysqli_fetch_assoc($countPendingResult);
+            $pendingTodoCount = $countRowPending['pending'];
+        }
+
+        $rowAssessment['graded'] = $gradedTodoCount;
         $rowAssessment['submittedTodo'] = $submittedTodoCount;
+        $rowAssessment['pending'] = $pendingTodoCount;
         $assessments[] = $rowAssessment;
     }
 }
@@ -102,13 +110,13 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                             <!-- Header Section -->
                             <div class="row align-items-center mb-3 text-center text-lg-start">
                                 <!-- Title -->
-                                <div class="col-12 col-lg-auto mb-3 mb-lg-0">
+                                <div class="col-12 mb-3 mb-lg-0">
                                     <h1 class="text-bold text-25 mb-0 mt-4" style="color: var(--black);">Assess
                                     </h1>
                                 </div>
 
                                 <!-- Dropdowns-->
-                                <div class="col-12 col-lg-auto mt-4">
+                                <div class="col-12 mt-4">
                                     <div
                                         class="d-flex flex-nowrap justify-content-center justify-content-lg-start gap-3">
 
@@ -176,11 +184,25 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                 <!-- Assessment Card -->
                                 <?php
                                 $chartsIDs = [];
+                                $submitted = [];
                                 if (mysqli_num_rows($assessmentsResult) > 0) {
                                     mysqli_data_seek($assessmentsResult, 0);
                                     $i = 1;
-                                    while ($assessments = mysqli_fetch_assoc($assessmentsResult)) {
+                                    foreach ($assessments as $assessment) {
+                                        $ID = $assessment['assessmentID'];
+                                        $type = $assessment['type'];
+                                        $assessmentTitle = $assessment['assessmentTitle'];
+                                        $courseCode = $assessment['courseCode'];
+                                        $courseTitle = $assessment['courseTitle'];
+                                        $deadline = $assessment['assessmentDeadline'];
+                                        $submittedCount = $assessment['submittedTodo'];
+                                        $pendingCount = $assessment['pending'];
+                                        $gradedCount = $assessment['graded'];
+
                                         $chartsIDs[] = "chart$i";
+                                        $submitted[] = $submittedCount;
+                                        $pending[] = $pendingCount;
+                                        $graded[] = $gradedCount;
                                 ?>
                                         <div class="assessment-card mb-3">
                                             <div class="card-content">
@@ -189,20 +211,21 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                                     <!-- Left Info -->
                                                     <div class="left-info">
                                                         <div class="mb-2 text-reg">
-                                                            <span class="badge rounded-pill task-badge"><?php echo $assessments['type']; ?></span>
+                                                            <span class="badge rounded-pill task-badge"><?php echo $type; ?></span>
                                                         </div>
-                                                        <div class="text-bold text-18 mb-2"><?php echo $assessments['assessmentTitle']; ?></div>
-                                                        <div class="text-sbold text-14"><?php echo $assessments['courseCode']; ?><br>
-                                                            <div class="text-reg text-14"><?php echo $assessments['courseTitle']; ?></div>
+                                                        <div class="text-bold text-18 mb-2"><?php echo $assessmentTitle; ?></div>
+                                                        <div class="text-sbold text-14"><?php echo $courseCode; ?><br>
+                                                            <div class="text-reg text-14"><?php echo $courseTitle; ?></div>
                                                         </div>
                                                     </div>
 
                                                     <!-- Submission Stats -->
+
                                                     <div class="submission-stats">
-                                                        <div class="text-reg text-14 mb-1"><span class="stat-value">10</span> submitted</div>
-                                                        <div class="text-reg text-14 mb-1"><span class="stat-value">11</span> pending submission</div>
-                                                        <div class="text-reg text-14 mb-1"><span class="stat-value">0</span> graded</div>
-                                                        <div class="text-reg text-14">Due <?php echo $assessments['assessmentDeadline']; ?></div>
+                                                        <div class="text-reg text-14 mb-1"><span class="stat-value"><?php echo $submittedCount; ?></span> submitted</div>
+                                                        <div class="text-reg text-14 mb-1"><span class="stat-value"><?php echo $pendingCount; ?></span> pending submission</div>
+                                                        <div class="text-reg text-14 mb-1"><span class="stat-value"><?php echo $gradedCount; ?></span> graded</div>
+                                                        <div class="text-reg text-14">Due <?php echo $deadline; ?></div>
                                                     </div>
 
                                                     <!-- Right Side: Progress Chart and Options -->
@@ -216,11 +239,11 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                                 <!-- Bottom Row: Action Buttons -->
                                                 <div class="bottom-row">
                                                     <div class="action-buttons">
-                                                        <button class="btn btn-action">
-                                                            <img src="../shared/assets/img/assess/info.png"
-                                                                alt="Assess Icon"
-                                                                style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Task Details
-                                                        </button>
+                                                        <a href="<?php echo ($type == 'Task') ? 'assess-task-details.php?assessmentID=' . $ID : 'assess-exam-details.php?assessmentID=' . $ID; ?>"><button class="btn btn-action">
+                                                                <img src="../shared/assets/img/assess/info.png"
+                                                                    alt="Assess Icon"
+                                                                    style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;"><?php echo ($type == 'Task') ? 'Task' : 'Test'; ?> Details
+                                                            </button></a>
                                                         <button class="btn btn-action">
                                                             <img src="../shared/assets/img/assess/assess.png"
                                                                 alt="Assess Icon"
@@ -269,7 +292,7 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                 data: {
                     datasets: [{
                         data: [submitted, pending, graded],
-                        backgroundColor: ['#3DA8FF', '#C7C7C7', '#E0E0E0'],
+                        backgroundColor: ['#3DA8FF', '#C7C7C7', '#d9ffe4ff'],
                         borderWidth: 0,
                     }]
                 },
@@ -289,7 +312,13 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
 
         document.addEventListener("DOMContentLoaded", function() {
             const chartsIDs = <?php echo json_encode($chartsIDs); ?>;
-            chartsIDs.forEach(id => createDoughnutChart(id, 10, 11, 0));
+            const submitted = <?php echo json_encode($submitted); ?>;
+            const pending = <?php echo json_encode($pending); ?>;
+            const graded = <?php echo json_encode($graded); ?>;
+            const i = 0;
+            chartsIDs.forEach(function(id, index) {
+                createDoughnutChart(id, submitted[index], pending[index], graded[index])
+            });
         });
     </script>
     </div>

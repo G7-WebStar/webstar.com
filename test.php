@@ -84,6 +84,10 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             .fs-sm-6 {
                 font-size: 1rem !important;
             }
+
+            .btn-mobile {
+                margin-bottom: calc(1.5rem + 80px) !important;
+            }
         }
 
         ::-webkit-scrollbar {
@@ -143,8 +147,8 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                                         style="color: var(--black);"></i>
                                     <div class="quiz-nav col-12 d-flex flex-column flex-md-row align-items-center justify-content-between my-2 px-3 px-md-5 py-2 py-md-3">
                                         <div class="d-flex flex-row align-items-center mb-0">
-                                            <i class="d-none d-md-block announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 me-3"
-                                                style="color: var(--black);"></i>
+                                            <a href="todo.php" class="text-decoration-none"><i class="d-none d-md-block announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 me-3"
+                                                    style="color: var(--black);"></i></a>
                                             <?php
                                             if (mysqli_num_rows($selectTestResult) > 0) {
                                                 while ($guideLines = mysqli_fetch_assoc($selectTestResult)) {
@@ -188,11 +192,11 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                                         </div>
 
                                         <div class="mt-auto text-sbold">
-                                            <div class="d-flex justify-content-center justify-content-md-around align-items-center mb-4 gap-3 gap-md-0 mt-5" id="buttonSection">
-                                                <div class="btn d-flex align-items-center justify-content-center border border-black rounded-5 px-sm-4 py-sm-2 interactable"
+                                            <div class="d-flex justify-content-center justify-content-md-around align-items-center mb-4 btn-mobile gap-3 gap-md-0 mt-5" id="buttonSection">
+                                                <button class="btn d-flex align-items-center justify-content-center border border-black rounded-5 px-sm-4 py-sm-2 interactable"
                                                     style="background-color: var(--primaryColor);" onclick="startQuiz();">
                                                     <span class="m-0 fs-sm-6">Start</span>
-                                                </div>
+                                                </button>
                                             </div>
                                         </div>
 
@@ -260,21 +264,43 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
 
         let savedChoiceText = JSON.parse(localStorage.getItem("choiceText<?php echo $testID; ?>"));
         let savedSelectedAnswers = JSON.parse(localStorage.getItem("selectedAnswers<?php echo $testID; ?>"));
-        let savedRemainingTime = localStorage.getItem("remainingTime<?php echo $testID; ?>");
 
         //Timer Variables
         <?php
         $timeLimitQuery = "SELECT testTimelimit FROM tests WHERE testID = $testID";
         $timeLimitResult = executeQuery($timeLimitQuery);
         $timeLimit = mysqli_fetch_assoc($timeLimitResult);
+
+        $timeStartQuery = "SELECT 
+        todo.timeStart AS testTimeStart,
+        (SELECT tests.testTimelimit - TIMESTAMPDIFF(SECOND, testTimeStart, CURRENT_TIMESTAMP)) AS remainingTime
+        FROM todo
+        INNER JOIN tests
+            ON todo.assessmentID = tests.assessmentID
+        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.timeStart IS NOT null";
+        $timeStartResult = executeQuery($timeStartQuery);
         ?>
 
         let seconds;
-        if (savedRemainingTime !== null) {
-            seconds = savedRemainingTime;
+
+        <?php
+        if (mysqli_num_rows($timeStartResult) > 0) {
+            $timeStartRow = mysqli_fetch_assoc($timeStartResult);
+        ?>
+            let remainingTime = <?php echo $timeStartRow['remainingTime']; ?>;
+            let status = "started";
+            if (remainingTime <= 0) {
+                seconds = 1;
+            } else {
+                seconds = remainingTime;
+            }
+        <?php
         } else {
+        ?>
             seconds = <?php echo $timeLimit['testTimelimit']; ?>;
+        <?php
         }
+        ?>
         let timerHtml = document.getElementById('timer');
         let interval;
 
@@ -328,7 +354,6 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             if (seconds <= 0) {
                 clearInterval(interval);
                 console.log("Time's up!");
-                identificationType();
                 choiceText.forEach(unanswered => {
                     if (unanswered.userAnswer == null) {
                         unanswered.userAnswer = "No Answer";
@@ -337,7 +362,6 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                 });
                 submitQuiz();
             }
-            localStorage.setItem("remainingTime<?php echo $testID; ?>", seconds);
             timerHtml.innerHTML = `<i class="bi bi-clock fa-xs me-2" style="color: var(--black);"></i>` + formatTime(seconds);
         }
 
@@ -372,31 +396,40 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             choiceText = savedChoiceText;
         }
 
+        if (status == "started") {
+            interval = setInterval(timer, 1000);
+        }
+
         //Starts Quiz
         function startQuiz() {
             currentQuestionIndex = 0;
-            interval = setInterval(timer, 1000);
-            showQuestion();
+            if (status != "started") {
+                interval = setInterval(timer, 1000);
+            }
+
+            fetch('shared/assets/processes/start-test-timer.php?testID=' + <?php echo $testID; ?>);
 
             //Shows navigation buttons for the quiz
             const buttonSection = document.getElementById('buttonSection');
             buttonSection.innerHTML = `         
-             <div class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable"
+             <button class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable" id="prevBtn"
                  style="background-color: var(--primaryColor);" onclick="prevQuestion();">
                      <i class="fa-solid fs-6 fa-arrow-left text-reg" style="color: var(--black);"></i>
                          <span class="m-0 fs-sm-6">Prev</span>
-             </div>
+             </button>
  
-             <div class="btn d-flex align-items-center justify-content-center border border-black rounded-5 px-sm-4 py-sm-2 interactable"
+             <button class="btn d-flex align-items-center justify-content-center border border-black rounded-5 px-sm-4 py-sm-2 interactable"
                  style="background-color: var(--primaryColor);" onclick="submitQuiz();">
                  <span class="m-0 fs-sm-6">Submit</span>
-             </div>
+             </button>
  
-             <div class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable"
+             <button class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable" id="nextBtn"
                  style="background-color: var(--primaryColor);" onclick="nextQuestion();">
                  <span class="m-0 fs-sm-6">Next</span>
                  <i class="fa-solid fs-6 fa-arrow-right text-reg" style="color: var(--black);"></i>
-             </div>`;
+             </button>`;
+
+            showQuestion();
         }
 
         //Shows questions
@@ -409,6 +442,18 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             choiceIDs = [];
             questionContainer.innerHTML = currentQuestion.
             question;
+
+            //Disables pagination buttons if there are no content on the next page
+            if (currentQuestionIndex == 0) {
+                document.getElementById('prevBtn').classList.remove('interactable');
+                document.getElementById('prevBtn').disabled = true;
+            }
+
+            if (currentQuestionIndex == questions.length - 1) {
+                document.getElementById('nextBtn').classList.remove('interactable');
+                document.getElementById('nextBtn').disabled = true;
+            }
+
             //Indicates which question is currently on screen
             questionNumber.innerHTML = "Section Name · Question " + questionNo + " of " + totalQuestion;
 
@@ -459,6 +504,11 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                 identificationType();
             }
 
+            if (currentQuestionIndex == 0) {
+                document.getElementById('prevBtn').classList.add('interactable');
+                document.getElementById('prevBtn').disabled = false;
+            }
+
             (currentQuestionIndex + 1 < questions.length) ? currentQuestionIndex++ : null;
             if ((currentQuestionIndex + 1) <= questions.length) {
                 choices.innerHTML = '';
@@ -469,6 +519,11 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
         function prevQuestion() {
             if (questions[currentQuestionIndex].type == "Identification") {
                 identificationType();
+            }
+
+            if (currentQuestionIndex == questions.length - 1) {
+                document.getElementById('nextBtn').classList.add('interactable');
+                document.getElementById('nextBtn').disabled = false;
             }
 
             if ((currentQuestionIndex + 1) > 1) {
@@ -568,7 +623,6 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                         console.error('Error:', error);
                     });
                 localStorage.removeItem("choiceText<?php echo $testID; ?>");
-                localStorage.removeItem("remainingTime<?php echo $testID; ?>");
                 localStorage.removeItem("selectedAnswers<?php echo $testID; ?>");
                 window.location.href = 'index.php';
             } else {
@@ -576,6 +630,8 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             }
             console.log(timeSpent);
         }
+
+        console.log(choiceText);
     </script>
 </body>
 
