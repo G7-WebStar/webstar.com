@@ -515,7 +515,7 @@ if (isset($_POST['buyItem'])) {
                                                                 </div>
                                                             <?php elseif ($item['colorThemeID']): ?>
                                                                 <div class="shopCardImage"
-                                                                    style="background-color: <?php echo htmlspecialchars($item['hexCode']); ?>; height: 150px;">
+                                                                    style="background-color: <?php echo htmlspecialchars($item['hexCode']); ?>;">
                                                                 </div>
                                                                 <div class="cardContent">
                                                                     <div class="cardTitle text-med text-18 text-truncate">

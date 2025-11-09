@@ -2,10 +2,9 @@
 $activePage = 'courseInfo';
 $activeTab = $_POST['activeTab'] ?? 'announcements';
 
-
-include("shared/assets/database/connect.php");
+include('../shared/assets/database/connect.php');
 date_default_timezone_set('Asia/Manila');
-include("shared/assets/processes/session-process.php");
+include("../shared/assets/processes/prof-session-process.php");
 
 if (isset($_GET['courseID'])) {
     $courseID = $_GET['courseID'];
@@ -18,10 +17,7 @@ if (isset($_GET['courseID'])) {
     FROM courses
     INNER JOIN userinfo AS profInfo
     	ON courses.userID = profInfo.userID
-    INNER JOIN enrollments
-    	ON courses.courseID = enrollments.courseID
-    WHERE enrollments.userID = '$userID' AND enrollments.courseID = '$courseID';
-;
+    WHERE courses.courseID = '$courseID' AND courses.userID = '$userID';
 ";
     $selectCourseResult = executeQuery($selectCourseQuery);
 
@@ -67,49 +63,45 @@ if (isset($_GET['courseID'])) {
         $todoWhereStatus = "AND todo.status = 'Missing'";
     }
 
-    $selectAssessmentQuery = "SELECT
-    tests.testID,
-    assignments.assignmentID,
-    assessments.*,
-    assessments.assessmentTitle AS assessmentTitle,
-    todo.*,
-    courses.courseCode,
-    DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline
+    $selectAssessmentQuery = "  SELECT
+        tests.testID,
+        assignments.assignmentID,
+        assessments.*,
+        assessments.assessmentTitle AS assessmentTitle,
+        courses.courseCode,
+        DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline
     FROM assessments
     INNER JOIN courses
         ON assessments.courseID = courses.courseID
-    INNER JOIN todo 
-        ON assessments.assessmentID = todo.assessmentID
     LEFT JOIN assignments
-    	ON assignments.assessmentID = todo.assessmentID
+        ON assignments.assessmentID = assessments.assessmentID
     LEFT JOIN tests
-        ON tests.assessmentID = todo.assessmentID
-    WHERE todo.userID = '$userID' 
-    AND courses.courseID = '$courseID' $todoWhereStatus
-    ORDER BY $todoOrderBy
+        ON tests.assessmentID = assessments.assessmentID
+    WHERE courses.courseID = '$courseID'
+      AND NOW() < assessments.deadline
+    ORDER BY assessments.deadline ASC;
 ";
     $selectAssessmentResult = executeQuery($selectAssessmentQuery);
 
-    $selectAssessmentQueryForCourseCard = "SELECT
-    tests.testID,
-    assignments.assignmentID,
-    assessments.*,
-    assessments.assessmentTitle AS assessmentTitle,
-    todo.*,
-    courses.courseCode,
-    DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline
+    $selectAssessmentQueryForCourseCard = "
+    SELECT
+        tests.testID,
+        assignments.assignmentID,
+        assessments.*,
+        assessments.assessmentTitle AS assessmentTitle,
+        courses.courseCode,
+        DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline
     FROM assessments
     INNER JOIN courses
         ON assessments.courseID = courses.courseID
-    INNER JOIN todo 
-        ON assessments.assessmentID = todo.assessmentID
     LEFT JOIN assignments
-    	ON assignments.assessmentID = todo.assessmentID
+        ON assignments.assessmentID = assessments.assessmentID
     LEFT JOIN tests
-        ON tests.assessmentID = todo.assessmentID
-    WHERE todo.userID = '$userID' 
-    AND courses.courseID = '$courseID'AND todo.status = 'Pending'
-    ORDER BY $todoOrderBy";
+        ON tests.assessmentID = assessments.assessmentID
+    WHERE courses.courseID = '$courseID'
+      AND NOW() < assessments.deadline
+    ORDER BY assessments.deadline ASC;
+";
 
     $selectLimitAssessmentQuery = $selectAssessmentQueryForCourseCard;
     $selectLimitAssessmentResult = executeQuery($selectLimitAssessmentQuery);
@@ -229,11 +221,11 @@ $user = mysqli_fetch_assoc($result);
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
-    <link rel="stylesheet" href="shared/assets/css/global-styles.css">
-    <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
-    <link rel="stylesheet" href="shared/assets/css/course-Info.css">
+    <link rel="stylesheet" href="../shared/assets/css/global-styles.css">
+    <link rel="stylesheet" href="../shared/assets/css/sidebar-and-container-styles.css">
+    <link rel="stylesheet" href="../shared/assets/css/course-Info.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
+    <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
@@ -256,15 +248,15 @@ $user = mysqli_fetch_assoc($result);
 
         <div class="row w-100">
 
-            <?php include 'shared/components/sidebar-for-mobile.php'; ?>
-            <?php include 'shared/components/sidebar-for-desktop.php'; ?>
+            <?php include '../shared/components/prof-sidebar-for-mobile.php'; ?>
+            <?php include '../shared/components/prof-sidebar-for-desktop.php'; ?>
 
             <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-0 p-md-4 overflow-y-auto">
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
 
-                    <?php include 'shared/components/navbar-for-mobile.php'; ?>
-                    
+                    <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
+
                     <div class="container-fluid py-3 overflow-y-auto row-padding-top" style="white-space: nowrap; ">
                         <div class="row d-flex justify-content-center">
                             <div class="row mt-0">
@@ -313,15 +305,15 @@ $user = mysqli_fetch_assoc($result);
                                                             <!-- Course Image -->
                                                             <div class="course-image w-100 mb-3 mt-1"
                                                                 style="position: relative; overflow: hidden; border-radius: 10px; min-height: 150px; background-color:var(--primaryColor)">
-                                                                <img src="shared/assets/img/course-images/<?php echo $courses['courseImage']; ?>"
-                                                            alt="Course Image"
-                                                            style="width: 100%; height: 100%; object-fit: cover;">
+                                                                <img src="../shared/assets/img/course-images/<?php echo $courses['courseImage']; ?>"
+                                                                    alt="Course Image"
+                                                                    style="width: 100%; height: 100%; object-fit: cover;">
                                                             </div>
 
                                                             <!-- Prof -->
                                                             <div class="d-flex align-items-center text-decoration-none">
                                                                 <div class="rounded-circle me-2 flex-shrink-0" style="width: 25px; height: 25px; background-color: #5ba9ff;
-                                                    background: url('shared/assets/pfp-uploads/<?php echo $courses['profPFP']; ?>') no-repeat center center;
+                                                    background: url('../shared/assets/pfp-uploads/<?php echo $courses['profPFP']; ?>') no-repeat center center;
                                                     background-size: cover;">
                                                                 </div>
                                                                 <div class="d-flex flex-column justify-content-center">
@@ -479,7 +471,7 @@ $user = mysqli_fetch_assoc($result);
                                                     <!-- Course Image -->
                                                     <div class="course-image w-100 mb-3"
                                                         style="position: relative; overflow: hidden; border-radius: 10px; min-height: 150px; background-color:var(--primaryColor)">
-                                                        <img src="shared/assets/img/course-images/<?php echo $courses['courseImage']; ?>"
+                                                        <img src="../shared/assets/img/course-images/<?php echo $courses['courseImage']; ?>"
                                                             alt="Course Image"
                                                             style="width: 100%; height: 100%; object-fit: cover;">
                                                     </div>
@@ -493,7 +485,7 @@ $user = mysqli_fetch_assoc($result);
                                                     <!-- Prof -->
                                                     <div class="d-flex align-items-center text-decoration-none">
                                                         <div class="rounded-circle me-2 flex-shrink-0" style="width: 30px; height: 30px; background-color: #5ba9ff;
-                                                    background: url('shared/assets/pfp-uploads/<?php echo $courses['profPFP']; ?>') no-repeat center center;
+                                                    background: url('../shared/assets/pfp-uploads/<?php echo $courses['profPFP']; ?>') no-repeat center center;
                                                     background-size: cover;">
                                                         </div>
                                                         <div class="d-flex flex-column justify-content-center">
@@ -517,67 +509,6 @@ $user = mysqli_fetch_assoc($result);
                                                             <span class="text-reg text-14">
                                                                 <span class="me-1 text-med">Thursdays</span> 8AM - 10AM
                                                             </span>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Class Standing -->
-                                                    <div class="row mb-3 mt-3">
-                                                        <div class="col">
-                                                            <label class="text-med text-14 mb-1">Class Standing</label>
-                                                            <div class="class-standing text-14 d-flex justify-content-between align-items-center rounded-3 mt-2"
-                                                                style="background-color:white">
-                                                                <span class="material-symbols-outlined" style="font-size:20px">
-                                                                    leaderboard
-                                                                </span>
-                                                                <span class="text-sbold">
-                                                                    RANK 1
-                                                                </span>
-                                                                <?php
-                                                                if (mysqli_num_rows($selectLeaderboardResult) > 0) {
-                                                                    mysqli_data_seek($selectLeaderboardResult, 0);
-                                                                    while ($points = mysqli_fetch_assoc($selectLeaderboardResult)) {
-                                                                        ?>
-                                                                        <div class="d-flex align-items-center">
-                                                                            <img class="me-1" src="shared/assets/img/xp.png"
-                                                                                alt="Description of Image" width="15">
-                                                                            <span class="text-med"><?php echo $points['totalPoints']; ?>
-                                                                                XPs</span>
-                                                                        </div>
-
-                                                                        <?php
-                                                                    }
-                                                                }
-                                                                ?>
-
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Level -->
-                                                    <div class="row mb-3 mt-3">
-                                                        <div class="col">
-                                                            <label class="text-med text-14 mb-1">Level</label>
-                                                            <div class="class-standing text-14 align-items-center rounded-3 p-3 mt-2"
-                                                                style="background-color:white">
-                                                                <div class="d-flex justify-content-between py-1">
-                                                                    <span class="text-sbold">
-                                                                        LV. 1 · Mentor
-                                                                    </span>
-                                                                    <span class="text-sbold">
-                                                                        3160 / 4000 XP
-                                                                    </span>
-                                                                </div>
-
-                                                                <div class="progress mt-2 mb-2" role="progressbar"
-                                                                    aria-label="Basic example" aria-valuenow="0"
-                                                                    aria-valuemin="0" aria-valuemax="100"
-                                                                    style="height: 10px; border: 1px solid var(--black);">
-                                                                    <div class="progress-bar"
-                                                                        style="width: 50%; background-color:var(--primaryColor); border-right: 1px solid var(--black);">
-                                                                    </div>
-                                                                </div>
-
-                                                            </div>
                                                         </div>
                                                     </div>
 
@@ -678,12 +609,7 @@ $user = mysqli_fetch_assoc($result);
                                                             <a class="nav-link text-14 <?php echo ($activeTab == 'leaderboard') ? 'active' : ''; ?>"
                                                                 data-bs-toggle="tab" href="#leaderboard">Leaderboard</a>
                                                         </li>
-
-                                                        <li class="nav-item nav-report">
-                                                            <a class="nav-link text-14 <?php echo ($activeTab == 'report') ? 'active' : ''; ?>"
-                                                                data-bs-toggle="tab" href="#report">Report</a>
-                                                        </li>
-
+                                                        
                                                         <li class="nav-item nav-student">
                                                             <a class="nav-link text-14 <?php echo ($activeTab == 'student') ? 'active' : ''; ?>"
                                                                 data-bs-toggle="tab" href="#student">Students</a>
@@ -707,49 +633,43 @@ $user = mysqli_fetch_assoc($result);
                                             <!-- Announcements -->
                                             <div class="tab-pane fade <?php echo ($activeTab == 'announcements') ? 'show active' : ''; ?>"
                                                 id="announcements" role="tabpanel">
-                                                <?php include 'course-info-contents/announcements.php'; ?>
+                                                <?php include 'course-info/announcements.php'; ?>
                                             </div>
 
                                             <!-- Lessons -->
                                             <div class="tab-pane fade <?php echo ($activeTab == 'lessons') ? 'show active' : ''; ?>"
                                                 id="lessons" role="tabpanel">
-                                                <?php include 'course-info-contents/lessons.php'; ?>
+                                                <?php include 'course-info/lessons.php'; ?>
                                             </div>
 
                                             <!-- To-do -->
                                             <div class="tab-pane fade <?php echo ($activeTab == 'todo') ? 'show active' : ''; ?>"
                                                 id="todo" role="tabpanel">
-                                                <?php include 'course-info-contents/to-do.php'; ?>
+                                                <?php include 'course-info/to-do.php'; ?>
                                             </div>
 
                                             <!-- Attachments -->
                                             <div class="tab-pane fade <?php echo ($activeTab == 'attachments') ? 'show active' : ''; ?>"
                                                 id="attachments" role="tabpanel">
-                                                <?php include 'course-info-contents/attachments.php'; ?>
+                                                <?php include 'course-info/attachments.php'; ?>
                                             </div>
 
                                             <!-- Links -->
                                             <div class="tab-pane fade <?php echo ($activeTab == 'link') ? 'show active' : ''; ?>"
                                                 id="link" role="tabpanel">
-                                                <?php include 'course-info-contents/link.php'; ?>
+                                                <?php include 'course-info/link.php'; ?>
                                             </div>
 
                                             <!-- Leaderboard -->
                                             <div class="tab-pane fade <?php echo ($activeTab == 'leaderboard') ? 'show active' : ''; ?>"
                                                 id="leaderboard" role="tabpanel">
-                                                <?php include 'course-info-contents/leaderboard.php'; ?>
-                                            </div>
-
-                                            <!-- Report -->
-                                            <div class="tab-pane fade <?php echo ($activeTab == 'report') ? 'show active' : ''; ?>"
-                                                id="report" role="tabpanel">
-                                                <?php include 'course-info-contents/report.php'; ?>
+                                                <?php include 'course-info/leaderboard.php'; ?>
                                             </div>
 
                                             <!-- Students -->
                                             <div class="tab-pane fade <?php echo ($activeTab == 'student') ? 'show active' : ''; ?>"
                                                 id="student" role="tabpanel">
-                                                <?php include 'course-info-contents/student.php'; ?>
+                                                <?php include 'course-info/student.php'; ?>
                                             </div>
                                         </div>
 
