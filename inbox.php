@@ -153,7 +153,7 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                         <?php
                                         if (mysqli_num_rows($selectInboxResult) > 0) {
                                             while ($inbox = mysqli_fetch_assoc($selectInboxResult)) {
-                                                ?>
+                                        ?>
                                                 <div class="card mb-1 me-3 w-100 mt-2"
                                                     style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
                                                     <div class="card-body py-2 px-4 px-md-3">
@@ -192,7 +192,7 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                                     </div>
 
                                                 </div>
-                                                <?php
+                                            <?php
                                             }
                                         } else {
                                             ?>
@@ -201,7 +201,7 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                                 <img src="shared/assets/img/empty/inbox.png" width="100" class="mb-1">
                                                 <div class="text-center text-14 text-reg mt-1">Your inbox is empty!</div>
                                             </div>
-                                            <?php
+                                        <?php
                                         }
                                         ?>
                                     </div>
@@ -213,18 +213,66 @@ $selectInboxResult = executeQuery($selectInboxQuery);
             </div>
         </div>
     </div>
-    </div>
 
-    </div>
-    </div>
-    </div>
-    </div>
+    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered py-4" style="max-width: 700px;  height: 25px;">
+            <div class="modal-content">
 
+                <!-- HEADER -->
+                <div class="modal-header border-bottom">
+                    <div class="modal-title text-sbold text-20 ms-3">
+                        Congratulations!
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <form id="feedbackForm" action="" method="POST">
+                    <div class="modal-body pb-2">
+                        <div class="container">
+                            <div class="row justify-content-center">
+                                <div class="col-12 d-flex justify-content-center flex-column text-center">
+                                    <img class="img-fluid object-fit-contain mx-auto mb-3" width="200px" src="shared/assets/img/badge/perfect_scorer.png" alt="image">
+                                    <p class="text-sbold mb-0">You’ve unlocked a new badge:</p>
+                                    <p class="text-bold">Ahead of the Curve</p>
+                                </div>
+                                <div class="row">
+                                    <div class="mx-auto col-8 text-center">
+                                        <p class="text-reg text-14">You’re leading the pack! This badge is awarded for staying on top of lessons and completing tasks before the deadlines. Keep blazing the trail!</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="mx-auto col-8 text-center">
+                                        <img class="img-fluid object-fit-contain mx-auto" width="20px" src="shared/assets/img/xp.png" alt="XP">
+                                        <span class="text-sbold">+150 XPs</span>
+                                    </div>
+                                    <div class="mx-auto col-8 text-center">
+                                        <img class="img-fluid object-fit-contain mx-auto" width="20px" src="shared/assets/img/webstar.png" alt="XP">
+                                        <span class="text-sbold">+50 Webstars</span>
+                                    </div>
+                                    <div class="mx-auto col-8 text-center my-3">
+                                        <span class="text-reg text-12 badge rounded-pill course-badge"
+                                            style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
+                                            COMP-006
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="modal-footer border-top">
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const filterToggle = document.getElementById("filterToggle");
             const mobileFilters = document.getElementById("mobileFilters");
             const icon = filterToggle.querySelector(".material-symbols-rounded");
