@@ -1,139 +1,116 @@
-<?php $activePage = 'assign-task';
-
+<?php $activePage = 'assign-task'; ?>
+<?php
 include('../shared/assets/database/connect.php');
 date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
-
-$mode = '';
-$taskID = 0;
-
-if (isset($_GET['edit'])) {
-    $mode = 'edit';
-    $taskID = intval($_GET['edit']); // task to duplicate
-} elseif (isset($_GET['reuse'])) {
-    $mode = 'reuse';
-    $taskID = intval($_GET['reuse']); // task to update
-}
 
 $course = "SELECT courseID, courseCode 
            FROM courses 
            WHERE userID = '$userID'";
 $courses = executeQuery($course);
 
-// Save Assignment Query
 if (isset($_POST['saveAssignment'])) {
-    $mode = $_POST['mode'] ?? 'new';
-    $taskID = intval($_POST['taskID'] ?? 0);
+    $title = $_POST['assignmentTitle'];
+    $content = $_POST['assignmentContent'];
+    $assignmentDeadline = !empty($_POST['deadline']) ? $_POST['deadline'] : null;
+    $assignmentPoints = !empty($_POST['points']) ? $_POST['points'] : 0;
+    $createdAt = date("Y-m-d H:i:s");
 
-    $title = mysqli_real_escape_string($conn, $_POST['assignmentTitle'] ?? '');
-    $desc = mysqli_real_escape_string($conn, $_POST['assignmentContent'] ?? '');
-    $deadline = !empty($_POST['deadline']) ? $_POST['deadline'] : null;
-    $points = !empty($_POST['points']) ? $_POST['points'] : 0;
-    $rubricID = !empty($_POST['selectedRubricID']) ? intval($_POST['selectedRubricID']) : null;
-    $links = $_POST['links'] ?? [];
-    $uploadedFiles = !empty($_FILES['materials']['name'][0]);
+    if (!empty($_POST['courses'])) {
+        foreach ($_POST['courses'] as $selectedCourseID) {
 
-    foreach ($_POST['courses'] ?? [] as $selectedCourseID) {
-        $deadlineEnabled = isset($_POST['stopSubmissions']) ? 1 : 0;
+            $deadlineEnabled = isset($_POST['stopSubmissions']) ? 1 : 0;
 
-        if ($mode === 'new' || $mode === 'reuse') {
-            // INSERT new assessment + assignment
             $insertAssessment = "INSERT INTO assessments 
-                (courseID, assessmentTitle, type, deadline, deadlineEnabled, createdAt)
-                VALUES 
-                ('$selectedCourseID', '$title', 'task', " . ($deadline ? "'$deadline'" : "NULL") . ", '$deadlineEnabled', NOW())";
+            (courseID, assessmentTitle, type, deadline, deadlineEnabled, createdAt)
+            VALUES 
+            ('$selectedCourseID', '$title', 'task', " .
+                ($assignmentDeadline ? "'$assignmentDeadline'" : "NULL") . ", '$deadlineEnabled', '$createdAt')";
             executeQuery($insertAssessment);
+
+            // Retrieve assessmentID based on unique data
             $assessmentID = mysqli_insert_id($conn);
 
+            // Insert into assignments (linked to assessmentID)
             $insertAssignment = "INSERT INTO assignments 
-                (assessmentID, assignmentDescription, assignmentPoints, rubricID)
-                VALUES 
-                ('$assessmentID', '$desc', '$points', '$rubricID')";
+            (assessmentID,  assignmentDescription, assignmentPoints)
+            VALUES 
+            ('$assessmentID', '$content', '$assignmentPoints')";
             executeQuery($insertAssignment);
 
-            $assignmentID = $assessmentID;
+            // Get assignmentID right after inserting into assignments
+            $assignmentID = mysqli_insert_id($conn);
 
-            // Insert into todo
+            // Then insert into todo
             $insertTodo = "INSERT INTO todo 
-                (userID, assessmentID, status, isRead)
-                VALUES ('$userID', '$assignmentID', 'Pending', 0)";
+            (userID, assessmentID, title, status, isRead)
+            VALUES 
+            ('$userID', '$assessmentID', '$title', 'Pending',  0)";
             executeQuery($insertTodo);
 
-        } elseif ($mode === 'edit') {
-            // UPDATE existing assessment + assignment
-            $updateAssessment = "UPDATE assessments 
-                SET assessmentTitle='$title', deadline=" . ($deadline ? "'$deadline'" : "NULL") . " 
-                WHERE assessmentID='$taskID'";
-            executeQuery($updateAssessment);
 
-            $updateAssignment = "UPDATE assignments 
-                SET assignmentDescription='$desc', assignmentPoints='$points', rubricID='$rubricID'
-                WHERE assessmentID='$taskID'";
-            executeQuery($updateAssignment);
+            // Handle file uploads
+            if (!empty($_FILES['materials']['name'][0])) {
+                $uploadDir = __DIR__ . "/../shared/assets/files/";
 
-            $assignmentID = $taskID;
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
 
-            // Delete old files **only if new files or links were provided**
-            if ($uploadedFiles || !empty($links)) {
-                executeQuery("DELETE FROM files WHERE assignmentID='$assignmentID'");
-            }
-        }
+                foreach ($_FILES['materials']['name'] as $key => $fileName) {
+                    $tmpName = $_FILES['materials']['tmp_name'][$key];
+                    $fileError = $_FILES['materials']['error'][$key];
 
-        // --- Handle uploaded files ---
-        if ($uploadedFiles) {
-            $uploadDir = __DIR__ . "/../shared/assets/files/";
-            if (!is_dir($uploadDir))
-                mkdir($uploadDir, 0777, true);
+                    if ($fileError === UPLOAD_ERR_OK) {
+                        $safeName = str_replace(" ", "_", basename($fileName));
+                        $targetPath = $uploadDir . $safeName;
 
-            foreach ($_FILES['materials']['name'] as $key => $fileName) {
-                $tmpName = $_FILES['materials']['tmp_name'][$key];
-                $fileError = $_FILES['materials']['error'][$key];
-
-                if ($fileError === UPLOAD_ERR_OK) {
-                    $safeName = str_replace(" ", "_", basename($fileName));
-                    $targetPath = $uploadDir . $safeName;
-
-                    if (move_uploaded_file($tmpName, $targetPath)) {
-                        $insertFile = "INSERT INTO files 
+                        if (move_uploaded_file($tmpName, $targetPath)) {
+                            $insertFile = "INSERT INTO files 
                             (courseID, userID, assignmentID, fileAttachment, fileLink) 
                             VALUES 
                             ('$selectedCourseID', '$userID', '$assignmentID', '$safeName', '')";
-                        executeQuery($insertFile);
+                            executeQuery($insertFile);
+                        }
                     }
                 }
             }
-        }
+            // Handle file links
+            if (!empty($_POST['links'])) {
+                $links = $_POST['links'];
+                if (is_array($links)) {
+                    foreach ($links as $link) {
+                        $link = trim($link);
+                        if ($link !== '') {
 
-        // --- Handle link files ---
-        if (!empty($links)) {
-            foreach ($links as $link) {
-                $link = trim($link);
-                if ($link === '')
-                    continue;
+                            // Try to fetch link title
+                            $fileTitle = $link;
+                            $context = stream_context_create([
+                                "http" => ["header" => "User-Agent: Mozilla/5.0"]
+                            ]);
+                            $html = @file_get_contents($link, false, $context);
 
-                $fileTitle = $link;
-                $context = stream_context_create(["http" => ["header" => "User-Agent: Mozilla/5.0"]]);
-                $html = @file_get_contents($link, false, $context);
+                            if ($html !== false) {
+                                if (preg_match('/<meta property="og:title" content="([^"]+)"/i', $html, $matches)) {
+                                    $fileTitle = $matches[1];
+                                } elseif (preg_match("/<title>(.*?)<\/title>/i", $html, $matches)) {
+                                    $fileTitle = $matches[1];
+                                }
+                            }
 
-                if ($html !== false) {
-                    if (preg_match('/<meta property="og:title" content="([^"]+)"/i', $html, $matches)) {
-                        $fileTitle = $matches[1];
-                    } elseif (preg_match("/<title>(.*?)<\/title>/i", $html, $matches)) {
-                        $fileTitle = $matches[1];
+                            // Insert with title
+                            $insertLink = "INSERT INTO files 
+                            (courseID, userID, assignmentID, fileAttachment, fileTitle, fileLink) 
+                            VALUES 
+                            ('$selectedCourseID', '$userID', '$assignmentID', '', '" . mysqli_real_escape_string($conn, $fileTitle) . "', '$link')";
+                            executeQuery($insertLink);
+                        }
                     }
                 }
-
-                $insertLink = "INSERT INTO files 
-                    (courseID, userID, assignmentID, fileAttachment, fileTitle, fileLink) 
-                    VALUES 
-                    ('$selectedCourseID', '$userID', '$assignmentID', '', '" . mysqli_real_escape_string($conn, $fileTitle) . "', '$link')";
-                executeQuery($insertLink);
             }
         }
     }
 }
-
-
 //Fetch the Title of link
 if (isset($_GET['fetchTitle'])) {
     $url = $_GET['fetchTitle'];
@@ -157,7 +134,6 @@ if (isset($_GET['fetchTitle'])) {
     exit;
 }
 
-// Selecting Tasks made by the Instructor logged in
 $taskQuery = "SELECT a.assessmentTitle, asg.assignmentDescription, a.createdAt, a.assessmentID, c.courseCode
         FROM assessments a
         JOIN assignments asg 
@@ -171,108 +147,18 @@ $taskQuery = "SELECT a.assessmentTitle, asg.assignmentDescription, a.createdAt, 
 
 $tasks = executeQuery($taskQuery);
 
-// Storing reused data
 $reusedData = null;
 
-// Storing selected rubric
-$activeRubric = null; // always exists
-
-// If the instructor chose to reuse, it'll check the button if it was set
 if (isset($_GET['reuse'])) {
-    $reuseID = intval($_GET['reuse']);
-
-    // Getting the data of the selected task to reuse
-    $reuseQuery = "
-    SELECT 
-        a.assessmentTitle, 
-        asg.assignmentDescription, 
-        a.deadline, 
-        asg.assignmentPoints,
-        r.rubricID,
-        r.rubricTitle,
-        r.totalPoints,
-        COUNT(c.criterionID) AS criteriaCount,
-        f.fileID,
-        f.fileAttachment,
-        f.fileTitle,
-        f.fileLink
-    FROM assessments a
-    JOIN assignments asg ON a.assessmentID = asg.assessmentID
-    LEFT JOIN files f ON asg.assignmentID = f.assignmentID
-    LEFT JOIN rubric r ON asg.rubricID = r.rubricID
-    LEFT JOIN criteria c ON c.rubricID = r.rubricID
-    WHERE a.assessmentID = '$reuseID' 
-      AND a.type = 'Task'
-    GROUP BY r.rubricID, r.rubricTitle, r.totalPoints, f.fileID
-";
+    $reuseID = $_GET['reuse'];
+    $reuseQuery = "SELECT a.assessmentTitle, asg.assignmentDescription, a.deadline, asg.assignmentPoints
+                   FROM assessments a
+                   JOIN assignments asg ON a.assessmentID = asg.assessmentID
+                   WHERE a.assessmentID = '$reuseID' AND a.type = 'Task'";
 
     $reuseResult = executeQuery($reuseQuery);
     if ($reuseResult && $reuseResult->num_rows > 0) {
-        $reusedData = [];
-        while ($row = $reuseResult->fetch_assoc()) {
-            $reusedData[] = $row; // store all file rows
-        }
-    }
-}
-
-if (!empty($reusedData)) {
-    // If the instructor chose to reuse, it'll populate these fields with the selected task's info
-    $mainData = [
-        'assessmentTitle' => $reusedData[0]['assessmentTitle'],
-        'assignmentDescription' => $reusedData[0]['assignmentDescription'],
-        'deadline' => $reusedData[0]['deadline'],
-        'assignmentPoints' => $reusedData[0]['assignmentPoints']
-    ];
-
-    // Display the attachments of the reused tasks 
-    $files = [];
-    foreach ($reusedData as $row) {
-        if (!empty($row['fileID'])) {
-            $files[] = [
-                'fileID' => $row['fileID'],
-                'fileTitle' => $row['fileTitle'],
-                'fileAttachment' => $row['fileAttachment'],
-                'fileLink' => $row['fileLink']
-            ];
-        }
-    }
-
-    // Fetch rubric for the reused assignment
-    $reusedRubricInfo = null;
-
-    if (!empty($reusedData)) {
-        // Find the first row that has a rubricID
-        foreach ($reusedData as $row) {
-            if (isset($row['rubricID']) && $row['rubricID'] != null && $row['rubricID'] != 0) {
-                $reusedRubricInfo = [
-                    'rubricID' => $row['rubricID'],
-                    'rubricTitle' => $row['rubricTitle'] ?? 'Untitled Rubric',
-                    'criteriaCount' => $row['criteriaCount'] ?? 0,
-                    'totalPoints' => $row['totalPoints'] ?? 0
-                ];
-                break; // stop at the first one
-            }
-        }
-    }
-
-    // Default to null (no rubric selected)
-    $activeRubric = null;
-
-    // If this task is reused, get the reused rubric info
-    if (!empty($reusedRubricInfo)) {
-        $activeRubric = $reusedRubricInfo;
-    }
-
-    // If user manually selects a rubric via GET/POST, override
-    $selectedRubricID = isset($_GET['selectedRubricID']) ? intval($_GET['selectedRubricID']) : 0;
-    if ($selectedRubricID > 0) {
-        // Look it up from $rubricsList
-        foreach ($rubricsList as $r) {
-            if ($r['rubricID'] == $selectedRubricID) {
-                $activeRubric = $r;
-                break;
-            }
-        }
+        $reusedData = $reuseResult->fetch_assoc();
     }
 }
 
@@ -280,28 +166,41 @@ if (!empty($reusedData)) {
 // Detect if totalPoints column exists to avoid SQL errors on older DBs
 $hasTotalPoints = false;
 $colCheck = executeQuery("SHOW COLUMNS FROM rubric LIKE 'totalPoints'");
-if ($colCheck && $colCheck->num_rows > 0) {
-    $hasTotalPoints = true;
+if ($colCheck && $colCheck->num_rows > 0) { $hasTotalPoints = true; }
+
+$rubricInfo = null;
+$selectedRubricID = isset($_GET['selectedRubricID']) ? intval($_GET['selectedRubricID']) : 0;
+if ($selectedRubricID > 0) {
+    $tpSelect = $hasTotalPoints ? "IFNULL(r.totalPoints, 0) AS totalPoints" : "0 AS totalPoints";
+    $tpGroup  = $hasTotalPoints ? ", r.totalPoints" : "";
+    $rubricQuery = "SELECT r.rubricID, r.rubricTitle, r.rubricType, $tpSelect, COUNT(c.criterionID) AS criteriaCount
+                    FROM rubric r
+                    LEFT JOIN criteria c ON c.rubricID = r.rubricID
+                    WHERE r.userID = '$userID' AND r.rubricID = '$selectedRubricID'
+                    GROUP BY r.rubricID, r.rubricTitle, r.rubricType$tpGroup
+                    LIMIT 1";
+    $rubricRes = executeQuery($rubricQuery);
+    if ($rubricRes && $rubricRes->num_rows > 0) {
+        $rubricInfo = $rubricRes->fetch_assoc();
+    }
 }
 
 // Fetch all rubrics for modal list
 $rubricsList = [];
 $tpSelectList = $hasTotalPoints ? "IFNULL(r.totalPoints,0) AS totalPoints" : "0 AS totalPoints";
-$tpGroupList = $hasTotalPoints ? ", r.totalPoints" : "";
-$tpGroupList = $hasTotalPoints ? ", r.totalPoints" : "";
+$tpGroupList  = $hasTotalPoints ? ", r.totalPoints" : "";
 $rubricsQuery = "SELECT r.rubricID, r.rubricTitle, r.rubricType, $tpSelectList, COUNT(c.criterionID) AS criteriaCount
                  FROM rubric r
                  LEFT JOIN criteria c ON c.rubricID = r.rubricID
                  WHERE r.userID = '$userID'
                  GROUP BY r.rubricID, r.rubricTitle, r.rubricType$tpGroupList
                  ORDER BY r.rubricID DESC";
-
 $rubricsRes = executeQuery($rubricsQuery);
 if ($rubricsRes && $rubricsRes->num_rows > 0) {
-    while ($row = $rubricsRes->fetch_assoc()) {
-        $rubricsList[] = $row;
-    }
+    while ($row = $rubricsRes->fetch_assoc()) { $rubricsList[] = $row; }
 }
+
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -421,15 +320,6 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 
                                 <!-- Form starts -->
                                 <form action="" method="POST" enctype="multipart/form-data">
-                                    <input type="hidden" name="selectedRubricID" id="selectedRubricID"
-                                        value="<?= $activeRubric['rubricID'] ?? '' ?>">
-                                    <input type="hidden" name="mode"
-                                        value="<?= isset($_GET['edit']) ? 'edit' : (isset($_GET['reuse']) ? 'reuse' : 'new') ?>">
-                                    <input type="hidden" name="taskID"
-                                        value="<?= $_GET['edit'] ?? $_GET['reuse'] ?? '' ?>">
-
-
-
                                     <div class="row">
                                         <div class="col-12 pt-3">
                                             <label for="taskInfo" class="form-label text-med text-16">Task
@@ -437,7 +327,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                             <input type="text"
                                                 class="form-control textbox mb-2 px-3 py-2 text-reg text-16"
                                                 id="taskInfo" name="assignmentTitle" placeholder="Task Title *"
-                                                value="<?php echo isset($mainData) ? htmlspecialchars($mainData['assessmentTitle']) : ''; ?>"
+                                                value="<?php echo isset($reusedData) ? htmlspecialchars($reusedData['assessmentTitle']) : ''; ?>"
                                                 required>
                                         </div>
                                     </div>
@@ -459,8 +349,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <input type="hidden" name="assignmentContent" id="task">
-                                            <input type="hidden" name="assignmentContent" id="task">
+                                            <input type="hidden" name="assignmentContent" id="task" >
                                         </div>
                                     </div>
 
@@ -475,7 +364,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                     <input type="datetime-local"
                                                         class="form-control textbox text-reg text-16 me-0 me-md-2"
                                                         name="deadline"
-                                                        value="<?php echo isset($mainData['deadline']) ? date('Y-m-d\TH:i', strtotime($mainData['deadline'])) : ''; ?>"
+                                                        value="<?php echo isset($reusedData['deadline']) ? date('Y-m-d\TH:i', strtotime($reusedData['deadline'])) : ''; ?>"
                                                         required>
                                                 </div>
                                             </div>
@@ -485,10 +374,9 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                 <label class="form-label text-med text-16">
                                                     Points
                                                 </label>
-                                                <input type="number" id="rubricPointsInput"
-                                                    class="form-control textbox text-reg text-16" name="points"
-                                                    placeholder="Ungraded if left blank"
-                                                    value="<?php echo isset($mainData['assignmentPoints']) ? htmlspecialchars($mainData['assignmentPoints']) : ''; ?>" />
+                                                <input type="number" class="form-control textbox text-reg text-16"
+                                                    name="points" placeholder="Ungraded if left blank"
+                                                    value="<?php echo isset($reusedData['assignmentPoints']) ? htmlspecialchars($reusedData['assignmentPoints']) : ''; ?>" />
 
                                             </div>
                                         </div>
@@ -596,71 +484,48 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                     </div>
 
 
-                                                    <div class="row mb-0 mt-3"
-                                                        data-has-rubric="<?= !empty($activeRubric) ? '1' : '0' ?>"
-                                                        <?= $activeRubric ? '' : 'style="display:none;"' ?>>
+                                                    <div class="row mb-0 mt-3" <?php echo $rubricInfo ? '' : 'style="display:none;"'; ?>>
                                                         <div class="col-12">
+                                                            <!-- Rubric Card -->
                                                             <div
-                                                                class="materials-card rubric-card d-flex align-items-stretch px-2 py-2 w-100 rounded-3">
+                                                                class="materials-card d-flex align-items-stretch px-2 py-2 w-100 rounded-3">
                                                                 <div
                                                                     class="d-flex w-100 align-items-center justify-content-between">
                                                                     <div class="d-flex align-items-center flex-grow-1">
                                                                         <div class="mx-3 d-flex align-items-center">
-                                                                            <span
-                                                                                class="material-symbols-rounded">rate_review</span>
+                                                                            <span class="material-symbols-rounded">
+                                                                                rate_review
+                                                                            </span>
                                                                         </div>
                                                                         <div>
                                                                             <div class="text-sbold text-16"
                                                                                 style="line-height: 1.5;">
-                                                                                <?= $activeRubric['rubricTitle'] ?? '' ?>
+                                                                                <?php echo $rubricInfo ? ($rubricInfo['rubricTitle']) : ''; ?>
                                                                             </div>
                                                                             <div class="text-reg text-12 text-break"
                                                                                 style="line-height: 1.5;">
-                                                                                <?= ($activeRubric['totalPoints'] ?? 0) ?>
-                                                                                Points ·
-                                                                                <?= intval($activeRubric['criteriaCount'] ?? 0) ?>
-                                                                                Criteria
+                                                                                <?php if ($rubricInfo) { echo ($rubricInfo['totalPoints']) . ' Points · ' . intval($rubricInfo['criteriaCount']) . ' Criteria'; } ?>
                                                                             </div>
                                                                         </div>
                                                                     </div>
                                                                     <div class="mx-3 d-flex align-items-center">
-                                                                        <span class="material-symbols-outlined"
-                                                                            style="cursor:pointer;">close</span>
+                                                                        <span
+                                                                            class="material-symbols-outlined">close</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-
+                                                    <?php if ($rubricInfo) { ?>
                                                     <script>
-                                                        (function () {
+                                                        (function(){
                                                             try {
-                                                                var cardRow = document.querySelector('.row.mb-0.mt-3');
-                                                                if (!cardRow) return;
-
-                                                                // Only show the card if PHP has an active rubric
-                                                                var hasActiveRubric = cardRow.dataset.hasRubric === '1';
-                                                                if (hasActiveRubric) {
-                                                                    cardRow.style.display = '';
-                                                                } else {
-                                                                    cardRow.style.display = 'none';
-                                                                }
-                                                            } catch (e) { }
+                                                                var ptsInput = document.querySelector('input[name="points"]');
+                                                                if (ptsInput) { ptsInput.value = '<?php echo (float)$rubricInfo['totalPoints']; ?>'; }
+                                                            } catch (e) {}
                                                         })();
                                                     </script>
-
-
-                                                    <?php if ($activeRubric) { ?>
-                                                        <script>
-                                                            (function () {
-                                                                try {
-                                                                    var ptsInput = document.querySelector('input[name="points"]');
-                                                                    if (ptsInput) { ptsInput.value = '<?= (float) ($activeRubric['totalPoints'] ?? 0) ?>'; }
-                                                                } catch (e) { }
-                                                            })();
-                                                        </script>
                                                     <?php } ?>
-
                                                     <!-- Buttons -->
                                                     <div class="mt-2 mb-5 text-start">
                                                         <!-- Select Rubric Button -->
@@ -766,37 +631,33 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                         <div class="card rounded-3 mb-2 border-0">
                             <div class="card-body p-0">
                                 <!-- OPTIONS -->
-                                <?php if (!empty($rubricsList)) {
-                                    foreach ($rubricsList as $rub) {
-                                        $isSelected = ($activeRubric && $activeRubric['rubricID'] == $rub['rubricID']);
-                                        ?>
-                                        <div class="rubric-option rounded-3 d-flex align-items-center justify-content-between mb-2"
-                                            style="cursor: pointer; background-color: <?= $isSelected ? 'var(--primaryColor)' : 'var(--pureWhite)' ?>; border: 1px solid var(--black);"
-                                            data-rubric-id="<?= $rub['rubricID'] ?>"
-                                            data-rubric-title="<?= htmlspecialchars($rub['rubricTitle']) ?>"
-                                            data-rubric-points="<?= $rub['totalPoints'] ?>"
-                                            data-rubric-criteria="<?= (int) $rub['criteriaCount'] ?>">
-                                            <div style="line-height: 1.5; padding:10px 15px;">
-                                                <div class="text-sbold text-14"><?= $rub['rubricTitle'] ?></div>
-                                                <div class="text-med text-12"><?= $rub['totalPoints'] ?> Points ·
-                                                    <?= (int) $rub['criteriaCount'] ?> Criteria
-                                                </div>
+                                <?php if (!empty($rubricsList)) { foreach ($rubricsList as $rub) { ?>
+                                    <div class="rubric-option rounded-3 d-flex align-items-center justify-content-between mb-2"
+                                        style="cursor: pointer; background-color: var(--pureWhite); border: 1px solid var(--black);"
+                                        data-rubric-id="<?php echo $rub['rubricID']; ?>"
+                                        data-rubric-title="<?php echo htmlspecialchars($rub['rubricTitle']); ?>"
+                                        data-rubric-points="<?php echo $rub['totalPoints']; ?>"
+                                        data-rubric-criteria="<?php echo (int)$rub['criteriaCount']; ?>">
+                                        <div
+                                            style="line-height: 1.5; padding-left:15px; padding-right:15px; padding-top:10px; padding-bottom:10px">
+                                            <div class="text-sbold text-14"><?php echo $rub['rubricTitle']; ?></div>
+                                            <div class="text-med text-12">
+                                                <?php echo $rub['totalPoints']; ?> Points · <?php echo (int)$rub['criteriaCount']; ?> Criteria
                                             </div>
-                                            <?php if (($rub['rubricType'] ?? '') === 'Created') { ?>
-                                                <a href="edit-rubric.php?rubricID=<?= $rub['rubricID'] ?>"
-                                                    class="text-decoration-none" onclick="event.stopPropagation();">
-                                                    <span class="material-symbols-rounded"
-                                                        style="font-variation-settings: 'FILL' 1; padding-right:15px; color: var(--black);">
-                                                        edit
-                                                    </span>
-                                                </a>
-                                            <?php } ?>
                                         </div>
-                                    <?php }
-                                } else { ?>
+                                        <?php if (($rub['rubricType'] ?? '') === 'Created') { ?>
+                                            <a href="edit-rubric.php?rubricID=<?php echo $rub['rubricID']; ?>" class="text-decoration-none"
+                                               onclick="event.stopPropagation();">
+                                                <span class="material-symbols-rounded"
+                                                    style="font-variation-settings: 'FILL' 1; padding-right:15px; color: var(--black);">
+                                                    edit
+                                                </span>
+                                            </a>
+                                        <?php } ?>
+                                    </div>
+                                <?php } } else { ?>
                                     <div class="text-muted text-reg text-14 px-3 py-2">No rubrics found. Create one.</div>
                                 <?php } ?>
-
                                 <!-- Select Rubric Button -->
                                 <a href="create-rubric.php"
                                     class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14"
@@ -827,27 +688,6 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
         </div>
     </div>
     </div>
-
-    <script>
-        document.getElementById('confirmRubricBtn').addEventListener('click', function () {
-            const hiddenInput = document.getElementById('selectedRubricID');
-            const cardRow = document.querySelector('.row.mb-0.mt-3'); // your rubric card row
-            const titleDiv = cardRow.querySelector('.text-sbold.text-16');
-            const infoDiv = cardRow.querySelector('.text-reg.text-12');
-
-            const selectedOption = document.querySelector(`.rubric-option[data-rubric-id="${selectedRubric.id}"]`);
-            if (selectedOption) {
-                cardRow.style.display = '';
-                titleDiv.textContent = selectedOption.dataset.rubricTitle;
-                infoDiv.textContent = `${selectedOption.dataset.rubricPoints} Points · ${selectedOption.dataset.rubricCriteria} Criteria`;
-                hiddenInput.value = selectedRubric.id;
-            }
-
-            const modalEl = document.getElementById('selectRubricModal');
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            if (modal) modal.hide();
-        });
-    </script>
 
     <!-- Reuse Task Modal -->
     <div class="modal fade" id="reuseTaskModal" tabindex="-1" aria-labelledby="reuseTaskModalLabel" aria-hidden="true">
@@ -900,7 +740,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                     }
                                 } else {
                                     ?>
-                                    <div class="text-muted text-reg text-14 py-2">No existing assignments found.</div>
+                                    <div class="text-muted text-reg text-14 px-3 py-2">No existing assignments found.</div>
                                     <?php
                                 }
                                 ?>
@@ -935,7 +775,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
         });
 
         <?php if (isset($reusedData)) { ?>
-            quill.root.innerHTML = <?php echo json_encode($mainData['assignmentDescription']); ?>;
+            quill.root.innerHTML = <?php echo json_encode($reusedData['assignmentDescription']); ?>;
         <?php } ?>
 
 
@@ -1092,7 +932,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                 fileInput.files = dt.files;
                 allFiles = Array.from(fileInput.files); // update allFiles list
 
-                // Remove only file previews, keep links
+                // 🔹 Remove only file previews, keep links
                 container.querySelectorAll('.file-preview').forEach(el => el.remove());
 
                 // Rebuild file previews
@@ -1156,181 +996,61 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 
 </html>
 <script>
-    // Pass reused files from PHP to JavaScript
-    const reusedFiles = <?= json_encode($files) ?>;
-</script>
-
-<?php if (!empty($files)): ?>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const container = document.getElementById('filePreviewContainer');
-            if (!container) return;
-
-            <?php foreach ($files as $file): ?>
-                <?php if (!empty($file['fileLink'])): ?>
-                        // Render Link Preview
-                        (function () {
-                            const linkValue = <?php echo json_encode($file['fileLink']); ?>;
-                            const uniqueID = Date.now() + Math.floor(Math.random() * 1000);
-                            try {
-                                const urlObj = new URL(linkValue);
-                                const domain = urlObj.hostname;
-                                const faviconURL = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
-                                const html = `
-                        <div class="col-12 my-1" data-id="${uniqueID}">
-                            <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
-                                <div class="d-flex w-100 align-items-center justify-content-between">
-                                    <div class="d-flex align-items-center flex-grow-1">
-                                        <div class="mx-3 d-flex align-items-center">
-                                            <img src="${faviconURL}" alt="${domain} Icon"
-                                                onerror="this.onerror=null;this.src='../shared/assets/img/web.png';"
-                                                style="width: 30px; height: 30px;">
-                                        </div>
-                                        <div>
-                                            <div id="title-${uniqueID}" class="text-sbold text-16" style="line-height: 1.5;"><?= htmlspecialchars($file['fileTitle']) ?></div>
-                                            <div class="text-reg text-12 text-break" style="line-height: 1.5;">
-                                                <a href="${linkValue}" target="_blank">${linkValue}</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">
-                                        <span class="material-symbols-outlined">close</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <input type="hidden" name="links[]" value="${linkValue}" class="link-hidden">
-                        </div>`;
-                                container.insertAdjacentHTML('beforeend', html);
-                            } catch (e) { }
-                        })();
-                <?php elseif (!empty($file['fileAttachment'])): ?>
-                        // Render File Preview
-                        (function () {
-                            const fileName = <?php echo json_encode($file['fileTitle'] ?: basename($file['fileAttachment'])); ?>;
-                            const ext = fileName.split('.').pop().toUpperCase();
-                            const uniqueID = Date.now() + Math.floor(Math.random() * 1000);
-                            <?php
-                            $filePath = "../shared/assets/files/" . $file['fileAttachment'];
-                            $fileExt = strtoupper(pathinfo($file['fileAttachment'], PATHINFO_EXTENSION));
-                            $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
-                            $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
-                            ?>
-
-                            const html = `
-                    <div class="col-12 my-1 file-preview">
-                        <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
-                            <div class="d-flex w-100 align-items-center justify-content-between">
-                                <div class="d-flex align-items-center flex-grow-1">
-                                    <div class="mx-3 d-flex align-items-center">
-                                        <span class="material-symbols-rounded">description</span>
-                                    </div>
-                                    <div>
-                                        <div class="text-sbold text-16" style="line-height: 1.5;"><?= htmlspecialchars($file['fileAttachment']) ?></div>
-                                        <div class="text-reg text-12" style="line-height: 1.5;">
-    <?= $fileExt ?> · <?= $fileSizeMB ?>
-</div>
-
-                                    </div>
-                                </div>
-                                <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">
-                                    <span class="material-symbols-outlined">close</span>
-                                </div>
-                            </div>
-                        </div>
-                        <input type="hidden" name="existingFiles[]" value="<?php echo htmlspecialchars($file['fileAttachment']); ?>">
-                    </div>`;
-                            container.insertAdjacentHTML('beforeend', html);
-                        })();
-                <?php endif; ?>
-            <?php endforeach; ?>
-        });
-        //  Enable delete buttons for preloaded (reused) items
-        document.addEventListener('click', function (event) {
-            if (event.target.closest('.delete-file')) {
-                const col = event.target.closest('.col-12');
-                if (col) col.remove();
-            }
-        });
-
-    </script>
-<?php endif; ?>
-
-<!-- Rubric JS -->
-<script>
     // Auto-open rubric modal when returning from create-rubric
-    (function () {
-        function openRubricModal() {
-    (function () {
-        function openRubricModal() {
+    (function(){
+        function openRubricModal(){
             var modalEl = document.getElementById('selectRubricModal');
             if (!modalEl) return;
             var modal = new bootstrap.Modal(modalEl);
             // slight delay to ensure layout ready
-            setTimeout(function () { modal.show(); }, 50);
-            setTimeout(function () { modal.show(); }, 50);
+            setTimeout(function(){ modal.show(); }, 50);
         }
-        function needsOpen() {
-        function needsOpen() {
+        function needsOpen(){
             try {
                 var params = new URLSearchParams(window.location.search);
                 if (params.get('openRubric') === '1') return true;
-            } catch (e) { }
-            } catch (e) { }
+            } catch(e) {}
             // also support hash trigger
             if (window.location.hash === '#openRubric') return true;
             return false;
         }
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function () { if (needsOpen()) openRubricModal(); });
-            document.addEventListener('DOMContentLoaded', function () { if (needsOpen()) openRubricModal(); });
+            document.addEventListener('DOMContentLoaded', function(){ if (needsOpen()) openRubricModal(); });
         } else {
             if (needsOpen()) openRubricModal();
         }
     })();
-
+    // If a rubric was just created/selected via URL param, ensure the card shows and persist show state
+    (function(){
+        try {
+            var params = new URLSearchParams(window.location.search);
+            var sel = params.get('selectedRubricID');
+            if (sel) {
+                var cardRow = document.querySelector('.row.mb-0.mt-3');
+                if (cardRow) cardRow.style.display = '';
+                try { localStorage.setItem('rubricCardHidden','0'); } catch(e) {}
+            }
+        } catch(e) {}
+    })();
     var selectedRubric = null;
-    (function () {
-        // Only run if the card exists
-        var cardRow = document.querySelector('.row.mb-0.mt-3');
-        if (!cardRow) return;
-
-        var hiddenInput = document.getElementById('selectedRubricID');
-        var titleDiv = cardRow.querySelector('.text-sbold.text-16');
-        var infoDiv = cardRow.querySelector('.text-reg.text-12');
-
-        // Check if PHP has an active rubric
-        var hasActiveRubric = cardRow.dataset.hasRubric === '1';
-        if (hasActiveRubric && hiddenInput) {
-            // Populate hidden input
-            hiddenInput.value = "<?= $activeRubric['rubricID'] ?? '' ?>";
-
-            // Populate card content
-            titleDiv.textContent = "<?= addslashes($activeRubric['rubricTitle'] ?? '') ?>";
-            infoDiv.textContent = "<?= ($activeRubric['totalPoints'] ?? 0) ?> Points · <?= intval($activeRubric['criteriaCount'] ?? 0) ?> Criteria";
-
-            // Also set selectedRubric JS variable
-            window.selectedRubric = {
-                id: "<?= $activeRubric['rubricID'] ?? '' ?>",
-                title: "<?= addslashes($activeRubric['rubricTitle'] ?? '') ?>",
-                points: "<?= ($activeRubric['totalPoints'] ?? 0) ?>",
-                criteria: "<?= intval($activeRubric['criteriaCount'] ?? 0) ?>"
-            };
-
-            // Ensure card is visible
-            cardRow.style.display = '';
-        }
+    // Hide card on load if previously closed
+    (function(){
+        try {
+            var hidden = localStorage.getItem('rubricCardHidden');
+            if (hidden === '1') {
+                var cardRow = document.querySelector('.row.mb-0.mt-3');
+                if (cardRow) cardRow.style.display = 'none';
+            }
+        } catch (e) {}
     })();
 
-
     // Click on a rubric option: highlight and store selection
-    document.addEventListener('click', function (e) {
-    document.addEventListener('click', function (e) {
+    document.addEventListener('click', function(e){
         var opt = e.target.closest && e.target.closest('.rubric-option');
         if (!opt) return;
 
         // Clear previous highlight
-        document.querySelectorAll('.rubric-option').forEach(function (el) {
-        document.querySelectorAll('.rubric-option').forEach(function (el) {
+        document.querySelectorAll('.rubric-option').forEach(function(el){
             el.style.backgroundColor = 'var(--pureWhite)';
         });
         // Highlight selected (yellow)
@@ -1345,65 +1065,45 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
     });
 
     // Confirm selection: apply to card and close modal
-    document.addEventListener('click', function (e) {
-    document.addEventListener('click', function (e) {
+    document.addEventListener('click', function(e){
         var btn = e.target.closest && e.target.closest('#confirmRubricBtn');
         if (!btn) return;
         if (!selectedRubric) return;
 
         var cardRow = document.querySelector('.row.mb-0.mt-3');
         if (cardRow) cardRow.style.display = '';
-        var titleEl = document.querySelector('.rubric-card .text-sbold.text-16');
-        var metaEl = document.querySelector('.rubric-card .text-reg.text-12');
+        var titleEl = document.querySelector('.materials-card .text-sbold.text-16');
+        var metaEl = document.querySelector('.materials-card .text-reg.text-12');
         if (titleEl) titleEl.textContent = selectedRubric.title;
         if (metaEl) metaEl.textContent = selectedRubric.points + ' Points · ' + selectedRubric.criteria + ' Criteria';
 
         // Also reflect total points into the Points input field
         try {
-            var ptsInput = document.querySelector('#rubricPointsInput'); // add an ID to the points input
+            var ptsInput = document.querySelector('input[name="points"]');
             if (ptsInput) ptsInput.value = selectedRubric.points;
-
-        } catch (e) { }
+        } catch (e) {}
 
         var modalEl = document.getElementById('selectRubricModal');
         if (modalEl) {
             var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
             modal.hide();
         }
+        try { localStorage.setItem('rubricCardHidden','0'); } catch(e) {}
     });
 
-    // Close rubric card
-    document.addEventListener('click', function (e) {
-        const closeIcon = e.target.closest('.rubric-card .material-symbols-outlined');
-        if (!closeIcon) return;
-
-        const cardRow = closeIcon.closest('.row.mb-0.mt-3');
-        if (cardRow) cardRow.style.display = 'none';
-
-        // Clear selection
-        selectedRubric = null;
-        const hiddenInput = document.getElementById('selectedRubricID');
-        if (hiddenInput) hiddenInput.value = '';
-
-        // Clear card text
-        const titleDiv = cardRow.querySelector('.text-sbold.text-16');
-        const infoDiv = cardRow.querySelector('.text-reg.text-12');
-        if (titleDiv) titleDiv.textContent = '';
-        if (infoDiv) infoDiv.textContent = '';
-
-        // Reset modal option highlights
-        document.querySelectorAll('.rubric-option').forEach(el => {
-            el.style.backgroundColor = 'var(--pureWhite)';
-        });
+    // X/close on rubric card hides the card
+    document.addEventListener('click', function(e){
+        var closeIcon = e.target.closest && e.target.closest('.materials-card .material-symbols-outlined');
+        if (closeIcon) {
+            var cardRow = closeIcon.closest('.row.mb-0.mt-3');
+            if (cardRow) cardRow.style.display = 'none';
+            try { localStorage.setItem('rubricCardHidden','1'); } catch(e) {}
+        }
     });
-
 </script>
-
-<!-- Assign Task JS -->
 <script>
     // Persist Assign Task form fields using localStorage so input survives navigating away and back
-    (function () {
-    (function () {
+    (function(){
         var STORAGE_KEY = 'assignTaskDraft_v1';
         var NAVIGATION_FLAG = 'assignTaskNavigatedAway_v1';
 
@@ -1447,13 +1147,11 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                     links: getCurrentLinks()
                 };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
-            } catch (e) { }
-            } catch (e) { }
+            } catch (e) {}
         }
 
         function clearDraftInStorage() {
-            try { localStorage.removeItem(STORAGE_KEY); } catch (e) { }
-            try { localStorage.removeItem(STORAGE_KEY); } catch (e) { }
+            try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
         }
 
         function appendLinkPreview(linkValue) {
@@ -1501,7 +1199,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
             if (draft.links && Array.isArray(draft.links) && draft.links.length > 0) return true;
             return false;
         }
-        
+
         function clearAllFormFields() {
             try {
                 var titleInput = getElementById('taskInfo');
@@ -1519,21 +1217,18 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                 if (typeof quill !== 'undefined' && quill.root) {
                     quill.root.innerHTML = '';
                 }
-            } catch (e) { }
-            } catch (e) { }
+            } catch (e) {}
         }
 
         function restoreDraftFromStorage() {
             var raw = null;
-            try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { }
-            try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { }
+            try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) {}
             if (!raw) {
                 clearAllFormFields();
                 return;
             }
             var draft = null;
-            try { draft = JSON.parse(raw); } catch (e) {
-            try { draft = JSON.parse(raw); } catch (e) {
+            try { draft = JSON.parse(raw); } catch (e) { 
                 draft = null;
                 clearDraftInStorage();
                 clearAllFormFields();
@@ -1585,49 +1280,37 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                 if (draft.links && draft.links.length) {
                     for (i = 0; i < draft.links.length; i++) appendLinkPreview(draft.links[i]);
                 }
-            } catch (e) { }
-            } catch (e) { }
+            } catch (e) {}
         }
 
         function bindDraftPersistenceListeners() {
             var form = document.querySelector('form');
             if (form) {
-                form.addEventListener('input', function () { saveDraftToStorage(); });
-                form.addEventListener('change', function () { saveDraftToStorage(); });
-                form.addEventListener('submit', function () {
-                    clearDraftInStorage();
-                    clearNavigationFlag();
-                form.addEventListener('input', function () { saveDraftToStorage(); });
-                form.addEventListener('change', function () { saveDraftToStorage(); });
-                form.addEventListener('submit', function () {
-                    clearDraftInStorage();
-                    clearNavigationFlag();
+                form.addEventListener('input', function(){ saveDraftToStorage(); });
+                form.addEventListener('change', function(){ saveDraftToStorage(); });
+                form.addEventListener('submit', function(){ 
+                    clearDraftInStorage(); 
+                    clearNavigationFlag(); 
                 });
             }
             try {
                 if (typeof quill !== 'undefined') {
-                    quill.on('text-change', function () { saveDraftToStorage(); });
-                    quill.on('text-change', function () { saveDraftToStorage(); });
+                    quill.on('text-change', function(){ saveDraftToStorage(); });
                 }
-            } catch (e) { }
-            document.addEventListener('click', function (event) {
-            } catch (e) { }
-            document.addEventListener('click', function (event) {
+            } catch (e) {}
+            document.addEventListener('click', function(event){
                 var isAddLink = event.target && event.target.id === 'addLinkBtn';
                 var isDelete = event.target && (event.target.closest ? event.target.closest('.delete-file') : null);
-                if (isAddLink || isDelete) { setTimeout(function () { saveDraftToStorage(); }, 0); }
-                if (isAddLink || isDelete) { setTimeout(function () { saveDraftToStorage(); }, 0); }
+                if (isAddLink || isDelete) { setTimeout(function(){ saveDraftToStorage(); }, 0); }
             });
         }
 
         function setNavigationFlag() {
-            try { localStorage.setItem(NAVIGATION_FLAG, '1'); } catch (e) { }
-            try { localStorage.setItem(NAVIGATION_FLAG, '1'); } catch (e) { }
+            try { localStorage.setItem(NAVIGATION_FLAG, '1'); } catch (e) {}
         }
 
         function clearNavigationFlag() {
-            try { localStorage.removeItem(NAVIGATION_FLAG); } catch (e) { }
-            try { localStorage.removeItem(NAVIGATION_FLAG); } catch (e) { }
+            try { localStorage.removeItem(NAVIGATION_FLAG); } catch (e) {}
         }
 
         function hasNavigatedAway() {
@@ -1667,8 +1350,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                 }
 
                 var draft = null;
-                try { draft = JSON.parse(raw); } catch (e) {
-                try { draft = JSON.parse(raw); } catch (e) {
+                try { draft = JSON.parse(raw); } catch (e) { 
                     clearDraftInStorage();
                     bindDraftPersistenceListeners();
                     return;
@@ -1693,8 +1375,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
         }
 
         function bindNavigationAwayListeners() {
-            document.addEventListener('click', function (event) {
-            document.addEventListener('click', function (event) {
+            document.addEventListener('click', function(event) {
                 var link = event.target.closest ? event.target.closest('a') : null;
                 if (!link || !link.href) return;
                 var href = link.href;
@@ -1702,29 +1383,24 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                     setNavigationFlag();
                 }
             }, true);
-
-
+            
             function bindEditLinks() {
                 var editLinks = document.querySelectorAll('a[href*="edit-rubric.php"]');
                 for (var i = 0; i < editLinks.length; i++) {
                     var link = editLinks[i];
                     if (link.dataset.navFlagSet) continue;
                     link.dataset.navFlagSet = '1';
-                    link.addEventListener('click', function () {
-                    link.addEventListener('click', function () {
+                    link.addEventListener('click', function() {
                         setNavigationFlag();
                     });
                 }
             }
-
-
+            
             bindEditLinks();
-
-
+            
             var modalEl = document.getElementById('selectRubricModal');
             if (modalEl) {
-                modalEl.addEventListener('shown.bs.modal', function () {
-                modalEl.addEventListener('shown.bs.modal', function () {
+                modalEl.addEventListener('shown.bs.modal', function() {
                     setTimeout(bindEditLinks, 100);
                 });
             }
@@ -1732,8 +1408,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 
         function initializeDraftPersistenceWithCleanStart() {
             bindNavigationAwayListeners();
-
-
+            
             function attemptCheck() {
                 if (typeof quill !== 'undefined' && quill.root) {
                     checkAndClearOrRestore();
@@ -1743,8 +1418,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
             }
 
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', function () { attemptCheck(); });
-                document.addEventListener('DOMContentLoaded', function () { attemptCheck(); });
+                document.addEventListener('DOMContentLoaded', function(){ attemptCheck(); });
             } else {
                 attemptCheck();
             }
@@ -1752,51 +1426,4 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 
         initializeDraftPersistenceWithCleanStart();
     })();
-</script>
-
-<!-- Change the selected rubric  -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const rubricOptions = document.querySelectorAll('.rubric-option');
-        const hiddenInput = document.getElementById('selectedRubricID');
-        const cardRow = document.querySelector('.rubric-card-row');
-        const titleDiv = cardRow.querySelector('.rubric-title');
-        const infoDiv = cardRow.querySelector('.rubric-info');
-
-        // Track currently selected option
-        let selectedRubricId = hiddenInput.value;
-
-        rubricOptions.forEach(option => {
-            option.addEventListener('click', function () {
-                // Highlight selected
-                rubricOptions.forEach(o => o.style.backgroundColor = 'var(--pureWhite)');
-                this.style.backgroundColor = 'var(--primaryColor)';
-
-                // Update hidden input
-                selectedRubricId = this.dataset.rubricId;
-                hiddenInput.value = selectedRubricId;
-            });
-        });
-
-        document.getElementById('confirmRubricBtn').addEventListener('click', function () {
-            // Find selected option
-            const selectedOption = document.querySelector(`.rubric-option[data-rubric-id="${selectedRubricId}"]`);
-            if (selectedOption) {
-                // Show card if hidden
-                cardRow.style.display = '';
-
-                // Update card content
-                titleDiv.textContent = selectedOption.dataset.rubricTitle;
-                infoDiv.textContent = `${selectedOption.dataset.rubricPoints} Points · ${selectedOption.dataset.rubricCriteria} Criteria`;
-            }
-
-            // Close modal
-            const modalEl = document.getElementById('selectRubricModal');
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            if (modal) modal.hide();
-
-        });
-    });
-
-
 </script>
