@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 09, 2025 at 10:25 AM
+-- Generation Time: Nov 09, 2025 at 01:28 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -702,6 +702,7 @@ CREATE TABLE `scores` (
   `scoreID` int(5) NOT NULL,
   `userID` int(5) NOT NULL,
   `assignmentID` int(5) DEFAULT NULL,
+  `submissionID` int(5) DEFAULT NULL,
   `testID` int(5) DEFAULT NULL,
   `score` int(5) NOT NULL,
   `feedback` varchar(255) DEFAULT NULL,
@@ -1029,6 +1030,7 @@ INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`, `status`
 CREATE TABLE `webstars` (
   `webstarsID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
+  `assessmentID` int(11) DEFAULT NULL,
   `sourceType` varchar(50) NOT NULL,
   `pointsChanged` int(100) NOT NULL,
   `dateEarned` datetime NOT NULL
@@ -1038,8 +1040,8 @@ CREATE TABLE `webstars` (
 -- Dumping data for table `webstars`
 --
 
-INSERT INTO `webstars` (`webstarsID`, `userID`, `sourceType`, `pointsChanged`, `dateEarned`) VALUES
-(22, 2, 'Shop Purchase', -150, '2025-11-06 17:56:42');
+INSERT INTO `webstars` (`webstarsID`, `userID`, `assessmentID`, `sourceType`, `pointsChanged`, `dateEarned`) VALUES
+(22, 2, NULL, 'Shop Purchase', -150, '2025-11-06 17:56:42');
 
 --
 -- Indexes for dumped tables
