@@ -118,13 +118,13 @@ INNER JOIN assessments
 	ON todo.assessmentID = assessments.assessmentID
 INNER JOIN courses
 	ON assessments.courseID = courses.courseID
-WHERE status != 'Graded' AND  courses.userID = $userID";
+WHERE status = 'Submitted' AND  courses.userID = $userID";
 
 $toGradeQuery = "SELECT COUNT(*) AS toGrade $baseJoinGrading;
 ";
 $toGradeResult = executeQuery($toGradeQuery);
 
-$toGradeTodayQuery = "SELECT COUNT(*) AS toGradeToday $baseJoinGrading AND todo.updatedAt >= (CURRENT_TIMESTAMP - INTERVAL 1 DAY)";
+$toGradeTodayQuery = "SELECT COUNT(*) AS toGradeToday $baseJoinGrading AND (todo.updatedAt >= (CURRENT_TIMESTAMP - INTERVAL 1 DAY) AND todo.updatedAt < CURRENT_TIMESTAMP)";
 $toGradeTodayResult = executeQuery($toGradeTodayQuery);
 
 $activeAssessmentsQuery = "SELECT COUNT(*) FROM assessments

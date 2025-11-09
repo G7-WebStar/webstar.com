@@ -84,6 +84,10 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             .fs-sm-6 {
                 font-size: 1rem !important;
             }
+
+            .btn-mobile {
+                margin-bottom: calc(1.5rem + 80px) !important;
+            }
         }
 
         ::-webkit-scrollbar {
@@ -188,7 +192,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                                         </div>
 
                                         <div class="mt-auto text-sbold">
-                                            <div class="d-flex justify-content-center justify-content-md-around align-items-center mb-4 gap-3 gap-md-0 mt-5" id="buttonSection">
+                                            <div class="d-flex justify-content-center justify-content-md-around align-items-center mb-4 btn-mobile gap-3 gap-md-0 mt-5" id="buttonSection">
                                                 <button class="btn d-flex align-items-center justify-content-center border border-black rounded-5 px-sm-4 py-sm-2 interactable"
                                                     style="background-color: var(--primaryColor);" onclick="startQuiz();">
                                                     <span class="m-0 fs-sm-6">Start</span>
