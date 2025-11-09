@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $testID = $_GET['testID'];
         $userAnswer = $answer['userAnswer'];
         $userID = $userID; // from session
-        $isCorrect = ($userAnswer == $correctAnswer) ? 1 : 0;
+        $isCorrect = ($userAnswer == $correctAnswer || $userAnswer == strtolower($correctAnswer)) ? 1 : 0;
 
         $insertQuery = "INSERT INTO testresponses (testID, testQuestionID, userID, userAnswer, isCorrect)
                         VALUES ('$testID', '$testQuestionID', '$userID', '$userAnswer', '$isCorrect')";
