@@ -605,6 +605,11 @@ $user = mysqli_fetch_assoc($result);
                                                                 data-bs-toggle="tab" href="#link">Links</a>
                                                         </li>
 
+                                                        <li class="nav-item">
+                                                            <a class="nav-link text-14 <?php echo ($activeTab == 'records') ? 'active' : ''; ?>"
+                                                                data-bs-toggle="tab" href="#records">Records</a>
+                                                        </li>
+
                                                         <li class="nav-item nav-leaderboard">
                                                             <a class="nav-link text-14 <?php echo ($activeTab == 'leaderboard') ? 'active' : ''; ?>"
                                                                 data-bs-toggle="tab" href="#leaderboard">Leaderboard</a>
@@ -658,6 +663,12 @@ $user = mysqli_fetch_assoc($result);
                                             <div class="tab-pane fade <?php echo ($activeTab == 'link') ? 'show active' : ''; ?>"
                                                 id="link" role="tabpanel">
                                                 <?php include 'course-info/link.php'; ?>
+                                            </div>
+
+                                            <!-- Records -->
+                                            <div class="tab-pane fade <?php echo ($activeTab == 'records') ? 'show active' : ''; ?>"
+                                                id="records" role="tabpanel">
+                                                <?php include 'course-info/records.php'; ?>
                                             </div>
 
                                             <!-- Leaderboard -->

@@ -203,9 +203,9 @@ include("shared/assets/processes/registration-profile-process.php");
             studentIDInput.value = studentIDInput.value.toUpperCase();
         });
 
-        // Auto-lowercase username and remove spaces/dots
+        // Auto-lowercase username and remove spaces
         usernameInput.addEventListener('input', () => {
-            usernameInput.value = usernameInput.value.toLowerCase().replace(/[\s.]/g, '');
+            usernameInput.value = usernameInput.value.toLowerCase().replace(/[^a-z0-9.]/g, '');
         });
 
         // Trigger file input
