@@ -71,9 +71,9 @@ $showDropdowns = $assessmentCount > 0
                                 $link = "#";
 
                                 if ($type === 'task') {
-                                    $link = "assignment.php?assignmentID=" . $todo['assignmentID'];
+                                    $link = "task-info.php?assignmentID=" . $todo['assignmentID'];
                                 } elseif ($type === 'test') {
-                                    $link = "test.php?testID=" . $todo['testID'];
+                                    $link = "test-info.php?testID=" . $todo['testID'];
                                 }
                                 ?>
 

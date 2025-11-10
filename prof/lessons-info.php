@@ -1,7 +1,8 @@
 <?php
 $activePage = 'lessons-info';
-include('shared/assets/database/connect.php');
-include("shared/assets/processes/session-process.php");
+include('../shared/assets/database/connect.php');
+include("../shared/assets/processes/prof-session-process.php");
+
 if (!isset($_GET['lessonID'])) {
     echo "Lesson ID is missing in the URL.";
     exit;
@@ -28,7 +29,9 @@ $courseID = $lesson['courseID'];
 $lessonTitle = $lesson['lessonTitle'];
 $lessonDescription = $lesson['lessonDescription'];
 $profName = $lesson['firstName'] . " " . $lesson['lastName'];
-$profPic = !empty($lesson['profilePicture']) ? $lesson['profilePicture'] : "shared/assets/img/courseInfo/prof.png";
+$profPic = !empty($lesson['profilePicture'])
+    ? "../shared/assets/pfp-uploads/" . $lesson['profilePicture']
+    : "../shared/assets/img/courseInfo/prof.png";
 
 $displayTime = !empty($lesson['updatedAt']) ? $lesson['updatedAt'] : $lesson['createdAt'];
 $formattedTime = !empty($displayTime) ? date("F j, Y g:i A", strtotime($displayTime)) : "";
@@ -72,11 +75,11 @@ $linkCount = count($linksArray);
     <title>Webstar | Lessons-info</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
-    <link rel="stylesheet" href="shared/assets/css/global-styles.css">
-    <link rel="stylesheet" href="shared/assets/css/lessons-info.css">
-    <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
+    <link rel="stylesheet" href="../shared/assets/css/global-styles.css">
+    <link rel="stylesheet" href="../shared/assets/css/lessons-info.css">
+    <link rel="stylesheet" href="../shared/assets/css/sidebar-and-container-styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
+    <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
 
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
@@ -92,10 +95,10 @@ $linkCount = count($linksArray);
         <div class="row w-100">
 
             <!-- Sidebar (only shows on mobile) -->
-            <?php include 'shared/components/sidebar-for-mobile.php'; ?>
+            <?php include '../shared/components/prof-sidebar-for-mobile.php'; ?>
 
             <!-- Sidebar Column (fixed on desktop) -->
-            <?php include 'shared/components/sidebar-for-desktop.php'; ?>
+            <?php include '../shared/components/prof-sidebar-for-desktop.php'; ?>
 
             <!-- Main Container Column-->
             <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-0 p-md-4 overflow-y-auto">
@@ -103,7 +106,7 @@ $linkCount = count($linksArray);
                     style="background-color: transparent;">
 
                     <!-- Navbar for mobile -->
-                    <?php include 'shared/components/navbar-for-mobile.php'; ?>
+                    <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
                     <div class="container-fluid py-3 overflow-y-auto row-padding-top">
                         <div class="row mb-3">
@@ -213,7 +216,7 @@ $linkCount = count($linksArray);
                                     <div class="text-sbold text-14 pb-3">Prepared by</div>
                                     <div class="d-flex align-items-center pb-5">
                                         <div class="rounded-circle me-2" style="width: 50px; height: 50px; background-color: var(--highlight75);">
-                                            <img src="<?php echo !empty($lesson['profilePicture']) ? 'shared/assets/pfp-uploads/' . $lesson['profilePicture'] : 'shared/assets/img/default-profile.png'; ?>"
+                                            <img src="<?php echo $profPic ?>"
                                                 alt="Prof Picture" class="rounded-circle" style="width:50px;height:50px;">
                                         </div>
                                         <div>
