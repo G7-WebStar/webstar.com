@@ -1,6 +1,13 @@
 <?php
 include("../shared/assets/database/connect.php");
 include("../shared/assets/processes/prof-session-process.php");
+
+if (!isset($_GET['assessmentID'])) {
+    echo "Assessment ID is missing in the URL.";
+    exit;
+}
+
+$assessmentID = $_GET['assessmentID'];
 ?>
 
 <!doctype html>
