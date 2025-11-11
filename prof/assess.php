@@ -33,6 +33,9 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                 WHERE assessmentID = '$assessmentID' AND status = 'Graded'";
         $countGradedResult = executeQuery($countGradedQuery);
 
+        $getSubmissionIDQuery = "SELECT submissionID FROM submissions WHERE assessmentID = $assessmentID";
+        $getSubmissionIDResult = executeQuery($getSubmissionIDQuery);
+
         $submittedTodoCount = 0;
 
         if (mysqli_num_rows($countSubmittedResult) > 0) {
@@ -54,9 +57,17 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
             $pendingTodoCount = $countRowPending['pending'];
         }
 
+        $submissionID = 0;
+
+        if (mysqli_num_rows($getSubmissionIDResult) > 0) {
+            $submissionIDRow = mysqli_fetch_assoc($getSubmissionIDResult);
+            $submissionID = $submissionIDRow['submissionID'];
+        }
+
         $rowAssessment['graded'] = $gradedTodoCount;
         $rowAssessment['submittedTodo'] = $submittedTodoCount;
         $rowAssessment['pending'] = $pendingTodoCount;
+        $rowAssessment['submissionID'] = $submissionID;
         $assessments[] = $rowAssessment;
     }
 }
@@ -110,15 +121,15 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                             <!-- Header Section -->
                             <div class="row align-items-center mb-3 text-center text-lg-start">
                                 <!-- Title -->
-                                <div class="col-12 mb-3 mb-lg-0">
-                                    <h1 class="text-bold text-25 mb-0 mt-4" style="color: var(--black);">Assess
+                                <div class="col-12 col-xl-2 mb-3 mb-lg-0">
+                                    <h1 class="text-bold text-25 mx-0 mb-0 mt-4" style="color: var(--black);">Assess
                                     </h1>
                                 </div>
 
                                 <!-- Dropdowns-->
-                                <div class="col-12 mt-4">
+                                <div class="col-12 col-xl-10 mt-4">
                                     <div
-                                        class="d-flex flex-nowrap justify-content-center justify-content-lg-start gap-3">
+                                        class="d-flex flex-wrap flex-lg-nowrap justify-content-center justify-content-lg-start gap-3">
 
                                         <!-- Type dropdown -->
                                         <div class="d-flex align-items-center flex-nowrap dropdown-container">
@@ -198,6 +209,7 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                         $submittedCount = $assessment['submittedTodo'];
                                         $pendingCount = $assessment['pending'];
                                         $gradedCount = $assessment['graded'];
+                                        $cardSubmissionID = $assessment['submissionID'];
 
                                         $chartsIDs[] = "chart$i";
                                         $submitted[] = $submittedCount;
@@ -207,7 +219,7 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                         <div class="assessment-card mb-3">
                                             <div class="card-content">
                                                 <!-- Top Row: Left Info and Submission Stats -->
-                                                <div class="top-row">
+                                                <div class="top-row overflow-hidden">
                                                     <!-- Left Info -->
                                                     <div class="left-info">
                                                         <div class="mb-2 text-reg">
@@ -230,7 +242,7 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
 
                                                     <!-- Right Side: Progress Chart and Options -->
                                                     <div class="right-section">
-                                                        <div class="chart-container">
+                                                        <div class="chart-container" id="chart-container<?php echo $i; ?>">
                                                             <canvas id="chart<?php echo $i; ?>" width="120" height="120"></canvas>
                                                         </div>
                                                     </div>
@@ -244,12 +256,14 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                                                     alt="Assess Icon"
                                                                     style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;"><?php echo ($type == 'Task') ? 'Task' : 'Test'; ?> Details
                                                             </button></a>
-                                                        <button class="btn btn-action">
-                                                            <img src="../shared/assets/img/assess/assess.png"
-                                                                alt="Assess Icon"
-                                                                style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
-                                                            Sheet
-                                                        </button>
+                                                        <a href="grading-sheet-pdf-with-image.php?submissionID=<?php echo $cardSubmissionID; ?>">
+                                                            <button class="btn btn-action">
+                                                                <img src="../shared/assets/img/assess/assess.png"
+                                                                    alt="Assess Icon"
+                                                                    style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
+                                                                Sheet
+                                                            </button>
+                                                        </a>
                                                     </div>
                                                     <!-- More Options aligned with buttons on the right -->
                                                     <div class="options-container">
@@ -258,7 +272,7 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                                                 <i class="fas fa-ellipsis-v"></i>
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end">
-                                                                <li><a class="dropdown-item" href="#"><i class="fas fa-archive me-2"></i>Mark as Archived</a></li>
+                                                                <li><a class="dropdown-item" href="#" id="<?php echo $i; ?>" onclick="archive(this);"><i class="fas fa-archive me-2"></i>Mark as Archived</a></li>
                                                             </ul>
                                                         </div>
                                                     </div>
@@ -320,14 +334,14 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                 createDoughnutChart(id, submitted[index], pending[index], graded[index])
             });
         });
+
+        function archive(element) {
+            const archiveLabel = document.getElementById('chart-container' + element.id);
+            const archiveDropdown = document.getElementById(element.id);
+            archiveLabel.innerHTML = `<span class="badge rounded-pill text-bg-secondary text-reg">Archived</span>`;
+            archiveDropdown.innerHTML = `<i class="fas fa-archive me-2"></i>Unarchived`;
+        }
     </script>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
 
 </body>
 
