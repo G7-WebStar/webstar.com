@@ -16,15 +16,16 @@ $assignmentQuery = "SELECT
                     assessments.deadline,
                     assignments.assignmentDescription,
                     assignments.assignmentPoints,
+                    assignments.rubricID,
                     userinfo.firstName,
                     userinfo.lastName,
-                    userinfo.profilePicture,
-                    assignments.assignmentPoints
-                    FROM courses 
-                    INNER JOIN assessments ON courses.courseID = assessments.courseID 
-                    INNER JOIN assignments ON assessments.assessmentID = assignments.assessmentID
-                    INNER JOIN userinfo ON courses.userID = userInfo.userID 
-                    WHERE assignments.assignmentID = $assignmentID";
+                    userinfo.profilePicture
+                FROM courses 
+                INNER JOIN assessments ON courses.courseID = assessments.courseID 
+                INNER JOIN assignments ON assessments.assessmentID = assignments.assessmentID
+                INNER JOIN userinfo ON courses.userID = userInfo.userID 
+                WHERE assignments.assignmentID = $assignmentID";
+
 $assignmentResult = executeQuery($assignmentQuery);
 
 $assignmentRow = mysqli_fetch_assoc($assignmentResult);
@@ -59,6 +60,44 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
         $linksArray = array_merge($linksArray, $links);
     }
 }
+
+// Rubric Info
+$rubricID = isset($assignmentRow['rubricID']) ? $assignmentRow['rubricID'] : null;
+$rubricTitle = '';
+$rubricPoints = 0;
+$criteriaList = [];
+$levelsByCriterion = [];
+
+if (!empty($rubricID)) {
+    // Get rubric title and total points
+    $rubricQuery = "SELECT rubricTitle, totalPoints FROM rubric WHERE rubricID = $rubricID LIMIT 1";
+    $rubricResult = executeQuery($rubricQuery);
+    $rubricRow = mysqli_fetch_assoc($rubricResult);
+
+    if ($rubricRow) {
+        $rubricTitle = $rubricRow['rubricTitle'];
+        $rubricPoints = $rubricRow['totalPoints'];
+    }
+
+    // Get criteria for this rubric
+    $criteriaQuery = "SELECT criterionID, criteriaTitle FROM criteria WHERE rubricID = $rubricID ORDER BY criterionID ASC";
+    $criteriaResult = executeQuery($criteriaQuery);
+    while ($criterion = mysqli_fetch_assoc($criteriaResult)) {
+        $criteriaList[] = $criterion;
+
+        // Get levels for this criterion
+        $criterionID = $criterion['criterionID'];
+        $levelsQuery = "SELECT levelID, levelTitle, levelDescription, points 
+                        FROM level 
+                        WHERE criterionID = $criterionID 
+                        ORDER BY points DESC";
+        $levelsResult = executeQuery($levelsQuery);
+        $levelsByCriterion[$criterionID] = [];
+        while ($level = mysqli_fetch_assoc($levelsResult)) {
+            $levelsByCriterion[$criterionID][] = $level;
+        }
+    }
+}
 ?>
 
 <!doctype html>
@@ -72,8 +111,7 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="../shared/assets/css/global-styles.css">
     <link rel="stylesheet" href="../shared/assets/css/sidebar-and-container-styles.css">
-    <link rel="stylesheet" href="../shared/assets/css/profIndex.css">
-    <link rel="stylesheet" href="../shared/assets/css/assess-exam-details.css">
+    <link rel="stylesheet" href="../shared/assets/css/assignment.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
 
@@ -233,21 +271,24 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
 
                                                 <hr>
 
-                                                <div class="text-sbold text-14 mt-4">Rubric</div>
-                                                <div class="cardFile my-3 mb-4 w-lg-25 d-flex align-items-start"
-                                                    style="width:400px; max-width:100%; min-width:310px; cursor:pointer;"
-                                                    data-bs-toggle="modal" data-bs-target="#rubricModal">
+                                                <?php if (!empty($rubricID) && !empty($rubricTitle)): ?>
+                                                    <div class="text-sbold text-14 mt-4">Rubric</div>
+                                                    <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
+                                                        style="max-width:100%; min-width:310px; cursor:pointer;" data-bs-toggle="modal"
+                                                        data-bs-target="#rubricModal">
 
-                                                    <span class="material-symbols-outlined ps-3 pe-2 py-3"
-                                                        style="font-variation-settings:'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;">
-                                                        rate_review
-                                                    </span>
+                                                        <span class="material-symbols-outlined ps-3 pe-2 py-3"
+                                                            style="font-variation-settings:'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;">
+                                                            rate_review
+                                                        </span>
 
-                                                    <div class="ms-2">
-                                                        <div class="text-sbold text-16 mt-1">Essay Rubric</div>
-                                                        <div class="due text-reg text-14 mb-1">20 points</div>
+                                                        <div class="ms-2">
+                                                            <div class="text-sbold text-16 mt-1"><?php echo $rubricTitle; ?></div>
+                                                            <div class="due text-reg text-14 mb-1"><?php echo $rubricPoints; ?> points
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                <?php endif; ?>
 
                                                 <hr>
 
@@ -276,8 +317,112 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
         </div>
     </div>
 
+    <!-- Rubric Modal -->
+    <div class="modal fade" id="rubricModal" tabindex="-1" aria-labelledby="rubricModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered py-4">
+            <div class="modal-content rounded-4" style="max-height:450px; overflow:hidden;">
+
+                <!-- HEADER -->
+                <div class="modal-header border-bottom">
+                    <div class="modal-title text-sbold text-20 ms-3" id="rubricModalLabel">
+                        <?php echo $rubricTitle; ?>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- BODY -->
+                <div class="modal-body" style="overflow-y:auto; scrollbar-width:thin;">
+                    <div class="container text-center px-5">
+                        <?php foreach ($criteriaList as $criterionIndex => $criterion): ?>
+                            <!-- Section Title -->
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <div class="text-sbold text-15" style="color: var(--black);">
+                                        <?php echo $criterion['criteriaTitle']; ?>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Accordion for levels -->
+                            <div id="ratingAccordion<?php echo $criterionIndex; ?>" class="row justify-content-center">
+                                <div class="col-12 col-md-10">
+                                    <?php foreach ($levelsByCriterion[$criterion['criterionID']] as $levelIndex => $level):
+                                        $collapseID = strtolower(preg_replace('/\s+/', '', $level['levelTitle'])) . $criterionIndex;
+                                    ?>
+                                        <div class="mb-2">
+                                            <div class="w-100 d-flex align-items-center justify-content-center flex-column text-med text-14"
+                                                style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black);">
+
+                                                <div class="d-flex justify-content-between align-items-center w-100 px-3 py-2">
+                                                    <span class="flex-grow-1 text-center ps-3">
+                                                        <?php echo $level['levelTitle']; ?> · <?php echo $level['points']; ?>
+                                                        pts
+                                                    </span>
+
+                                                    <!-- only the icon is clickable -->
+                                                    <span class="material-symbols-rounded collapse-toggle"
+                                                        data-bs-toggle="collapse" data-bs-target="#<?php echo $collapseID; ?>"
+                                                        aria-expanded="false" aria-controls="<?php echo $collapseID; ?>"
+                                                        style="cursor:pointer;">
+                                                        expand_more
+                                                    </span>
+                                                </div>
+
+                                                <div class="collapse w-100 mt-2" id="<?php echo $collapseID; ?>"
+                                                    data-bs-parent="#ratingAccordion<?php echo $criterionIndex; ?>">
+                                                    <p class="mb-0 px-3 pb-2 text-reg text-14">
+                                                        <?php echo $level['levelDescription']; ?>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="modal-footer">
+                    <div class="container">
+                        <div class="row justify-content-end py-2">
+                            <!-- Optional footer buttons -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const icons = document.querySelectorAll('.collapse-toggle');
+
+        icons.forEach(icon => {
+            const target = icon.getAttribute('data-bs-target');
+            const collapse = document.querySelector(target);
+            const container = icon.closest('div.d-flex.justify-content-between'); // parent row
+
+            if (collapse && container) {
+                collapse.addEventListener('show.bs.collapse', () => {
+                    document.querySelectorAll('.material-symbols-rounded')
+                        .forEach(ic => ic.style.transform = 'rotate(0deg)');
+                    icon.style.transform = 'rotate(180deg)';
+                    icon.style.transition = 'transform 0.3s';
+                    container.parentElement.style.backgroundColor = 'var(--primaryColor)';
+                });
+
+                collapse.addEventListener('hide.bs.collapse', () => {
+                    icon.style.transform = 'rotate(0deg)';
+                    container.parentElement.style.backgroundColor = 'var(--pureWhite)';
+                });
+            }
+        });
+    </script>
+
 </body>
 
 </html>

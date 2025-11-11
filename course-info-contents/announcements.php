@@ -231,9 +231,8 @@ $announcementResult = executeQuery($announcementQuery);
 
         <!-- No Announcements -->
         <div class="empty-state text-center">
-            <img src="shared/assets/img/courseInfo/megaphone.png" alt="No Announcements" class="empty-state-img"
-                style="filter: grayscale(100%) brightness(2.8) contrast(0.4) opacity(0.85);">
-            <div class="empty-state-text text-reg text-16">
+            <img src="shared/assets/img/empty/announcements.png" alt="No Announcements" class="empty-state-img">
+            <div class="empty-state-text text-reg text-14">
                 No announcements have been posted yet.
             </div>
         </div>

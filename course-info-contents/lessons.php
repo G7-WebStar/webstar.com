@@ -118,8 +118,8 @@ mysqli_data_seek($lessonResult, 0);
 <?php else: ?>
     <!-- No Lessons Placeholder -->
     <div class="empty-state text-center">
-        <img src="shared/assets/img/notebook.png" alt="No Lessons" class="empty-state-img">
-        <div class="empty-state-text text-reg text-16">
+        <img src="shared/assets/img/empty/lessons.png" alt="No Lessons" class="empty-state-img">
+        <div class="empty-state-text text-reg text-14">
             No lessons have been posted yet.
         </div>
     </div>

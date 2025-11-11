@@ -79,6 +79,7 @@ $linkCount = count($linksArray);
     <link rel="stylesheet" href="../shared/assets/css/lessons-info.css">
     <link rel="stylesheet" href="../shared/assets/css/sidebar-and-container-styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
 
     <!-- Material Design Icons -->
@@ -233,7 +234,40 @@ $linkCount = count($linksArray);
         </div>
     </div>
 
+    <!-- Toast Container -->
+    <div id="toastContainerFiles"
+        class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+        style="z-index:1100; pointer-events:none;">
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toastContainer = document.getElementById('toastContainerFiles');
+
+            function showToast(message) {
+                const toastEl = document.createElement('div');
+                toastEl.className = "alert alert-success mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2";
+                toastEl.style.cssText = "border-radius:8px; display:flex; align-items:center; gap:8px; padding:0.5rem 0.75rem; text-align:center; background-color:#d1e7dd; color:#0f5132;";
+                toastEl.innerHTML = `<i class="bi bi-check-circle-fill fs-6" style="color: var(--black);"></i>
+                             <span style="color: var(--black);">${message}</span>`;
+
+                toastContainer.appendChild(toastEl);
+
+                setTimeout(() => {
+                    toastEl.remove();
+                }, 3000);
+            }
+
+            // Add click listener to all download links
+            document.querySelectorAll('a[download]').forEach(link => {
+                link.addEventListener('click', () => {
+                    showToast('File successfully downloaded!');
+                });
+            });
+        });
+    </script>
+
 </body>
 
 </html>
