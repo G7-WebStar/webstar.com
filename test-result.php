@@ -106,6 +106,10 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             }
         }
 
+        .btn-mobile {
+            margin-bottom: calc(1.5rem + 80px) !important;
+        }
+
         ::-webkit-scrollbar {
             width: 10px;
         }
@@ -204,7 +208,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                                         </div>
 
                                         <div class="mt-auto text-sbold">
-                                            <div class="d-flex justify-content-center justify-content-md-around align-items-center mb-4 gap-3 gap-md-0 mt-5" id="buttonSection">
+                                            <div class="d-flex justify-content-center justify-content-md-around align-items-center btn-mobile mb-4 gap-3 gap-md-0 mt-5" id="buttonSection">
                                                 <button class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable" id="prevBtn"
                                                     style="background-color: var(--primaryColor);" onclick="prevQuestion();">
                                                     <i class="fa-solid fs-6 fa-arrow-left text-reg" style="color: var(--black);"></i>
