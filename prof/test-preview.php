@@ -12,7 +12,9 @@ if ($testID == null) {
 $selectTestQuery = "SELECT assessmentTitle, generalGuidance FROM tests 
                     INNER JOIN assessments
                         ON tests.assessmentID = assessments.assessmentID
-                    WHERE testID = $testID";
+                    INNER JOIN courses
+                        ON assessments.courseID = courses.courseID
+                    WHERE testID = $testID AND courses.userID = $userID";
 $selectTestResult = executeQuery($selectTestQuery);
 
 $selectQuestionsQuery = "SELECT 
