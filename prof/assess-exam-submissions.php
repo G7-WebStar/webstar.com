@@ -6,7 +6,6 @@ include('../shared/assets/database/connect.php');
 include("../shared/assets/processes/prof-session-process.php");
 date_default_timezone_set('Asia/Manila');
 
-// Get the assessmentID from URL
 if (!isset($_GET['assessmentID'])) {
     echo "Assessment ID is missing in the URL.";
     exit;
@@ -17,15 +16,37 @@ $assessmentID = intval($_GET['assessmentID']);
 $sortBy = $_GET['sortBy'] ?? 'All';
 $statusFilter = $_GET['status'] ?? 'All';
 
+$testInfoQuery = "
+    SELECT *
+    FROM tests
+    LEFT JOIN assessments ON tests.assessmentID = assessments.assessmentID
+    WHERE assessments.assessmentID = $assessmentID
+";
+$testInfoResult = executeQuery($testInfoQuery);
+
+if (!$test = mysqli_fetch_assoc($testInfoResult)) {
+    echo "Test not found.";
+    exit;
+}
+
+$testID       = $test['testID'];
+$testTitle    = $test['assessmentTitle'] ?? 'No Submissions';
+$deadline     = $test['deadline'] ?? date("Y-m-d H:i:s");
+$currentDate  = date("Y-m-d H:i:s");
+$isCompleted  = (strtotime($currentDate) > strtotime($deadline));
+$examStatus   = $isCompleted ? "Completed" : "Active";
+$examDuration = $test['testTimelimit'] ?? 0;
+$courseID     = $test['courseID'] ?? 0;
+
+// Fetch distinct course codes for dropdown
 $courseCodesQuery = "
     SELECT DISTINCT courseCode 
     FROM courses 
     ORDER BY courseCode ASC
 ";
-
 $courseCodesResult = executeQuery($courseCodesQuery);
 
-//  Status Filter
+// Status filter
 $statusSQL = "";
 if ($statusFilter === "Submitted") {
     $statusSQL = "AND (todo.status = 'Submitted' OR todo.status = 'Returned') AND scores.score IS NOT NULL";
@@ -35,6 +56,7 @@ if ($statusFilter === "Submitted") {
     $statusSQL = "AND todo.status IS NULL AND scores.score IS NULL AND NOW() > assessments.deadline";
 }
 
+// Fetch student submissions
 $testSubmissionQuery = "
     SELECT *
     FROM users
@@ -52,24 +74,13 @@ $testSubmissionQuery = "
 
 $testSubmissionResult = executeQuery($testSubmissionQuery);
 
-// Extract test/assessment info
-$test = mysqli_fetch_assoc($testSubmissionResult);
-
-$testTitle    = $test['assessmentTitle'] ?? 'No Submissions';
-$deadline     = $test['deadline'] ?? date("Y-m-d H:i:s");
-$currentDate  = date("Y-m-d H:i:s");
-$isCompleted  = (strtotime($currentDate) > strtotime($deadline));
-$examStatus   = $isCompleted ? "Completed" : "Active";
-$examDuration = $test['testTimelimit'] ?? 0;
-$courseID     = $test['courseID'] ?? 0;
-
 // Total exam items
-$totalItemsQuery = "SELECT COUNT(*) AS totalItems FROM testquestions WHERE testID = " . ($test['testID'] ?? 0);
+$totalItemsQuery = "SELECT COUNT(*) AS totalItems FROM testquestions WHERE testID = $testID";
 $totalItemsResult = executeQuery($totalItemsQuery);
 $totalItems = mysqli_fetch_assoc($totalItemsResult)['totalItems'] ?? 0;
 
 // Total exam points
-$totalPointsQuery = "SELECT SUM(testQuestionPoints) AS totalPoints FROM testquestions WHERE testID = " . ($test['testID'] ?? 0);
+$totalPointsQuery = "SELECT SUM(testQuestionPoints) AS totalPoints FROM testquestions WHERE testID = $testID";
 $totalPointsResult = executeQuery($totalPointsQuery);
 $totalPoints = mysqli_fetch_assoc($totalPointsResult)['totalPoints'] ?? 0;
 
@@ -80,17 +91,13 @@ $totalStudents = mysqli_fetch_assoc($totalStudentsResult)['totalStudents'] ?? 0;
 
 // Handle Return All submission
 if (isset($_POST['returnAll']) && isset($_POST['assessmentID'])) {
-
     $updateAssessmentID = intval($_POST['assessmentID']);
-    $testID = $test['testID'] ?? 0;
-
     $updateQuery = "
         UPDATE todo
         JOIN scores ON scores.userID = todo.userID AND scores.testID = $testID
         SET todo.status = 'Returned'
         WHERE todo.assessmentID = $assessmentID
     ";
-
     executeQuery($updateQuery);
 }
 
@@ -109,7 +116,6 @@ $submittedCount = mysqli_fetch_assoc($submittedResult)['submittedCount'] ?? 0;
 $pendingCount = $totalStudents - $submittedCount;
 if ($pendingCount < 0) $pendingCount = 0;
 ?>
-
 
 <!doctype html>
 <html lang="en">

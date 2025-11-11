@@ -183,3 +183,15 @@
    } */
 
  }
+
+ /* count badges */
+ .count-badge {
+   display: inline-block;
+   width: 50px;
+   padding: 5px 10px;
+   border: 1px solid var(--black);
+   background-color: var(--primaryColor);
+   color: var(--black);
+   text-align: center;
+   border-radius: 25px;
+ }
