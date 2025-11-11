@@ -8,7 +8,7 @@ if (!isset($_SESSION['userID'])) {
     $userID = $_SESSION['userID'];
 }
 
-if ($_SESSION['role'] != 'admin' && $_SESSION['role'] == 'student') {
+if ($_SESSION['role'] != 'professor' && $_SESSION['role'] == 'student') {
     header("Location: ../index.php");
     exit();
 }

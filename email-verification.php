@@ -161,6 +161,7 @@ if (isset($_POST['resend'])) {
     <link rel="stylesheet" href="shared/assets/css/email-verification.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
@@ -172,22 +173,14 @@ if (isset($_POST['resend'])) {
 
 <body>
     <?php if (isset($_SESSION['success'])): ?>
-        <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1100;">
-            <div id="successToast"
-                class="toast align-items-center text-bg-success border-0 show shadow-lg"
+        <div class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+            style="z-index:1100; pointer-events:none;">
+            <div class="alert alert-success mb-2 shadow-lg text-med text-12
+            d-flex align-items-center justify-content-center gap-2 px-3 py-2"
                 role="alert"
-                aria-live="assertive"
-                aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body text-center">
-                        <i class="fa-solid fa-circle-check me-2"></i>
-                        <?= $_SESSION['success']; ?>
-                    </div>
-                    <button type="button"
-                        class="btn-close btn-close-white me-2 m-auto"
-                        data-bs-dismiss="toast"
-                        aria-label="Close"></button>
-                </div>
+                style="border-radius:8px; display:flex; align-items:center; gap:8px; padding:0.5rem 0.75rem; text-align:center; background-color:#d1e7dd; color:#0f5132;">
+                <i class="bi bi-check-circle-fill fs-6" style="color: var(--black);"></i>
+                <span style="color: var(--black);"><?= $_SESSION['success']; ?></span>
             </div>
         </div>
         <?php unset($_SESSION['success']); ?>
@@ -246,8 +239,8 @@ if (isset($_POST['resend'])) {
 
                     <div class="container d-flex justify-content-center mb-3 text-16">
                         <span class="text-reg" style="color: black;">Didn’t get the code?</span>
-                        <button type="submit" name="resend" formnovalidate class="btn btn-link p-0 text-bold"
-                            style="color: var(--black); text-decoration: none;"> Resend Code</button>
+                        <button type="submit" name="resend" formnovalidate class="btn btn-link p-0 text-bold ms-1"
+                            style="color: var(--black); text-decoration: none; border: none; ">Resend Code</button>
                     </div>
 
                 </form>

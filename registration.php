@@ -86,12 +86,6 @@ include("shared/assets/processes/registration-process.php");
                             Log in
                         </a>
                     </div>
-
-                    <div class="text-reg text-14 text-center pt-1" style="color: var(--black);">
-                        By clicking register, you agree to our
-                        <a href="#" class="text-bold" style="color: var(--black);">Terms of Service</a> and
-                        <a href="#" class="text-bold" style="color: var(--black);">Privacy Policy</a>
-                    </div>
                 </div>
             </div>
         </div>

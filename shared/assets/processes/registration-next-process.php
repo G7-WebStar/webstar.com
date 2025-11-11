@@ -25,8 +25,27 @@ if (isset($_POST['nextBtn'])) {
 
     $nextResult = executeQuery($nextQuery);
 
+    $_SESSION['userID'] = $userID;
+
     if ($nextResult) {
         $_SESSION['profile_setup_success'] = true;
     }
 }
+
+if (isset($_POST['letsGo'])) {
+    $userID = $_SESSION['userID'];
+
+    $userQuery = "SELECT * FROM users WHERE userID = $userID";
+    $userResult = executeQuery($userQuery);
+    $userRow = mysqli_fetch_assoc($userResult);
+
+    $role = $userRow['role'];
+
+    $_SESSION['userID'] = $userID;
+    $_SESSION['role'] = $role;
+    
+    header("Location: course-join.php");
+    exit();
+}
+
 ?>

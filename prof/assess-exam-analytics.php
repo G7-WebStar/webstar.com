@@ -1,3 +1,145 @@
+<?php
+$activePage = 'assess-exam-analytics';
+$activeTab = $_GET['tab'] ?? 'analytics';
+
+include('../shared/assets/database/connect.php');
+include("../shared/assets/processes/prof-session-process.php");
+
+// Get the assessmentID from URL
+if (!isset($_GET['assessmentID'])) {
+    echo "Assessment ID is missing in the URL.";
+    exit;
+}
+$assessmentID = intval($_GET['assessmentID']);
+
+// Get testID from assessmentID
+$testQuery = "SELECT testID FROM tests WHERE assessmentID = $assessmentID LIMIT 1";
+$testResult = executeQuery($testQuery);
+$testRow = mysqli_fetch_assoc($testResult);
+$testID = $testRow['testID'] ?? 0; // fallback to 0 if not found
+
+// Total exam points
+$totalPointsQuery = "SELECT SUM(testQuestionPoints) AS totalPoints FROM testquestions WHERE testID = $testID";
+$totalPointsResult = executeQuery($totalPointsQuery);
+$totalPoints = mysqli_fetch_assoc($totalPointsResult)['totalPoints'] ?? 0;
+
+$testAnalyticQuery = "
+    SELECT *
+    FROM users
+    LEFT JOIN userinfo ON users.userID = userinfo.userID
+    LEFT JOIN enrollments ON users.userID = enrollments.userID
+    LEFT JOIN courses ON enrollments.courseID = courses.courseID
+    LEFT JOIN assessments ON courses.courseID = assessments.courseID
+    LEFT JOIN tests ON assessments.assessmentID = tests.assessmentID
+    LEFT JOIN todo ON todo.userID = users.userID AND todo.assessmentID = assessments.assessmentID
+    LEFT JOIN scores ON scores.userID = users.userID AND scores.testID = tests.testID
+    LEFT JOIN testresponses on testresponses.userID = users.userID and testresponses.testID = tests.testID
+    LEFT JOIN testquestions on testquestions.testID = tests.testID
+    WHERE assessments.assessmentID = $assessmentID
+";
+
+$testAnalyticResult = executeQuery($testAnalyticQuery);
+
+if (!$test = mysqli_fetch_assoc($testAnalyticResult)) {
+    echo "Test not found.";
+    exit;
+}
+
+$totalScore = 0;
+$scoreCount = 0;
+$passedCount = 0;
+$passingThreshold = 0.5; // 50% of total points
+$totalTimeSpent = 0;
+$timeCount = 0;
+
+// Reset pointer to loop all rows including first row we fetched
+mysqli_data_seek($testAnalyticResult, 0);
+while ($row = mysqli_fetch_assoc($testAnalyticResult)) {
+    if ($row['score'] !== null) {
+        $totalScore += $row['score'];
+        $scoreCount++;
+        if ($row['score'] >= ($totalPoints * $passingThreshold)) {
+            $passedCount++;
+        }
+    }
+
+    if (isset($row['timeSpent']) && $row['timeSpent'] !== null) {
+        $totalTimeSpent += $row['timeSpent'];
+        $timeCount++;
+    }
+}
+
+// Average score and percentage
+$averageScore = ($scoreCount > 0) ? $totalScore / $scoreCount : 0;
+$averagePercent = ($totalPoints > 0) ? round(($averageScore / $totalPoints) * 100) : 0;
+// Passing rate percentage
+$passingPercent = ($scoreCount > 0) ? round(($passedCount / $scoreCount) * 100) : 0;
+// Compute average time spent
+$averageTimeSpent = ($timeCount > 0) ? round($totalTimeSpent / $timeCount) : 0;
+
+$testTitle = $test['assessmentTitle'];
+$deadline = $test['deadline'];
+$currentDate = date("Y-m-d H:i:s");
+$isCompleted = (strtotime($currentDate) > strtotime($deadline));
+$examStatus = $isCompleted ? "Completed" : "Active";
+$examDuration = $test['testTimelimit'];
+$courseID = $test['courseID'];
+$assessmentID = $test['assessmentID'];
+
+// Total exam items
+$totalItemsQuery = "SELECT COUNT(*) AS totalItems FROM testquestions WHERE testID = $testID";
+$totalItemsResult = executeQuery($totalItemsQuery);
+$totalItems = mysqli_fetch_assoc($totalItemsResult)['totalItems'] ?? 0;
+
+// Score Range Computation (fixed to 6 bars)
+$scoreRanges = [];
+$segments = 6;
+if ($totalItems > 0) {
+
+    $rangeSize = ceil($totalItems / $segments);
+    $rangeStart = 0;
+
+    for ($i = 0; $i < $segments; $i++) {
+
+        $rangeEnd = $rangeStart + $rangeSize - 1;
+
+        if ($rangeEnd > $totalItems) {
+            $rangeEnd = $totalItems;
+        }
+
+        $scoreQuery = "
+            SELECT COUNT(*) AS total
+            FROM scores
+            WHERE testID = $testID
+            AND score BETWEEN $rangeStart AND $rangeEnd
+        ";
+
+        $scoreResult = executeQuery($scoreQuery);
+        $scoreCount = mysqli_fetch_assoc($scoreResult)['total'] ?? 0;
+
+        $scoreRanges[] = $scoreCount;
+
+        $rangeStart = $rangeEnd + 1;
+    }
+}
+
+// Total students enrolled
+$totalStudentsQuery = "SELECT COUNT(*) AS totalStudents FROM enrollments WHERE courseID = $courseID";
+$totalStudentsResult = executeQuery($totalStudentsQuery);
+$totalStudents = mysqli_fetch_assoc($totalStudentsResult)['totalStudents'] ?? 0;
+
+// Calculate submitted and pending counts
+$submittedQuery = "
+    SELECT COUNT(*) AS submittedCount
+    FROM todo
+    WHERE assessmentID = $assessmentID AND (status = 'Submitted' OR status = 'Returned')
+";
+$submittedResult = executeQuery($submittedQuery);
+$submittedCount = mysqli_fetch_assoc($submittedResult)['submittedCount'] ?? 0;
+
+$pendingCount = $totalStudents - $submittedCount;
+if ($pendingCount < 0) $pendingCount = 0;
+?>
 
 <!doctype html>
 <html lang="en">
@@ -16,7 +158,6 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
-
 </head>
 
 <body>
@@ -42,7 +183,6 @@
                     <!-- Fixed Header -->
                     <div class="row mb-3">
                         <div class="col-12 cardHeader p-3 mb-4">
-
                             <!-- DESKTOP VIEW -->
                             <div class="row desktop-header d-none d-sm-flex">
                                 <div class="col-auto me-2">
@@ -52,12 +192,10 @@
                                     </a>
                                 </div>
                                 <div class="col">
-                                    <span class="text-sbold text-25">Quiz #1</span>
-                                    <div class="text-reg text-18">Active · Due Sept 9</div>
+                                    <span class="text-sbold text-25"><?php echo $testTitle; ?></span>
+                                    <div class="text-reg text-18"><?php echo $examStatus; ?> · <?php echo date("M d, Y", strtotime($deadline)); ?></div>
                                 </div>
                             </div>
-
-
                             <!-- MOBILE VIEW -->
                             <div class="d-block d-sm-none mobile-assignment">
                                 <div class="mobile-top">
@@ -68,13 +206,12 @@
                                         </a>
                                     </div>
                                     <div class="col">
-                                        <span class="text-sbold text-25">Quiz #1</span>
-                                        <div class="text-reg text-18">Active · Due Sept 9</div>
+                                        <span class="text-sbold text-25"><?php echo $testTitle; ?></span>
+                                        <div class="text-reg text-18"><?php echo $examStatus; ?> · <?php echo date("M d, Y", strtotime($deadline)); ?></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                         <!-- Scrollable Content Container -->
                         <div class="content-scroll-container">
                             <div class="container-fluid py-3">
@@ -85,21 +222,15 @@
                                             <div class="tab-carousel-wrapper d-block"
                                                 style="--tabs-right-extend: 60px;">
                                                 <div class="tab-scroll">
-                                                    <ul class="nav nav-tabs custom-nav-tabs mb-3 flex-nowrap" id="myTab"
-                                                        role="tablist">
-
+                                                    <ul class="nav nav-tabs custom-nav-tabs mb-3 flex-nowrap">
                                                         <li class="nav-item">
-                                                            <a class="nav-link" href="assess-exam-details.php">Exam
-                                                                Details</a>
+                                                            <a class="nav-link <?php echo $activeTab == 'details' ? 'active' : ''; ?>" href="assess-exam-details.php?assessmentID=<?php echo $assessmentID; ?>&tab=details">Exam Details</a>
                                                         </li>
                                                         <li class="nav-item">
-                                                            <a class="nav-link"
-                                                                href="assess-exam-submissions.php">Submissions</a>
+                                                            <a class="nav-link <?php echo $activeTab == 'submissions' ? 'active' : ''; ?>" href="assess-exam-submissions.php?assessmentID=<?php echo $assessmentID; ?>&tab=submissions">Submissions</a>
                                                         </li>
                                                         <li class="nav-item">
-                                                            <a class="nav-link active" id="announcements-tab"
-                                                                data-bs-toggle="tab" href="#announcements"
-                                                                role="tab">Analytics</a>
+                                                            <a class="nav-link <?php echo $activeTab == 'analytics' ? 'active' : ''; ?>" href="assess-exam-analytics.php?assessmentID=<?php echo $assessmentID; ?>&tab=analytics">Analytics</a>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -120,7 +251,7 @@
                                                             <span class="material-symbols-outlined"
                                                                 style="vertical-align: middle;">analytics</span>
                                                             <span class="analytics-score-value"
-                                                                style="margin-left: 6px;">90%</span>
+                                                                style="margin-left: 6px;"><?php echo $averagePercent; ?>%</span>
                                                         </div>
                                                         <div class="analytics-score-label" style="margin-top: -6px;">
                                                             average score</div>
@@ -140,7 +271,7 @@
                                                                         check_circle
                                                                     </span>
                                                                     <span class="analytics-score-value"
-                                                                        style=" margin-left: 8px;">100%</span>
+                                                                        style=" margin-left: 8px;"><?php echo $passingPercent; ?>%</span>
                                                                 </div>
                                                                 <div class="analytics-score-label">passing rate</div>
                                                                 <div class="analytics-score-desc mt-3">
@@ -156,7 +287,7 @@
                                                                         alarm
                                                                     </span>
                                                                     <span class="analytics-score-value"
-                                                                        style=" margin-left: 8px;">10 mins</span>
+                                                                        style=" margin-left: 8px;"><?php echo $averageTimeSpent; ?> mins</span>
                                                                 </div>
                                                                 <div class="analytics-score-label">average time spent
                                                                 </div>
@@ -164,38 +295,8 @@
                                                                     typical completion time</div>
                                                             </div>
                                                         </div>
-                                                        <div class="col-12 col-md-6">
-                                                            <div class="analytics-metric text-center">
-                                                                <div class="mb-2">
-                                                                    <span class="material-symbols-outlined" style="vertical-align: middle;">
-                                                                        trending_up
-                                                                    </span>
-                                                                    <span class="analytics-score-value"
-                                                                        style=" margin-left: 8px;"> 50 </span>
-                                                                </div>
-                                                                <div class="analytics-score-label"> highest score
-                                                                </div>
-                                                                <div class="analytics-score-desc mt-3">
-                                                                    by Christian James Torrillo</div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-12 col-md-6">
-                                                        <div class="analytics-metric text-center">
-                                                        <div class="mb-2">
-                                                                    <span class="material-symbols-outlined"
-                                                                        style="vertical-align: middle;">trending_down</span>
-                                                                        <span class="analytics-score-value"
-                                                                        style=" margin-left: 8px;"> 10 </span>
-                                                                </div>
-                                                                <div class="analytics-score-label"> lowest score
-                                                                </div>
-                                                                <div class="analytics-score-desc mt-3">
-                                                                    by Ariana Grande</div>
-                                                            </div>
-                                                        </div>
                                                     </div>
                                                 </div>
-
                                             </div>
                                         </div>
                                     </div>
@@ -204,13 +305,11 @@
                                             <div class="p-2">
                                                 <div class="exam-details-title mb-5">Exam Details</div>
                                                 <div class="text-center mb-3">
-                                                    <div class="exam-stat-value mb-2">50</div>
+                                                    <div class="exam-stat-value mb-2"><?php echo $totalItems; ?></div>
                                                     <div class="exam-stat-label mb-5">Total Exam Items</div>
-
-                                                    <div class="exam-stat-value mb-2">50</div>
+                                                    <div class="exam-stat-value mb-2"><?php echo $totalPoints; ?></div>
                                                     <div class="exam-stat-label mb-5">Total Exam Points</div>
-
-                                                    <div class="exam-stat-value mb-2">50</div>
+                                                    <div class="exam-stat-value mb-2"><?php echo $examDuration; ?>mins</div>
                                                     <div class="exam-stat-label">Exam Duration</div>
                                                 </div>
 
@@ -224,11 +323,11 @@
                                                     <div class="col-auto">
                                                         <!-- Submission Stats -->
                                                         <div class="submission-stats">
-                                                            <div class="text-reg text-14"><span
-                                                                    class="stat-value">10</span>
+                                                            <div class="text-reg text-14 mt-2"><span
+                                                                    class="stat-value"><?php echo $submittedCount; ?></span>
                                                                 submitted</div>
                                                             <div class="text-reg text-14"><span
-                                                                    class="stat-value">11</span>
+                                                                    class="stat-value"><?php echo $pendingCount; ?></span>
                                                                 pending submission</div>
                                                         </div>
                                                     </div>
@@ -246,48 +345,130 @@
                                             <h5 class="text-sbold text-18 mb-1">Score Range Overview</h5>
                                             <p class="text-reg text-14 text-muted">Displays the number of students in each score bracket</p>
                                         </div>
-                                        
+
                                         <!-- Chart Container -->
                                         <div class="score-range-chart-full">
                                             <div class="chart-container-full">
                                                 <canvas id="scoreRangeChartFull" width="800" height="200"></canvas>
                                             </div>
                                         </div>
-                                        
+
                                         <!-- Item Analysis section (content before badges) -->
                                         <div class="item-analysis mt-4">
                                             <div class="section-title">Item Analysis (Per Question)</div>
                                             <div class="section-desc">Performance insights per question to spot unclear or overly difficult items.</div>
                                             <hr class="item-divider mt-4 mb-4">
 
-                                            <!-- Example Question 1 -->
-                                            <div class="question-block">
-                                                <div class="question-text mb-2 ">Which HTML tag is used to define the largest heading?</div>
-                                                <span class="choice-ok">90% answered correctly</span>
-                                                <div class="chart-badges mt-3">
-                                                    <span class="metric-badge badge-blue">90% answered correctly</span>
-                                                    <span class="metric-badge badge-green">10 students got it right</span>
-                                                    <span class="metric-badge badge-red">10 students got it wrong</span>
-                                                </div>
-                                            </div>
-                                            <hr class="item-divider mt-4 mb 4">
+                                            <?php
+                                            // Fetch all questions for this test
+                                            $questionsQuery = "SELECT * FROM testQuestions WHERE testID = $testID";
+                                            $questionsResult = executeQuery($questionsQuery);
+                                            $questions = [];
 
-                                            <!-- Example Question 2 with choices -->
-                                            <div class="question-block mt-4">
-                                                <div class="question-text">Which HTML tag is used to define the largest heading?</div>
-                                                <div class="chart-badges mt-4 mb-4">
-                                                    <span class="metric-badge badge-blue">90% answered correctly</span>
-                                                    <span class="metric-badge badge-green">10 students got it right</span>
-                                                    <span class="metric-badge badge-red">10 students got it wrong</span>
+                                            while ($q = mysqli_fetch_assoc($questionsResult)) {
+                                                $qID = $q['testQuestionID'];
+                                                $questions[$qID] = [
+                                                    'questionText' => $q['testQuestion'],
+                                                    'questionType' => $q['questionType'],
+                                                    'correctAnswer' => $q['correctAnswer'],
+                                                    'choices' => [],
+                                                    'totalResponses' => 0,
+                                                    'correctCount' => 0,
+                                                    'wrongCount' => 0,
+                                                    'studentsCorrect' => [],
+                                                    'studentsWrong' => []
+                                                ];
+                                                // Fetch choices for Multiple Choice
+                                                if ($q['questionType'] == "Multiple Choice") {
+                                                    $choicesQuery = "SELECT * FROM testQuestionChoices WHERE testQuestionID = $qID";
+                                                    $choicesResult = executeQuery($choicesQuery);
+                                                    while ($c = mysqli_fetch_assoc($choicesResult)) {
+                                                        $questions[$qID]['choices'][$c['choiceText']] = 0;
+                                                    }
+                                                }
+                                            }
+                                            // Count student responses
+                                            $responsesQuery = "
+                                                SELECT * 
+                                                FROM users 
+                                                LEFT JOIN userinfo ON users.userID = userinfo.userID 
+                                                LEFT JOIN testResponses ON users.userID = testResponses.userID AND testResponses.testID = $testID 
+                                                LEFT JOIN scores ON users.userID = scores.userID AND scores.testID = $testID 
+                                                LEFT JOIN tests ON tests.testID = $testID
+                                            ";
+                                            $responsesResult = executeQuery($responsesQuery);
+
+                                            while ($r = mysqli_fetch_assoc($responsesResult)) {
+                                                $qID = $r['testQuestionID'];
+                                                if (!isset($questions[$qID])) continue;
+
+                                                $questions[$qID]['totalResponses']++;
+
+                                                $fullName = trim($r['firstName'] . ' ' . $r['lastName']);
+
+                                                if ($r['isCorrect'] == 1) {
+                                                    $questions[$qID]['correctCount']++;
+                                                    $questions[$qID]['studentsCorrect'][] = $fullName;
+                                                } else {
+                                                    $questions[$qID]['wrongCount']++;
+                                                    $questions[$qID]['studentsWrong'][] = $fullName;
+                                                }
+
+                                                if ($questions[$qID]['questionType'] == "Multiple Choice") {
+                                                    $answer = trim($r['userAnswer']);
+                                                    if (isset($questions[$qID]['choices'][$answer])) {
+                                                        $questions[$qID]['choices'][$answer]++;
+                                                    }
+                                                }
+                                            }
+
+                                            // Render questions
+                                            foreach ($questions as $qID => $q):
+                                                $total = $q['totalResponses'];
+                                                $correct = $q['correctCount'];
+                                                $wrong = $q['wrongCount'];
+                                                $correctPercent = ($total > 0) ? round(($correct / $total) * 100) : 0;
+                                            ?>
+
+                                                <div class="question-block mt-4">
+                                                    <div class="question-text mb-2">
+                                                        <?php echo htmlspecialchars($q['questionText']); ?>
+                                                    </div>
+                                                    <!-- Correct answer for Identification -->
+                                                    <?php if ($q['questionType'] == "Identification"): ?>
+                                                        <div class="correct-answer mb-2 choice-ok">
+                                                            Correct Answer: <?php echo htmlspecialchars($q['correctAnswer']); ?>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                    <div class="chart-badges mt-3">
+                                                        <span class="metric-badge badge-blue">
+                                                            <?php echo $correctPercent; ?>% answered correctly
+                                                        </span>
+                                                        <span class="metric-badge badge-green" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#modalCorrect<?php echo $qID; ?>">
+                                                            <?php echo $correct; ?> students got it right
+                                                        </span>
+                                                        <span class="metric-badge badge-red" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#modalWrong<?php echo $qID; ?>">
+                                                            <?php echo $wrong; ?> students got it wrong
+                                                        </span>
+                                                    </div>
+
+                                                    <?php if ($q['questionType'] == "Multiple Choice"): ?>
+                                                        <ul class="choice-list mt-3">
+                                                            <?php foreach ($q['choices'] as $choice => $count):
+                                                                $percent = ($total > 0 ? round(($count / $total) * 100) : 0);
+                                                                $isCorrect = ($choice == $q['correctAnswer']);
+                                                            ?>
+                                                                <li class="<?php echo $isCorrect ? 'choice-ok' : ''; ?>">
+                                                                    <?php echo htmlspecialchars($choice); ?> -
+                                                                    <?php echo $count; ?> students -
+                                                                    <?php echo $percent; ?>%
+                                                                </li>
+                                                            <?php endforeach; ?>
+                                                        </ul>
+                                                    <?php endif; ?>
                                                 </div>
-                                                <ul class="choice-list mt-3">
-                                                    <li>Choice A - 10 students - 25%</li>
-                                                    <li>Choice B - 10 students - 25%</li>
-                                                    <li class="choice-ok">Choice C - 10 students - 25%</li>
-                                                    <li>Choice D - 10 students - 25%</li>
-                                                </ul>
-                                            </div>
-                                            <hr class="item-divider">
+                                                <hr class="item-divider mt-4 mb-4">
+                                            <?php endforeach; ?>
                                         </div>
                                     </div>
                                 </div>
@@ -299,9 +480,54 @@
         </div>
     </div>
 
+    <!-- Modal for correct and wrong answers -->
+    <?php foreach ($questions as $qID => $q): ?>
+        <!-- Correct Students Modal -->
+        <div class="modal fade" id="modalCorrect<?php echo $qID; ?>" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-sbold text-20 ps-1">Students Who Got It Right</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="width: 20px; height: 20px; font-size: 0.75rem;"></button>
+                    </div>
+                    <div class="modal-body text-med text-16">
+                        <ul>
+                            <?php foreach ($q['studentsCorrect'] as $student): ?>
+                                <li><?php echo htmlspecialchars($student); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                    <div class="modal-footer border-top" style="padding-top: 45px;"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Wrong Students Modal -->
+        <div class="modal fade" id="modalWrong<?php echo $qID; ?>" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-sbold text-20 ps-1">Students Who Got It Wrong</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="width: 20px; height: 20px; font-size: 0.75rem;"></button>
+                    </div>
+                    <div class="modal-body text-med text-16">
+                        <ul>
+                            <?php foreach ($q['studentsWrong'] as $student): ?>
+                                <li><?php echo htmlspecialchars($student); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                    <div class="modal-footer border-top" style="padding-top: 45px;"></div>
+                </div>
+            </div>
+        </div>
+    <?php endforeach; ?>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        // Doughnut Chart
         function createDoughnutChart(canvasId, submitted, pending, graded) {
             const ctx = document.getElementById(canvasId).getContext('2d');
             new Chart(ctx, {
@@ -316,30 +542,65 @@
                 options: {
                     cutout: '75%',
                     plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: false }
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: false
+                        }
                     }
                 }
             });
         }
+        //Initialize doughnut chart
+        createDoughnutChart('taskChart', <?php echo $submittedCount; ?>, <?php echo $pendingCount; ?>);
+        //REQUIRED: Auto-generate score ranges
+        function generateScoreRanges(totalItems) {
+            const ranges = [];
+            const segments = 6;
 
-        createDoughnutChart('taskChart', 10, 11, 0);
+            if (totalItems <= 0) return ranges;
 
-        // Full Width Score Range Overview Chart
-        function createScoreRangeChartFull() {
+            const rangeSize = Math.ceil(totalItems / segments);
+            let start = 0;
+
+            for (let i = 0; i < segments; i++) {
+                let end = start + rangeSize - 1;
+
+                if (end > totalItems) {
+                    end = totalItems;
+                }
+
+                ranges.push(`${start}-${end}`);
+                start = end + 1;
+            }
+
+            return ranges;
+        }
+
+        // Score range values from PHP
+        const scoreRangeData = <?php echo json_encode($scoreRanges); ?>;
+
+        // FULL WIDTH SCORE RANGE BAR CHART
+        function createScoreRangeChartFull(totalItems) {
             const ctx = document.getElementById('scoreRangeChartFull').getContext('2d');
+
+            const labels = generateScoreRanges(totalItems);
+            const step = Math.ceil(totalItems / 5);
+
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['0-10', '11-20', '21-30', '31-40', '41-50', '51-60'],
+                    labels: labels,
                     datasets: [{
                         label: 'Number of Students',
-                        data: [57, 64, 77, 79, 70, 37],
+                        data: scoreRangeData,
                         backgroundColor: '#8DA9F7',
                         borderColor: '#8DA9F7',
                         borderWidth: 0,
                         borderRadius: 4,
                         borderSkipped: false,
+                        maxBarThickness: 120
                     }]
                 },
                 options: {
@@ -350,7 +611,7 @@
                             display: false
                         },
                         tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            backgroundColor: 'rgba(0,0,0,0.8)',
                             titleColor: '#fff',
                             bodyColor: '#fff',
                             borderColor: '#8DA9F7',
@@ -358,21 +619,17 @@
                             cornerRadius: 6,
                             displayColors: false,
                             callbacks: {
-                                title: function(context) {
-                                    return 'Score Range: ' + context[0].label;
-                                },
-                                label: function(context) {
-                                    return 'Students: ' + context.parsed.y;
-                                }
+                                title: (ctx) => 'Score Range: ' + ctx[0].label,
+                                label: (ctx) => 'Students: ' + ctx.parsed.y
                             }
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: 100,
+                            max: totalItems,
                             ticks: {
-                                stepSize: 20,
+                                stepSize: step,
                                 color: '#666',
                                 font: {
                                     family: 'Regular, sans-serif',
@@ -416,10 +673,10 @@
                 }
             });
         }
-
-        // Initialize the full width score range chart
-        createScoreRangeChartFull();
+        // Initialize Score Range Chart
+        createScoreRangeChartFull(<?php echo $totalItems; ?>);
     </script>
+
 </body>
 
 </html>

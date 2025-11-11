@@ -154,22 +154,14 @@ if (isset($_POST['reset'])) { // Reset password button
 
 <body>
     <?php if (isset($_SESSION['success'])): ?>
-        <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1100;">
-            <div id="successToast"
-                class="toast align-items-center text-bg-success border-0 show"
+        <div class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+            style="z-index:1100; pointer-events:none;">
+            <div class="alert alert-success mb-2 shadow-lg text-med text-12
+            d-flex align-items-center justify-content-center gap-2 px-3 py-2"
                 role="alert"
-                aria-live="assertive"
-                aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body text-center">
-                        <i class="fa-solid fa-circle-check me-2"></i>
-                        <?= $_SESSION['success']; ?>
-                    </div>
-                    <button type="button"
-                        class="btn-close btn-close-white me-2 m-auto"
-                        data-bs-dismiss="toast"
-                        aria-label="Close"></button>
-                </div>
+                style="border-radius:8px; display:flex; align-items:center; gap:8px; padding:0.5rem 0.75rem; text-align:center; background-color:#d1e7dd; color:#0f5132;">
+                <i class="bi bi-check-circle-fill fs-6" style="color: var(--black);"></i>
+                <span style="color: var(--black);"><?= $_SESSION['success']; ?></span>
             </div>
         </div>
         <?php unset($_SESSION['success']); ?>
