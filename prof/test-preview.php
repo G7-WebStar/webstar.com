@@ -1,19 +1,13 @@
 <?php
-$activePage = '';
+$activePage = 'profIndex';
 include('../shared/assets/database/connect.php');
+include("../shared/assets/processes/prof-session-process.php");
 
-include("../shared/assets/processes/session-process.php");
-
-$scoresQuery = "SELECT * FROM testresponses WHERE testID = $testID AND userID = $userID";
-$scoresResult = executeQuery($scoresQuery);
-$scoresArray = [];
-if (mysqli_num_rows($scoresResult) > 0) {
-    while ($scoresRow = mysqli_fetch_assoc($scoresResult)) {
-        $scoresArray[] = ["userAnswer" => $scoresRow['userAnswer'], "isCorrect" => $scoresRow['isCorrect']];
-    }
+$testID = $_GET['testID'];
+if ($testID == null) {
+    header("Location: 404.html");
+    exit();
 }
-
-$scoresRow = mysqli_fetch_assoc($scoresResult);
 
 $selectTestQuery = "SELECT assessmentTitle, generalGuidance FROM tests 
                     INNER JOIN assessments
@@ -39,11 +33,11 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="shared/assets/css/global-styles.css">
-    <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
-    <link rel="stylesheet" href="shared/assets/css/index.css">
+    <link rel="stylesheet" href="../shared/assets/css/global-styles.css">
+    <link rel="stylesheet" href="../shared/assets/css/sidebar-and-container-styles.css">
+    <link rel="stylesheet" href="../shared/assets/css/index.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
+    <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
 
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
@@ -66,10 +60,6 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
 
         .bg-correct {
             background-color: var(--highlight15) !important;
-        }
-
-        .bg-wrong {
-            background-color: #ecc1c1ff;
         }
 
         @media screen and (max-width: 767px) {
@@ -112,10 +102,10 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
         <div class="row w-100 m-0">
 
             <!-- Sidebar (only shows on mobile) -->
-            <?php include 'shared/components/sidebar-for-mobile.php'; ?>
+            <?php include '../shared/components/prof-sidebar-for-mobile.php'; ?>
 
             <!-- Sidebar Column (fixed on desktop) -->
-            <?php include 'shared/components/sidebar-for-desktop.php'; ?>
+            <?php include '../shared/components/prof-sidebar-for-desktop.php'; ?>
 
             <!-- Main Container Column -->
             <div class="col-12 col-md main-container m-0 p-0 mx-0 mx-md-2 p-md-4 overflow-auto">
@@ -123,7 +113,7 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
                     style="background-color: transparent;">
 
                     <!-- Navbar for mobile -->
-                    <?php include 'shared/components/navbar-for-mobile.php'; ?>
+                    <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
                     <div class="container-fluid py-1 overflow-y-auto d-flex flex-column h-100 row-padding-top">
                         <div class="row flex-grow-1">
@@ -262,7 +252,6 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
 
         let currentQuestionIndex = 0;
         let score = 0;
-        let isCorrectArray = <?php echo json_encode($scoresArray); ?>;
 
         //Arrays used for handling answers
         let choiceIDs = [];
@@ -281,7 +270,6 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
             let totalQuestion = questions.length;
             let choiceNo = 1;
 
-            console.log(isCorrectArray);
             choiceIDs = [];
             questionContainer.innerHTML = currentQuestion.
             question;
@@ -315,10 +303,6 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
                         button.classList.remove('bg-white');
                     }
 
-                    if ((button.textContent == isCorrectArray[currentQuestionIndex].userAnswer) && (isCorrectArray[currentQuestionIndex].isCorrect == 0)) {
-                        button.classList.add('bg-wrong');
-                        button.classList.remove('bg-white');
-                    }
                     button.id = "question" + questionNo + "-choice" + choiceNo;
                     choiceIDs.push(button.id);
                     choiceNo++;
@@ -329,17 +313,11 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
                 //Displays an input text field if the question is of identification type
                 choices.innerHTML = `<input disabled type="text" placeholder="Answer" class="rounded-3 p-3 text-center border border-black" id="input` + currentQuestionIndex + `">`;
                 let textValue = document.getElementById('input' + currentQuestionIndex)
-                textValue.value = isCorrectArray[currentQuestionIndex].userAnswer;
                 correctIdentification = document.createElement('div');
                 correctIdentification.id = "identificationCorrection" + questionNo;
                 correctIdentification.classList.add('mt-3', 'text-sbold', 'text-center');
                 correctIdentification.innerHTML = "Correct Answer: " + encodeHTML(questions[currentQuestionIndex].correctAnswer);
                 choices.appendChild(correctIdentification);
-                if (isCorrectArray[currentQuestionIndex].isCorrect == 1) {
-                    textValue.classList.add('bg-correct');
-                } else {
-                    textValue.classList.add('bg-wrong');
-                }
             }
 
             //Displays the image if it exists
