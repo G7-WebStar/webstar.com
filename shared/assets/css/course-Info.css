@@ -296,10 +296,9 @@ a.btn:hover {
 }
 
 .empty-state-img {
-    width: 210px;
+    width: 100px;
     max-width: 80vw;
     height: auto;
-    filter: grayscale(100%) brightness(2) contrast(0.6) opacity(0.8);
 }
 
 .empty-state-text {

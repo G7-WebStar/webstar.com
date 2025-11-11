@@ -93,6 +93,7 @@ $selectAssessmentQuery = "SELECT
     LEFT JOIN tests
         ON assessments.assessmentID = tests.assessmentID
     WHERE todo.userID = '$userID' AND todo.status = 'Pending'
+    AND (assessments.deadline IS NULL OR assessments.deadline >= CURDATE())
     GROUP BY assessments.assessmentID DESC
     LIMIT 3;
 ";
@@ -133,6 +134,8 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet" />
 
 </head>
 
@@ -162,7 +165,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                             <?php
                             if (mysqli_num_rows($selectEnrolledResult) > 0) {
                                 while ($studentEnrolled = mysqli_fetch_assoc($selectEnrolledResult)) {
-                                    ?>
+                            ?>
                                     <!-- left side -->
                                     <div class="col-12 col-sm-12 col-md-7">
                                         <div class="row align-items-center ps-4">
@@ -191,11 +194,14 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                     <div
                                                         class="p-4 pb-0 d-flex justify-content-between align-items-center mb-3">
                                                         <div class="d-flex align-items-center">
-                                                            <i class="fas fa-folder"
-                                                                style="color: var(--black); font-size: 20px; width: 26px; margin-right: 5px;"></i>
+                                                            <span class="material-symbols-outlined" style="color: var(--black); margin-right: 5px;">
+                                                                folder
+                                                            </span>
                                                             <span>Your Courses</span>
                                                         </div>
-                                                        <div><?php echo $studentEnrolled['totalEnrollments']; ?></div>
+                                                        <span class="count-badge ms-2 text-sbold text-16">
+                                                            <?php echo $studentEnrolled['totalEnrollments']; ?>
+                                                        </span>
                                                     </div>
 
                                                     <!-- Scroll Controls -->
@@ -203,8 +209,8 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                         <button
                                                             class="scroll-btn left-scroll ms-2 position-absolute top-50 start-0 translate-middle-y d-none d-md-block"
                                                             style="border:none;background:white;cursor:pointer;z-index:5;
-                   width:35px;height:35px;border-radius:50%;display:flex;align-items:center;
-                   justify-content:center;box-shadow:0 2px 4px rgba(0,0,0,0.15); margin-top:-15px">
+                                                                    width:35px;height:35px;border-radius:50%;display:flex;align-items:center;
+                                                                    justify-content:center;box-shadow:0 2px 4px rgba(0,0,0,0.15); margin-top:-15px">
                                                             <i class="fas fa-chevron-left"
                                                                 style="font-size:18px;color:var(--black);"></i>
                                                         </button>
@@ -217,7 +223,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                 if (mysqli_num_rows($selectEnrolledResult) > 0) {
                                                                     mysqli_data_seek($selectEnrolledResult, 0);
                                                                     while ($enrolledSubjects = mysqli_fetch_assoc($selectEnrolledResult)) {
-                                                                        ?>
+                                                                ?>
                                                                         <!-- Card 1 -->
                                                                         <div class="card custom-course-card">
                                                                             <a href="course-info.php?courseID=<?php echo $enrolledSubjects['courseID']; ?>"
@@ -234,7 +240,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                                 </div>
                                                                             </a>
                                                                         </div>
-                                                                        <?php
+                                                                <?php
                                                                     }
                                                                 }
                                                                 ?>
@@ -244,8 +250,8 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                         <button
                                                             class="scroll-btn right-scroll position-absolute me-2 top-50 end-0 translate-middle-y d-none d-md-block"
                                                             style="border:none;background:white;cursor:pointer;z-index:5;
-                   width:35px;height:35px;border-radius:50%;display:flex;align-items:center ;margin-top:-15px;
-                   justify-content:center;box-shadow:0 2px 4px rgba(0,0,0,0.15);">
+                                                                width:35px;height:35px;border-radius:50%;display:flex;align-items:center ;margin-top:-15px;
+                                                                justify-content:center;box-shadow:0 2px 4px rgba(0,0,0,0.15);">
                                                             <i class="fas fa-chevron-right"
                                                                 style="font-size:18px;color:var(--black);"></i>
                                                         </button>
@@ -263,10 +269,14 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                     <!-- Top Header  -->
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                                         <div class="d-flex align-items-center">
-                                                            <i class="fa-solid fa-bullhorn"
-                                                                style="color: var(--black); font-size: 20px; width: 26px; margin-right: 5px;"></i>
+                                                            <span class="material-symbols-outlined" style="color: var(--black); margin-right: 5px;">
+                                                                article
+                                                            </span>
                                                             <span>Recent Announcements</span>
                                                         </div>
+                                                        <span class="count-badge ms-2 text-sbold text-16">
+                                                            <?php echo mysqli_num_rows($selectAnnouncementsResult); ?>
+                                                        </span>
                                                     </div>
                                                     <!-- Scrollable Card List -->
                                                     <div
@@ -274,7 +284,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                         <?php
                                                         if (mysqli_num_rows($selectAnnouncementsResult) > 0) {
                                                             while ($announcements = mysqli_fetch_assoc($selectAnnouncementsResult)) {
-                                                                ?>
+                                                        ?>
                                                                 <!-- Card 1 -->
                                                                 <div class="card mb-3"
                                                                     style="border-radius: 12px; border: 1px solid rgba(44, 44, 44, 1); padding: 15px;">
@@ -318,15 +328,16 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                         </a>
                                                                     </div>
                                                                 </div>
-                                                                <?php
+                                                            <?php
                                                             }
                                                         } else {
                                                             ?>
-                                                            <div class="col-12 text-center">
-                                                                <p class="text-bold mb-0">Nothing new here.</p>
-                                                                <p class="text-reg">Announcements are all caught up.</p>
+                                                            <div class="col-12 text-center text-14">
+                                                                <img src="shared/assets/img/empty/announcements.png" alt="No Announcements" class="empty-state-img" style="width: 100px;">
+                                                                <p class="text-med mt-1 mb-0">Nothing new here.</p>
+                                                                <p class="text-reg mt-1">Announcements are all caught up.</p>
                                                             </div>
-                                                            <?php
+                                                        <?php
                                                         }
                                                         ?>
                                                     </div>
@@ -353,14 +364,21 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
 
                                                             <span>Upcoming</span>
                                                         </div>
-                                                        <div><?php if (mysqli_num_rows($selectAssessmentResult) > 0) {
-                                                            $emptyAssessment = false;
-                                                            $totalAssessments = mysqli_fetch_assoc($selectAssessmentResult);
-                                                            echo $totalAssessments['totalAssessments'];
-                                                        } else {
-                                                            $emptyAssessment = true;
-                                                        }
-                                                        ?></div>
+                                                        <div>
+                                                            <?php
+                                                            $totalAssessmentsCount = mysqli_num_rows($selectAssessmentResult);
+                                                            if ($totalAssessmentsCount > 0) {
+                                                                $emptyAssessment = false;
+                                                                $totalAssessments = mysqli_fetch_assoc($selectAssessmentResult);
+                                                            ?>
+                                                                <span class="count-badge ms-2 text-sbold text-16"><?php echo $totalAssessments['totalAssessments']; ?></span>
+                                                            <?php
+                                                            } else {
+                                                                $emptyAssessment = true;
+                                                            }
+                                                            ?>
+                                                        </div>
+
                                                     </div>
                                                     <!-- Scrollable course -->
                                                     <div
@@ -376,7 +394,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                 } elseif ($type === 'test') {
                                                                     $link = "test.php?testID=" . $activities['testID'];
                                                                 }
-                                                                ?>
+                                                        ?>
                                                                 <div class="todo-card d-flex align-items-stretch mb-2">
                                                                     <!-- Date -->
                                                                     <div
@@ -412,15 +430,16 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <?php
+                                                            <?php
                                                             }
                                                         } else {
                                                             ?>
-                                                            <div class="col-12 text-center">
-                                                                <p class="text-bold mb-0">You're on track.</p>
-                                                                <p class="text-reg mb-0">No new assessments ahead.</p>
+                                                            <div class="col-12 text-center text-14">
+                                                                <img src="shared/assets/img/empty/todo.png" alt="No Leaderboard" class="empty-state-img" style="width: 100px;">
+                                                                <p class="text-med mt-1 mb-0">You're on track.</p>
+                                                                <p class="text-reg mt-1">No new assessments ahead.</p>
                                                             </div>
-                                                            <?php
+                                                        <?php
                                                         }
                                                         ?>
 
@@ -449,22 +468,10 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                     <!-- Top Header -->
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                                         <div class="d-flex align-items-center">
-                                                            <i class="fa-solid fa-ranking-star"
-                                                                style="color: var(--black); font-size: 22px; width: 26px; margin-right: 10px;"></i>
+                                                            <span class="material-symbols-outlined" style="color: var(--black); margin-right: 10px;">
+                                                                leaderboard
+                                                            </span>
                                                             <span>Lederboard Rank</span>
-                                                        </div>
-                                                        <div class="d-flex align-items-center flex-nowrap">
-                                                            <button
-                                                                class="btn text-reg dropdown-toggle d-flex justify-content-between align-items-center fs-6 fs-lg-5 dropdown-custom"
-                                                                style="opacity: 1;" type="button" data-bs-toggle="dropdown"
-                                                                aria-expanded="false">
-                                                                <span class="text-reg text-14">Weekly</span>
-                                                            </button>
-                                                            <ul class="dropdown-menu">
-                                                                <li><a class="dropdown-item text-reg" href="#">Weekly</a></li>
-                                                                <li><a class="dropdown-item text-reg" href="#">All-time</a></li>
-                                                                </li>
-                                                            </ul>
                                                         </div>
                                                     </div>
                                                     <!-- Scrollable leaderboard -->
@@ -474,7 +481,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                         <?php
                                                         if (mysqli_num_rows($selectLeaderboardResult) > 0) {
                                                             while ($leaderboards = mysqli_fetch_assoc($selectLeaderboardResult)) {
-                                                                ?>
+                                                        ?>
                                                                 <div class="card custom-leaderboard-card">
                                                                     <div class="card-body p-4">
                                                                         <div style="display: inline-flex; align-items: center;">
@@ -508,15 +515,16 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <?php
+                                                            <?php
                                                             }
                                                         } else {
                                                             ?>
-                                                            <div class="col-12 text-center">
-                                                                <p class="text-bold mb-0">Leaderboard is empty.</p>
-                                                                <p class="text-reg">Start submitting tasks to earn scores.</p>
+                                                            <div class="col-12 text-center text-14">
+                                                                <img src="shared/assets/img/empty/leaderboard.png" alt="No Leaderboard" class="empty-state-img" style="width: 100px;">
+                                                                <p class="text-med mt-1 mb-0">Leaderboard is empty.</p>
+                                                                <p class="text-reg mt-1">Start submitting tasks to earn scores.</p>
                                                             </div>
-                                                            <?php
+                                                        <?php
                                                         }
                                                         ?>
                                                     </div>
@@ -524,7 +532,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                             </div>
                                         </div>
                                     </div>
-                                    <?php
+                            <?php
                                 }
                             } else {
                                 echo "<script>window.location.href = 'course-join.php';</script>";
@@ -555,11 +563,17 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
         scrollContainer.style.scrollBehavior = 'smooth';
 
         leftBtn.addEventListener('click', () => {
-            scrollContainer.scrollBy({ left: -200, behavior: 'smooth' });
+            scrollContainer.scrollBy({
+                left: -200,
+                behavior: 'smooth'
+            });
         });
 
         rightBtn.addEventListener('click', () => {
-            scrollContainer.scrollBy({ left: 200, behavior: 'smooth' });
+            scrollContainer.scrollBy({
+                left: 200,
+                behavior: 'smooth'
+            });
         });
 
         // Hide scrollbar visually

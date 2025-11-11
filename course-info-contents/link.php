@@ -88,12 +88,12 @@ mysqli_data_seek($fileResult, 0);
 <?php else: ?>
     <!-- No Files Placeholder -->
     <div class="empty-state text-center">
-        <img src="shared/assets/img/courseInfo/bookmark.png"
+        <img src="shared/assets/img/empty/files.png"
             alt="No Links"
             class="empty-state-img">
-        <div class="empty-state-text text-16 d-flex flex-column align-items-center">
-            <p class="text-med mb-0">No links yet.</p>
-            <p class="text-reg">Links from announcements and quests appear here.</p>
+        <div class="empty-state-text text-14 d-flex flex-column align-items-center">
+            <p class="text-med mt-1 mb-0">No links yet.</p>
+            <p class="text-reg mt-1">Links from announcements and quests appear here.</p>
         </div>
     </div>
 <?php endif; ?>
