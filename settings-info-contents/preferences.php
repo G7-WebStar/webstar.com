@@ -46,10 +46,9 @@ if (isset($_POST['save'])) {
 <div class="container">
     <form id="notificationForm" method="POST">
         <input type="hidden" name="activeTab" value="preferences">
-        <div class="row mb-3">
-            <div class="col-12 col-md-6 mb-2 d-flex align-items-center">
-                <div class="text-bold text-20 mb-0">Email Notification</div>
-                <button type="submit" name="save" id="saveBtn" class="btn rounded-5 text-reg text-12 ms-3"
+        <div class="row mb-3 mt-2">
+            <div class="col-12 col-md-6 mt-2 mb-4 d-flex align-items-center">
+                <button type="submit" name="save" id="saveBtn" class="btn rounded-5 text-reg text-12"
                     style="background-color: var(--primaryColor); border: 1px solid var(--black); display:none;">
                     Save changes
                 </button>

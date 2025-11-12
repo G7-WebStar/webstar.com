@@ -4,87 +4,105 @@ include('../shared/assets/database/connect.php');
 date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
 
+$mode = '';
+$announcementID = 0;
+
+if (isset($_GET['edit'])) {
+    $mode = 'edit';
+    $announcementID = intval($_GET['edit']);
+} elseif (isset($_GET['reuse'])) {
+    $mode = 'reuse';
+    $announcementID = intval($_GET['reuse']);
+}
+
 // Get all courses owned by this user
 $sql = "SELECT courseID, courseCode FROM courses WHERE userID = '$userID'";
 $courses = executeQuery($sql);
 
+// Save announcement query
 if (isset($_POST['save_announcement'])) {
-    $content = $_POST['announcement'];
+    $mode = $_POST['mode'] ?? 'new'; // new, reuse, or edit
+    $announcementID = intval($_POST['announcementID'] ?? 0); // used in edit mode
+    $content = mysqli_real_escape_string($conn, $_POST['announcement'] ?? '');
+    $links = $_POST['links'] ?? [];
+    $uploadedFiles = !empty($_FILES['materials']['name'][0]);
     $date = date("Y-m-d");
     $time = date("H:i:s");
     $isRequired = 0;
 
-    if (!empty($_POST['courses'])) {
-        foreach ($_POST['courses'] as $selectedCourseID) {
+    foreach ($_POST['courses'] ?? [] as $selectedCourseID) {
 
-            // Insert announcement
+        if ($mode === 'new' || $mode === 'reuse') {
+            // INSERT new announcement
             $insertAnnouncement = "INSERT INTO announcements 
                 (courseID, userID, announcementContent, announcementDate, announcementTime, isRequired) 
                 VALUES 
                 ('$selectedCourseID', '$userID', '$content', '$date', '$time', '$isRequired')";
             executeQuery($insertAnnouncement);
-
-            // Get the new announcementID
-            global $conn;
             $announcementID = mysqli_insert_id($conn);
 
-            // Handle file uploads
-            if (!empty($_FILES['materials']['name'][0])) {
-                $uploadDir = __DIR__ . "/../shared/assets/files/";
+        } elseif ($mode === 'edit') {
+            // UPDATE existing announcement
+            $updateAnnouncement = "UPDATE announcements 
+                SET courseID='$selectedCourseID', announcementContent='$content', announcementDate='$date', announcementTime='$time', isRequired='$isRequired'
+                WHERE announcementID='$announcementID'";
+            executeQuery($updateAnnouncement);
 
-                if (!is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
+            // Delete old files only if new files or links are provided
+            if ($uploadedFiles || !empty($links)) {
+                executeQuery("DELETE FROM files WHERE announcementID='$announcementID'");
+            }
+        }
 
-                foreach ($_FILES['materials']['name'] as $key => $fileName) {
-                    $tmpName = $_FILES['materials']['tmp_name'][$key];
-                    $fileError = $_FILES['materials']['error'][$key];
+        // --- Handle uploaded files ---
+        if ($uploadedFiles) {
+            $uploadDir = __DIR__ . "/../shared/assets/files/";
+            if (!is_dir($uploadDir))
+                mkdir($uploadDir, 0777, true);
 
-                    if ($fileError === UPLOAD_ERR_OK) {
-                        $safeName = str_replace(" ", "_", basename($fileName));
-                        $targetPath = $uploadDir . $safeName;
+            foreach ($_FILES['materials']['name'] as $key => $fileName) {
+                $tmpName = $_FILES['materials']['tmp_name'][$key];
+                $fileError = $_FILES['materials']['error'][$key];
 
-                        if (move_uploaded_file($tmpName, $targetPath)) {
-                            $insertFile = "INSERT INTO files 
-                                (courseID, userID, announcementID, fileAttachment, fileLink) 
-                                VALUES 
-                                ('$selectedCourseID', '$userID', '$announcementID', '$safeName', '')";
-                            executeQuery($insertFile);
-                        }
+                if ($fileError === UPLOAD_ERR_OK) {
+                    $safeName = str_replace(" ", "_", basename($fileName));
+                    $targetPath = $uploadDir . $safeName;
+
+                    if (move_uploaded_file($tmpName, $targetPath)) {
+                        $insertFile = "INSERT INTO files 
+                            (courseID, userID, announcementID, fileAttachment, fileLink) 
+                            VALUES 
+                            ('$selectedCourseID', '$userID', '$announcementID', '$safeName', '')";
+                        executeQuery($insertFile);
                     }
                 }
             }
+        }
 
-            // Handle file links
-            if (!empty($_POST['links'])) {
-                $links = $_POST['links'];
-                if (is_array($links)) {
-                    foreach ($links as $link) {
-                        $link = trim($link);
-                        if ($link !== '') {
-                            // Fetch link title using get_meta_tags
-                            $title = '';
-                            $metaTags = @get_meta_tags($link);
-                            if (!empty($metaTags['title'])) {
-                                $title = $metaTags['title'];
-                            } else {
-                                // If get_meta_tags doesn't have title, try fetching it manually
-                                $html = @file_get_contents($link);
-                                if ($html) {
-                                    if (preg_match("/<title>(.*?)<\/title>/i", $html, $matches)) {
-                                        $title = $matches[1];
-                                    }
-                                }
-                            }
+        // --- Handle link files ---
+        if (!empty($links)) {
+            foreach ($links as $link) {
+                $link = trim($link);
+                if ($link === '')
+                    continue;
 
-                            $insertLink = "INSERT INTO files 
-                            (courseID, userID, announcementID, fileAttachment, fileTitle, fileLink) 
-                            VALUES 
-                            ('$selectedCourseID', '$userID', '$announcementID', '', '$title', '$link')";
-                            executeQuery($insertLink);
-                        }
+                $fileTitle = $link;
+                $context = stream_context_create(["http" => ["header" => "User-Agent: Mozilla/5.0"]]);
+                $html = @file_get_contents($link, false, $context);
+
+                if ($html !== false) {
+                    if (preg_match('/<meta property="og:title" content="([^"]+)"/i', $html, $matches)) {
+                        $fileTitle = $matches[1];
+                    } elseif (preg_match("/<title>(.*?)<\/title>/i", $html, $matches)) {
+                        $fileTitle = $matches[1];
                     }
                 }
+
+                $insertLink = "INSERT INTO files 
+                    (courseID, userID, announcementID, fileAttachment, fileTitle, fileLink) 
+                    VALUES 
+                    ('$selectedCourseID', '$userID', '$announcementID', '', '" . mysqli_real_escape_string($conn, $fileTitle) . "', '$link')";
+                executeQuery($insertLink);
             }
         }
     }
@@ -113,6 +131,91 @@ if (isset($_GET['fetchTitle'])) {
     exit;
 }
 
+// Selecting Announcements made by the Instructor logged in
+$announcementQuery = "
+    SELECT 
+        ann.announcementID,
+        ann.announcementContent,
+        ann.announcementDate,
+        ann.announcementTime,
+        ann.isRequired,
+        c.courseCode
+    FROM announcements ann
+    JOIN courses c ON ann.courseID = c.courseID
+    WHERE c.userID = '$userID'
+    ORDER BY ann.announcementDate DESC, ann.announcementTime DESC
+";
+
+$announcements = executeQuery($announcementQuery);
+
+// Storing reused data
+$reusedData = null;
+
+// If the instructor chose to reuse or edit an announcement
+if (isset($_GET['reuse']) || isset($_GET['edit'])) {
+    $reuseID = isset($_GET['reuse']) ? intval($_GET['reuse']) : intval($_GET['edit']);
+
+    // Get announcement data
+    $reuseQuery = "
+        SELECT 
+            an.announcementContent,
+            an.announcementDate,
+            an.announcementTime,
+            an.isRequired,
+            crs.courseID,
+            crs.courseCode,
+            f.fileID,
+            f.fileAttachment,
+            f.fileTitle,
+            f.fileLink
+        FROM announcements an
+        JOIN courses crs ON an.courseID = crs.courseID
+        JOIN users u ON crs.userID = u.userID
+        LEFT JOIN files f ON an.announcementID = f.announcementID
+        WHERE an.announcementID = '$reuseID'
+          AND u.userID = '$userID'
+    ";
+
+    $reuseResult = executeQuery($reuseQuery);
+    if ($reuseResult && $reuseResult->num_rows > 0) {
+        $reusedData = [];
+        while ($row = $reuseResult->fetch_assoc()) {
+            $reusedData[] = $row; // store all file rows
+        }
+    } else {
+        // Invalid or unauthorized reuse/edit attempt
+        header("Location: post-announcement.php");
+        exit();
+    }
+}
+
+if (!empty($reusedData)) {
+    // Populate main fields for reuse/edit
+    $mainData = [
+        'announcementContent' => $reusedData[0]['announcementContent'],
+        'announcementDate' => $reusedData[0]['announcementDate'],
+        'announcementTime' => $reusedData[0]['announcementTime'],
+        'isRequired' => $reusedData[0]['isRequired']
+    ];
+
+    // Collect attached files/links
+    $files = [];
+    $selectedCourses = []; // for pre-checking the courses
+    foreach ($reusedData as $row) {
+        if (!empty($row['fileID'])) {
+            $files[] = [
+                'fileID' => $row['fileID'],
+                'fileTitle' => $row['fileTitle'],
+                'fileAttachment' => $row['fileAttachment'],
+                'fileLink' => $row['fileLink']
+            ];
+        }
+        if (!in_array($row['courseID'], $selectedCourses)) {
+            $selectedCourses[] = $row['courseID'];
+        }
+    }
+}
+
 ?>
 
 <!doctype html>
@@ -121,7 +224,12 @@ if (isset($_GET['fetchTitle'])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | Post Announcement</title>
+    <title>
+        <?php
+        echo isset($_GET['reuse']) ? 'Repost Announcement' : (isset($_GET['edit']) ? 'Edit Announcement' : 'Post Announcement');
+        ?> ✦ Webstar
+    </title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="../shared/assets/css/global-styles.css">
@@ -138,7 +246,43 @@ if (isset($_GET['fetchTitle'])) {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
-    
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet" />
+
+    <style>
+        /* Change font for text typed inside the Quill editor */
+        .ql-editor {
+            font-family: 'Regular', sans-serif;
+            letter-spacing: -0.03em;
+            color: var(--black);
+            font-size: 16px;
+            /* optional */
+        }
+
+        .ql-editor {
+            padding: 12px 16px;
+            /* customize as you like */
+        }
+
+        .ql-editor::before {
+            padding: 12px 16px;
+        }
+
+        .ql-editor::before {
+            font-family: inherit;
+            /* use same font as the text */
+            font-size: inherit;
+            /* same size as the text */
+            line-height: inherit;
+            /* align vertically */
+            padding: 1px 1px;
+            /* match .ql-editor padding */
+            opacity: 1;
+            /* ensure visibility */
+        }
+    </style>
+
+
 </head>
 
 <body>
@@ -162,29 +306,58 @@ if (isset($_GET['fetchTitle'])) {
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
                     <div class="container-fluid py-3 overflow-y-auto row-padding-top">
-                        <div class="row">
+                        <div class="create-prof-row">
                             <div class="col-12">
                                 <!-- Header -->
                                 <div class="row mb-3 align-items-center">
-                                    <div class="col-auto">
-                                        <a href="#" class="text-decoration-none">
+
+                                    <!-- Back Arrow -->
+                                    <div class="col-auto d-none d-md-block">
+                                        <a href="javascript:history.back()" class="text-decoration-none">
                                             <i class="fa-solid fa-arrow-left text-reg text-16"
                                                 style="color: var(--black);"></i>
                                         </a>
                                     </div>
+
+                                    <!-- Page Title -->
                                     <div class="col text-center text-md-start">
-                                        <span class="text-sbold text-25">Post Announcement</span>
+                                        <span class="text-sbold text-20"><?php
+                                        if (isset($_GET['edit'])) {
+                                            echo 'Edit Announcement';
+                                        } elseif (isset($_GET['reuse'])) {
+                                            echo 'Repost Announcement';
+                                        } else {
+                                            echo 'Post Announcement';
+                                        }
+                                        ?></span>
+                                    </div>
+
+                                    <!-- Assign Existing Task Button -->
+                                    <div
+                                        class="col-12 col-md-auto text-center d-flex d-md-block justify-content-center justify-content-md-end mt-3 mt-md-0">
+                                        <button type="button"
+                                            class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 my-1 d-flex align-items-center gap-2"
+                                            style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);"
+                                            data-bs-toggle="modal" data-bs-target="#reuseTaskModal">
+                                            <span class="material-symbols-rounded"
+                                                style="font-size:16px">campaign</span>
+                                            <span>Post an existing announcement</span>
+                                        </button>
                                     </div>
                                 </div>
 
                                 <!-- Form starts -->
                                 <form action="" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="mode"
+                                        value="<?= isset($_GET['edit']) ? 'edit' : (isset($_GET['reuse']) ? 'reuse' : 'new') ?>">
+                                    <input type="hidden" name="announcementID"
+                                        value="<?= $_GET['edit'] ?? $_GET['reuse'] ?? '' ?>">
                                     <!-- Rich Text Editor -->
-                                    <div class="row">
+                                    <div class="row pt-4">
                                         <div class="col-12 mb-3">
                                             <div class="editor-wrapper">
                                                 <div id="editor"></div>
-                                                <div id="toolbar" class="row align-items-center p-2 p-md-4 g-2 g-md-5">
+                                                <div id="toolbar" class="row align-items-center p-3 p-md-3 g-2 g-md-5">
                                                     <div
                                                         class="col d-flex align-items-center px-2 px-md-4 gap-1 gap-md-3">
                                                         <button class="ql-bold"></button>
@@ -192,7 +365,7 @@ if (isset($_GET['fetchTitle'])) {
                                                         <button class="ql-underline"></button>
                                                         <button class="ql-list" value="bullet"></button>
                                                         <span id="word-counter"
-                                                            class="ms-auto text-muted text-med text-16">0/120</span>
+                                                            class="ms-auto text-muted text-med text-16 me-2">0/120</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -205,90 +378,140 @@ if (isset($_GET['fetchTitle'])) {
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="learning-materials">
-                                                <label class="text-med text-16 mt-4">Attachments</label>
-                                                <span class="fst-italic text-reg text-14 ms-2">You can add up to 10
-                                                    files or links.</span>
+                                                <div class="d-flex align-items-center mt-4 mb-0 mb-md-2">
+                                                    <label class="text-med text-16">Attachments</label>
+                                                    <!-- For desktop -->
+                                                    <span class="material-symbols-outlined ms-3 me-1 d-none d-md-block"
+                                                        style="font-size:16px">
+                                                        info
+                                                    </span>
+                                                    <span class="text-reg text-14 d-none d-md-block">You can add up to
+                                                        10
+                                                        files or links.</span>
+                                                </div>
+                                                <!-- For mobile -->
+                                                <div class="d-block d-md-none d-flex align-items-center mb-2">
+                                                    <span class="material-symbols-outlined me-1" style="font-size:16px">
+                                                        info
+                                                    </span>
+                                                    <span class="text-reg text-14">You can add up to 10
+                                                        files or links.</span>
+                                                </div>
 
                                                 <!-- Container for dynamically added file & link cards -->
-                                                <div id="filePreviewContainer" class="row mb-0 mt-3"></div>
+                                                <div id="filePreviewContainer" class="row mb-0"></div>
 
                                                 <!-- Upload buttons -->
-                                                <div class="mt-3 mb-4 text-center text-md-start">
+                                                <div class="mt-0 mb-4 text-start ">
                                                     <input type="file" name="materials[]" class="d-none" id="fileUpload"
                                                         multiple>
                                                     <button type="button"
-                                                        class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-2 ms-2"
+                                                        class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-1"
                                                         style="background-color: var(--primaryColor); border: 1px solid var(--black);"
                                                         onclick="document.getElementById('fileUpload').click();">
-                                                        <img src="../shared/assets/img/upload.png" alt="Upload Icon"
-                                                            style="width:12px; height:14px;" class="me-1">
-                                                        File
+                                                        <div style="display: flex; align-items: center; gap: 5px;">
+                                                            <span class="material-symbols-rounded"
+                                                                style="font-size:16px">upload</span>
+                                                            <span>Upload</span>
+                                                        </div>
                                                     </button>
 
                                                     <button type="button"
-                                                        class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-2 ms-2"
+                                                        class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 ms-2 mt-1"
                                                         style="background-color: var(--primaryColor); border: 1px solid var(--black);"
                                                         data-bs-container="body" data-bs-toggle="popover"
                                                         data-bs-placement="right" data-bs-html="true"
-                                                        data-bs-content='<div class="form-floating mb-3"><input type="url" class="form-control" id="linkInput" placeholder="Paste link here"><label for="linkInput">Link</label></div><div class="link-popover-actions"><button type="button" class="btn btn-sm px-3 py-1 rounded-pill" id="addLinkBtn" style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);">Add link</button></div>'>
-                                                        <img src="../shared/assets/img/link.png" alt="Upload Icon"
-                                                            class="me-1">
-                                                        Link
+                                                        data-bs-content='<div class="form-floating mb-3 text-reg"><input type="url" class="form-control text-reg" id="linkInput" placeholder="Paste link here"><label for="linkInput">Link</label></div><div class="link-popover-actions"><button type="button" class="btn btn-sm px-3 py-1 rounded-pill text-reg" id="addLinkBtn" style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);">Add link</button></div>'>
+                                                        <div style="display: flex; align-items: center; gap: 5px;">
+                                                            <span class="material-symbols-rounded"
+                                                                style="font-size:20px">link</span>
+                                                            <span>Link</span>
+                                                        </div>
                                                     </button>
 
                                                     <!-- Hidden input to store added links -->
-                                                    <input type="hidden" name="links[]" id="announcementLinks">
+                                                    <input type="hidden" name="links[]" id="taskLinks">
                                                 </div>
                                             </div>
 
                                             <!-- Course selection + Post button -->
-                                            <div class="row align-items-center mb-5 text-center text-md-start">
-                                                <div
-                                                    class="col-12 col-md-auto mt-3 d-flex justify-content-center justify-content-md-start">
-                                                    <div class="d-flex align-items-center flex-nowrap">
-                                                        <span class="me-2 text-med text-16 pe-3">Add to Course</span>
-                                                        <button
-                                                            class="btn dropdown-toggle dropdown-shape text-med text-16 me-md-5"
-                                                            type="button" data-bs-toggle="dropdown"
-                                                            aria-expanded="false">
-                                                            <span>Select Course</span>
-                                                        </button>
-                                                        <ul class="dropdown-menu p-2" style="min-width: 200px;">
-                                                            <?php
-                                                            if ($courses && $courses->num_rows > 0) {
-                                                                while ($course = $courses->fetch_assoc()) {
-                                                                    ?>
-                                                                    <li>
-                                                                        <div class="form-check">
-                                                                            <input class="form-check-input course-checkbox"
-                                                                                type="checkbox" name="courses[]"
-                                                                                value="<?php echo $course['courseID']; ?>"
-                                                                                id="course<?php echo $course['courseID']; ?>">
-                                                                            <label class="form-check-label text-reg"
-                                                                                for="course<?php echo $course['courseID']; ?>">
-                                                                                <?php echo $course['courseCode']; ?>
-                                                                            </label>
-                                                                        </div>
-                                                                    </li>
-                                                                    <?php
-                                                                }
-                                                            } else {
-                                                                ?>
-                                                                <li><span class="dropdown-item-text text-muted">No courses
-                                                                        found</span></li>
+                                            <div class="row align-items-center justify-content-between text-center text-md-start mt-5"
+                                                style="margin-bottom: <?php echo ($courses && $courses->num_rows > 0) ? ($courses->num_rows * 50) : 0; ?>px;">
+                                                <!-- Dynamic Border Bottom based on the number of courses hehe -->
+                                                <!-- Add to Course -->
+                                                <?php if (!isset($_GET['edit'])): ?>
+                                                    <div
+                                                        class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center flex-nowrap justify-content-center justify-content-md-start">
+                                                        <span class="me-2 text-med text-16 pe-3">Add to
+                                                            Course</span>
+                                                        <div class="dropdown">
+                                                            <button
+                                                                class="btn dropdown-toggle dropdown-shape text-med text-16 me-md-5"
+                                                                type="button" data-bs-toggle="dropdown"
+                                                                aria-expanded="false">
+                                                                <span class="me-2">Select Course</span>
+                                                            </button>
+                                                            <ul class="dropdown-menu p-2 mt-2"
+                                                                style="min-width: 200px; border: 1px solid var(--black);">
                                                                 <?php
-                                                            }
-                                                            ?>
-                                                        </ul>
+                                                                if ($courses && $courses->num_rows > 0) {
+                                                                    // If editing, get the assigned courses for this task
+                                                                    $assignedCourseIDs = [];
+                                                                    if (isset($_GET['edit'])) {
+                                                                        $editID = intval($_GET['edit']);
+                                                                        $assignedQuery = "SELECT courseID FROM announcements WHERE announcementID = '$editID'";
+                                                                        $assignedResult = executeQuery($assignedQuery);
+                                                                        if ($assignedResult && $assignedResult->num_rows > 0) {
+                                                                            while ($row = $assignedResult->fetch_assoc()) {
+                                                                                $assignedCourseIDs[] = $row['courseID'];
+                                                                            }
+                                                                        }
+                                                                    }
+
+                                                                    while ($course = $courses->fetch_assoc()) {
+                                                                        $checked = in_array($course['courseID'], $assignedCourseIDs) ? 'checked' : '';
+                                                                        ?>
+                                                                        <li>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input course-checkbox"
+                                                                                    type="checkbox" name="courses[]"
+                                                                                    style="border: 1px solid var(--black);"
+                                                                                    value="<?= $course['courseID'] ?>"
+                                                                                    id="course<?= $course['courseID'] ?>"
+                                                                                    <?= $checked ?>>
+                                                                                <label class="form-check-label text-reg"
+                                                                                    for="course<?= $course['courseID'] ?>">
+                                                                                    <?= $course['courseCode'] ?>
+                                                                                </label>
+                                                                            </div>
+                                                                        </li>
+                                                                    <?php }
+                                                                } else { ?>
+                                                                    <li><span class="dropdown-item-text text-muted">No
+                                                                            courses found</span></li>
+                                                                <?php } ?>
+                                                            </ul>
+
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <!-- Post Button -->
-                                                <div class="col-md-6 text-center text-md-center mt-3 mt-md-0 ms-md-5">
+                                                <?php endif; ?>
+
+                                                <!-- Assign Button -->
+                                                <div class="col-12 col-md-auto mt-3 mt-md-0 text-center">
                                                     <button type="submit" name="save_announcement"
-                                                        class="px-4 py-2 rounded-pill text-sbold text-md-14 mt-3 ms-3"
+                                                        class="px-4 py-2 rounded-pill text-sbold text-md-14 mt-4 mt-md-0"
                                                         style="background-color: var(--primaryColor); border: 1px solid var(--black);">
-                                                        Post
+                                                        <?php
+                                                        if (isset($_GET['edit'])) {
+                                                            echo 'Save Changes';
+                                                        } elseif (isset($_GET['reuse'])) {
+                                                            echo 'Repost';
+                                                        } else {
+                                                            echo 'Post';
+                                                        }
+                                                        ?>
                                                     </button>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -297,6 +520,70 @@ if (isset($_GET['fetchTitle'])) {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Reuse Announcement Modal -->
+    <div class="modal fade" id="reuseTaskModal" tabindex="-1" aria-labelledby="reuseTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered py-4 " style="max-width: 700px;  height: 80vh">
+            <div class="modal-content d-flex flex-column" style="height: 100%;">
+
+                <!-- HEADER -->
+                <div class="modal-header flex-shrink-0">
+                    <div class="modal-title text-sbold text-20 ms-3" id="selectRubricModalLabel">Post an existing
+                        announcement
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        style="transform: scale(0.8); filter: grayscale(100%);"></button>
+                </div>
+
+                <!-- DESC -->
+                <div class="modal-body flex-grow-1 overflow-auto">
+                    <p class="mb-3 text-med text-14 mx-3" style="color: var(--black);">
+                        Select an announcement you’ve previously created to reuse its content. You can review and edit
+                        the
+                        text or settings before posting it again.
+                    </p>
+                    <div class="col p-0 m-3">
+                        <div class="card rounded-3 mb-2 border-0">
+                            <div class="card-body p-0">
+                                <!-- OPTIONS -->
+                                <?php if ($announcements && $announcements->num_rows > 0) {
+                                    while ($announcement = $announcements->fetch_assoc()) {
+                                        ?>
+                                        <div class="rubric-option rounded-3 d-flex align-items-center justify-content-between mb-2 w-100"
+                                            style="cursor: pointer; background-color: var(--pureWhite); border: 1px solid var(--black);"
+                                            onclick='window.location.href="post-announcement.php?reuse=<?php echo $announcement["announcementID"]; ?>"'>
+                                            <div style="line-height: 1.5; padding:10px 15px;">
+                                                <div class="text-sbold text-14"
+                                                    style="display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;">
+                                                    <?php echo htmlspecialchars(substr($announcement['announcementContent'], 0, 100)); ?>
+                                                </div>
+                                                <div class="text-med text-muted text-12"
+                                                    style="display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;">
+                                                    <?php
+                                                    echo date('F j, Y g:i A', strtotime($announcement['announcementDate'] . ' ' . $announcement['announcementTime']))
+                                                        . ' · ' . $announcement['courseCode'];
+                                                    ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <?php
+                                    }
+                                } else {
+                                    ?>
+                                    <div class="text-muted text-reg text-14 py-2">No existing announcements found.</div>
+                                    <?php
+                                }
+                                ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="modal-footer border-top flex-shrink-0 py-4">
                 </div>
             </div>
         </div>
@@ -320,6 +607,10 @@ if (isset($_GET['fetchTitle'])) {
             placeholder: 'Announce something to your class ',
             modules: { toolbar: '#toolbar' }
         });
+
+        <?php if (isset($reusedData)) { ?>
+            quill.root.innerHTML = <?php echo json_encode($mainData['announcementContent']); ?>;
+        <?php } ?>
 
         // Word counter
         const maxWords = 120;
@@ -502,6 +793,101 @@ if (isset($_GET['fetchTitle'])) {
             });
         });
     </script>
+
+    <?php if (!empty($files)): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const container = document.getElementById('filePreviewContainer');
+                if (!container) return;
+
+                <?php foreach ($files as $file): ?>
+                    <?php if (!empty($file['fileLink'])): ?>
+                            // Render Link Preview
+                            (function () {
+                                const linkValue = <?php echo json_encode($file['fileLink']); ?>;
+                                const uniqueID = Date.now() + Math.floor(Math.random() * 1000);
+                                try {
+                                    const urlObj = new URL(linkValue);
+                                    const domain = urlObj.hostname;
+                                    const faviconURL = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
+                                    const html = `
+                        <div class="col-12 my-1" data-id="${uniqueID}">
+                            <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
+                                <div class="d-flex w-100 align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center flex-grow-1">
+                                        <div class="mx-3 d-flex align-items-center">
+                                            <img src="${faviconURL}" alt="${domain} Icon"
+                                                onerror="this.onerror=null;this.src='../shared/assets/img/web.png';"
+                                                style="width: 30px; height: 30px;">
+                                        </div>
+                                        <div>
+                                            <div id="title-${uniqueID}" class="text-sbold text-16" style="line-height: 1.5;"><?= htmlspecialchars($file['fileTitle']) ?></div>
+                                            <div class="text-reg text-12 text-break" style="line-height: 1.5;">
+                                                <a href="${linkValue}" target="_blank">${linkValue}</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="links[]" value="${linkValue}" class="link-hidden">
+                        </div>`;
+                                    container.insertAdjacentHTML('beforeend', html);
+                                } catch (e) { }
+                            })();
+                    <?php elseif (!empty($file['fileAttachment'])): ?>
+                            // Render File Preview
+                            (function () {
+                                const fileName = <?php echo json_encode($file['fileTitle'] ?: basename($file['fileAttachment'])); ?>;
+                                const ext = fileName.split('.').pop().toUpperCase();
+                                const uniqueID = Date.now() + Math.floor(Math.random() * 1000);
+                                <?php
+                                $filePath = "../shared/assets/files/" . $file['fileAttachment'];
+                                $fileExt = strtoupper(pathinfo($file['fileAttachment'], PATHINFO_EXTENSION));
+                                $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
+                                $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
+                                ?>
+
+                                const html = `
+                    <div class="col-12 my-1 file-preview">
+                        <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
+                            <div class="d-flex w-100 align-items-center justify-content-between">
+                                <div class="d-flex align-items-center flex-grow-1">
+                                    <div class="mx-3 d-flex align-items-center">
+                                        <span class="material-symbols-rounded">description</span>
+                                    </div>
+                                    <div>
+                                        <div class="text-sbold text-16" style="line-height: 1.5;"><?= htmlspecialchars($file['fileAttachment']) ?></div>
+                                        <div class="text-reg text-12" style="line-height: 1.5;">
+    <?= $fileExt ?> · <?= $fileSizeMB ?>
+</div>
+
+                                    </div>
+                                </div>
+                                <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">
+                                    <span class="material-symbols-outlined">close</span>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="existingFiles[]" value="<?php echo htmlspecialchars($file['fileAttachment']); ?>">
+                    </div>`;
+                                container.insertAdjacentHTML('beforeend', html);
+                            })();
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            });
+            //  Enable delete buttons for preloaded (reused) items
+            document.addEventListener('click', function (event) {
+                if (event.target.closest('.delete-file')) {
+                    const col = event.target.closest('.col-12');
+                    if (col) col.remove();
+                }
+            });
+
+        </script>
+    <?php endif; ?>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>

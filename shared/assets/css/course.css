@@ -1,7 +1,7 @@
 /* Search Container */
 .search-container {
     position: relative;
-    width: 90%;
+    width: 100%;
 }
 
 .search-container input {
@@ -68,7 +68,7 @@
 
 @media screen and (max-width: 991px) {
     .search-container {
-        width: 100% !important;
+        width: 80% !important;
     }
 
     .text-md-14 {
@@ -88,6 +88,41 @@
 
 @media screen and (max-width: 575px) {
     .search-container {
-        width: 100% !important;
+        width: 75% !important;
     }
+}
+
+/* Small screens: <576px (mobile) */
+@media (max-width: 575.98px) {
+  .course-image {
+    height: 250px!important;
+  }
+}
+
+/* Medium screens: ≥576px and <992px (tablet) */
+@media (min-width: 576px) and (max-width: 991.98px) {
+  .course-image {
+    height: 150px!important;
+  }
+}
+
+/* Large screens (≥992px) */
+@media (min-width: 992px) {
+  .course-image {
+    height: 150px!important;
+  }
+}
+
+/* Extra Large screens (≥1200px) */
+@media (min-width: 1200px) {
+  .course-image {
+    height: 150px!important;
+  }
+}
+
+/* XXL screens (≥1400px) */
+@media (min-width: 1400px) {
+  .course-image {
+    height: 200px!important;
+  }
 }

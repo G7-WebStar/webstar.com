@@ -303,9 +303,6 @@ $selectInboxResult = executeQuery($selectInboxQuery);
         });
     </script>
 
-
-
-
     <!-- Dropdown js -->
     <script>
         document.querySelectorAll('.custom-dropdown').forEach(dropdown => {

@@ -292,7 +292,7 @@ if (isset($_POST['buyItem'])) {
                                                             href="#color-themes">Color
                                                             Themes</a>
                                                     </li>
-                                                    <li class="nav-item">
+                                                    <li class="nav-item" style="margin-right: 0px!important;">
                                                         <a class="nav-link text-14 <?php echo ($activeTab == 'my-items') ? 'active' : ''; ?>"
                                                             data-bs-toggle="tab" data-label="my-items"
                                                             href="#my-items">My Items</a>
