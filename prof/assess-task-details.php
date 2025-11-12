@@ -9,10 +9,15 @@ if (!isset($_GET['assessmentID'])) {
 
 $assessmentID = $_GET['assessmentID'];
 
+if ($assessmentID == null) {
+    echo "Assessment ID is missing in the URL.";
+    exit;
+}
+
 $selectAssignmentQuery = "SELECT * FROM assignments WHERE assessmentID = '$assessmentID'";
 $selectAssignmentResult = executeQuery($selectAssignmentQuery);
 
-$selectAssessmentQuery = "SELECT assessmentTitle, DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline, type
+$selectAssessmentQuery = "SELECT assessmentTitle, DATE_FORMAT(deadline, '%b %e') AS assessmentDeadline, type, DATE_FORMAT(createdAt, '%b %e, %Y %l:%i %p') AS creationDate
                           FROM assessments WHERE assessmentID = '$assessmentID'";
 $selectAssessmentResult = executeQuery($selectAssessmentQuery);
 
@@ -44,6 +49,9 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
         $linksArray = array_merge($linksArray, $links);
     }
 }
+
+$profInfoQuery = "SELECT * FROM userInfo WHERE userID = '$userID'";
+$profInfoResult = executeQuery($profInfoQuery);
 ?>
 
 <!doctype html>
@@ -159,7 +167,7 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
                                                                 role="tab">Task Details</a>
                                                         </li>
                                                         <li class="nav-item">
-                                                            <a class="nav-link" id="lessons-tab" href="assess-submissions.php" role="tab">Submissions</a>
+                                                            <a class="nav-link" id="lessons-tab" href="assess-submissions.php?assessmentID=<?php echo $assessmentID; ?>" role="tab">Submissions</a>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -229,19 +237,37 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
                                                             <?php endforeach; ?>
 
                                                             <hr>
+                                                            <?php
+                                                            if (mysqli_num_rows($profInfoResult) > 0) {
+                                                                while ($prof = mysqli_fetch_assoc($profInfoResult)) {
 
-                                                            <div class="text-sbold text-14 pb-3">Prepared by</div>
-                                                            <div class="d-flex align-items-center pb-5">
-                                                                <div class="rounded-circle me-2"
-                                                                    style="width: 50px; height: 50px; background-color: var(--highlight75);">
-                                                                    <img src="../shared/assets/img/assess/prof.png" alt="professor"
-                                                                        class="rounded-circle" style="width:50px;height:50px;">
-                                                                </div>
-                                                                <div>
-                                                                    <div class="text-sbold text-14">Prof. Jane Smith</div>
-                                                                    <div class="text-med text-12">January 12, 2024 8:00AM</div>
-                                                                </div>
-                                                            </div>
+
+                                                            ?>
+                                                                    <div class="text-sbold text-14 pb-3">Prepared by</div>
+                                                                    <div class="d-flex align-items-center pb-5">
+                                                                        <div class="rounded-circle me-2"
+                                                                            style="width: 50px; height: 50px; background-color: var(--highlight75);">
+                                                                            <img src="../shared/assets/img/assess/prof.png" alt="professor"
+                                                                                class="rounded-circle" style="width:50px;height:50px;">
+                                                                        </div>
+                                                                        <div>
+                                                                            <div class="text-sbold text-14">Prof. <?php echo $prof['firstName'] . " " . $prof['middleName'] . " " . $prof['lastName']; ?></div>
+                                                                    <?php
+                                                                }
+                                                            }
+                                                                    ?>
+                                                                    <?php
+                                                                    if (mysqli_num_rows($selectAssessmentResult) > 0) {
+                                                                        mysqli_data_seek($selectAssessmentResult, 0);
+                                                                        while ($createdAt = mysqli_fetch_assoc($selectAssessmentResult)) {
+                                                                    ?>
+                                                                            <div class="text-med text-12"><?php echo $createdAt['creationDate']; ?></div>
+                                                                    <?php
+                                                                        }
+                                                                    }
+                                                                    ?>
+                                                                        </div>
+                                                                    </div>
                                                         </div>
 
                                                         <!-- Submissions Tab - Disabled -->

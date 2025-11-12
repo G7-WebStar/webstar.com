@@ -1,6 +1,18 @@
 <?php
 include("../shared/assets/database/connect.php");
 include("../shared/assets/processes/prof-session-process.php");
+
+if (!isset($_GET['assessmentID'])) {
+    echo "Assessment ID is missing in the URL.";
+    exit;
+}
+
+$assessmentID = $_GET['assessmentID'];
+
+if ($assessmentID == null) {
+    echo "Assessment ID is missing in the URL.";
+    exit;
+}
 ?>
 
 <!doctype html>
@@ -95,7 +107,7 @@ include("../shared/assets/processes/prof-session-process.php");
                                                     <ul class="nav nav-tabs custom-nav-tabs mb-3 flex-nowrap" id="myTab"
                                                         role="tablist">
                                                         <li class="nav-item">
-                                                            <a class="nav-link" id="announcements-tab" href="assess-task-details.php" role="tab">Task Details</a>
+                                                            <a class="nav-link" id="announcements-tab" href="assess-task-details.php?assessmentID=<?php echo $assessmentID; ?>" role="tab">Task Details</a>
                                                         </li>
                                                         <li class="nav-item">
                                                             <a class="nav-link active" id="lessons-tab" data-bs-toggle="tab"
@@ -127,74 +139,74 @@ include("../shared/assets/processes/prof-session-process.php");
                                                             <li><a class="dropdown-item text-reg" href="#">Other courses</a>
                                                             </li>
                                                         </ul>
-                                                         <button class="btn btn-action btn-return-all">
-                                                                <img src="../shared/assets/img/assess/assignment.png"
-                                                                    alt="Assess Icon"
-                                                                    style="width: 18px; height: 18px; margin-right: 5px; object-fit: contain;">Return All
-                                                            </button>
+                                                        <button class="btn btn-action btn-return-all">
+                                                            <img src="../shared/assets/img/assess/assignment.png"
+                                                                alt="Assess Icon"
+                                                                style="width: 18px; height: 18px; margin-right: 5px; object-fit: contain;">Return All
+                                                        </button>
                                                     </div>
-                                                    
+
                                                     <!-- Submissions List -->
                                                     <div class="submissions-list mt-4">
-                                                <div class="submission-item d-flex align-items-center py-3 border-bottom">
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
-                                                            <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                                                        <div class="submission-item d-flex align-items-center py-3 border-bottom">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
+                                                                    <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                                                                </div>
+                                                                <span class="text-sbold text-16">Christian James D. Torrillo</span>
+                                                            </div>
+                                                            <div class="flex-grow-1 d-flex justify-content-center">
+                                                                <span class="badge badge-pending">Pending</span>
+                                                            </div>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="../shared/assets/img/assess/arrow.png" alt="Arrow" style="width: 20px; height: 20px;">
+                                                            </div>
                                                         </div>
-                                                        <span class="text-sbold text-16">Christian James D. Torrillo</span>
-                                                    </div>
-                                                    <div class="flex-grow-1 d-flex justify-content-center">
-                                                        <span class="badge badge-pending">Pending</span>
-                                                    </div>
-                                                    <div class="d-flex align-items-center">
-                                                        <img src="../shared/assets/img/assess/arrow.png" alt="Arrow" style="width: 20px; height: 20px;">
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="submission-item d-flex align-items-center py-3 border-bottom">
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
-                                                            <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+
+                                                        <div class="submission-item d-flex align-items-center py-3 border-bottom">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
+                                                                    <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                                                                </div>
+                                                                <span class="text-sbold text-16">Christian James D. Torrillo</span>
+                                                            </div>
+                                                            <div class="flex-grow-1 d-flex justify-content-center">
+                                                                <span class="badge badge-submitted">Submitted</span>
+                                                            </div>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="../shared/assets/img/assess/arrow.png" alt="Arrow" style="width: 20px; height: 20px;">
+                                                            </div>
                                                         </div>
-                                                        <span class="text-sbold text-16">Christian James D. Torrillo</span>
-                                                    </div>
-                                                    <div class="flex-grow-1 d-flex justify-content-center">
-                                                        <span class="badge badge-submitted">Submitted</span>
-                                                    </div>
-                                                    <div class="d-flex align-items-center">
-                                                        <img src="../shared/assets/img/assess/arrow.png" alt="Arrow" style="width: 20px; height: 20px;">
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="submission-item d-flex align-items-center py-3 border-bottom">
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
-                                                            <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+
+                                                        <div class="submission-item d-flex align-items-center py-3 border-bottom">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
+                                                                    <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                                                                </div>
+                                                                <span class="text-sbold text-16">Christian James D. Torrillo</span>
+                                                            </div>
+                                                            <div class="flex-grow-1 d-flex justify-content-center">
+                                                                <span class="badge badge-missing">Missing</span>
+                                                            </div>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="../shared/assets/img/assess/arrow.png" alt="Arrow" style="width: 20px; height: 20px;">
+                                                            </div>
                                                         </div>
-                                                        <span class="text-sbold text-16">Christian James D. Torrillo</span>
-                                                    </div>
-                                                    <div class="flex-grow-1 d-flex justify-content-center">
-                                                        <span class="badge badge-missing">Missing</span>
-                                                    </div>
-                                                    <div class="d-flex align-items-center">
-                                                        <img src="../shared/assets/img/assess/arrow.png" alt="Arrow" style="width: 20px; height: 20px;">
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="submission-item d-flex align-items-center py-3">
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
-                                                            <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+
+                                                        <div class="submission-item d-flex align-items-center py-3">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
+                                                                    <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                                                                </div>
+                                                                <span class="text-sbold text-16">Christian James D. Torrillo</span>
+                                                            </div>
+                                                            <div class="flex-grow-1 d-flex justify-content-center">
+                                                                <span class="badge badge-score">100/100</span>
+                                                            </div>
+                                                            <div class="d-flex align-items-center">
+                                                                <img src="../shared/assets/img/assess/arrow.png" alt="Arrow" style="width: 20px; height: 20px;">
+                                                            </div>
                                                         </div>
-                                                        <span class="text-sbold text-16">Christian James D. Torrillo</span>
-                                                    </div>
-                                                    <div class="flex-grow-1 d-flex justify-content-center">
-                                                        <span class="badge badge-score">100/100</span>
-                                                    </div>
-                                                    <div class="d-flex align-items-center">
-                                                        <img src="../shared/assets/img/assess/arrow.png" alt="Arrow" style="width: 20px; height: 20px;">
-                                                    </div>
-                                                </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -262,8 +274,12 @@ include("../shared/assets/processes/prof-session-process.php");
                     options: {
                         cutout: '75%',
                         plugins: {
-                            legend: { display: false },
-                            tooltip: { enabled: false }
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: false
+                            }
                         }
                     }
                 });
