@@ -16,7 +16,7 @@ if (isset($_POST['markArchived'])) {
 }
 
 $filter = isset($_GET['status']) ? $_GET['status'] : 'active';
-$isActive = ($filter == 'archived') ? 'No' : 'Yes';
+$isActive = ($filter == 'archived') ? '0' : '1';
 
 $course = "SELECT 
               userinfo.userInfoID,
@@ -27,9 +27,7 @@ $course = "SELECT
               courses.courseID,
               courses.courseCode,
               courses.courseTitle,
-              courses.courseImage,
-              SUBSTRING_INDEX(courses.schedule, ' ', 1)  AS courseDays,
-              SUBSTRING_INDEX(courses.schedule, ' ', -1) AS courseTime
+              courses.courseImage
             FROM userinfo
             INNER JOIN courses ON userinfo.userID = courses.userID
             WHERE courses.userID = '$userID'

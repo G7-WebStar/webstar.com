@@ -110,15 +110,14 @@ if (isset($_POST['saveChanges'])) {
             <!-- Top Row -->
             <div class="row mb-3">
                 <div class="col-12 col-md-6 mb-2 d-flex align-items-center">
-                    <div class="text-bold text-20 me-2">Edit Profile</div>
-                    <button type="submit" name="saveChanges" id="saveChangesBtn" class="btn rounded-5 text-reg text-12"
+                    <button type="submit" name="saveChanges" id="saveChangesBtn" class="btn rounded-5 mt-3 text-reg text-12"
                         style="background-color: var(--primaryColor); border:1px solid var(--black); display:none;">Save
                         changes</button>
                 </div>
             </div>
 
             <!-- Upload Profile Picture for mobile only -->
-            <div class="ms-4 d-block d-md-none mb-3 d-flex flex-column align-items-center text-center">
+            <div class="d-block d-md-none mb-3 d-flex flex-column align-items-center text-center mb-5">
                 <div class="profile-pic mb-2">
                     <img id="profilePreviewMobile"
                         src="<?php echo !empty($profilePicture) ? 'shared/assets/pfp-uploads/' . $profilePicture : 'https://via.placeholder.com/150'; ?>"
@@ -136,15 +135,15 @@ if (isset($_POST['saveChanges'])) {
                 </button>
             </div>
             <!-- FORM LEFT COLUMN -->
-            <div class="row" style="margin-left:2px;">
+            <div class="row p-0 m-0 d-flex justify-content-center" style="margin-left:2px;">
                 <div class="col-12 col-md-8 text-reg custom-forms px-2 px-md-0">
                     <!-- Basic Info -->
-                    <div class="col mb-4 text-med text-16 text-center text-md-start" style="color:var(--black);">Basic
+                    <div class="col mb-3 text-med text-16 text-center text-md-start" style="color:var(--black);">Basic
                         Information</div>
 
-                    <div class="row mb-3 gx-3">
+                    <div class="row mb-2 gx-2">
                         <div class="col">
-                            <div class="form-floating mb-3">
+                            <div class="form-floating">
                                 <input type="text" name="firstName" class="form-control" id="firstName" placeholder=" "
                                     value="<?php echo $firstName ?? ''; ?>">
                                 <label for="firstName" class="text-reg text-16">First Name</label>
@@ -159,7 +158,7 @@ if (isset($_POST['saveChanges'])) {
                         </div>
                     </div>
 
-                    <div class="row mb-3 gx-3">
+                    <div class="row mb-2 gx-2">
                         <div class="col">
                             <div class="form-floating">
                                 <input type="text" name="lastName" class="form-control" id="lastName" placeholder=" "
@@ -176,11 +175,11 @@ if (isset($_POST['saveChanges'])) {
                         </div>
                     </div>
 
-                    <div class="row mb-3 mt-5 gx-3">
+                    <div class="row mb-2 gx-2">
                         <div class="col">
                             <!-- Student ID -->
                             <div class="form-floating">
-                                <input type="text" name="studentID" class="form-control mb-3" id="studentID"
+                                <input type="text" name="studentID" class="form-control mb-2" id="studentID"
                                     placeholder=" " value="<?php echo $studentID ?? ''; ?>">
                                 <label for="studentID" class="text-reg text-16">Student No.</label>
                             </div>
@@ -215,7 +214,7 @@ if (isset($_POST['saveChanges'])) {
                         </div>
                     </div>
                     <!-- Gender -->
-                    <div class="row gx-2 mb-4 mt-3 align-dropdowns">
+                    <div class="row gx-2 mb-2 align-dropdowns">
                         <div class="col-md-4 col-12 mb-3 mb-md-0">
                             <div class="form-floating">
                                 <select class="form-select" name="gender" id="gender">
@@ -259,12 +258,13 @@ if (isset($_POST['saveChanges'])) {
 
                     <!-- Contact Information -->
                     <div class="col-12 col-md-auto text-reg custom-forms px-2 px-md-0">
-                        <div class="col mb-4 text-med text-16 text-center text-md-start" style="color: var(--black);">
+                        <div class="col mb-3 mt-5 text-med text-16 text-center text-md-start"
+                            style="color: var(--black);">
                             Contact Information
                         </div>
 
-                        <div class="row mb-2 gx-3 flex-column">
-                            <div class="col-12 mb-3">
+                        <div class="row gx-3 flex-column">
+                            <div class="col-12 ">
 
                                 <div class="form-floating">
                                     <input type="email" name="schoolEmail" class="form-control" id="schoolEmail"
@@ -277,7 +277,8 @@ if (isset($_POST['saveChanges'])) {
 
                     <!-- Social Media -->
                     <div class="col-12 col-md-auto text-reg custom-forms px-2 px-md-0">
-                        <div class="col mb-4 text-med text-16 text-center text-md-start" style="color: var(--black);">
+                        <div class="col mb-3 mt-5 text-med text-16 text-center text-md-start"
+                            style="color: var(--black);">
                             Social Media <i>(optional)</i>
                         </div>
 
@@ -304,11 +305,21 @@ if (isset($_POST['saveChanges'])) {
                             </div>
                         </div>
                     </div>
+                    <div
+                        class="col-12 col-md-auto text-reg custom-forms px-2 px-md-0 text-center d-flex justify-content-center">
+                        <form action="reset_password.php" method="post">
+                            
+                            <button type="submit" class="btn rounded-5 text-med text-12 px-5"
+                                style="background-color: var(--primaryColor); border: 1px solid var(--black);">
+                                Reset Password
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- RIGHT COLUMN: DESKTOP PROFILE -->
-                <div class="col-12 col-md-4 d-none d-md-flex flex-column align-items-center ps-md-3 px-3 mb-4"
-                    style="margin-top:-60px;">
+                <div
+                    class="col-12 col-md-4 mt-4 pt-1 d-none d-md-flex flex-column align-items-center ps-md-3 px-3 mb-4 mx-auto">
                     <div class="profile-pic">
                         <img id="profilePreviewDesktop"
                             src="<?php echo !empty($profilePicture) ? 'shared/assets/pfp-uploads/' . $profilePicture : 'https://via.placeholder.com/150'; ?>"
@@ -323,20 +334,7 @@ if (isset($_POST['saveChanges'])) {
                 </div>
             </div>
         </form>
-        <!-- Reset Password -->
-        <div class="row">
-            <div class="col-12 col-md-auto text-reg custom-forms px-2 px-md-0 text-center text-md-start">
-                <form action="reset_password.php" method="post">
-                    <div class="col mb-2 text-med text-16" style="color: var(--black);">
-                        Reset Password
-                    </div>
-                    <button type="submit" class="btn rounded-5 text-sbold text-12 px-5"
-                        style="background-color: var(--primaryColor); border: 1px solid var(--black);">
-                        Reset Password
-                    </button>
-                </form>
-            </div>
-        </div>
+
     </div>
 </div>
 

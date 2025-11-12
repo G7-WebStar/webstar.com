@@ -161,6 +161,8 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet" />
 
 </head>
 
@@ -204,14 +206,16 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                     <?php
                                                     if (mysqli_num_rows($profInfoResult) > 0) {
                                                         while ($profInfo = mysqli_fetch_assoc($profInfoResult)) {
-                                                    ?>
+                                                            ?>
                                                             <div class="text-truncate w-100">
-                                                                <div class="text-sbold text-22">Welcome back, Prof. <?php echo $profInfo['firstName']; ?>!</div>
+                                                                <div class="text-sbold text-22">Welcome back, Prof.
+                                                                    <?php echo $profInfo['firstName']; ?>!
+                                                                </div>
                                                                 <div class="text-reg text-16">Resume your work and keep
                                                                     developing your
                                                                     course.</div>
                                                             </div>
-                                                    <?php
+                                                            <?php
                                                         }
                                                     }
                                                     ?>
@@ -230,25 +234,46 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                     </button>
                                                     <ul class="dropdown-menu shadow text-med"
                                                         aria-labelledby="dropdownMenuButtonMobile">
-                                                        <li><a class="dropdown-item d-flex align-items-center mt-1"
+                                                        <li>
+                                                            <a class="dropdown-item d-flex align-items-center mt-1"
                                                                 href="#">
-                                                                <img src="../shared/assets/img/profIndex/file.png"
-                                                                    class="me-2" alt="icon"> Create course</a></li>
-                                                        <li><a class="dropdown-item d-flex align-items-center" href="#">
-                                                                <img src="../shared/assets/img/profIndex/announcement.png"
-                                                                    class="me-2" alt="icon"> Post announcement</a></li>
-                                                        <li><a class="dropdown-item d-flex align-items-center" href="#">
-                                                                <img src="../shared/assets/img/profIndex/uploadLesson.png"
-                                                                    class="me-2" alt="icon"> Upload lesson</a></li>
-                                                        <li><a class="dropdown-item d-flex align-items-center" href="#">
-                                                                <img src="../shared/assets/img/profIndex/createExam.png"
-                                                                    class="me-2" alt="icon"> Create exam</a></li>
-                                                        <li><a class="dropdown-item d-flex align-items-center" href="#">
-                                                                <img src="../shared/assets/img/profIndex/assignTask.png"
-                                                                    class="me-2" alt="icon"> Assign task</a></li>
+                                                                <span class="material-symbols-rounded me-2"
+                                                                    style="color:#2c2c2c;font-size:16px">description</span>
+                                                                Create course
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                                                <span class="material-symbols-rounded me-2"
+                                                                    style="color:#2c2c2c;font-size:16px">campaign</span>
+                                                                Post announcement
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                                                <span class="material-symbols-rounded me-2"
+                                                                    style="color:#2c2c2c;font-size:16px">notes</span>
+                                                                Upload lesson
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                                                <span class="material-symbols-rounded me-2"
+                                                                    style="color:#2c2c2c;font-size:16px">quiz</span>
+                                                                Create exam
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                                                <span class="material-symbols-rounded me-2"
+                                                                    style="color:#2c2c2c;font-size:16px">add_task</span>
+                                                                Assign task
+                                                            </a>
+                                                        </li>
                                                     </ul>
                                                 </div>
                                             </div>
+
 
                                         </div>
                                     </div>
@@ -271,32 +296,41 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                         <li>
                                                             <a class="dropdown-item d-flex align-items-center mt-1"
                                                                 href="create-course.php">
-                                                                <img src="../shared/assets/img/profIndex/file.png"
-                                                                    class="me-2" alt="icon"> Create course
+                                                                <span class="material-symbols-rounded me-2"
+                                                                    style="color:#2c2c2c;font-size:16px">description</span>
+                                                                Create course
                                                             </a>
                                                         </li>
                                                         <li>
-                                                            <a class="dropdown-item d-flex align-items-center" href="post-announcement.php">
-                                                                <img src="../shared/assets/img/profIndex/announcement.png"
-                                                                    class="me-2" alt="icon"> Post announcement
+                                                            <a class="dropdown-item d-flex align-items-center"
+                                                                href="post-announcement.php">
+                                                                <span class="material-symbols-rounded me-2"
+                                                                    style="color:#2c2c2c;font-size:16px">campaign</span>
+                                                                Post announcement
                                                             </a>
                                                         </li>
                                                         <li>
-                                                            <a class="dropdown-item d-flex align-items-center" href="add-lesson.php">
-                                                                <img src="../shared/assets/img/profIndex/uploadLesson.png"
-                                                                    class="me-2" alt="icon"> Add lesson
+                                                            <a class="dropdown-item d-flex align-items-center"
+                                                                href="add-lesson.php">
+                                                                <span class="material-symbols-rounded me-2"
+                                                                    style="color:#2c2c2c;font-size:16px">notes</span>
+                                                                Add lesson
                                                             </a>
                                                         </li>
                                                         <li>
-                                                            <a class="dropdown-item d-flex align-items-center" href="create-exam.php">
-                                                                <img src="../shared/assets/img/profIndex/createExam.png"
-                                                                    class="me-2" alt="icon"> Create exam
+                                                            <a class="dropdown-item d-flex align-items-center"
+                                                                href="create-exam.php">
+                                                                <span class="material-symbols-rounded me-2"
+                                                                    style="color:#2c2c2c;font-size:16px">quiz</span>
+                                                                Create exam
                                                             </a>
                                                         </li>
                                                         <li>
-                                                            <a class="dropdown-item d-flex align-items-center" href="assign-task.php">
-                                                                <img src="../shared/assets/img/profIndex/assignTask.png"
-                                                                    class="me-2" alt="icon"> Assign task
+                                                            <a class="dropdown-item d-flex align-items-center"
+                                                                href="assign-task.php">
+                                                                <span class="material-symbols-rounded me-2"
+                                                                    style="color:#2c2c2c;font-size:16px">add_task</span>
+                                                                Assign task
                                                             </a>
                                                         </li>
                                                     </ul>
@@ -305,65 +339,77 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                         </div>
                                     </div>
 
+
                                     <!-- Stats Section -->
                                     <div class="row stats mt-5 align-items-center">
                                         <?php
                                         if (mysqli_num_rows($studentsTaughtResult) > 0) {
                                             while ($studentsTaught = mysqli_fetch_assoc($studentsTaughtResult)) {
-                                        ?>
+                                                ?>
                                                 <div class="col-12 col-md-3 mb-3">
                                                     <div class="d-flex align-items-center">
                                                         <img src="../shared/assets/img/profIndex/people.png" alt="Students"
                                                             width="26" height="26" class="me-2">
-                                                        <div class="stats-count text-22 text-bold"><?php echo $studentsTaught['studentsTaught']; ?></div>
+                                                        <div class="stats-count text-22 text-bold">
+                                                            <?php echo $studentsTaught['studentsTaught']; ?>
+                                                        </div>
                                                     </div>
                                                     <div class="stats-label text-18 text-sbold">currently enrolled</div>
-                                                    <div class="text-reg text-16"><?php echo $studentsTaught['studentsTaught']; ?> students taught all-time</div>
+                                                    <div class="text-reg text-16">
+                                                        <?php echo $studentsTaught['studentsTaught']; ?> students taught
+                                                        all-time
+                                                    </div>
                                                 </div>
-                                        <?php
+                                                <?php
                                             }
                                         }
                                         ?>
                                         <?php
                                         if (mysqli_num_rows($activeCoursesResult) > 0) {
                                             while ($activeCourses = mysqli_fetch_assoc($activeCoursesResult)) {
-                                        ?>
+                                                ?>
                                                 <div class="col-12 col-md-3 mb-3">
                                                     <div class="d-flex align-items-center">
                                                         <img src="../shared/assets/img/courses.png" alt="Courses" width="26"
                                                             height="26" class="me-2">
-                                                        <div class="stats-count text-22 text-bold"><?php echo $activeCourses['activeCourses']; ?></div>
+                                                        <div class="stats-count text-22 text-bold">
+                                                            <?php echo $activeCourses['activeCourses']; ?>
+                                                        </div>
                                                     </div>
                                                     <div class="stats-label text-18 text-sbold">active courses</div>
-                                            <?php
+                                                    <?php
                                             }
                                         }
-                                            ?>
+                                        ?>
                                             <?php
                                             if (mysqli_num_rows($coursesResult) > 0) {
                                                 while ($totalCourse = mysqli_fetch_assoc($coursesResult)) {
-                                            ?>
-                                                    <div class="text-reg text-16"><?php echo $totalCourse['activeCourses']; ?> courses created all-time</div>
+                                                    ?>
+                                                    <div class="text-reg text-16"><?php echo $totalCourse['activeCourses']; ?>
+                                                        courses created all-time</div>
                                                 </div>
-                                        <?php
+                                                <?php
                                                 }
                                             }
-                                        ?>
+                                            ?>
                                         <?php
                                         if (mysqli_num_rows($toGradeResult) > 0) {
                                             $toGradeToday = mysqli_fetch_assoc($toGradeTodayResult);
                                             while ($toGrade = mysqli_fetch_assoc($toGradeResult)) {
-                                        ?>
+                                                ?>
                                                 <div class="col-12 col-md-3 mb-3">
                                                     <div class="d-flex align-items-center">
                                                         <img src="../shared/assets/img/profIndex/tasks.png" alt="Tasks"
                                                             width="26" height="26" class="me-2">
-                                                        <div class="stats-count text-22 text-bold"><?php echo $toGrade['toGrade']; ?></div>
+                                                        <div class="stats-count text-22 text-bold">
+                                                            <?php echo $toGrade['toGrade']; ?>
+                                                        </div>
                                                     </div>
                                                     <div class="stats-label text-18 text-sbold">tasks to grade</div>
-                                                    <div class="text-reg text-16">+<?php echo $toGradeToday['toGradeToday']; ?> in the past 24 hours</div>
+                                                    <div class="text-reg text-16">+<?php echo $toGradeToday['toGradeToday']; ?>
+                                                        in the past 24 hours</div>
                                                 </div>
-                                        <?php
+                                                <?php
                                             }
                                         }
                                         ?>
@@ -371,17 +417,20 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                         $pendingTodo = mysqli_fetch_assoc($pendingTodoResult);
                                         if (mysqli_num_rows($countAssessmentsResult) > 0) {
                                             while ($countAssessments = mysqli_fetch_assoc($countAssessmentsResult)) {
-                                        ?>
+                                                ?>
                                                 <div class="col-12 col-md-3 mb-3">
                                                     <div class="d-flex align-items-center">
                                                         <img src="../shared/assets/img/profIndex/assess.png" alt="Assessments"
                                                             width="26" height="26" class="me-2">
-                                                        <div class="stats-count text-22 text-bold"><?php echo $countAssessments['activeAssessments']; ?></div>
+                                                        <div class="stats-count text-22 text-bold">
+                                                            <?php echo $countAssessments['activeAssessments']; ?>
+                                                        </div>
                                                     </div>
                                                     <div class="stats-label text-18 text-sbold">active assessments</div>
-                                                    <div class="text-reg text-16"><?php echo $pendingTodo['pending']; ?> students yet to complete</div>
+                                                    <div class="text-reg text-16"><?php echo $pendingTodo['pending']; ?>
+                                                        students yet to complete</div>
                                                 </div>
-                                        <?php
+                                                <?php
                                             }
                                         }
                                         ?>
@@ -409,13 +458,14 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                         <div><?php echo (int) $totalCourses; ?></div>
                                                     </div>
                                                     <!-- Scrollable course -->
-                                                    <div class="ps-4 pb-4 pe-4 scroll-attachments" style="overflow-x: auto; white-space: nowrap;">
+                                                    <div class="ps-4 pb-4 pe-4 scroll-attachments"
+                                                        style="overflow-x: auto; white-space: nowrap;">
                                                         <div style="display: inline-flex; gap: 20px;">
                                                             <?php if ($totalCourses === 0) { ?>
                                                                 <div class="text-reg text-14"
                                                                     style="color: var(--black); opacity: 0.85;">No courses
                                                                     found.</div>
-                                                                <?php } else {
+                                                            <?php } else {
                                                                 foreach ($courses as $course) {
                                                                     $courseCode = ($course['courseCode'] ?? '');
                                                                     $courseTitle = ($course['courseTitle'] ?? '');
@@ -424,7 +474,7 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                                     $imageFile = trim((string) ($course['courseImage'] ?? ''));
                                                                     $imagePath = "../shared/assets/img/course-images/" . $imageFile;
                                                                     $fallbackImage = "../shared/assets/img/home/webdev.jpg";
-                                                                ?>
+                                                                    ?>
                                                                     <div class="card custom-course-card">
                                                                         <img src="<?php echo $imageFile ? $imagePath : $fallbackImage; ?>"
                                                                             class="card-img-top"
@@ -440,7 +490,8 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                                             <div class="d-flex align-items-center mb-2 mt-4">
                                                                                 <img src="../shared/assets/img/profIndex/people.png"
                                                                                     alt="people" width="26" height="26">
-                                                                                <span class="text-reg text-14 ms-2"><?php echo $course['studentCount']; ?>
+                                                                                <span
+                                                                                    class="text-reg text-14 ms-2"><?php echo $course['studentCount']; ?>
                                                                                     Students</span>
                                                                             </div>
                                                                             <div class="d-flex align-items-start mb-2 mt-4">
@@ -464,7 +515,7 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                                                 updated recently</div>
                                                                         </div>
                                                                     </div>
-                                                            <?php }
+                                                                <?php }
                                                             } ?>
                                                         </div>
                                                     </div>
@@ -496,7 +547,7 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                             <div class="text-reg text-14"
                                                                 style="color: var(--black); opacity: 0.85;">No assessments
                                                                 found.</div>
-                                                            <?php } else {
+                                                        <?php } else {
                                                             $chartsIDs = [];
                                                             $i = 1;
                                                             foreach ($assessments as $assessment) {
@@ -510,7 +561,7 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                                 $chartsIDs[] = "chart$i";
                                                                 $submittedChart[] = $submittedTodo;
                                                                 $studentChart[] = $courseStudents;
-                                                            ?>
+                                                                ?>
                                                                 <div class="card mb-3"
                                                                     style="border-radius: 12px; border: 1px solid var(--black); padding: 15px;">
                                                                     <div
@@ -521,9 +572,13 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                                                 <span class="badge rounded-pill"
                                                                                     style="background: var(--highlight50); color: var(--black); font-size:12px;"><?php echo $assessmentType ?></span>
                                                                             </div>
-                                                                            <div class="text-bold"><?php echo $assessmentTitle ?></div>
-                                                                            <div class="text-sbold text-14 pt-1"><?php echo $assessmentCourseCode ?><br>
-                                                                                <div class="text-reg text-14"><?php echo $about ?>
+                                                                            <div class="text-bold">
+                                                                                <?php echo $assessmentTitle ?>
+                                                                            </div>
+                                                                            <div class="text-sbold text-14 pt-1">
+                                                                                <?php echo $assessmentCourseCode ?><br>
+                                                                                <div class="text-reg text-14">
+                                                                                    <?php echo $about ?>
                                                                                 </div>
                                                                             </div>
                                                                             <div class="text-reg text-12 mt-2"
@@ -552,7 +607,7 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                                         </a>
                                                                     </div>
                                                                 </div>
-                                                        <?php
+                                                                <?php
                                                                 $i++;
                                                             }
                                                         } ?>
@@ -601,7 +656,7 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                 });
             }
 
-            document.addEventListener("DOMContentLoaded", function() {
+            document.addEventListener("DOMContentLoaded", function () {
                 const chartsIDs = <?php echo json_encode($chartsIDs); ?>;
                 const submitted = <?php echo json_encode($submittedChart); ?>;
                 const student = <?php echo json_encode($studentChart); ?>;

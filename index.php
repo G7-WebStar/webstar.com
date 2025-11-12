@@ -230,7 +230,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                                 class="text-decoration-none text-black">
                                                                                 <img src="shared/assets/img/course-images/<?php echo $enrolledSubjects['courseImage']; ?>"
                                                                                     class="card-img-top" alt="...">
-                                                                                <div class="card-body px-3 py-2">
+                                                                                <div class="card-body border-top border-black px-3 py-2">
                                                                                     <div class="text-sbold text-16">
                                                                                         <?php echo $enrolledSubjects['courseCode']; ?>
                                                                                     </div>

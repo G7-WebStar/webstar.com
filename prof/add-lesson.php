@@ -4,27 +4,57 @@ include('../shared/assets/database/connect.php');
 date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
 
+$mode = '';
+$lessonID = 0;
+
+if (isset($_GET['edit'])) {
+    $mode = 'edit';
+    $lessonID = intval($_GET['edit']);
+} elseif (isset($_GET['reuse'])) {
+    $mode = 'reuse';
+    $lessonID = intval($_GET['reuse']);
+}
+
+// Get all courses owned by this user
 $course = "SELECT courseID, courseCode 
            FROM courses 
            WHERE userID = '$userID'";
 $courses = executeQuery($course);
 
 if (isset($_POST['save_lesson'])) {
+    $mode = $_POST['mode'] ?? 'new'; // new, reuse, or edit
+    $lessonID = intval($_POST['lessonID'] ?? 0); // used in edit mode
     $title = $_POST['lessonTitle'];
     $content = $_POST['lessonContent'];
+    $links = $_POST['links'] ?? [];
+    $uploadedFiles = !empty($_FILES['materials']['name'][0]);
     $createdAt = date("Y-m-d H:i:s");
 
     if (!empty($_POST['courses'])) {
         foreach ($_POST['courses'] as $selectedCourseID) {
-            $lessons = "INSERT INTO lessons 
-            (courseID, lessonTitle, lessonDescription, createdAt) 
-            VALUES 
-            ('$selectedCourseID', '$title', '$content', '$createdAt')";
-            executeQuery($lessons);
 
-            // Get the actual last inserted ID from MySQL
-            $lessonID = mysqli_insert_id($conn);
+            if ($mode === 'new' || $mode === 'reuse') {
+                // INSERT new lesson
+                $lessons = "INSERT INTO lessons 
+                    (courseID, lessonTitle, lessonDescription, createdAt) 
+                    VALUES 
+                    ('$selectedCourseID', '$title', '$content', '$createdAt')";
+                executeQuery($lessons);
+                $lessonID = mysqli_insert_id($conn);
+            } elseif ($mode === 'edit') {
+                // UPDATE existing lesson
+                $updateLesson = "UPDATE lessons 
+                    SET courseID='$selectedCourseID', lessonTitle='$title', lessonDescription='$content', createdAt='$createdAt'
+                    WHERE lessonID='$lessonID'";
+                executeQuery($updateLesson);
 
+                // Delete old files only if new files or links are provided
+                if (!empty($_FILES['materials']['name'][0]) || !empty($_POST['links'])) {
+                    executeQuery("DELETE FROM files WHERE lessonID='$lessonID'");
+                }
+            }
+
+            // --- Handle uploaded files ---
             if (!empty($_FILES['materials']['name'][0])) {
                 $uploadDir = __DIR__ . "/../shared/assets/files/";
 
@@ -41,48 +71,48 @@ if (isset($_POST['save_lesson'])) {
                         $targetPath = $uploadDir . $safeName;
 
                         if (move_uploaded_file($tmpName, $targetPath)) {
-                            // For uploaded files
                             $insertFile = "INSERT INTO files 
-                            (courseID, userID, lessonID, fileAttachment, fileLink) 
-                            VALUES 
-                            ('$selectedCourseID', '$userID', '$lessonID', '$safeName', '')";
+                                (courseID, userID, lessonID, fileAttachment, fileLink) 
+                                VALUES 
+                                ('$selectedCourseID', '$userID', '$lessonID', '$safeName', '')";
                             executeQuery($insertFile);
                         }
                     }
                 }
             }
 
-            // Handle file links
+            // --- Handle file links ---
             if (!empty($_POST['links'])) {
                 $links = $_POST['links'];
                 if (is_array($links)) {
                     foreach ($links as $link) {
                         $link = trim($link);
                         if ($link !== '') {
-                            // Fetch link title using get_meta_tags or fallback to <title> tag
-                            $title = '';
+                            $fileTitle = '';
                             $metaTags = @get_meta_tags($link);
                             if (!empty($metaTags['title'])) {
-                                $title = $metaTags['title'];
+                                $fileTitle = $metaTags['title'];
                             } else {
                                 $html = @file_get_contents($link);
                                 if ($html && preg_match("/<title>(.*?)<\/title>/i", $html, $matches)) {
-                                    $title = $matches[1];
+                                    $fileTitle = $matches[1];
                                 }
                             }
 
                             $insertLink = "INSERT INTO files 
-                            (courseID, userID, lessonID, fileAttachment, fileTitle, fileLink) 
-                            VALUES 
-                            ('$selectedCourseID', '$userID', '$lessonID', '', '$title', '$link')";
+                                (courseID, userID, lessonID, fileAttachment, fileTitle, fileLink) 
+                                VALUES 
+                                ('$selectedCourseID', '$userID', '$lessonID', '', '$fileTitle', '$link')";
                             executeQuery($insertLink);
                         }
                     }
                 }
             }
+
         }
     }
 }
+
 
 //Fetch the Title of link
 if (isset($_GET['fetchTitle'])) {
@@ -106,6 +136,90 @@ if (isset($_GET['fetchTitle'])) {
     echo json_encode(["title" => $title]);
     exit;
 }
+
+// Selecting Lessons made by the Instructor logged in
+$lessonQuery = "
+    SELECT 
+        l.lessonID,
+        l.lessonTitle,
+        l.lessonDescription,
+        l.createdAt,
+        c.courseID,
+        c.courseCode
+    FROM lessons l
+    JOIN courses c ON l.courseID = c.courseID
+    WHERE c.userID = '$userID'
+    ORDER BY l.createdAt DESC
+";
+
+$lessons = executeQuery($lessonQuery);
+
+// Storing reused data
+$reusedData = null;
+
+// If the instructor chose to reuse or edit a lesson
+if (isset($_GET['reuse']) || isset($_GET['edit'])) {
+    $reuseID = isset($_GET['reuse']) ? intval($_GET['reuse']) : intval($_GET['edit']);
+
+    // Get lesson data
+    $reuseQuery = "
+        SELECT 
+            l.lessonTitle,
+            l.lessonDescription,
+            l.courseID,
+            l.createdAt,
+            crs.courseID,
+            crs.courseCode,
+            f.fileID,
+            f.fileAttachment,
+            f.fileTitle,
+            f.fileLink
+        FROM lessons l
+        JOIN courses crs ON l.courseID = crs.courseID
+        JOIN users u ON crs.userID = u.userID
+        LEFT JOIN files f ON l.lessonID = f.lessonID
+        WHERE l.lessonID = '$reuseID'
+          AND u.userID = '$userID'
+    ";
+
+    $reuseResult = executeQuery($reuseQuery);
+    if ($reuseResult && $reuseResult->num_rows > 0) {
+        $reusedData = [];
+        while ($row = $reuseResult->fetch_assoc()) {
+            $reusedData[] = $row; // store all file rows
+        }
+    } else {
+        // Invalid or unauthorized reuse/edit attempt
+        header("Location: add-lesson.php");
+        exit();
+    }
+}
+
+if (!empty($reusedData)) {
+    // Populate main fields for reuse/edit
+    $mainData = [
+        'lessonTitle' => $reusedData[0]['lessonTitle'],
+        'lessonDescription' => $reusedData[0]['lessonDescription']
+    ];
+
+    // Collect attached files/links
+    $files = [];
+    $selectedCourses = []; // for pre-checking the courses
+    foreach ($reusedData as $row) {
+        if (!empty($row['fileID'])) {
+            $files[] = [
+                'fileID' => $row['fileID'],
+                'fileTitle' => $row['fileTitle'],
+                'fileAttachment' => $row['fileAttachment'],
+                'fileLink' => $row['fileLink']
+            ];
+        }
+        if (!in_array($row['courseID'], $selectedCourses)) {
+            $selectedCourses[] = $row['courseID'];
+        }
+    }
+}
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -113,7 +227,12 @@ if (isset($_GET['fetchTitle'])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | Add Lesson</title>
+    <title>
+        <?php
+        echo isset($_GET['reuse']) ? 'Reuse Lesson' : (isset($_GET['edit']) ? 'Edit Lesson' : 'Add Lesson');
+        ?> ✦ Webstar
+    </title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="../shared/assets/css/global-styles.css">
@@ -130,7 +249,41 @@ if (isset($_GET['fetchTitle'])) {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet" />
 
+    <style>
+        /* Change font for text typed inside the Quill editor */
+        .ql-editor {
+            font-family: 'Regular', sans-serif;
+            letter-spacing: -0.03em;
+            color: var(--black);
+            font-size: 16px;
+            /* optional */
+        }
+
+        .ql-editor {
+            padding: 12px 16px;
+            /* customize as you like */
+        }
+
+        .ql-editor::before {
+            padding: 12px 16px;
+        }
+
+        .ql-editor::before {
+            font-family: inherit;
+            /* use same font as the text */
+            font-size: inherit;
+            /* same size as the text */
+            line-height: inherit;
+            /* align vertically */
+            padding: 1px 1px;
+            /* match .ql-editor padding */
+            opacity: 1;
+            /* ensure visibility */
+        }
+    </style>
 </head>
 
 <body>
@@ -154,30 +307,59 @@ if (isset($_GET['fetchTitle'])) {
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
                     <div class="container-fluid py-3 overflow-y-auto row-padding-top">
-                        <div class="row">
+                        <div class="create-prof-row">
                             <div class="col-12">
                                 <!-- Header -->
                                 <div class="row mb-3 align-items-center">
-                                    <div class="col-auto">
-                                        <a href="#" class="text-decoration-none">
+
+                                    <!-- Back Arrow -->
+                                    <div class="col-auto d-none d-md-block">
+                                        <a href="javascript:history.back()" class="text-decoration-none">
                                             <i class="fa-solid fa-arrow-left text-reg text-16"
                                                 style="color: var(--black);"></i>
                                         </a>
                                     </div>
+
+                                    <!-- Page Title -->
                                     <div class="col text-center text-md-start">
-                                        <span class="text-sbold text-25">Add Lesson</span>
+                                        <span class="text-sbold text-20"><?php
+                                        if (isset($_GET['edit'])) {
+                                            echo 'Edit Lesson';
+                                        } elseif (isset($_GET['reuse'])) {
+                                            echo 'Reuse Lesson';
+                                        } else {
+                                            echo 'Add Lesson';
+                                        }
+                                        ?></span>
+                                    </div>
+
+                                    <!-- Assign Existing Task Button -->
+                                    <div
+                                        class="col-12 col-md-auto text-center d-flex d-md-block justify-content-center justify-content-md-end mt-3 mt-md-0">
+                                        <button type="button"
+                                            class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 my-1 d-flex align-items-center gap-2"
+                                            style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);"
+                                            data-bs-toggle="modal" data-bs-target="#reuseTaskModal">
+                                            <span class="material-symbols-rounded" style="font-size:16px">notes</span>
+                                            <span>Add an existing lesson</span>
+                                        </button>
                                     </div>
                                 </div>
-
                                 <!-- Form starts -->
                                 <form action="" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="mode"
+                                        value="<?= isset($_GET['edit']) ? 'edit' : (isset($_GET['reuse']) ? 'reuse' : 'new') ?>">
+                                    <input type="hidden" name="lessonID"
+                                        value="<?= $_GET['edit'] ?? $_GET['reuse'] ?? '' ?>">
                                     <div class="row">
-                                        <div class="col-12 pt-3 mb-3">
+                                        <div class="col-12 pt-3">
                                             <label for="lessonInfo" class="form-label text-med text-16">Lesson
                                                 Information</label>
                                             <input type="text"
-                                                class="form-control form-control textbox mb-3 p-2 text-reg text-14 text-muted"
-                                                id="lessonInfo" name="lessonTitle" placeholder="Lesson Title" required>
+                                                class="form-control form-control textbox mb-2 px-3 py-2 text-reg text-16"
+                                                id="lessonInfo" name="lessonTitle" placeholder="Lesson Title *"
+                                                value="<?php echo isset($mainData) ? htmlspecialchars($mainData['lessonTitle']) : ''; ?>"
+                                                required>
                                         </div>
                                     </div>
 
@@ -186,7 +368,7 @@ if (isset($_GET['fetchTitle'])) {
                                         <div class="col-12 mb-3">
                                             <div class="editor-wrapper">
                                                 <div id="editor"></div>
-                                                <div id="toolbar" class="row align-items-center p-2 p-md-4 g-2 g-md-5">
+                                                <div id="toolbar" class="row align-items-center p-3 p-md-3 g-2 g-md-5">
                                                     <div
                                                         class="col d-flex align-items-center px-2 px-md-4 gap-1 gap-md-3">
                                                         <button class="ql-bold"></button>
@@ -194,7 +376,7 @@ if (isset($_GET['fetchTitle'])) {
                                                         <button class="ql-underline"></button>
                                                         <button class="ql-list" value="bullet"></button>
                                                         <span id="word-counter"
-                                                            class="ms-auto text-muted text-med text-16">0/120</span>
+                                                            class="ms-auto text-muted text-med text-16 me-2">0/120</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -207,35 +389,55 @@ if (isset($_GET['fetchTitle'])) {
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="learning-materials">
-                                                <label class="text-med text-16 mt-4">Attachments</label>
-                                                <span class="fst-italic text-reg text-14 ms-2">You can add up to 10
-                                                    files or links.</span>
+                                                <div class="d-flex align-items-center mt-4 mb-0 mb-md-2">
+                                                    <label class="text-med text-16">Attachments</label>
+                                                    <!-- For desktop -->
+                                                    <span class="material-symbols-outlined ms-3 me-1 d-none d-md-block"
+                                                        style="font-size:16px">
+                                                        info
+                                                    </span>
+                                                    <span class="text-reg text-14 d-none d-md-block">You can add up to
+                                                        10
+                                                        files or links.</span>
+                                                </div>
+                                                <!-- For mobile -->
+                                                <div class="d-block d-md-none d-flex align-items-center mb-2">
+                                                    <span class="material-symbols-outlined me-1" style="font-size:16px">
+                                                        info
+                                                    </span>
+                                                    <span class="text-reg text-14">You can add up to 10
+                                                        files or links.</span>
+                                                </div>
 
                                                 <!-- Container for dynamically added file & link cards -->
-                                                <div id="filePreviewContainer" class="row mb-0 mt-3"></div>
+                                                <div id="filePreviewContainer" class="row mb-0"></div>
 
                                                 <!-- Upload buttons -->
-                                                <div class="mt-3 mb-4 text-center text-md-start">
+                                                <div class="mt-0 mb-4 text-start ">
                                                     <input type="file" name="materials[]" class="d-none" id="fileUpload"
                                                         multiple>
                                                     <button type="button"
-                                                        class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-2 ms-2"
+                                                        class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-1"
                                                         style="background-color: var(--primaryColor); border: 1px solid var(--black);"
                                                         onclick="document.getElementById('fileUpload').click();">
-                                                        <img src="../shared/assets/img/upload.png" alt="Upload Icon"
-                                                            style="width:12px; height:14px;" class="me-1">
-                                                        File
+                                                        <div style="display: flex; align-items: center; gap: 5px;">
+                                                            <span class="material-symbols-rounded"
+                                                                style="font-size:16px">upload</span>
+                                                            <span>Upload</span>
+                                                        </div>
                                                     </button>
 
                                                     <button type="button"
-                                                        class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 mt-2 ms-2"
+                                                        class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 ms-2 mt-1"
                                                         style="background-color: var(--primaryColor); border: 1px solid var(--black);"
                                                         data-bs-container="body" data-bs-toggle="popover"
                                                         data-bs-placement="right" data-bs-html="true"
-                                                        data-bs-content='<div class="form-floating mb-3"><input type="url" class="form-control" id="linkInput" placeholder="Paste link here"><label for="linkInput">Link</label></div><div class="link-popover-actions"><button type="button" class="btn btn-sm px-3 py-1 rounded-pill" id="addLinkBtn" style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);">Add link</button></div>'>
-                                                        <img src="../shared/assets/img/link.png" alt="Upload Icon"
-                                                            class="me-1">
-                                                        Link
+                                                        data-bs-content='<div class="form-floating mb-3 text-reg"><input type="url" class="form-control text-reg" id="linkInput" placeholder="Paste link here"><label for="linkInput">Link</label></div><div class="link-popover-actions"><button type="button" class="btn btn-sm px-3 py-1 rounded-pill text-reg" id="addLinkBtn" style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);">Add link</button></div>'>
+                                                        <div style="display: flex; align-items: center; gap: 5px;">
+                                                            <span class="material-symbols-rounded"
+                                                                style="font-size:20px">link</span>
+                                                            <span>Link</span>
+                                                        </div>
                                                     </button>
 
                                                     <!-- Hidden input to store added links -->
@@ -244,53 +446,83 @@ if (isset($_GET['fetchTitle'])) {
                                             </div>
 
                                             <!-- Course selection + Post button -->
-                                            <div class="row align-items-center mb-5 text-center text-md-start">
-                                                <div
-                                                    class="col-12 col-md-auto mt-3 d-flex justify-content-center justify-content-md-start">
-                                                    <div class="d-flex align-items-center flex-nowrap">
-                                                        <span class="me-2 text-med text-16 pe-3">Add to Course</span>
-                                                        <button
-                                                            class="btn dropdown-toggle dropdown-shape text-med text-16 me-md-5"
-                                                            type="button" data-bs-toggle="dropdown"
-                                                            aria-expanded="false">
-                                                            <span>Select Course</span>
-                                                        </button>
-                                                        <ul class="dropdown-menu p-2" style="min-width: 200px;">
-                                                            <?php
-                                                            if ($courses && $courses->num_rows > 0) {
-                                                                while ($course = $courses->fetch_assoc()) {
-                                                                    ?>
-                                                                    <li>
-                                                                        <div class="form-check">
-                                                                            <input class="form-check-input course-checkbox"
-                                                                                type="checkbox" name="courses[]"
-                                                                                value="<?php echo $course['courseID']; ?>"
-                                                                                id="course<?php echo $course['courseID']; ?>">
-                                                                            <label class="form-check-label text-reg"
-                                                                                for="course<?php echo $course['courseID']; ?>">
-                                                                                <?php echo $course['courseCode']; ?>
-                                                                            </label>
-                                                                        </div>
-                                                                    </li>
-                                                                    <?php
-                                                                }
-                                                            } else {
-                                                                ?>
-                                                                <li><span class="dropdown-item-text text-muted">No courses
-                                                                        found</span></li>
+                                            <div class="row align-items-center justify-content-between text-center text-md-start mt-5"
+                                                style="margin-bottom: <?php echo ($courses && $courses->num_rows > 0) ? ($courses->num_rows * 50) : 0; ?>px;">
+                                                <!-- Dynamic Border Bottom based on the number of courses hehe -->
+                                                <!-- Add to Course -->
+                                                <?php if (!isset($_GET['edit'])): ?>
+                                                    <div
+                                                        class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center flex-nowrap justify-content-center justify-content-md-start">
+                                                        <span class="me-2 text-med text-16 pe-3">Add to
+                                                            Course</span>
+                                                        <div class="dropdown">
+                                                            <button
+                                                                class="btn dropdown-toggle dropdown-shape text-med text-16 me-md-5"
+                                                                type="button" data-bs-toggle="dropdown"
+                                                                aria-expanded="false">
+                                                                <span class="me-2">Select Course</span>
+                                                            </button>
+                                                            <ul class="dropdown-menu p-2 mt-2"
+                                                                style="min-width: 200px; border: 1px solid var(--black);">
                                                                 <?php
-                                                            }
-                                                            ?>
-                                                        </ul>
+                                                                if ($courses && $courses->num_rows > 0) {
+                                                                    // If editing, get the assigned courses for this task
+                                                                    $assignedCourseIDs = [];
+                                                                    if (isset($_GET['edit'])) {
+                                                                        $editID = intval($_GET['edit']);
+                                                                        $assignedQuery = "SELECT courseID FROM lessons WHERE lessonID = '$editID'";
+                                                                        $assignedResult = executeQuery($assignedQuery);
+                                                                        if ($assignedResult && $assignedResult->num_rows > 0) {
+                                                                            while ($row = $assignedResult->fetch_assoc()) {
+                                                                                $assignedCourseIDs[] = $row['courseID'];
+                                                                            }
+                                                                        }
+                                                                    }
+
+                                                                    while ($course = $courses->fetch_assoc()) {
+                                                                        $checked = in_array($course['courseID'], $assignedCourseIDs) ? 'checked' : '';
+                                                                        ?>
+                                                                        <li>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input course-checkbox"
+                                                                                    type="checkbox" name="courses[]"
+                                                                                    style="border: 1px solid var(--black);"
+                                                                                    value="<?= $course['courseID'] ?>"
+                                                                                    id="course<?= $course['courseID'] ?>"
+                                                                                    <?= $checked ?>>
+                                                                                <label class="form-check-label text-reg"
+                                                                                    for="course<?= $course['courseID'] ?>">
+                                                                                    <?= $course['courseCode'] ?>
+                                                                                </label>
+                                                                            </div>
+                                                                        </li>
+                                                                    <?php }
+                                                                } else { ?>
+                                                                    <li><span class="dropdown-item-text text-muted">No
+                                                                            courses found</span></li>
+                                                                <?php } ?>
+                                                            </ul>
+
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <!-- Add Button -->
-                                                <div class="col-md-6 text-center text-md-center mt-3 mt-md-0 ms-md-5">
+                                                <?php endif; ?>
+
+                                                <!-- Assign Button -->
+                                                <div class="col-12 col-md-auto mt-3 mt-md-0 text-center">
                                                     <button type="submit" name="save_lesson"
-                                                        class="px-4 py-2 rounded-pill text-sbold text-md-14 mt-3 ms-3"
+                                                        class="px-4 py-2 rounded-pill text-sbold text-md-14 mt-4 mt-md-0"
                                                         style="background-color: var(--primaryColor); border: 1px solid var(--black);">
-                                                        Add
+                                                        <?php
+                                                        if (isset($_GET['edit'])) {
+                                                            echo 'Save Changes';
+                                                        } elseif (isset($_GET['reuse'])) {
+                                                            echo 'Reuse';
+                                                        } else {
+                                                            echo 'Add';
+                                                        }
+                                                        ?>
                                                     </button>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -303,6 +535,76 @@ if (isset($_GET['fetchTitle'])) {
             </div>
         </div>
     </div>
+
+    <!-- Reuse Lesson Modal -->
+    <div class="modal fade" id="reuseTaskModal" tabindex="-1" aria-labelledby="reuseTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered py-4" style="max-width: 700px; height: 80vh">
+            <div class="modal-content d-flex flex-column" style="height: 100%;">
+
+                <!-- HEADER -->
+                <div class="modal-header flex-shrink-0">
+                    <div class="modal-title text-sbold text-20 ms-3" id="selectRubricModalLabel">
+                        Add an existing lesson
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        style="transform: scale(0.8); filter: grayscale(100%);"></button>
+                </div>
+
+                <!-- DESC -->
+                <div class="modal-body flex-grow-1 overflow-auto">
+                    <p class="mb-3 text-med text-14 mx-3" style="color: var(--black);">
+                        Select a lesson you’ve previously created to reuse its details. You can review and edit the
+                        title,
+                        description, or attached materials before assigning or saving it.
+                    </p>
+                    <div class="col p-0 m-3">
+                        <div class="card rounded-3 mb-2 border-0">
+                            <div class="card-body p-0">
+                                <!-- OPTIONS -->
+                                <?php if ($lessons && $lessons->num_rows > 0) {
+                                    while ($lesson = $lessons->fetch_assoc()) {
+                                        ?>
+                                        <div class="rubric-option rounded-3 d-flex align-items-center justify-content-between mb-2 w-100"
+                                            style="cursor: pointer; background-color: var(--pureWhite); border: 1px solid var(--black);"
+                                            onclick='window.location.href="add-lesson.php?reuse=<?php echo $lesson["lessonID"]; ?>"'>
+                                            <div style="line-height: 1.5; padding:10px 15px;">
+                                                <div class="text-sbold text-14"
+                                                    style="display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;">
+                                                    <?php echo htmlspecialchars(substr($lesson['lessonTitle'], 0, 100)); ?>
+                                                </div>
+                                                <div class="text-med text-12"
+                                                    style="display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;">
+                                                    <?php echo htmlspecialchars(substr($lesson['lessonDescription'], 0, 100)); ?>
+                                                </div>
+                                                <div class="text-med text-muted text-12"
+                                                    style="display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;">
+                                                    <?php
+                                                    echo date('F j, Y g:i A', strtotime($lesson['createdAt']))
+                                                        . ' · ' . $lesson['courseCode'];
+                                                    ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <?php
+                                    }
+                                } else {
+                                    ?>
+                                    <div class="text-muted text-reg text-14 py-2">No existing lessons found.</div>
+                                    <?php
+                                }
+                                ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="modal-footer border-top flex-shrink-0 py-4">
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Quill JS -->
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
@@ -324,6 +626,10 @@ if (isset($_GET['fetchTitle'])) {
                 toolbar: '#toolbar'
             }
         });
+
+        <?php if (isset($reusedData)) { ?>
+            quill.root.innerHTML = <?php echo json_encode($mainData['lessonDescription']); ?>;
+        <?php } ?>
 
         // Word counter
         const maxWords = 120;
@@ -400,24 +706,25 @@ if (isset($_GET['fetchTitle'])) {
                         let displayTitle = "Loading...";
 
                         const previewHTML = `
-                    <div class="col-12 mt-2" data-id="${uniqueID}">
-                        <div class="materials-card d-flex align-items-stretch p-2 w-100">
+                    <div class="col-12 my-1" data-id="${uniqueID}">
+                        <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
                             <div class="d-flex w-100 align-items-center justify-content-between">
                                 <div class="d-flex align-items-center flex-grow-1">
-                                    <div class="mx-4">
+                                    <div class="mx-3 d-flex align-items-center">
                                         <img src="${faviconURL}" alt="${domain} Icon" 
                                             onerror="this.onerror=null;this.src='../shared/assets/img/web.png';" 
                                             style="width: 30px; height: 30px;">
                                     </div>
                                     <div>
-                                        <div id="title-${uniqueID}" class="text-sbold text-16 py-1">${displayTitle}</div>
-                                        <div class="text-reg text-12 text-break">
+                                        <div id="title-${uniqueID}" class="text-sbold text-16" style="line-height: 1.5;">${displayTitle}</div>
+                                        <div class="text-reg text-12 text-break" style="line-height: 1.5;">
                                             <a href="${linkValue}" target="_blank">${linkValue}</a>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="mx-4 delete-file" style="cursor:pointer;">
-                                    <img src="../shared/assets/img/trash.png" alt="Delete Icon">
+                                <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">
+                                    <span
+                                    class="material-symbols-outlined">close</span>
                                 </div>
                             </div>
                         </div>
@@ -469,20 +776,23 @@ if (isset($_GET['fetchTitle'])) {
                     const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
                     const ext = file.name.split('.').pop().toUpperCase();
                     const fileHTML = `
-                <div class="col-12 mt-2 file-preview">
-                    <div class="materials-card d-flex align-items-stretch p-2 w-100">
+               <div class="col-12 my-1 file-preview">
+                    <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
                         <div class="d-flex w-100 align-items-center justify-content-between">
                             <div class="d-flex align-items-center flex-grow-1">
-                                <div class="mx-4">
-                                    <i class="bi bi-file-earmark-fill" style="font-size: 22px;"></i>
+                                <div class="mx-3 d-flex align-items-center">
+                                    <span class="material-symbols-rounded">
+                                        description
+                                    </span>
                                 </div>
                                 <div>
-                                    <div class="text-sbold text-16 py-1">${file.name}</div>
-                                    <div class="text-reg text-12">${ext} · ${fileSizeMB} MB</div>
+                                    <div class="text-sbold text-16" style="line-height: 1.5;">${file.name}</div>
+                                    <div class="text-reg text-12 " style="line-height: 1.5;">${ext} · ${fileSizeMB} MB</div>
                                 </div>
                             </div>
-                            <div class="mx-4 delete-file" style="cursor:pointer;" data-index="${index}">
-                                <img src="../shared/assets/img/trash.png" alt="Delete Icon">
+                            <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;" data-index="${index}">
+                                <span
+                                    class="material-symbols-outlined">close</span>
                             </div>
                         </div>
                     </div>
@@ -506,6 +816,101 @@ if (isset($_GET['fetchTitle'])) {
             });
         });
     </script>
+
+    <?php if (!empty($files)): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const container = document.getElementById('filePreviewContainer');
+                if (!container) return;
+
+                <?php foreach ($files as $file): ?>
+                    <?php if (!empty($file['fileLink'])): ?>
+                            // Render Link Preview
+                            (function () {
+                                const linkValue = <?php echo json_encode($file['fileLink']); ?>;
+                                const uniqueID = Date.now() + Math.floor(Math.random() * 1000);
+                                try {
+                                    const urlObj = new URL(linkValue);
+                                    const domain = urlObj.hostname;
+                                    const faviconURL = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
+                                    const html = `
+                        <div class="col-12 my-1" data-id="${uniqueID}">
+                            <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
+                                <div class="d-flex w-100 align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center flex-grow-1">
+                                        <div class="mx-3 d-flex align-items-center">
+                                            <img src="${faviconURL}" alt="${domain} Icon"
+                                                onerror="this.onerror=null;this.src='../shared/assets/img/web.png';"
+                                                style="width: 30px; height: 30px;">
+                                        </div>
+                                        <div>
+                                            <div id="title-${uniqueID}" class="text-sbold text-16" style="line-height: 1.5;"><?= htmlspecialchars($file['fileTitle']) ?></div>
+                                            <div class="text-reg text-12 text-break" style="line-height: 1.5;">
+                                                <a href="${linkValue}" target="_blank">${linkValue}</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="links[]" value="${linkValue}" class="link-hidden">
+                        </div>`;
+                                    container.insertAdjacentHTML('beforeend', html);
+                                } catch (e) { }
+                            })();
+                    <?php elseif (!empty($file['fileAttachment'])): ?>
+                            // Render File Preview
+                            (function () {
+                                const fileName = <?php echo json_encode($file['fileTitle'] ?: basename($file['fileAttachment'])); ?>;
+                                const ext = fileName.split('.').pop().toUpperCase();
+                                const uniqueID = Date.now() + Math.floor(Math.random() * 1000);
+                                <?php
+                                $filePath = "../shared/assets/files/" . $file['fileAttachment'];
+                                $fileExt = strtoupper(pathinfo($file['fileAttachment'], PATHINFO_EXTENSION));
+                                $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
+                                $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
+                                ?>
+
+                                const html = `
+                    <div class="col-12 my-1 file-preview">
+                        <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
+                            <div class="d-flex w-100 align-items-center justify-content-between">
+                                <div class="d-flex align-items-center flex-grow-1">
+                                    <div class="mx-3 d-flex align-items-center">
+                                        <span class="material-symbols-rounded">description</span>
+                                    </div>
+                                    <div>
+                                        <div class="text-sbold text-16" style="line-height: 1.5;"><?= htmlspecialchars($file['fileAttachment']) ?></div>
+                                        <div class="text-reg text-12" style="line-height: 1.5;">
+    <?= $fileExt ?> · <?= $fileSizeMB ?>
+</div>
+
+                                    </div>
+                                </div>
+                                <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">
+                                    <span class="material-symbols-outlined">close</span>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="existingFiles[]" value="<?php echo htmlspecialchars($file['fileAttachment']); ?>">
+                    </div>`;
+                                container.insertAdjacentHTML('beforeend', html);
+                            })();
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            });
+            //  Enable delete buttons for preloaded (reused) items
+            document.addEventListener('click', function (event) {
+                if (event.target.closest('.delete-file')) {
+                    const col = event.target.closest('.col-12');
+                    if (col) col.remove();
+                }
+            });
+
+        </script>
+    <?php endif; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
