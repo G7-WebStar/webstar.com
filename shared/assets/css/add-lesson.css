@@ -29,7 +29,6 @@
     --bs-popover-arrow-border: var(--black);
     --bs-popover-arrow-width: 12px;  /* slightly larger arrow */
     --bs-popover-arrow-height: 12px;
-    font-family: 'Poppins', sans-serif; /* ensure Poppins inside popover */
 }
 
 .popover.link-popover .popover-body {
@@ -37,7 +36,6 @@
     position: relative;
     background: var(--pureWhite); 
     border-radius: 12px; 
-    font-family: 'Poppins', sans-serif;
 }
 
 .popover.link-popover .form-floating {
@@ -49,7 +47,6 @@
     background-color: var(--pureWhite);
     border: 1px solid var(--black);
     color: var(--black);
-    font-family: 'Poppins', sans-serif;
 }
 
 .popover.link-popover .form-control:focus {
@@ -62,7 +59,6 @@
 .popover.link-popover .form-floating > label {
     color: var(--black);
     opacity: 0.7;
-    font-family: 'Poppins', sans-serif;
 }
 
 /* Bottom-right action area for the popover */

@@ -272,14 +272,21 @@ a.btn:hover {
   width: 100%;
 }
 
-/* Medium screens (md: ≥768px and <1200px) */
+/* Medium screens (md: ≥768px) */
+@media (min-width: 768px) and (max-width: 1159px) {
+  .create-prof-row {
+    width: 85%; /* Adjust as desired */
+  }
+}
+
+/* Large screens (lg: ≥1160px and <1599px) */
 @media (min-width: 1160px) and (max-width: 1599px) {
   .create-prof-row {
     width: 70%;
   }
 }
 
-/* Large screens (lg: ≥1600px and <2000px) */
+/* Extra large screens (xl: ≥1600px) */
 @media (min-width: 1600px) {
   .create-prof-row {
     width: 50%;

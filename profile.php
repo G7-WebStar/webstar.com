@@ -164,6 +164,58 @@ if (!$username && isset($_SESSION['userID'])) {
 $result = mysqli_query($conn, $query);
 $user = mysqli_fetch_assoc($result);
 
+// For My Items
+if (!$username && isset($_SESSION['userID'])) {
+    // Use userID from session
+    $myItemsQuery = "
+        SELECT 
+        prof.bio,
+        prof.webstars,
+        e.emblemName AS emblemTitle,
+        e.emblemPath AS emblemImg,
+        c.title AS coverTitle,
+        c.imagePath AS coverImg,
+        t.themeName AS colorTitle,
+        t.hexCode AS colorHex
+    FROM profile prof
+    LEFT JOIN emblem e ON prof.emblemID = e.emblemID
+    LEFT JOIN coverImage c ON prof.coverImageID = c.coverImageID
+    LEFT JOIN colorTheme t ON prof.colorThemeID = t.colorThemeID
+        WHERE prof.userID = '$userID'
+    ";
+} elseif ($username) {
+    $escaped = mysqli_real_escape_string($conn, $username);
+    // Get userID by username first
+    $userRow = $conn->query("SELECT userID FROM users WHERE userName = '$escaped' LIMIT 1")->fetch_assoc();
+    if ($userRow) {
+        $userID = (int) $userRow['userID'];
+        $myItemsQuery = "
+            SELECT 
+        prof.bio,
+        prof.webstars,
+        e.emblemName AS emblemTitle,
+        e.emblemPath AS emblemImg,
+        c.title AS coverTitle,
+        c.imagePath AS coverImg,
+        t.themeName AS colorTitle,
+        t.hexCode AS colorHex
+    FROM profile prof
+    LEFT JOIN emblem e ON prof.emblemID = e.emblemID
+    LEFT JOIN coverImage c ON prof.coverImageID = c.coverImageID
+    LEFT JOIN colorTheme t ON prof.colorThemeID = t.colorThemeID
+            WHERE prof.userID = '$escaped'
+        ";
+    } else {
+        // Username not found
+        header("Location: 404.php");
+        exit;
+    }
+}
+
+// Execute the query
+$myItemsResult = mysqli_query($conn, $myItemsQuery);
+$profile = mysqli_fetch_assoc($myItemsResult);
+
 if (!$user) {
     // Redirect to 404 page if user is not found
     header("Location: 404.php");
@@ -269,10 +321,10 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                 <div class="row m-0 w-100" id="firstColumn">
                                     <div class="col m-0 p-0 ">
                                         <div class="card profile rounded-4 me-md-2"
-                                            style="border: 1px solid var(--black);">
+                                            style="border: 1px solid var(--black);background: linear-gradient(to bottom, <?= htmlspecialchars($profile['colorHex']) ?>, #FFFFFF);">
                                             <!-- General Info -->
                                             <div class="row m-0 pb-md-3 d-flex align-items-center">
-                                                <div class="cover-photo"></div>
+                                                <div class="cover-photo" style="background: url('shared/assets/img/shop/cover-images/<?= htmlspecialchars($profile['coverImg']) ?>') center/cover no-repeat;"></div>
 
                                                 <!-- Profile Block -->
                                                 <div class="profile-block px-4">
@@ -289,7 +341,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                                 @<?= htmlspecialchars($user['userName']) ?>
                                                             </div>
                                                             <div class="user-username text-med text-muted">
-                                                                <?= htmlspecialchars($user['programInitial'] . ' ' . $user['yearLevel'] . '-' . $user['yearSection'])?>
+                                                                <?= htmlspecialchars($user['programInitial'] . ' ' . $user['yearLevel'] . '-' . $user['yearSection']) ?>
                                                             </div>
 
                                                             <!-- Bio -->
@@ -333,7 +385,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                                 <a href="https://mail.google.com/mail/?view=cm&fs=1&to=<?= htmlspecialchars($user['schoolEmail']) ?>"
                                                                     target="_blank" rel="noopener noreferrer"
                                                                     class="btn d-flex align-items-center justify-content-center gap-2 rounded-3 text-sbold text-14 m-0"
-                                                                    style="background-color: var(--primaryColor); border: 1px solid var(--black); width: 100%;">
+                                                                    style="background-color: <?= htmlspecialchars($profile['colorHex']) ?>; border: 1px solid var(--black); width: 100%;">
 
                                                                     <span class="material-symbols-rounded">mail</span>
                                                                     <span>Email</span>
@@ -411,7 +463,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                 <span class="text-sbold">My Emblem</span>
                                             </div>
                                             <div class="h-100 d-flex justify-content-center align-items-center">
-                                                <img src="shared/assets/img/badge.png" class="img-fluid"
+                                                <img src="shared/assets/img/shop/emblems/<?= htmlspecialchars($profile['emblemImg']) ?>" class="img-fluid"
                                                     style="max-height: 250px; width: 100%; height: auto; object-fit: contain;">
                                             </div>
 
@@ -476,10 +528,6 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                     ?>
                                                 </div>
                                             </div>
-
-
-
-
                                         </div>
                                     </div>
                                 </div>
@@ -573,7 +621,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                     <div>
                                                         <button type="button"
                                                             class="btn btn-sm px-3 rounded-pill text-med text-14"
-                                                            style="background-color: var(--primaryColor); border: 1px solid var(--black);"
+                                                            style="background-color: <?= htmlspecialchars($profile['colorHex']) ?>; border: 1px solid var(--black);"
                                                             onclick="exportCardAsJPG()"
                                                             title="Download your Star Card and share it with your friends!"
                                                             data-bs-toggle="tooltip" data-bs-placement="left">
@@ -591,7 +639,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                 <div class="mt-3 rounded-4 p-0"
                                                     style="border: 1px solid var(--black); width: 250px;  aspect-ratio: 1 / 1  !important;">
                                                     <div class="px-4 rounded-4 star-card"
-                                                        style="background: linear-gradient(to bottom, #FDDF94, #FFFFFF); max-width: 350px; ">
+                                                        style="background: linear-gradient(to bottom,<?= htmlspecialchars($profile['colorHex']) ?>, #FFFFFF); max-width: 350px; ">
                                                         <div class="text-center text-12 text-sbold mb-4"
                                                             style="margin-top: 30px;">
                                                             <span class="me-1">My Week on </span>
@@ -649,7 +697,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                         <div class="emblem">
                                                             <div
                                                                 class="h-100 d-flex justify-content-center align-items-center">
-                                                                <img src="shared/assets/img/badge.png" class="img-fluid"
+                                                                <img src="shared/assets/img/shop/emblems/<?= htmlspecialchars($profile['emblemImg']) ?>" class="img-fluid"
                                                                     style="max-height: 250px; width: 100%; height: auto; object-fit: contain;">
                                                             </div>
                                                         </div>

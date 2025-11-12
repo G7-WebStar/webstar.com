@@ -6,11 +6,11 @@ include("../shared/assets/processes/prof-session-process.php");
 
 if (isset($_POST['createCourse'])) {
     $courseTitle = $_POST['courseTitle'];
-    $courseCode = strtoupper($_POST['courseCode']); // convert to uppercase
+    $courseCode = strtoupper($_POST['courseCode']); // Convert to uppercase
     $section = strtoupper($_POST['section']);
     $userID = $_SESSION['userID'];
 
-    // handle image
+    // Handle image
     $courseImage = '';
     if (isset($_FILES['fileUpload']) && $_FILES['fileUpload']['error'] === 0) {
         $courseImage = $_FILES['fileUpload']['name'];
@@ -31,13 +31,15 @@ if (isset($_POST['createCourse'])) {
         return $randomCode;
     }
 
+    // Generate a random 6 alphanumeric code
     do {
-        $accessCode = generateAccessCode(6); // random 6-character alphanumeric
+        $accessCode = generateAccessCode(6); 
         $checkCodeQuery = "SELECT * FROM courses WHERE code = '$accessCode'";
         $codeExists = executeQuery($checkCodeQuery);
     } while (mysqli_num_rows($codeExists) > 0);
 
 
+    // Insert Query
     $insertCourse = "
         INSERT INTO courses (userID, courseTitle, courseCode, section, courseImage, code)
         VALUES ('$userID', '$courseTitle', '$courseCode', '$section', '$courseImage', '$accessCode')
@@ -333,19 +335,6 @@ if (isset($_POST['createCourse'])) {
                                             <!-- Page Title -->
                                             <div class="col text-center text-md-start">
                                                 <span class="text-sbold text-20">Create Course</span>
-                                            </div>
-
-                                            <!-- Create an existing course Button -->
-                                            <div
-                                                class="col-12 col-md-auto create-ex-course text-center d-flex d-md-block justify-content-center justify-content-md-end mt-3 mt-md-0">
-                                                <button type="button"
-                                                    class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 my-1 d-flex align-items-center gap-2"
-                                                    style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);"
-                                                    data-bs-toggle="modal" data-bs-target="#reuseTaskModal">
-                                                    <span class="material-symbols-rounded"
-                                                        style="font-size:16px">folder</span>
-                                                    <span>Create an existing course</span>
-                                                </button>
                                             </div>
                                         </div>
                                     </div>

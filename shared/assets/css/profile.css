@@ -16,7 +16,6 @@ body {
 }
 
 .profile {
-    background: linear-gradient(to bottom, #FDDF94, #FFFFFF);
     min-height: 200px;
     position: relative;
 }
@@ -28,7 +27,6 @@ body {
 .cover-photo {
     width: 100%;
     height: 150px;
-    background: url('../pfp-uploads/cover4.jpg') center/cover no-repeat;
     border-radius: 15px 15px 0 0;
     -webkit-mask-image: linear-gradient(to bottom, black 10%, transparent 100%);
     mask-image: linear-gradient(to bottom, black 10%, transparent 100%);

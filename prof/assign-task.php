@@ -9,10 +9,10 @@ $taskID = 0;
 
 if (isset($_GET['edit'])) {
     $mode = 'edit';
-    $taskID = intval($_GET['edit']); // task to duplicate
+    $taskID = intval($_GET['edit']);
 } elseif (isset($_GET['reuse'])) {
     $mode = 'reuse';
-    $taskID = intval($_GET['reuse']); // task to update
+    $taskID = intval($_GET['reuse']);
 }
 
 $course = "SELECT courseID, courseCode 
@@ -41,7 +41,7 @@ if (isset($_POST['saveAssignment'])) {
             $insertAssessment = "INSERT INTO assessments 
                 (courseID, assessmentTitle, type, deadline, deadlineEnabled, createdAt)
                 VALUES 
-                ('$selectedCourseID', '$title', 'task', " . ($deadline ? "'$deadline'" : "NULL") . ", '$deadlineEnabled', NOW())";
+                ('$selectedCourseID', '$title', 'Task', " . ($deadline ? "'$deadline'" : "NULL") . ", '$deadlineEnabled', NOW())";
             executeQuery($insertAssessment);
             $assessmentID = mysqli_insert_id($conn);
 
@@ -51,7 +51,7 @@ if (isset($_POST['saveAssignment'])) {
                 ('$assessmentID', '$desc', '$points', '$rubricID')";
             executeQuery($insertAssignment);
 
-            $assignmentID = $assessmentID;
+            $assignmentID = mysqli_insert_id($conn);
 
             // Insert into todo
             $insertTodo = "INSERT INTO todo 
@@ -133,7 +133,6 @@ if (isset($_POST['saveAssignment'])) {
     }
 }
 
-
 //Fetch the Title of link
 if (isset($_GET['fetchTitle'])) {
     $url = $_GET['fetchTitle'];
@@ -158,18 +157,24 @@ if (isset($_GET['fetchTitle'])) {
 }
 
 // Selecting Tasks made by the Instructor logged in
-$taskQuery = "SELECT a.assessmentTitle, asg.assignmentDescription, a.createdAt, a.assessmentID, c.courseCode
-        FROM assessments a
-        JOIN assignments asg 
-        ON a.assessmentID = asg.assessmentID
-        JOIN courses c
-        ON a.courseID = c.courseID
-        JOIN users u
-        ON c.userID = u.userID
-        WHERE a.type = 'Task' AND u.userID = '$userID'
-        ORDER BY a.createdAt DESC";
+$taskQuery = "
+    SELECT 
+        a.assessmentTitle, 
+        asg.assignmentDescription, 
+        a.createdAt, 
+        a.assessmentID, 
+        c.courseCode
+    FROM assessments a
+    JOIN assignments asg ON a.assessmentID = asg.assessmentID
+    JOIN courses c ON a.courseID = c.courseID
+    JOIN users u ON c.userID = u.userID
+    WHERE a.type = 'Task' AND u.userID = '$userID'
+    GROUP BY a.assessmentTitle, asg.assignmentDescription
+    ORDER BY a.createdAt DESC
+";
 
 $tasks = executeQuery($taskQuery);
+
 
 // Storing reused data
 $reusedData = null;
@@ -178,15 +183,16 @@ $reusedData = null;
 $activeRubric = null; // always exists
 
 // If the instructor chose to reuse, it'll check the button if it was set
-if (isset($_GET['reuse'])) {
-    $reuseID = intval($_GET['reuse']);
+if (isset($_GET['reuse']) || isset($_GET['edit'])) {
+    $reuseID = isset($_GET['reuse']) ? intval($_GET['reuse']) : intval($_GET['edit']);
 
-    // Getting the data of the selected task to reuse
+    // Getting the data of the selected task to reuse or edit
     $reuseQuery = "
     SELECT 
         a.assessmentTitle, 
         asg.assignmentDescription, 
         a.deadline, 
+        a.deadlineEnabled,
         asg.assignmentPoints,
         r.rubricID,
         r.rubricTitle,
@@ -201,10 +207,13 @@ if (isset($_GET['reuse'])) {
     LEFT JOIN files f ON asg.assignmentID = f.assignmentID
     LEFT JOIN rubric r ON asg.rubricID = r.rubricID
     LEFT JOIN criteria c ON c.rubricID = r.rubricID
-    WHERE a.assessmentID = '$reuseID' 
+    JOIN courses crs ON a.courseID = crs.courseID
+    JOIN users u ON crs.userID = u.userID
+    WHERE a.assessmentID = '$reuseID'
       AND a.type = 'Task'
+      AND u.userID = '$userID'
     GROUP BY r.rubricID, r.rubricTitle, r.totalPoints, f.fileID
-";
+    ";
 
     $reuseResult = executeQuery($reuseQuery);
     if ($reuseResult && $reuseResult->num_rows > 0) {
@@ -212,6 +221,10 @@ if (isset($_GET['reuse'])) {
         while ($row = $reuseResult->fetch_assoc()) {
             $reusedData[] = $row; // store all file rows
         }
+    } else {
+        // Invalid or unauthorized reuse/edit attempt
+        header("Location: assign-task.php");
+        exit();
     }
 }
 
@@ -221,7 +234,8 @@ if (!empty($reusedData)) {
         'assessmentTitle' => $reusedData[0]['assessmentTitle'],
         'assignmentDescription' => $reusedData[0]['assignmentDescription'],
         'deadline' => $reusedData[0]['deadline'],
-        'assignmentPoints' => $reusedData[0]['assignmentPoints']
+        'assignmentPoints' => $reusedData[0]['assignmentPoints'],
+        'deadlineEnabled' => $reusedData[0]['deadlineEnabled']
     ];
 
     // Display the attachments of the reused tasks 
@@ -277,7 +291,6 @@ if (!empty($reusedData)) {
 }
 
 // Fetch latest rubric for current user to display in the rubric card
-// Detect if totalPoints column exists to avoid SQL errors on older DBs
 $hasTotalPoints = false;
 $colCheck = executeQuery("SHOW COLUMNS FROM rubric LIKE 'totalPoints'");
 if ($colCheck && $colCheck->num_rows > 0) {
@@ -287,7 +300,6 @@ if ($colCheck && $colCheck->num_rows > 0) {
 // Fetch all rubrics for modal list
 $rubricsList = [];
 $tpSelectList = $hasTotalPoints ? "IFNULL(r.totalPoints,0) AS totalPoints" : "0 AS totalPoints";
-$tpGroupList = $hasTotalPoints ? ", r.totalPoints" : "";
 $tpGroupList = $hasTotalPoints ? ", r.totalPoints" : "";
 $rubricsQuery = "SELECT r.rubricID, r.rubricTitle, r.rubricType, $tpSelectList, COUNT(c.criterionID) AS criteriaCount
                  FROM rubric r
@@ -302,6 +314,9 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
         $rubricsList[] = $row;
     }
 }
+
+
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -309,7 +324,12 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | Assign Task</title>
+    <title>
+        <?php
+        echo isset($_GET['reuse']) ? 'Reassign Task' : (isset($_GET['edit']) ? 'Edit Task' : 'Assign Task');
+        ?> ✦ Webstar
+    </title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="../shared/assets/css/global-styles.css">
@@ -401,7 +421,15 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 
                                     <!-- Page Title -->
                                     <div class="col text-center text-md-start">
-                                        <span class="text-sbold text-20">Assign Task</span>
+                                        <span class="text-sbold text-20"><?php
+                                        if (isset($_GET['edit'])) {
+                                            echo 'Edit Task';
+                                        } elseif (isset($_GET['reuse'])) {
+                                            echo 'Reassign Task';
+                                        } else {
+                                            echo 'Assign Task';
+                                        }
+                                        ?></span>
                                     </div>
 
                                     <!-- Assign Existing Task Button -->
@@ -427,8 +455,6 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                         value="<?= isset($_GET['edit']) ? 'edit' : (isset($_GET['reuse']) ? 'reuse' : 'new') ?>">
                                     <input type="hidden" name="taskID"
                                         value="<?= $_GET['edit'] ?? $_GET['reuse'] ?? '' ?>">
-
-
 
                                     <div class="row">
                                         <div class="col-12 pt-3">
@@ -459,7 +485,6 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <input type="hidden" name="assignmentContent" id="task">
                                             <input type="hidden" name="assignmentContent" id="task">
                                         </div>
                                     </div>
@@ -495,16 +520,17 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 
                                         <div class="form-check mt-2 col d-flex align-items-center">
                                             <input class="form-check-input" type="checkbox" id="stopSubmissions"
-                                                name="stopSubmissions" value="1"
-                                                style="border: 1px solid var(--black);" />
+                                                name="stopSubmissions" value="1" style="border: 1px solid var(--black);"
+                                                <?php if (!empty($mainData['deadlineEnabled']) && $mainData['deadlineEnabled'] == 1)
+                                                    echo 'checked'; ?> />
                                             <label class="form-check-label text-reg text-14 ms-2"
                                                 style="margin-top: 4.5px;" for="stopSubmissions">
                                                 Stop accepting submissions after the deadline.
                                             </label>
                                         </div>
 
-                                    </div>
 
+                                    </div>
 
                                     <!-- Learning Materials -->
                                     <div class="row">
@@ -530,7 +556,6 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                         files or links.</span>
                                                 </div>
 
-
                                                 <!-- Container for dynamically added file & link cards -->
                                                 <div id="filePreviewContainer" class="row mb-0"></div>
 
@@ -554,7 +579,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                         style="background-color: var(--primaryColor); border: 1px solid var(--black);"
                                                         data-bs-container="body" data-bs-toggle="popover"
                                                         data-bs-placement="right" data-bs-html="true"
-                                                        data-bs-content='<div class="form-floating mb-3"><input type="url" class="form-control" id="linkInput" placeholder="Paste link here"><label for="linkInput">Link</label></div><div class="link-popover-actions"><button type="button" class="btn btn-sm px-3 py-1 rounded-pill" id="addLinkBtn" style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);">Add link</button></div>'>
+                                                        data-bs-content='<div class="form-floating mb-3 text-reg"><input type="url" class="form-control text-reg" id="linkInput" placeholder="Paste link here"><label for="linkInput">Link</label></div><div class="link-popover-actions"><button type="button" class="btn btn-sm px-3 py-1 rounded-pill text-reg" id="addLinkBtn" style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);">Add link</button></div>'>
                                                         <div style="display: flex; align-items: center; gap: 5px;">
                                                             <span class="material-symbols-rounded"
                                                                 style="font-size:20px">link</span>
@@ -681,54 +706,81 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                         style="margin-bottom: <?php echo ($courses && $courses->num_rows > 0) ? ($courses->num_rows * 50) : 0; ?>px;">
                                                         <!-- Dynamic Border Bottom based on the number of courses hehe -->
                                                         <!-- Add to Course -->
-                                                        <div
-                                                            class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center flex-nowrap justify-content-center justify-content-md-start">
-                                                            <span class="me-2 text-med text-16 pe-3">Add to
-                                                                Course</span>
-                                                            <div class="dropdown">
-                                                                <button
-                                                                    class="btn dropdown-toggle dropdown-shape text-med text-16 me-md-5"
-                                                                    type="button" data-bs-toggle="dropdown"
-                                                                    aria-expanded="false">
-                                                                    <span class="me-2">Select Course</span>
-                                                                </button>
-                                                                <ul class="dropdown-menu p-2 mt-2"
-                                                                    style="min-width: 200px; border: 1px solid var(--black);">
-                                                                    <?php
-                                                                    if ($courses && $courses->num_rows > 0) {
-                                                                        while ($course = $courses->fetch_assoc()) { ?>
-                                                                            <li>
-                                                                                <div class="form-check">
-                                                                                    <input
-                                                                                        class="form-check-input course-checkbox"
-                                                                                        type="checkbox" name="courses[]"
-                                                                                        style="border: 1px solid var(--black);"
-                                                                                        value="<?php echo $course['courseID']; ?>"
-                                                                                        id="course<?php echo $course['courseID']; ?>">
-                                                                                    <label class="form-check-label text-reg"
-                                                                                        for="course<?php echo $course['courseID']; ?>">
-                                                                                        <?php echo $course['courseCode']; ?>
-                                                                                    </label>
-                                                                                </div>
-                                                                            </li>
-                                                                        <?php }
-                                                                    } else { ?>
-                                                                        <li><span class="dropdown-item-text text-muted">No
-                                                                                courses found</span></li>
-                                                                    <?php } ?>
-                                                                </ul>
+                                                        <?php if (!isset($_GET['edit'])): ?>
+                                                            <div
+                                                                class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center flex-nowrap justify-content-center justify-content-md-start">
+                                                                <span class="me-2 text-med text-16 pe-3">Add to
+                                                                    Course</span>
+                                                                <div class="dropdown">
+                                                                    <button
+                                                                        class="btn dropdown-toggle dropdown-shape text-med text-16 me-md-5"
+                                                                        type="button" data-bs-toggle="dropdown"
+                                                                        aria-expanded="false">
+                                                                        <span class="me-2">Select Course</span>
+                                                                    </button>
+                                                                    <ul class="dropdown-menu p-2 mt-2"
+                                                                        style="min-width: 200px; border: 1px solid var(--black);">
+                                                                        <?php
+                                                                        if ($courses && $courses->num_rows > 0) {
+                                                                            // If editing, get the assigned courses for this task
+                                                                            $assignedCourseIDs = [];
+                                                                            if (isset($_GET['edit'])) {
+                                                                                $editID = intval($_GET['edit']);
+                                                                                $assignedQuery = "SELECT courseID FROM assessments WHERE assessmentID = '$editID'";
+                                                                                $assignedResult = executeQuery($assignedQuery);
+                                                                                if ($assignedResult && $assignedResult->num_rows > 0) {
+                                                                                    while ($row = $assignedResult->fetch_assoc()) {
+                                                                                        $assignedCourseIDs[] = $row['courseID'];
+                                                                                    }
+                                                                                }
+                                                                            }
+
+                                                                            while ($course = $courses->fetch_assoc()) {
+                                                                                $checked = in_array($course['courseID'], $assignedCourseIDs) ? 'checked' : '';
+                                                                                ?>
+                                                                                <li>
+                                                                                    <div class="form-check">
+                                                                                        <input
+                                                                                            class="form-check-input course-checkbox"
+                                                                                            type="checkbox" name="courses[]"
+                                                                                            style="border: 1px solid var(--black);"
+                                                                                            value="<?= $course['courseID'] ?>"
+                                                                                            id="course<?= $course['courseID'] ?>"
+                                                                                            <?= $checked ?>>
+                                                                                        <label class="form-check-label text-reg"
+                                                                                            for="course<?= $course['courseID'] ?>">
+                                                                                            <?= $course['courseCode'] ?>
+                                                                                        </label>
+                                                                                    </div>
+                                                                                </li>
+                                                                            <?php }
+                                                                        } else { ?>
+                                                                            <li><span class="dropdown-item-text text-muted">No
+                                                                                    courses found</span></li>
+                                                                        <?php } ?>
+                                                                    </ul>
+
+                                                                </div>
                                                             </div>
-                                                        </div>
+                                                        <?php endif; ?>
 
                                                         <!-- Assign Button -->
                                                         <div class="col-12 col-md-auto mt-3 mt-md-0 text-center">
                                                             <button type="submit" name="saveAssignment"
                                                                 class="px-4 py-2 rounded-pill text-sbold text-md-14 mt-4 mt-md-0"
                                                                 style="background-color: var(--primaryColor); border: 1px solid var(--black);">
-                                                                <?php echo isset($reusedData) ? 'Reassign Task' : 'Assign'; ?>
+                                                                <?php
+                                                                if (isset($_GET['edit'])) {
+                                                                    echo 'Save Changes';
+                                                                } elseif (isset($_GET['reuse'])) {
+                                                                    echo 'Reassign';
+                                                                } else {
+                                                                    echo 'Assign';
+                                                                }
+                                                                ?>
                                                             </button>
-
                                                         </div>
+
                                                     </div>
 
                                                 </div>
@@ -864,7 +916,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 
                 <!-- DESC -->
                 <div class="modal-body flex-grow-1 overflow-auto">
-                    <p class="mb-3 text-med text-14 ms-3" style="color: var(--black);">
+                    <p class="mb-3 text-med text-14 mx-3" style="color: var(--black);">
                         Select a task you’ve previously created to reuse its details. You can review and edit the title,
                         instructions, or settings before assigning or saving the task.
                     </p>
@@ -911,13 +963,8 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 
                 <!-- FOOTER -->
                 <div class="modal-footer border-top flex-shrink-0 py-4">
-
-
-
                 </div>
             </div>
-
-
         </div>
     </div>
     </div>
@@ -1260,28 +1307,22 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
     // Auto-open rubric modal when returning from create-rubric
     (function () {
         function openRubricModal() {
-    (function () {
-        function openRubricModal() {
             var modalEl = document.getElementById('selectRubricModal');
             if (!modalEl) return;
             var modal = new bootstrap.Modal(modalEl);
             // slight delay to ensure layout ready
             setTimeout(function () { modal.show(); }, 50);
-            setTimeout(function () { modal.show(); }, 50);
         }
-        function needsOpen() {
         function needsOpen() {
             try {
                 var params = new URLSearchParams(window.location.search);
                 if (params.get('openRubric') === '1') return true;
-            } catch (e) { }
             } catch (e) { }
             // also support hash trigger
             if (window.location.hash === '#openRubric') return true;
             return false;
         }
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function () { if (needsOpen()) openRubricModal(); });
             document.addEventListener('DOMContentLoaded', function () { if (needsOpen()) openRubricModal(); });
         } else {
             if (needsOpen()) openRubricModal();
@@ -1324,12 +1365,10 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 
     // Click on a rubric option: highlight and store selection
     document.addEventListener('click', function (e) {
-    document.addEventListener('click', function (e) {
         var opt = e.target.closest && e.target.closest('.rubric-option');
         if (!opt) return;
 
         // Clear previous highlight
-        document.querySelectorAll('.rubric-option').forEach(function (el) {
         document.querySelectorAll('.rubric-option').forEach(function (el) {
             el.style.backgroundColor = 'var(--pureWhite)';
         });
@@ -1345,7 +1384,6 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
     });
 
     // Confirm selection: apply to card and close modal
-    document.addEventListener('click', function (e) {
     document.addEventListener('click', function (e) {
         var btn = e.target.closest && e.target.closest('#confirmRubricBtn');
         if (!btn) return;
@@ -1403,7 +1441,6 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 <script>
     // Persist Assign Task form fields using localStorage so input survives navigating away and back
     (function () {
-    (function () {
         var STORAGE_KEY = 'assignTaskDraft_v1';
         var NAVIGATION_FLAG = 'assignTaskNavigatedAway_v1';
 
@@ -1448,11 +1485,9 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                 };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
             } catch (e) { }
-            } catch (e) { }
         }
 
         function clearDraftInStorage() {
-            try { localStorage.removeItem(STORAGE_KEY); } catch (e) { }
             try { localStorage.removeItem(STORAGE_KEY); } catch (e) { }
         }
 
@@ -1501,7 +1536,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
             if (draft.links && Array.isArray(draft.links) && draft.links.length > 0) return true;
             return false;
         }
-        
+
         function clearAllFormFields() {
             try {
                 var titleInput = getElementById('taskInfo');
@@ -1520,19 +1555,16 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                     quill.root.innerHTML = '';
                 }
             } catch (e) { }
-            } catch (e) { }
         }
 
         function restoreDraftFromStorage() {
             var raw = null;
-            try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { }
             try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { }
             if (!raw) {
                 clearAllFormFields();
                 return;
             }
             var draft = null;
-            try { draft = JSON.parse(raw); } catch (e) {
             try { draft = JSON.parse(raw); } catch (e) {
                 draft = null;
                 clearDraftInStorage();
@@ -1586,7 +1618,6 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                     for (i = 0; i < draft.links.length; i++) appendLinkPreview(draft.links[i]);
                 }
             } catch (e) { }
-            } catch (e) { }
         }
 
         function bindDraftPersistenceListeners() {
@@ -1597,36 +1628,25 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                 form.addEventListener('submit', function () {
                     clearDraftInStorage();
                     clearNavigationFlag();
-                form.addEventListener('input', function () { saveDraftToStorage(); });
-                form.addEventListener('change', function () { saveDraftToStorage(); });
-                form.addEventListener('submit', function () {
-                    clearDraftInStorage();
-                    clearNavigationFlag();
                 });
             }
             try {
                 if (typeof quill !== 'undefined') {
                     quill.on('text-change', function () { saveDraftToStorage(); });
-                    quill.on('text-change', function () { saveDraftToStorage(); });
                 }
-            } catch (e) { }
-            document.addEventListener('click', function (event) {
             } catch (e) { }
             document.addEventListener('click', function (event) {
                 var isAddLink = event.target && event.target.id === 'addLinkBtn';
                 var isDelete = event.target && (event.target.closest ? event.target.closest('.delete-file') : null);
-                if (isAddLink || isDelete) { setTimeout(function () { saveDraftToStorage(); }, 0); }
                 if (isAddLink || isDelete) { setTimeout(function () { saveDraftToStorage(); }, 0); }
             });
         }
 
         function setNavigationFlag() {
             try { localStorage.setItem(NAVIGATION_FLAG, '1'); } catch (e) { }
-            try { localStorage.setItem(NAVIGATION_FLAG, '1'); } catch (e) { }
         }
 
         function clearNavigationFlag() {
-            try { localStorage.removeItem(NAVIGATION_FLAG); } catch (e) { }
             try { localStorage.removeItem(NAVIGATION_FLAG); } catch (e) { }
         }
 
@@ -1641,12 +1661,14 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
             try {
                 var params = new URLSearchParams(window.location.search);
                 var hasReuse = params.get('reuse');
-                if (hasReuse) {
+                var hasEdit = params.get('edit');
+                if (hasReuse || hasEdit) {
                     clearDraftInStorage();
                     clearNavigationFlag();
                     bindDraftPersistenceListeners();
                     return;
                 }
+
 
                 var hasSelectedRubric = params.get('selectedRubricID');
                 var shouldRestore = hasNavigatedAway() || hasSelectedRubric;
@@ -1667,7 +1689,6 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                 }
 
                 var draft = null;
-                try { draft = JSON.parse(raw); } catch (e) {
                 try { draft = JSON.parse(raw); } catch (e) {
                     clearDraftInStorage();
                     bindDraftPersistenceListeners();
@@ -1694,7 +1715,6 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 
         function bindNavigationAwayListeners() {
             document.addEventListener('click', function (event) {
-            document.addEventListener('click', function (event) {
                 var link = event.target.closest ? event.target.closest('a') : null;
                 if (!link || !link.href) return;
                 var href = link.href;
@@ -1703,7 +1723,6 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                 }
             }, true);
 
-
             function bindEditLinks() {
                 var editLinks = document.querySelectorAll('a[href*="edit-rubric.php"]');
                 for (var i = 0; i < editLinks.length; i++) {
@@ -1711,19 +1730,15 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                     if (link.dataset.navFlagSet) continue;
                     link.dataset.navFlagSet = '1';
                     link.addEventListener('click', function () {
-                    link.addEventListener('click', function () {
                         setNavigationFlag();
                     });
                 }
             }
 
-
             bindEditLinks();
-
 
             var modalEl = document.getElementById('selectRubricModal');
             if (modalEl) {
-                modalEl.addEventListener('shown.bs.modal', function () {
                 modalEl.addEventListener('shown.bs.modal', function () {
                     setTimeout(bindEditLinks, 100);
                 });
@@ -1732,7 +1747,6 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 
         function initializeDraftPersistenceWithCleanStart() {
             bindNavigationAwayListeners();
-
 
             function attemptCheck() {
                 if (typeof quill !== 'undefined' && quill.root) {
@@ -1743,7 +1757,6 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
             }
 
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', function () { attemptCheck(); });
                 document.addEventListener('DOMContentLoaded', function () { attemptCheck(); });
             } else {
                 attemptCheck();

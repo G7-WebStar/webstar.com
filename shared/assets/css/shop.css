@@ -8,14 +8,12 @@
     font-weight: normal !important;
     background-color: transparent !important;
     white-space: nowrap !important;
-    font-size: 14px !important;
 }
 
 .custom-nav-tabs .nav-link:hover {
     color: var(--black) !important;
     text-decoration: none !important;
     background-color: transparent !important;
-    font-size: 14px !important;
 }
 
 .custom-nav-tabs .nav-link.active {
