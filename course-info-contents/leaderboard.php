@@ -200,9 +200,9 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
 </div>
 <?php else: ?>
     <!-- EMPTY STATE -->
-    <div class="container text-center py-5">
-        <img src="shared/assets/img/courseInfo/trophy.png" alt="No Stars" class="empty-state-img mb-3" style="max-width:150px;">
-        <div class="empty-state-text text-reg text-16 d-flex flex-column align-items-center">
+    <div class="empty-state text-center">
+        <img src="shared/assets/img/empty/leaderboard.png" alt="No Stars" class="empty-state-img">
+        <div class="empty-state-text text-14 d-flex flex-column align-items-center">
             <p class="text-med mb-1">No stars shining yet!</p>
             <p class="text-reg">Earn XP from quests to climb the leaderboard</p>
         </div>

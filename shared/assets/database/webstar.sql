@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 07, 2025 at 01:42 AM
+-- Generation Time: Nov 09, 2025 at 01:28 PM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -702,6 +702,7 @@ CREATE TABLE `scores` (
   `scoreID` int(5) NOT NULL,
   `userID` int(5) NOT NULL,
   `assignmentID` int(5) DEFAULT NULL,
+  `submissionID` int(5) DEFAULT NULL,
   `testID` int(5) DEFAULT NULL,
   `score` int(5) NOT NULL,
   `feedback` varchar(255) DEFAULT NULL,
@@ -916,17 +917,18 @@ CREATE TABLE `todo` (
   `status` varchar(20) NOT NULL DEFAULT 'Pending',
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp(),
   `isRead` tinyint(1) DEFAULT 0,
-  `timeSpent` int(11) DEFAULT NULL
+  `timeSpent` int(11) DEFAULT NULL,
+  `timeStart` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `todo`
 --
 
-INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `status`, `updatedAt`, `isRead`, `timeSpent`) VALUES
-(1, 2, 1, 'Missing', '2025-11-07 08:30:03', 0, NULL),
-(2, 2, 4, 'Pending', '2025-10-29 09:00:00', 1, NULL),
-(3, 2, 2, 'Pending', '2025-11-04 18:16:16', 1, 0);
+INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `status`, `updatedAt`, `isRead`, `timeSpent`, `timeStart`) VALUES
+(1, 2, 1, 'Missing', '2025-11-07 08:30:03', 0, NULL, NULL),
+(2, 2, 4, 'Pending', '2025-10-29 09:00:00', 1, NULL, NULL),
+(3, 2, 2, 'Pending', '2025-11-04 18:16:16', 1, 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -1028,6 +1030,7 @@ INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`, `status`
 CREATE TABLE `webstars` (
   `webstarsID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
+  `assessmentID` int(11) DEFAULT NULL,
   `sourceType` varchar(50) NOT NULL,
   `pointsChanged` int(100) NOT NULL,
   `dateEarned` datetime NOT NULL
@@ -1037,8 +1040,8 @@ CREATE TABLE `webstars` (
 -- Dumping data for table `webstars`
 --
 
-INSERT INTO `webstars` (`webstarsID`, `userID`, `sourceType`, `pointsChanged`, `dateEarned`) VALUES
-(22, 2, 'Shop Purchase', -150, '2025-11-06 17:56:42');
+INSERT INTO `webstars` (`webstarsID`, `userID`, `assessmentID`, `sourceType`, `pointsChanged`, `dateEarned`) VALUES
+(22, 2, NULL, 'Shop Purchase', -150, '2025-11-06 17:56:42');
 
 --
 -- Indexes for dumped tables

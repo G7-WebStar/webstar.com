@@ -71,9 +71,9 @@ $showDropdowns = $assessmentCount > 0
                                 $link = "#";
 
                                 if ($type === 'task') {
-                                    $link = "assignment.php?assignmentID=" . $todo['assignmentID'];
+                                    $link = "task-info.php?assignmentID=" . $todo['assignmentID'];
                                 } elseif ($type === 'test') {
-                                    $link = "test.php?testID=" . $todo['testID'];
+                                    $link = "test-info.php?testID=" . $todo['testID'];
                                 }
                                 ?>
 
@@ -91,32 +91,32 @@ $showDropdowns = $assessmentCount > 0
 <?php elseif (!empty($statusFilter) && $statusFilter != 'All' || $sortTodo == 'Missing'): ?>
     <div class="empty-state text-center">
         <?php if ($statusFilter == 'Pending'): ?>
-            <img src="../shared/assets/img/courseInfo/puzzle.png" alt="No Pending Quests" class="empty-state-img">
-            <div class="empty-state-text text-reg text-16 d-flex flex-column align-items-center">
-                <p class="text-med mb-0">No quests have been assigned yet.</p>
-                <p class="text-reg">Your next adventure awaits!</p>
+            <img src="../shared/assets/img/empty/todo.png" alt="No Pending Quests" class="empty-state-img">
+            <div class="empty-state-text text-reg text-14 d-flex flex-column align-items-center">
+                <p class="text-med mt-1 mb-0">No quests have been assigned yet.</p>
+                <p class="text-reg mt-1">Your next adventure awaits!</p>
             </div>
 
         <?php elseif ($statusFilter == 'Missing' || $sortTodo == 'Missing'): ?>
-            <img src="../shared/assets/img/courseInfo/thumbs-up.png" alt="No Missing Quests" class="empty-state-img">
-            <div class="empty-state-text text-reg text-16 d-flex flex-column align-items-center">
-                <p class="text-med mb-0">No missing quests.</p>
-                <p class="text-reg">You’re right on track, adventurer!</p>
+            <img src="../shared/assets/img/empty/quest.png" alt="No Missing Quests" class="empty-state-img">
+            <div class="empty-state-text text-reg text-14 d-flex flex-column align-items-center">
+                <p class="text-med mt-1 mb-0">No missing quests.</p>
+                <p class="text-reg mt-1">You’re right on track, adventurer!</p>
             </div>
 
         <?php elseif ($statusFilter == 'Done'): ?>
-            <img src="../shared/assets/img/courseInfo/file.png" alt="No Done Quests" class="empty-state-img">
-            <div class="empty-state-text text-reg text-16 d-flex flex-column align-items-center">
-                <p class="text-med mb-0">You haven’t submitted any quests yet.</p>
-                <p class="text-reg">Complete one to earn XPs!</p>
+            <img src="../shared/assets/img/empty/folder.png" alt="No Done Quests" class="empty-state-img">
+            <div class="empty-state-text text-reg text-14 d-flex flex-column align-items-center">
+                <p class="text-med mt-1 mb-0">You haven’t submitted any quests yet.</p>
+                <p class="text-reg mt-1">Complete one to earn XPs!</p>
             </div>
         <?php endif; ?>
     </div>
 
 <?php else: ?>
     <div class="empty-state text-center">
-        <img src="../shared/assets/img/courseInfo/puzzle.png" alt="No Quests" class="empty-state-img">
-        <div class="empty-state-text text-reg text-16 d-flex flex-column align-items-center">
+        <img src="../shared/assets/img/empty/todo.png" alt="No Quests" class="empty-state-img">
+        <div class="empty-state-text text-reg text-14 d-flex flex-column align-items-center">
             <p class="text-med mb-0">No quests are available at the moment.</p>
         </div>
     </div>

@@ -1,3 +1,121 @@
+<?php
+$activePage = 'assess-exam-submissions';
+$activeTab = $_GET['tab'] ?? 'submissions';
+
+include('../shared/assets/database/connect.php');
+include("../shared/assets/processes/prof-session-process.php");
+date_default_timezone_set('Asia/Manila');
+
+if (!isset($_GET['assessmentID'])) {
+    echo "Assessment ID is missing in the URL.";
+    exit;
+}
+$assessmentID = intval($_GET['assessmentID']);
+
+// Default filters
+$sortBy = $_GET['sortBy'] ?? 'All';
+$statusFilter = $_GET['status'] ?? 'All';
+
+$testInfoQuery = "
+    SELECT *
+    FROM tests
+    LEFT JOIN assessments ON tests.assessmentID = assessments.assessmentID
+    WHERE assessments.assessmentID = $assessmentID
+";
+$testInfoResult = executeQuery($testInfoQuery);
+
+if (!$test = mysqli_fetch_assoc($testInfoResult)) {
+    echo "Test not found.";
+    exit;
+}
+
+$testID       = $test['testID'];
+$testTitle    = $test['assessmentTitle'] ?? 'No Submissions';
+$deadline     = $test['deadline'] ?? date("Y-m-d H:i:s");
+$currentDate  = date("Y-m-d H:i:s");
+$isCompleted  = (strtotime($currentDate) > strtotime($deadline));
+$examStatus   = $isCompleted ? "Completed" : "Active";
+$examDuration = $test['testTimelimit'] ?? 0;
+$courseID     = $test['courseID'] ?? 0;
+
+// Fetch distinct course codes for dropdown
+$courseCodesQuery = "
+    SELECT DISTINCT courseCode 
+    FROM courses 
+    ORDER BY courseCode ASC
+";
+$courseCodesResult = executeQuery($courseCodesQuery);
+
+// Status filter
+$statusSQL = "";
+if ($statusFilter === "Submitted") {
+    $statusSQL = "AND (todo.status = 'Submitted' OR todo.status = 'Returned') AND scores.score IS NOT NULL";
+} elseif ($statusFilter === "Pending") {
+    $statusSQL = "AND todo.status IS NULL AND scores.score IS NULL AND NOW() < assessments.deadline";
+} elseif ($statusFilter === "Missing") {
+    $statusSQL = "AND todo.status IS NULL AND scores.score IS NULL AND NOW() > assessments.deadline";
+}
+
+// Fetch student submissions
+$testSubmissionQuery = "
+    SELECT *
+    FROM users
+    LEFT JOIN userinfo ON users.userID = userinfo.userID
+    LEFT JOIN enrollments ON users.userID = enrollments.userID
+    LEFT JOIN courses ON enrollments.courseID = courses.courseID
+    LEFT JOIN assessments ON courses.courseID = assessments.courseID
+    LEFT JOIN todo ON todo.userID = users.userID AND todo.assessmentID = assessments.assessmentID
+    LEFT JOIN tests ON assessments.assessmentID = tests.assessmentID
+    LEFT JOIN scores ON scores.userID = users.userID AND scores.testID = tests.testID
+    WHERE assessments.assessmentID = $assessmentID
+    ORDER BY lastName ASC
+    $statusSQL
+";
+
+$testSubmissionResult = executeQuery($testSubmissionQuery);
+
+// Total exam items
+$totalItemsQuery = "SELECT COUNT(*) AS totalItems FROM testquestions WHERE testID = $testID";
+$totalItemsResult = executeQuery($totalItemsQuery);
+$totalItems = mysqli_fetch_assoc($totalItemsResult)['totalItems'] ?? 0;
+
+// Total exam points
+$totalPointsQuery = "SELECT SUM(testQuestionPoints) AS totalPoints FROM testquestions WHERE testID = $testID";
+$totalPointsResult = executeQuery($totalPointsQuery);
+$totalPoints = mysqli_fetch_assoc($totalPointsResult)['totalPoints'] ?? 0;
+
+// Total students enrolled
+$totalStudentsQuery = "SELECT COUNT(*) AS totalStudents FROM enrollments WHERE courseID = $courseID";
+$totalStudentsResult = executeQuery($totalStudentsQuery);
+$totalStudents = mysqli_fetch_assoc($totalStudentsResult)['totalStudents'] ?? 0;
+
+// Handle Return All submission
+if (isset($_POST['returnAll']) && isset($_POST['assessmentID'])) {
+    $updateAssessmentID = intval($_POST['assessmentID']);
+    $updateQuery = "
+        UPDATE todo
+        JOIN scores ON scores.userID = todo.userID AND scores.testID = $testID
+        SET todo.status = 'Returned'
+        WHERE todo.assessmentID = $assessmentID
+    ";
+    executeQuery($updateQuery);
+}
+
+// Fetch submissions **after** potential update
+$testSubmissionResult = executeQuery($testSubmissionQuery);
+
+// Calculate submitted and pending counts
+$submittedQuery = "
+    SELECT COUNT(*) AS submittedCount
+    FROM todo
+    WHERE assessmentID = $assessmentID AND (status = 'Submitted' OR status = 'Returned')
+";
+$submittedResult = executeQuery($submittedQuery);
+$submittedCount = mysqli_fetch_assoc($submittedResult)['submittedCount'] ?? 0;
+
+$pendingCount = $totalStudents - $submittedCount;
+if ($pendingCount < 0) $pendingCount = 0;
+?>
 
 <!doctype html>
 <html lang="en">
@@ -52,11 +170,10 @@
                                     </a>
                                 </div>
                                 <div class="col">
-                                    <span class="text-sbold text-25">Quiz #1</span>
-                                    <div class="text-reg text-18">Active · Due Sept 9</div>
+                                    <span class="text-sbold text-25"><?php echo $testTitle; ?></span>
+                                    <div class="text-reg text-18"><?php echo $examStatus; ?> · <?php echo date("M d, Y", strtotime($deadline)); ?></div>
                                 </div>
                             </div>
-
 
                             <!-- MOBILE VIEW -->
                             <div class="d-block d-sm-none mobile-assignment">
@@ -68,8 +185,8 @@
                                         </a>
                                     </div>
                                     <div class="col">
-                                        <span class="text-sbold text-25">Quiz #1</span>
-                                        <div class="text-reg text-18">Active · Due Sept 9</div>
+                                        <span class="text-sbold text-25"><?php echo $testTitle; ?></span>
+                                        <div class="text-reg text-18"><?php echo $examStatus; ?> · <?php echo date("M d, Y", strtotime($deadline)); ?></div>
                                     </div>
                                 </div>
                             </div>
@@ -85,21 +202,15 @@
                                             <div class="tab-carousel-wrapper d-block"
                                                 style="--tabs-right-extend: 60px;">
                                                 <div class="tab-scroll">
-                                                    <ul class="nav nav-tabs custom-nav-tabs mb-3 flex-nowrap" id="myTab"
-                                                        role="tablist">
-
+                                                    <ul class="nav nav-tabs custom-nav-tabs mb-3 flex-nowrap">
                                                         <li class="nav-item">
-                                                            <a class="nav-link" href="assess-exam-details.php">Exam
-                                                                Details</a>
+                                                            <a class="nav-link <?php echo $activeTab == 'details' ? 'active' : ''; ?>" href="assess-exam-details.php?assessmentID=<?php echo $assessmentID; ?>&tab=details">Exam Details</a>
                                                         </li>
                                                         <li class="nav-item">
-                                                            <a class="nav-link active" id="announcements-tab"
-                                                                data-bs-toggle="tab" href="#announcements"
-                                                                role="tab">Submissions</a>
+                                                            <a class="nav-link <?php echo $activeTab == 'submissions' ? 'active' : ''; ?>" href="assess-exam-submissions.php?assessmentID=<?php echo $assessmentID; ?>&tab=submissions">Submissions</a>
                                                         </li>
                                                         <li class="nav-item">
-                                                            <a class="nav-link"
-                                                                href="assess-exam-analytics.php">Analytics</a>
+                                                            <a class="nav-link <?php echo $activeTab == 'analytics' ? 'active' : ''; ?>" href="assess-exam-analytics.php?assessmentID=<?php echo $assessmentID; ?>&tab=analytics">Analytics</a>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -119,157 +230,126 @@
                                                     <!-- Filters row: Sort By + Status + Return All -->
                                                     <div class="d-flex align-items-center flex-wrap dropdown-container">
                                                         <!-- Sort By -->
-                                                        <div class="d-flex align-items-center flex-nowrap me-3">
-                                                            <span class="dropdown-label me-2">Sort By</span>
-                                                            <button class="btn dropdown-toggle dropdown-custom"
-                                                                type="button" data-bs-toggle="dropdown"
-                                                                aria-expanded="false">
-                                                                <span>Newest</span>
-                                                            </button>
-                                                            <ul class="dropdown-menu">
-                                                                <li><a class="dropdown-item text-reg"
-                                                                        href="#">Newest</a></li>
-                                                                <li><a class="dropdown-item text-reg"
-                                                                        href="#">COMP-006</a></li>
-                                                                <li><a class="dropdown-item text-reg" href="#">Other
-                                                                        courses</a></li>
-                                                            </ul>
-                                                        </div>
-                                                        <!-- Status -->
-                                                        <div class="d-flex align-items-center flex-nowrap me-3">
+                                                        <form method="GET" class="d-flex align-items-center flex-nowrap me-3">
+                                                            <input type="hidden" name="testID" value="<?php echo $testID; ?>">
+                                                            <input type="hidden" name="status" id="statusInput" value="<?php echo $statusFilter; ?>">
                                                             <span class="dropdown-label me-2">Status</span>
-                                                            <button class="btn dropdown-toggle dropdown-custom"
-                                                                type="button" data-bs-toggle="dropdown"
-                                                                aria-expanded="false">
-                                                                <span>Missing</span>
-                                                            </button>
-                                                            <ul class="dropdown-menu">
-                                                                <li><a class="dropdown-item text-reg"
-                                                                        href="#">Missing</a></li>
-                                                                <li><a class="dropdown-item text-reg"
-                                                                        href="#">Pending</a></li>
-                                                                <li><a class="dropdown-item text-reg"
-                                                                        href="#">Submitted</a></li>
-                                                            </ul>
-                                                        </div>
+                                                            <div class="custom-dropdown">
+                                                                <button type="button" class="dropdown-btn text-reg text-14"><?php echo $statusFilter; ?></button>
+                                                                <ul class="dropdown-list text-reg text-14">
+                                                                    <li data-value="All">All</li>
+                                                                    <li data-value="Pending">Pending</li>
+                                                                    <li data-value="Submitted">Submitted</li>
+                                                                    <li data-value="Missing">Missing</li>
+                                                                </ul>
+                                                            </div>
+                                                        </form>
+
                                                         <!-- Return All -->
-                                                        <button type="button"
-                                                            class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 d-inline-flex align-items-center btn-return-all"
-                                                            style="background-color: var(--primaryColor); border: 1px solid var(--black);  margin-right: auto; height: 27px;">
-                                                            <span class="material-symbols-outlined">
-                                                                assignment_return
-                                                            </span>
-                                                            Return All
-                                                        </button>
+                                                        <form method="POST" class="ms-auto flex-shrink-0">
+                                                            <input type="hidden" name="assessmentID" value="<?php echo $assessmentID; ?>">
+                                                            <button type="submit" name="returnAll"
+                                                                class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 d-inline-flex align-items-center btn-return-all"
+                                                                style="background-color: var(--primaryColor); border: 1px solid var(--black); margin-right: auto; height: 27px;"
+                                                                <?php echo ($currentDate < $deadline) ? 'disabled title="Return All available after deadline"' : ''; ?>>
+                                                                <span class="material-symbols-outlined">assignment_return</span>
+                                                                Return All
+                                                            </button>
+                                                        </form>
                                                     </div>
 
                                                     <!-- Submissions List -->
                                                     <div class="submissions-list mt-4">
-                                                        <div
-                                                            class="submission-item d-flex align-items-center py-3 border-bottom">
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="avatar me-3"
-                                                                    style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
-                                                                    <img src="../shared/assets/img/assess/prof.png"
-                                                                        alt="Profile"
-                                                                        style="width: 100%; height: 100%; object-fit: cover;">
-                                                                </div>
-                                                                <span class="text-sbold text-16">Christian James D.
-                                                                    Torrillo</span>
-                                                            </div>
-                                                            <div
-                                                                class="flex-grow-1 d-flex justify-content-center submission-center">
-                                                                <span class="badge badge-pending">Pending</span>
-                                                            </div>
-                                                            <div
-                                                                class="ms-auto d-flex align-items-center submission-right">
-                                                                <span class="badge-time">-</span>
-                                                            </div>
-                                                        </div>
+                                                        <?php if (mysqli_num_rows($testSubmissionResult) > 0): ?>
+                                                            <?php while ($test = mysqli_fetch_assoc($testSubmissionResult)): ?>
+                                                                <?php
+                                                                $profilePic = !empty($test['profilePicture'])
+                                                                    ? '../shared/assets/pfp-uploads/' . $test['profilePicture']
+                                                                    : '../shared/assets/img/default-profile.png';
+                                                                $score = $test['score'];
+                                                                $status = $test['status'];
 
-                                                        <div
-                                                            class="submission-item d-flex align-items-center py-3 border-bottom">
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="avatar me-3"
-                                                                    style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
-                                                                    <img src="../shared/assets/img/assess/prof.png"
-                                                                        alt="Profile"
-                                                                        style="width: 100%; height: 100%; object-fit: cover;">
-                                                                </div>
-                                                                <span class="text-sbold text-16">Christian James D.
-                                                                    Torrillo</span>
-                                                            </div>
-                                                            <div
-                                                                class="flex-grow-1 d-flex justify-content-center submission-center">
-                                                                <span class="badge badge-score">100/100</span>
-                                                            </div>
-                                                            <div
-                                                                class="ms-auto d-flex align-items-center submission-right">
-                                                                <span class="badge-time">35 mins</span>
-                                                            </div>
-                                                        </div>
+                                                                if (!is_null($score)) {
+                                                                    $submissionStatus = $score . ' / ' . $totalPoints;
+                                                                    $badgeClass = 'badge-score';
+                                                                } else {
+                                                                    if ($currentDate > $deadline) {
+                                                                        $submissionStatus = 'Missing';
+                                                                        $badgeClass = 'badge-missing';
+                                                                    } else {
+                                                                        $submissionStatus = 'Pending';
+                                                                        $badgeClass = 'badge-pending';
+                                                                    }
+                                                                }
+                                                                ?>
+                                                                <div class="submission-item d-flex align-items-center py-3 border-bottom">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
+                                                                            <img src="<?php echo $profilePic ?>" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                                                                        </div>
+                                                                        <span class="text-sbold text-16 text-truncate"
+                                                                            style="width:100px"
+                                                                            title="<?php echo $test['lastName'] . ', ' . $test['firstName']; ?>">
+                                                                            <?php echo $test['lastName'] . ', ' . $test['firstName']; ?>
+                                                                        </span>
 
-                                                        <div
-                                                            class="submission-item d-flex align-items-center py-3 border-bottom">
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="avatar me-3"
-                                                                    style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
-                                                                    <img src="../shared/assets/img/assess/prof.png"
-                                                                        alt="Profile"
-                                                                        style="width: 100%; height: 100%; object-fit: cover;">
+                                                                    </div>
+                                                                    <div class="flex-grow-1 d-flex justify-content-center submission-center">
+                                                                        <span class="badge <?php echo $badgeClass; ?>"><?php echo $submissionStatus; ?></span>
+                                                                    </div>
+                                                                    <div class="ms-auto d-flex align-items-center submission-right">
+                                                                        <?php
+                                                                        // Check if timeSpent exists for this student
+                                                                        $timeSpentDisplay = (!isset($test['timeSpent']) || $test['timeSpent'] == 0) ? '-' : $test['timeSpent'] . ' mins';
+                                                                        ?>
+                                                                        <span class="badge-time"><?php echo $timeSpentDisplay; ?></span>
+                                                                    </div>
                                                                 </div>
-                                                                <span class="text-sbold text-16">Christian James D.
-                                                                    Torrillo</span>
-                                                            </div>
-                                                            <div
-                                                                class="flex-grow-1 d-flex justify-content-center submission-center">
-                                                                <span class="badge badge-missing">Missing</span>
-                                                            </div>
-                                                            <div
-                                                                class="ms-auto d-flex align-items-center submission-right">
-                                                                <span class="badge-time">-</span>
-                                                            </div>
-                                                        </div>
+                                                            <?php endwhile; ?>
 
-                                                        <div class="submission-item d-flex align-items-center py-3">
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="avatar me-3"
-                                                                    style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
-                                                                    <img src="../shared/assets/img/assess/prof.png"
-                                                                        alt="Profile"
-                                                                        style="width: 100%; height: 100%; object-fit: cover;">
-                                                                </div>
-                                                                <span class="text-sbold text-16">Christian James D.
-                                                                    Torrillo</span>
+                                                        <?php elseif (!empty($statusFilter) && $statusFilter != 'All'): ?>
+                                                            <div class="empty-state d-flex flex-column justify-content-center align-items-center text-center py-5">
+                                                                <?php if ($statusFilter == 'Pending'): ?>
+                                                                    <img src="../shared/assets/img/courseInfo/puzzle.png" alt="No Submissions" class="empty-state-img" style="filter: grayscale(100%) brightness(2) contrast(0.6) opacity(0.8); width: 100px;">
+                                                                    <div class="empty-state-text text-reg text-14">
+                                                                        <p class="text-med mt-1 mb-0">No pending submissions at the moment.</p>
+                                                                        <p class="text-reg mt-1">All students have either submitted or passed the deadline.</p>
+                                                                    </div>
+
+                                                                <?php elseif ($statusFilter == 'Missing' || $sortTodo == 'Missing'): ?>
+                                                                    <img src="../shared/assets/img/courseInfo/thumbs-up.png" alt="No Submissions" class="empty-state-img" style="filter: grayscale(100%) brightness(2) contrast(0.6) opacity(0.8); width: 100px;">
+                                                                    <div class="empty-state-text text-reg text-14">
+                                                                        <p class="text-med mt-1 mb-0">No submissions before the deadline.</p>
+                                                                        <p class="text-reg mt-1">They are now marked as missing.</p>
+                                                                    </div>
+
+                                                                <?php elseif ($statusFilter == 'Submitted' || $statusFilter == 'Returned'): ?>
+                                                                    <img src="../shared/assets/img/courseInfo/file.png" alt="No Submissions" class="empty-state-img" style="filter: grayscale(100%) brightness(2) contrast(0.6) opacity(0.8); width: 100px;">
+                                                                    <div class="empty-state-text text-reg text-14">
+                                                                        <p class="text-med mt-1 mb-0">No submissions yet.</p>
+                                                                        <p class="text-reg mt-1">No students have submitted or returned their work for this assessment.</p>
+                                                                    </div>
+                                                                <?php endif; ?>
                                                             </div>
-                                                            <div
-                                                                class="flex-grow-1 d-flex justify-content-center submission-center">
-                                                                <span class="badge badge-score">100/100</span>
-                                                            </div>
-                                                            <div
-                                                                class="ms-auto d-flex align-items-center submission-right">
-                                                                <span class="badge-time">5 mins</span>
-                                                            </div>
-                                                        </div>
+                                                        <?php endif; ?>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-
                                     <div class="col-12 col-lg-4">
                                         <div class="cardSticky position-sticky" style="top: 20px;">
                                             <div class="p-2">
                                                 <div class="exam-details-title mb-5">Exam Details</div>
                                                 <div class="text-center mb-3">
-                                                    <div class="exam-stat-value mb-2">50</div>
+                                                    <div class="exam-stat-value mb-2"><?php echo $totalItems; ?></div>
                                                     <div class="exam-stat-label mb-5">Total Exam Items</div>
 
-                                                    <div class="exam-stat-value mb-2">50</div>
+                                                    <div class="exam-stat-value mb-2"><?php echo $totalPoints; ?></div>
                                                     <div class="exam-stat-label mb-5">Total Exam Points</div>
 
-                                                    <div class="exam-stat-value mb-2">50</div>
+                                                    <div class="exam-stat-value mb-2"><?php echo $examDuration; ?>mins</div>
                                                     <div class="exam-stat-label">Exam Duration</div>
                                                 </div>
 
@@ -283,10 +363,10 @@
                                                     <div class="col-auto">
                                                         <!-- Submission Stats -->
                                                         <div class="submission-stats">
+                                                            <div class="text-reg text-14 mt-2"><span
+                                                                    class="stat-value"><?php echo $submittedCount; ?></span> submitted</div>
                                                             <div class="text-reg text-14"><span
-                                                                    class="stat-value">10</span> submitted</div>
-                                                            <div class="text-reg text-14"><span
-                                                                    class="stat-value">11</span> pending submission
+                                                                    class="stat-value"><?php echo $pendingCount; ?></span> pending submission
                                                             </div>
                                                         </div>
                                                     </div>
@@ -319,15 +399,53 @@
                     options: {
                         cutout: '75%',
                         plugins: {
-                            legend: { display: false },
-                            tooltip: { enabled: false }
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: false
+                            }
                         }
                     }
                 });
             }
 
-            createDoughnutChart('taskChart', 10, 11, 0);
+            createDoughnutChart('taskChart', <?php echo $submittedCount; ?>, <?php echo $pendingCount; ?>);
         </script>
+        <!-- Dropdown js -->
+        <script>
+            document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+                const btn = dropdown.querySelector('.dropdown-btn');
+                const list = dropdown.querySelector('.dropdown-list');
+
+                btn.addEventListener('click', () => {
+                    list.style.display = list.style.display === 'block' ? 'none' : 'block';
+                });
+
+                list.querySelectorAll('li').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const value = item.dataset.value;
+                        btn.textContent = value;
+
+                        // Update hidden input(s) in the same form
+                        const form = dropdown.closest('form');
+                        if (form.querySelector('input[name="status"]')) {
+                            form.querySelector('input[name="status"]').value = value;
+                        }
+
+                        form.submit(); // submit **this form**
+                        list.style.display = 'none';
+                    });
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!dropdown.contains(e.target)) {
+                        list.style.display = 'none';
+                    }
+                });
+            });
+        </script>
+
 </body>
 
 </html>

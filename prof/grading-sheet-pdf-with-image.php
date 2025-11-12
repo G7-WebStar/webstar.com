@@ -1,28 +1,48 @@
-<?php $activePage = 'grading-sheet-pdf-with-image'; ?>
 <?php
+$activePage = 'grading-sheet-pdf-with-image';
 include("../shared/assets/database/connect.php");
 include("../shared/assets/processes/prof-session-process.php");
 
-// Use GET lessonID if provided, otherwise default to 5
-$lessonID = isset($_GET['lessonID']) ? intval($_GET['lessonID']) : 19;
+// ✅ Get submissionID
+$submissionID = isset($_GET['submissionID']) ? intval($_GET['submissionID']) : 0;
 
-// Fetch all files under this lessonID
-$sql = "SELECT fileAttachment FROM files WHERE lessonID = $lessonID";
-$result = $conn->query($sql);
+// ✅ Automatically fetch userID from the submissions table
+$getInfo = $conn->prepare("
+    SELECT s.userID
+    FROM submissions s
+    WHERE s.submissionID = ?
+    LIMIT 1
+");
+$getInfo->bind_param("i", $submissionID);
+$getInfo->execute();
+$result = $getInfo->get_result();
+
+if ($row = $result->fetch_assoc()) {
+    $userID = intval($row['userID']);
+} else {
+    die("<p class='text-danger'>No student found for this submission.</p>");
+}
+
+// ✅ Fetch all files under this submissionID
+$fileQuery = $conn->prepare("SELECT fileAttachment, fileLink, fileTitle FROM files WHERE submissionID = ?");
+$fileQuery->bind_param("i", $submissionID);
+$fileQuery->execute();
+$fileResult = $fileQuery->get_result();
 
 $fileLinks = [];
-if ($result && $result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        // store original attachment value and build safe path
+if ($fileResult && $fileResult->num_rows > 0) {
+    while ($row = $fileResult->fetch_assoc()) {
         $fileName = basename($row['fileAttachment']);
         $fileLinks[] = [
             'name' => $fileName,
-            'path' => "../shared/assets/files/" . $fileName
+            'path' => "../shared/assets/files/" . $fileName,
+            'link' => $row['fileLink'],
+            'title' => $row['fileTitle']
         ];
     }
 }
 
-// helper to check extension
+// ✅ Helper functions
 function is_image_ext($ext)
 {
     $ext = strtolower($ext);
@@ -33,18 +53,100 @@ function is_pdf_ext($ext)
     return strtolower($ext) === 'pdf';
 }
 
-// decide view type: if no files -> none; else check first file's ext and use that
+// ✅ Determine view type
 $viewType = 'none';
 if (!empty($fileLinks)) {
     $firstExt = pathinfo($fileLinks[0]['name'], PATHINFO_EXTENSION);
     if (is_image_ext($firstExt))
         $viewType = 'image';
-    else if (is_pdf_ext($firstExt))
+    elseif (is_pdf_ext($firstExt))
         $viewType = 'pdf';
     else
         $viewType = 'other';
 }
+
+// ✅ Fetch badges (11–21)
+$badges = [];
+$badgeQuery = $conn->query("SELECT badgeID, badgeName, badgeDescription, badgeIcon FROM badges WHERE badgeID BETWEEN 11 AND 21");
+if ($badgeQuery && $badgeQuery->num_rows > 0) {
+    while ($b = $badgeQuery->fetch_assoc()) {
+        $badges[] = $b;
+    }
+}
+
+// ✅ Handle feedback submission
+// if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['feedbackContent'])) {
+//     $feedback = trim($_POST['feedbackContent']);
+
+//     if (!empty($feedback) && $userID > 0 && $submissionID > 0) {
+//         $check = $conn->prepare("SELECT scoreID FROM scores WHERE userID = ? AND submissionID = ?");
+//         $check->bind_param("ii", $userID, $submissionID);
+//         $check->execute();
+//         $exists = $check->get_result();
+
+//         if ($exists && $exists->num_rows > 0) {
+//             $update = $conn->prepare("UPDATE scores SET feedback = ?, gradedAt = NOW() WHERE userID = ? AND submissionID = ?");
+//             $update->bind_param("sii", $feedback, $userID, $submissionID);
+//             $update->execute();
+//         } else {
+//             $insert = $conn->prepare("INSERT INTO scores (userID, submissionID, score, feedback, gradedAt) VALUES (?, ?, 0, ?, NOW())");
+//             $insert->bind_param("iis", $userID, $submissionID, $feedback);
+//             $insert->execute();
+//         }
+//     }
+// }
+
+// ✅ Handle grade + feedback submission together
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
+    $score = isset($_POST['score']) ? floatval($_POST['score']) : 0;
+    $feedback = trim($_POST['feedback'] ?? '');
+
+    if ($userID > 0 && $submissionID > 0) {
+        // Check if a record already exists for this user and submission
+        $check = $conn->prepare("SELECT scoreID FROM scores WHERE userID = ? AND submissionID = ?");
+        $check->bind_param("ii", $userID, $submissionID);
+        $check->execute();
+        $checkResult = $check->get_result();
+
+        if ($checkResult && $checkResult->num_rows > 0) {
+            // ✅ Update existing score and feedback
+            $row = $checkResult->fetch_assoc();
+            $scoreID = intval($row['scoreID']);
+
+            $update = $conn->prepare("UPDATE scores 
+                SET score = ?, feedback = ?, gradedAt = NOW() 
+                WHERE scoreID = ?");
+            $update->bind_param("dsi", $score, $feedback, $scoreID);
+            $update->execute();
+        } else {
+            // ✅ Insert new record if none exists
+            $insert = $conn->prepare("INSERT INTO scores (userID, submissionID, score, feedback, gradedAt) 
+                VALUES (?, ?, ?, ?, NOW())");
+            $insert->bind_param("iids", $userID, $submissionID, $score, $feedback);
+            $insert->execute();
+
+            // Get the newly inserted scoreID
+            $scoreID = $insert->insert_id;
+        }
+
+        // ✅ Update the submissions table to reflect the scoreID
+        $updateSubmission = $conn->prepare("UPDATE submissions SET scoreID = ? WHERE submissionID = ?");
+        $updateSubmission->bind_param("ii", $scoreID, $submissionID);
+        $updateSubmission->execute();
+        $updateSubmission->close();
+    }
+}
+
+
+// Filter only files that have a non-empty link
+$linkFiles = array_filter($fileLinks, function ($f) {
+    return !empty($f['link']);
+});
+
 ?>
+
+
+
 <!doctype html>
 <html lang="en">
 
@@ -99,8 +201,8 @@ if (!empty($fileLinks)) {
                                             <div>
                                                 <div class="text-sbold text-18" style="color: var(--black);">Christian
                                                     James D. Torrillo · BSIT 3-1</div>
-                                                <div class="text-reg text-14 text-muted">Assessing 2 of 30 students with
-                                                    submissions</div>
+                                                <div class="text-reg text-14 text-muted">Submitted October 21, 2025
+                                                    10:00PM</div>
                                             </div>
                                         </div>
                                     </div>
@@ -151,6 +253,16 @@ if (!empty($fileLinks)) {
 
                                     <?php if (!empty($images) || !empty($pdfs) || !empty($others)): ?>
 
+                                        <!-- 📄 PDF SECTION -->
+                                        <?php if (!empty($pdfs)): ?>
+                                            <?php foreach ($pdfs as $f): ?>
+                                                <div class="mt-4 mb-4">
+                                                    <iframe src="<?php echo htmlspecialchars($f['path']); ?>" width="100%"
+                                                        height="600px" style="border:none; border-radius:10px;"></iframe>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+
                                         <!-- 🖼 IMAGE SECTION -->
                                         <?php if (!empty($images)): ?>
                                             <div class="container mt-3">
@@ -162,26 +274,32 @@ if (!empty($fileLinks)) {
                                                         <div class="col-12 col-sm-6 col-md-4">
                                                             <div class="pdf-preview-box text-center" data-bs-toggle="modal"
                                                                 data-bs-target="#imageModal<?php echo $index; ?>"
-                                                                style="cursor: zoom-in; overflow: hidden; border-radius: 10px; height: 180px; position: relative;">
+                                                                style="cursor: zoom-in; overflow: hidden; border-radius: 10px; height: 180px; position: relative; border: 1px solid var(--black);">
                                                                 <img src="<?php echo $link; ?>" alt="Preview - <?php echo $name; ?>"
                                                                     style="width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.3s ease;">
                                                             </div>
                                                         </div>
 
+
                                                         <!-- Modal for each image -->
                                                         <div class="modal fade" id="imageModal<?php echo $index; ?>" tabindex="-1"
                                                             aria-hidden="true">
                                                             <div class="modal-dialog modal-fullscreen">
-                                                                <div
-                                                                    class="modal-content bg-black border-0 d-flex justify-content-center align-items-center position-relative">
+                                                                <div class="modal-content bg-black border-0 d-flex justify-content-center align-items-center position-relative"
+                                                                    style="width: 99vw; height: 95vh; border-radius: 0;">
+
                                                                     <button type="button"
                                                                         class="btn-close btn-close-white position-absolute top-0 end-0 m-4"
                                                                         data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                    <div class="modal-img-wrapper p-0 m-0 w-100 h-100">
+
+                                                                    <div
+                                                                        class="modal-img-wrapper p-0 m-0 w-100 h-100 d-flex justify-content-center align-items-center">
                                                                         <img class="modal-zoomable" src="<?php echo $link; ?>"
-                                                                            alt="Full - <?php echo $name; ?>">
+                                                                            alt="Full - <?php echo $name; ?>"
+                                                                            style="max-width: 100%; max-height: 100%; object-fit: contain;">
                                                                     </div>
                                                                 </div>
+
                                                             </div>
                                                         </div>
                                                     <?php endforeach; ?>
@@ -189,31 +307,31 @@ if (!empty($fileLinks)) {
                                             </div>
                                         <?php endif; ?>
 
-                                        <!-- 📄 PDF SECTION -->
-                                        <?php if (!empty($pdfs)): ?>
-                                            <?php foreach ($pdfs as $f): ?>
-                                                <div class="mt-4 mb-4">
-                                                    <iframe src="<?php echo htmlspecialchars($f['path']); ?>" width="100%"
-                                                        height="600px" style="border:none; border-radius:10px;"></iframe>
+                                        <!-- 🔗 OTHER FILES & LINKS SECTION -->
+                                        <?php if (!empty($linkFiles)): ?>
+                                            <p class="text-sbold text-14 mt-4">Link Attachments</p>
+
+                                            <?php foreach ($linkFiles as $f): ?>
+                                                <div class="mt-4b">
+                                                    <iframe src="<?php echo htmlspecialchars($f['link']); ?>" width="100%"
+                                                        height="600" frameborder="0" allowfullscreen
+                                                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                                        loading="lazy" style="border-radius: 10px; border: 1px solid var(--black);">
+                                                    </iframe>
+
+                                                    <div class="text-start mt-3">
+                                                        <a href="<?php echo htmlspecialchars($f['link']); ?>" target="_blank"
+                                                            rel="noopener noreferrer" class="btn custom-btn px-4 py-2">
+                                                            <i class="fa-solid fa-up-right-from-square me-2"></i> Open link in new
+                                                            tab
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             <?php endforeach; ?>
                                         <?php endif; ?>
-
-                                        <!-- 🔗 OTHER FILES SECTION -->
-                                        <?php if (!empty($others)): ?>
-                                            <p class="text-warning mt-3">Other file types:</p>
-                                            <ul class="mt-2">
-                                                <?php foreach ($others as $f): ?>
-                                                    <li><a href="<?php echo htmlspecialchars($f['path']); ?>" target="_blank"
-                                                            rel="noopener">
-                                                            <?php echo htmlspecialchars($f['name']); ?></a></li>
-                                                <?php endforeach; ?>
-                                            </ul>
-                                        <?php endif; ?>
-
                                     <?php else: ?>
-                                        <p class="text-danger mt-3">No attachments found for lessonID
-                                            <?php echo $lessonID; ?>.
+                                        <p class="text-danger mt-3">No attachments found
+                                            <?php echo $submissionID; ?>.
                                         </p>
                                     <?php endif; ?>
 
@@ -222,269 +340,197 @@ if (!empty($fileLinks)) {
 
                             <!-- Right Content -->
                             <div class="col-12 col-lg-4">
-                                <div class="cardSticky position-sticky" style="top: 20px;">
-                                    <div class="ms-2 me-2">
-                                        <div class="d-flex align-items-center justify-content-center mb-5 mt-5">
-                                            <input type="number" class="form-control me-2 ms-1 text-16"
-                                                placeholder="Grade"
-                                                style="width: 130px; border-radius: 10px; border: 1px solid var(--black);"
-                                                min="0">
-                                            <span class="text-sbold">/100</span>
-                                        </div>
+                                <!-- Sticky Parent Container -->
+                                <div class="position-sticky" style="top: 20px;">
+                                    <!-- Grade Submission Form -->
+                                    <form method="POST" action="">
+                                        <!-- Dynamically include the submissionID -->
+                                        <input type="hidden" name="submissionID"
+                                            value="<?php echo htmlspecialchars($submissionID); ?>">
 
-                                        <div class="text-center mt-5">
-                                            <div class="text-sbold text-15 mb-3" style="color: var(--black);">Optional
-                                                Actions</div>
-                                            <div class="d-flex flex-column align-items-center gap-2 mb-5">
-                                                <!-- ADD AWARD BADGE BUTTON (opens modal) -->
-                                                <button
-                                                    class="btn custom-btn d-flex align-items-center justify-content-center"
-                                                    data-bs-toggle="modal" data-bs-target="#awardBadgeModal">
-                                                    <span class="material-symbols-rounded me-2">emoji_events</span>
-                                                    Award badge
-                                                </button>
-                                                <!-- ADD FEEDBACK BUTTON (opens modal) -->
-                                                <button
-                                                    class="btn custom-btn d-flex align-items-center justify-content-center"
-                                                    data-bs-toggle="modal" data-bs-target="#feedbackModal">
-                                                    <i class="material-symbols-rounded me-2">comment</i> Add feedback
-                                                </button>
+                                        <!-- Card Section -->
+                                        <div class="cardSticky">
+                                            <div class="ms-2 me-2">
+                                                <div class="d-flex align-items-center justify-content-center mb-5 mt-5">
+                                                    <input type="number" name="score"
+                                                        class="form-control me-2 ms-1 text-16" placeholder="Grade"
+                                                        style="width: 130px; border-radius: 10px; border: 1px solid var(--black);"
+                                                        min="0" max="100" required>
+                                                    <span class="text-sbold">/100</span>
+                                                </div>
+
+                                                <div class="text-center mt-5">
+                                                    <div class="text-sbold text-15 mb-3" style="color: var(--black);">
+                                                        Optional Actions</div>
+                                                    <div class="d-flex flex-column align-items-center gap-2 mb-5">
+                                                        <!-- ADD AWARD BADGE BUTTON -->
+                                                        <button type="button"
+                                                            class="btn custom-btn d-flex align-items-center justify-content-center"
+                                                            data-bs-toggle="modal" data-bs-target="#awardBadgeModal">
+                                                            <span
+                                                                class="material-symbols-rounded me-2">emoji_events</span>
+                                                            Award badge
+                                                        </button>
+                                                        <!-- FEEDBACK INPUT (replacing modal button) -->
+                                                        <div class="feedback-input-container w-100"
+                                                            style="max-width: 600px;">
+                                                            <label for="feedbackInput"
+                                                                class="text-sbold text-15 mb-2 d-block"
+                                                                style="color: var(--black);">
+                                                                Add feedback
+                                                            </label>
+                                                            <textarea name="feedback" id="feedbackInput" rows="3"
+                                                                class="form-control text-reg text-15 border rounded-3 p-3"
+                                                                placeholder="Write feedback that helps your student level up their learning journey!"
+                                                                style="resize: none; background-color: #fff;"></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+
+                                        <!-- Buttons always below the card -->
+                                        <div class="text-center mt-4">
+                                            <div class="d-flex justify-content-center align-items-center gap-3 mb-2">
+                                                <button type="button"
+                                                    class="btn px-4 py-2 border rounded-pill text-15 fw-semibold"
+                                                    style="background-color: #fff; border-color: var(--black); color: var(--black);">
+                                                    Previous
+                                                </button>
+                                                <button type="submit" name="submitGrade"
+                                                    class="btn px-4 py-2 border rounded-pill text-15 fw-semibold"
+                                                    style="background-color: #FEE9A8; border-color: var(--black); color: var(--black);">
+                                                    Submit
+                                                </button>
+                                                <button type="button"
+                                                    class="btn px-4 py-2 border rounded-pill text-15 fw-semibold"
+                                                    style="background-color: #fff; border-color: var(--black); color: var(--black);">
+                                                    Next
+                                                </button>
+                                            </div>
+
+                                            <p class="text-15 fw-medium mt-2" style="color: var(--black);">
+                                                10 submissions left to review
+                                            </p>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
+
                         </div> <!-- end row -->
                     </div>
                 </div>
             </div>
         </div>
-        <!-- AWARD BADGE MODAL -->
-        <div class="modal fade" id="awardBadgeModal" tabindex="-1" aria-labelledby="awardBadgeModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" style="max-width:700px;">
-                <div class="modal-content"
-                    style="max-height:80vh; overflow:hidden;">
+    </div>
+    <!-- AWARD BADGE MODAL -->
+    <div class="modal fade" id="awardBadgeModal" tabindex="-1" aria-labelledby="awardBadgeModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width:700px;">
+            <div class="modal-content" style="max-height:80vh; overflow:hidden;">
 
-                    <!-- HEADER -->
-                    <div class="modal-header">
-                        <div class="modal-title text-sbold text-20 ms-3" id="awardBadgeModalLabel">Award badge</div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                            style="transform: scale(0.8); filter: grayscale(100%);"></button>
+                <!-- HEADER -->
+                <div class="modal-header">
+                    <div class="modal-title text-sbold text-20 ms-3" id="awardBadgeModalLabel">Award badge</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        style="transform: scale(0.8); filter: grayscale(100%);"></button>
+                </div>
+
+                <div class="modal-body" style="overflow-y:auto; scrollbar-width:thin;">
+                    <p class="mb-3 text-med text-14 ms-3" style="color: var(--black);">
+                        Choose a badge to reward and recognize your student’s hard work.
+                    </p>
+
+
+                    <div class="col p-0 m-3">
+                        <?php if (!empty($badges)): ?>
+                            <?php foreach ($badges as $badge): ?>
+                                <div class="card rounded-3 mb-2"
+                                    style="background-color: var(--pureWhite); border: 1px solid var(--black);">
+                                    <div class="card-body p-0">
+                                        <div class="badge-option rounded-4 d-flex align-items-center" style="cursor: pointer;">
+                                            <img src="../shared/assets/img/badge/<?php echo htmlspecialchars($badge['badgeIcon']); ?>"
+                                                alt="<?php echo htmlspecialchars($badge['badgeName']); ?> Icon"
+                                                style="width: 55px; height: 55px;" class="mx-1 ms-2">
+                                            <div>
+                                                <div style="line-height: 1.1;">
+                                                    <div class="text-bold text-14">
+                                                        <?php echo htmlspecialchars($badge['badgeName']); ?>
+                                                    </div>
+                                                    <div class="text-med text-12 text-muted">
+                                                        <?php echo htmlspecialchars($badge['badgeDescription']); ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
 
-                    <div class="modal-body" style="overflow-y:auto; scrollbar-width:thin;">
+                </div>
+
+                <!-- FOOTER -->
+                <div class="modal-footer border-top">
+                    <button type="submit" class="btn rounded-5 px-4 text-sbold text-14 me-3"
+                        style="background-color: var(--primaryColor); border: 1px solid var(--black);">
+                        Award
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FEEDBACK MODAL -->
+    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered py-4" style="max-width: 700px;  height: 25px;">
+            <div class="modal-content">
+
+                <!-- HEADER -->
+                <div class="modal-header border-bottom">
+                    <div class="modal-title text-sbold text-20 ms-3">
+                        Add feedback
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <form id="feedbackForm" action="" method="POST">
+                    <div class="modal-body pb-2">
                         <p class="mb-3 text-med text-14 ms-3" style="color: var(--black);">
-                            Choose a badge to reward and recognize your student’s hard work.
+                            Write feedback that helps your student level up their learning journey!
                         </p>
 
-                        <div class="col p-0 m-3">
-                            <div class="card rounded-3 mb-2"
-                                style="background-color: var(--pureWhite); border: 1px solid var(--black);">
-                                <div class="card-body p-0">
-                                    <div class="badge-option rounded-4 d-flex align-items-center"
-                                        style="cursor: pointer;">
-                                        <img src="../shared/assets/img/badge/Badge.png" alt="Badge"
-                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
-                                        <div>
-                                            <div style="line-height: 1.1;">
-                                                <div class="text-bold text-14">Ahead of the Curve</div>
-                                                <div class="text-med text-12">
-                                                    You submitted before the deadline—way to stay ahead!
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <!-- Rich text editor -->
+                        <div class="editor-wrapper mb-3 border rounded-3 text-reg text-20">
+                            <div id="editor" style="min-height:100px;"></div>
 
-                            <div class="card rounded-3 mb-2"
-                                style="background-color: var(--pureWhite); border: 1px solid var(--black);">
-                                <div class="card-body p-0">
-                                    <div class="badge-option rounded-4 d-flex align-items-center"
-                                        style="cursor: pointer;">
-                                        <img src="../shared/assets/img/badge/Badge.png" alt="Badge"
-                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
-                                        <div>
-                                            <div style="line-height: 1.1;">
-                                                <div class="text-bold text-14">Ahead of the Curve</div>
-                                                <div class="text-med text-12">
-                                                    You submitted before the deadline—way to stay ahead!
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card rounded-3 mb-2"
-                                style="background-color: var(--pureWhite); border: 1px solid var(--black);">
-                                <div class="card-body p-0">
-                                    <div class="badge-option rounded-4 d-flex align-items-center"
-                                        style="cursor: pointer;">
-                                        <img src="../shared/assets/img/badge/Badge.png" alt="Badge"
-                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
-                                        <div>
-                                            <div style="line-height: 1.1;">
-                                                <div class="text-bold text-14">Ahead of the Curve</div>
-                                                <div class="text-med text-12">
-                                                    You submitted before the deadline—way to stay ahead!
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card rounded-3 mb-2"
-                                style="background-color: var(--pureWhite); border: 1px solid var(--black);">
-                                <div class="card-body p-0">
-                                    <div class="badge-option rounded-4 d-flex align-items-center"
-                                        style="cursor: pointer;">
-                                        <img src="../shared/assets/img/badge/Badge.png" alt="Badge"
-                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
-                                        <div>
-                                            <div style="line-height: 1.1;">
-                                                <div class="text-bold text-14">Ahead of the Curve</div>
-                                                <div class="text-med text-12">
-                                                    You submitted before the deadline—way to stay ahead!
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card rounded-3 mb-2"
-                                style="background-color: var(--pureWhite); border: 1px solid var(--black);">
-                                <div class="card-body p-0">
-                                    <div class="badge-option rounded-4 d-flex align-items-center"
-                                        style="cursor: pointer;">
-                                        <img src="../shared/assets/img/badge/Badge.png" alt="Badge"
-                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
-                                        <div>
-                                            <div style="line-height: 1.1;">
-                                                <div class="text-bold text-14">Ahead of the Curve</div>
-                                                <div class="text-med text-12">
-                                                    You submitted before the deadline—way to stay ahead!
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card rounded-3 mb-2"
-                                style="background-color: var(--pureWhite); border: 1px solid var(--black);">
-                                <div class="card-body p-0">
-                                    <div class="badge-option rounded-4 d-flex align-items-center"
-                                        style="cursor: pointer;">
-                                        <img src="../shared/assets/img/badge/Badge.png" alt="Badge"
-                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
-                                        <div>
-                                            <div style="line-height: 1.1;">
-                                                <div class="text-bold text-14">Ahead of the Curve</div>
-                                                <div class="text-med text-12">
-                                                    You submitted before the deadline—way to stay ahead!
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card rounded-3 mb-2"
-                                style="background-color: var(--pureWhite); border: 1px solid var(--black);">
-                                <div class="card-body p-0">
-                                    <div class="badge-option rounded-4 d-flex align-items-center"
-                                        style="cursor: pointer;">
-                                        <img src="../shared/assets/img/badge/Badge.png" alt="Badge"
-                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
-                                        <div>
-                                            <div style="line-height: 1.1;">
-                                                <div class="text-bold text-14">Ahead of the Curve</div>
-                                                <div class="text-med text-12">
-                                                    You submitted before the deadline—way to stay ahead!
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card rounded-3 mb-2"
-                                style="background-color: var(--pureWhite); border: 1px solid var(--black);">
-                                <div class="card-body p-0">
-                                    <div class="badge-option rounded-4 d-flex align-items-center"
-                                        style="cursor: pointer;">
-                                        <img src="../shared/assets/img/badge/Badge.png" alt="Badge"
-                                            style="width: 55px; height: 55px;" class="mx-1 ms-2">
-                                        <div>
-                                            <div style="line-height: 1.1;">
-                                                <div class="text-bold text-14">Ahead of the Curve</div>
-                                                <div class="text-med text-12">
-                                                    You submitted before the deadline—way to stay ahead!
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div id="toolbar" class="border-top d-flex align-items-center p-2 px-3 bg-white">
+                                <button class="ql-bold"></button>
+                                <button class="ql-italic"></button>
+                                <button class="ql-underline"></button>
+                                <button class="ql-list" value="bullet"></button>
+                                <span id="word-counter" class="ms-auto text-muted text-reg text-12">Max word limit:
+                                    120 words</span>
                             </div>
                         </div>
+
+                        <input type="hidden" name="feedbackContent" id="feedbackContent">
+                        <input type="hidden" name="studentID" value="<?php echo $studentID; ?>">
+                        <input type="hidden" name="assignmentID" value="<?php echo $assignmentID; ?>">
                     </div>
 
                     <!-- FOOTER -->
                     <div class="modal-footer border-top">
                         <button type="submit" class="btn rounded-5 px-4 text-sbold text-14 me-3"
                             style="background-color: var(--primaryColor); border: 1px solid var(--black);">
-                            Award
+                            Add
                         </button>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
-
-        <!-- FEEDBACK MODAL -->
-        <div class="modal fade" id="feedbackModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered py-4" style="max-width: 700px;  height: 25px;">
-                <div class="modal-content">
-
-                    <!-- HEADER -->
-                    <div class="modal-header border-bottom">
-                        <div class="modal-title text-sbold text-20 ms-3">
-                            Add feedback
-                        </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <form id="feedbackForm" action="" method="POST">
-                        <div class="modal-body pb-2">
-                            <p class="mb-3 text-med text-14 ms-3" style="color: var(--black);">
-                                Write feedback that helps your student level up their learning journey!
-                            </p>
-
-                            <!-- Rich text editor -->
-                            <div class="editor-wrapper mb-3 border rounded-3 text-reg text-20">
-                                <div id="editor" style="min-height:100px;"></div>
-
-                                <div id="toolbar" class="border-top d-flex align-items-center p-2 px-3 bg-white">
-                                    <button class="ql-bold"></button>
-                                    <button class="ql-italic"></button>
-                                    <button class="ql-underline"></button>
-                                    <button class="ql-list" value="bullet"></button>
-                                    <span id="word-counter" class="ms-auto text-muted text-reg text-12">Max word limit:
-                                        120 words</span>
-                                </div>
-                            </div>
-
-                            <input type="hidden" name="feedbackContent" id="feedbackContent">
-                            <input type="hidden" name="studentID" value="2">
-                            <input type="hidden" name="assignmentID" value="1">
-                        </div>
-
-                        <!-- FOOTER -->
-                        <div class="modal-footer border-top">
-                            <button type="submit" class="btn rounded-5 px-4 text-sbold text-14 me-3"
-                                style="background-color: var(--primaryColor); border: 1px solid var(--black);">Add</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+    </div>
 
     </div>
 
@@ -723,6 +769,32 @@ if (!empty($fileLinks)) {
                 });
             });
         });
+
+        // Remove modal backdrop for image viewer
+        document.querySelectorAll('[id^="imageModal"]').forEach(modal => {
+            modal.addEventListener('show.bs.modal', () => {
+                // Remove any existing backdrop
+                document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+
+                // Disable new backdrop from being added
+                setTimeout(() => {
+                    document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+                    document.body.classList.remove('modal-open'); // avoid scroll lock
+                }, 100);
+            });
+
+            modal.addEventListener('shown.bs.modal', () => {
+                document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+                document.body.classList.remove('modal-open');
+            });
+
+            modal.addEventListener('hidden.bs.modal', () => {
+                // Restore scroll
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+            });
+        });
+
     </script>
 </body>
 

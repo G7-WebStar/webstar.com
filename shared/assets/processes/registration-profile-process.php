@@ -33,7 +33,7 @@ if (isset($_POST['nextBtn'])) {
     $nextQuery = "INSERT INTO userinfo 
         (userID, firstName, middleName, lastName, studentID, programID, gender, yearLevel, yearSection, profilePicture, createdAt) 
         VALUES 
-        ('$userID', '$firstName', '$middleName', '$lastName', '$studentID', '$programID', '$gender', '$yearLevel', '$yearSection', '$htmlfolder$htmlfileupload', NOW())";
+        ('$userID', '$firstName', '$middleName', '$lastName', '$studentID', '$programID', '$gender', '$yearLevel', '$yearSection', '$htmlfileupload', NOW())";
     $nextResult = executeQuery($nextQuery);
 
     if ($nextResult) {

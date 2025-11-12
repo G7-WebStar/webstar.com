@@ -99,12 +99,45 @@ mysqli_data_seek($fileResult, 0);
 <?php else: ?>
     <!-- No Files Placeholder -->
     <div class="empty-state text-center">
-        <img src="../shared/assets/img/courseInfo/bookmark.png"
+        <img src="../shared/assets/img/empty/files.png"
             alt="No Files"
             class="empty-state-img">
-        <div class="empty-state-text text-16 d-flex flex-column align-items-center">
-            <p class="text-med mb-0">No files yet.</p>
-            <p class="text-reg">Attachments from announcements and quests appear here.</p>
+        <div class="empty-state-text text-14 d-flex flex-column align-items-center">
+            <p class="text-med mt-1 mb-0">No files yet.</p>
+            <p class="text-reg mt-1">Attachments from announcements and quests appear here.</p>
         </div>
     </div>
 <?php endif; ?>
+
+<!-- Toast Container -->
+<div id="toastContainerFiles"
+    class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+    style="z-index:1100; pointer-events:none;">
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const toastContainer = document.getElementById('toastContainerFiles');
+
+        function showToast(message) {
+            const toastEl = document.createElement('div');
+            toastEl.className = "alert alert-success mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2";
+            toastEl.style.cssText = "border-radius:8px; display:flex; align-items:center; gap:8px; padding:0.5rem 0.75rem; text-align:center; background-color:#d1e7dd; color:#0f5132;";
+            toastEl.innerHTML = `<i class="bi bi-check-circle-fill fs-6" style="color: var(--black);"></i>
+                             <span style="color: var(--black);">${message}</span>`;
+
+            toastContainer.appendChild(toastEl);
+
+            setTimeout(() => {
+                toastEl.remove();
+            }, 3000);
+        }
+
+        // Add click listener to all download links
+        document.querySelectorAll('a[download]').forEach(link => {
+            link.addEventListener('click', () => {
+                showToast('File successfully downloaded!');
+            });
+        });
+    });
+</script>

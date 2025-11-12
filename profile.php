@@ -694,6 +694,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        
                                                         <div class="emblem">
                                                             <div
                                                                 class="h-100 d-flex justify-content-center align-items-center">

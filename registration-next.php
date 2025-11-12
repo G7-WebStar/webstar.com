@@ -98,34 +98,36 @@ include("shared/assets/processes/registration-next-process.php");
                             Finish
                         </button>
                     </div>
+                    
+                    <!-- Modal (outside form) -->
+                    <div class="modal fade" id="finishModal" tabindex="-1" aria-labelledby="finishModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+
+                                <div class="modal-header">
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+
+                                <div class="modal-body text-center">
+                                    <img src="shared/assets/img/notebook.png"
+                                        alt="Logo"
+                                        style="width: 165px; height: 165px; margin-bottom: 8px;">
+                                    <div class="d-flex justify-content-center text-bold text-22 mt-1">You're all set!</div>
+                                    <div class="d-flex justify-content-center text-reg text-12">Head to your dashboard to set up your first course.</div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="submit" name="letsGo" formnovalidate class="text-sbold btn btn-go-custom">
+                                        Let's go!
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </form>
             </div>
 
-            <!-- Modal (outside form) -->
-            <div class="modal fade" id="finishModal" tabindex="-1" aria-labelledby="finishModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-
-                        <div class="modal-header">
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-
-                        <div class="modal-body text-center">
-                            <img src="shared/assets/img/notebook.png"
-                                alt="Logo"
-                                style="width: 165px; height: 165px; margin-bottom: 8px;">
-                            <div class="d-flex justify-content-center text-bold text-22 mt-1">You're all set!</div>
-                            <div class="d-flex justify-content-center text-reg text-12">Head to your dashboard to set up your first course.</div>
-                        </div>
-
-                        <div class="modal-footer">
-                            <a href="course-join.php" class="text-sbold btn btn-go-custom">
-                                Let's go!
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
