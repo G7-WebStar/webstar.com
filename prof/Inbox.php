@@ -2,12 +2,11 @@
 include('../shared/assets/database/connect.php');
 include("../shared/assets/processes/prof-session-process.php");
 
-$selectEnrolledQuery = "SELECT
+$selectEnrolledQuery = "SELECT DISTINCT
 courses.courseCode
 FROM courses
-INNER JOIN enrollments
-    ON courses.courseID = enrollments.courseID
-WHERE enrollments.userID = '$userID'
+WHERE courses.userID = '$userID'
+ORDER BY courses.courseCode ASC
 ";
 $selectEnrolledResult = executeQuery($selectEnrolledQuery);
 
@@ -97,11 +96,11 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                 <div class="col-auto mobile-dropdown">
                                     <div class="d-flex align-items-center flex-nowrap mt-2">
                                         <span class="dropdown-label me-2 text-reg">Sort by</span>
-                                        <div class="custom-dropdown">
-                                            <button class="dropdown-btn text-reg text-14">Newest</button>
+                                        <div class="custom-dropdown" data-dropdown="sort">
+                                            <button class="dropdown-btn text-reg text-14" data-selected-sort="Newest">Newest</button>
                                             <ul class="dropdown-list text-reg text-14">
-                                                <li data-value="Newest">Newest</li>
-                                                <li data-value="Oldest">Oldest</li>
+                                                <li data-value="Newest" data-sort="desc">Newest</li>
+                                                <li data-value="Oldest" data-sort="asc">Oldest</li>
                                             </ul>
                                         </div>
                                     </div>
@@ -111,63 +110,62 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                 <div class="col-auto mobile-dropdown">
                                     <div class="d-flex align-items-center flex-nowrap mt-2">
                                         <span class="dropdown-label me-2 text-reg">Courses</span>
-                                        <div class="custom-dropdown">
-                                            <button class="dropdown-btn text-reg text-14">All</button>
+                                        <div class="custom-dropdown" data-dropdown="course">
+                                            <button class="dropdown-btn text-reg text-14" data-selected-course="All">All</button>
                                             <ul class="dropdown-list text-reg text-14">
-                                                <li data-value="Newest">All</li>
-                                                <li data-value="Oldest">Courses</li>
+                                                <li data-value="All" data-course="All">All</li>
+                                                <?php
+                                                if ($selectEnrolledResult && mysqli_num_rows($selectEnrolledResult) > 0) {
+                                                    mysqli_data_seek($selectEnrolledResult, 0);
+                                                    while ($course = mysqli_fetch_assoc($selectEnrolledResult)) {
+                                                        $courseCode = $course['courseCode'];
+                                                        ?>
+                                                        <li data-value="<?php echo $courseCode; ?>" data-course="<?php echo $courseCode; ?>">
+                                                            <?php echo $courseCode; ?>
+                                                        </li>
+                                                        <?php
+                                                    }
+                                                    mysqli_data_seek($selectEnrolledResult, 0);
+                                                }
+                                                ?>
                                             </ul>
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Type -->
-                                <div class="col-auto mobile-dropdown">
-                                    <div class="d-flex align-items-center flex-nowrap mt-2">
-                                        <span class="dropdown-label me-2 text-reg">Type</span>
-                                        <div class="custom-dropdown">
-                                            <button class="dropdown-btn text-reg text-14">All</button>
-                                            <ul class="dropdown-list text-reg text-14">
-                                                <li data-value="Newest">All</li>
-                                                <li data-value="Oldest">Course Updates</li>
-                                                <li data-value="Unread">Badge Updates</li>
-                                                <li data-value="Unread">Leaderboard Updates</li>
-                                                <li data-value="Unread">Level Updates</li>
-                                                <li data-value="Unread">Submission Updates</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-
-
 
                                     <!-- Message Content -->
                                     <div class="message-container mt-4 mt-lg-4 pb-4">
                                         <?php
                                         if (mysqli_num_rows($selectInboxResult) > 0) {
                                             while ($inbox = mysqli_fetch_assoc($selectInboxResult)) {
+                                                $timestamp = strtotime($inbox['inboxCreatedAt']);
+                                                $displayDate = $timestamp ? date("F j, Y g:ia", $timestamp) : '';
+                                                $courseCode = $inbox['courseCode'];
+                                                $messageText = trim($inbox['messageText'] . ' ' . $inbox['assessmentTitle']);
                                                 ?>
-                                                <div class="card mb-1 me-3 w-100 mt-2"
+                                                <div class="card mb-1 me-3 w-100 mt-2 inbox-card"
+                                                    data-timestamp="<?php echo $timestamp ?: 0; ?>"
+                                                    data-course="<?php echo $courseCode; ?>"
                                                     style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
                                                     <div class="card-body py-2 px-4 px-md-3">
                                                         <div class="row align-items-center">
                                                             <!-- Message Text -->
                                                             <div class="col d-flex flex-column text-start mt-2 mb-2">
-                                                                <p class="mb-2 text-sbold text-17"
+                                                                <p class="mb-2 text-sbold text-17 message-text"
                                                                     style="color: var(--black); line-height: 100%;">
-                                                                    <?php echo $inbox['messageText'] . " " . $inbox['assessmentTitle']; ?>
+                                                                    <?php echo $messageText; ?>
                                                                 </p>
                                                                 <small class="text-reg text-12"
-                                                                    style="color: var(--black); line-height: 100%;">January
-                                                                    12, 2024
-                                                                    8:00AM</small>
+                                                                    style="color: var(--black); line-height: 100%;">
+                                                                    <?php echo $displayDate; ?>
+                                                                </small>
 
                                                                 <!-- Course tag on small screen below message text -->
                                                                 <div class="d-block d-lg-none mt-2">
                                                                     <span
                                                                         class="text-reg text-12 badge rounded-pill course-badge"
                                                                         style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                                        <?php echo $inbox['courseCode']; ?>
+                                                                        <?php echo $courseCode; ?>
                                                                     </span>
                                                                 </div>
                                                             </div>
@@ -177,7 +175,7 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                                                 style="display:flex;align-items:center;">
                                                                 <span class="text-reg text-12 badge rounded-pill course-badge"
                                                                     style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                                    <?php echo $inbox['courseCode']; ?>
+                                                                    <?php echo $courseCode; ?>
                                                                 </span>
                                                             </div>
                                                         </div>
@@ -190,8 +188,8 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                         } else {
                                             ?>
                                             <!-- Empty State -->
-                                            <div class="d-flex flex-column justify-content-center align-items-center">
-                                                <img src="../shared/assets/img/empty/inbox.png" width="100">
+                                            <div class="d-flex flex-column justify-content-center align-items-center inbox-empty-state">
+                                                <img src="../shared/assets/img/empty/inbox.png" width="100" class="mb-1">
                                                 <div class="text-center text-14 text-reg mt-1">Your inbox is empty!</div>
                                             </div>
                                             <?php
@@ -214,6 +212,84 @@ $selectInboxResult = executeQuery($selectInboxQuery);
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
+     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const messageContainer = document.querySelector('.message-container');
+            const sortDropdown = document.querySelector('.custom-dropdown[data-dropdown="sort"]');
+            const courseDropdown = document.querySelector('.custom-dropdown[data-dropdown="course"]');
+            const messageCards = messageContainer ? Array.from(messageContainer.querySelectorAll('.inbox-card')) : [];
+
+            if (!messageContainer || messageCards.length === 0) {
+                return;
+            }
+
+            let currentSortDirection = 'desc';
+            let currentCourseFilter = 'All';
+
+            let filterEmptyState = messageContainer.querySelector('.inbox-filter-empty');
+            if (!filterEmptyState) {
+                filterEmptyState = document.createElement('div');
+                filterEmptyState.className = 'd-flex flex-column justify-content-center align-items-center inbox-empty-state inbox-filter-empty';
+                filterEmptyState.style.display = 'none';
+                filterEmptyState.innerHTML = `
+                    <img src="../shared/assets/img/empty/inbox.png" width="100" class="mb-1" alt="Empty inbox">
+                    <div class="text-center text-14 text-reg mt-1">No messages match your filters.</div>
+                `;
+                messageContainer.appendChild(filterEmptyState);
+            }
+
+            const applyFilters = () => {
+                const cards = Array.from(messageContainer.querySelectorAll('.inbox-card'));
+
+                cards.sort((a, b) => {
+                    const aTime = parseInt(a.dataset.timestamp || '0', 10);
+                    const bTime = parseInt(b.dataset.timestamp || '0', 10);
+                    return currentSortDirection === 'asc' ? aTime - bTime : bTime - aTime;
+                }).forEach(card => messageContainer.appendChild(card));
+
+                let visibleCount = 0;
+                cards.forEach(card => {
+                    const matchesCourse = currentCourseFilter === 'All' || card.dataset.course === currentCourseFilter;
+                    card.style.display = matchesCourse ? '' : 'none';
+                    if (matchesCourse) {
+                        visibleCount++;
+                    }
+                });
+
+                messageContainer.appendChild(filterEmptyState);
+                filterEmptyState.style.display = visibleCount === 0 ? 'flex' : 'none';
+            };
+
+            if (sortDropdown) {
+                const sortButton = sortDropdown.querySelector('.dropdown-btn');
+                sortDropdown.querySelectorAll('li').forEach(item => {
+                    item.addEventListener('click', () => {
+                        currentSortDirection = item.dataset.sort || 'desc';
+                        if (sortButton) {
+                            sortButton.dataset.selectedSort = item.dataset.value || 'Newest';
+                        }
+                        applyFilters();
+                    });
+                });
+            }
+
+            if (courseDropdown) {
+                const courseButton = courseDropdown.querySelector('.dropdown-btn');
+                courseDropdown.querySelectorAll('li').forEach(item => {
+                    item.addEventListener('click', () => {
+                        currentCourseFilter = item.dataset.course || 'All';
+                        if (courseButton) {
+                            courseButton.dataset.selectedCourse = currentCourseFilter;
+                        }
+                        applyFilters();
+                    });
+                });
+            }
+
+            applyFilters();
+        });
+    </script>
 
      <!-- Dropdown js -->
      <script>

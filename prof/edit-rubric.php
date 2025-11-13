@@ -9,9 +9,19 @@ $rubricID = isset($_GET['rubricID']) ? intval($_GET['rubricID']) : 0;
 $rubricTitle = '';
 $totalPoints = 0;
 $hasCriteria = false;
+$serverError = '';
+$serverSuccess = '';
 
+// Load existing rubric data and any saved criteria for the current professor.
 if ($rubricID > 0) {
-    $rubricSql = "SELECT rubricTitle, IFNULL(totalPoints,0) AS totalPoints FROM rubric WHERE rubricID='$rubricID' AND userID='$userID' LIMIT 1";
+    $rubricSql = "
+        SELECT rubricTitle,
+               IFNULL(totalPoints, 0) AS totalPoints
+        FROM rubric
+        WHERE rubricID = '$rubricID'
+          AND userID = '$userID'
+        LIMIT 1
+    ";
     $rubricResult = executeQuery($rubricSql);
     if ($rubricResult && $rubricResult->num_rows > 0) {
         $rubricRow = $rubricResult->fetch_assoc();
@@ -19,7 +29,15 @@ if ($rubricID > 0) {
         $totalPoints = (float)$rubricRow['totalPoints'];
     }
 
-    $criteriaSql = "SELECT criterionID, criteriaTitle, criteriaDescription FROM criteria WHERE rubricID='$rubricID' ORDER BY criterionID ASC";
+    // Retrieve criteria so the UI can render each existing row.
+    $criteriaSql = "
+        SELECT criterionID,
+               criteriaTitle,
+               criteriaDescription
+        FROM criteria
+        WHERE rubricID = '$rubricID'
+        ORDER BY criterionID ASC
+    ";
     $criteriaResult = executeQuery($criteriaSql);
     if ($criteriaResult && $criteriaResult->num_rows > 0) {
         $hasCriteria = true;
@@ -29,8 +47,8 @@ if ($rubricID > 0) {
 // Handle update (hidden form submission)
 if (isset($_POST['update_rubric'])) {
     $rubricID = intval($_POST['rubricID']);
-    $criterionID = intval($_POST['criterionID']);
-    $levelID = intval($_POST['levelID']);
+    $criterionID = isset($_POST['criterionID']) ? intval($_POST['criterionID']) : 0;
+    $levelID = isset($_POST['levelID']) ? intval($_POST['levelID']) : 0;
 
     $rubricTitle = mysqli_real_escape_string($conn, $_POST['rubricTitle'] ?? '');
     $criteriaTitle = mysqli_real_escape_string($conn, $_POST['criteriaTitle'] ?? '');
@@ -39,59 +57,287 @@ if (isset($_POST['update_rubric'])) {
     $levelDescription = mysqli_real_escape_string($conn, $_POST['levelDescription'] ?? '');
     $points = isset($_POST['points']) && $_POST['points'] !== '' ? floatval($_POST['points']) : 0;
 
-    if ($criterionID > 0) {
-        $updateCriteriaQuery = "UPDATE criteria SET criteriaTitle='$criteriaTitle', criteriaDescription='$criteriaDescription' WHERE criterionID='$criterionID'";
-        executeQuery($updateCriteriaQuery);
+    // Decode incoming JSON payloads once
+    $criteriaItems = [];
+    if (isset($_POST['criteriaData']) && $_POST['criteriaData'] !== '') {
+        $decoded = json_decode($_POST['criteriaData'], true);
+        if (is_array($decoded)) {
+            $criteriaItems = $decoded;
+        }
     }
-
-    if ($levelID > 0) {
-        $updateLevelQuery = "UPDATE level SET levelTitle='$levelTitle', levelDescription='$levelDescription', points='$points' WHERE levelID='$levelID'";
-        executeQuery($updateLevelQuery);
-    }
-
-    // Bulk update levels from submitted JSON (if provided)
+    $levelItems = [];
     if (isset($_POST['allLevelsData']) && $_POST['allLevelsData'] !== '') {
-        $json = $_POST['allLevelsData'];
-        $levelItems = json_decode($json, true);
-        if (is_array($levelItems)) {
-            for ($i = 0; $i < count($levelItems); $i++) {
-                $item = $levelItems[$i];
-                // Defensive reads
-                $postedLevelId = isset($item['levelID']) ? intval($item['levelID']) : 0;
-                $postedCriterionId = isset($item['criterionID']) ? intval($item['criterionID']) : 0;
-                $postedLevelTitle = mysqli_real_escape_string($conn, isset($item['levelTitle']) ? $item['levelTitle'] : '');
-                $postedLevelDescription = mysqli_real_escape_string($conn, isset($item['levelDescription']) ? $item['levelDescription'] : '');
-                $postedPoints = isset($item['points']) ? floatval($item['points']) : 0;
-                if ($postedLevelId > 0) {
-                    $bulkUpdateLevelQuery = "UPDATE level SET levelTitle='$postedLevelTitle', levelDescription='$postedLevelDescription', points='$postedPoints' WHERE levelID='$postedLevelId'";
-                    executeQuery($bulkUpdateLevelQuery);
+        $decodedLevels = json_decode($_POST['allLevelsData'], true);
+        if (is_array($decodedLevels)) {
+            $levelItems = $decodedLevels;
+        }
+    }
+
+    // --- Server-side validation to prevent empty/invalid updates ---
+    $validationFailed = false;
+    if (trim($rubricTitle) === '') {
+        $serverError = 'Rubric title is required.';
+        $validationFailed = true;
+    }
+    if (!$validationFailed && (!is_array($criteriaItems) || count($criteriaItems) === 0)) {
+        $serverError = 'Add at least one criterion before updating.';
+        $validationFailed = true;
+    }
+    // Validate each criterion has title/description and at least one valid level
+    if (!$validationFailed) {
+        // Build fast lookup for levels by criterionID and by criterionIndex (for new rows)
+        $levelsByCriterionId = [];
+        $levelsByCriterionIndex = [];
+        foreach ($levelItems as $li) {
+            $cid = isset($li['criterionID']) ? intval($li['criterionID']) : 0;
+            $cidx = isset($li['criterionIndex']) ? intval($li['criterionIndex']) : 0;
+            if ($cid > 0) {
+                if (!isset($levelsByCriterionId[$cid])) $levelsByCriterionId[$cid] = [];
+                $levelsByCriterionId[$cid][] = $li;
+            } elseif ($cidx > 0) {
+                if (!isset($levelsByCriterionIndex[$cidx])) $levelsByCriterionIndex[$cidx] = [];
+                $levelsByCriterionIndex[$cidx][] = $li;
+            }
+        }
+        foreach ($criteriaItems as $citem) {
+            $postedCriterionId = isset($citem['criterionID']) ? intval($citem['criterionID']) : 0;
+            $postedCriterionIndex = isset($citem['criterionIndex']) ? intval($citem['criterionIndex']) : 0;
+            $postedCriteriaTitle = trim($citem['criteriaTitle'] ?? '');
+            $postedCriteriaDescription = trim($citem['criteriaDescription'] ?? '');
+            if ($postedCriteriaTitle === '') {
+                $serverError = 'Each criterion must have a title.';
+                $validationFailed = true;
+                break;
+            }
+            if ($postedCriteriaDescription === '') {
+                $serverError = 'Each criterion must have a description.';
+                $validationFailed = true;
+                break;
+            }
+            // Collect levels for this criterion (either by existing ID or by new index)
+            $candidateLevels = [];
+            if ($postedCriterionId > 0 && isset($levelsByCriterionId[$postedCriterionId])) {
+                $candidateLevels = $levelsByCriterionId[$postedCriterionId];
+            } elseif ($postedCriterionIndex > 0 && isset($levelsByCriterionIndex[$postedCriterionIndex])) {
+                $candidateLevels = $levelsByCriterionIndex[$postedCriterionIndex];
+            }
+            if (count($candidateLevels) === 0) {
+                $serverError = 'Each criterion needs at least one level.';
+                $validationFailed = true;
+                break;
+            }
+            // Validate each level fields
+            foreach ($candidateLevels as $lvl) {
+                $lt = trim($lvl['levelTitle'] ?? '');
+                $ld = trim($lvl['levelDescription'] ?? '');
+                $lp = $lvl['points'] ?? '';
+                if ($lt === '' || $ld === '') {
+                    $serverError = 'Level title and description are required.';
+                    $validationFailed = true;
+                    break 2;
+                }
+                if ($lp === '' || !is_numeric($lp)) {
+                    $serverError = 'Level points must be a number.';
+                    $validationFailed = true;
+                    break 2;
                 }
             }
         }
     }
 
-    // Recalculate total points for the rubric from DB: sum of max points per criterion
-    $totalCalculated = 0;
-    $criteriaCalculationSql = "SELECT criterionID FROM criteria WHERE rubricID='$rubricID'";
-    $criteriaCalculationResult = executeQuery($criteriaCalculationSql);
-    if ($criteriaCalculationResult && $criteriaCalculationResult->num_rows > 0) {
-        while ($criteriaCalculationRow = $criteriaCalculationResult->fetch_assoc()) {
-            $criterionIdForCalculation = intval($criteriaCalculationRow['criterionID']);
-            $maxPointsSql = "SELECT MAX(points) AS maxPoints FROM level WHERE criterionID='$criterionIdForCalculation'";
-            $maxPointsResult = executeQuery($maxPointsSql);
-            if ($maxPointsResult && $maxPointsResult->num_rows > 0) {
-                $maxPointsRow = $maxPointsResult->fetch_assoc();
-                $maxPointsValue = isset($maxPointsRow['maxPoints']) ? floatval($maxPointsRow['maxPoints']) : 0;
-                $totalCalculated += $maxPointsValue;
+    if ($validationFailed) {
+        // Do not proceed with DB updates; render form again and show toast through $serverError
+    } else {
+    // Map for newly created criteria keyed by temporary criterionIndex from the client
+    $criterionIndexToId = [];
+
+    // Upsert criteria from submitted JSON list 
+    if (!empty($criteriaItems)) {
+            foreach ($criteriaItems as $citem) {
+                $postedCriterionId = isset($citem['criterionID']) ? intval($citem['criterionID']) : 0;
+                $postedCriterionIndex = isset($citem['criterionIndex']) ? intval($citem['criterionIndex']) : 0;
+                $postedCriteriaTitle = mysqli_real_escape_string($conn, $citem['criteriaTitle'] ?? '');
+                $postedCriteriaDescription = mysqli_real_escape_string($conn, $citem['criteriaDescription'] ?? '');
+                if ($postedCriterionId > 0) {
+                    $updateCriteriaQuery = "
+                        UPDATE criteria
+                        SET criteriaTitle = '$postedCriteriaTitle',
+                            criteriaDescription = '$postedCriteriaDescription'
+                        WHERE criterionID = '$postedCriterionId'
+                          AND rubricID = '$rubricID'
+                    ";
+                    executeQuery($updateCriteriaQuery);
+                    $criterionIndexToId[$postedCriterionIndex] = $postedCriterionId;
+                } else {
+                    // Insert new criterion for this rubric
+                    $insertCriteriaQuery = "
+                        INSERT INTO criteria (rubricID, criteriaTitle, criteriaDescription)
+                        VALUES ('$rubricID', '$postedCriteriaTitle', '$postedCriteriaDescription')
+                    ";
+                    $insResult = executeQuery($insertCriteriaQuery);
+                    if ($insResult) {
+                        $newCriterionId = mysqli_insert_id($conn);
+                        if ($postedCriterionIndex > 0) {
+                            $criterionIndexToId[$postedCriterionIndex] = $newCriterionId;
+                        }
+                    }
+                }
+            }
+    }
+
+    // Legacy support: ina-update ang isang criterion gamit ang lumang hidden inputs.
+    if ($criterionID > 0) {
+        $updateCriteriaQuery = "
+            UPDATE criteria
+            SET criteriaTitle = '$criteriaTitle',
+                criteriaDescription = '$criteriaDescription'
+            WHERE criterionID = '$criterionID'
+        ";
+        executeQuery($updateCriteriaQuery);
+    }
+
+    // Legacy support: ina-update ang isang level gamit ang lumang hidden inputs.
+    if ($levelID > 0) {
+        $updateLevelQuery = "
+            UPDATE level
+            SET levelTitle = '$levelTitle',
+                levelDescription = '$levelDescription',
+                points = '$points'
+            WHERE levelID = '$levelID'
+        ";
+        executeQuery($updateLevelQuery);
+    }
+
+    // Ina-update/gumagawa ng levels ayon sa JSON na listahan.
+    if (!empty($levelItems)) {
+            for ($i = 0; $i < count($levelItems); $i++) {
+                $item = $levelItems[$i];
+                // Defensive reads
+                $postedLevelId = isset($item['levelID']) ? intval($item['levelID']) : 0;
+                $postedCriterionId = isset($item['criterionID']) ? intval($item['criterionID']) : 0;
+                $postedCriterionIndex = isset($item['criterionIndex']) ? intval($item['criterionIndex']) : 0;
+                $postedLevelTitle = mysqli_real_escape_string($conn, isset($item['levelTitle']) ? $item['levelTitle'] : '');
+                $postedLevelDescription = mysqli_real_escape_string($conn, isset($item['levelDescription']) ? $item['levelDescription'] : '');
+                $postedPoints = isset($item['points']) ? floatval($item['points']) : 0;
+                if ($postedLevelId > 0) {
+                    $bulkUpdateLevelQuery = "
+                        UPDATE level
+                        SET levelTitle = '$postedLevelTitle',
+                            levelDescription = '$postedLevelDescription',
+                            points = '$postedPoints'
+                        WHERE levelID = '$postedLevelId'
+                    ";
+                    executeQuery($bulkUpdateLevelQuery);
+                } else {
+                    // for bagong level at hinahanap ang tama criterionID (existing o bagong gawa).
+                    $resolvedCriterionId = 0;
+                    if ($postedCriterionId > 0) {
+                        $resolvedCriterionId = $postedCriterionId;
+                    } elseif ($postedCriterionIndex > 0 && isset($criterionIndexToId[$postedCriterionIndex])) {
+                        $resolvedCriterionId = intval($criterionIndexToId[$postedCriterionIndex]);
+                    }
+                    if ($resolvedCriterionId > 0) {
+                        $insertLevelQuery = "
+                            INSERT INTO level (criterionID, levelTitle, levelDescription, points)
+                            VALUES ('$resolvedCriterionId', '$postedLevelTitle', '$postedLevelDescription', '$postedPoints')
+                        ";
+                        executeQuery($insertLevelQuery);
+                    }
+                }
+            }
+    }
+
+    // Remove levels explicitly marked for deletion
+    if (isset($_POST['deletedLevels']) && $_POST['deletedLevels'] !== '') {
+        $deletedLevels = json_decode($_POST['deletedLevels'], true);
+        if (is_array($deletedLevels)) {
+            foreach ($deletedLevels as $levelIdToDelete) {
+                $levelIdToDelete = intval($levelIdToDelete);
+                if ($levelIdToDelete > 0) {
+                    $deleteLevelQuery = "
+                        DELETE FROM level
+                        WHERE levelID = '$levelIdToDelete'
+                          AND criterionID IN (
+                              SELECT criterionID FROM criteria WHERE rubricID = '$rubricID'
+                          )
+                    ";
+                    executeQuery($deleteLevelQuery);
+                }
             }
         }
     }
 
-    $updateRubricQuery = "UPDATE rubric SET rubricTitle='$rubricTitle', totalPoints='$totalCalculated' WHERE rubricID='$rubricID' AND userID='$userID'";
+    // Remove criteria explicitly marked for deletion (and cascade their levels)
+    if (isset($_POST['deletedCriteria']) && $_POST['deletedCriteria'] !== '') {
+        $deletedCriteria = json_decode($_POST['deletedCriteria'], true);
+        if (is_array($deletedCriteria)) {
+            foreach ($deletedCriteria as $criterionIdToDelete) {
+                $criterionIdToDelete = intval($criterionIdToDelete);
+                if ($criterionIdToDelete > 0) {
+                    $criterionCheckQuery = "
+                        SELECT criterionID
+                        FROM criteria
+                        WHERE criterionID = '$criterionIdToDelete'
+                          AND rubricID = '$rubricID'
+                        LIMIT 1
+                    ";
+                    $criterionCheckResult = executeQuery($criterionCheckQuery);
+                    if ($criterionCheckResult && $criterionCheckResult->num_rows > 0) {
+                        $deleteCriterionLevelsQuery = "
+                            DELETE FROM level
+                            WHERE criterionID = '$criterionIdToDelete'
+                        ";
+                        executeQuery($deleteCriterionLevelsQuery);
+
+                        $deleteCriterionQuery = "
+                            DELETE FROM criteria
+                            WHERE criterionID = '$criterionIdToDelete'
+                              AND rubricID = '$rubricID'
+                        ";
+                        executeQuery($deleteCriterionQuery);
+                    }
+                }
+            }
+        }
+    }
+
+    // Kinokolekta ulit ang total points ng rubric batay sa lahat ng level points.
+    $totalCalculated = 0;
+    $criteriaCalculationSql = "
+        SELECT criterionID
+        FROM criteria
+        WHERE rubricID = '$rubricID'
+    ";
+    $criteriaCalculationResult = executeQuery($criteriaCalculationSql);
+    if ($criteriaCalculationResult && $criteriaCalculationResult->num_rows > 0) {
+        while ($criteriaCalculationRow = $criteriaCalculationResult->fetch_assoc()) {
+            $criterionIdForCalculation = intval($criteriaCalculationRow['criterionID']);
+            $totalPointsSql = "
+                SELECT SUM(points) AS totalPoints
+                FROM level
+                WHERE criterionID = '$criterionIdForCalculation'
+            ";
+            $totalPointsResult = executeQuery($totalPointsSql);
+            if ($totalPointsResult && $totalPointsResult->num_rows > 0) {
+                $totalPointsRow = $totalPointsResult->fetch_assoc();
+                $totalPointsValue = isset($totalPointsRow['totalPoints']) ? floatval($totalPointsRow['totalPoints']) : 0;
+                $totalCalculated += $totalPointsValue;
+            }
+        }
+    }
+
+    $updateRubricQuery = "
+        UPDATE rubric
+        SET rubricTitle = '$rubricTitle',
+            totalPoints = '$totalCalculated'
+        WHERE rubricID = '$rubricID'
+          AND userID = '$userID'
+    ";
     executeQuery($updateRubricQuery);
 
     header('Location: assign-task.php?selectedRubricID=' . $rubricID);
     exit;
+    }
 }
 ?>
 
@@ -186,7 +432,14 @@ if (isset($_POST['update_rubric'])) {
                                 <?php
                                 $computedTotal = 0;
                                 if ($hasCriteria && $rubricID > 0) {
-                                    $criteriaSql = "SELECT criterionID, criteriaTitle, criteriaDescription FROM criteria WHERE rubricID='$rubricID' ORDER BY criterionID ASC";
+                                    $criteriaSql = "
+                                        SELECT criterionID,
+                                               criteriaTitle,
+                                               criteriaDescription
+                                        FROM criteria
+                                        WHERE rubricID = '$rubricID'
+                                        ORDER BY criterionID ASC
+                                    ";
                                     $criteriaResult = executeQuery($criteriaSql);
                                     $criterionIndex = 0;
                                     if ($criteriaResult && $criteriaResult->num_rows > 0) {
@@ -198,8 +451,16 @@ if (isset($_POST['update_rubric'])) {
                                             
         	                                // Fetch levels once: collect rows and compute max points
                                             $levelRows = [];
-                                            $maxPointsForCriterion = 0;
-                                            $levelsSql = "SELECT levelID, levelTitle, levelDescription, points FROM level WHERE criterionID='$criterionId' ORDER BY levelID ASC";
+                                            $pointsSumForCriterion = 0;
+                                            $levelsSql = "
+                                                SELECT levelID,
+                                                       levelTitle,
+                                                       levelDescription,
+                                                       points
+                                                FROM level
+                                                WHERE criterionID = '$criterionId'
+                                                ORDER BY levelID ASC
+                                            ";
                                             $levelsResult = executeQuery($levelsSql);
                                             if ($levelsResult && $levelsResult->num_rows > 0) {
                                                 while ($levelRow = $levelsResult->fetch_assoc()) {
@@ -207,20 +468,18 @@ if (isset($_POST['update_rubric'])) {
                                                     $levelTitleVal = $levelRow['levelTitle'];
                                                     $levelDescVal = $levelRow['levelDescription'];
                                                     $levelPointsVal = isset($levelRow['points']) ? floatval($levelRow['points']) : 0;
-                                                    if ($levelPointsVal > $maxPointsForCriterion) {
-                                                        $maxPointsForCriterion = $levelPointsVal;
-                                                    }
+                                                    $pointsSumForCriterion += $levelPointsVal;
                                                     // store as numeric array to avoid associative arrow syntax
                                                     $levelRows[] = [$levelIdVal, $levelTitleVal, $levelDescVal, $levelPointsVal];
                                                 }
                                             }
-                                            $computedTotal += $maxPointsForCriterion;
+                                            $computedTotal += $pointsSumForCriterion;
                                 ?>
                                 <div class="criterion-wrapper" data-index="<?php echo $criterionIndex; ?>" data-criterion-id="<?php echo $criterionId; ?>">
                                 <div class="row">
                                     <div class="col-12 pt-0 mb-2">
                                         <div class="d-flex align-items-center">
-                                                <span class="form-label text-med text-16 m-0 criterion-header-points">Criterion <?php echo $criterionIndex; ?> · <?php echo $maxPointsForCriterion; ?> Points</span>
+                                                <span class="form-label text-med text-16 m-0 criterion-header-points">Criterion <?php echo $criterionIndex; ?> · <?php echo $pointsSumForCriterion; ?> Points</span>
                                                 <div class="flex" style="border-top: 1px solid transparent;"></div>
                                                 <button type="button" class="criterion-remove-btn" aria-label="Remove criterion">
                                                     <span class="material-symbols-outlined">close</span>
@@ -282,7 +541,7 @@ if (isset($_POST['update_rubric'])) {
                                 <div class="row">
                                                             <div class="col-12 pt-2 mb-3">
                                                                 <label for="criteriaTitle" class="form-label">Points</label>
-                                                                <input type="text" value="<?php echo htmlspecialchars($levelPointsValue); ?>" class="form-control textbox mb-1 p-3 text-reg text-14 text-muted level-points" id="pointsLabel" aria-describedby="pointsLabel" placeholder="0">
+                                                                <input type="number" step="any" required value="<?php echo htmlspecialchars($levelPointsValue); ?>" class="form-control textbox mb-1 p-3 text-reg text-14 text-muted level-points" id="pointsLabel" aria-describedby="pointsLabel" placeholder="0">
                                                             </div>
                                                         </div>
                                                     </form>
@@ -315,7 +574,7 @@ if (isset($_POST['update_rubric'])) {
                                                         <div class="row">
                                                             <div class="col-12 pt-2 mb-3">
                                                                 <label for="criteriaTitle" class="form-label">Points</label>
-                                                                <input type="text" value="0" class="form-control textbox mb-1 p-3 text-reg text-14 text-muted level-points" id="pointsLabel" aria-describedby="pointsLabel" placeholder="0">
+                                                                <input type="number" step="any" required value="0" class="form-control textbox mb-1 p-3 text-reg text-14 text-muted level-points" id="pointsLabel" aria-describedby="pointsLabel" placeholder="0">
                                                             </div>
                                                         </div>
                                                     </form>
@@ -340,7 +599,7 @@ if (isset($_POST['update_rubric'])) {
                                     }
                                 } else { 
                                 ?>
-                                <!-- No criteria: render one empty criterion like create page -->
+                                <!-- Kapag walang criteria, gumagawa ng default na blangkong criterion -->
                                 <div class="criterion-wrapper" data-index="1">
                                     <div class="row">
                                         <div class="col-12 pt-0 mb-2">
@@ -393,7 +652,7 @@ if (isset($_POST['update_rubric'])) {
                                                     <div class="row">
                                                         <div class="col-12 pt-2 mb-3">
                                                             <label for="criteriaTitle" class="form-label">Points</label>
-                                                                <input type="text" value="0" class="form-control textbox mb-1 p-3 text-reg text-14 text-muted level-points" id="pointsLabel" aria-describedby="pointsLabel" placeholder="0">
+                                                                <input type="number" step="any" required value="0" class="form-control textbox mb-1 p-3 text-reg text-14 text-muted level-points" id="pointsLabel" aria-describedby="pointsLabel" placeholder="0">
                                                         </div>
                                                     </div>
                                                 </form>
@@ -462,9 +721,15 @@ if (isset($_POST['update_rubric'])) {
             <input type="hidden" name="levelTitle" id="post_levelTitle">
             <input type="hidden" name="levelDescription" id="post_levelDescription">
             <input type="hidden" name="points" id="post_points">
+            <input type="hidden" name="criteriaData" id="post_criteriaData">
             <input type="hidden" name="allLevelsData" id="post_allLevelsData">
+            <input type="hidden" name="deletedCriteria" id="post_deletedCriteria">
+            <input type="hidden" name="deletedLevels" id="post_deletedLevels">
         </form>
         <script>
+            // --- Toast Part ---
+            var deletedCriteria = [];
+            var deletedLevels = [];
             (function(){
                 function showAlert(message) {
                     var container = document.getElementById('toastContainer');
@@ -485,44 +750,134 @@ if (isset($_POST['update_rubric'])) {
                         setTimeout(function() { if (alertEl && alertEl.parentNode) alertEl.parentNode.removeChild(alertEl); }, 500);
                     }, 4000);
                 }
+                window.showAlert = showAlert;
 
-                function showSuccessToast(message) {
-                    var container = document.getElementById('toastContainer');
-                    if (!container) return;
+                function isBlank(value) {
+                    return value === undefined || value === null || value.trim() === '';
+                }
 
-                    var alertEl = document.createElement('div');
-                    alertEl.className = 'alert alert-success mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2';
-                    alertEl.role = 'alert';
-                    alertEl.style.transition = 'opacity 2s ease';
-                    alertEl.style.opacity = '1';
-                    alertEl.innerHTML = '<i class="bi bi-check-circle-fill fs-6"></i>' +
-                        '<span>' + message + '</span>';
+                function validateRubric(options) {
+                    var wrappers = document.querySelectorAll('.criterion-wrapper');
+                    var rubricInput = document.getElementById('rubricInfo');
+                    if (rubricInput) {
+                        rubricInput.required = true;
+                        if (isBlank(rubricInput.value)) {
+                            rubricInput.reportValidity();
+                            return false;
+                        }
+                    }
 
-                    container.appendChild(alertEl);
+                    if (!wrappers || !wrappers.length) {
+                        showAlert('Add at least one criterion before updating.');
+                        return false;
+                    }
 
-                    setTimeout(function() {
-                        alertEl.style.opacity = '0';
-                        setTimeout(function() { alertEl.remove(); }, 2000);
-                    }, 3000);
+                    for (var cIdx = 0; cIdx < wrappers.length; cIdx++) {
+                        var wrapper = wrappers[cIdx];
+                        // for checking ng bawat criterion title at description.
+                        var titleInput = wrapper.querySelector('form.criteria-title input#criteriaTitle');
+                        if (titleInput) {
+                            titleInput.required = true;
+                            if (isBlank(titleInput.value)) {
+                                titleInput.reportValidity();
+                                return false;
+                            }
+                        }
+                        var descInput = wrapper.querySelector('form.criterion-description input#criterionDescription');
+                        if (descInput) {
+                            descInput.required = true;
+                            if (isBlank(descInput.value)) {
+                                descInput.reportValidity();
+                                return false;
+                            }
+                        }
+
+                        var levelCards = wrapper.querySelectorAll('.criterion-description-card');
+                        if (!levelCards || !levelCards.length) {
+                            showAlert('Each criterion needs at least one level.');
+                            return false;
+                        }
+
+                        for (var lIdx = 0; lIdx < levelCards.length; lIdx++) {
+                            var levelCard = levelCards[lIdx];
+                            // for checking ng bawat level title/description.
+                            var levelTitleInput = levelCard.querySelector('#levelTitle');
+                            if (levelTitleInput) {
+                                levelTitleInput.required = true;
+                                if (isBlank(levelTitleInput.value)) {
+                                    levelTitleInput.reportValidity();
+                                    return false;
+                                }
+                            }
+                            var levelDescInput = levelCard.querySelector('#levelDescription');
+                            if (levelDescInput) {
+                                levelDescInput.required = true;
+                                if (isBlank(levelDescInput.value)) {
+                                    levelDescInput.reportValidity();
+                                    return false;
+                                }
+                            }
+                            var pointsInput = levelCard.querySelector('.level-points');
+                            if (pointsInput) {
+                                // para sure if may value ang points.
+                                pointsInput.required = true;
+                                var rawPoints = pointsInput.value ? pointsInput.value.trim() : '';
+                                if (rawPoints === '') {
+                                    pointsInput.reportValidity();
+                                    return false;
+                                }
+                                if (!pointsInput.checkValidity()) {
+                                    pointsInput.reportValidity();
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+
+                    return true;
                 }
 
                 var btn = document.getElementById('updateBtn');
                 if (!btn) return;
                 btn.addEventListener('click', function(){
+                    if (!validateRubric()) return;
+
                     var get = function(id){ var el = document.getElementById(id); return el && el.value ? el.value.trim() : ''; };
-                    document.getElementById('post_rubricTitle').value = get('rubricInfo');
+                    var rubricTitleValue = get('rubricInfo');
+                    var wrappers = document.querySelectorAll('.criterion-wrapper');
+
+                    document.getElementById('post_rubricTitle').value = rubricTitleValue;
                     document.getElementById('post_criteriaTitle').value = get('criteriaTitle');
                     document.getElementById('post_criteriaDescription').value = get('criterionDescription');
                     document.getElementById('post_levelTitle').value = get('levelTitle');
                     document.getElementById('post_levelDescription').value = get('levelDescription');
                     document.getElementById('post_points').value = get('pointsLabel');
 
-                    // Collect all level edits across all criteria
+                    // Collect criteria edits (existing and new)
+                    var criteriaData = [];
+                    for (var c = 0; c < wrappers.length; c++){
+                        var criterionIdAttr = wrappers[c].getAttribute('data-criterion-id');
+                        var criterionIdVal = criterionIdAttr ? parseInt(criterionIdAttr, 10) : 0;
+                        var criterionIndexVal = wrappers[c].dataset && wrappers[c].dataset.index ? parseInt(wrappers[c].dataset.index, 10) : (c + 1);
+                        var titleInput = wrappers[c].querySelector('form.criteria-title input#criteriaTitle');
+                        var descInput = wrappers[c].querySelector('form.criterion-description input#criterionDescription');
+                        var titleVal = titleInput && titleInput.value ? titleInput.value.trim() : '';
+                        var descVal = descInput && descInput.value ? descInput.value.trim() : '';
+                        criteriaData.push({
+                            criterionID: isNaN(criterionIdVal) ? 0 : criterionIdVal,
+                            criterionIndex: criterionIndexVal,
+                            criteriaTitle: titleVal,
+                            criteriaDescription: descVal
+                        });
+                    }
+                    try { document.getElementById('post_criteriaData').value = JSON.stringify(criteriaData); } catch (e) { document.getElementById('post_criteriaData').value = '[]'; }
+
+                    // Collect all level edits across all criteria (existing and new)
                     var levelsData = [];
-                    var wrappers = document.querySelectorAll('.criterion-wrapper');
                     for (var i = 0; i < wrappers.length; i++){
                         var criterionIdAttr = wrappers[i].getAttribute('data-criterion-id');
                         var criterionIdVal = criterionIdAttr ? parseInt(criterionIdAttr, 10) : 0;
+                        var criterionIndexVal2 = wrappers[i].dataset && wrappers[i].dataset.index ? parseInt(wrappers[i].dataset.index, 10) : (i + 1);
                         var levelCards = wrappers[i].querySelectorAll('.criterion-description-card');
                         for (var j = 0; j < levelCards.length; j++){
                             var levelIdAttr = levelCards[j].getAttribute('data-level-id');
@@ -534,60 +889,63 @@ if (isset($_POST['update_rubric'])) {
                             var descVal = descInput && descInput.value ? descInput.value.trim() : '';
                             var pts = pointsInput && pointsInput.value ? parseFloat(pointsInput.value) : 0;
                             if (isNaN(pts)) { pts = 0; }
-                            levelsData.push({ criterionID: criterionIdVal, levelID: levelIdVal, levelTitle: titleVal, levelDescription: descVal, points: pts });
+                            levelsData.push({ criterionID: criterionIdVal, criterionIndex: criterionIndexVal2, levelID: levelIdVal, levelTitle: titleVal, levelDescription: descVal, points: pts });
                         }
                     }
                     try { document.getElementById('post_allLevelsData').value = JSON.stringify(levelsData); } catch (e) { document.getElementById('post_allLevelsData').value = '[]'; }
+                    try { document.getElementById('post_deletedCriteria').value = JSON.stringify(deletedCriteria); } catch (e) { document.getElementById('post_deletedCriteria').value = '[]'; }
+                    try { document.getElementById('post_deletedLevels').value = JSON.stringify(deletedLevels); } catch (e) { document.getElementById('post_deletedLevels').value = '[]'; }
 
-                    // Submit via AJAX instead of form submission
                     var form = document.getElementById('hiddenEditPost');
-                    var formData = new FormData(form);
-                    var xhr = new XMLHttpRequest();
-                    xhr.open('POST', window.location.href, true);
-                    xhr.onreadystatechange = function() {
-                        if (xhr.readyState === 4) {
-                            if (xhr.status === 200 || xhr.status === 302) {
-                                // Success - show toast then redirect
-                                var rubricIDInput = form.querySelector('input[name="rubricID"]');
-                                var rubricID = rubricIDInput ? rubricIDInput.value : '';
-                                showSuccessToast('Rubric successfully updated');
-                                setTimeout(function() {
-                                    window.location.href = 'assign-task.php?selectedRubricID=' + encodeURIComponent(rubricID);
-                                }, 1500);
-                            } else {
-                                showAlert('Failed to update rubric.');
-                            }
-                        }
-                    };
-                    xhr.send(formData);
+                    if (form && form.submit) {
+                        form.submit();
+                    }
                 });
             })();
         </script>
 
         <script>
             (function(){
+                // --- this part naman is para i-update ang header at total points ---
                 function parsePoints(val){ var n = parseFloat(val); return isNaN(n) ? 0 : n; }
-                function calculateCriterionMax(wrapper){
+                function calculateCriterionSum(wrapper){
                     if (!wrapper) return 0;
                     var inputs = wrapper.getElementsByClassName('level-points');
-                    var max = 0;
-                    for (var i = 0; i < inputs.length; i++) { var v = parsePoints(inputs[i].value); if (v > max) max = v; }
-                    return max;
+                    var sum = 0;
+                    for (var i = 0; i < inputs.length; i++) {
+                        sum += parsePoints(inputs[i].value);
+                    }
+                    return sum;
                 }
                 function updateCriterionHeader(wrapper){
                     if (!wrapper) return 0;
-                    var max = calculateCriterionMax(wrapper);
+                    var sum = calculateCriterionSum(wrapper);
                     var header = wrapper.querySelector('.criterion-header-points');
                     var idx = wrapper.dataset && wrapper.dataset.index ? wrapper.dataset.index : '1';
-                    if (header) header.textContent = 'Criterion ' + idx + ' · ' + max + ' Points';
-                    return max;
+                    if (header) header.textContent = 'Criterion ' + idx + ' · ' + sum + ' Points';
+                    return sum;
                 }
                 function updateTotal(){
                     var total = 0;
                     var wrappers = document.querySelectorAll('.criterion-wrapper');
-                    for (var i = 0; i < wrappers.length; i++) total += calculateCriterionMax(wrappers[i]);
+                    for (var i = 0; i < wrappers.length; i++) total += calculateCriterionSum(wrappers[i]);
                     var lbl = document.querySelector('.total-points-label');
                     if (lbl) lbl.textContent = 'Total Points: ' + total;
+                }
+                function addUniqueId(targetArray, rawValue){
+                    var id = parseInt(rawValue, 10);
+                    if (!isNaN(id) && id > 0 && targetArray.indexOf(id) === -1){
+                        targetArray.push(id);
+                    }
+                }
+                function renumberCriteriaWrappers(){
+                    var wrappers = document.querySelectorAll('.criterion-wrapper');
+                    for (var i = 0; i < wrappers.length; i++){
+                        var wrapper = wrappers[i];
+                        wrapper.dataset.index = String(i + 1);
+                        updateCriterionHeader(wrapper);
+                    }
+                    updateTotal();
                 }
                 document.addEventListener('input', function(e){
                     if (e.target && e.target.classList && e.target.classList.contains('level-points')){
@@ -597,24 +955,54 @@ if (isset($_POST['update_rubric'])) {
                     }
                 });
                 document.addEventListener('click', function(e){
-                    var btn = e.target && (e.target.closest ? e.target.closest('.card-remove-btn') : null);
-                    if (!btn) return;
-                    var card = btn.closest ? btn.closest('.criterion-description-card') : null;
-                    if (!card) return;
-                    var wrap = btn.closest ? btn.closest('.criterion-wrapper') : null;
-                    var container = wrap ? wrap.querySelector('.levelsContainer') : null;
-                    if (!container) return;
-                    var total = container.querySelectorAll('.criterion-description-card').length;
-                    if (total > 1) {
+                    var levelBtn = e.target && (e.target.closest ? e.target.closest('.card-remove-btn') : null);
+                    if (levelBtn) {
+                        // Tinatanggal ang isang level; pinipigilan kapag iisa na lang ang natitira.
+                        var card = levelBtn.closest ? levelBtn.closest('.criterion-description-card') : null;
+                        if (!card) return;
+                        var wrap = levelBtn.closest ? levelBtn.closest('.criterion-wrapper') : null;
+                        var container = wrap ? wrap.querySelector('.levelsContainer') : null;
+                        if (!container) return;
+                        var total = container.querySelectorAll('.criterion-description-card').length;
+                        if (total <= 1) {
+                            if (typeof showAlert === 'function') showAlert('Each criterion needs at least one level.');
+                            return;
+                        }
+                        var levelIdAttr = card.getAttribute('data-level-id');
+                        addUniqueId(deletedLevels, levelIdAttr);
                         card.parentNode.removeChild(card);
                         updateCriterionHeader(wrap);
                         updateTotal();
+                        return;
+                    }
+                    var criterionBtn = e.target && (e.target.closest ? e.target.closest('.criterion-remove-btn') : null);
+                    if (criterionBtn) {
+                        // naghandle ng removal ng criterion sa db and yung kasama level.
+                        var wrapper = criterionBtn.closest ? criterionBtn.closest('.criterion-wrapper') : null;
+                        if (!wrapper) return;
+                        var allWrappers = document.querySelectorAll('.criterion-wrapper');
+                        if (!allWrappers || allWrappers.length <= 1) {
+                            if (typeof showAlert === 'function') showAlert('At least one criterion is required.');
+                            return;
+                        }
+                        var criterionIdAttr = wrapper.getAttribute('data-criterion-id');
+                        addUniqueId(deletedCriteria, criterionIdAttr);
+
+                        var levelCards = wrapper.querySelectorAll('.criterion-description-card');
+                        for (var idx = 0; idx < levelCards.length; idx++) {
+                            var levelIdAttrInner = levelCards[idx].getAttribute('data-level-id');
+                            addUniqueId(deletedLevels, levelIdAttrInner);
+                        }
+
+                        wrapper.parentNode.removeChild(wrapper);
+                        renumberCriteriaWrappers();
                     }
                 });
                 function bindLevelButtons(scope){
                     var buttons = (scope || document).getElementsByClassName('add-level-btn');
                     for (var i = 0; i < buttons.length; i++){
                         buttons[i].onclick = function(){
+                            // para lang sa duplication ng level card.
                             var wrap = this.closest ? this.closest('.criterion-wrapper') : null;
                             if (!wrap) return;
                             var container = wrap.querySelector('.levelsContainer');
@@ -622,7 +1010,8 @@ if (isset($_POST['update_rubric'])) {
                             if (!firstCard) return;
                             var clone = firstCard.cloneNode(true);
                             var inputs = clone.querySelectorAll('input');
-                            for (var j = 0; j < inputs.length; j++) { inputs[j].value = ''; inputs[j].style.border = ''; }
+                            for (var j = 0; j < inputs.length; j++) { inputs[j].value = ''; inputs[j].style.border = ''; inputs[j].classList.remove('is-invalid'); }
+                            clone.setAttribute('data-level-id', '0');
                             container.appendChild(clone);
                             updateCriterionHeader(wrap);
                             updateTotal();
@@ -635,6 +1024,7 @@ if (isset($_POST['update_rubric'])) {
                     var btn = document.getElementById('addCriteriaBtn');
                     if (!btn) return;
                     btn.addEventListener('click', function(){
+                        // copy of criterion template para sa new criterion.
                         var list = document.getElementById('criteriaList');
                         if (!list) return;
                         var wrappers = list.querySelectorAll('.criterion-wrapper');
@@ -643,21 +1033,28 @@ if (isset($_POST['update_rubric'])) {
                         var base = wrappers.length > 0 ? wrappers[0] : null;
                         if (!base) return;
                         var wrapper = base.cloneNode(true);
+                        wrapper.setAttribute('data-criterion-id', '0');
                         // clear inputs
                         var inputs = wrapper.querySelectorAll('input');
-                        for (var i = 0; i < inputs.length; i++) { inputs[i].value = ''; inputs[i].style.border = ''; }
-                        // keep only first level card
+                        for (var i = 0; i < inputs.length; i++) { inputs[i].value = ''; inputs[i].style.border = ''; inputs[i].classList.remove('is-invalid'); }
+                        // Tinatanggal ang sobrang level cards sa kinopyang criterion.
                         var levelsContainer = wrapper.querySelector('.levelsContainer');
                         if (levelsContainer) {
                             var cards = levelsContainer.querySelectorAll('.criterion-description-card');
                             for (var k = 1; k < cards.length; k++) { cards[k].parentNode.removeChild(cards[k]); }
+                            var remainingCard = levelsContainer.querySelector('.criterion-description-card');
+                            if (remainingCard) {
+                                remainingCard.setAttribute('data-level-id', '0');
+                                var remainingInputs = remainingCard.querySelectorAll('input');
+                                for (var m = 0; m < remainingInputs.length; m++) { remainingInputs[m].value = ''; remainingInputs[m].style.border = ''; remainingInputs[m].classList.remove('is-invalid'); }
+                            }
                         }
                         wrapper.dataset.index = String(nextIndex);
                         var header = wrapper.querySelector('.criterion-header-points');
                         if (header) header.textContent = 'Criterion ' + nextIndex + ' · 0 Points';
                         bindLevelButtons(wrapper);
                         list.appendChild(wrapper);
-                        updateTotal();
+                        renumberCriteriaWrappers();
                         if (wrapper.scrollIntoView) wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     });
                 })();
@@ -668,6 +1065,19 @@ if (isset($_POST['update_rubric'])) {
                 })();
             })();
         </script>
+
+        <?php if (!empty($serverError)) { ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var msg = '<?php echo addslashes($serverError); ?>';
+                if (typeof window.showAlert === 'function') {
+                    window.showAlert(msg);
+                } else {
+                    alert(msg);
+                }
+            });
+        </script>
+        <?php } ?>
 
 </body>
 

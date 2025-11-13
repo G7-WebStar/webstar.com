@@ -151,7 +151,8 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                                 class="col-12 col-md-auto text-center d-flex d-md-block justify-content-center justify-content-md-end mt-1 mt-md-0">
                                 <button type="button"
                                     class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 my-1 d-flex align-items-center gap-2"
-                                    style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);">
+                                    style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);"
+                                    data-bs-toggle="modal" data-bs-target="#enrollCourseModal">
                                     <span>+ Join Course</span>
                                 </button>
                             </div>
@@ -237,6 +238,50 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                 </div>
             </div>
 
+        <!-- Enroll Course Modal -->
+        <div class="modal fade" id="enrollCourseModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered py-4" style="max-width: 500px;">
+                <div class="modal-content">
+                    <div class="modal-header border-bottom d-flex justify-content-between align-items-center">
+                        <h5 class="modal-title enroll-modal-title mb-0 text-sbold">Enter access code</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form id="enrollForm">
+                        <div class="modal-body p-4">
+                            <div class="mx-auto" style="width: 100%; max-width: 420px;">
+                                <p class="text-med enroll-modal-description text-start mt-3 mb-2">
+                                    Enter the access code provided by your professor.
+                                </p>
+                                <div class="d-flex justify-content-center mb-3">
+                                    <input type="text" name="access_code"
+                                        class="input-style form-control rounded-4 border-blue"
+                                        id="accessCodeInput" placeholder="0 0 0 0 0 0" required
+                                        inputmode="text" pattern="^[A-Z0-9]{6}$" maxlength="6"
+                                        oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0,6);">
+                                </div>
+                            </div>
+
+                            <div id="alertContainer" style="display: none;" class="mb-3">
+                                <div class="alert alert-danger d-flex align-items-center mb-0" role="alert">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                    <div class="text-reg text-14" id="alertMessage"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer border-top">
+                            <button type="submit"
+                                class="btn btn-sm px-3 py-1 rounded-pill text-sbold text-md-14 d-inline-flex align-items-center justify-content-center criteria-add-btn"
+                                style="background-color: var(--primaryColor); border: 1px solid var(--black);">
+                                Enroll
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
             <!-- Dropdown js -->
             <script>
                 document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
@@ -294,6 +339,66 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                     });
                 });
             </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('accessCodeInput');
+            const form = document.getElementById('enrollForm');
+            const alertContainer = document.getElementById('alertContainer');
+            const modal = document.getElementById('enrollCourseModal');
+            // Hide alert when user starts typing
+            if (input) {
+                input.addEventListener('input', function() {
+                    if (alertContainer) {
+                        alertContainer.style.display = 'none';
+                    }
+                });
+            }
+
+            // Handle form submission
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const code = input ? input.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '') : '';
+
+                    if (code.length !== 6) {
+                        if (alertContainer) {
+                            document.getElementById('alertMessage').textContent = 'Please enter a complete 6-character access code.';
+                            alertContainer.style.display = 'block';
+                        }
+                        if (input) {
+                            input.focus();
+                        }
+                        return false;
+                    }
+
+                    // Here you can add your enrollment logic
+                    console.log('Access code:', code);
+                    // Example: You can make an AJAX call here to submit the code
+                });
+            }
+
+            // Reset form when modal is closed
+            if (modal) {
+                modal.addEventListener('hidden.bs.modal', function() {
+                    if (input) {
+                        input.value = '';
+                    }
+                    if (alertContainer) {
+                        alertContainer.style.display = 'none';
+                    }
+                });
+
+                // Focus input when modal opens
+                modal.addEventListener('shown.bs.modal', function() {
+                    if (input) {
+                        input.focus();
+                    }
+                });
+            }
+
+        });
+    </script>
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 </body>

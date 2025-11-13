@@ -2,18 +2,20 @@
 include('shared/assets/database/connect.php');
 include("shared/assets/processes/session-process.php");
 
-$selectEnrolledQuery = "SELECT
+$selectEnrolledQuery = "SELECT DISTINCT
 courses.courseCode
 FROM courses
 INNER JOIN enrollments
     ON courses.courseID = enrollments.courseID
 WHERE enrollments.userID = '$userID'
+ORDER BY courses.courseCode ASC
 ";
 $selectEnrolledResult = executeQuery($selectEnrolledQuery);
 
 $selectInboxQuery = "SELECT 
 inbox.createdAt AS inboxCreatedAt,
 inbox.messageText,
+inbox.notifType,
 courses.courseCode,
 assessments.assessmentTitle AS assessmentTitle,
 userinfo.profilePicture AS profPFP
@@ -101,11 +103,11 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                         <div class="col-auto mobile-dropdown p-0">
                                             <div class="d-flex align-items-center flex-nowrap my-2">
                                                 <span class="dropdown-label me-2 text-reg">Sort by</span>
-                                                <div class="custom-dropdown">
-                                                    <button class="dropdown-btn text-reg text-14">Newest</button>
+                                                <div class="custom-dropdown" data-dropdown="sort">
+                                                    <button class="dropdown-btn text-reg text-14" data-selected-sort="Newest">Newest</button>
                                                     <ul class="dropdown-list text-reg text-14">
-                                                        <li data-value="Newest">Newest</li>
-                                                        <li data-value="Oldest">Oldest</li>
+                                                        <li data-value="Newest" data-sort="desc">Newest</li>
+                                                        <li data-value="Oldest" data-sort="asc">Oldest</li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -115,11 +117,24 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                         <div class="col-auto mobile-dropdown p-0">
                                             <div class="d-flex align-items-center flex-nowrap my-2">
                                                 <span class="dropdown-label me-2 text-reg">Courses</span>
-                                                <div class="custom-dropdown">
-                                                    <button class="dropdown-btn text-reg text-14">All</button>
+                                                <div class="custom-dropdown" data-dropdown="course">
+                                                    <button class="dropdown-btn text-reg text-14" data-selected-course="All">All</button>
                                                     <ul class="dropdown-list text-reg text-14">
-                                                        <li data-value="All">All</li>
-                                                        <li data-value="Courses">Courses</li>
+                                                        <li data-value="All" data-course="All">All</li>
+                                                        <?php
+                                                        if ($selectEnrolledResult && mysqli_num_rows($selectEnrolledResult) > 0) {
+                                                            mysqli_data_seek($selectEnrolledResult, 0);
+                                                            while ($course = mysqli_fetch_assoc($selectEnrolledResult)) {
+                                                                $courseCode = $course['courseCode'];
+                                                                ?>
+                                                                <li data-value="<?php echo $courseCode; ?>" data-course="<?php echo $courseCode; ?>">
+                                                                    <?php echo $courseCode; ?>
+                                                                </li>
+                                                                <?php
+                                                            }
+                                                            mysqli_data_seek($selectEnrolledResult, 0);
+                                                        }
+                                                        ?>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -129,16 +144,16 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                         <div class="col-auto mobile-dropdown p-0">
                                             <div class="d-flex align-items-center flex-nowrap my-2">
                                                 <span class="dropdown-label me-2 text-reg">Type</span>
-                                                <div class="custom-dropdown">
-                                                    <button class="dropdown-btn text-reg text-14">All</button>
+                                                <div class="custom-dropdown" data-dropdown="type">
+                                                    <button class="dropdown-btn text-reg text-14" data-selected-type="All">All</button>
                                                     <ul class="dropdown-list text-reg text-14">
-                                                        <li data-value="All">All</li>
-                                                        <li data-value="Course Updates">Course Updates</li>
-                                                        <li data-value="Badge Updates">Badge Updates</li>
-                                                        <li data-value="Leaderboard Updates">Leaderboard Updates
+                                                        <li data-value="All" data-type="All">All</li>
+                                                        <li data-value="Course Updates" data-type="Course Updates">Course Updates</li>
+                                                        <li data-value="Badge Updates" data-type="Badge Updates">Badge Updates</li>
+                                                        <li data-value="Leaderboard Updates" data-type="Leaderboard Updates">Leaderboard Updates
                                                         </li>
-                                                        <li data-value="Level Updates">Level Updates</li>
-                                                        <li data-value="Submission Updates">Submission Updates</li>
+                                                        <li data-value="Level Updates" data-type="Level Updates">Level Updates</li>
+                                                        <li data-value="Submission Updates" data-type="Submission Updates">Submission Updates</li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -151,8 +166,16 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                         <?php
                                         if (mysqli_num_rows($selectInboxResult) > 0) {
                                             while ($inbox = mysqli_fetch_assoc($selectInboxResult)) {
+                                                $timestamp = strtotime($inbox['inboxCreatedAt']);
+                                                $displayDate = $timestamp ? date('F j, Y g:iA', $timestamp) : '';
+                                                $courseCode = $inbox['courseCode'] ?? '';
+                                                $notificationType = $inbox['notifType'] ?? 'Course Updates';
+                                                $messageText = trim($inbox['messageText']);
                                         ?>
-                                                <div class="card mb-1 me-3 w-100 mt-2"
+                                                <div class="card mb-1 me-3 w-100 mt-2 inbox-card"
+                                                    data-timestamp="<?php echo $timestamp ?: 0; ?>"
+                                                    data-course="<?php echo $courseCode; ?>"
+                                                    data-type="<?php echo $notificationType; ?>"
                                                     style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
                                                     <div class="card-body py-2 px-4 px-md-3">
                                                         <div class="row align-items-center">
@@ -160,19 +183,19 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                                             <div class="col d-flex flex-column text-start mt-2 mb-2">
                                                                 <p class="mb-2 text-sbold text-17 message-text"
                                                                     style="color: var(--black); line-height: 100%;">
-                                                                    <?php echo $inbox['messageText'] . " " . $inbox['assessmentTitle']; ?>
+                                                                    <?php echo $messageText; ?>
                                                                 </p>
                                                                 <small class="text-reg text-12"
-                                                                    style="color: var(--black); line-height: 100%;">January
-                                                                    12, 2024
-                                                                    8:00AM</small>
+                                                                    style="color: var(--black); line-height: 100%;">
+                                                                    <?php echo $displayDate; ?>
+                                                                </small>
 
                                                                 <!-- Course tag on small screen below message text -->
                                                                 <div class="d-block d-lg-none mt-2">
                                                                     <span
                                                                         class="text-reg text-12 badge rounded-pill course-badge"
                                                                         style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                                        <?php echo $inbox['courseCode']; ?>
+                                                                        <?php echo $courseCode; ?>
                                                                     </span>
                                                                 </div>
                                                             </div>
@@ -182,7 +205,7 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                                                 style="display:flex;align-items:center;">
                                                                 <span class="text-reg text-12 badge rounded-pill course-badge"
                                                                     style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                                    <?php echo $inbox['courseCode']; ?>
+                                                                    <?php echo $courseCode; ?>
                                                                 </span>
                                                             </div>
                                                         </div>

@@ -318,10 +318,10 @@ if (isset($_POST['save_rubric'])) {
                                                     <div class="row">
                                                         <div class="col-12 pt-2 mb-3">
                                                             <label for="criteriaTitle" class="form-label">Points</label>
-                                                            <input type="text" autocomplete="off"
+                                                            <input type="number" step="any" autocomplete="off" required
                                                                 class="form-control textbox mb-1 p-3 text-reg text-14 text-muted level-points"
                                                                 id="pointsLabel" aria-describedby="pointsLabel"
-                                                                placeholder="0">
+                                                                placeholder="0" value="">
                                                         </div>
                                                     </div>
                                                 </form>
@@ -622,8 +622,11 @@ if (isset($_POST['save_rubric'])) {
                     return total;
                 }
 
-                // Recalculate when points inputs change
+                // Recalculate when points inputs change and reset validation state
                 document.addEventListener('input', function(e) {
+                    if (e.target && typeof e.target.setCustomValidity === 'function') {
+                        e.target.setCustomValidity('');
+                    }
                     if (e.target && e.target.classList && e.target.classList.contains('level-points')) {
                         var wrap = e.target.closest ? e.target.closest('.criterion-wrapper') : null;
                         updateCriterionPoints(wrap);
@@ -633,40 +636,64 @@ if (isset($_POST['save_rubric'])) {
 
                 createButton.addEventListener('click', function() {
                     var rubricTitle = getInputValueById('rubricInfo');
-                    var criteriaTitle = getInputValueById('criteriaTitle');
-                    var criteriaDescription = getInputValueById('criterionDescription');
-                    var points = getInputValueById('pointsLabel');
 
-                    // Use native HTML5 validation bubbles (like Assign Task)
-                    // Validate top-level fields
-                    var topReq = [
-                        { id: 'rubricInfo', label: 'Rubric Title' },
-                        { id: 'criteriaTitle', label: 'Criteria Title' },
-                        { id: 'criterionDescription', label: 'Criterion Description' }
-                    ];
-                    for (var i = 0; i < topReq.length; i++) {
-                        var t = topReq[i];
-                        var tel = document.getElementById(t.id);
-                        if (!tel) continue;
-                        tel.required = true;
-                        if (!tel.value || tel.value.trim() === '') {
-                            tel.reportValidity();
+                    // Require rubric title using native validation
+                    var rubricEl = document.getElementById('rubricInfo');
+                    if (rubricEl) {
+                        rubricEl.required = true;
+                        if (!rubricEl.value || rubricEl.value.trim() === '') {
+                            rubricEl.reportValidity();
                             return;
                         }
                     }
 
-                    // Validate all level cards
-                    var containers = document.querySelectorAll('#criteriaList .levelsContainer');
-                    for (var ci = 0; ci < containers.length; ci++) {
-                        var cards = containers[ci].querySelectorAll('.criterion-description-card');
+                    // Validate ALL criteria and their levels (including newly added ones)
+                    var wrappers = document.querySelectorAll('.criterion-wrapper');
+                    if (!wrappers || wrappers.length === 0) {
+                        showAlert('Add at least one criterion before creating.');
+                        return;
+                    }
+                    for (var w = 0; w < wrappers.length; w++) {
+                        var wrap = wrappers[w];
+
+                        // Criterion fields
+                        var cTitleEl = wrap.querySelector('#criteriaTitle');
+                        var cDescEl = wrap.querySelector('#criterionDescription');
+                        if (cTitleEl) {
+                            cTitleEl.required = true;
+                            if (!cTitleEl.value || cTitleEl.value.trim() === '') { cTitleEl.reportValidity(); return; }
+                        }
+                        if (cDescEl) {
+                            cDescEl.required = true;
+                            if (!cDescEl.value || cDescEl.value.trim() === '') { cDescEl.reportValidity(); return; }
+                        }
+
+                        // Levels under this criterion
+                        var cards = wrap.querySelectorAll('.criterion-description-card');
+                        if (!cards || cards.length === 0) {
+                            showAlert('Each criterion needs at least one level.');
+                            return;
+                        }
                         for (var c = 0; c < cards.length; c++) {
                             var card = cards[c];
                             var lt = card.querySelector('#levelTitle');
                             var ld = card.querySelector('#levelDescription');
-                            if (lt) lt.required = true;
-                            if (ld) ld.required = true;
+                            var lp = card.querySelector('#pointsLabel');
+                            if (lt) { lt.required = true; if (typeof lt.setCustomValidity === 'function') lt.setCustomValidity(''); }
+                            if (ld) { ld.required = true; if (typeof ld.setCustomValidity === 'function') ld.setCustomValidity(''); }
+                            if (lp) { lp.required = true; if (typeof lp.setCustomValidity === 'function') lp.setCustomValidity(''); }
                             if (lt && (!lt.value || lt.value.trim() === '')) { lt.reportValidity(); return; }
                             if (ld && (!ld.value || ld.value.trim() === '')) { ld.reportValidity(); return; }
+                            if (lp) {
+                                var lpVal = lp.value ? lp.value.trim() : '';
+                                if (lpVal === '') { lp.reportValidity(); return; }
+                                var lpNum = parseFloat(lpVal);
+                                if (isNaN(lpNum)) {
+                                    lp.setCustomValidity('Please enter a valid number.');
+                                    lp.reportValidity();
+                                    return;
+                                }
+                            }
                         }
                     }
 
