@@ -274,9 +274,11 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                             </span>
                                                             <span>Recent Announcements</span>
                                                         </div>
-                                                        <span class="count-badge ms-2 text-sbold text-16">
-                                                            <?php echo mysqli_num_rows($selectAnnouncementsResult); ?>
-                                                        </span>
+                                                        <?php if (mysqli_num_rows($selectAnnouncementsResult) > 0): ?>
+                                                            <span class="count-badge ms-2 text-sbold text-16">
+                                                                <?php echo mysqli_num_rows($selectAnnouncementsResult); ?>
+                                                            </span>
+                                                        <?php endif; ?>
                                                     </div>
                                                     <!-- Scrollable Card List -->
                                                     <div
