@@ -23,6 +23,57 @@ if ($row = $result->fetch_assoc()) {
     die("<p class='text-danger'>No student found for this submission.</p>");
 }
 
+// ✅ Fetch student, program, course, and assessment details
+$detailsQuery = $conn->prepare("
+    SELECT 
+        s.userID,
+        a.assessmentID,
+        CONCAT(u.firstName, ' ', u.middleName, '. ', u.lastName) AS studentName,
+        p.programInitial,
+        u.yearLevel,
+        u.yearSection,
+        c.courseID,
+        c.courseCode,
+        c.courseTitle,
+        a.assessmentTitle,
+        s.submittedAt
+    FROM submissions s
+    INNER JOIN assessments a ON s.assessmentID = a.assessmentID
+    INNER JOIN courses c ON a.courseID = c.courseID
+    INNER JOIN userinfo u ON s.userID = u.userID
+    INNER JOIN program p ON u.programID = p.programID
+    WHERE s.submissionID = ?
+    LIMIT 1
+");
+$detailsQuery->bind_param("i", $submissionID);
+$detailsQuery->execute();
+$detailsResult = $detailsQuery->get_result();
+
+if ($detailsResult && $detailsResult->num_rows > 0) {
+    $details = $detailsResult->fetch_assoc(); // Only fetch once
+    // Create formatted student info
+    $studentDisplay = $details['studentName'] . ' · ' . $details['programInitial'] . ' ' . $details['yearLevel'] . '-' . $details['yearSection'];
+} else {
+    $details = [
+        'userID' => 0,
+        'assessmentID' => 0,
+        'studentName' => 'Unknown Student',
+        'programInitial' => 'N/A',
+        'yearLevel' => 'N/A',
+        'yearSection' => 'N/A',
+        'courseID' => 0,
+        'courseCode' => 'N/A',
+        'courseTitle' => 'N/A',
+        'assessmentTitle' => 'N/A',
+        'submittedAt' => 'N/A'
+    ];
+    $studentDisplay = $details['studentName'] . ' · ' . $details['programInitial'] . ' ' . $details['yearLevel'] . '-' . $details['yearSection'];
+}
+
+
+
+
+
 // ✅ Fetch all files under this submissionID
 $fileQuery = $conn->prepare("SELECT fileAttachment, fileLink, fileTitle FROM files WHERE submissionID = ?");
 $fileQuery->bind_param("i", $submissionID);
@@ -74,27 +125,6 @@ if ($badgeQuery && $badgeQuery->num_rows > 0) {
     }
 }
 
-// ✅ Handle feedback submission
-// if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['feedbackContent'])) {
-//     $feedback = trim($_POST['feedbackContent']);
-
-//     if (!empty($feedback) && $userID > 0 && $submissionID > 0) {
-//         $check = $conn->prepare("SELECT scoreID FROM scores WHERE userID = ? AND submissionID = ?");
-//         $check->bind_param("ii", $userID, $submissionID);
-//         $check->execute();
-//         $exists = $check->get_result();
-
-//         if ($exists && $exists->num_rows > 0) {
-//             $update = $conn->prepare("UPDATE scores SET feedback = ?, gradedAt = NOW() WHERE userID = ? AND submissionID = ?");
-//             $update->bind_param("sii", $feedback, $userID, $submissionID);
-//             $update->execute();
-//         } else {
-//             $insert = $conn->prepare("INSERT INTO scores (userID, submissionID, score, feedback, gradedAt) VALUES (?, ?, 0, ?, NOW())");
-//             $insert->bind_param("iis", $userID, $submissionID, $feedback);
-//             $insert->execute();
-//         }
-//     }
-// }
 
 // ✅ Handle grade + feedback submission together
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
@@ -143,6 +173,166 @@ $linkFiles = array_filter($fileLinks, function ($f) {
     return !empty($f['link']);
 });
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
+    // --- Existing grade & feedback code here ---
+
+    if (!empty($_POST['selectedBadgeIDs'])) {
+        $badgeIDs = explode(',', $_POST['selectedBadgeIDs']); // Split multiple IDs
+        $userID = intval($details['userID']);
+        $courseID = intval($details['courseID']);
+        $assignmentID = intval($details['assessmentID']);
+        $earnedAt = date('Y-m-d H:i:s');
+
+        foreach ($badgeIDs as $badgeID) {
+            $badgeID = intval(trim($badgeID));
+            if ($badgeID <= 0)
+                continue;
+
+            // Prevent duplicate entries
+            $check = $conn->prepare("
+            SELECT userID 
+            FROM studentbadges 
+            WHERE userID = ? AND badgeID = ? AND assignmentID = ?
+        ");
+            $check->bind_param("iii", $userID, $badgeID, $assignmentID);
+            $check->execute();
+            $checkResult = $check->get_result();
+
+            if ($checkResult && $checkResult->num_rows == 0) {
+                $insert = $conn->prepare("
+                INSERT INTO studentbadges (userID, badgeID, courseID, assignmentID, earnedAt) 
+                VALUES (?, ?, ?, ?, ?)
+            ");
+                $insert->bind_param("iiiis", $userID, $badgeID, $courseID, $assignmentID, $earnedAt);
+                $insert->execute();
+                $insert->close();
+            }
+
+            $check->close();
+        }
+    }
+
+
+}
+
+// Fetch all ungraded submissions for this assessment
+$submissionIDs = [];
+$subQuery = $conn->prepare("
+    SELECT s.submissionID
+    FROM submissions s
+    LEFT JOIN scores sc ON s.submissionID = sc.submissionID
+    WHERE s.assessmentID = ? AND sc.scoreID IS NULL
+    ORDER BY s.submittedAt ASC
+");
+$subQuery->bind_param("i", $details['assessmentID']);
+$subQuery->execute();
+$subResult = $subQuery->get_result();
+
+while ($row = $subResult->fetch_assoc()) {
+    $submissionIDs[] = intval($row['submissionID']);
+}
+$subQuery->close();
+
+// If no ungraded submissions, show a message
+if (empty($submissionIDs)) {
+    header("Location: assess.php"); // redirect to assess.php
+    exit(); // stop further execution
+}
+
+
+// Find current submission index in ungraded list
+$currentIndex = array_search($submissionID, $submissionIDs);
+
+// Total ungraded submissions
+$totalUngraded = count($submissionIDs);
+
+// Left to review = total ungraded minus 1 (exclude current student)
+$leftToReview = $totalUngraded > 0 ? $totalUngraded - 1 : 0;
+
+// Determine next and previous ungraded submissions (looping)
+$nextIndex = ($currentIndex + 1) % $totalUngraded;
+$prevIndex = ($currentIndex - 1 + $totalUngraded) % $totalUngraded;
+
+$nextSubmissionID = $submissionIDs[$nextIndex];
+$prevSubmissionID = $submissionIDs[$prevIndex];
+
+
+
+
+
+// Get total ungraded submissions for this assessment/course
+$ungradedQuery = $conn->prepare("
+    SELECT COUNT(*) AS totalUngraded
+    FROM submissions s
+    LEFT JOIN scores sc ON s.submissionID = sc.submissionID
+    WHERE s.assessmentID = ? AND sc.scoreID IS NULL
+");
+$ungradedQuery->bind_param("i", $details['assessmentID']);
+$ungradedQuery->execute();
+$ungradedResult = $ungradedQuery->get_result();
+$totalUngraded = 0;
+if ($row = $ungradedResult->fetch_assoc()) {
+    $totalUngraded = intval($row['totalUngraded']);
+}
+
+
+
+// count of student
+// Fetch all submissions for this assessment (graded + ungraded)
+$submissionIDs = [];
+$subQuery = $conn->prepare("
+    SELECT s.submissionID
+    FROM submissions s
+    WHERE s.assessmentID = ?
+    ORDER BY s.submittedAt ASC
+");
+$subQuery->bind_param("i", $details['assessmentID']);
+$subQuery->execute();
+$subResult = $subQuery->get_result();
+
+while ($row = $subResult->fetch_assoc()) {
+    $submissionIDs[] = intval($row['submissionID']);
+}
+$subQuery->close();
+
+// Fetch all ungraded submissions for this assessment
+$submissionIDs = [];
+$subQuery = $conn->prepare("
+    SELECT s.submissionID
+    FROM submissions s
+    LEFT JOIN scores sc ON s.submissionID = sc.submissionID
+    WHERE s.assessmentID = ? AND sc.scoreID IS NULL
+    ORDER BY s.submittedAt ASC
+");
+$subQuery->bind_param("i", $details['assessmentID']);
+$subQuery->execute();
+$subResult = $subQuery->get_result();
+
+while ($row = $subResult->fetch_assoc()) {
+    $submissionIDs[] = intval($row['submissionID']);
+}
+$subQuery->close();
+
+// If no ungraded submissions left
+if (empty($submissionIDs)) {
+    die("<p class='text-danger'>All submissions have been graded.</p>");
+}
+
+// Find current submission index in ungraded list
+$currentIndex = array_search($submissionID, $submissionIDs);
+
+// Total ungraded submissions
+$totalUngraded = count($submissionIDs);
+
+// Left to review = total ungraded minus 1 (exclude current student)
+$leftToReview = $totalUngraded > 0 ? $totalUngraded - 1 : 0;
+
+// Determine next and previous ungraded submissions (looping)
+$nextIndex = ($currentIndex + 1) % $totalUngraded;
+$prevIndex = ($currentIndex - 1 + $totalUngraded) % $totalUngraded;
+
+$nextSubmissionID = $submissionIDs[$nextIndex];
+$prevSubmissionID = $submissionIDs[$prevIndex];
 ?>
 
 
@@ -191,7 +381,8 @@ $linkFiles = array_filter($fileLinks, function ($f) {
                                 <div
                                     class="row desktop-header d-none d-sm-flex align-items-center justify-content-between">
                                     <div class="col-auto d-flex align-items-center gap-3">
-                                        <a href="todo.php?userID=2" class="text-decoration-none">
+                                        <a href="todo.php?userID=<?php echo htmlspecialchars($userID); ?>"
+                                            class="text-decoration-none">
                                             <i class="fa-solid fa-arrow-left text-20" style="color: var(--black);"></i>
                                         </a>
                                         <div class="d-flex align-items-center gap-3">
@@ -199,16 +390,25 @@ $linkFiles = array_filter($fileLinks, function ($f) {
                                                 style="width: 40px; height: 40px; background-color: var(--highlight75);">
                                             </div>
                                             <div>
-                                                <div class="text-sbold text-18" style="color: var(--black);">Christian
-                                                    James D. Torrillo · BSIT 3-1</div>
-                                                <div class="text-reg text-14 text-muted">Submitted October 21, 2025
-                                                    10:00PM</div>
+                                                <div class="text-sbold text-18" style="color: var(--black);">
+                                                    <?php echo htmlspecialchars($studentDisplay); ?>
+                                                </div>
+                                                <div class="text-reg text-14 text-muted">
+                                                    Submitted
+                                                    <?php echo date("F j, Y g:i A", strtotime($details['submittedAt'])); ?>
+                                                </div>
                                             </div>
                                         </div>
+
                                     </div>
                                     <div class="col-auto text-end" style="line-height: 1.3;">
-                                        <div class="text-sbold text-16" style="color: var(--black);">Assignment #1</div>
-                                        <div class="text-reg text-muted text-14">COMP–006<br>Web Development</div>
+                                        <div class="text-sbold text-16" style="color: var(--black);">
+                                            <?php echo htmlspecialchars($details['assessmentTitle']); ?>
+                                        </div>
+                                        <div class="text-reg text-muted text-14">
+                                            <?php echo htmlspecialchars($details['courseCode']); ?><br>
+                                            <?php echo htmlspecialchars($details['courseTitle']); ?>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -216,16 +416,19 @@ $linkFiles = array_filter($fileLinks, function ($f) {
                                 <div class="d-block d-sm-none mobile-assignment mt-3">
                                     <div class="mobile-top d-flex align-items-center gap-3">
                                         <div class="arrow">
-                                            <a href="todo.php?userID=2" class="text-decoration-none">
+                                            <a href="todo.php?userID=<?php echo htmlspecialchars($userID); ?>"
+                                                class="text-decoration-none">
                                                 <i class="fa-solid fa-arrow-left text-reg text-16"
                                                     style="color: var(--black);"></i>
                                             </a>
                                         </div>
-                                        <div class="title text-sbold text-18">Assignment #1</div>
+                                        <div class="title text-sbold text-18">
+                                            <?php echo htmlspecialchars($details['assessmentTitle']); ?>
+                                        </div>
                                     </div>
                                 </div>
-
                             </div>
+
                         </div>
 
                         <div class="row">
@@ -347,6 +550,7 @@ $linkFiles = array_filter($fileLinks, function ($f) {
                                         <!-- Dynamically include the submissionID -->
                                         <input type="hidden" name="submissionID"
                                             value="<?php echo htmlspecialchars($submissionID); ?>">
+                                        <input type="hidden" name="selectedBadgeIDs" id="selectedBadgeIDs">
 
                                         <!-- Card Section -->
                                         <div class="cardSticky">
@@ -372,18 +576,11 @@ $linkFiles = array_filter($fileLinks, function ($f) {
                                                             Award badge
                                                         </button>
                                                         <!-- FEEDBACK INPUT (replacing modal button) -->
-                                                        <div class="feedback-input-container w-100"
-                                                            style="max-width: 600px;">
-                                                            <label for="feedbackInput"
-                                                                class="text-sbold text-15 mb-2 d-block"
-                                                                style="color: var(--black);">
-                                                                Add feedback
-                                                            </label>
-                                                            <textarea name="feedback" id="feedbackInput" rows="3"
-                                                                class="form-control text-reg text-15 border rounded-3 p-3"
-                                                                placeholder="Write feedback that helps your student level up their learning journey!"
-                                                                style="resize: none; background-color: #fff;"></textarea>
-                                                        </div>
+                                                        <textarea name="feedback" id="feedbackInput" rows="3"
+                                                            class="form-control text-reg text-15 rounded-3 p-3 mt-3"
+                                                            style="resize: none; background-color: #fff; border: 1px solid var(--black) !important;"
+                                                            placeholder="Write feedback that helps your student level up their learning journey!"></textarea>
+
                                                     </div>
                                                 </div>
                                             </div>
@@ -392,26 +589,33 @@ $linkFiles = array_filter($fileLinks, function ($f) {
                                         <!-- Buttons always below the card -->
                                         <div class="text-center mt-4">
                                             <div class="d-flex justify-content-center align-items-center gap-3 mb-2">
-                                                <button type="button"
-                                                    class="btn px-4 py-2 border rounded-pill text-15 fw-semibold"
-                                                    style="background-color: #fff; border-color: var(--black); color: var(--black);">
+                                                <button type="button" id="prevBtn"
+                                                    class="btn px-4 py-2 rounded-pill text-15 fw-semibold"
+                                                    data-current-index="<?php echo $currentIndex; ?>"
+                                                    style="background-color: #fff; border: 1px solid var(--black); color: var(--black);">
                                                     Previous
                                                 </button>
+
                                                 <button type="submit" name="submitGrade"
-                                                    class="btn px-4 py-2 border rounded-pill text-15 fw-semibold"
-                                                    style="background-color: #FEE9A8; border-color: var(--black); color: var(--black);">
+                                                    class="btn px-4 py-2 rounded-pill text-15 fw-semibold"
+                                                    style="background-color: #FEE9A8; border: 1px solid var(--black); color: var(--black);">
                                                     Submit
                                                 </button>
-                                                <button type="button"
-                                                    class="btn px-4 py-2 border rounded-pill text-15 fw-semibold"
-                                                    style="background-color: #fff; border-color: var(--black); color: var(--black);">
+
+                                                <button type="button" id="nextBtn"
+                                                    class="btn px-4 py-2 rounded-pill text-15 fw-semibold"
+                                                    data-current-index="<?php echo $currentIndex; ?>"
+                                                    style="background-color: #fff; border: 1px solid var(--black); color: var(--black);">
                                                     Next
                                                 </button>
                                             </div>
 
+
+
                                             <p class="text-15 fw-medium mt-2" style="color: var(--black);">
-                                                10 submissions left to review
+                                                <?php echo $leftToReview; ?> submissions left to review
                                             </p>
+
                                         </div>
                                     </form>
                                 </div>
@@ -473,65 +677,9 @@ $linkFiles = array_filter($fileLinks, function ($f) {
 
                 <!-- FOOTER -->
                 <div class="modal-footer border-top">
-                    <button type="submit" class="btn rounded-5 px-4 text-sbold text-14 me-3"
-                        style="background-color: var(--primaryColor); border: 1px solid var(--black);">
-                        Award
-                    </button>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- FEEDBACK MODAL -->
-    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered py-4" style="max-width: 700px;  height: 25px;">
-            <div class="modal-content">
-
-                <!-- HEADER -->
-                <div class="modal-header border-bottom">
-                    <div class="modal-title text-sbold text-20 ms-3">
-                        Add feedback
-                    </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <form id="feedbackForm" action="" method="POST">
-                    <div class="modal-body pb-2">
-                        <p class="mb-3 text-med text-14 ms-3" style="color: var(--black);">
-                            Write feedback that helps your student level up their learning journey!
-                        </p>
-
-                        <!-- Rich text editor -->
-                        <div class="editor-wrapper mb-3 border rounded-3 text-reg text-20">
-                            <div id="editor" style="min-height:100px;"></div>
-
-                            <div id="toolbar" class="border-top d-flex align-items-center p-2 px-3 bg-white">
-                                <button class="ql-bold"></button>
-                                <button class="ql-italic"></button>
-                                <button class="ql-underline"></button>
-                                <button class="ql-list" value="bullet"></button>
-                                <span id="word-counter" class="ms-auto text-muted text-reg text-12">Max word limit:
-                                    120 words</span>
-                            </div>
-                        </div>
-
-                        <input type="hidden" name="feedbackContent" id="feedbackContent">
-                        <input type="hidden" name="studentID" value="<?php echo $studentID; ?>">
-                        <input type="hidden" name="assignmentID" value="<?php echo $assignmentID; ?>">
-                    </div>
-
-                    <!-- FOOTER -->
-                    <div class="modal-footer border-top">
-                        <button type="submit" class="btn rounded-5 px-4 text-sbold text-14 me-3"
-                            style="background-color: var(--primaryColor); border: 1px solid var(--black);">
-                            Add
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     </div>
 
     <!-- bootstrap bundle -->
@@ -795,7 +943,102 @@ $linkFiles = array_filter($fileLinks, function ($f) {
             });
         });
 
+        // award badge
+        document.addEventListener("DOMContentLoaded", function () {
+            const badgeOptions = document.querySelectorAll(".badge-option");
+            const selectedInput = document.getElementById("selectedBadgeIDs");
+
+            // Store multiple selected badge IDs
+            let selectedBadges = JSON.parse(localStorage.getItem("selectedBadgeIDs")) || [];
+
+            // Add data-badge-id dynamically (from PHP)
+            const badgeIDs = <?php echo json_encode(array_column($badges, 'badgeID')); ?>;
+
+            badgeOptions.forEach((badge, index) => {
+                const badgeId = String(badgeIDs[index]); // ensure string for matching
+                badge.dataset.badgeId = badgeId;
+
+                // Highlight previously selected badges
+                if (selectedBadges.includes(badgeId)) {
+                    highlightBadge(badge);
+                }
+
+                // Toggle selection on click
+                badge.addEventListener("click", function () {
+                    const id = this.dataset.badgeId;
+                    const index = selectedBadges.indexOf(id);
+
+                    if (index === -1) {
+                        // Select this badge
+                        selectedBadges.push(id);
+                        highlightBadge(this);
+                    } else {
+                        // Unselect this badge
+                        selectedBadges.splice(index, 1);
+                        resetBadge(this);
+                    }
+
+                    // Update hidden input + localStorage
+                    selectedInput.value = selectedBadges.join(",");
+                    localStorage.setItem("selectedBadgeIDs", JSON.stringify(selectedBadges));
+                });
+            });
+
+            // ✅ Highlight selected badge
+            function highlightBadge(badge) {
+                badge.style.backgroundColor = "var(--primaryColor)";
+                badge.classList.add("selected-badge");
+            }
+
+            // ✅ Reset unselected badge
+            function resetBadge(badge) {
+                badge.style.backgroundColor = "var(--pureWhite)";
+                badge.classList.remove("selected-badge");
+            }
+
+            // ✅ Clear saved selections when form is submitted
+            const form = document.querySelector("form");
+            if (form) {
+                form.addEventListener("submit", () => {
+                    localStorage.removeItem("selectedBadgeIDs");
+                });
+            }
+        });
+
+        // next and previous button
+        document.addEventListener("DOMContentLoaded", () => {
+            const submissionIDs = <?php echo json_encode($submissionIDs); ?>;
+            const currentSubmissionID = <?php echo $submissionID; ?>; // current submission from PHP
+
+            const prevBtn = document.getElementById("prevBtn");
+            const nextBtn = document.getElementById("nextBtn");
+
+            function goToSubmission(index) {
+                if (submissionIDs.length === 0) return;
+                // Wrap around
+                if (index < 0) index = submissionIDs.length - 1;
+                if (index >= submissionIDs.length) index = 0;
+
+                const submissionID = submissionIDs[index];
+                window.location.href = `?submissionID=${submissionID}`;
+            }
+
+            prevBtn.addEventListener("click", () => {
+                let currentIndex = submissionIDs.indexOf(currentSubmissionID);
+                goToSubmission(currentIndex - 1);
+            });
+
+            nextBtn.addEventListener("click", () => {
+                let currentIndex = submissionIDs.indexOf(currentSubmissionID);
+                goToSubmission(currentIndex + 1);
+            });
+        });
+
     </script>
+
+
+
+
 </body>
 
 </html>
