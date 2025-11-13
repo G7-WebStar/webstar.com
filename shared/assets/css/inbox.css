@@ -51,7 +51,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
-@media (max-width: 500px) {
+@media (max-width: 768px) {
     .mobile-dropdown {
         width: 100% !important;
         display: flex;

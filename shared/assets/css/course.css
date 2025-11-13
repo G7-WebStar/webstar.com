@@ -66,6 +66,7 @@
     }
 }
 
+
 @media screen and (max-width: 991px) {
     .search-container {
         width: 80% !important;
@@ -77,6 +78,12 @@
 
     .dynamic-text {
         font-size: 25px !important;
+    }
+}
+
+@media screen and (max-width: 991px) {
+    .search-container-prof {
+        width: 100% !important;
     }
 }
 
