@@ -10,6 +10,7 @@ courses.courseID,
 courses.courseCode, 
 courses.courseTitle, 
 assessments.assessmentID,
+assessments.isArchived,
 DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline
 FROM assessments
 INNER JOIN courses
@@ -210,11 +211,13 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                         $pendingCount = $assessment['pending'];
                                         $gradedCount = $assessment['graded'];
                                         $cardSubmissionID = $assessment['submissionID'];
+                                        $archiveStatus = $assessment['isArchived'];
 
                                         $chartsIDs[] = "chart$i";
                                         $submitted[] = $submittedCount;
                                         $pending[] = $pendingCount;
                                         $graded[] = $gradedCount;
+                                        $isArchived[] = $archiveStatus;
                                 ?>
                                         <div class="assessment-card mb-3">
                                             <div class="card-content">
@@ -272,7 +275,8 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                                                 <i class="fas fa-ellipsis-v"></i>
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end">
-                                                                <li><a class="dropdown-item" href="#" id="<?php echo $i; ?>" onclick="archive(this);"><i class="fas fa-archive me-2"></i>Mark as Archived</a></li>
+                                                                <li><a class="dropdown-item" href="#" id="<?php echo $i; ?>" onclick="archive(this, <?php echo $ID; ?>);"><i class="fas fa-archive me-2"></i>
+                                                                        <?php echo ($archiveStatus == 0) ? 'Mark as Archived' : 'Unarchive'; ?></a></li>
                                                             </ul>
                                                         </div>
                                                     </div>
@@ -324,23 +328,58 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
             });
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const chartsIDs = <?php echo json_encode($chartsIDs); ?>;
-            const submitted = <?php echo json_encode($submitted); ?>;
-            const pending = <?php echo json_encode($pending); ?>;
-            const graded = <?php echo json_encode($graded); ?>;
-            const i = 0;
-            chartsIDs.forEach(function(id, index) {
-                createDoughnutChart(id, submitted[index], pending[index], graded[index])
-            });
-        });
+        function showDoughnut() {
+            document.addEventListener("DOMContentLoaded", function() {
+                const chartsIDs = <?php echo json_encode($chartsIDs); ?>;
+                const submitted = <?php echo json_encode($submitted); ?>;
+                const pending = <?php echo json_encode($pending); ?>;
+                const graded = <?php echo json_encode($graded); ?>;
+                const isArchived = <?php echo json_encode($isArchived); ?>
 
-        function archive(element) {
+                chartsIDs.forEach(function(id, index) {
+                    if (isArchived[index] == 0) {
+                        createDoughnutChart(id, submitted[index], pending[index], graded[index])
+                    } else {
+                        const archiveLabel = document.getElementById('chart-container' + (index + 1));
+                        archiveLabel.innerHTML = `<span class="badge rounded-pill text-bg-secondary text-reg">Archived</span>`;
+                        console.log('chart-container' + (index + 1));
+                    }
+                });
+            });
+        }
+
+
+        function archive(element, ID) {
             const archiveLabel = document.getElementById('chart-container' + element.id);
             const archiveDropdown = document.getElementById(element.id);
-            archiveLabel.innerHTML = `<span class="badge rounded-pill text-bg-secondary text-reg">Archived</span>`;
-            archiveDropdown.innerHTML = `<i class="fas fa-archive me-2"></i>Unarchived`;
+
+            if (archiveDropdown.textContent == 'Mark as Archived') {
+                archiveDropdown.innerHTML = `<i class="fas fa-archive me-2"></i>Unarchive`;
+            } else if (archiveDropdown.textContent == 'Unarchive') {
+                archiveDropdown.innerHTML = `<i class="fas fa-archive me-2"></i>Mark as Archived`;
+            }
+
+            fetchArchiveQuery(ID);
+            showDoughnut();
         }
+
+        function fetchArchiveQuery(assessmentID) {
+            fetch('../shared/assets/processes/archive-assessment.php?assessmentID=' + assessmentID)
+                .then(response => {
+                    if (!response.ok) {
+                        console.log("There was a problem with your request :(");
+                    } else {
+                        console.log("Successful!");
+                        window.location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error archiving assessment:', error);
+                    alert('Failed to archive. Please try again.');
+                });
+        }
+
+        showDoughnut();
     </script>
 
 </body>

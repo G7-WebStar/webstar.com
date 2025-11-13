@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 09, 2025 at 01:28 PM
+-- Generation Time: Nov 13, 2025 at 03:40 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `webstar`
+-- Database: `test_webstar`
 --
 
 -- --------------------------------------------------------
@@ -100,18 +100,19 @@ CREATE TABLE `assessments` (
   `type` enum('Task','Test') DEFAULT 'Task',
   `deadline` date NOT NULL,
   `deadlineEnabled` tinyint(1) NOT NULL DEFAULT 0,
-  `createdAt` datetime DEFAULT current_timestamp()
+  `createdAt` datetime DEFAULT current_timestamp(),
+  `isArchived` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `assessments`
 --
 
-INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `type`, `deadline`, `deadlineEnabled`, `createdAt`) VALUES
-(1, 1, 'Activity #1', 'Task', '2025-10-15', 0, '2025-09-09 23:00:15'),
-(2, 1, 'Test #1', 'Test', '2025-11-06', 0, '2025-09-04 22:00:15'),
-(3, 2, 'Activity #2', 'Task', '2025-10-23', 0, '2025-10-22 22:00:15'),
-(4, 2, 'Activity #1', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15');
+INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `type`, `deadline`, `deadlineEnabled`, `createdAt`, `isArchived`) VALUES
+(1, 1, 'Activity #1', 'Task', '2025-10-15', 0, '2025-09-09 23:00:15', 0),
+(2, 1, 'Test #1', 'Test', '2025-11-06', 0, '2025-09-04 22:00:15', 0),
+(3, 2, 'Activity #2', 'Task', '2025-10-23', 0, '2025-10-22 22:00:15', 0),
+(4, 2, 'Activity #1', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15', 0);
 
 -- --------------------------------------------------------
 
@@ -389,27 +390,28 @@ CREATE TABLE `enrollments` (
   `enrollmentID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
   `courseID` int(5) NOT NULL,
-  `yearSection` int(11) NOT NULL
+  `yearSection` int(11) NOT NULL,
+  `xpPoints` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `enrollments`
 --
 
-INSERT INTO `enrollments` (`enrollmentID`, `userID`, `courseID`, `yearSection`) VALUES
-(1, 2, 1, 2023),
-(2, 2, 2, 2023),
-(3, 3, 1, 2023),
-(4, 4, 1, 2023),
-(5, 5, 1, 2023),
-(6, 6, 1, 2023),
-(7, 7, 1, 2023),
-(8, 8, 1, 2023),
-(9, 9, 1, 2023),
-(10, 10, 1, 2023),
-(11, 11, 1, 2023),
-(12, 12, 1, 2023),
-(13, 2, 3, 1);
+INSERT INTO `enrollments` (`enrollmentID`, `userID`, `courseID`, `yearSection`, `xpPoints`) VALUES
+(1, 2, 1, 2023, 0),
+(2, 2, 2, 2023, 0),
+(3, 3, 1, 2023, 0),
+(4, 4, 1, 2023, 0),
+(5, 5, 1, 2023, 0),
+(6, 6, 1, 2023, 0),
+(7, 7, 1, 2023, 0),
+(8, 8, 1, 2023, 0),
+(9, 9, 1, 2023, 0),
+(10, 10, 1, 2023, 0),
+(11, 11, 1, 2023, 0),
+(12, 12, 1, 2023, 0),
+(13, 2, 3, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -488,7 +490,6 @@ CREATE TABLE `leaderboard` (
   `enrollmentID` int(11) NOT NULL,
   `timeRange` varchar(10) NOT NULL,
   `periodStart` date NOT NULL,
-  `xpPoints` int(11) NOT NULL,
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -496,20 +497,20 @@ CREATE TABLE `leaderboard` (
 -- Dumping data for table `leaderboard`
 --
 
-INSERT INTO `leaderboard` (`leaderboardID`, `enrollmentID`, `timeRange`, `periodStart`, `xpPoints`, `updatedAt`) VALUES
-(1, 1, 'Weekly', '2025-08-25', 450, '2025-08-30 12:00:00'),
-(2, 2, 'Weekly', '2025-08-25', 450, '2025-08-30 12:00:00'),
-(3, 1, 'Weekly', '2025-09-28', 100, '2025-09-28 16:50:22'),
-(4, 3, 'Weekly', '2025-09-28', 400, '2025-09-28 16:58:09'),
-(5, 4, 'Weekly', '2025-09-01', 152, '2025-09-28 21:03:44'),
-(6, 5, 'Weekly', '2025-09-01', 189, '2025-09-28 21:03:44'),
-(7, 6, 'Weekly', '2025-09-01', 215, '2025-09-28 21:03:44'),
-(8, 7, 'Weekly', '2025-09-01', 176, '2025-09-28 21:03:44'),
-(9, 8, 'Weekly', '2025-09-01', 221, '2025-09-28 21:03:44'),
-(10, 9, 'Weekly', '2025-09-01', 167, '2025-09-28 21:03:44'),
-(11, 10, 'Weekly', '2025-09-01', 195, '2025-09-28 21:03:44'),
-(12, 11, 'Weekly', '2025-09-01', 214, '2025-09-28 21:03:44'),
-(13, 12, 'Monthly', '2025-09-01', 95, '2025-09-28 21:34:51');
+INSERT INTO `leaderboard` (`leaderboardID`, `enrollmentID`, `timeRange`, `periodStart`, `updatedAt`) VALUES
+(1, 1, 'Weekly', '2025-08-25', '2025-08-30 12:00:00'),
+(2, 2, 'Weekly', '2025-08-25', '2025-08-30 12:00:00'),
+(3, 1, 'Weekly', '2025-09-28', '2025-09-28 16:50:22'),
+(4, 3, 'Weekly', '2025-09-28', '2025-09-28 16:58:09'),
+(5, 4, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
+(6, 5, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
+(7, 6, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
+(8, 7, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
+(9, 8, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
+(10, 9, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
+(11, 10, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
+(12, 11, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
+(13, 12, 'Monthly', '2025-09-01', '2025-09-28 21:34:51');
 
 -- --------------------------------------------------------
 

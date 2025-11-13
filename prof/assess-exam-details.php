@@ -30,6 +30,11 @@ if (!$test = mysqli_fetch_assoc($testInfoResult)) {
 }
 $testID = $test['testID'];
 
+if ($testID == null) {
+    echo "Test not found.";
+    exit;
+}
+
 $testTitle = $test['assessmentTitle'];
 $testDescription = $test['generalGuidance'];
 $profName = $test['firstName'] . " " . $test['lastName'];

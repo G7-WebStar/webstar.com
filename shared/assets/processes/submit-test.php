@@ -5,18 +5,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents("php://input"), true);
 
     foreach ($data['answers'] as $answer) {
+        $testID = $_GET['testID'];
         $testQuestionID = $answer['testQuestionID'];
-        $correctAnswerQuery = "SELECT correctAnswer FROM testquestions WHERE testID = 1 AND testQuestionID = $testQuestionID";
+        $correctAnswerQuery = "SELECT correctAnswer FROM testquestions WHERE testID = $testID AND testQuestionID = $testQuestionID";
         $correctAnswerResult = executeQuery($correctAnswerQuery);
         $correctAnswer;
         if (mysqli_num_rows($correctAnswerResult) > 0) {
             $correctAnswerRow = mysqli_fetch_assoc($correctAnswerResult);
             $correctAnswer = $correctAnswerRow['correctAnswer'];
         }
-        $testID = $_GET['testID'];
         $userAnswer = $answer['userAnswer'];
         $userID = $userID; // from session
-        $isCorrect = ($userAnswer == $correctAnswer || $userAnswer == strtolower($correctAnswer)) ? 1 : 0;
+        $isCorrect = (($userAnswer == $correctAnswer) || ($userAnswer == strtolower($correctAnswer))) ? 1 : 0;
 
         $insertQuery = "INSERT INTO testresponses (testID, testQuestionID, userID, userAnswer, isCorrect)
                         VALUES ('$testID', '$testQuestionID', '$userID', '$userAnswer', '$isCorrect')";
@@ -41,4 +41,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                           todo.updatedAt = CURRENT_TIMESTAMP
                                       WHERE todo.userID = '$userID' AND todo.status = 'Pending' AND assessments.type = 'Test' AND tests.testID = '$testID'";
     $updateTodoStatusResult = executeQuery($updateTodoStatusQuery);
+
+    $scoreQuery = "SELECT COUNT(isCorrect) AS correct FROM testresponses WHERE isCorrect = '1' AND userID = '$userID' AND testID = '$testID'";
+    $scoreResult = executeQuery($scoreQuery);
+    $scoreRow = mysqli_fetch_assoc($scoreResult);
+    $score = $scoreRow['correct'];
+
+    $insertScoreQuery = "INSERT INTO scores (userID, testID, score, gradedAt) VALUES ('$userID','$testID','$score')";
+    $insertScoreResult = executeQuery($insertQuery);
 }

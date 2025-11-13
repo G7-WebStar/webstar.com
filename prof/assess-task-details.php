@@ -1,6 +1,72 @@
 <?php
 include("../shared/assets/database/connect.php");
 include("../shared/assets/processes/prof-session-process.php");
+
+if (!isset($_GET['assessmentID'])) {
+    echo "Assessment ID is missing in the URL.";
+    exit;
+}
+
+$assessmentID = $_GET['assessmentID'];
+
+if ($assessmentID == null) {
+    echo "Assessment ID is missing in the URL.";
+    exit;
+}
+
+$selectAssignmentQuery = "SELECT * FROM assignments WHERE assessmentID = '$assessmentID'";
+$selectAssignmentResult = executeQuery($selectAssignmentQuery);
+
+$selectAssessmentQuery = "SELECT assessmentTitle, DATE_FORMAT(deadline, '%b %e') AS assessmentDeadline, type, DATE_FORMAT(createdAt, '%b %e, %Y %l:%i %p') AS creationDate
+                          FROM assessments WHERE assessmentID = '$assessmentID'";
+$selectAssessmentResult = executeQuery($selectAssessmentQuery);
+
+$assessmentResultRow = mysqli_fetch_assoc($selectAssessmentResult);
+$type = $assessmentResultRow['type'];
+
+if ($type != 'Task') {
+    echo "Assessment doesn't exist";
+    exit;
+}
+
+$assignmentRow = mysqli_fetch_assoc($selectAssignmentResult);
+
+$assignmentID = $assignmentRow['assignmentID'];
+$filesQuery = "SELECT * FROM files WHERE assignmentID = '$assignmentID'";
+$filesResult = executeQuery($filesQuery);
+
+$attachmentsArray = [];
+$linksArray = [];
+
+while ($file = mysqli_fetch_assoc($filesResult)) {
+    if (!empty($file['fileAttachment'])) {
+        $attachments = array_map('trim', explode(',', $file['fileAttachment']));
+        $attachmentsArray = array_merge($attachmentsArray, $attachments);
+    }
+
+    if (!empty($file['fileLink'])) {
+        $links = array_map('trim', explode(',', $file['fileLink']));
+        $linksArray = array_merge($linksArray, $links);
+    }
+}
+
+$profInfoQuery = "SELECT * FROM userInfo WHERE userID = '$userID'";
+$profInfoResult = executeQuery($profInfoQuery);
+
+$countPendingQuery = "SELECT COUNT(*) AS pending FROM todo 
+                      WHERE assessmentID = '$assessmentID' AND status = 'Pending'";
+$countPendingResult = executeQuery($countPendingQuery);
+$pending = mysqli_fetch_assoc($countPendingResult);
+
+$countSubmittedQuery = "SELECT COUNT(*) AS submittedTodo FROM todo 
+                        WHERE assessmentID = '$assessmentID' AND status = 'Submitted'";
+$countSubmittedResult = executeQuery($countSubmittedQuery);
+$submitted = mysqli_fetch_assoc($countSubmittedResult);
+
+$countGradedQuery = "SELECT COUNT(*) AS graded FROM todo 
+                     WHERE assessmentID = '$assessmentID' AND status = 'Graded'";
+$countGradedResult = executeQuery($countGradedQuery);
+$graded = mysqli_fetch_assoc($countGradedResult);
 ?>
 
 <!doctype html>
@@ -58,10 +124,18 @@ include("../shared/assets/processes/prof-session-process.php");
                                             style="color: var(--black);"></i>
                                     </a>
                                 </div>
-                                <div class="col">
-                                    <span class="text-sbold text-25">Assignment #1</span>
-                                    <div class="text-reg text-18">Due Sep 9, 2024</div>
-                                </div>
+                                <?php
+                                if (mysqli_num_rows($selectAssessmentResult) > 0) {
+                                    mysqli_data_seek($selectAssessmentResult, 0);
+                                    while ($assessmentRow = mysqli_fetch_assoc($selectAssessmentResult)) {
+                                ?>
+                                        <div class="col">
+                                            <span class="text-sbold text-25"><?php echo $assessmentRow['assessmentTitle']; ?></span>
+                                            <div class="text-reg text-18">Due <?php echo $assessmentRow['assessmentDeadline']; ?></div>
+                                        </div>
+                                <?php
+                                    }
+                                } ?>
                             </div>
 
 
@@ -74,10 +148,18 @@ include("../shared/assets/processes/prof-session-process.php");
                                                 style="color: var(--black);"></i>
                                         </a>
                                     </div>
-                                    <div class="col">
-                                        <span class="text-sbold text-25">Assignment #1</span>
-                                        <div class="text-reg text-18">Due Sep 9, 2024</div>
-                                    </div>
+                                    <?php
+                                    if (mysqli_num_rows($selectAssessmentResult) > 0) {
+                                        mysqli_data_seek($selectAssessmentResult, 0);
+                                        while ($assessmentRow = mysqli_fetch_assoc($selectAssessmentResult)) {
+                                    ?>
+                                            <div class="col">
+                                                <span class="text-sbold text-25"><?php echo $assessmentRow['assessmentTitle']; ?></span>
+                                                <div class="text-reg text-18">Due <?php echo $assessmentRow['assessmentDeadline']; ?></div>
+                                            </div>
+                                    <?php
+                                        }
+                                    } ?>
                                 </div>
                             </div>
                         </div>
@@ -100,59 +182,118 @@ include("../shared/assets/processes/prof-session-process.php");
                                                                 role="tab">Task Details</a>
                                                         </li>
                                                         <li class="nav-item">
-                                                            <a class="nav-link" id="lessons-tab" href="assess-submissions.php" role="tab">Submissions</a>
+                                                            <a class="nav-link" id="lessons-tab" href="assess-submissions.php?assessmentID=<?php echo $assessmentID; ?>" role="tab">Submissions</a>
                                                         </li>
                                                     </ul>
                                                 </div>
                                             </div>
 
                                             <!-- Tab Content -->
-                                            <div class="tab-content" id="myTabContent">
-                                                <!-- Task Details Tab - Active -->
-                                                <div class="tab-pane fade show active" id="announcements" role="tabpanel" aria-labelledby="announcements-tab">
-                                                    <div class="text-sbold text-14 mt-5">Task Instructions</div>
-                                                    <p class="mb-5 mt-2 text-med text-14">Attached is a Google Doc that you can
-                                                        edit.
-                                                    </p>
-                                                    <p class="mb-5 mt-2 text-med text-14">In Figma, design a "404 Not Found"
-                                                        page.</p>
-                                                    <p class="mb-1 mt-2 text-med text-14">Create two versions, one for the
-                                                        mobile and
-                                                        one for the desktop.</p>
-                                                    <p class="mb-5  text-med text-14">Turn in when done.</p>
+                                            <?php
+                                            if (mysqli_num_rows($selectAssignmentResult) > 0) {
+                                                mysqli_data_seek($selectAssignmentResult, 0);
+                                                while ($assignmentRow = mysqli_fetch_assoc($selectAssignmentResult)) {
+                                            ?>
+                                                    <div class="tab-content" id="myTabContent">
+                                                        <!-- Task Details Tab - Active -->
+                                                        <div class="tab-pane fade show active" id="announcements" role="tabpanel" aria-labelledby="announcements-tab">
+                                                            <div class="text-sbold text-14 mt-5">Task Instructions</div>
+                                                            <p class="mb-5 mt-2 text-med text-14">
+                                                                <?php echo $assignmentRow['assignmentDescription']; ?>
+                                                            </p>
 
-                                                    <hr>
+                                                            <hr>
 
-                                                    <div class="text-sbold text-14 mt-3">Task Materials</div>
-                                                    <div class="cardFile my-3 w-lg-25 d-flex align-items-center"
-                                                        style="width:400px; max-width:100%; min-width:310px;">
-                                                        <i class="px-4 py-3 fa-solid fa-file"></i>
-                                                        <div class="ms-2 d-flex align-items-center">
-                                                            <div class="text-sbold text-16">ADET A03</div>
+                                                            <div class="text-sbold text-14 mt-3">Task Materials</div>
+                                                            <?php foreach ($attachmentsArray as $file):
+                                                                $filePath = "shared/assets/files/" . $file;
+                                                                $fileExt = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
+                                                                $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
+                                                                $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
+
+                                                                // Remove extension from display name
+                                                                $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
+                                                            ?>
+                                                                <a href="<?php echo $filePath; ?>"
+                                                                    <?php if (!preg_match('/^https?:\/\//', $filePath)) : ?>
+                                                                    download="<?php echo htmlspecialchars($file); ?>"
+                                                                    <?php endif; ?>
+                                                                    style="text-decoration:none; color:inherit;">
+
+                                                                    <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
+                                                                        style="width:400px; max-width:100%; min-width:310px;">
+                                                                        <span class="px-3 py-3 material-symbols-outlined">draft</span>
+                                                                        <div class="ms-2">
+                                                                            <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
+                                                                            <div class="due text-reg text-14 mb-1">
+                                                                                <?php echo $fileExt ?> · <?php echo $fileSizeMB ?>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </a>
+                                                            <?php endforeach; ?>
+
+
+                                                            <?php foreach ($linksArray as $link): ?>
+                                                                <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
+                                                                    style="width:400px; max-width:100%; min-width:310px;">
+                                                                    <span class="px-3 py-3 material-symbols-outlined">public</span>
+                                                                    <div class="ms-2">
+                                                                        <!-- temoparary lang ang filename here -->
+                                                                        <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
+                                                                        <div class="text-reg link text-12 mt-0">
+                                                                            <a href="<?php echo $link ?>" target="_blank" rel="noopener noreferrer"
+                                                                                style="text-decoration: none; color: var(--black);">
+                                                                                <?php echo $link ?>
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            <?php endforeach; ?>
+
+                                                            <hr>
+                                                            <?php
+                                                            if (mysqli_num_rows($profInfoResult) > 0) {
+                                                                while ($prof = mysqli_fetch_assoc($profInfoResult)) {
+
+
+                                                            ?>
+                                                                    <div class="text-sbold text-14 pb-3">Prepared by</div>
+                                                                    <div class="d-flex align-items-center pb-5">
+                                                                        <div class="rounded-circle me-2"
+                                                                            style="width: 50px; height: 50px; background-color: var(--highlight75);">
+                                                                            <img src="../shared/assets/img/assess/prof.png" alt="professor"
+                                                                                class="rounded-circle" style="width:50px;height:50px;">
+                                                                        </div>
+                                                                        <div>
+                                                                            <div class="text-sbold text-14">Prof. <?php echo $prof['firstName'] . " " . $prof['middleName'] . " " . $prof['lastName']; ?></div>
+                                                                    <?php
+                                                                }
+                                                            }
+                                                                    ?>
+                                                                    <?php
+                                                                    if (mysqli_num_rows($selectAssessmentResult) > 0) {
+                                                                        mysqli_data_seek($selectAssessmentResult, 0);
+                                                                        while ($createdAt = mysqli_fetch_assoc($selectAssessmentResult)) {
+                                                                    ?>
+                                                                            <div class="text-med text-12"><?php echo $createdAt['creationDate']; ?></div>
+                                                                    <?php
+                                                                        }
+                                                                    }
+                                                                    ?>
+                                                                        </div>
+                                                                    </div>
+                                                        </div>
+
+                                                        <!-- Submissions Tab - Disabled -->
+                                                        <div class="tab-pane fade" id="lessons" role="tabpanel" aria-labelledby="lessons-tab">
+                                                            <!-- Empty content - tab is disabled -->
                                                         </div>
                                                     </div>
-
-                                                    <hr>
-
-                                                    <div class="text-sbold text-14 pb-3">Prepared by</div>
-                                                    <div class="d-flex align-items-center pb-5">
-                                                        <div class="rounded-circle me-2"
-                                                            style="width: 50px; height: 50px; background-color: var(--highlight75);">
-                                                            <img src="../shared/assets/img/assess/prof.png" alt="professor"
-                                                                class="rounded-circle" style="width:50px;height:50px;">
-                                                        </div>
-                                                        <div>
-                                                            <div class="text-sbold text-14">Prof. Jane Smith</div>
-                                                            <div class="text-med text-12">January 12, 2024 8:00AM</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Submissions Tab - Disabled -->
-                                                <div class="tab-pane fade" id="lessons" role="tabpanel" aria-labelledby="lessons-tab">
-                                                    <!-- Empty content - tab is disabled -->
-                                                </div>
-                                            </div>
+                                            <?php
+                                                }
+                                            }
+                                            ?>
                                         </div>
                                     </div>
 
@@ -171,11 +312,11 @@ include("../shared/assets/processes/prof-session-process.php");
                                                         <!-- Submission Stats -->
                                                         <div class="submission-stats">
                                                             <div class="text-reg text-14 mb-1"><span
-                                                                    class="stat-value">10</span> submitted</div>
+                                                                    class="stat-value"><?php echo $submitted['submittedTodo']; ?></span> submitted</div>
                                                             <div class="text-reg text-14 mb-1"><span
-                                                                    class="stat-value">11</span> did not submit</div>
+                                                                    class="stat-value"><?php echo $pending['pending']; ?></span> did not submit</div>
                                                             <div class="text-reg text-14 mb-1"><span
-                                                                    class="stat-value">0</span>
+                                                                    class="stat-value"><?php echo $graded['graded']; ?></span>
                                                                 graded</div>
                                                         </div>
                                                     </div>
@@ -229,7 +370,7 @@ include("../shared/assets/processes/prof-session-process.php");
             });
         }
 
-        createDoughnutChart('taskChart', 10, 11, 0);
+        createDoughnutChart('taskChart', <?php echo $submitted['submittedTodo']; ?>, <?php echo $pending['pending']; ?>, <?php echo $graded['graded']; ?>);
     </script>
 </body>
 
