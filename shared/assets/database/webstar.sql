@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 09, 2025 at 01:28 PM
+-- Generation Time: Nov 13, 2025 at 03:32 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `webstar`
+-- Database: `test_webstar`
 --
 
 -- --------------------------------------------------------
@@ -100,18 +100,19 @@ CREATE TABLE `assessments` (
   `type` enum('Task','Test') DEFAULT 'Task',
   `deadline` date NOT NULL,
   `deadlineEnabled` tinyint(1) NOT NULL DEFAULT 0,
-  `createdAt` datetime DEFAULT current_timestamp()
+  `createdAt` datetime DEFAULT current_timestamp(),
+  `isArchived` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `assessments`
 --
 
-INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `type`, `deadline`, `deadlineEnabled`, `createdAt`) VALUES
-(1, 1, 'Activity #1', 'Task', '2025-10-15', 0, '2025-09-09 23:00:15'),
-(2, 1, 'Test #1', 'Test', '2025-11-06', 0, '2025-09-04 22:00:15'),
-(3, 2, 'Activity #2', 'Task', '2025-10-23', 0, '2025-10-22 22:00:15'),
-(4, 2, 'Activity #1', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15');
+INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `type`, `deadline`, `deadlineEnabled`, `createdAt`, `isArchived`) VALUES
+(1, 1, 'Activity #1', 'Task', '2025-10-15', 0, '2025-09-09 23:00:15', 0),
+(2, 1, 'Test #1', 'Test', '2025-11-06', 0, '2025-09-04 22:00:15', 0),
+(3, 2, 'Activity #2', 'Task', '2025-10-23', 0, '2025-10-22 22:00:15', 0),
+(4, 2, 'Activity #1', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15', 0);
 
 -- --------------------------------------------------------
 
