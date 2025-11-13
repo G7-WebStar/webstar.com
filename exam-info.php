@@ -1,5 +1,102 @@
 <?php
 $activePage = 'exam-info';
+include('shared/assets/database/connect.php');
+include("shared/assets/processes/session-process.php");
+$testID = $_GET['testID'];
+
+if ($testID == null) {
+    header("Location: 404.html");
+    exit();
+}
+
+$testExistenceQuery = "SELECT tests.testID, tests.testTimeLimit FROM tests 
+INNER JOIN assessments 
+    ON tests.assessmentID = assessments.assessmentID 
+INNER JOIN todo 
+    ON assessments.assessmentID = todo.assessmentID 
+WHERE tests.testID = '$testID' AND todo.userID = '$userID'";
+$testExistenceResult = executeQuery($testExistenceQuery);
+$testTimeLimitRow = mysqli_fetch_assoc($testExistenceResult);
+$testTimeLimit = $testTimeLimitRow['testTimeLimit'];
+
+if (mysqli_num_rows($testExistenceResult) <= 0) {
+    echo "Test doesn't exists.";
+    exit();
+}
+
+$selectTestQuery = "SELECT assessments.assessmentTitle, DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline, assessments.assessmentID FROM tests 
+                    INNER JOIN assessments
+                        ON tests.assessmentID = assessments.assessmentID
+                    WHERE tests.testID = $testID";
+$selectTestResult = executeQuery($selectTestQuery);
+$assessmentIDRow = mysqli_fetch_assoc($selectTestResult);
+$assessmentID = $assessmentIDRow['assessmentID'];
+
+$scoreQuery = "SELECT COUNT(isCorrect) AS correct FROM testresponses WHERE isCorrect = '1' AND userID = '$userID' AND testID = '$testID'";
+$scoreResult = executeQuery($scoreQuery);
+
+$checkPendingQuery = "SELECT todo.status FROM todo 
+INNER JOIN tests
+    ON todo.assessmentID = tests.assessmentID
+WHERE tests.testID = '$testID'";
+$checkPendingResult = executeQuery($checkPendingQuery);
+$statusRow = mysqli_fetch_assoc($checkPendingResult);
+$status = $statusRow['status'];
+
+$scoreRow = mysqli_fetch_assoc($scoreResult);
+$score = ($status == 'Pending') ? '-' : $scoreRow['correct'];
+
+$btnText = 'Answer Now';
+$btnLink = 'test.php';
+
+if ($status == 'Pending') {
+    $btnText = 'Answer Now';
+    $btnLink = 'test.php';
+} else if ($status == 'Submitted') {
+    $btnText = 'View Submission';
+    $btnLink = 'test-submitted.php';
+} else if ($status == 'Graded') {
+    $btnText = 'View Results';
+    $btnLink = 'test-result.php';
+}
+
+$totalItemsQuery = "SELECT COUNT(*) AS totalItems FROM testquestions WHERE testID = '$testID'";
+$totalItemsResult = executeQuery($totalItemsQuery);
+$totalItemsRow = mysqli_fetch_assoc($totalItemsResult);
+$totalItems = $totalItemsRow['totalItems'];
+
+$totalPointsQuery = "SELECT SUM(testQuestionPoints) AS totalPoints FROM testquestions WHERE testID = '$testID'";
+$totalPointsResult = executeQuery($totalPointsQuery);
+$totalPointsRow = mysqli_fetch_assoc($totalPointsResult);
+$totalPoints = $totalPointsRow['totalPoints'];
+
+$testGuidelinesQuery = "SELECT generalGuidance FROM tests WHERE testID = '$testID'";
+$testGuidelinesResult = executeQuery($testGuidelinesQuery);
+$testGuidelinesRow = mysqli_fetch_assoc($testGuidelinesResult);
+$testGuidelines = $testGuidelinesRow['generalGuidance'];
+
+$getProfIDQuery = "SELECT userinfo.userID FROM userinfo
+INNER JOIN courses
+    ON userinfo.userID = courses.userID
+INNER JOIN assessments 
+    ON courses.courseID = assessments.courseID
+INNER JOIN tests
+    ON assessments.assessmentID = tests.assessmentID
+INNER JOIN todo
+    ON tests.assessmentID = todo.assessmentID
+WHERE todo.userID = '$userID' AND tests.testID = '$testID'
+";
+$getProfIDResult = executeQuery($getProfIDQuery);
+$profUserIDRow = mysqli_fetch_assoc($getProfIDResult);
+$profUserID = $profUserIDRow['userID'];
+
+$profInfoQuery = "SELECT * FROM userInfo WHERE userID = '$profUserID'";
+$profInfoResult = executeQuery($profInfoQuery);
+
+$assessmentCreationDateQuery = "SELECT DATE_FORMAT(createdAt, '%b %e, %Y %l:%i %p') AS creationDate FROM assessments WHERE assessmentID = '$assessmentID'";
+$assessmentCreationDateResult = executeQuery($assessmentCreationDateQuery);
+$assessmentCreationDateRow = mysqli_fetch_assoc($assessmentCreationDateResult);
+$assessmentCreationDate = $assessmentCreationDateRow['creationDate']
 ?>
 
 <!doctype html>
@@ -16,6 +113,14 @@ $activePage = 'exam-info';
     <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
+
+    <style>
+        @media screen and (max-width: 767px) {
+            .mobile-view {
+                margin-bottom: calc(1.5rem + 80px) !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -44,13 +149,22 @@ $activePage = 'exam-info';
                                                 style="color: var(--black);"></i>
                                         </a>
                                     </div>
-                                    <div class="col">
-                                        <div class="text-sbold text-25">Quiz #1</div>
-                                        <span class="text-reg text-18">Due Sept 9</span>
-                                    </div>
+                                    <?php
+                                    if (mysqli_num_rows($selectTestResult) > 0) {
+                                        mysqli_data_seek($selectTestResult, 0);
+                                        while ($testTitle = mysqli_fetch_assoc($selectTestResult)) {
+                                    ?>
+                                            <div class="col">
+                                                <div class="text-sbold text-25"><?php echo $testTitle['assessmentTitle']; ?></div>
+                                                <span class="text-reg text-18">Due <?php echo $testTitle['assessmentDeadline']; ?></span>
+                                            </div>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
                                     <div class="col-auto text-end">
                                         Score <div class="text-sbold text-25">
-                                            - <span class="text-muted">/0</span>
+                                            <?php echo $score; ?><span class="text-muted">/<?php echo $totalItems; ?></span>
                                         </div>
                                     </div>
                                 </div>
@@ -68,7 +182,7 @@ $activePage = 'exam-info';
                                     </div>
                                     <div class="graded text-reg text-18 mt-4">Score</div>
                                     <div class="score text-sbold text-25">
-                                        - <span class="text-muted">0</span>
+                                        <?php echo $score; ?>/<span class="text-muted"><?php echo $totalItems; ?></span>
                                     </div>
                                 </div>
                             </div>
@@ -79,38 +193,43 @@ $activePage = 'exam-info';
                             <div class="col-12 col-lg-8">
                                 <div class="p-0 px-lg-5">
                                     <div class="text-sbold text-14 mt-3">Exam General Guidelines</div>
-                                    <p class="mt-3 text-med text-14 ">Attached is a Google Docs you can edit.</p>
-                                    <p class="mt-3 text-med text-14 ">In Figma, design a "404 Not Found" page.</p>
-                                    <p class="mt-3 text-med text-14 ">Create two versions, one for the mobile and one
-                                        for the desktop.</p>
+                                    <p class="mt-3 text-med text-14 "><?php echo $testGuidelines; ?></p>
                                     <hr>
                                     <div class="text-sbold text-14 pb-3">Prepared by</div>
-                                    <div class="d-flex align-items-center pb-5">
-                                        <div class="rounded-circle me-2" style="width: 50px; height: 50px; background-color: var(--highlight75);">
-                                            <img src="shared/assets/pfp-uploads/prof.png"
-                                                alt="Prof Picture" class="rounded-circle" style="width:50px;height:50px;">
-                                        </div>
-                                        <div>
-                                            <div class="text-sbold text-14">Chistian James Torillo</div>
-                                            <div class="text-med text-12">January 12, 2024 8:00AM</div>
-                                        </div>
-                                    </div>
+                                    <?php
+                                    if (mysqli_num_rows($profInfoResult) > 0) {
+                                        while ($prof = mysqli_fetch_assoc($profInfoResult)) {
+                                    ?>
+                                            <div class="d-flex align-items-center pb-5">
+                                                <div class="rounded-circle me-2" style="width: 50px; height: 50px; background-color: var(--highlight75);">
+                                                    <img src="shared/assets/pfp-uploads/prof.png"
+                                                        alt="Prof Picture" class="rounded-circle" style="width:50px;height:50px;">
+                                                </div>
+                                                <div>
+                                                    <div class="text-sbold text-14">Prof. <?php echo $prof['firstName'] . " " . $prof['middleName'] . " " . $prof['lastName']; ?></div>
+                                                    <div class="text-med text-12"><?php echo $assessmentCreationDate; ?></div>
+                                                </div>
+                                            </div>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
                                 </div>
                             </div>
 
                             <!-- Right Content -->
                             <div class="col-12 col-lg-4">
-                                <div class="cardSticky position-sticky" style="top: 20px;">
+                                <div class="cardSticky position-sticky mobile-view" style="top: 20px;">
                                     <div class="p-2">
                                         <div class="text-sbold text-16">Exam Details</div>
 
-                                        <div class="text-sbold text-16 text-center mt-4">50</div>
+                                        <div class="text-sbold text-16 text-center mt-4"><?php echo $totalItems; ?></div>
                                         <div class="text-reg text-14 text-center">Total Exam Items</div>
 
-                                        <div class="text-sbold text-16 text-center mt-4">50</div>
+                                        <div class="text-sbold text-16 text-center mt-4"><?php echo $totalPoints; ?></div>
                                         <div class="text-reg text-14 text-center">Total Exam Points</div>
 
-                                        <div class="text-sbold text-16 text-center mt-4">50 mins</div>
+                                        <div class="text-sbold text-16 text-center mt-4"><?php echo ($testTimeLimit / 60); ?> mins</div>
                                         <div class="text-reg text-14 text-center">Exam Duration</div>
 
                                         <div id="examStatusText" class="text-reg text-14 text-center mt-4">
@@ -120,11 +239,11 @@ $activePage = 'exam-info';
                                         <!-- Buttons Section -->
                                         <div class="pt-3 text-center">
                                             <!-- ✅ Visible by default -->
-                                            <a href="#">
+                                            <a href="<?php echo $btnLink; ?>?testID=<?php echo $testID; ?>">
                                                 <button id="answerBtn"
                                                     class="button px-3 py-1 rounded-pill text-reg text-md-14"
-                                                    style="background-color: var(--primaryColor);" onclick="takeExam()">
-                                                    Answer Now
+                                                    style="background-color: var(--primaryColor);">
+                                                    <?php echo $btnText; ?>
                                                 </button>
                                             </a>
                                         </div>
@@ -152,27 +271,6 @@ $activePage = 'exam-info';
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        function takeExam() {
-            // Hide "Answer Now" button
-            document.getElementById('answerBtn').style.display = 'none';
-            document.getElementById('examStatusText').innerText =
-                'Please wait for your instructor to release the test results.';
-
-            // Simulate instructor grading after a delay (for demo only)
-            setTimeout(() => {
-                // Show "View Result" section only when graded
-                document.getElementById('viewResultContainer').style.display = 'block';
-                document.getElementById('examStatusText').innerText =
-                    'Tests Results Available.';
-            }, 5000);
-        }
-
-        function viewResult() {
-            alert('Viewing your results...');
-        }
-    </script>
 </body>
 
 </html>

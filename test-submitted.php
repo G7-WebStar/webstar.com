@@ -1,15 +1,20 @@
 <?php
 $activePage = 'todo';
 include('shared/assets/database/connect.php');
-
 include("shared/assets/processes/session-process.php");
 $testID = $_GET['testID'];
+
 if ($testID == null) {
     header("Location: 404.html");
     exit();
 }
 
-$testExistenceQuery = "SELECT * FROM tests WHERE testID = '$testID'";
+$testExistenceQuery = "SELECT tests.testID FROM tests 
+INNER JOIN assessments 
+    ON tests.assessmentID = assessments.assessmentID 
+INNER JOIN todo 
+    ON assessments.assessmentID = todo.assessmentID 
+WHERE tests.testID = '$testID' AND todo.userID = '$userID'";
 $testExistenceResult = executeQuery($testExistenceQuery);
 
 if (mysqli_num_rows($testExistenceResult) <= 0) {
@@ -22,14 +27,8 @@ $selectTestQuery = "SELECT assessmentTitle FROM tests
                         ON tests.assessmentID = assessments.assessmentID
                     WHERE testID = $testID";
 $selectTestResult = executeQuery($selectTestQuery);
-
-$selectQuestionsQuery = "SELECT 
-testquestions.*
-FROM tests 
-INNER JOIN testquestions 
-    ON tests.testID = testquestions.testID 
-WHERE tests.testID = $testID";
-$selectQuestionsResult = executeQuery($selectQuestionsQuery);
+$pageTitleRow = mysqli_fetch_assoc($selectTestResult);
+$pageTitle = $pageTitleRow['assessmentTitle'];
 
 $validateTestIDQuery = "SELECT 
                         todo.* 
@@ -150,7 +149,7 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | Index</title>
+    <title>Webstar | <?php echo $pageTitle; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
@@ -259,6 +258,7 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
                                                     style="color: var(--black);"></i></a>
                                             <?php
                                             if (mysqli_num_rows($selectTestResult) > 0) {
+                                                mysqli_data_seek($selectTestResult, 0);
                                                 while ($guideLines = mysqli_fetch_assoc($selectTestResult)) {
                                             ?>
                                                     <div class="text-center text-md-auto h2 m-0">
@@ -313,10 +313,11 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
                                                 <span class="m-0 fs-sm-6 text-16 text-sm-12">Use XP Multiplier</span>
                                             </button>
 
-                                            <button class="btn d-flex align-items-center justify-content-start gap-2 border border-black rounded-5 px-lg-4 py-lg-2 interactable" id="returnBtn"
-                                                style="background-color: var(--primaryColor);">
-                                                <span class="m-0 fs-sm-6 text-16 text-sm-12">Return to Test Info</span>
-                                            </button>
+                                            <a href="exam-info.php?testID=<?php echo $testID; ?>" class="text-decoration-none text-dark">
+                                                <button class="btn d-flex align-items-center justify-content-start gap-2 border border-black rounded-5 px-lg-4 py-lg-2 interactable" id="returnBtn"
+                                                    style="background-color: var(--primaryColor);">
+                                                    <span class="m-0 fs-sm-6 text-16 text-sm-12">Return to Test Info</span>
+                                                </button></a>
                                         </div>
                                     </div>
                                 </div>
