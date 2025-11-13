@@ -220,7 +220,7 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                         <!-- Settings -->
                         <li style="margin-bottom:6px;">
                             <a class="dropdown-item d-flex align-items-center text-med text-14" href="settings.php">
-                                <span class="material-symbols-rounded me-2" style="font-size:18px;">settings</span>
+                                <span class="material-symbols-rounded" style="font-size:18px; display: inline-flex; width: 1.5em; ">settings</span>
                                 Settings
                             </a>
                         </li>
@@ -228,7 +228,7 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                         <!-- Support -->
                         <li style="margin-bottom:6px;">
                             <a class="dropdown-item d-flex align-items-center text-med text-14" href="support.php">
-                                <span class="material-symbols-rounded me-2" style="font-size:18px;">contact_support</span>
+                                <span class="material-symbols-rounded" style="font-size:18px; display: inline-flex; width: 1.5em; ">contact_support</span>
                                 Support
                             </a>
                         </li>
@@ -236,8 +236,8 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                         <!-- Settings -->
                         <li style="margin-bottom:6px;">
                             <a class="dropdown-item d-flex align-items-center text-med text-14" href="calendar.php">
-                                <span class="material-symbols-rounded me-2"
-                                    style="font-size:18px;">calendar_month</span>
+                                <span class="material-symbols-rounded"
+                                    style="font-size:18px; display: inline-flex; width: 1.5em; ">calendar_month</span>
                                 Calendar
                             </a>
                         </li>
@@ -245,7 +245,7 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                         <!-- Profile -->
                         <li style="margin-bottom:6px;">
                             <a class="dropdown-item d-flex align-items-center text-med text-14" href="profile.php">
-                                <span class="material-symbols-rounded me-2" style="font-size:18px;">person</span>
+                                <span class="material-symbols-rounded" style="font-size:18px; display: inline-flex; width: 1.5em; ">person</span>
                                 My Profile
                             </a>
                         </li>
@@ -254,7 +254,7 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                         <li>
                             <a class="dropdown-item d-flex align-items-center text-med text-14" href="login.php"
                                 style="color:var(--highlight);">
-                                <span class="material-symbols-rounded me-2" style="font-size:18px;">logout</span>
+                                <span class="material-symbols-rounded" style="font-size:18px; display: inline-flex; width: 1.5em; ">logout</span>
                                 Sign Out
                             </a>
                         </li>
