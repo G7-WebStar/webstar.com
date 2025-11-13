@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 13, 2025 at 03:32 PM
+-- Generation Time: Nov 13, 2025 at 03:40 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -390,27 +390,28 @@ CREATE TABLE `enrollments` (
   `enrollmentID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
   `courseID` int(5) NOT NULL,
-  `yearSection` int(11) NOT NULL
+  `yearSection` int(11) NOT NULL,
+  `xpPoints` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `enrollments`
 --
 
-INSERT INTO `enrollments` (`enrollmentID`, `userID`, `courseID`, `yearSection`) VALUES
-(1, 2, 1, 2023),
-(2, 2, 2, 2023),
-(3, 3, 1, 2023),
-(4, 4, 1, 2023),
-(5, 5, 1, 2023),
-(6, 6, 1, 2023),
-(7, 7, 1, 2023),
-(8, 8, 1, 2023),
-(9, 9, 1, 2023),
-(10, 10, 1, 2023),
-(11, 11, 1, 2023),
-(12, 12, 1, 2023),
-(13, 2, 3, 1);
+INSERT INTO `enrollments` (`enrollmentID`, `userID`, `courseID`, `yearSection`, `xpPoints`) VALUES
+(1, 2, 1, 2023, 0),
+(2, 2, 2, 2023, 0),
+(3, 3, 1, 2023, 0),
+(4, 4, 1, 2023, 0),
+(5, 5, 1, 2023, 0),
+(6, 6, 1, 2023, 0),
+(7, 7, 1, 2023, 0),
+(8, 8, 1, 2023, 0),
+(9, 9, 1, 2023, 0),
+(10, 10, 1, 2023, 0),
+(11, 11, 1, 2023, 0),
+(12, 12, 1, 2023, 0),
+(13, 2, 3, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -489,7 +490,6 @@ CREATE TABLE `leaderboard` (
   `enrollmentID` int(11) NOT NULL,
   `timeRange` varchar(10) NOT NULL,
   `periodStart` date NOT NULL,
-  `xpPoints` int(11) NOT NULL,
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -497,20 +497,20 @@ CREATE TABLE `leaderboard` (
 -- Dumping data for table `leaderboard`
 --
 
-INSERT INTO `leaderboard` (`leaderboardID`, `enrollmentID`, `timeRange`, `periodStart`, `xpPoints`, `updatedAt`) VALUES
-(1, 1, 'Weekly', '2025-08-25', 450, '2025-08-30 12:00:00'),
-(2, 2, 'Weekly', '2025-08-25', 450, '2025-08-30 12:00:00'),
-(3, 1, 'Weekly', '2025-09-28', 100, '2025-09-28 16:50:22'),
-(4, 3, 'Weekly', '2025-09-28', 400, '2025-09-28 16:58:09'),
-(5, 4, 'Weekly', '2025-09-01', 152, '2025-09-28 21:03:44'),
-(6, 5, 'Weekly', '2025-09-01', 189, '2025-09-28 21:03:44'),
-(7, 6, 'Weekly', '2025-09-01', 215, '2025-09-28 21:03:44'),
-(8, 7, 'Weekly', '2025-09-01', 176, '2025-09-28 21:03:44'),
-(9, 8, 'Weekly', '2025-09-01', 221, '2025-09-28 21:03:44'),
-(10, 9, 'Weekly', '2025-09-01', 167, '2025-09-28 21:03:44'),
-(11, 10, 'Weekly', '2025-09-01', 195, '2025-09-28 21:03:44'),
-(12, 11, 'Weekly', '2025-09-01', 214, '2025-09-28 21:03:44'),
-(13, 12, 'Monthly', '2025-09-01', 95, '2025-09-28 21:34:51');
+INSERT INTO `leaderboard` (`leaderboardID`, `enrollmentID`, `timeRange`, `periodStart`, `updatedAt`) VALUES
+(1, 1, 'Weekly', '2025-08-25', '2025-08-30 12:00:00'),
+(2, 2, 'Weekly', '2025-08-25', '2025-08-30 12:00:00'),
+(3, 1, 'Weekly', '2025-09-28', '2025-09-28 16:50:22'),
+(4, 3, 'Weekly', '2025-09-28', '2025-09-28 16:58:09'),
+(5, 4, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
+(6, 5, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
+(7, 6, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
+(8, 7, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
+(9, 8, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
+(10, 9, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
+(11, 10, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
+(12, 11, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
+(13, 12, 'Monthly', '2025-09-01', '2025-09-28 21:34:51');
 
 -- --------------------------------------------------------
 
