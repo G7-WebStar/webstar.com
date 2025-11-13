@@ -270,7 +270,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                                         <div class="d-flex align-items-center">
                                                             <span class="material-symbols-outlined" style="color: var(--black); margin-right: 5px;">
-                                                                article
+                                                                campaign
                                                             </span>
                                                             <span>Recent Announcements</span>
                                                         </div>
