@@ -135,7 +135,7 @@ $courses = executeQuery($course);
                                 </div>
 
                                 <!-- Status Dropdown -->
-                                <div class="col-auto mobile-dropdown p-0 mt-2 mt-md-0">
+                                <div class="col-auto mobile-dropdown mobile-dropdown-course-prof p-0 mt-2 mt-md-0">
                                     <div class="d-flex align-items-center flex-nowrap my-2">
                                         <span class="dropdown-label me-2 text-reg">Status</span>
                                         <div class="custom-dropdown">

@@ -51,8 +51,16 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
-@media (max-width: 768px) {
+@media (max-width: 500px) {
     .mobile-dropdown {
+        width: 100% !important;
+        display: flex;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .mobile-dropdown-course-prof {
         width: 100% !important;
         display: flex;
         justify-content: center;
