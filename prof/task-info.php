@@ -148,9 +148,9 @@ if (!empty($rubricID)) {
                         <div class="col-12 cardHeader p-3 mb-4">
 
                             <!-- DESKTOP VIEW -->
-                            <div class="row desktop-header d-none d-sm-flex">
+                            <div class="row desktop-header d-none d-md-flex">
                                 <div class="col-auto me-2">
-                                    <a href="#" class="text-decoration-none">
+                                    <a href="assess.php" class="text-decoration-none">
                                         <span class="material-symbols-outlined" style="color: var(--black); font-size: 22px;">
                                             arrow_back
                                         </span>
@@ -158,7 +158,7 @@ if (!empty($rubricID)) {
                                 </div>
                                 <div class="col">
                                     <span class="text-sbold text-25"><?php echo $assignmentTitle ?></span>
-                                    <div class="text-reg text-18">Due<?php echo date("M d, Y", strtotime($deadline)); ?></div>
+                                    <div class="text-reg text-18">Due <?php echo date("M d, Y", strtotime($deadline)); ?></div>
                                 </div>
                                 <div class="col-auto d-flex align-items-center">
                                     <a href="assess-task-details.php?assessmentID=<?php echo $assessmentID; ?>" style="text-decoration: none;">
@@ -171,26 +171,21 @@ if (!empty($rubricID)) {
                                         </button>
                                     </a>
                                 </div>
-
                             </div>
 
                             <!-- MOBILE VIEW -->
-                            <div class="d-block d-sm-none mobile-assignment">
+                            <div class="d-flex d-md-none mobile-assignment">
                                 <div class="mobile-top">
                                     <div class="arrow">
-                                        <a href="assess-task-details.php?assessmentID=<?php echo $assessmentID; ?>" style="text-decoration: none;">
-                                            <button class="btn d-flex align-items-center justify-content-center text-med text-14"
-                                                style="background-color: var(--primaryColor); border: 1px solid var(--black); border-radius: 50px; width: 120px; padding: 2px 5px; gap:5px; color: black;"
-                                                onmouseover="this.style.color='black';"
-                                                onmouseout="this.style.color='black';">
-                                                <span class="material-symbols-outlined">assignment</span>
-                                                Assess
-                                            </button>
+                                        <a href="assess.php" class="text-decoration-none">
+                                            <span class="material-symbols-outlined" style="color: var(--black); font-size: 22px;">
+                                                arrow_back
+                                            </span>
                                         </a>
                                     </div>
                                     <div class="col">
                                         <span class="text-sbold text-25"><?php echo $assignmentTitle ?></span>
-                                        <div class="text-reg text-18">Due<?php echo date("M d, Y", strtotime($deadline)); ?></div>
+                                        <div class="text-reg text-18">Due <?php echo date("M d, Y", strtotime($deadline)); ?></div>
                                     </div>
                                     <div class="col-auto d-flex align-items-center">
                                         <a href="assess-task-details.php?assessmentID=<?php echo $assessmentID; ?>" style="text-decoration: none;">
@@ -387,7 +382,6 @@ if (!empty($rubricID)) {
                 <div class="modal-footer">
                     <div class="container">
                         <div class="row justify-content-end py-2">
-                            <!-- Optional footer buttons -->
                         </div>
                     </div>
                 </div>

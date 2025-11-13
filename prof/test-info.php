@@ -113,7 +113,7 @@ $assessmentID = $test['assessmentID'];
                             <!-- DESKTOP VIEW -->
                             <div class="row desktop-header d-none d-sm-flex">
                                 <div class="col-auto me-2">
-                                    <a href="#" class="text-decoration-none">
+                                    <a href="assess.php" class="text-decoration-none">
                                         <span class="material-symbols-outlined" style="color: var(--black); font-size: 22px;">
                                             arrow_back
                                         </span>
@@ -141,7 +141,7 @@ $assessmentID = $test['assessmentID'];
                             <div class="d-block d-sm-none mobile-assignment">
                                 <div class="mobile-top">
                                     <div class="arrow">
-                                        <a href="#" class="text-decoration-none">
+                                        <a href="assess.php" class="text-decoration-none">
                                             <span class="material-symbols-outlined" style="color: var(--black); font-size: 22px;">
                                                 arrow_back
                                             </span>
@@ -215,8 +215,7 @@ $assessmentID = $test['assessmentID'];
                                                 </div>
 
                                                 <div class="d-flex flex-column align-items-center mt-5 mb-3 text-med text-14">
-                                                    <!-- Bumabalik sa index means null yung testID -->
-                                                    <a href="../test-result.php?testID=<?php echo $testID; ?>" style="text-decoration:none;">
+                                                    <a href="test-preview.php?testID=<?php echo $testID; ?>" style="text-decoration:none;">
                                                         <button class="btn px-4 py-2"
                                                             style="background-color: var(--primaryColor); border: 1px solid var(--black); border-radius: 50px; width: 150px; padding: 5px 10px; color: black;"
                                                             onmouseover="this.style.color='black';"

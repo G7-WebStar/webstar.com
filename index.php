@@ -270,13 +270,15 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                                         <div class="d-flex align-items-center">
                                                             <span class="material-symbols-outlined" style="color: var(--black); margin-right: 5px;">
-                                                                article
+                                                                campaign
                                                             </span>
                                                             <span>Recent Announcements</span>
                                                         </div>
-                                                        <span class="count-badge ms-2 text-sbold text-16">
-                                                            <?php echo mysqli_num_rows($selectAnnouncementsResult); ?>
-                                                        </span>
+                                                        <?php if (mysqli_num_rows($selectAnnouncementsResult) > 0): ?>
+                                                            <span class="count-badge ms-2 text-sbold text-16">
+                                                                <?php echo mysqli_num_rows($selectAnnouncementsResult); ?>
+                                                            </span>
+                                                        <?php endif; ?>
                                                     </div>
                                                     <!-- Scrollable Card List -->
                                                     <div

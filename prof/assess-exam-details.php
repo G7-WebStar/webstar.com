@@ -142,7 +142,7 @@ if ($pendingCount < 0) $pendingCount = 0;
                             <div class="d-block d-sm-none mobile-assignment">
                                 <div class="mobile-top">
                                     <div class="arrow">
-                                        <a href="#" class="text-decoration-none">
+                                        <a href="assess.php" class="text-decoration-none">
                                             <i class="fa-solid fa-arrow-left text-reg text-16"
                                                 style="color: var(--black);"></i>
                                         </a>
