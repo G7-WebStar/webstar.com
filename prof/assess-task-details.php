@@ -52,6 +52,21 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
 
 $profInfoQuery = "SELECT * FROM userInfo WHERE userID = '$userID'";
 $profInfoResult = executeQuery($profInfoQuery);
+
+$countPendingQuery = "SELECT COUNT(*) AS pending FROM todo 
+                      WHERE assessmentID = '$assessmentID' AND status = 'Pending'";
+$countPendingResult = executeQuery($countPendingQuery);
+$pending = mysqli_fetch_assoc($countPendingResult);
+
+$countSubmittedQuery = "SELECT COUNT(*) AS submittedTodo FROM todo 
+                        WHERE assessmentID = '$assessmentID' AND status = 'Submitted'";
+$countSubmittedResult = executeQuery($countSubmittedQuery);
+$submitted = mysqli_fetch_assoc($countSubmittedResult);
+
+$countGradedQuery = "SELECT COUNT(*) AS graded FROM todo 
+                     WHERE assessmentID = '$assessmentID' AND status = 'Graded'";
+$countGradedResult = executeQuery($countGradedQuery);
+$graded = mysqli_fetch_assoc($countGradedResult);
 ?>
 
 <!doctype html>
@@ -297,11 +312,11 @@ $profInfoResult = executeQuery($profInfoQuery);
                                                         <!-- Submission Stats -->
                                                         <div class="submission-stats">
                                                             <div class="text-reg text-14 mb-1"><span
-                                                                    class="stat-value">10</span> submitted</div>
+                                                                    class="stat-value"><?php echo $submitted['submittedTodo']; ?></span> submitted</div>
                                                             <div class="text-reg text-14 mb-1"><span
-                                                                    class="stat-value">11</span> did not submit</div>
+                                                                    class="stat-value"><?php echo $pending['pending']; ?></span> did not submit</div>
                                                             <div class="text-reg text-14 mb-1"><span
-                                                                    class="stat-value">0</span>
+                                                                    class="stat-value"><?php echo $graded['graded']; ?></span>
                                                                 graded</div>
                                                         </div>
                                                     </div>
@@ -355,7 +370,7 @@ $profInfoResult = executeQuery($profInfoQuery);
             });
         }
 
-        createDoughnutChart('taskChart', 10, 11, 0);
+        createDoughnutChart('taskChart', <?php echo $submitted['submittedTodo']; ?>, <?php echo $pending['pending']; ?>, <?php echo $graded['graded']; ?>);
     </script>
 </body>
 

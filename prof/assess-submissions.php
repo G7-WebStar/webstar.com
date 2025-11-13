@@ -13,6 +13,24 @@ if ($assessmentID == null) {
     echo "Assessment ID is missing in the URL.";
     exit;
 }
+$selectAssessmentQuery = "SELECT assessmentTitle, DATE_FORMAT(deadline, '%b %e') AS assessmentDeadline, type, DATE_FORMAT(createdAt, '%b %e, %Y %l:%i %p') AS creationDate
+                          FROM assessments WHERE assessmentID = '$assessmentID'";
+$selectAssessmentResult = executeQuery($selectAssessmentQuery);
+
+$countPendingQuery = "SELECT COUNT(*) AS pending FROM todo 
+                      WHERE assessmentID = '$assessmentID' AND status = 'Pending'";
+$countPendingResult = executeQuery($countPendingQuery);
+$pending = mysqli_fetch_assoc($countPendingResult);
+
+$countSubmittedQuery = "SELECT COUNT(*) AS submittedTodo FROM todo 
+                        WHERE assessmentID = '$assessmentID' AND status = 'Submitted'";
+$countSubmittedResult = executeQuery($countSubmittedQuery);
+$submitted = mysqli_fetch_assoc($countSubmittedResult);
+
+$countGradedQuery = "SELECT COUNT(*) AS graded FROM todo 
+                     WHERE assessmentID = '$assessmentID' AND status = 'Graded'";
+$countGradedResult = executeQuery($countGradedQuery);
+$graded = mysqli_fetch_assoc($countGradedResult);
 ?>
 
 <!doctype html>
@@ -70,10 +88,18 @@ if ($assessmentID == null) {
                                             style="color: var(--black);"></i>
                                     </a>
                                 </div>
-                                <div class="col">
-                                    <span class="text-sbold text-25">Assignment #1</span>
-                                    <div class="text-reg text-18">Due Sep 9, 2024</div>
-                                </div>
+                                <?php
+                                if (mysqli_num_rows($selectAssessmentResult) > 0) {
+                                    mysqli_data_seek($selectAssessmentResult, 0);
+                                    while ($assessmentRow = mysqli_fetch_assoc($selectAssessmentResult)) {
+                                ?>
+                                        <div class="col">
+                                            <span class="text-sbold text-25"><?php echo $assessmentRow['assessmentTitle']; ?></span>
+                                            <div class="text-reg text-18">Due <?php echo $assessmentRow['assessmentDeadline']; ?></div>
+                                        </div>
+                                <?php
+                                    }
+                                } ?>
                             </div>
 
 
@@ -86,10 +112,18 @@ if ($assessmentID == null) {
                                                 style="color: var(--black);"></i>
                                         </a>
                                     </div>
-                                    <div class="col">
-                                        <span class="text-sbold text-25">Assignment #1</span>
-                                        <div class="text-reg text-18">Due Sep 9, 2024</div>
-                                    </div>
+                                    <?php
+                                    if (mysqli_num_rows($selectAssessmentResult) > 0) {
+                                        mysqli_data_seek($selectAssessmentResult, 0);
+                                        while ($assessmentRow = mysqli_fetch_assoc($selectAssessmentResult)) {
+                                    ?>
+                                            <div class="col">
+                                                <span class="text-sbold text-25"><?php echo $assessmentRow['assessmentTitle']; ?></span>
+                                                <div class="text-reg text-18">Due <?php echo $assessmentRow['assessmentDeadline']; ?></div>
+                                            </div>
+                                    <?php
+                                        }
+                                    } ?>
                                 </div>
                             </div>
                         </div>
@@ -228,11 +262,11 @@ if ($assessmentID == null) {
                                                         <!-- Submission Stats -->
                                                         <div class="submission-stats">
                                                             <div class="text-reg text-14 mb-1"><span
-                                                                    class="stat-value">10</span> submitted</div>
+                                                                    class="stat-value"><?php echo $submitted['submittedTodo']; ?></span> submitted</div>
                                                             <div class="text-reg text-14 mb-1"><span
-                                                                    class="stat-value">11</span> did not submit</div>
+                                                                    class="stat-value"><?php echo $pending['pending']; ?></span> did not submit</div>
                                                             <div class="text-reg text-14 mb-1"><span
-                                                                    class="stat-value">0</span>
+                                                                    class="stat-value"><?php echo $graded['graded']; ?></span>
                                                                 graded</div>
                                                         </div>
                                                     </div>
@@ -285,7 +319,7 @@ if ($assessmentID == null) {
                 });
             }
 
-            createDoughnutChart('taskChart', 10, 11, 0);
+            createDoughnutChart('taskChart', <?php echo $submitted['submittedTodo']; ?>, <?php echo $pending['pending']; ?>, <?php echo $graded['graded']; ?>);
         </script>
 </body>
 
