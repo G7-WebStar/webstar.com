@@ -111,4 +111,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $updateCurrentWebstarsQuery = "UPDATE profile SET webstars = '$newWebstars' WHERE userID = '$userID'";
     $updateCurrentWebstarsResult = executeQuery($updateCurrentWebstarsQuery);
+
+    $baseXP = 10 * $totalPoints;
+    $correctBonusXP =  $baseXP * ($score / $totalPoints);
+    $finalXP = $baseXP + ($correctBonusXP * $timeFactor);
+
+    $courseIDQuery = "SELECT courseID FROM assessments WHERE assessmentID = '$assessmentID'";
+    $courseIDResult = executeQuery($courseIDQuery);
+    $courseIDRow = mysqli_fetch_assoc($courseIDResult);
+    $courseID = $courseIDRow['courseID'];
+
+    $currentXPQuery = "SELECT leaderboard.xpPoints, enrollments.enrollmentID FROM leaderboard 
+                       INNER JOIN enrollments
+                        ON leaderboard.enrollmentID = enrollments.enrollmentID
+                       WHERE enrollments.userID = '$userID' AND enrollments.courseID = '$courseID'";
+    $currentXPResult = executeQuery($currentXPQuery);
+    $currentXPRow = mysqli_fetch_assoc($currentXPResult);
+    $currentXP = $currentXPRow['xpPoints'];
+
+    $updatedXP = $currentXP + $finalXP;
+
+    $enrollmentID = $currentXPRow['enrollmentID'];
+
+    //Update xpPoints of the current user 
+    $updateLeaderboardXPQuery = "UPDATE leaderboard SET xpPoints = '$updatedXP' WHERE enrollmentID = '$enrollmentID'";
+    $updateLeaderboardXPResult = executeQuery($updateLeaderboardXPQuery);
 }

@@ -95,10 +95,20 @@ $correctBonusWebstars = $baseWebstars * ($score / $totalPoints);
 $timeFactor = 1 + ($timelimit - $timeSpent) / $timelimit;
 $finalXP = $baseXP + ($correctBonusXP * $timeFactor);
 $finalWebstars = $baseWebstars + ($correctBonusWebstars * $timeFactor);
-$multipliedXP = $finalXP * 2;
+$multipliedXP = round($finalXP) * 2;
 
 $bonusXP = $finalXP - $baseXP;
 $bonusWebstars = $finalWebstars - $baseWebstars;
+
+//Get Assessment ID of current test
+$assessmentIDQuery = "SELECT assessmentID FROM tests WHERE testID = '$testID'";
+$assessmentIDResult = executeQuery($assessmentIDQuery);
+$assessmentIDRow = mysqli_fetch_assoc($assessmentIDResult);
+$assessmentID = $assessmentIDRow['assessmentID'];
+
+//Checks if multiplier is already used
+$checkMultiplierUseQuery = "SELECT * FROM webstars WHERE userID = '$userID' AND assessmentID = '$assessmentID' AND sourceType = 'XP Multiplier Usage'";
+$checkMultiplierUseResult = executeQuery($checkMultiplierUseQuery);
 
 echo "<script>console.log(" . $baseXP . ");</script>";
 echo "<script>console.log(" . $baseWebstars . ");</script>";
@@ -274,12 +284,12 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
                                     </div>
                                     <div class="mt-auto text-sbold">
                                         <div class="d-flex justify-content-center align-items-center btn-mobile mb-4 gap-3 mt-5" id="buttonSection">
-                                            <button class="gradient-bg btn d-flex align-items-center justify-content-end gap-2 border border-black rounded-5 px-lg-4 py-lg-2 interactable" id="prevBtn"
+                                            <button class="gradient-bg btn d-flex align-items-center justify-content-end gap-2 border border-black rounded-5 px-lg-4 py-lg-2 interactable" id="useBtn"
                                                 style="background-color: var(--primaryColor);" data-bs-toggle="modal" data-bs-target="#multiplier">
                                                 <span class="m-0 fs-sm-6 text-16 text-sm-12">Use XP Multiplier</span>
                                             </button>
 
-                                            <button class="btn d-flex align-items-center justify-content-start gap-2 border border-black rounded-5 px-lg-4 py-lg-2 interactable" id="nextBtn"
+                                            <button class="btn d-flex align-items-center justify-content-start gap-2 border border-black rounded-5 px-lg-4 py-lg-2 interactable" id="returnBtn"
                                                 style="background-color: var(--primaryColor);">
                                                 <span class="m-0 fs-sm-6 text-16 text-sm-12">Return to Test Info</span>
                                             </button>
@@ -305,37 +315,37 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <form class="my-0" id="feedbackForm" action="" method="POST">
-                    <div class="modal-body">
-                        <div class="container">
-                            <div class="row justify-content-center">
-                                <div class="col-12 d-flex justify-content-center flex-column text-center text-30">
-                                    <p class="text-bold">Multiply your XPs</p>
+
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-12 d-flex justify-content-center flex-column text-center text-30">
+                                <p class="text-bold">Multiply your XPs</p>
+                            </div>
+                            <div class="row">
+                                <div class="mx-auto col-8 text-center">
+                                    <p class="text-reg text-18 text-reg mb-0">Cost: <span class="text-sbold">1000 Webstars</span></p>
+                                    <p class="text-reg text-18 text-reg">Current XPs: <span class="text-sbold"><?php echo round($finalXP); ?> → <?php echo $multipliedXP; ?> XPs </span>after boost</p>
                                 </div>
-                                <div class="row">
-                                    <div class="mx-auto col-8 text-center">
-                                        <p class="text-reg text-18 text-reg mb-0">Cost: <span class="text-sbold">1000 Webstars</span></p>
-                                        <p class="text-reg text-18 text-reg">Current XPs: <span class="text-sbold"><?php echo round($finalXP); ?> → <?php echo round($multipliedXP); ?> XPs </span>after boost</p>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <span class="text-16 text-center text-reg mb-3">
-                                        Are you sure you want to use
-                                        <span class="text-sbold">1000 Webstars</span> to activate this multiplier?
-                                    </span>
-                                </div>
+                            </div>
+                            <div class="row">
+                                <span class="text-16 text-center text-reg mb-3">
+                                    Are you sure you want to use
+                                    <span class="text-sbold">1000 Webstars</span> to activate this multiplier?
+                                </span>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- FOOTER -->
-                    <div class="modal-footer justify-content-center">
-                        <button class="gradient-bg my-auto text-sbold btn d-flex align-items-center justify-content-center border border-black rounded-5 px-lg-4 py-lg-2 interactable"
-                            data-bs-toggle="modal" data-bs-target="#multiplier">
-                            <span class="m-0 fs-sm-6 text-16 text-sm-12">Use XP Multiplier</span>
-                        </button>
-                    </div>
-                </form>
+                <!-- FOOTER -->
+                <div class="modal-footer justify-content-center">
+                    <button id="multiplierBtn" class="gradient-bg my-auto text-sbold btn d-flex align-items-center justify-content-center border border-black rounded-5 px-lg-4 py-lg-2 interactable"
+                        data-bs-toggle="modal" data-bs-target="#multiplier" <?php echo (mysqli_num_rows($checkMultiplierUseResult) <= 0) ? 'onclick="applyXPMultiplier();"' : ''; ?>>
+                        <span class="m-0 fs-sm-6 text-16 text-sm-12">Use XP Multiplier</span>
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>
@@ -387,6 +397,35 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
         }
 
         timerHtml.innerHTML = `<i class="bi bi-clock fa-xs me-2" style="color: var(--black);"></i>` + formatTime(seconds);
+
+        <?php
+        if (mysqli_num_rows($checkMultiplierUseResult) <= 0) {
+            echo "async function applyXPMultiplier() {
+            try {
+                const response = await fetch('shared/assets/processes/xp-multiplier.php?testID=" . $testID . "');
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const result = await response.json();
+                console.log('XP Multiplier Result:', result);
+
+                if (result.success) {
+                    console.log('XP multiplier applied successfully. New XP:', result.newXP);
+                } else {
+                    console.warn('Failed to apply multiplier:', result.error);
+                }
+            } catch (error) {
+                console.error('Error applying XP multiplier:', error);
+            }
+        window.location.reload();
+        }";
+        } else {
+            echo "document.getElementById('multiplierBtn').disabled = true;
+                  document.getElementById('useBtn').disabled = true;";
+        }
+        ?>
     </script>
 </body>
 
