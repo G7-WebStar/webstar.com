@@ -254,7 +254,7 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
                                         style="color: var(--black);"></i>
                                     <div class="quiz-nav col-12 d-flex flex-column flex-md-row align-items-center justify-content-between my-2 px-3 px-md-5 py-2 py-md-3">
                                         <div class="d-flex flex-row align-items-center mb-0">
-                                            <a href="todo.php" class="text-decoration-none"><i class="d-none d-md-block announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 me-3"
+                                            <a href="exam-info.php?testID=<?php echo $testID; ?>" class="text-decoration-none"><i class="d-none d-md-block announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 me-3"
                                                     style="color: var(--black);"></i></a>
                                             <?php
                                             if (mysqli_num_rows($selectTestResult) > 0) {
