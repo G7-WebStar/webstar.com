@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 13, 2025 at 03:40 PM
+-- Generation Time: Nov 13, 2025 at 04:20 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `test_webstar`
+-- Database: `webstar`
 --
 
 -- --------------------------------------------------------
@@ -100,19 +100,18 @@ CREATE TABLE `assessments` (
   `type` enum('Task','Test') DEFAULT 'Task',
   `deadline` date NOT NULL,
   `deadlineEnabled` tinyint(1) NOT NULL DEFAULT 0,
-  `createdAt` datetime DEFAULT current_timestamp(),
-  `isArchived` tinyint(1) NOT NULL DEFAULT 0
+  `createdAt` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `assessments`
 --
 
-INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `type`, `deadline`, `deadlineEnabled`, `createdAt`, `isArchived`) VALUES
-(1, 1, 'Activity #1', 'Task', '2025-10-15', 0, '2025-09-09 23:00:15', 0),
-(2, 1, 'Test #1', 'Test', '2025-11-06', 0, '2025-09-04 22:00:15', 0),
-(3, 2, 'Activity #2', 'Task', '2025-10-23', 0, '2025-10-22 22:00:15', 0),
-(4, 2, 'Activity #1', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15', 0);
+INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `type`, `deadline`, `deadlineEnabled`, `createdAt`) VALUES
+(1, 1, 'Activity #1', 'Task', '2025-10-15', 0, '2025-09-09 23:00:15'),
+(2, 1, 'Test #1', 'Test', '2025-11-06', 0, '2025-09-04 22:00:15'),
+(3, 2, 'Activity #2', 'Task', '2025-10-23', 0, '2025-10-22 22:00:15'),
+(4, 2, 'Activity #1', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15');
 
 -- --------------------------------------------------------
 
@@ -133,8 +132,8 @@ CREATE TABLE `assignments` (
 --
 
 INSERT INTO `assignments` (`assignmentID`, `assessmentID`, `assignmentDescription`, `assignmentPoints`, `rubricID`) VALUES
-(1, 1, 'Attached is a Google Doc that you can edit.\n\nIn Figma, design a “404 Not Found” page.\n\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\n\nTurn in when done.\n\n', 100, NULL),
-(2, 4, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100, NULL),
+(1, 1, 'Attached is a Google Doc that you can edit.\n\nIn Figma, design a “404 Not Found” page.\n\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\n\nTurn in when done.\n\n', 100, 1),
+(2, 4, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100, 1),
 (3, 2, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100, NULL);
 
 -- --------------------------------------------------------
@@ -452,10 +451,7 @@ CREATE TABLE `files` (
 --
 
 INSERT INTO `files` (`fileID`, `courseID`, `userID`, `announcementID`, `lessonID`, `assignmentID`, `submissionID`, `fileAttachment`, `fileTitle`, `fileLink`, `uploadedAt`) VALUES
-(1, 1, 1, 1, 1, NULL, NULL, 'Web Development Course Material', 'Web Development', 'https://gmail.com/lesson1,https://gmail.com/lesson1.1', '2025-08-30 10:30:00'),
-(24, 1, 2, NULL, NULL, NULL, 9, 'STS_Lesson3_Summary.pdf', '', '', '2025-11-07 03:55:54'),
-(26, 1, 2, NULL, NULL, NULL, 9, 'STS_L3.pdf', '', '', '2025-11-07 03:55:54'),
-(27, 1, 2, NULL, NULL, NULL, 9, 'SPIC_LESSONS.pdf', '', '', '2025-11-07 04:00:50');
+(1, 1, 1, 1, 1, NULL, NULL, 'Web Development Course Material', 'Web Development', 'https://gmail.com/lesson1,https://gmail.com/lesson1.1', '2025-08-30 10:30:00');
 
 -- --------------------------------------------------------
 
@@ -467,6 +463,7 @@ CREATE TABLE `inbox` (
   `inboxID` int(11) NOT NULL,
   `enrollmentID` int(11) NOT NULL,
   `messageText` text NOT NULL,
+  `notifType` int(11) NOT NULL,
   `createdAt` datetime DEFAULT current_timestamp(),
   `isRead` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -475,9 +472,9 @@ CREATE TABLE `inbox` (
 -- Dumping data for table `inbox`
 --
 
-INSERT INTO `inbox` (`inboxID`, `enrollmentID`, `messageText`, `createdAt`, `isRead`) VALUES
-(1, 1, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 1),
-(2, 2, 'Prof. Christian James has posted a new assignment.', '2024-01-31 08:04:00', 1);
+INSERT INTO `inbox` (`inboxID`, `enrollmentID`, `messageText`, `notifType`, `createdAt`, `isRead`) VALUES
+(1, 1, 'Prof. Christian James has posted a new assignment.', 0, '2024-01-31 08:04:00', 1),
+(2, 2, 'Prof. Christian James has posted a new assignment.', 0, '2024-01-31 08:04:00', 1);
 
 -- --------------------------------------------------------
 
@@ -702,12 +699,23 @@ INSERT INTO `rubric` (`rubricID`, `rubricTitle`, `rubricType`, `userID`, `totalP
 CREATE TABLE `scores` (
   `scoreID` int(5) NOT NULL,
   `userID` int(5) NOT NULL,
-  `assignmentID` int(5) DEFAULT NULL,
   `submissionID` int(5) DEFAULT NULL,
   `testID` int(5) DEFAULT NULL,
   `score` int(5) NOT NULL,
   `feedback` varchar(255) DEFAULT NULL,
   `gradedAt` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `selectedlevels`
+--
+
+CREATE TABLE `selectedlevels` (
+  `selectedLevelID` int(11) NOT NULL,
+  `submissionID` int(11) NOT NULL,
+  `levelID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -752,6 +760,7 @@ CREATE TABLE `studentbadges` (
   `userID` int(11) NOT NULL,
   `badgeID` int(11) NOT NULL,
   `courseID` int(11) NOT NULL,
+  `assignmentID` int(11) NOT NULL,
   `earnedAt` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -759,10 +768,10 @@ CREATE TABLE `studentbadges` (
 -- Dumping data for table `studentbadges`
 --
 
-INSERT INTO `studentbadges` (`studentBadgeID`, `userID`, `badgeID`, `courseID`, `earnedAt`) VALUES
-(1, 2, 1, 1, '2025-10-28 20:16:06'),
-(2, 2, 2, 1, '2025-10-28 20:16:06'),
-(3, 2, 2, 1, '2025-10-28 20:16:06');
+INSERT INTO `studentbadges` (`studentBadgeID`, `userID`, `badgeID`, `courseID`, `assignmentID`, `earnedAt`) VALUES
+(1, 2, 1, 1, 0, '2025-10-28 20:16:06'),
+(2, 2, 2, 1, 0, '2025-10-28 20:16:06'),
+(3, 2, 2, 1, 0, '2025-10-28 20:16:06');
 
 -- --------------------------------------------------------
 
@@ -776,8 +785,86 @@ CREATE TABLE `submissions` (
   `assessmentID` int(11) NOT NULL,
   `scoreID` int(11) DEFAULT NULL,
   `submittedAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `isSubmitted` tinyint(4) NOT NULL
+  `isSubmitted` tinyint(4) NOT NULL,
+  `modalShown` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `supports`
+--
+
+CREATE TABLE `supports` (
+  `supportID` int(5) NOT NULL,
+  `supportRole` enum('Student','Professor') NOT NULL,
+  `supportQuestion` varchar(50) NOT NULL,
+  `supportAnswer` varchar(500) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `supports`
+--
+
+INSERT INTO `supports` (`supportID`, `supportRole`, `supportQuestion`, `supportAnswer`) VALUES
+(1, 'Student', 'What is Webstar', 'Webstar is an interactive online learning platform designed to help users explore courses, track their progress, and earn points through engaging activities. It focuses on making learning fun, structured, and community driven.'),
+(2, 'Student', 'What is required on the Login Setup Page?', 'If you are a new user, you will be directed to the Account Setup Page where you are required to enter a valid email address. A verification code will be sent to your email, and you must input that code to confirm your ownership of the account. After the verification, you will be directed to create a new password and confirm it. Once you complete these steps, you can proceed to the user dashboard.'),
+(3, 'Student', 'How do I enroll in my first course?', 'You enroll by entering the access code given by your professor. Your new course will appear in the \"Your Courses\" list immediately. The rest of your dashboard will show an empty state until your course is active with announcements and tasks.'),
+(4, 'Student', 'What is the Home Page and what does it show?', 'The Webstar Home page is your central, personalized dashboard providing a quick overview of your academic life, featuring your enrolled courses, recent announcements, a timeline of upcoming tasks, and your leaderboard rank.'),
+(5, 'Student', 'What information is available on the Courses page?', 'The Courses page serves as your complete directory, listing every course you have enrolled in, with each card displaying key details like the Course Code and Name, the Professor Name, and the class Schedule.'),
+(6, 'Student', 'How can I manage or find my courses?', 'The Courses page offers several organizational tools, including a Search Bar to find courses by code or name, and a Status Filter that allows you to sort the list to view either \"Active\" or \"Archived\" classes.'),
+(7, 'Student', 'How do I add a new course?', 'To add an additional course, click the \"+ Join Course\" button in the top right corner, then enter the access code provided by your professor in the access form and click \"Enroll\" to add the class to your list.'),
+(8, 'Student', 'What does the Course Info page contain?', 'The Course Info page aggregates all resources and activities for a single class, featuring top navigation tabs for Announcements, Lessons, To-do, Files, Leaderboard, Report, and Students, alongside a sidebar card that tracks your overall Class Standing, level, and current Quests.'),
+(9, 'Student', 'How do I enroll or unenroll from a course?', 'You can choose to unenroll from a course by clicking the three-dot menu at the top of the course card on the left side of the Course Info page.'),
+(10, 'Student', 'How do I view professor announcements and access a', 'The Announcements tab contains messages and updates posted by your professor, which you can filter to view the newest or oldest messages. If an announcement includes extra resources, you can click the designated button to view any attached files.'),
+(11, 'Student', 'Where can I find the learning materials and lectur', 'The Lessons tab contains all the organized lectures and learning materials for the course. Clicking on any lesson card will redirect you to the Lesson Info, where you can access and review the specific content provided by your professor.'),
+(12, 'Student', 'How do I view and manage my activities for the cou', 'The To-do tab lists all required course activities, which you can manage by sorting them or filtering by Status (Pending, Missing, Done). Clicking an activity takes you to the respective page where you can submit your work or take your exams.'),
+(13, 'Student', 'How do I submit my work for an assignment or activ', 'In the submission area, you can attach your completed work either by uploading files from your device or by providing a link to an external source (like Google Drive or Figma), and then click \"Turn In\" to submit.'),
+(14, 'Student', 'What rewards do I receive after submitting an assi', 'After successfully submitting a task or taking an exam, you will be shown a reward screen indicating the XPs (Experience Points) and Webstars you have earned.'),
+(15, 'Student', 'What is the purpose of the XP Multiplier and how d', 'The XP Multiplier is used to instantly increase the Experience Points (XPs) you earned from an exam, helping you level up faster and improve your standing.'),
+(16, 'Student', 'Where can I view the results and answers for my co', 'You can view the full results, including your score and the correct/incorrect answers, by returning to the Exam Info. The results become available only after your instructor has released them; at that point, you will see a \"View Results\" button on the page.'),
+(17, 'Student', 'Where can I find and download course materials sha', 'The Files tab serves as a repository for all documents and links shared by your professor. If the item is a document, clicking it allows you to view the file and offers a download button. If it is a link, clicking it will open the external resource.'),
+(18, 'Student', 'What information is in the Leaderboard?', 'The Leaderboard tab shows a ranked list of students based on their performance, highlighting the top 3 in the class. You can also use the search function to quickly find any of your classmates within the list.'),
+(19, 'Student', 'How can I view a detailed performance report for a', 'To view a detailed performance report for a classmate, you must go to the Leaderboard, click on their name, and you will be redirected to their Report tab, which shows their on-time submissions, overall performance, records, charts, and badges.'),
+(20, 'Student', 'How can I view a list of all students enrolled in ', 'To see everyone enrolled, navigate to the student’s tab within the Course Info. You can view the full class roster, use the search bar to quickly find a specific student, and apply filters to sort the list by newest or oldest student.'),
+(21, 'Student', 'What notifications will I find in my Inbox?', 'Inbox serves as your notification center, containing updates on every relevant course activity, including notifications for submitted tasks, lessons, exams, announcements, submissions, and feedback. You can sort your notifications and filter them by course or type. If the notification is about a new badge, you can click it to view the new badge, XPs, and Webstars you earned.'),
+(22, 'Student', 'What will I see in the My To-do section, and how c', 'My To-do displays all your activities, exams, and tasks from every course you are enrolled in. You can organize this list by using filters to view activities by specific course or by Status (Pending, Missing, Done), and you can sort the items from newest to oldest. Clicking on any activity card will direct you to its respective page.'),
+(23, 'Student', 'What is the purpose of the Explore page?', 'The Explore page serves as the main search directory for the platform, allowing you to easily search for and find information about students and professors enrolled or working within the Webstar system.'),
+(24, 'Student', 'What kinds of items can I purchase in the Shop?', 'The Shop allows you to purchase various cosmetic items to personalize your profile, including emblems, cover photos, moving profile photos, and profile colors. You can view all the items you currently own in the \"My Items\" section.'),
+(25, 'Student', 'What will I use to buy the items in the Shop?', 'You can use your earned Webstars to purchase items in the Shop. Each item has a different price indicated in Webstars.'),
+(26, 'Student', 'What happens after I purchase an item from the Sho', 'Once you successfully purchase an item, it is immediately applied to your profile to customize your look and display your achievement.'),
+(27, 'Student', 'How can I edit my profile?', 'You can edit your profile by clicking \"Edit Profile\" in the Settings sidebar. Here, you can update your personal information such as your name, email, and profile picture. Once you save the changes, your updated information will be reflected across the system.'),
+(28, 'Student', 'How can I share my Star Card with others?', 'You can share your Star Card by going to your Settings sidebar and clicking \"Edit Profile\". On the profile editing page, locate the specific section or card for the Star Card, where you will find and click the Share button and you can download the Star Card in My Star Card tab.'),
+(29, 'Student', 'How can I reset my password?', 'You can reset your password under the Edit Profile tab in the Settings sidebar. You are required to enter a valid email address, and a verification code will be sent to your email. You must input the code to confirm ownership of your account. After the verification, you will be directed to create a new password and confirm it. This ensures that your account remains secure.'),
+(30, 'Student', 'How can I customize my profile?', 'You can customize your settings by clicking Settings Customization tab. Here, you can also design borders for your cover photo and profile photo to personalize your profile further.'),
+(31, 'Student', 'How can I access support and send feedback?', 'You can access support by clicking Support tab. This will provide you with resources, guides, and options to contact the support team if you need help with the system. Under Support, there is an Email option where you can compose and send messages directly to the system’s support email. This allows you to report issues, ask questions, or request assistance from the support team.'),
+(32, 'Student', 'How can I provide feedback?', 'You can provide feedback by clicking Feedback tab. This allows you to share suggestions, report issues, or give comments directly to the development or support team to help improve the system.'),
+(33, 'Student', 'How can I manage and control my email notification', 'You can manage your email notifications by navigating to the Preferences tab within your settings. This page provides toggle buttons that allow you to select whether you wish to receive email updates regarding your course activities, quests, deadlines, and announcements.'),
+(34, 'Professor', 'What is Webstar', 'Webstar is an interactive online learning platform designed to help users explore courses, track their progress, and earn points through engaging activities. It focuses on making learning fun, structured, and community driven.'),
+(35, 'Professor', 'What is required on the Login Setup Page?', 'If you are a new user, you will be directed to the Account Setup Page where you are required to enter a valid email address. A verification code will be sent to your email, and you must input that code to confirm your ownership of the account. After the verification, you will be directed to create a new password and confirm it. Once you complete these steps, you can proceed to the professor dashboard.'),
+(36, 'Professor', 'How can I create a course?', 'You can create a course by clicking the <strong>Create</strong> button on the dashboard and selecting <strong>Create Course</strong> or go to courses tab and you will see the <strong>create course</strong> button there. You will be directed to create-course page where you enter the course details, such as the course title, description, and other relevant information. Once saved, the course will appear on the student’s dashboard and be accessible to them.'),
+(37, 'Professor', 'How can I post announcements?', 'You can post announcements by clicking the <strong>Create</strong> button and selecting <strong>Post Announcement</strong>. You will be directed to post-announcement page where you can write the announcement, attach relevant files, links, and choose which course/s should receive it. Once posted, the announcement will be visible to the student’s dashboard and course-info section.'),
+(38, 'Professor', 'How can I add lessons?', 'You can add lessons by clicking the <strong>Create</strong> button and selecting <strong>Add Lesson</strong>. You will be directed to add-lesson page where you can provide the lesson title, description, and attach links or files. Once added, students can access the lessons in the course-info section.'),
+(39, 'Professor', 'How can I create tests?', 'You can create tests by clicking the <strong>Create</strong> button and selecting <strong>Create Exam</strong>. You will be directed to the <strong>Create Exam</strong> page, where you can set the exam title, time limits, choose the type of test (multiple choice or identification questions), and select which course(s) should receive it. Once published, students can take the exam according to the deadline you set.'),
+(40, 'Professor', 'How can I assign tasks?', 'You can assign tasks by clicking the <strong>Create</strong> button and selecting <strong>Assign Task</strong>. You will be directed to assign-task page where you can provide task instructions, set deadlines, attach necessary files, links, rubrics and select which course(s) should receive it. Once assigned, students will receive notifications and can submit their work through the dashboard.'),
+(41, 'Professor', 'How can I view the courses I have created?', 'You can see all the courses you have created in the <strong>Courses</strong> sidebar on the dashboard. Clicking on a course will take you to the <strong>Course Info</strong> page, where you can access all the course contents.'),
+(42, 'Professor', 'How can I view or manage announcements for a cours', 'On the <strong>Course Info</strong> page, you can access the <strong>Announcements</strong> tab section. You can view existing announcements or manage them by clicking the <strong>three dots (⋮)</strong> to <strong>edit or delete</strong> any announcement.'),
+(43, 'Professor', 'How can I view or manage lessons in a course?', 'On the <strong>Course Info</strong> page, you can go to the <strong>Lessons</strong> tab section. Clicking on a lesson will take you to <strong>Lesson Info</strong>, where you can view its content (title, objectives, attachments). You can also <strong>edit or delete</strong> any lesson by clicking the <strong>three dots (⋮)</strong> next to it.'),
+(44, 'Professor', 'How can I manage tests and assignments in a course', 'On the <strong>Course Info</strong> page, the <strong>To-Do</strong> tab section displays cards for each <strong>Test</strong> and <strong>Task</strong>. Each card has a <strong>three dots (⋮)</strong> menu. Clicking it allows you to <strong>edit or delete</strong> the item. Clicking the card itself will direct you to the <strong>Assess</strong> page, where you can view test details, student submissions, and analytics. Clicking <strong>Preview</strong> on the card will take you to the <strong>Te'),
+(45, 'Professor', 'How can I view course records, links, files and le', 'You can access all assessment records in the <strong>Records</strong> section of the <strong>Course Info</strong> page. Here, you can view and track student’s grades. In the <strong>Files and Link</strong> tab section of the <strong>Course Info</strong> page, you can see all the files and links you have uploaded for the course. You can view student rankings in the <strong>Leaderboard</strong> tab section of the <strong>Course Info</strong> page. This shows the performance of students based on sc'),
+(46, 'Professor', 'How can I view students enrolled in a course?', 'On the <strong>Students</strong> tab of the <strong>Course Info</strong> page, you can see all students enrolled in the course. You can manage students by searching for a specific student using the <strong>search bar</strong>. Each student also has a <strong>three dots (⋮)</strong> menu, where you can view their report page, access their profile page, or remove them from the course if necessary. This allows you to efficiently manage students and monitor their progress.'),
+(47, 'Professor', 'What is the Inbox tab used for?', 'The <strong>Inbox</strong> tab serves as a reminder system for professors. You can view notifications about completed assessment deadlines and see if all students have submitted their work. This helps you keep track of important course activities without missing any updates.'),
+(48, 'Professor', 'How can I find a student’s name?', 'You can use the <strong>search bar</strong> on the dashboard or within the <strong>student’s</strong> tab to quickly find a specific student. Simply type the student’s name, and the system will display matching results. You can then click on a student to visit their <strong>profile</strong> and access related course information or records.'),
+(49, 'Professor', 'How can I view and manage the assessments I have c', 'In the <strong>Assess</strong> tab, you can see all the assessments you have created. Each assessment has buttons for <strong>Task Details, Grading Sheet, and Return All</strong>. If the assessment type is a task, clicking <strong>Task Details</strong> will redirect you to the <strong>Task Details</strong> page, where you can view the task information and student submissions. The <strong>Grading Sheet</strong> allows you to review and grade student work, while <strong>Return All</strong> lets yo'),
+(50, 'Professor', 'How can I see the status of student submissions an', 'In the <strong>Submission</strong> section of the <strong>Assess</strong> tab, you can view the status of each student’s work to see who has submitted and who hasn’t. After the assessment deadline, once all submissions have been graded, you can click <strong>Return All</strong> to return the graded work to all students at once. This allows you to efficiently track student progress and complete the grading process.'),
+(51, 'Professor', 'How can I grade student submissions for a task?', 'If the assessment type is a task, you can click <strong>Grading Sheet</strong> on the assessment card, which will direct you to the <strong>Grading Sheet</strong> page. Here, you can award badges, provide rubrics (if available), and give feedback to each student. This allows you to grade submissions thoroughly and provide meaningful evaluations for your students.'),
+(52, 'Professor', 'How can I view student performance on a test?', 'On the <strong>Assess Exam Analytics</strong> page, you can view detailed student performance, including question-level performance, class averages, overall performance, and the average time students took to answer each question. You can also see which students passed, the average number of correct answers per question, and the names of students who answered each question correctly or incorrectly.'),
+(53, 'Professor', 'How can I reuse an existing item in my courses?', 'You can reuse an existing item by clicking the <strong>Reuse</strong> option on its card. This works for announcements, lessons, exams, and tasks. Clicking Reuse will open a <strong>modal</strong> where you can select the course(s) where you want to post or use the item again.'),
+(54, 'Professor', 'How can I edit my profile?', 'You can edit your profile by clicking <strong>Edit Profile</strong> in the Settings sidebar. Here, you can update your personal information such as your name, email, and profile picture. Once you save the changes, your updated information will be reflected across the system.'),
+(55, 'Professor', 'How can I reset my password?', 'You can reset your password under the <strong>Edit Profile</strong> tab in the Settings sidebar. You are required to enter a valid email address, and a verification code will be sent to your email. You must input the code to confirm ownership of your account. After the verification, you will be directed to create a new password and confirm it. This ensures that your account remains secure.'),
+(56, 'Professor', 'How can I customize my profile?', 'You can customize your settings by clicking <strong>Settings Customization</strong> tab. Here, you can also design borders for your <strong>cover photo and profile photo</strong> to personalize your profile further.'),
+(57, 'Professor', 'How can I access support and send feedback?', 'You can access support by clicking <strong>Support tab</strong>. This will provide you with resources, guides, and options to contact the support team if you need help with the system. Under Support, there is an <strong>Email</strong> option where you can compose and send messages directly to the system’s support email. This allows you to report issues, ask questions, or request assistance from the support team.'),
+(58, 'Professor', 'How can I provide feedback?', 'You can provide feedback by clicking <strong>Feedback tab</strong>. This allows you to share suggestions, report issues, or give comments directly to the development or support team to help improve the system.');
 
 -- --------------------------------------------------------
 
@@ -927,8 +1014,8 @@ CREATE TABLE `todo` (
 --
 
 INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `status`, `updatedAt`, `isRead`, `timeSpent`, `timeStart`) VALUES
-(1, 2, 1, 'Missing', '2025-11-07 08:30:03', 0, NULL, NULL),
-(2, 2, 4, 'Pending', '2025-10-29 09:00:00', 1, NULL, NULL),
+(1, 2, 1, 'Missing', '2025-11-11 02:36:50', 1, NULL, NULL),
+(2, 2, 4, 'Submitted', '2025-11-13 19:59:36', 0, NULL, NULL),
 (3, 2, 2, 'Pending', '2025-11-04 18:16:16', 1, 0, NULL);
 
 -- --------------------------------------------------------
@@ -1207,6 +1294,12 @@ ALTER TABLE `scores`
   ADD PRIMARY KEY (`scoreID`);
 
 --
+-- Indexes for table `selectedlevels`
+--
+ALTER TABLE `selectedlevels`
+  ADD PRIMARY KEY (`selectedLevelID`);
+
+--
 -- Indexes for table `settings`
 --
 ALTER TABLE `settings`
@@ -1226,6 +1319,12 @@ ALTER TABLE `studentbadges`
 --
 ALTER TABLE `submissions`
   ADD PRIMARY KEY (`submissionID`);
+
+--
+-- Indexes for table `supports`
+--
+ALTER TABLE `supports`
+  ADD PRIMARY KEY (`supportID`);
 
 --
 -- Indexes for table `testquestionchoices`
@@ -1367,7 +1466,7 @@ ALTER TABLE `feedback`
 -- AUTO_INCREMENT for table `files`
 --
 ALTER TABLE `files`
-  MODIFY `fileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `fileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `inbox`
@@ -1379,7 +1478,7 @@ ALTER TABLE `inbox`
 -- AUTO_INCREMENT for table `leaderboard`
 --
 ALTER TABLE `leaderboard`
-  MODIFY `leaderboardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `leaderboardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `lessons`
@@ -1427,7 +1526,13 @@ ALTER TABLE `rubric`
 -- AUTO_INCREMENT for table `scores`
 --
 ALTER TABLE `scores`
-  MODIFY `scoreID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `scoreID` int(5) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `selectedlevels`
+--
+ALTER TABLE `selectedlevels`
+  MODIFY `selectedLevelID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `settings`
@@ -1439,13 +1544,19 @@ ALTER TABLE `settings`
 -- AUTO_INCREMENT for table `studentbadges`
 --
 ALTER TABLE `studentbadges`
-  MODIFY `studentBadgeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `studentBadgeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `submissions`
 --
 ALTER TABLE `submissions`
-  MODIFY `submissionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `submissionID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `supports`
+--
+ALTER TABLE `supports`
+  MODIFY `supportID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT for table `testquestionchoices`
@@ -1493,7 +1604,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `webstars`
 --
 ALTER TABLE `webstars`
-  MODIFY `webstarsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `webstarsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- Constraints for dumped tables
