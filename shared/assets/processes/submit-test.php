@@ -41,4 +41,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                           todo.updatedAt = CURRENT_TIMESTAMP
                                       WHERE todo.userID = '$userID' AND todo.status = 'Pending' AND assessments.type = 'Test' AND tests.testID = '$testID'";
     $updateTodoStatusResult = executeQuery($updateTodoStatusQuery);
+
+    $scoreQuery = "SELECT COUNT(isCorrect) AS correct FROM testresponses WHERE isCorrect = '1' AND userID = '$userID' AND testID = '$testID'";
+    $scoreResult = executeQuery($scoreQuery);
+    $scoreRow = mysqli_fetch_assoc($scoreResult);
+    $score = $scoreRow['correct'];
+
+    $insertScoreQuery = "INSERT INTO scores (userID, testID, score, gradedAt) VALUES ('$userID','$testID','$score')";
+    $insertScoreResult = executeQuery($insertQuery);
 }
