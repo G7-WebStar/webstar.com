@@ -9,18 +9,7 @@ if ($testID == null) {
     exit();
 }
 
-$scoresQuery = "SELECT * FROM testresponses WHERE testID = $testID AND userID = $userID";
-$scoresResult = executeQuery($scoresQuery);
-$scoresArray = [];
-if (mysqli_num_rows($scoresResult) > 0) {
-    while ($scoresRow = mysqli_fetch_assoc($scoresResult)) {
-        $scoresArray[] = ["userAnswer" => $scoresRow['userAnswer'], "isCorrect" => $scoresRow['isCorrect']];
-    }
-}
-
-$scoresRow = mysqli_fetch_assoc($scoresResult);
-
-$selectTestQuery = "SELECT assessmentTitle, generalGuidance FROM tests 
+$selectTestQuery = "SELECT assessmentTitle FROM tests 
                     INNER JOIN assessments
                         ON tests.assessmentID = assessments.assessmentID
                     WHERE testID = $testID";
@@ -56,7 +45,61 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
         exit();
     }
 }
+
+$timeStartQuery = "SELECT 
+        todo.timeStart AS testTimeStart,
+        (SELECT tests.testTimelimit - todo.timeSpent) AS remainingTime
+        FROM todo
+        INNER JOIN tests
+            ON todo.assessmentID = tests.assessmentID
+        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.timeStart IS NOT null";
+$timeStartResult = executeQuery($timeStartQuery);
+$timeStartRow = mysqli_fetch_assoc($timeStartResult);
+
+$totalPointsQuery = "SELECT SUM(testQuestionPoints) AS totalPoints FROM testquestions WHERE testID = '$testID'";
+$totalPointsResult = executeQuery($totalPointsQuery);
+$totalPointsRow = mysqli_fetch_assoc($totalPointsResult);
+$totalPoints = $totalPointsRow['totalPoints'];
+
+$scoreQuery = "SELECT COUNT(isCorrect) AS correct FROM testresponses WHERE isCorrect = '1' AND userID = '$userID' AND testID = '$testID'";
+$scoreResult = executeQuery($scoreQuery);
+$scoreRow = mysqli_fetch_assoc($scoreResult);
+$score = $scoreRow['correct'];
+
+$totalItemsQuery = "SELECT COUNT(*) AS totalItems FROM testquestions WHERE testID = '$testID'";
+$totalItemsResult = executeQuery($totalItemsQuery);
+$totalItemsRow = mysqli_fetch_assoc($totalItemsResult);
+$totalItems = $totalItemsRow['totalItems'];
+
+$timeFactorQuery = "SELECT tests.testTimeLimit, todo.timeSpent FROM tests INNER JOIN todo ON tests.assessmentID = todo.assessmentID WHERE tests.testID = '$testID'";
+$timeFactorResult = executeQuery($timeFactorQuery);
+$timeFactorRow = mysqli_fetch_assoc($timeFactorResult);
+$timelimit = $timeFactorRow['testTimeLimit'];
+$timeSpent = $timeFactorRow['timeSpent'];
+
+$baseXP = 10 * $totalPoints;
+$baseWebstars = 1 * $totalPoints;
+$correctBonusXP =  $baseXP * ($score / $totalPoints);
+$correctBonusWebstars = $baseWebstars * ($score / $totalPoints);
+$timeFactor = 1 + ($timelimit - $timeSpent) / $timelimit;
+$finalXP = $baseXP + ($correctBonusXP * $timeFactor);
+$finalWebstars = $baseWebstars + ($correctBonusWebstars * $timeFactor);
+$multipliedXP = $finalXP * 2;
+
+$bonusXP = $finalXP - $baseXP;
+$bonusWebstars = $finalWebstars - $baseWebstars;
+
+echo "<script>console.log(" . $baseXP . ");</script>";
+echo "<script>console.log(" . $baseWebstars . ");</script>";
+echo "<script>console.log(" . $correctBonusXP . ");</script>";
+echo "<script>console.log(" . $correctBonusWebstars . ");</script>";
+echo "<script>console.log(" . $timeFactor . ");</script>";
+echo "<script>console.log(" . $finalXP . ");</script>";
+echo "<script>console.log(" . $finalWebstars . ");</script>";
+echo "<script>console.log(" . $multipliedXP . ");</script>";
+echo "<script>console.log(" . $bonusXP . ");</script>";
 ?>
+
 <!doctype html>
 <html lang="en">
 
@@ -78,36 +121,41 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
     <style>
-        .choice-selected {
-            transition: 0.3s ease-in-out;
-            background-color: var(--primaryColor) !important;
+        .gradient-bg {
+            background: linear-gradient(to right, #FDE29C, #C1ECC4, #C1C8EC, #ECC1C1);
         }
 
-        .interactable {
-            cursor: pointer;
-        }
 
-        .interactable:hover {
-            transition: 0.3s ease-in-out;
-            background-color: var(--highlight75) !important;
-        }
-
-        .bg-correct {
-            background-color: var(--highlight15) !important;
-        }
-
-        .bg-wrong {
-            background-color: #ecc1c1ff;
+        @media screen and (max-width: 1199px) {
+            .text-lg-16 {
+                font-size: 16px !important;
+            }
         }
 
         @media screen and (max-width: 767px) {
             .fs-sm-6 {
                 font-size: 1rem !important;
             }
-        }
 
-        .btn-mobile {
-            margin-bottom: calc(1.5rem + 80px) !important;
+            .medal-img {
+                width: 200px;
+            }
+
+            .btn-mobile {
+                margin-bottom: calc(1.5rem + 80px) !important;
+            }
+
+            .text-sm-12 {
+                font-size: 12px !important;
+            }
+
+            .text-sm-14 {
+                font-size: 14px !important;
+            }
+
+            .text-sm-18 {
+                font-size: 18px !important;
+            }
         }
 
         ::-webkit-scrollbar {
@@ -124,10 +172,6 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             /* Your accent color */
             border-radius: 10px;
             border: 2px solid var(--dirtyWhite);
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #ff7b82;
         }
 
         * {
@@ -189,40 +233,46 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
 
                                 <!-- Content -->
                                 <div class="row flex-grow-1">
-                                    <div class="col-12 d-flex flex-column flex-grow-1">
+                                    <div class="col-12 d-flex flex-column flex-grow-1 align-items-center">
                                         <div class="question-container">
-                                            <div class="h2 text-reg text-center mt-4 fs-sm-6" id="question-number">
-                                                <div class="text-sbold">
-
+                                            <div class="h2 text-sbold text-center fs-sm-6" id="question-container">
+                                                <img class="medal-img" src="shared/assets/img/medal.png" alt="medal">
+                                                <div class="text-bold">You scored <?php echo $score; ?>/<?php echo $totalItems; ?> !</div>
+                                                <div class="text-sbold mt-4 mt-md-5 text-18">Rewards</div>
+                                                <div class="row mt-2">
+                                                    <div class="col-12">
+                                                        <img class="img-fluid object-fit-contain mx-0" width="20px" src="shared/assets/img/xp.png" alt="xp">
+                                                        <span class="text-bold text-20 text-sm-18">+<?php echo round($baseXP); ?> XPs</span>
+                                                        <span class="text-sbold text-16 text-sm-14">+<?php echo round($bonusXP); ?> Bonus XPs</span>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-0">
+                                                    <div class="col-12">
+                                                        <img class="img-fluid object-fit-contain mx-0" width="20px" src="shared/assets/img/webstar.png" alt="xp">
+                                                        <span class="text-bold text-20 text-sm-18">+<?php echo round($baseWebstars); ?> Webstars</span>
+                                                        <span class="text-sbold text-16 text-sm-14">+<?php echo round($bonusWebstars); ?> Bonus Webstars</span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="h2 text-sbold text-center mt-4 fs-sm-6" id="question-container">
-
-                                            </div>
                                         </div>
 
-                                        <div class="row my-0 mx-auto justify-content-center align-content-center" id="img-container">
-                                            <img src="" id="img-question">
+                                        <div class="col-12 col-md-8 text-sbold text-20 text-lg-16 d-flex justify-content-center mt-4 mt-md-5" id="choices">
+                                            Please wait for your instructor to release the test results. Once returned,
+                                            you’ll be able to review which questions you got correct and get feedback.
                                         </div>
-                                        <div class="col-12 col-md-8 h5 text-reg mx-auto my-0 px-3 px-md-0 text-center text-md-start fs-sm-6 d-flex justify-content-center flex-column" id="choices">
+                                    </div>
+                                    <div class="mt-auto text-sbold">
+                                        <div class="d-flex justify-content-center align-items-center btn-mobile mb-4 gap-3 mt-5" id="buttonSection">
+                                            <button class="gradient-bg btn d-flex align-items-center justify-content-end gap-2 border border-black rounded-5 px-lg-4 py-lg-2 interactable" id="prevBtn"
+                                                style="background-color: var(--primaryColor);" data-bs-toggle="modal" data-bs-target="#multiplier">
+                                                <span class="m-0 fs-sm-6 text-16 text-sm-12">Use XP Multiplier</span>
+                                            </button>
+
+                                            <button class="btn d-flex align-items-center justify-content-start gap-2 border border-black rounded-5 px-lg-4 py-lg-2 interactable" id="nextBtn"
+                                                style="background-color: var(--primaryColor);">
+                                                <span class="m-0 fs-sm-6 text-16 text-sm-12">Return to Test Info</span>
+                                            </button>
                                         </div>
-
-                                        <div class="mt-auto text-sbold">
-                                            <div class="d-flex justify-content-center justify-content-md-around align-items-center btn-mobile mb-4 gap-3 gap-md-0 mt-5" id="buttonSection">
-                                                <button class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable" id="prevBtn"
-                                                    style="background-color: var(--primaryColor);" onclick="prevQuestion();">
-                                                    <i class="fa-solid fs-6 fa-arrow-left text-reg" style="color: var(--black);"></i>
-                                                    <span class="m-0 fs-sm-6">Prev</span>
-                                                </button>
-
-                                                <button class="btn d-flex align-items-center justify-content-center gap-2 border border-black rounded-5 px-sm-4 py-sm-2 interactable" id="nextBtn"
-                                                    style="background-color: var(--primaryColor);" onclick="nextQuestion();">
-                                                    <span class="m-0 fs-sm-6">Next</span>
-                                                    <i class="fa-solid fs-6 fa-arrow-right text-reg" style="color: var(--black);"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-
                                     </div>
                                 </div>
                                 <!-- End Content -->
@@ -235,186 +285,97 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
         </div>
     </div>
 
+    <div class="modal fade" id="multiplier" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered py-4" style="max-width: 700px;  height: 25px;">
+            <div class="modal-content">
+
+                <!-- HEADER -->
+                <div class="modal-header border-bottom">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <form class="my-0" id="feedbackForm" action="" method="POST">
+                    <div class="modal-body">
+                        <div class="container">
+                            <div class="row justify-content-center">
+                                <div class="col-12 d-flex justify-content-center flex-column text-center text-30">
+                                    <p class="text-bold">Multiply your XPs</p>
+                                </div>
+                                <div class="row">
+                                    <div class="mx-auto col-8 text-center">
+                                        <p class="text-reg text-18 text-reg mb-0">Cost: <span class="text-sbold">1000 Webstars</span></p>
+                                        <p class="text-reg text-18 text-reg">Current XPs: <span class="text-sbold">120 → 240 XPs </span>after boost</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <span class="text-16 text-center text-reg mb-3">
+                                        Are you sure you want to use
+                                        <span class="text-sbold">1000 Webstars</span> to activate this multiplier?
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="modal-footer justify-content-center">
+                        <button class="gradient-bg my-auto text-sbold btn d-flex align-items-center justify-content-center border border-black rounded-5 px-lg-4 py-lg-2 interactable"
+                            data-bs-toggle="modal" data-bs-target="#multiplier">
+                            <span class="m-0 fs-sm-6 text-16 text-sm-12">Use XP Multiplier</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        //Fetch Questions and Choices from DB
-        const questions = [
-            <?php
-            if (mysqli_num_rows($selectQuestionsResult) > 0) {
-                $totalQuestion = mysqli_num_rows($selectQuestionsResult);
-                $countQuestion = 0;
-                while ($questions = mysqli_fetch_assoc($selectQuestionsResult)) {
-                    $testQuestionID = $questions['testQuestionID'];
-                    $selectChoicesQuery = "SELECT 
-                                       testquestions.testQuestionID, 
-                                       testquestionchoices.* 
-                                       FROM tests 
-                                       INNER JOIN testquestions 
-                                           ON tests.testID = testquestions.testID 
-                                       INNER JOIN testquestionchoices 
-                                           ON testquestions.testQuestionID = testquestionchoices.testQuestionID 
-                                       WHERE tests.testID = $testID AND testquestions.testQuestionID = $testQuestionID;
-                                       ";
-                    $selectChoicesResult = executeQuery($selectChoicesQuery);
-                    $countQuestion++;
-            ?> {
-                        question: "<?php echo $questions['testQuestion']; ?>",
-                        questionID: "<?php echo $questions['testQuestionID']; ?>",
-                        img: "<?php echo $questions['testQuestionImage']; ?>",
-                        type: "<?php echo $questions['questionType']; ?>",
-                        correctAnswer: "<?php echo $questions['correctAnswer'] ?>",
-                        answers: [
-                            <?php
-                            if (mysqli_num_rows($selectChoicesResult) > 0) {
-                                $totalChoice = mysqli_num_rows($selectChoicesResult);
-                                $countChoice = 0;
-                                while ($choices = mysqli_fetch_assoc($selectChoicesResult)) {
-                            ?> {
-                                        text: "<?php echo $choices['choiceText']; ?>"
-                                    }
-                                    <?php echo ($countChoice < $totalChoice) ? "," : null; ?>
-                            <?php
-                                }
-                            }
-                            ?>
-                        ]
-                    }
-                    <?php echo ($countQuestion < $totalQuestion) ? "," : null; ?>
-            <?php
+        let timerHtml = document.getElementById('timer');
+        let seconds = <?php echo $timeStartRow['remainingTime']; ?>;
+        //Format time
+        function formatTime(sec) {
+            let days = Math.floor(sec / 86400)
+            let hours = Math.floor(sec / 3600);
+            let minutes = Math.floor(sec / 60);
+            let secondsTime = sec % 60;
+
+            if (days < 10) {
+                days = "0" + days;
+            }
+
+            if (hours < 10) {
+                hours = "0" + hours;
+            } else if (hours >= 24) {
+                hours = hours % 24;
+                if ((hours % 24) < 10) {
+                    hours = "0" + hours % 24;
                 }
             }
-            ?>
-        ];
 
-        //Get IDs of elements
-        const questionContainer = document.getElementById('question-container');
-        const choices = document.getElementById('choices');
-        const imgContainer = document.getElementById('img-container');
-        const questionNumber = document.getElementById('question-number');
-
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let isCorrectArray = <?php echo json_encode($scoresArray); ?>;
-
-        //Arrays used for handling answers
-        let choiceIDs = [];
-
-        //Prevents strings turning into HTML special entities
-        function encodeHTML(str) {
-            let txt = document.createElement("textarea");
-            txt.textContent = str;
-            return txt.innerHTML;
-        }
-
-        //Shows questions
-        function showQuestion() {
-            let currentQuestion = questions[currentQuestionIndex];
-            let questionNo = currentQuestionIndex + 1;
-            let totalQuestion = questions.length;
-            let choiceNo = 1;
-
-            console.log(isCorrectArray);
-            choiceIDs = [];
-            questionContainer.innerHTML = currentQuestion.
-            question;
-            //Indicates which question is currently on screen
-            questionNumber.innerHTML = "Section Name · Question " + questionNo + " of " + totalQuestion;
-
-            //Disables pagination buttons if there are no content on the next page
-            if (currentQuestionIndex == 0) {
-                document.getElementById('prevBtn').classList.remove('interactable');
-                document.getElementById('prevBtn').disabled = true;
+            if (minutes < 10) {
+                minutes = "0" + minutes;
+            } else if (minutes >= 60) {
+                minutes = minutes % 60;
+                if ((minutes % 60) < 10) {
+                    minutes = "0" + (minutes % 60);
+                }
             }
 
-            if (currentQuestionIndex == questions.length - 1) {
-                document.getElementById('nextBtn').classList.remove('interactable');
-                document.getElementById('nextBtn').disabled = true;
+            if (secondsTime < 10) {
+                secondsTime = "0" + secondsTime;
             }
 
-            //Adds a margin when there is an img
-            if (questions[currentQuestionIndex].img == "") {
-                choices.classList.add('mt-4');
-            }
-
-            //Displays the choices for the current question
-            if (questions[currentQuestionIndex].type == "Multiple Choice") {
-                currentQuestion.answers.forEach(answer => {
-                    const button = document.createElement('div');
-                    button.textContent = answer.text;
-                    button.classList.add('col-12', 'bg-white', 'border', 'border-black', 'rounded-3', 'my-2', 'p-2', 'text-sbold', 'text-center');
-                    if (currentQuestion.correctAnswer == button.textContent) {
-                        button.classList.add('bg-correct');
-                        button.classList.remove('bg-white');
-                    }
-
-                    if ((button.textContent == isCorrectArray[currentQuestionIndex].userAnswer) && (isCorrectArray[currentQuestionIndex].isCorrect == 0)) {
-                        button.classList.add('bg-wrong');
-                        button.classList.remove('bg-white');
-                    }
-                    button.id = "question" + questionNo + "-choice" + choiceNo;
-                    choiceIDs.push(button.id);
-                    choiceNo++;
-                    choices.appendChild(button);
-                });
-
+            //Return results
+            if (sec < 86400 && sec >= 3600) {
+                return time = hours + ":" + minutes + ":" + secondsTime;
+            } else if (sec < 3600) {
+                return time = minutes + ":" + secondsTime;
             } else {
-                //Displays an input text field if the question is of identification type
-                choices.innerHTML = `<input disabled type="text" placeholder="Answer" class="rounded-3 p-3 text-center border border-black" id="input` + currentQuestionIndex + `">`;
-                let textValue = document.getElementById('input' + currentQuestionIndex)
-                textValue.value = isCorrectArray[currentQuestionIndex].userAnswer;
-                correctIdentification = document.createElement('div');
-                correctIdentification.id = "identificationCorrection" + questionNo;
-                correctIdentification.classList.add('mt-3', 'text-sbold', 'text-center');
-                correctIdentification.innerHTML = "Correct Answer: " + encodeHTML(questions[currentQuestionIndex].correctAnswer);
-                choices.appendChild(correctIdentification);
-                if (isCorrectArray[currentQuestionIndex].isCorrect == 1) {
-                    textValue.classList.add('bg-correct');
-                } else {
-                    textValue.classList.add('bg-wrong');
-                }
-            }
-
-            //Displays the image if it exists
-            const img = document.getElementById('img-question');
-            imgContainer.style.maxWidth = "30%";
-            img.src = questions[currentQuestionIndex].img;
-            img.style.maxWidth = "auto";
-            img.style.height = "auto";
-            img.style.objectFit = "cover";
-            imgContainer.appendChild(img);
-            img.classList.add('rounded-5', 'my-2');
-
-
-        }
-
-        function nextQuestion() {
-            if (currentQuestionIndex == 0) {
-                document.getElementById('prevBtn').classList.add('interactable');
-                document.getElementById('prevBtn').disabled = false;
-            }
-
-            (currentQuestionIndex + 1 < questions.length) ? currentQuestionIndex++ : null;
-            if ((currentQuestionIndex + 1) <= questions.length) {
-                choices.innerHTML = '';
-                showQuestion();
+                return time = days + ":" + hours + ":" + minutes + ":" + secondsTime;
             }
         }
 
-        function prevQuestion() {
-            if (currentQuestionIndex == questions.length - 1) {
-                document.getElementById('nextBtn').classList.add('interactable');
-                document.getElementById('nextBtn').disabled = false;
-            }
-
-            if ((currentQuestionIndex + 1) > 1) {
-                currentQuestionIndex--;
-                choices.innerHTML = '';
-                showQuestion();
-            }
-        }
-
-        showQuestion();
-        console.log(questions);
+        timerHtml.innerHTML = `<i class="bi bi-clock fa-xs me-2" style="color: var(--black);"></i>` + formatTime(seconds);
     </script>
 </body>
 
