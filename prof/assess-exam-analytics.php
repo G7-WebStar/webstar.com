@@ -92,34 +92,27 @@ $totalItemsResult = executeQuery($totalItemsQuery);
 $totalItems = mysqli_fetch_assoc($totalItemsResult)['totalItems'] ?? 0;
 
 // Score Range Computation (fixed to 6 bars)
-$scoreRanges = [];
 $segments = 6;
-if ($totalItems > 0) {
+$scoreRanges = array_fill(0, $segments, 0);
+$scoreLabels = [];
 
-    $rangeSize = ceil($totalItems / $segments);
-    $rangeStart = 0;
+if ($totalPoints > 0) {
+    $rangeSize = ceil($totalPoints / $segments);
+
+    // Get all scored students
+    $allScoresQuery = "SELECT score FROM scores WHERE testID = $testID";
+    $allScoresResult = executeQuery($allScoresQuery);
+
+    while ($row = mysqli_fetch_assoc($allScoresResult)) {
+        $score = floatval($row['score']);
+        $segmentIndex = min(floor($score / $rangeSize), $segments - 1);
+        $scoreRanges[$segmentIndex]++;
+    }
 
     for ($i = 0; $i < $segments; $i++) {
-
-        $rangeEnd = $rangeStart + $rangeSize - 1;
-
-        if ($rangeEnd > $totalItems) {
-            $rangeEnd = $totalItems;
-        }
-
-        $scoreQuery = "
-            SELECT COUNT(*) AS total
-            FROM scores
-            WHERE testID = $testID
-            AND score BETWEEN $rangeStart AND $rangeEnd
-        ";
-
-        $scoreResult = executeQuery($scoreQuery);
-        $scoreCount = mysqli_fetch_assoc($scoreResult)['total'] ?? 0;
-
-        $scoreRanges[] = $scoreCount;
-
-        $rangeStart = $rangeEnd + 1;
+        $start = $i * $rangeSize;
+        $end = min(($i + 1) * $rangeSize - 1, $totalPoints);
+        $scoreLabels[] = $start . '-' . $end;
     }
 }
 
@@ -186,7 +179,7 @@ if ($pendingCount < 0) $pendingCount = 0;
                             <!-- DESKTOP VIEW -->
                             <div class="row desktop-header d-none d-sm-flex">
                                 <div class="col-auto me-2">
-                                    <a href="#" class="text-decoration-none">
+                                    <a href="assess.php" class="text-decoration-none">
                                         <i class="fa-solid fa-arrow-left text-reg text-16"
                                             style="color: var(--black);"></i>
                                     </a>
@@ -200,7 +193,7 @@ if ($pendingCount < 0) $pendingCount = 0;
                             <div class="d-block d-sm-none mobile-assignment">
                                 <div class="mobile-top">
                                     <div class="arrow">
-                                        <a href="#" class="text-decoration-none">
+                                        <a href="assess.php" class="text-decoration-none">
                                             <i class="fa-solid fa-arrow-left text-reg text-16"
                                                 style="color: var(--black);"></i>
                                         </a>
@@ -582,11 +575,11 @@ if ($pendingCount < 0) $pendingCount = 0;
         const scoreRangeData = <?php echo json_encode($scoreRanges); ?>;
 
         // FULL WIDTH SCORE RANGE BAR CHART
-        function createScoreRangeChartFull(totalItems) {
+        function createScoreRangeChartFull(totalPoints) {
             const ctx = document.getElementById('scoreRangeChartFull').getContext('2d');
 
-            const labels = generateScoreRanges(totalItems);
-            const step = Math.ceil(totalItems / 5);
+            const labels = generateScoreRanges(totalPoints);
+            const step = Math.ceil(totalPoints / 5);
 
             new Chart(ctx, {
                 type: 'bar',
@@ -627,7 +620,7 @@ if ($pendingCount < 0) $pendingCount = 0;
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: totalItems,
+                            max: totalPoints,
                             ticks: {
                                 stepSize: step,
                                 color: '#666',
@@ -674,7 +667,7 @@ if ($pendingCount < 0) $pendingCount = 0;
             });
         }
         // Initialize Score Range Chart
-        createScoreRangeChartFull(<?php echo $totalItems; ?>);
+        createScoreRangeChartFull(<?php echo $totalPoints; ?>);
     </script>
 
 </body>
