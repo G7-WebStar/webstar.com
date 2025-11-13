@@ -6,7 +6,7 @@ include("shared/assets/processes/session-process.php");
 $testID = $_GET['testID'];
 
 if ($testID == null) {
-    header("Location: 404.php");
+    header("Location: 404.html");
     exit();
 }
 
@@ -14,7 +14,7 @@ $submissionValidationQuery = "SELECT * FROM testresponses WHERE testID = $testID
 $submissionValidationResult = executeQuery($submissionValidationQuery);
 
 if (mysqli_num_rows($submissionValidationResult) > 0) {
-    header("Location: index.php");
+    header("Location: test-submitted.php?testID=" . $testID);
     exit();
 }
 
@@ -41,7 +41,7 @@ $validateTestIDQuery = "SELECT
 $validateTestIDResult = executeQuery($validateTestIDQuery);
 
 if (mysqli_num_rows($validateTestIDResult) <= 0) {
-    header("Location: index.php");
+    header("Location: test-submitted.php?testID=" . $testID);
     exit();
 }
 ?>
@@ -418,7 +418,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                          <span class="m-0 fs-sm-6">Prev</span>
              </button>
  
-             <button class="btn d-flex align-items-center justify-content-center border border-black rounded-5 px-sm-4 py-sm-2 interactable"
+             <button class="btn d-flex align-items-center justify-content-center border border-black rounded-5 px-sm-4 py-sm-2 interactable" id="submitBtn"
                  style="background-color: var(--primaryColor);" onclick="submitQuiz();">
                  <span class="m-0 fs-sm-6">Submit</span>
              </button>
@@ -604,6 +604,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             const incomplete = choiceText.some(checkNull => checkNull.userAnswer === null || checkNull.userAnswer === '');
 
             if (!incomplete) {
+                document.getElementById('submitBtn').disabled = true;
                 fetch('shared/assets/processes/submit-test.php?testID=' + <?php echo $testID; ?>, {
                         method: 'POST',
                         headers: {
@@ -624,7 +625,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                     });
                 localStorage.removeItem("choiceText<?php echo $testID; ?>");
                 localStorage.removeItem("selectedAnswers<?php echo $testID; ?>");
-                window.location.href = 'index.php';
+                window.location.href = 'test-submitted.php?testID=<?php echo $testID; ?>';
             } else {
                 console.log("Please answer all items");
             }

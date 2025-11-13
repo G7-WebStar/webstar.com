@@ -22,27 +22,38 @@ INNER JOIN testquestions
     ON tests.testID = testquestions.testID 
 WHERE tests.testID = $testID";
 $selectQuestionsResult = executeQuery($selectQuestionsQuery);
-$todoStatus = 'Submitted';
+
 $validateTestIDQuery = "SELECT 
                         todo.* 
                         FROM todo 
                         INNER JOIN tests 
                         ON todo.assessmentID = tests.assessmentID 
-                        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = '$todoStatus';";
+                        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = 'Submitted';";
 $validateTestIDResult = executeQuery($validateTestIDQuery);
 
 if (mysqli_num_rows($validateTestIDResult) <= 0) {
-    $todoStatus = 'Pending';
     $checkStatusQuery = "SELECT 
                         todo.* 
                         FROM todo 
                         INNER JOIN tests 
                         ON todo.assessmentID = tests.assessmentID 
-                        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = '$todoStatus';";
+                        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = 'Pending';";
     $checkStatusResult = executeQuery($checkStatusQuery);
     if (mysqli_num_rows($checkStatusResult) > 0) {
         header("Location: test.php?testID=" . $testID);
         exit();
+    } else {
+        $checkStatusQuery = "SELECT 
+                            todo.* FROM todo 
+                            INNER JOIN tests 
+                                ON todo.assessmentID = tests.assessmentID 
+                            WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = 'Graded';";
+        $checkStatusResult = executeQuery($checkStatusQuery);
+
+        if (mysqli_num_rows($checkStatusResult) > 0) {
+            header("Location: test-result.php?testID=" . $testID);
+            exit();
+        }
     }
 }
 
@@ -304,7 +315,7 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
                                 <div class="row">
                                     <div class="mx-auto col-8 text-center">
                                         <p class="text-reg text-18 text-reg mb-0">Cost: <span class="text-sbold">1000 Webstars</span></p>
-                                        <p class="text-reg text-18 text-reg">Current XPs: <span class="text-sbold">120 → 240 XPs </span>after boost</p>
+                                        <p class="text-reg text-18 text-reg">Current XPs: <span class="text-sbold"><?php echo round($finalXP); ?> → <?php echo round($multipliedXP); ?> XPs </span>after boost</p>
                                     </div>
                                 </div>
                                 <div class="row">
