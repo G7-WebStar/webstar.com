@@ -59,6 +59,14 @@
     }
 }
 
+@media (max-width: 768px) {
+    .mobile-dropdown-course-prof {
+        width: 100% !important;
+        display: flex;
+        justify-content: center;
+    }
+}
+
 /* Items */
 .dropdown-list li {
     padding: 8px 16px;

@@ -96,9 +96,8 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                     <!-- Navbar for mobile -->
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto row-padding-top" style="padding-bottom: 100px !important;">
-
-
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top"
+                        style="padding-bottom: 100px !important;">
                         <div class="row header-section align-items-center ">
                             <div class="col-12 col-md-auto text-center text-md-start position-relative">
                                 <h1 class="text-sbold text-25 my-2 me-0 me-md-3" style="color: var(--black);">My Courses
@@ -107,7 +106,7 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                                 <span id="filterToggle"
                                     class="position-absolute end-0 top-50 translate-middle-y d-md-none px-2"
                                     role="button" tabindex="0" aria-label="Show filters"
-                                    style="cursor: pointer; user-select: nones; ">
+                                    style="cursor: pointer; user-select: none; ">
                                     <span class="material-symbols-rounded"
                                         style="font-size: 30px; color: var(--black);">
                                         tune
@@ -118,7 +117,8 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                             <!-- Dropdowns -->
                             <div class="col-12 col-md-auto d-flex flex-wrap justify-content-center justify-content-md-start gap-3 mt-2 mt-md-0 d-none d-md-flex"
                                 style="row-gap: 0!important;" id="mobileFilters">
-                                <div class="col-12 col-lg-6 px-0 px-xl-auto me-2 my-1 d-flex justify-content-center justify-content-md-start">
+                                <div
+                                    class="col-12 col-lg-6 px-0 px-xl-auto me-2 my-1 d-flex justify-content-center justify-content-md-start">
                                     <div class="search-container d-flex me-0">
                                         <form method="GET" class="form-control bg-transparent border-0 p-0">
                                             <input type="text" placeholder="Search" name="search"
@@ -131,22 +131,29 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                                     </div>
                                 </div>
                                 <div
-                                    class="col-12 col-sm-3 mt-2  mt-md-0 ms-0 ms-md-3 justify-content-center justify-content-lg-end justify-content-xl-start align-items-center px-0 px-xl-auto d-flex d-lg-flex">
+                                    class="col-12 col-sm-3 mt-2 mt-md-0 ms-0 ms-md-3 justify-content-center justify-content-xl-start align-items-center px-0 px-xl-auto d-flex d-lg-flex">
                                     <div class="d-flex align-items-center flex-nowrap my-1">
                                         <span class="dropdown-label me-2 text-reg">Status</span>
-                                        <button class="btn dropdown-toggle dropdown-custom" type="button"
-                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                            <span class="text-reg text-14">Active</span>
-                                        </button>
-                                        <ul class="dropdown-menu text-reg text-14">
-                                            <li><a class="dropdown-item text-reg text-14" href="#">Active</a>
-                                            </li>
-                                            <li><a class="dropdown-item text-reg text-14" href="#">Archived</a>
-                                            </li>
-                                        </ul>
+                                        <div class="custom-dropdown">
+                                            <button class="dropdown-btn text-reg text-14">Active</button>
+                                            <ul class="dropdown-list text-reg text-14">
+                                                <li data-value="Active" onclick="console.log('Active clicked')">Active
+                                                </li>
+                                                <li data-value="Archived" onclick="console.log('Archived clicked')">
+                                                    Archived</li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
 
+                            </div>
+                            <div
+                                class="col-12 col-md-auto text-center d-flex d-md-block justify-content-center justify-content-md-end mt-1 mt-md-0">
+                                <button type="button"
+                                    class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 my-1 d-flex align-items-center gap-2"
+                                    style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);">
+                                    <span>+ Join Course</span>
+                                </button>
                             </div>
                         </div>
 
@@ -229,37 +236,64 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                     </div>
                 </div>
             </div>
+
+            <!-- Dropdown js -->
             <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const filterToggle = document.getElementById("filterToggle");
-            const mobileFilters = document.getElementById("mobileFilters");
-            const icon = filterToggle.querySelector(".material-symbols-rounded");
+                document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+                    const btn = dropdown.querySelector('.dropdown-btn');
+                    const list = dropdown.querySelector('.dropdown-list');
 
-            // Unique key per page
-            const storageKey = "filtersVisible_" + "<?php echo $activePage; ?>";
+                    btn.addEventListener('click', () => {
+                        list.style.display = list.style.display === 'block' ? 'none' : 'block';
+                    });
 
-            // Restore previous state
-            if (localStorage.getItem(storageKey) === "true") {
-                mobileFilters.classList.remove("d-none");
-                filterToggle.classList.add("active");
-                icon.textContent = "close";
-            }
+                    list.querySelectorAll('li').forEach(item => {
+                        item.addEventListener('click', () => {
+                            btn.textContent = item.dataset.value;
+                            list.style.display = 'none';
+                        });
+                    });
 
-            filterToggle.addEventListener("click", () => {
-                const isVisible = !mobileFilters.classList.contains("d-none");
+                    // Close dropdown if clicked outside
+                    document.addEventListener('click', (e) => {
+                        if (!dropdown.contains(e.target)) {
+                            list.style.display = 'none';
+                        }
+                    });
+                });
+            </script>
 
-                // Toggle panel
-                mobileFilters.classList.toggle("d-none");
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const filterToggle = document.getElementById("filterToggle");
+                    const mobileFilters = document.getElementById("mobileFilters");
+                    const icon = filterToggle.querySelector(".material-symbols-rounded");
 
-                // Toggle icon
-                filterToggle.classList.toggle("active");
-                icon.textContent = filterToggle.classList.contains("active") ? "close" : "tune";
+                    // Unique key per page
+                    const storageKey = "filtersVisible_" + "<?php echo $activePage; ?>";
 
-                // Save state
-                localStorage.setItem(storageKey, !isVisible);
-            });
-        });
-    </script>
+                    // Restore previous state
+                    if (localStorage.getItem(storageKey) === "true") {
+                        mobileFilters.classList.remove("d-none");
+                        filterToggle.classList.add("active");
+                        icon.textContent = "close";
+                    }
+
+                    filterToggle.addEventListener("click", () => {
+                        const isVisible = !mobileFilters.classList.contains("d-none");
+
+                        // Toggle panel
+                        mobileFilters.classList.toggle("d-none");
+
+                        // Toggle icon
+                        filterToggle.classList.toggle("active");
+                        icon.textContent = filterToggle.classList.contains("active") ? "close" : "tune";
+
+                        // Save state
+                        localStorage.setItem(storageKey, !isVisible);
+                    });
+                });
+            </script>
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 </body>

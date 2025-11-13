@@ -146,8 +146,6 @@ $selectInboxResult = executeQuery($selectInboxQuery);
 
                                     </div>
 
-
-
                                     <!-- Message Content -->
                                     <div class="message-container mt-3 pb-4">
                                         <?php
