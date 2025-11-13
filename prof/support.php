@@ -1,13 +1,12 @@
 <?php
 $activePage = 'support';
-include('shared/assets/database/connect.php');
-include("shared/assets/processes/session-process.php");
+include('../shared/assets/database/connect.php');
+include("../shared/assets/processes/prof-session-process.php");
 
 
-$supportRole = "Student";
-$supportStudentQuery = "SELECT * FROM supports WHERE supportRole = '$supportRole'";
-$supportStudentResult = executeQuery($supportStudentQuery);
-
+$supportRole = "Professor";
+$supportProfQuery = "SELECT * FROM supports WHERE supportRole = '$supportRole'";
+$supportProfResult = executeQuery($supportProfQuery);
 
 ?>
 
@@ -21,11 +20,11 @@ $supportStudentResult = executeQuery($supportStudentQuery);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="shared/assets/css/global-styles.css">
-    <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
-    <link rel="stylesheet" href="shared/assets/css/settings.css">
+    <link rel="stylesheet" href="../shared/assets/css/global-styles.css">
+    <link rel="stylesheet" href="../shared/assets/css/sidebar-and-container-styles.css">
+    <link rel="stylesheet" href="../shared/assets/css/settings.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
+    <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
@@ -39,13 +38,13 @@ $supportStudentResult = executeQuery($supportStudentQuery);
     <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center p-0 p-md-3"
         style="background-color: var(--black);">
         <div class="row w-100">
-            <?php include 'shared/components/sidebar-for-mobile.php'; ?>
-            <?php include 'shared/components/sidebar-for-desktop.php'; ?>
+            <?php include '../shared/components/prof-sidebar-for-mobile.php'; ?>
+            <?php include '../shared/components/prof-sidebar-for-desktop.php'; ?>
 
             <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-md-4 overflow-y-auto">
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
-                    <?php include 'shared/components/navbar-for-mobile.php'; ?>
+                    <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
                     <div class="container-fluid py-3 row-padding-top">
                         <div class="row">
@@ -60,12 +59,12 @@ $supportStudentResult = executeQuery($supportStudentQuery);
                                     <!-- Message Content -->
                                     <div class="message-container mt-3 pb-4">
                                         <div id="ratingAccordion">
-                                            <!-- Question 1 -->
+                                            <!-- Questions -->
                                             <div class="row">
                                                 <?php
                                                 $counter = 1;
-                                                if (mysqli_num_rows($supportStudentResult) > 0) {
-                                                    while ($faq = mysqli_fetch_assoc($supportStudentResult)) {
+                                                if (mysqli_num_rows($supportProfResult) > 0) {
+                                                    while ($faq = mysqli_fetch_assoc($supportProfResult)) {
                                                         $collapseID = 'faq' . $counter;
                                                 ?>
                                                         <div class="col-12 col-md-8 mb-2">
@@ -76,13 +75,13 @@ $supportStudentResult = executeQuery($supportStudentQuery);
                                                                 style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black); text-align: left; white-space: normal; word-wrap: break-word;">
 
                                                                 <div class="d-flex w-100 align-items-center">
-                                                                    <span class="flex-grow-1 text-start text-16 text-sbold"><?php echo htmlspecialchars($faq['supportQuestion']); ?></span>
-                                                                    <span
-                                                                        class="material-symbols-rounded transition">expand_more</span>
+                                                                    <span class="flex-grow-1 text-start text-16 text-sbold">
+                                                                        <?php echo htmlspecialchars($faq['supportQuestion']); ?>
+                                                                    </span>
+                                                                    <span class="material-symbols-rounded transition">expand_more</span>
                                                                 </div>
 
-                                                                <div class="collapse w-100" id="<?php echo $collapseID; ?>"
-                                                                    data-bs-parent="#ratingAccordion">
+                                                                <div class="collapse w-100" id="<?php echo $collapseID; ?>" data-bs-parent="#ratingAccordion">
                                                                     <p class="mb-0 text-reg text-14 text-start pe-4 pb-2"
                                                                         style="white-space: normal; word-wrap: break-word;">
                                                                         <?php echo $faq['supportAnswer'];
@@ -99,6 +98,7 @@ $supportStudentResult = executeQuery($supportStudentQuery);
                                                 }
                                                 ?>
                                             </div>
+
 
                                             <div class="row mt-3">
                                                 <div class="col-12 col-md-6">

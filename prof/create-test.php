@@ -74,7 +74,9 @@ if (isset($_POST['save_exam'])) {
                     $questionType = $question['questionType'] ?? '';
                     $testQuestionPoints = $question['testQuestionPoints'] ?? 1;
                     $correctAnswer = !empty($question['correctAnswer'])
-                        ? (is_array($question['correctAnswer']) ? implode(',', $question['correctAnswer']) : $question['correctAnswer'])
+                        ? strtolower(is_array($question['correctAnswer'])
+                            ? implode(',', array_map('strtolower', $question['correctAnswer']))
+                            : $question['correctAnswer'])
                         : '';
 
                     $testQuestionImage = null;
@@ -183,7 +185,7 @@ if (isset($_GET['reuse']) || isset($_GET['edit'])) {
     if ($reuseResult && $reuseResult->num_rows > 0) {
         $reusedData = [];
         while ($row = $reuseResult->fetch_assoc()) {
-            $reusedData[] = $row; // store all rows with questions, choices, and files
+            $reusedData[] = $row; 
         }
     } else {
         // Invalid or unauthorized reuse/edit attempt
@@ -341,14 +343,14 @@ if (!empty($reusedData)) {
                                     <!-- Page Title -->
                                     <div class="col text-center text-md-start">
                                         <span class="text-sbold text-20"><?php
-                                        if (isset($_GET['edit'])) {
-                                            echo 'Edit Test';
-                                        } elseif (isset($_GET['reuse'])) {
-                                            echo 'Recreate Test';
-                                        } else {
-                                            echo 'Create Test';
-                                        }
-                                        ?></span>
+                                                                            if (isset($_GET['edit'])) {
+                                                                                echo 'Edit Test';
+                                                                            } elseif (isset($_GET['reuse'])) {
+                                                                                echo 'Recreate Test';
+                                                                            } else {
+                                                                                echo 'Create Test';
+                                                                            }
+                                                                            ?></span>
                                     </div>
 
                                     <!-- Assign Existing Task Button -->
@@ -517,15 +519,15 @@ if (!empty($reusedData)) {
                                                             <div class="text-reg mb-1">Correct Answers</div>
                                                             <div class="d-flex align-items-center overflow-auto answers-scroll"
                                                                 style="white-space: nowrap;">
-                                                                <div
-                                                                    class="answers-container d-flex align-items-center flex-nowrap">
-                                                                    <!-- Answer inputs appended here -->
+                                                                <div class="answers-container d-flex align-items-center flex-nowrap">
+                                                                    <!-- Single answer input will be inserted here -->
                                                                 </div>
                                                                 <button type="button"
                                                                     class="btn text-reg rounded-pill add-answer-btn flex-shrink-0"
-                                                                    style="background-color: var(--primaryColor);transform: none !important; box-shadow: none !important;color:var(--black)!important">
+                                                                    style="background-color: var(--primaryColor); transform: none !important; box-shadow: none !important; color: var(--black) !important;">
                                                                     + Add
                                                                 </button>
+
                                                             </div>
                                                         </div>
                                                     </div>
@@ -679,15 +681,15 @@ if (!empty($reusedData)) {
                                             <button type="submit" name="save_exam"
                                                 class="px-4 py-2 rounded-pill text-sbold text-md-14 mt-4 mt-md-0"
                                                 style="background-color: var(--primaryColor); border: 1px solid var(--black);">
-                                                 <?php
-                                                        if (isset($_GET['edit'])) {
-                                                            echo 'Save Changes';
-                                                        } elseif (isset($_GET['reuse'])) {
-                                                            echo 'Recreate';
-                                                        } else {
-                                                            echo 'Create';
-                                                        }
-                                                        ?>
+                                                <?php
+                                                if (isset($_GET['edit'])) {
+                                                    echo 'Save Changes';
+                                                } elseif (isset($_GET['reuse'])) {
+                                                    echo 'Recreate';
+                                                } else {
+                                                    echo 'Create';
+                                                }
+                                                ?>
                                             </button>
 
                                         </div>
@@ -780,14 +782,14 @@ if (!empty($reusedData)) {
         const maxWords = 200;
         const counter = document.getElementById("word-counter");
 
-        quill.on('text-change', function () {
+        quill.on('text-change', function() {
             let text = quill.getText().trim();
             let words = text.length > 0 ? text.split(/\s+/).length : 0;
 
             if (words > maxWords) {
                 let limited = text.split(/\s+/).slice(0, maxWords).join(" ");
                 quill.setText(limited + " ");
-                quill.setSelection(quill.getLength()); // keep cursor at end
+                quill.setSelection(quill.getLength()); 
             }
 
             counter.textContent = `${Math.min(words, maxWords)}/${maxWords}`;
@@ -795,15 +797,15 @@ if (!empty($reusedData)) {
 
         const form = document.querySelector("form");
 
-        form.addEventListener("submit", function (e) {
+        form.addEventListener("submit", function(e) {
             // --- Quill ---
             let plainText = quill.getText().trim();
-            const guidelinesInput = document.getElementById("generalGuidance"); // hidden input
+            const guidelinesInput = document.getElementById("generalGuidance"); 
             guidelinesInput.value = plainText;
 
             if (plainText.length === 0) {
                 e.preventDefault();
-                quill.root.focus(); // focus editor
+                quill.root.focus(); 
                 guidelinesInput.setCustomValidity('Please fill out this field.');
                 guidelinesInput.reportValidity();
                 return false;
@@ -937,10 +939,17 @@ if (!empty($reusedData)) {
         });
 
         // Add answer (delegated)
-        document.addEventListener("click", function (e) {
+        document.addEventListener("click", function(e) {
             if (e.target.closest(".add-answer-btn")) {
                 const button = e.target.closest(".add-answer-btn");
                 const container = button.closest(".answers-scroll").querySelector(".answers-container");
+
+                // Prevent adding more than one answer
+                if (container.querySelectorAll("input").length > 0) {
+                    showAlert("Only one correct answer is allowed for identification questions.");
+                    return;
+                }
+
                 const questionBox = button.closest(".textbox");
                 const questionIndexInput = questionBox.querySelector("input[type='hidden'][name*='questionType']");
                 const questionIndex = questionIndexInput.name.match(/questions\[(\d+)\]/)[1];
@@ -951,9 +960,9 @@ if (!empty($reusedData)) {
                 const input = document.createElement("input");
                 input.type = "text";
                 input.placeholder = "Answer";
-                input.classList.add("border", "rounded", "p-2", "text-reg", "me-5");
+                input.classList.add("border", "rounded", "p-2", "text-reg");
                 input.style.width = "120px";
-                input.name = `questions[${questionIndex}][correctAnswer][]`;
+                input.name = `questions[${questionIndex}][correctAnswer]`;
 
                 const removeBtn = document.createElement("button");
                 removeBtn.type = "button";
@@ -963,21 +972,26 @@ if (!empty($reusedData)) {
                 wrapper.appendChild(input);
                 wrapper.appendChild(removeBtn);
                 container.appendChild(wrapper);
-                container.scrollLeft = container.scrollWidth;
             }
         });
 
+
         // Single Delete Handler for All Blocks
-        document.addEventListener("click", function (e) {
+        document.addEventListener("click", function(e) {
             const delBtn = e.target.closest(".delete-template");
             if (!delBtn) return;
 
-            const block = delBtn.closest(".textbox, .multiple-choice-item, .row");
+            const block =
+                delBtn.closest(".multiple-choice-item") ||
+                delBtn.closest(".textbox") ||
+                delBtn.closest(".row");
+
             if (block) block.remove();
 
             renumberQuestions();
             updateTotalPoints();
         });
+
 
         // Multiple Choice
         document.getElementById("addMultipleChoice").addEventListener("click", () => {
@@ -1006,7 +1020,7 @@ if (!empty($reusedData)) {
         });
 
         // Add Multiple Choice Choices
-        document.getElementById("allQuestionsContainer").addEventListener("click", function (e) {
+        document.getElementById("allQuestionsContainer").addEventListener("click", function(e) {
             if (e.target.closest(".add-radio-btn")) {
                 const button = e.target.closest(".add-radio-btn");
                 const container = button.closest(".multiple-choice-item").querySelector(".radio-choices-container");
@@ -1060,7 +1074,7 @@ if (!empty($reusedData)) {
         });
 
         // Toggle Image Container
-        document.addEventListener("click", function (e) {
+        document.addEventListener("click", function(e) {
             if (e.target.closest(".image-icon")) {
                 const card = e.target.closest(".textbox");
                 const imageContainer = card.querySelector(".image-container");
@@ -1103,7 +1117,7 @@ if (!empty($reusedData)) {
 
         }
 
-        document.addEventListener("click", function (e) {
+        document.addEventListener("click", function(e) {
             const delImgBtn = e.target.closest(".delete-image");
             if (!delImgBtn) return;
 
@@ -1116,7 +1130,7 @@ if (!empty($reusedData)) {
 
             img.src = "../shared/assets/img/placeholder/placeholder.png";
             fileInput.value = "";
-            container.style.display = "none"; // hide again
+            container.style.display = "none"; 
         });
 
         document.querySelectorAll(".question-image").forEach(img => bindImageUpload(img));
@@ -1148,7 +1162,7 @@ if (!empty($reusedData)) {
             });
         }
 
-        mainContainer.addEventListener('input', function (e) {
+        mainContainer.addEventListener('input', function(e) {
             if (e.target.type === "number") updateTotalPoints();
         });
 
