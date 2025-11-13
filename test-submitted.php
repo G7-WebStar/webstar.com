@@ -265,6 +265,7 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
                                                         <img class="img-fluid object-fit-contain mx-0" width="20px" src="shared/assets/img/xp.png" alt="xp">
                                                         <span class="text-bold text-20 text-sm-18">+<?php echo round($baseXP); ?> XPs</span>
                                                         <span class="text-sbold text-16 text-sm-14">+<?php echo round($bonusXP); ?> Bonus XPs</span>
+                                                        <?php echo (mysqli_num_rows($checkMultiplierUseResult) > 0) ? '<span class="text-sbold text-16 text-sm-14">+' . round($finalXP) . ' XPs boosted!</span>' : ''; ?>
                                                     </div>
                                                 </div>
                                                 <div class="row mt-0">
@@ -409,17 +410,17 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
                 }
 
                 const result = await response.json();
-                console.log('XP Multiplier Result:', result);
 
                 if (result.success) {
-                    console.log('XP multiplier applied successfully. New XP:', result.newXP);
+                    alert(result.message);
+                    window.location.reload();
                 } else {
-                    console.warn('Failed to apply multiplier:', result.error);
+                    alert('Failed to apply multiplier: ' + result.error);
                 }
             } catch (error) {
                 console.error('Error applying XP multiplier:', error);
             }
-        window.location.reload();
+        
         }";
         } else {
             echo "document.getElementById('multiplierBtn').disabled = true;

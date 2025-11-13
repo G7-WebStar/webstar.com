@@ -3,6 +3,10 @@ include('../database/connect.php');
 include('../processes/session-process.php');
 $testID = $_GET['testID'];
 
+//Process data for JS use
+header('Content-Type: application/json');
+$response = [];
+
 //Check multiplier affordability
 $checkWebstarsQuery = "SELECT webstars FROM profile WHERE userID ='$userID'";
 $checkWebstarsResult = executeQuery($checkWebstarsQuery);
@@ -10,6 +14,12 @@ $checkWebstarsRow = mysqli_fetch_assoc($checkWebstarsResult);
 $ownedWebstars = $checkWebstarsRow['webstars'];
 
 if ($ownedWebstars >= 1000) {
+    //Get Response for JS use
+    $response = [
+        'success' => true,
+        'message' => 'XP Multiplier applied successfully!'
+    ];
+
     //Get variables necessary for calculating finalXP
     $totalPointsQuery = "SELECT SUM(testQuestionPoints) AS totalPoints FROM testquestions WHERE testID = '$testID'";
     $totalPointsResult = executeQuery($totalPointsQuery);
@@ -67,7 +77,7 @@ if ($ownedWebstars >= 1000) {
     $xpMultiplierResult = executeQuery($xpMultiplierQuery);
 
     //Deduct price of multiplier from user funds
-    $buyMultiplierQuery = "";
+    $buyMultiplierQuery = "UPDATE profile SET webstars = (webstars - 1000) WHERE userID ='$userID'";
     $buyMultiplierResult = executeQuery($buyMultiplierQuery);
 
     //Record Usage of XP multiplier
@@ -75,5 +85,11 @@ if ($ownedWebstars >= 1000) {
                                         VALUES ('$userID', '$assessmentID', 'XP Multiplier Usage', '-1000', CURRENT_TIMESTAMP)";
     $recordMultiplierResult = executeQuery($recordMultiplierQuery);
 } else {
-    echo "<script>alert('Insufficient Webstars');</script>";
+    $response = [
+        'success' => false,
+        'error' => 'Insufficient Webstars'
+    ];
 }
+
+echo json_encode($response);
+exit;
