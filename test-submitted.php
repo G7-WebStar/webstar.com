@@ -5,7 +5,15 @@ include('shared/assets/database/connect.php');
 include("shared/assets/processes/session-process.php");
 $testID = $_GET['testID'];
 if ($testID == null) {
-    header("Location: 404.php");
+    header("Location: 404.html");
+    exit();
+}
+
+$testExistenceQuery = "SELECT * FROM tests WHERE testID = '$testID'";
+$testExistenceResult = executeQuery($testExistenceQuery);
+
+if (mysqli_num_rows($testExistenceResult) <= 0) {
+    echo "Test doesn't exists.";
     exit();
 }
 
@@ -53,6 +61,9 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
         if (mysqli_num_rows($checkStatusResult) > 0) {
             header("Location: test-result.php?testID=" . $testID);
             exit();
+        } else {
+            echo "Test doesn't exists.";
+            exit();
         }
     }
 }
@@ -85,14 +96,26 @@ $totalItems = $totalItemsRow['totalItems'];
 $timeFactorQuery = "SELECT tests.testTimeLimit, todo.timeSpent FROM tests INNER JOIN todo ON tests.assessmentID = todo.assessmentID WHERE tests.testID = '$testID'";
 $timeFactorResult = executeQuery($timeFactorQuery);
 $timeFactorRow = mysqli_fetch_assoc($timeFactorResult);
-$timelimit = $timeFactorRow['testTimeLimit'];
-$timeSpent = $timeFactorRow['timeSpent'];
+$timelimit = (mysqli_num_rows($timeFactorResult) > 0) ? $timeFactorRow['testTimeLimit'] : '0';
+$timeSpent = (mysqli_num_rows($timeFactorResult) > 0) ? $timeFactorRow['timeSpent'] : '0';
+
 
 $baseXP = 10 * $totalPoints;
 $baseWebstars = 1 * $totalPoints;
-$correctBonusXP =  $baseXP * ($score / $totalPoints);
-$correctBonusWebstars = $baseWebstars * ($score / $totalPoints);
-$timeFactor = 1 + ($timelimit - $timeSpent) / $timelimit;
+
+if ($totalPoints == 0) {
+    $correctBonusXP =  0;
+    $correctBonusWebstars = 0;
+} else {
+    $correctBonusXP =  $baseXP * ($score / $totalPoints);
+    $correctBonusWebstars = $baseWebstars * ($score / $totalPoints);
+}
+
+if ($timelimit == 0) {
+    $timeFactor = 0;
+} else {
+    $timeFactor = 1 + ($timelimit - $timeSpent) / $timelimit;
+}
 $finalXP = $baseXP + ($correctBonusXP * $timeFactor);
 $finalWebstars = $baseWebstars + ($correctBonusWebstars * $timeFactor);
 $multipliedXP = round($finalXP) * 2;
@@ -104,7 +127,7 @@ $bonusWebstars = $finalWebstars - $baseWebstars;
 $assessmentIDQuery = "SELECT assessmentID FROM tests WHERE testID = '$testID'";
 $assessmentIDResult = executeQuery($assessmentIDQuery);
 $assessmentIDRow = mysqli_fetch_assoc($assessmentIDResult);
-$assessmentID = $assessmentIDRow['assessmentID'];
+$assessmentID = (mysqli_num_rows($assessmentIDResult) > 0) ? $assessmentIDRow['assessmentID'] : null;
 
 //Checks if multiplier is already used
 $checkMultiplierUseQuery = "SELECT * FROM webstars WHERE userID = '$userID' AND assessmentID = '$assessmentID' AND sourceType = 'XP Multiplier Usage'";

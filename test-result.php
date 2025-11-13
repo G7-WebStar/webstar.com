@@ -64,6 +64,9 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
         if (mysqli_num_rows($checkStatusResult) > 0) {
             header("Location: test-submitted.php?testID=" . $testID);
             exit();
+        } else {
+            echo "Test doesn't exists.";
+            exit();
         }
     }
 }
