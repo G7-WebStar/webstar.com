@@ -27,7 +27,7 @@ if (isset($_GET['courseID'])) {
 
     // Sort Todo
     $sortTodo = $_POST['sortTodo'] ?? 'Newest';
-    $statusFilter = $_POST['statusFilter'] ?? 'All';
+    $statusFilter = $_POST['statusFilter'] ?? 'Pending';
 
     // Sort by
     switch ($sortTodo) {
@@ -55,7 +55,7 @@ if (isset($_GET['courseID'])) {
             break;
 
         case 'Done':
-            $todoWhereStatus = "AND todo.status IN ('Graded', 'Submitted')";
+            $todoWhereStatus = "AND todo.status IN ('Submitted', 'Returned', 'Graded')";
             break;
 
         default:

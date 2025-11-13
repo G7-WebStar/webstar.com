@@ -68,8 +68,8 @@ $testSubmissionQuery = "
     LEFT JOIN tests ON assessments.assessmentID = tests.assessmentID
     LEFT JOIN scores ON scores.userID = users.userID AND scores.testID = tests.testID
     WHERE assessments.assessmentID = $assessmentID
-    ORDER BY lastName ASC
     $statusSQL
+    ORDER BY lastName ASC
 ";
 
 $testSubmissionResult = executeQuery($testSubmissionQuery);
@@ -164,7 +164,7 @@ if ($pendingCount < 0) $pendingCount = 0;
                             <!-- DESKTOP VIEW -->
                             <div class="row desktop-header d-none d-sm-flex">
                                 <div class="col-auto me-2">
-                                    <a href="#" class="text-decoration-none">
+                                    <a href="assess.php" class="text-decoration-none">
                                         <i class="fa-solid fa-arrow-left text-reg text-16"
                                             style="color: var(--black);"></i>
                                     </a>
@@ -179,7 +179,7 @@ if ($pendingCount < 0) $pendingCount = 0;
                             <div class="d-block d-sm-none mobile-assignment">
                                 <div class="mobile-top">
                                     <div class="arrow">
-                                        <a href="#" class="text-decoration-none">
+                                        <a href="assess.php" class="text-decoration-none">
                                             <i class="fa-solid fa-arrow-left text-reg text-16"
                                                 style="color: var(--black);"></i>
                                         </a>
@@ -231,7 +231,7 @@ if ($pendingCount < 0) $pendingCount = 0;
                                                     <div class="d-flex align-items-center flex-wrap dropdown-container">
                                                         <!-- Sort By -->
                                                         <form method="GET" class="d-flex align-items-center flex-nowrap me-3">
-                                                            <input type="hidden" name="testID" value="<?php echo $testID; ?>">
+                                                            <input type="hidden" name="assessmentID" value="<?php echo $assessmentID; ?>">
                                                             <input type="hidden" name="status" id="statusInput" value="<?php echo $statusFilter; ?>">
                                                             <span class="dropdown-label me-2">Status</span>
                                                             <div class="custom-dropdown">

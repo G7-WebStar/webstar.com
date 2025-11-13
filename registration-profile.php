@@ -166,7 +166,7 @@ include("shared/assets/processes/registration-profile-process.php");
                             </div>
 
                             <input type="file" id="fileInput" name="fileUpload" class="form-control"
-                                accept=".png, .jpg, .jpeg" required style="display:none;">
+                                accept=".png, .jpg, .jpeg" style="display:none;">
 
                             <button type="button" class="text-reg text-14 btn btn-upload mt-1" id="uploadBtn">Upload Photo</button>
 
