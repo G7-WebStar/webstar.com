@@ -42,13 +42,16 @@ if ($userResult && mysqli_num_rows($userResult) > 0) {
     $profilePicture = $userData['profilePicture'];
 }
 
-// Handle Save Changes
+// Initialize username check message
+$usernameTaken = false;
+$usernameTakenMessage = '';
+
 if (isset($_POST['saveChanges'])) {
     $firstName = $_POST['firstName'] ?? '';
     $middleName = $_POST['middleName'] ?? '';
     $lastName = $_POST['lastName'] ?? '';
-    $userName = $_POST['userName'] ?? '';
-    $studentID = $_POST['studentID'] ?? '';
+    $userName = strtolower($_POST['userName']) ?? '';
+    $studentID = strtoupper($_POST['studentID']) ?? '';
     $programID = $_POST['program'] ?? '';
     $gender = $_POST['gender'] ?? '';
     $yearLevel = $_POST['yearLevel'] ?? '';
@@ -60,7 +63,6 @@ if (isset($_POST['saveChanges'])) {
 
     // Handle profile picture upload
     $uploadField = isset($_FILES['fileUpload']) ? 'fileUpload' : (isset($_FILES['fileUploadMobile']) ? 'fileUploadMobile' : null);
-
     if ($uploadField && isset($_FILES[$uploadField]) && $_FILES[$uploadField]['error'] === UPLOAD_ERR_OK) {
         $fileTmp = $_FILES[$uploadField]['tmp_name'];
         $fileName = basename($_FILES[$uploadField]['name']);
@@ -78,39 +80,133 @@ if (isset($_POST['saveChanges'])) {
         }
     }
 
-    // Update users table
-    executeQuery("UPDATE users SET username='$userName' WHERE userID='$userID'");
+    // Check if username is taken by another user
+    $userNameEscaped = mysqli_real_escape_string($conn, $userName);
+    $userIDInt = intval($userID);
+    $checkQuery = "SELECT userID FROM users WHERE username='$userNameEscaped' AND userID != $userIDInt";
+    $checkResult = mysqli_query($conn, $checkQuery);
 
-    // Update userinfo table
-    $updateInfoQuery = "
-        UPDATE userinfo SET
-            firstName='$firstName',
-            middleName='$middleName',
-            lastName='$lastName',
-            studentID='$studentID',
-            gender='$gender',
-            yearLevel='$yearLevel',
-            yearSection='$yearSection',
-            schoolEmail='$schoolEmail',
-            facebookLink='$fbLink',
-            linkedInLink='$linkedInLink',
-            githubLink='$githubLink',
-            programID='$programID'
-    ";
-    if (!empty($profilePicture))
-        $updateInfoQuery .= ", profilePicture='$profilePicture'";
-    $updateInfoQuery .= " WHERE userID='$userID'";
+    if ($checkResult && mysqli_num_rows($checkResult) > 0) {
+        $usernameTaken = true;
+        $usernameTakenMessage = "Username has already been taken";
+    } else {
+        // Update users table
+        executeQuery("UPDATE users SET username='$userName' WHERE userID='$userID'");
 
-    $result = executeQuery($updateInfoQuery);
+        // Update userinfo table
+        $updateInfoQuery = "
+            UPDATE userinfo SET
+                firstName='$firstName',
+                middleName='$middleName',
+                lastName='$lastName',
+                studentID='$studentID',
+                gender='$gender',
+                yearLevel='$yearLevel',
+                yearSection='$yearSection',
+                schoolEmail='$schoolEmail',
+                facebookLink='$fbLink',
+                linkedInLink='$linkedInLink',
+                githubLink='$githubLink',
+                programID='$programID'
+        ";
+        if (!empty($profilePicture))
+            $updateInfoQuery .= ", profilePicture='$profilePicture'";
+        $updateInfoQuery .= " WHERE userID='$userID'";
+
+        $result = executeQuery($updateInfoQuery);
+
+        $result = executeQuery($updateInfoQuery);
+
+        if ($result) {
+            $profileUpdated = true; 
+        }
+    }
+}
+
+if (isset($_POST['deleteAccount'])) {
+    $userID = $_SESSION['userID'];
+
+    // --- Delete dependent tables first ---
+    $tables = [
+        'activities' => 'userID',
+        'announcementnotes' => 'userID',
+        'enrollments' => 'userID',
+        'feedback' => ['senderID', 'receiverID'],
+        'files' => 'userID',
+        'inbox' => 'enrollmentID',
+        'leaderboard' => 'enrollmentID',
+        'myitems' => 'userID',
+        'profile' => 'userID',
+        'report' => 'enrollmentID',
+        'scores' => 'userID',
+        'selectedlevels' => 'submissionID',
+        'settings' => 'userID',
+        'studentbadges' => 'userID',
+        'submissions' => 'userID',
+        'testresponses' => 'userID',
+        'todo' => 'userID',
+        'webstars' => 'userID'
+    ];
+
+    // --- Start deletion ---
+    // 1. Fetch enrollmentIDs for this user
+    $enrollmentResult = executeQuery("SELECT enrollmentID FROM enrollments WHERE userID='$userID'");
+    $enrollmentIDs = [];
+    while ($row = mysqli_fetch_assoc($enrollmentResult)) {
+        $enrollmentIDs[] = $row['enrollmentID'];
+    }
+    $enrollmentIDsStr = !empty($enrollmentIDs) ? implode(',', $enrollmentIDs) : '0';
+
+    // 2. Fetch submissionIDs
+    $submissionResult = executeQuery("SELECT submissionID FROM submissions WHERE userID='$userID'");
+    $submissionIDs = [];
+    while ($row = mysqli_fetch_assoc($submissionResult)) {
+        $submissionIDs[] = $row['submissionID'];
+    }
+    $submissionIDsStr = !empty($submissionIDs) ? implode(',', $submissionIDs) : '0';
+
+    // 3. Delete from tables
+    executeQuery("DELETE FROM activities WHERE userID='$userID'");
+    executeQuery("DELETE FROM announcementnotes WHERE userID='$userID'");
+    executeQuery("DELETE FROM feedback WHERE senderID='$userID' OR receiverID='$userID'");
+    executeQuery("DELETE FROM submissions WHERE userID='$userID'");
+    executeQuery("DELETE FROM selectedlevels WHERE submissionID IN ($submissionIDsStr)");
+    executeQuery("DELETE FROM scores WHERE userID='$userID'");
+    executeQuery("DELETE FROM testresponses WHERE userID='$userID'");
+    executeQuery("DELETE FROM todo WHERE userID='$userID'");
+    executeQuery("DELETE FROM webstars WHERE userID='$userID'");
+    executeQuery("DELETE FROM studentbadges WHERE userID='$userID'");
+    executeQuery("DELETE FROM myitems WHERE userID='$userID'");
+    executeQuery("DELETE FROM profile WHERE userID='$userID'");
+    executeQuery("DELETE FROM settings WHERE userID='$userID'");
+
+    // Delete enrollments related data
+    if (!empty($enrollmentIDs)) {
+        executeQuery("DELETE FROM leaderboard WHERE enrollmentID IN ($enrollmentIDsStr)");
+        executeQuery("DELETE FROM report WHERE enrollmentID IN ($enrollmentIDsStr)");
+        executeQuery("DELETE FROM inbox WHERE enrollmentID IN ($enrollmentIDsStr)");
+        executeQuery("DELETE FROM enrollments WHERE userID='$userID'");
+    }
+
+    // Finally delete user info and account
+    executeQuery("DELETE FROM userinfo WHERE userID='$userID'");
+    executeQuery("DELETE FROM users WHERE userID='$userID'");
+
+    // Destroy session and redirect
+    session_destroy();
+    header("Location: login.php?accountDeleted=1");
+    exit();
 }
 ?>
+
 <div class="container">
     <div class="row d-flex justify-content-center">
         <form method="POST" action="" class="w-100" id="registrationForm" enctype="multipart/form-data">
             <!-- Top Row -->
             <div class="row mb-3">
                 <div class="col-12 col-md-6 mb-2 d-flex align-items-center">
-                    <button type="submit" name="saveChanges" id="saveChangesBtn" class="btn rounded-5 mt-3 text-reg text-12"
+                    <button type="submit" name="saveChanges" id="saveChangesBtn"
+                        class="btn rounded-5 mt-3 text-reg text-12"
                         style="background-color: var(--primaryColor); border:1px solid var(--black); display:none;">Save
                         changes</button>
                 </div>
@@ -145,14 +241,17 @@ if (isset($_POST['saveChanges'])) {
                         <div class="col">
                             <div class="form-floating">
                                 <input type="text" name="firstName" class="form-control" id="firstName" placeholder=" "
-                                    value="<?php echo $firstName ?? ''; ?>">
+                                    pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')"
+                                    value="<?php echo $firstName ?? ''; ?>" required>
                                 <label for="firstName" class="text-reg text-16">First Name</label>
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-floating">
                                 <input type="text" name="middleName" class="form-control" id="middleName"
-                                    placeholder=" " value="<?php echo $middleName ?? ''; ?>">
+                                    placeholder=" " pattern="[A-Za-z\s]+"
+                                    oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')"
+                                    value="<?php echo $middleName ?? ''; ?>" required>
                                 <label for="middleName" class="text-reg text-16">Middle Name</label>
                             </div>
                         </div>
@@ -162,15 +261,20 @@ if (isset($_POST['saveChanges'])) {
                         <div class="col">
                             <div class="form-floating">
                                 <input type="text" name="lastName" class="form-control" id="lastName" placeholder=" "
-                                    value="<?php echo $lastName ?? ''; ?>">
+                                    pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')"
+                                    value="<?php echo $lastName ?? ''; ?>" required>
                                 <label for="lastName" class="text-reg text-16">Last Name</label>
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-floating">
                                 <input type="text" name="userName" class="form-control" id="userName" placeholder=" "
-                                    value="<?php echo $userName ?? ''; ?>">
+                                    maxlength="30" pattern="^[^\s.]+$" value="<?php echo $userName ?? ''; ?>" required>
                                 <label for="userName" class="text-reg text-16">Username</label>
+                                <small id="usernameMsg" class="text-danger text-reg ms-1"
+                                    style="font-size:11px; display:<?= !empty($usernameTaken) ? 'block' : 'none'; ?>;">
+                                    <?= $usernameTakenMessage ?? '' ?>
+                                </small>
                             </div>
                         </div>
                     </div>
@@ -268,7 +372,7 @@ if (isset($_POST['saveChanges'])) {
 
                                 <div class="form-floating">
                                     <input type="email" name="schoolEmail" class="form-control" id="schoolEmail"
-                                        placeholder=" " value="<?php echo $schoolEmail ?? ''; ?>">
+                                        placeholder=" " required value="<?php echo $schoolEmail ?? ''; ?>">
                                     <label for="schoolEmail" class="text-reg text-16">School Email</label>
                                 </div>
                             </div>
@@ -305,15 +409,25 @@ if (isset($_POST['saveChanges'])) {
                             </div>
                         </div>
                     </div>
-                    <div
-                        class="col-12 col-md-auto text-reg custom-forms px-2 px-md-0 text-center d-flex justify-content-center">
-                        <form action="reset_password.php" method="post">
-                            
-                            <button type="submit" class="btn rounded-5 text-med text-12 px-5"
-                                style="background-color: var(--primaryColor); border: 1px solid var(--black);">
-                                Reset Password
-                            </button>
-                        </form>
+                    <div class="row justify-content-center">
+                        <div class="col-auto text-center">
+                            <form action="reset_password.php" method="post">
+                                <button type="submit" class="btn rounded-5 text-med text-12 px-5"
+                                    style="background-color: var(--primaryColor); border: 1px solid var(--black);">
+                                    Reset Password
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="col-auto text-center">
+                            <form action="" method="post">
+                                <button type="button" class="btn rounded-5 text-med text-12 px-5 mt-2 mt-md-0"
+                                    style="background-color: rgba(255, 80, 80, 1); border: 1px solid var(--black);"
+                                    data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                    Delete Account
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
@@ -337,7 +451,33 @@ if (isset($_POST['saveChanges'])) {
 
     </div>
 </div>
-
+<!-- Delete Modal -->
+<div class="modal" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="POST" action="">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        style="transform: scale(0.8); border:none !important; box-shadow:none !important;"></button>
+                </div>
+                <div class="modal-body d-flex flex-column justify-content-center align-items-center text-center">
+                    <span class="mt-4 text-bold text-22">This action cannot be undone.</span>
+                    <span class="mb-4 text-reg text-14">Are you sure you want to delete this course?</span>
+                    <input type="hidden" name="courseID" value="<?php echo $courseID; ?>">
+                </div>
+                <div class="modal-footer text-sbold text-18">
+                    <button type="button" class="btn rounded-pill px-4"
+                        style="background-color: var(--primaryColor); border: 1px solid var(--black);"
+                        data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" name="deleteAccount" class="btn rounded-pill px-4"
+                        style="background-color: rgba(255, 80, 80, 1); border: 1px solid var(--black); color: var(--black);">
+                        Delete
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <script>
     const fileInput = document.getElementById('fileInput');
     const uploadBtn = document.getElementById('uploadBtn');
@@ -346,12 +486,24 @@ if (isset($_POST['saveChanges'])) {
     const profilePreviewDesktop = document.getElementById('profilePreviewDesktop');
     const profilePreviewMobile = document.getElementById('profilePreviewMobile');
     const saveBtn = document.getElementById('saveChangesBtn');
+    const usernameInput = document.getElementById('userName');
+    const studentIDInput = document.getElementById('studentID');
+    const toastContainer = document.getElementById('toastContainer');
 
     function showSaveButton() {
         saveBtn.style.display = 'inline-block';
     }
 
-    // 🖥️ Desktop upload
+    studentIDInput.addEventListener('input', () => {
+        studentIDInput.value = studentIDInput.value.toUpperCase();
+    });
+
+    // Auto-lowercase username and remove spaces
+    usernameInput.addEventListener('input', () => {
+        usernameInput.value = usernameInput.value.toLowerCase().replace(/[^a-z0-9.]/g, '');
+    });
+
+    // Desktop upload
     uploadBtn.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', () => {
         const file = fileInput.files[0];
@@ -363,7 +515,7 @@ if (isset($_POST['saveChanges'])) {
         }
     });
 
-    // 📱 Mobile upload (FIXED)
+    // Mobile upload (FIXED)
     uploadBtnMobile.addEventListener('click', () => {
         // Make file upload required ONLY when user actually chooses a file
         fileInputMobile.required = false; // ensure it won't block the form
@@ -384,5 +536,64 @@ if (isset($_POST['saveChanges'])) {
     document.querySelectorAll('#registrationForm input, #registrationForm select').forEach(el => {
         el.addEventListener('input', showSaveButton);
         el.addEventListener('change', showSaveButton);
+    });
+
+    function showToast(message, type = 'success') {
+        const toastContainer = document.getElementById('toastContainer');
+
+        // Create a unique ID for the toast
+        const toastID = 'toast_' + Date.now();
+
+        // Prepare toast HTML
+        const toastHTML = `
+            <div id="${toastID}" class="alert mb-2 shadow-lg d-flex align-items-center gap-2 px-3 py-2 ${type === 'success' ? 'alert-success' : 'alert-danger'}" style="transition: opacity 0.5s ease; opacity:1;">
+                <i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'} fs-6" role="img" style="color:black;"></i>
+                <div class="text-med text-12">${message}</div>
+            </div>
+        `;
+
+        // Inject toast into container
+        toastContainer.innerHTML += toastHTML;
+
+        // Remove toast after 3s
+        setTimeout(() => {
+            const toast = document.getElementById(toastID);
+            if (toast) {
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    if (toast.parentNode) toast.parentNode.removeChild(toast);
+                }, 500);
+            }
+        }, 3000);
+    }
+
+    // File validation and preview
+    fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        const maxSize = 5 * 1024 * 1024; // 5 MB
+
+        if (!allowedTypes.includes(file.type)) {
+            fileInput.value = '';
+            profilePreviewDesktop.src = 'https://via.placeholder.com/150';
+            showToast('Invalid file type. Only JPG, JPEG, and PNG are allowed.', 'danger');
+            return;
+        }
+
+        if (file.size > maxSize) {
+            fileInput.value = '';
+            profilePreviewDesktop.src = 'https://via.placeholder.com/150';
+            showToast('File is too large. Maximum size is 5 MB.', 'danger');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = e => {
+            profilePreviewDesktop.src = e.target.result;
+            showToast('Image uploaded successfully!', 'success');
+        };
+        reader.readAsDataURL(file);
     });
 </script>

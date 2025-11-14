@@ -1,7 +1,7 @@
 <?php $activePage = 'adminIndex'; ?>
 <?php
 include('../shared/assets/database/connect.php');
-// include("../shared/assets/processes/prof-session-process.php");
+include("../shared/assets/processes/admin-session-process.php");
 
 ?>
 
@@ -24,7 +24,8 @@ include('../shared/assets/database/connect.php');
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet" />
 
 </head>
 
@@ -62,7 +63,8 @@ include('../shared/assets/database/connect.php');
                                                 style="width:68px; height:68px;">
                                             <div class="text-truncate w-100">
                                                 <div class="text-sbold text-22">Welcome back, Administrator!</div>
-                                                <div class="text-reg text-16">Continue managing and monitoring the platform.</div>
+                                                <div class="text-reg text-16">Continue managing and monitoring the
+                                                    platform.</div>
                                             </div>
                                         </div>
                                     </div>
@@ -135,91 +137,93 @@ include('../shared/assets/database/connect.php');
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-            <!-- Chart.js -->
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-            <script>
-                const ctx = document.getElementById('visitsChart').getContext('2d');
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('visitsChart').getContext('2d');
 
-                function getBarThickness() {
-                    if (window.innerWidth <= 576) return 40;
-                    if (window.innerWidth <= 768) return 70;
-                    return 120;
-                }
+        function getBarThickness() {
+            if (window.innerWidth <= 576) return 40;
+            if (window.innerWidth <= 768) return 70;
+            return 120;
+        }
 
-                const visitsChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Oct 15', 'Oct 16', 'Oct 17', 'Oct 18', 'Oct 19', 'Oct 21'],
-                        datasets: [{
-                            label: 'Visits',
-                            data: [55, 65, 75, 78, 70, 35],
-                            backgroundColor: 'rgba(90, 120, 255, 0.8)',
-                            borderColor: 'rgba(90, 120, 255, 1)',
-                            borderWidth: 1,
-                            borderRadius: 2,
-                            barThickness: getBarThickness(), // dynamic based on screen size
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                min: 0,
-                                max: 100,
-                                ticks: {
-                                    stepSize: 20,
-                                    color: '#555',
-                                    font: {
-                                        size: 13
-                                    }
-                                },
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.08)',
-                                    drawBorder: false
-                                }
-                            },
-                            x: {
-                                ticks: {
-                                    color: '#555',
-                                    font: {
-                                        size: 13
-                                    }
-                                },
-                                grid: {
-                                    display: false
-                                }
+        const visitsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Oct 15', 'Oct 16', 'Oct 17', 'Oct 18', 'Oct 19', 'Oct 21'],
+                datasets: [{
+                    label: 'Visits',
+                    data: [55, 65, 75, 78, 70, 35],
+                    backgroundColor: 'rgba(90, 120, 255, 0.8)',
+                    borderColor: 'rgba(90, 120, 255, 1)',
+                    borderWidth: 1,
+                    borderRadius: 2,
+                    barThickness: getBarThickness(), // dynamic based on screen size
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        min: 0,
+                        max: 100,
+                        ticks: {
+                            stepSize: 20,
+                            color: '#555',
+                            font: {
+                                size: 13
                             }
                         },
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(0, 0, 0, 0.75)',
-                                titleFont: {
-                                    size: 14
-                                },
-                                bodyFont: {
-                                    size: 13
-                                }
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.08)',
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#555',
+                            font: {
+                                size: 13
                             }
+                        },
+                        grid: {
+                            display: false
                         }
                     }
-                });
-
-                //  Dynamically on screen resize
-                window.addEventListener('resize', () => {
-                    const newThickness = getBarThickness();
-                    if (visitsChart.data.datasets[0].barThickness !== newThickness) {
-                        visitsChart.data.datasets[0].barThickness = newThickness;
-                        visitsChart.update();
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 13
+                        }
                     }
-                });
-            </script>
+                }
+            }
+        });
+
+        //  Dynamically on screen resize
+        window.addEventListener('resize', () => {
+            const newThickness = getBarThickness();
+            if (visitsChart.data.datasets[0].barThickness !== newThickness) {
+                visitsChart.data.datasets[0].barThickness = newThickness;
+                visitsChart.update();
+            }
+        });
+    </script>
 
 </body>
 
