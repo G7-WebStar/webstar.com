@@ -117,8 +117,10 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
             <div class="card border-0 sidebar mx-2 p-2 overflow-y-auto" style="width: 220px;">
                 <!-- Logo -->
                 <div class="d-flex justify-content-center">
-                    <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid px-3"
-                        style="padding-top:2rem; padding-bottom:2rem" width="180px;">
+                    <a href="index.php" style="text-decoration: none;">
+                        <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid px-3"
+                            style="padding-top:2rem; padding-bottom:2rem;" width="180px;" alt="Webstar Logo">
+                    </a>
                 </div>
 
                 <!-- Navigation -->
@@ -177,7 +179,7 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                         <img src="shared/assets/img/explore.png" class="img-fluid" style="width: 30px; height: 30px;">
                         <a href="#" style="text-decoration: none; color:var(--black)"
                             class="nav-link p-0 text-med text-18 ps-2 <?php echo ($activePage == 'explore') ? 'selected' : ''; ?>">
-                            <strong>Explore</strong></a>
+                            <strong>Search</strong></a>
                     </li>
 
 
@@ -191,10 +193,10 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                     <div class="mt-1 end-0 mt-2 mx-3 mb-2 p-2 d-flex align-items-center">
                         <img class="me-2" src="shared/assets/img/webstar.png" alt="Description of Image" width="30">
                         <div class="d-flex flex-column align-items-start ps-2" style="line-height: 1.2;">
-                            <a class="text-med text-18" style="text-decoration: none;">
+                            <a href="transactions.php" class="text-med text-18" style="text-decoration: none;">
                                 <strong><?php echo $userInformation['webstars'] ?></strong>
                             </a>
-                            <a class="text-med text-14" style="text-decoration: none;">
+                            <a href="transactions.php" class="text-med text-14" style="text-decoration: none;">
                                 Webstars
                             </a>
                         </div>
@@ -208,8 +210,11 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                     <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
                         data-bs-toggle="dropdown" aria-expanded="false">
                         <img src="shared/assets/pfp-uploads/<?php echo $userInformation['profilePicture'] ?>" alt=""
-                            width="32" height="32" class="rounded-circle me-2">
-                        <strong class="text-dark text-med text-16 px-1">
+                            width="32" height="32" class="rounded-circle me-2"
+                            style="object-fit: cover; width: 32px; height: 32px; overflow: hidden;">
+
+                        <strong class="text-dark text-med text-16 px-1 text-truncate" style="max-width:100px"
+                            title=" <?php echo $userInformation['userName'] ?>">
                             <?php echo $userInformation['userName'] ?>
                         </strong>
                     </a>
@@ -220,7 +225,8 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                         <!-- Settings -->
                         <li style="margin-bottom:6px;">
                             <a class="dropdown-item d-flex align-items-center text-med text-14" href="settings.php">
-                                <span class="material-symbols-rounded" style="font-size:18px; display: inline-flex; width: 1.5em; ">settings</span>
+                                <span class="material-symbols-rounded"
+                                    style="font-size:18px; display: inline-flex; width: 1.5em; ">settings</span>
                                 Settings
                             </a>
                         </li>
@@ -228,7 +234,8 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                         <!-- Support -->
                         <li style="margin-bottom:6px;">
                             <a class="dropdown-item d-flex align-items-center text-med text-14" href="support.php">
-                                <span class="material-symbols-rounded" style="font-size:18px; display: inline-flex; width: 1.5em; ">contact_support</span>
+                                <span class="material-symbols-rounded"
+                                    style="font-size:18px; display: inline-flex; width: 1.5em; ">contact_support</span>
                                 Support
                             </a>
                         </li>
@@ -245,7 +252,8 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                         <!-- Profile -->
                         <li style="margin-bottom:6px;">
                             <a class="dropdown-item d-flex align-items-center text-med text-14" href="profile.php">
-                                <span class="material-symbols-rounded" style="font-size:18px; display: inline-flex; width: 1.5em; ">person</span>
+                                <span class="material-symbols-rounded"
+                                    style="font-size:18px; display: inline-flex; width: 1.5em; ">person</span>
                                 My Profile
                             </a>
                         </li>
@@ -254,14 +262,13 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                         <li>
                             <a class="dropdown-item d-flex align-items-center text-med text-14" href="login.php"
                                 style="color:var(--highlight);">
-                                <span class="material-symbols-rounded" style="font-size:18px; display: inline-flex; width: 1.5em; ">logout</span>
+                                <span class="material-symbols-rounded"
+                                    style="font-size:18px; display: inline-flex; width: 1.5em; ">logout</span>
                                 Sign Out
                             </a>
                         </li>
                     </ul>
                 </div>
-
-
             </div>
         </div>
     </div>

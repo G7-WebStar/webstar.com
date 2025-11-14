@@ -1,44 +1,47 @@
 <?php
 include_once '../shared/assets/database/connect.php';
 if (session_status() !== PHP_SESSION_ACTIVE && !headers_sent()) {
-	session_start();
+    session_start();
 }
 
 if (!function_exists('prof_sidebar_resolve_user_id')) {
-	function prof_sidebar_resolve_user_id() {
-		$conn = $GLOBALS['conn'];
-		if (isset($_SESSION['userID'])) return (int) $_SESSION['userID'];
-		if (isset($_SESSION['email'])) {
-			$emailEsc = mysqli_real_escape_string($conn, $_SESSION['email']);
-			$res = executeQuery("SELECT userID, userName FROM users WHERE email = '$emailEsc' LIMIT 1");
-			if ($res && ($u = mysqli_fetch_assoc($res))) {
-				$_SESSION['userID'] = (int) $u['userID'];
-				if (!isset($_SESSION['userName']) && isset($u['userName'])) {
-					$_SESSION['userName'] = $u['userName'];
-				}
-				return (int) $u['userID'];
-			}
-		}
-		if (isset($_SESSION['userName'])) {
-			$userNameEsc = mysqli_real_escape_string($conn, $_SESSION['userName']);
-			$res = executeQuery("SELECT userID FROM users WHERE userName = '$userNameEsc' LIMIT 1");
-			if ($res && ($u = mysqli_fetch_assoc($res))) {
-				$_SESSION['userID'] = (int) $u['userID'];
-				return (int) $u['userID'];
-			}
-		}
-		return null;
-	}
+    function prof_sidebar_resolve_user_id()
+    {
+        $conn = $GLOBALS['conn'];
+        if (isset($_SESSION['userID']))
+            return (int) $_SESSION['userID'];
+        if (isset($_SESSION['email'])) {
+            $emailEsc = mysqli_real_escape_string($conn, $_SESSION['email']);
+            $res = executeQuery("SELECT userID, userName FROM users WHERE email = '$emailEsc' LIMIT 1");
+            if ($res && ($u = mysqli_fetch_assoc($res))) {
+                $_SESSION['userID'] = (int) $u['userID'];
+                if (!isset($_SESSION['userName']) && isset($u['userName'])) {
+                    $_SESSION['userName'] = $u['userName'];
+                }
+                return (int) $u['userID'];
+            }
+        }
+        if (isset($_SESSION['userName'])) {
+            $userNameEsc = mysqli_real_escape_string($conn, $_SESSION['userName']);
+            $res = executeQuery("SELECT userID FROM users WHERE userName = '$userNameEsc' LIMIT 1");
+            if ($res && ($u = mysqli_fetch_assoc($res))) {
+                $_SESSION['userID'] = (int) $u['userID'];
+                return (int) $u['userID'];
+            }
+        }
+        return null;
+    }
 }
 
 if (!function_exists('prof_sidebar_fetch_count')) {
-	function prof_sidebar_fetch_count($sql) {
-		$result = executeQuery($sql);
-		if ($result && ($row = mysqli_fetch_assoc($result)) && isset($row['c'])) {
-			return (int) $row['c'];
-		}
-		return 0;
-	}
+    function prof_sidebar_fetch_count($sql)
+    {
+        $result = executeQuery($sql);
+        if ($result && ($row = mysqli_fetch_assoc($result)) && isset($row['c'])) {
+            return (int) $row['c'];
+        }
+        return 0;
+    }
 }
 
 $profIsInboxPage = isset($activePage) && $activePage === 'inbox';
@@ -48,28 +51,48 @@ $profInboxCount = 0;
 // Get enrollmentIDs for the professor's courses
 $enrollmentIds = [];
 if ($profUserId !== null) {
-	$enrollmentQuery = "SELECT DISTINCT e.enrollmentID FROM enrollments e 
+    $enrollmentQuery = "SELECT DISTINCT e.enrollmentID FROM enrollments e 
 		INNER JOIN courses c ON e.courseID = c.courseID 
 		WHERE c.userID = $profUserId";
-	$enrollmentResult = executeQuery($enrollmentQuery);
-	if ($enrollmentResult) {
-		while ($row = mysqli_fetch_assoc($enrollmentResult)) {
-			$enrollmentIds[] = $row['enrollmentID'];
-		}
-	}
+    $enrollmentResult = executeQuery($enrollmentQuery);
+    if ($enrollmentResult) {
+        while ($row = mysqli_fetch_assoc($enrollmentResult)) {
+            $enrollmentIds[] = $row['enrollmentID'];
+        }
+    }
 }
 
 if (!empty($enrollmentIds)) {
-	$enrollmentIdsStr = implode(',', $enrollmentIds);
-	if ($profIsInboxPage) executeQuery("UPDATE inbox SET isRead = 1 WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
-	$profInboxCount = prof_sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
+    $enrollmentIdsStr = implode(',', $enrollmentIds);
+    if ($profIsInboxPage)
+        executeQuery("UPDATE inbox SET isRead = 1 WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
+    $profInboxCount = prof_sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
 } else {
-	if ($profIsInboxPage) executeQuery("UPDATE inbox SET isRead = 1 WHERE isRead = 0");
-	$profInboxCount = prof_sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE isRead = 0");
+    if ($profIsInboxPage)
+        executeQuery("UPDATE inbox SET isRead = 1 WHERE isRead = 0");
+    $profInboxCount = prof_sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE isRead = 0");
 }
 
 $_SESSION['profInboxCount'] = $profInboxCount;
+
+// Get username and pfp
+
+$userID = $_SESSION['userID'];
+
+$usernameAndProfilePictureQuery = "
+SELECT 
+    u.userName, 
+    ui.profilePicture
+FROM users u
+JOIN userinfo ui ON u.userID = ui.userID
+WHERE u.userID = $userID
+";
+
+$usernameAndProfilePictureResult = executeQuery($usernameAndProfilePictureQuery);
+$userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
+
 ?>
+
 
 <div class="col-auto d-none d-md-block">
     <div class="col-auto d-none d-md-block">
@@ -98,13 +121,13 @@ $_SESSION['profInboxCount'] = $profInboxCount;
                         <img src="../shared/assets/img/courses.png" class="img-fluid"
                             style="width: 30px; height: 30px;">
                         <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'course') ? 'selected' : ''; ?>"
-                            href="#"><strong>Courses</strong></a>
+                            href="course.php"><strong>Courses</strong></a>
                     </li>
 
                     <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'inbox') ? 'selected-box' : ''; ?>"
                         data-page="">
                         <img src="../shared/assets/img/inbox.png" class="img-fluid" style="width: 30px; height: 30px;">
-                        <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'inbox') ? 'inbox' : ''; ?>"
+                        <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'inbox') ? 'selected' : ''; ?>"
                             href="inbox.php"><strong>Inbox</strong></a>
                         <?php
                         $displayProfInbox = isset($profInboxCount) && is_numeric($profInboxCount)
@@ -119,8 +142,8 @@ $_SESSION['profInboxCount'] = $profInboxCount;
                     </li>
 
                     <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'search') ? 'selected-box' : ''; ?>"
-                        data-page="">
-                        <img src="../shared/assets/img/profIndex/search.png" class="img-fluid"
+                        data-page="explore" data-bs-toggle="modal" data-bs-target="#searchModal">
+                        <img src="../shared/assets/img/explore.png" class="img-fluid"
                             style="width: 30px; height: 30px;">
                         <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'search') ? 'selected' : ''; ?>"
                             href="#"><strong>Search</strong></a>
@@ -128,46 +151,122 @@ $_SESSION['profInboxCount'] = $profInboxCount;
 
                     <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'assess') ? 'selected-box' : ''; ?>"
                         data-page="">
-                        <img src="../shared/assets/img/profIndex/assess.png" class="img-fluid"
-                            style="width: 30px; height: 30px;">
+                        <img src="../shared/assets/img/assess.png" class="img-fluid" style="width: 30px; height: 30px;">
                         <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'assess') ? 'selected' : ''; ?>"
-                            href="#"><strong>Assess</strong></a>
+                            href="assess.php"><strong>Assess</strong></a>
                     </li>
+
+                    <div class="dropdown d-flex justify-content-center mt-2">
+                        <button class="btn btn-custom text-sbold rounded-pill px-4 dropdown-toggle" type="button"
+                            id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="background: var(--primaryColor) !important;
+                             border: 1px solid var(--black);">
+                            + Create
+                        </button>
+                        <ul class="dropdown-menu shadow text-med" aria-labelledby="dropdownMenuButton"
+                            style="left: 50%; transform: translateX(-50%); width: auto; min-width: 0;">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center mt-1" href="create-course.php">
+                                    <span class="material-symbols-rounded me-2"
+                                        style="color:#2c2c2c;font-size:16px">folder</span>
+                                    Course
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="post-announcement.php">
+                                    <span class="material-symbols-rounded me-2"
+                                        style="color:#2c2c2c;font-size:16px">campaign</span>
+                                    Announce
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="add-lesson.php">
+                                    <span class="material-symbols-rounded me-2"
+                                        style="color:#2c2c2c;font-size:16px">notes</span>
+                                    Lesson
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="create-test.php">
+                                    <span class="material-symbols-rounded me-2"
+                                        style="color:#2c2c2c;font-size:16px">quiz</span>
+                                    Test
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="assign-task.php">
+                                    <span class="material-symbols-rounded me-2"
+                                        style="color:#2c2c2c;font-size:16px">add_task</span>
+                                    Task
+                                </a>
+                            </li>
+                        </ul>
+
+                    </div>
 
                 </ul>
 
-
-
-
-                <div class="dropdown mt-auto p-4" style="letter-spacing: -1px;">
+                <!-- User Dropdown -->
+                <div class="dropdown mt-auto p-4">
                     <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark"
                         data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="https://avatars.githubusercontent.com/u/181800261?s=96&v=4" alt="" width="32"
-                            height="32" class="rounded-circle me-2">
-                        <strong class="text-dark text-med text-16 px-1">jamesdoe</strong>
+                        <img src="../shared/assets/pfp-uploads/<?php echo $userInformation['profilePicture'] ?>" alt=""
+                            width="32" height="32" class="rounded-circle me-2"
+                            style="object-fit: cover; width: 32px; height: 32px; overflow: hidden;">
+
+                        <strong class="text-dark text-med text-16 px-1 text-truncate" style="max-width:100px"
+                            title=" <?php echo $userInformation['userName'] ?>">
+                            <?php echo $userInformation['userName'] ?>
+                        </strong>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end text-small shadow">
-                        <li class="ms-3 my-1" style="font-family: var(--Bold);"><i
-                                class="fa-solid fa-gear me-2"></i>Settings</li>
-                        <li><a class="dropdown-item" style="font-family: var(--Regular);"
-                                href="termsAndConditions.php">Terms &
-                                Conditions</a></li>
-                        <li><a class="dropdown-item" style="font-family: var(--Regular);"
-                                href="changepassword.php">Change
-                                Password</a></li>
-                        <li><a class="dropdown-item" style="font-family: var(--Regular);" href="faqs.php">FAQs</a>
+
+                    <ul class="dropdown-menu dropdown-menu-end text-small shadow"
+                        style="margin-top: 8px; transform: none !important; --bs-dropdown-link-active-bg: transparent; --bs-dropdown-link-active-color: inherit;">
+
+                        <!-- Settings -->
+                        <li style="margin-bottom:6px;">
+                            <a class="dropdown-item d-flex align-items-center text-med text-14" href="settings.php">
+                                <span class="material-symbols-rounded"
+                                    style="font-size:18px; display: inline-flex; width: 1.5em; ">settings</span>
+                                Settings
+                            </a>
                         </li>
-                        <li><a class="dropdown-item" style="font-family: var(--Regular);" href="feedback.php">Send
-                                Feedback</a></li>
-                        <hr class="dropdown-divider">
-                        <li><a class="dropdown-item" style="font-family: var(--Bold);" href="profile.php"><i
-                                    class="fa-solid fa-user me-2"></i>My Profile</a></li>
+
+                        <!-- Support -->
+                        <li style="margin-bottom:6px;">
+                            <a class="dropdown-item d-flex align-items-center text-med text-14" href="support.php">
+                                <span class="material-symbols-rounded"
+                                    style="font-size:18px; display: inline-flex; width: 1.5em; ">contact_support</span>
+                                Support
+                            </a>
+                        </li>
+
+                        <!-- Settings -->
+                        <li style="margin-bottom:6px;">
+                            <a class="dropdown-item d-flex align-items-center text-med text-14" href="calendar.php">
+                                <span class="material-symbols-rounded"
+                                    style="font-size:18px; display: inline-flex; width: 1.5em; ">calendar_month</span>
+                                Calendar
+                            </a>
+                        </li>
+
+                        <!-- Profile -->
+                        <li style="margin-bottom:6px;">
+                            <a class="dropdown-item d-flex align-items-center text-med text-14" href="profile.php">
+                                <span class="material-symbols-rounded"
+                                    style="font-size:18px; display: inline-flex; width: 1.5em; ">person</span>
+                                My Profile
+                            </a>
+                        </li>
+
+                        <!-- Sign Out -->
                         <li>
-                            <hr class="dropdown-divider">
+                            <a class="dropdown-item d-flex align-items-center text-med text-14" href="../login.php"
+                                style="color:var(--highlight);">
+                                <span class="material-symbols-rounded"
+                                    style="font-size:18px; display: inline-flex; width: 1.5em; ">logout</span>
+                                Sign Out
+                            </a>
                         </li>
-                        <li><a class="dropdown-item" style="font-family: var(--Bold); color:var(--highlight)"
-                                href="../login.php"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign
-                                out</a></li>
                     </ul>
                 </div>
 
@@ -175,3 +274,58 @@ $_SESSION['profInboxCount'] = $profInboxCount;
         </div>
     </div>
 </div>
+
+<!-- Search Modal -->
+<div class="modal fade text-reg" id="searchModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow"
+            style="background: transparent !important; box-shadow: none !important;">
+
+            <!-- Search Bar -->
+            <form class="p-3 position-relative">
+                <input type="text" id="searchInput" class="form-control rounded-pill pt-3 pb-3"
+                    placeholder="Search students & professors"
+                    style="border: 1.5px solid #2c2c2c; padding-right: 5rem; padding-left: 27px;">
+                <span class="material-symbols-rounded pe-3" style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%);
+          color: #2c2c2c; font-size: 24px;">search</span>
+            </form>
+
+            <!-- Search Results -->
+            <div class="p-3">
+                <div class="rounded-4 shadow-sm scroll-box" style="border: 1.5px solid #2c2c2c;
+          border-radius: 16px; height: 350px; background-color: #fff; padding:10px;">
+                    <div id="searchResults" class="scroll-content"
+                        style="height: 100%; overflow-y: auto; border-radius: 12px;">
+                        <div class="text-center text-muted p-3">Type a name or username to search.</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Search Modal JS -->
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim();
+
+        if (query === '') {
+            searchResults.innerHTML = '<div class="text-center text-muted p-3">Type a name or username to search.</div>';
+            return;
+        }
+
+        fetch('../shared/assets/processes/search-modal-prof.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'searchTerm=' + encodeURIComponent(query)
+        })
+            .then(res => res.text())
+            .then(html => searchResults.innerHTML = html)
+            .catch(() => searchResults.innerHTML = '<div class="text-center text-muted p-3">Error loading results.</div>');
+    });
+
+</script>

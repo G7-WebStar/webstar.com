@@ -102,7 +102,7 @@ $profile = $conn->query($profileQuery)->fetch_assoc();
                                         <div class="card-body d-flex align-items-center justify-content-center p-2">
                                             <img src="shared/assets/img/shop/emblems/<?= htmlspecialchars($emblem['emblemImg']) ?>"
                                                 alt="<?= htmlspecialchars($emblem['emblemTitle']) ?>" class="img-fluid"
-                                                style="max-height:140px; object-fit:contain;">
+                                                style="max-height:140px; object-fit:contain; user-select: none;">
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
@@ -183,7 +183,7 @@ $profile = $conn->query($profileQuery)->fetch_assoc();
                                         <div class="card-body d-flex align-items-center justify-content-center p-0">
                                             <img src="shared/assets/img/shop/cover-images/<?= htmlspecialchars($cover['coverImg']) ?>"
                                                 alt="<?= htmlspecialchars($cover['coverTitle']) ?>" class="img-fluid"
-                                                style="max-height:240px; object-fit:cover; width:100%;">
+                                                style="max-height:240px; object-fit:cover; width:100%; user-select: none;">
                                         </div>
                                     </div>
                                 <?php endforeach; ?>

@@ -1,6 +1,6 @@
 <?php
-include('shared/assets/database/connect.php');
-include("shared/assets/processes/session-process.php");
+include('../shared/assets/database/connect.php');
+include("../shared/assets/processes/prof-session-process.php");
 
 // Get the username from the URL (e.g., profile.php?user=jamesdoe)
 $username = $_GET['user'] ?? null;
@@ -260,11 +260,11 @@ function getRelativeTime($datetime, $fullDateFallback = true)
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="shared/assets/css/global-styles.css">
-    <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
-    <link rel="stylesheet" href="shared/assets/css/profile.css">
+    <link rel="stylesheet" href="../shared/assets/css/global-styles.css">
+    <link rel="stylesheet" href="../shared/assets/css/sidebar-and-container-styles.css">
+    <link rel="stylesheet" href="../shared/assets/css/profile.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
+    <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
 
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
@@ -282,10 +282,10 @@ function getRelativeTime($datetime, $fullDateFallback = true)
         <div class="row w-100">
 
             <!-- Sidebar (only shows on mobile) -->
-            <?php include 'shared/components/sidebar-for-mobile.php'; ?>
+            <?php include '../shared/components/prof-sidebar-for-mobile.php'; ?>
 
             <!-- Sidebar Column (fixed on desktop) -->
-            <?php include 'shared/components/sidebar-for-desktop.php'; ?>
+            <?php include '../shared/components/prof-sidebar-for-desktop.php'; ?>
 
             <!-- Main Container Column-->
             <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-0 p-md-4 overflow-y-auto">
@@ -293,7 +293,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                     style="background-color: transparent;">
 
                     <!-- Navbar for mobile -->
-                    <?php include 'shared/components/navbar-for-mobile.php'; ?>
+                    <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
                     <div class="container-fluid py-3 overflow-y-auto row-padding-top" style="position: relative;">
                         <div class="row g-0 w-100">
@@ -302,7 +302,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                             <div class="d-flex align-items-center text-decoration-none sticky-header py-4"
                                 id="stickyHeader" style="padding: 14px 18px;">
                                 <div class="rounded-circle me-3 flex-shrink-0 ms-3" style="width: 40px; height: 40px; background-color: #5ba9ff;
-                                background: url('shared/assets/pfp-uploads/<?= htmlspecialchars($user['profilePicture']) ?>') no-repeat center center;
+                                background: url('../shared/assets/pfp-uploads/<?= htmlspecialchars($user['profilePicture']) ?>') no-repeat center center;
                                 background-size: cover;">
                                 </div>
                                 <div class="d-flex flex-column justify-content-center">
@@ -327,13 +327,13 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                             <!-- General Info -->
                                             <div class="row m-0 pb-md-3 d-flex align-items-center">
                                                 <div class="cover-photo"
-                                                    style="background: url('shared/assets/img/shop/cover-images/<?= htmlspecialchars($profile['coverImg']) ?>') center/cover no-repeat;">
+                                                    style="background: url('../shared/assets/img/shop/cover-images/<?= htmlspecialchars($profile['coverImg']) ?>') center/cover no-repeat;">
                                                 </div>
 
                                                 <!-- Profile Block -->
                                                 <div class="profile-block px-4">
                                                     <div class="profile-pic"
-                                                        style="background: url('shared/assets/pfp-uploads/<?= htmlspecialchars($user['profilePicture']) ?>') center/cover no-repeat white;">
+                                                        style="background: url('../shared/assets/pfp-uploads/<?= htmlspecialchars($user['profilePicture']) ?>') center/cover no-repeat white;">
                                                     </div>
                                                     <div class="profile-text mt-3">
                                                         <!-- Name and Username -->
@@ -474,7 +474,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                 <span class="text-sbold">My Emblem</span>
                                             </div>
                                             <div class="h-100 d-flex justify-content-center align-items-center">
-                                                <img src="shared/assets/img/shop/emblems/<?= htmlspecialchars($profile['emblemImg']) ?>"
+                                                <img src="../shared/assets/img/shop/emblems/<?= htmlspecialchars($profile['emblemImg']) ?>"
                                                     class="img-fluid"
                                                     style="max-height: 250px; width: 100%; height: auto; object-fit: contain;">
                                             </div>
@@ -517,7 +517,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                                 ?>
                                                                 <div class="w-100 badge-option rounded-3 d-flex align-items-center p-2 mt-2"
                                                                     style="cursor: pointer; border: 1px solid var(--black);">
-                                                                    <img src="shared/assets/img/badge/<?php echo $row['badgeIcon']; ?>"
+                                                                    <img src="../shared/assets/img/badge/<?php echo $row['badgeIcon']; ?>"
                                                                         alt="Badge" style="width: 55px; height: 55px;"
                                                                         class="mx-1 ms-1 me-2">
                                                                     <div>
@@ -539,7 +539,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                             // Display this if no badges
                                                             echo '
                                                                 <div class="text-center my-2">
-                                                                    <img src="shared/assets/img/empty/leaderboard.png" width="100" class="mb-1">
+                                                                    <img src="../shared/assets/img/empty/leaderboard.png" width="100" class="mb-1">
                                                                     <div class="text-med text-14 mt-2">This user has no badges yet.</div>
                                                                 </div>';
                                                         }
@@ -613,7 +613,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                 } else
                                                     echo '
                                                         <div class="text-center mb-2">
-                                                            <img src="shared/assets/img/empty/folder2.png" width="100" class="mb-1">
+                                                            <img src="../shared/assets/img/empty/folder2.png" width="100" class="mb-1">
                                                             <div class="text-med text-14 mt-2">This user is not enrolled <br>in any courses yet.</div>
                                                         </div>';
                                                 ?>
@@ -669,16 +669,16 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                             <div class="text-center text-12 text-sbold mb-4"
                                                                 style="margin-top: 30px;">
                                                                 <span class="me-1">My Week on </span>
-                                                                <img src="shared/assets/img/webstar-logo-black.png"
+                                                                <img src="../shared/assets/img/webstar-logo-black.png"
                                                                     style="width: 80px; height: 100%; object-fit: cover; margin-top:-5px"
                                                                     alt="Profile Picture">
                                                             </div>
                                                             <div
                                                                 class="d-flex justify-content-center text-decoration-none pb-2">
-                                                                <div class="rounded-circle flex-shrink-0 me-2 overflow-hidden d-flex justify-content-center align-items-center"
+                                                                <div class="rounded-circle flex-shrink-0 me-2 overflow-hidden"
                                                                     style="width: 40px; height: 40px; border: 1px solid var(--black); box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.8);">
-                                                                    <img src="shared/assets/pfp-uploads/<?= htmlspecialchars($user['profilePicture']) ?>"
-                                                                        style="width: auto; height: 100%; object-fit: cover;"
+                                                                    <img src="../shared/assets/pfp-uploads/<?= htmlspecialchars($user['profilePicture']) ?>"
+                                                                        style="width: 100%; height: 100%; object-fit: cover;"
                                                                         alt="Profile Picture">
                                                                 </div>
 
@@ -724,7 +724,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                             <div class="emblem">
                                                                 <div
                                                                     class="h-100 d-flex justify-content-center align-items-center py-2">
-                                                                    <img src="shared/assets/img/shop/emblems/<?= htmlspecialchars($profile['emblemImg']) ?>"
+                                                                    <img src="../shared/assets/img/shop/emblems/<?= htmlspecialchars($profile['emblemImg']) ?>"
                                                                         class="img-fluid"
                                                                         style="max-height: 250px; width: 100%; height: auto; object-fit: contain;">
                                                                 </div>
@@ -774,7 +774,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                     } else {
                                                         echo '
                                                         <div class="text-center mb-2">
-                                                            <img src="shared/assets/img/empty/activity.png" width="80" class="mb-1">
+                                                            <img src="../shared/assets/img/empty/activity.png" width="80" class="mb-1">
                                                             <div class="text-med text-14 mt-2">No recent activity yet.</div>
                                                         </div>';
                                                     }
@@ -801,7 +801,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
             const card = document.querySelector('.star-card');
 
             html2canvas(card, {
-                scale: window.devicePixelRatio * 3,
+                scale: window.devicePixelRatio * 4,
                 useCORS: true,
                 backgroundColor: null,
                 logging: false,

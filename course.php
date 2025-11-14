@@ -222,7 +222,7 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                                     <?php
                                 }
                             } else if ($noResult) { ?>
-                                    <div class="text-sbold h1 text-center mt-5">No Result.</div>
+                                    <div class="text-reg h1 text-center mt-5">No Result.</div>
                                 <?php
                             } else {
                                 ?>

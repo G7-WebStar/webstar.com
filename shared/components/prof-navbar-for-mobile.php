@@ -1,17 +1,209 @@
-<nav class="navbar navbar-light px-3 d-md-none">
-    <div class="container-fluid position-relative">
+<!-- Styles -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
+    rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
-        <!-- Toggler -->
-        <button class="navbar-toggler position-absolute start-0 top-50 translate-middle-y p-1 custom-toggler"
-            type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">
-            <span class="navbar-toggler-icon"></span>
-        </button>
 
-        <!-- Logo -->
-        <a class="navbar-brand mx-auto" href="#">
-            <img src="../shared/assets/img/webstar-logo-black.png" alt="Webstar" style="height: 35px;">
+<!-- Header Navbar -->
+<nav class="navbar navbar-light p-2 px-4 d-md-none border-bottom border-secondary-subtle"
+    style="position: absolute; top: 0; left: 0; right: 0; width: 100%; padding: 0; margin: 0; background-color: #fff; z-index: 1000;">
+    <div class="container-fluid p-0 m-0 d-flex justify-content-between align-items-center">
+
+        <!-- Logo (linked to home) -->
+        <a class="navbar-brand mb-2" href="index.php" style="margin-left: 0; text-decoration: none;">
+            <img src="../shared/assets/img/webstar-logo-black.png" alt="Webstar" style="height: 25px;">
         </a>
 
+        <div class="dropdown d-flex justify-content-center">
+                        <button class="btn btn-custom text-sbold rounded-3 px-2 d-flex justify-content-center align-items-center" type="button"
+                            id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="background: var(--primaryColor) !important;
+                             border: 1px solid var(--black);">
+                            <span class="material-symbols-rounded">add</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow text-med" aria-labelledby="dropdownMenuButton"
+                            style="width: auto; min-width: 0;">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center mt-1" href="create-course.php">
+                                    <span class="material-symbols-rounded me-2"
+                                        style="color:#2c2c2c;font-size:16px">folder</span>
+                                    Course
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="post-announcement.php">
+                                    <span class="material-symbols-rounded me-2"
+                                        style="color:#2c2c2c;font-size:16px">campaign</span>
+                                    Announce
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="add-lesson.php">
+                                    <span class="material-symbols-rounded me-2"
+                                        style="color:#2c2c2c;font-size:16px">notes</span>
+                                    Lesson
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="create-test.php">
+                                    <span class="material-symbols-rounded me-2"
+                                        style="color:#2c2c2c;font-size:16px">quiz</span>
+                                    Test
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="assign-task.php">
+                                    <span class="material-symbols-rounded me-2"
+                                        style="color:#2c2c2c;font-size:16px">add_task</span>
+                                    Task
+                                </a>
+                            </li>
+                        </ul>
+
+                    </div>
 
     </div>
 </nav>
+
+
+<!-- Bottom Navbar -->
+<nav class="navbar fixed-bottom border-top d-block d-md-none" style="background-color:white; height: 80px;">
+    <div class="container d-flex justify-content-around pb-1">
+
+        <!-- Home -->
+        <a href="index.php"
+            class="btn d-flex nav-btn-navbar flex-column align-items-center <?php echo ($activePage == 'home') ? 'selected-nav-item' : ''; ?>"
+            style="border-color:transparent; text-decoration:none;">
+            <span class="material-symbols-rounded" style="font-size:20px">
+                dashboard
+            </span>
+            <span class="text-med text-12">Home</span>
+        </a>
+
+        <!-- Courses -->
+        <a href="course.php"
+            class="btn d-flex nav-btn-navbar flex-column align-items-center <?php echo ($activePage == 'course') ? 'selected-nav-item' : ''; ?>"
+            style="border-color:transparent; text-decoration:none;">
+            <span class="material-symbols-rounded" style="font-size:20px">
+                folder
+            </span>
+            <small class="text-med text-12">Courses</small>
+        </a>
+
+        <!-- Quests -->
+        <a href="todo.php"
+            class="btn d-flex nav-btn-navbar flex-column align-items-center <?php echo ($activePage == 'todo') ? 'selected-nav-item' : ''; ?>"
+            style="border-color:transparent; text-decoration:none;">
+            <span class="material-symbols-rounded" style="font-size:21px">
+                assignment
+            </span>
+            <small class="text-med text-12">Assess</small>
+        </a>
+
+        <!-- Inbox -->
+        <a href="inbox.php"
+            class="btn d-flex nav-btn-navbar flex-column align-items-center position-relative <?php echo ($activePage == 'inbox') ? 'selected-nav-item' : ''; ?>"
+            style="border-color:transparent; text-decoration:none;">
+            <i class="bi bi-inbox-fill" style="font-size:25px; color:var(--black); margin-top:-10px;"></i>
+            <small class="text-med text-12" style="margin-top:-7px;">Inbox</small>
+            <span
+                class="mt-1 position-absolute top-0 start-100 z-3 translate-middle badge rounded-pill bg-danger text-reg text-white"
+                style="color:white!important;">
+                10
+            </span>
+        </a>
+
+
+        <!-- More -->
+        <div class="dropup">
+            <button class="btn nav-btn-navbar d-flex flex-column align-items-center" data-bs-toggle="dropdown"
+                aria-expanded="false" style="border-color:transparent;">
+                <span class="material-symbols-rounded dehaze-icon" style="font-size:20px;">
+                    dehaze
+                </span>
+                <small class="text-med text-12">More</small>
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-end text-small shadow"
+                style="bottom:100%; margin-bottom:8px; transform:none !important;">
+
+                <!-- Settings -->
+                <li style="margin-bottom:6px;">
+                    <a class="dropdown-item d-flex align-items-center text-med text-14" href="settings.php">
+                        <span class="material-symbols-rounded me-2" style="font-size:18px;">settings</span>
+                        Settings
+                    </a>
+                </li>
+
+                <!-- Support -->
+                <li style="margin-bottom:6px;">
+                    <a class="dropdown-item d-flex align-items-center text-med text-14" href="support.php">
+                        <span class="material-symbols-rounded me-2" style="font-size:18px;">contact_support</span>
+                        Support
+                    </a>
+                </li>
+                
+                <!-- Search -->
+                <li style="margin-bottom:6px;">
+                    <a class="dropdown-item d-flex align-items-center text-med text-14" href="search.php"
+                        data-bs-toggle="modal" data-bs-target="#searchModalMobile">
+                        <span class="material-symbols-rounded me-2" style="font-size:18px;">search</span>
+                        Search
+                    </a>
+                </li>
+
+                <!-- Calendar -->
+                <li style="margin-bottom:6px;">
+                    <a class="dropdown-item d-flex align-items-center text-med text-14" href="calendar.php">
+                        <span class="material-symbols-rounded me-2" style="font-size:18px;">calendar_month</span>
+                        Calendar
+                    </a>
+                </li>
+
+                <!-- Profile -->
+                <li style="margin-bottom:6px;">
+                    <a class="dropdown-item d-flex align-items-center text-med text-14" href="profile.php">
+                        <span class="material-symbols-rounded me-2" style="font-size:18px;">person</span>
+                        My Profile
+                    </a>
+                </li>
+
+                <!-- Sign Out -->
+                <li>
+                    <a class="dropdown-item d-flex align-items-center text-med text-14" href="login.php"
+                        style="color:var(--highlight);">
+                        <span class="material-symbols-rounded me-2" style="font-size:18px;">logout</span>
+                        Sign out
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const dropup = document.querySelector('.dropup');
+        const dropupBtn = dropup.querySelector('button');
+        const icon = dropupBtn.querySelector('.dehaze-icon');
+
+        // When dropdown is shown
+        dropup.addEventListener('shown.bs.dropdown', () => {
+            icon.textContent = 'close';
+            icon.classList.add('spin');
+        });
+
+        // When dropdown is hidden (click outside or menu item)
+        dropup.addEventListener('hidden.bs.dropdown', () => {
+            icon.textContent = 'dehaze';
+            icon.classList.remove('spin');
+        });
+
+        // When "Search" item clicked, also reset icon
+        const searchBtn = dropup.querySelector('a[data-bs-target="#searchModalMobile"]');
+        if (searchBtn) {
+            searchBtn.addEventListener('click', () => {
+                icon.textContent = 'dehaze';
+                icon.classList.remove('spin');
+            });
+        }
+    });
+</script>
