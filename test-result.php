@@ -5,7 +5,7 @@ include('shared/assets/database/connect.php');
 include("shared/assets/processes/session-process.php");
 $testID = $_GET['testID'];
 if ($testID == null) {
-    header("Location: 404.php");
+    header("Location: 404.html");
     exit();
 }
 
@@ -33,27 +33,41 @@ INNER JOIN testquestions
     ON tests.testID = testquestions.testID 
 WHERE tests.testID = $testID";
 $selectQuestionsResult = executeQuery($selectQuestionsQuery);
-$todoStatus = 'Submitted';
+
 $validateTestIDQuery = "SELECT 
                         todo.* 
                         FROM todo 
                         INNER JOIN tests 
                         ON todo.assessmentID = tests.assessmentID 
-                        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = '$todoStatus';";
+                        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = 'Graded';";
 $validateTestIDResult = executeQuery($validateTestIDQuery);
 
 if (mysqli_num_rows($validateTestIDResult) <= 0) {
-    $todoStatus = 'Pending';
     $checkStatusQuery = "SELECT 
                         todo.* 
                         FROM todo 
                         INNER JOIN tests 
                         ON todo.assessmentID = tests.assessmentID 
-                        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = '$todoStatus';";
+                        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = 'Pending';";
     $checkStatusResult = executeQuery($checkStatusQuery);
     if (mysqli_num_rows($checkStatusResult) > 0) {
         header("Location: test.php?testID=" . $testID);
         exit();
+    } else {
+        $checkStatusQuery = "SELECT 
+                            todo.* FROM todo 
+                            INNER JOIN tests 
+                                ON todo.assessmentID = tests.assessmentID 
+                            WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = 'Submitted';";
+        $checkStatusResult = executeQuery($checkStatusQuery);
+
+        if (mysqli_num_rows($checkStatusResult) > 0) {
+            header("Location: test-submitted.php?testID=" . $testID);
+            exit();
+        } else {
+            echo "Test doesn't exists.";
+            exit();
+        }
     }
 }
 ?>
@@ -167,7 +181,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                                         style="color: var(--black);"></i>
                                     <div class="quiz-nav col-12 d-flex flex-column flex-md-row align-items-center justify-content-between my-2 px-3 px-md-5 py-2 py-md-3">
                                         <div class="d-flex flex-row align-items-center mb-0">
-                                            <a href="todo.php" class="text-decoration-none"><i class="d-none d-md-block announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 me-3"
+                                            <a href="exam-info.php?testID=<?php echo $testID; ?>" class="text-decoration-none"><i class="d-none d-md-block announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 me-3"
                                                     style="color: var(--black);"></i></a>
                                             <?php
                                             if (mysqli_num_rows($selectTestResult) > 0) {

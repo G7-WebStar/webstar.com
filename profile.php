@@ -673,6 +673,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                                     style="width: 80px; height: 100%; object-fit: cover; margin-top:-5px"
                                                                     alt="Profile Picture">
                                                             </div>
+                                                            
                                                             <div
                                                                 class="d-flex justify-content-center text-decoration-none pb-2">
                                                                 <div class="rounded-circle flex-shrink-0 me-2 overflow-hidden d-flex justify-content-center align-items-center"

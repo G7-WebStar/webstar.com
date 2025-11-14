@@ -6,7 +6,7 @@ include("shared/assets/processes/session-process.php");
 $testID = $_GET['testID'];
 
 if ($testID == null) {
-    header("Location: 404.php");
+    header("Location: 404.html");
     exit();
 }
 
@@ -14,7 +14,7 @@ $submissionValidationQuery = "SELECT * FROM testresponses WHERE testID = $testID
 $submissionValidationResult = executeQuery($submissionValidationQuery);
 
 if (mysqli_num_rows($submissionValidationResult) > 0) {
-    header("Location: index.php");
+    header("Location: test-submitted.php?testID=" . $testID);
     exit();
 }
 
@@ -23,6 +23,8 @@ $selectTestQuery = "SELECT assessmentTitle, generalGuidance FROM tests
                         ON tests.assessmentID = assessments.assessmentID
                     WHERE testID = $testID";
 $selectTestResult = executeQuery($selectTestQuery);
+$pageTitleRow = mysqli_fetch_assoc($selectTestResult);
+$pageTitle = $pageTitleRow['assessmentTitle'];
 
 $selectQuestionsQuery = "SELECT 
 testquestions.*
@@ -41,8 +43,32 @@ $validateTestIDQuery = "SELECT
 $validateTestIDResult = executeQuery($validateTestIDQuery);
 
 if (mysqli_num_rows($validateTestIDResult) <= 0) {
-    header("Location: index.php");
-    exit();
+    $checkStatusQuery = "SELECT 
+                        todo.* 
+                        FROM todo 
+                        INNER JOIN tests 
+                        ON todo.assessmentID = tests.assessmentID 
+                        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = 'Submitted';";
+    $checkStatusResult = executeQuery($checkStatusQuery);
+    if (mysqli_num_rows($checkStatusResult) > 0) {
+        header("Location: test-submitted.php?testID=" . $testID);
+        exit();
+    } else {
+        $checkStatusQuery = "SELECT 
+                            todo.* FROM todo 
+                            INNER JOIN tests 
+                                ON todo.assessmentID = tests.assessmentID 
+                            WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = 'Graded';";
+        $checkStatusResult = executeQuery($checkStatusQuery);
+
+        if (mysqli_num_rows($checkStatusResult) > 0) {
+            header("Location: test-result.php?testID=" . $testID);
+            exit();
+        } else {
+            echo "Test doesn't exists.";
+            exit();
+        }
+    }
 }
 ?>
 <!doctype html>
@@ -51,7 +77,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | Index</title>
+    <title>Webstar | <?php echo $pageTitle; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
@@ -147,10 +173,11 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                                         style="color: var(--black);"></i>
                                     <div class="quiz-nav col-12 d-flex flex-column flex-md-row align-items-center justify-content-between my-2 px-3 px-md-5 py-2 py-md-3">
                                         <div class="d-flex flex-row align-items-center mb-0">
-                                            <a href="todo.php" class="text-decoration-none"><i class="d-none d-md-block announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 me-3"
+                                            <a href="exam-info.php?testID=<?php echo $testID; ?>" class="text-decoration-none"><i class="d-none d-md-block announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 me-3"
                                                     style="color: var(--black);"></i></a>
                                             <?php
                                             if (mysqli_num_rows($selectTestResult) > 0) {
+                                                mysqli_data_seek($selectTestResult, 0);
                                                 while ($guideLines = mysqli_fetch_assoc($selectTestResult)) {
                                             ?>
                                                     <div class="text-center text-md-auto h2 m-0">
@@ -184,8 +211,8 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                                             </div>
                                         </div>
 
-                                        <div class="row my-0 mx-auto justify-content-center align-content-center" id="img-container">
-                                            <img src="" id="img-question">
+                                        <div class="row my-0 mx-auto justify-content-center align-content-center" id="question-image">
+
                                         </div>
                                         <div class="col-12 col-md-8 h5 text-reg mx-auto my-0 px-3 px-md-0 text-center text-md-start fs-sm-6 d-flex justify-content-center flex-column" id="choices">
 
@@ -209,6 +236,20 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                     </div>
                 </div> <!-- End Card -->
             </div>
+        </div>
+    </div>
+    <!-- Modal for each image -->
+    <div class="modal fade" id="imageModal0" tabindex="-1" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content bg-black border-0 d-flex justify-content-center align-items-center position-relative" style="width: 100vw; height: 100vh; border-radius: 0;">
+
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-4" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <div id="modal-img-container" class="modal-img-wrapper p-0 m-0 w-100 h-100 d-flex justify-content-center align-items-center">
+                    <img id="modal-img" class="modal-zoomable" src="" alt="Full - image" style="max-width: 100%; max-height: 100%; object-fit: contain; cursor: zoom-in; transition: transform 0.12s; transform-origin: 50% 50%; transform: translate(0px, 0px) scale(1);">
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -375,6 +416,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
         const questionContainer = document.getElementById('question-container');
         const choices = document.getElementById('choices');
         const imgContainer = document.getElementById('img-container');
+        const modalImgContainer = document.getElementById('modal-img-container');
         const questionNumber = document.getElementById('question-number');
 
         let currentQuestionIndex = 0;
@@ -418,7 +460,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                          <span class="m-0 fs-sm-6">Prev</span>
              </button>
  
-             <button class="btn d-flex align-items-center justify-content-center border border-black rounded-5 px-sm-4 py-sm-2 interactable"
+             <button class="btn d-flex align-items-center justify-content-center border border-black rounded-5 px-sm-4 py-sm-2 interactable" id="submitBtn"
                  style="background-color: var(--primaryColor);" onclick="submitQuiz();">
                  <span class="m-0 fs-sm-6">Submit</span>
              </button>
@@ -489,14 +531,32 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             }
 
             //Displays the image if it exists
-            const img = document.getElementById('img-question');
-            imgContainer.style.maxWidth = "30%";
-            img.src = questions[currentQuestionIndex].img;
-            img.style.maxWidth = "auto";
-            img.style.height = "auto";
-            img.style.objectFit = "cover";
-            imgContainer.appendChild(img);
-            img.classList.add('rounded-5', 'my-2');
+            if (questions[currentQuestionIndex].img != '') {
+                document.getElementById('question-image').innerHTML =
+                    `<div class="row g-4 justify-content-center">
+                    <div class="col-12">
+                        <div id="img-container" class="pdf-preview-box text-center" data-bs-toggle="modal" data-bs-target="#imageModal0" style="cursor: zoom-in; overflow: hidden; border-radius: 10px; width: auto; height: 180px; position: relative; border: 1px solid var(--black);">
+                            <img id="img-question" src="" alt="image" style="width: 100%; height: 100%; object-fit: cover; object-position: center center; transition: transform 0.3s; transform: scale(1);">
+                        </div>
+                    </div>
+                </div>`;
+
+                imgDiv = document.getElementById('question-image');
+                if (imgDiv && imgDiv.innerHTML != '') {
+                    const img = document.getElementById('img-question');
+                    const modalImg = document.getElementById('modal-img');
+
+                    if (modalImg && modalImgContainer) {
+                        modalImg.src = questions[currentQuestionIndex].img;
+                    }
+
+
+                    img.src = questions[currentQuestionIndex].img;
+
+                }
+            } else {
+                document.getElementById('question-image').innerHTML = ``;
+            }
         }
 
         function nextQuestion() {
@@ -604,6 +664,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             const incomplete = choiceText.some(checkNull => checkNull.userAnswer === null || checkNull.userAnswer === '');
 
             if (!incomplete) {
+                document.getElementById('submitBtn').disabled = true;
                 fetch('shared/assets/processes/submit-test.php?testID=' + <?php echo $testID; ?>, {
                         method: 'POST',
                         headers: {
@@ -624,7 +685,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                     });
                 localStorage.removeItem("choiceText<?php echo $testID; ?>");
                 localStorage.removeItem("selectedAnswers<?php echo $testID; ?>");
-                window.location.href = 'index.php';
+                window.location.href = 'test-submitted.php?testID=<?php echo $testID; ?>';
             } else {
                 console.log("Please answer all items");
             }
