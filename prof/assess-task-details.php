@@ -33,13 +33,9 @@ if ($type != 'Task') {
     exit;
 }
 
-$assignmentRow = mysqli_fetch_assoc($selectAssignmentResult);
+$assignmentRow = (mysqli_num_rows($selectAssignmentResult) > 0) ? mysqli_fetch_assoc($selectAssignmentResult) : null;
 
-$assignmentID = (mysqli_num_rows($selectAssignmentResult) > 0) ? $assignmentRow['assignmentID'] : null;
-if ($assignmentID == null) {
-    echo "Assessment doesn't exists.";
-    exit();
-}
+$assignmentID = ($assignmentRow == null) ? null : $assignmentRow['assignmentID'];
 $filesQuery = "SELECT * FROM files WHERE assignmentID = '$assignmentID'";
 $filesResult = executeQuery($filesQuery);
 
@@ -93,8 +89,8 @@ $getSubmissionIDQuery = "SELECT submissions.submissionID
         ORDER BY todo.updatedAt ASC
         LIMIT 1";
 $getSubmissionIDResult = executeQuery($getSubmissionIDQuery);
-$submissionIDRow = mysqli_fetch_assoc($getSubmissionIDResult);
-$submissionID = $submissionIDRow['submissionID'];
+$submissionIDRow = (mysqli_num_rows($getSubmissionIDResult) > 0) ? mysqli_fetch_assoc($getSubmissionIDResult) : null;
+$submissionID = ($submissionIDRow == null) ? null : $submissionIDRow['submissionID'];
 ?>
 
 <!doctype html>
