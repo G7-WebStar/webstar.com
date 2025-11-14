@@ -106,8 +106,7 @@ $showDropdowns = $assessmentCount > 0
     <div class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
         style="z-index:1100; pointer-events:none;">
         <div class="alert alert-success mb-2 shadow-lg text-med text-12
-                d-flex align-items-center justify-content-center gap-2 px-3 py-2"
-            role="alert"
+                d-flex align-items-center justify-content-center gap-2 px-3 py-2" role="alert"
             style="border-radius:8px; display:flex; align-items:center; gap:8px; padding:0.5rem 0.75rem; text-align:center; background-color:#d1e7dd; color:#0f5132;">
             <i class="bi bi-check-circle-fill fs-6" style="color: var(--black);"></i>
             <span style="color: var(--black);"><?= $_SESSION['success']; ?></span>
@@ -150,11 +149,22 @@ $showDropdowns = $assessmentCount > 0
         <?php
         mysqli_data_seek($selectAssessmentResult, 0);
         while ($todo = mysqli_fetch_assoc($selectAssessmentResult)):
-            if (empty($todo['assessmentTitle'])) continue; // skip invalid assessments
-        ?>
+            if (empty($todo['assessmentTitle']))
+                continue; // skip invalid assessments
+            ?>
             <div class="row mb-0 mt-3">
                 <div class="col-12 col-md-10">
-                    <div class="todo-card d-flex align-items-stretch">
+                    <div class="todo-card d-flex align-items-stretch position-relative">
+                        <a href="<?php
+                        $type = strtolower(trim($todo['type']));
+                        if ($type === 'task')
+                            echo 'task-info.php?assignmentID=' . $todo['assignmentID'];
+                        elseif ($type === 'test')
+                            echo 'test-info.php?testID=' . $todo['testID'];
+                        else
+                            echo '#';
+                        ?>" class="stretched-link">
+                        </a>
                         <!-- Date -->
                         <div class="date d-flex align-items-center justify-content-center text-sbold text-20">
                             <?php echo $todo['assessmentDeadline']; ?>
@@ -191,8 +201,8 @@ $showDropdowns = $assessmentCount > 0
                                 <!-- DROPDOWN MENU -->
                                 <div class="d-flex align-items-center flex-nowrap">
                                     <button class="btn btn-light btn-sm p-1 px-2 border-0 bg-transparent" type="button"
-                                        id="dropdownMenuButton<?php echo $todoID; ?>"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        id="dropdownMenuButton<?php echo $todoID; ?>" data-bs-toggle="dropdown"
+                                        aria-expanded="false">
                                         <i class="bi bi-three-dots-vertical"></i>
                                     </button>
 
@@ -200,10 +210,8 @@ $showDropdowns = $assessmentCount > 0
                                         aria-labelledby="dropdownMenuButton<?php echo $todoID; ?>">
                                         <li><a class="dropdown-item text-reg text-14" href="<?php echo $link; ?>">Edit</a></li>
                                         <li>
-                                            <button type="button"
-                                                class="dropdown-item text-reg text-14 text-danger"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#deleteModal<?php echo $todoID; ?>">
+                                            <button type="button" class="dropdown-item text-reg text-14 text-danger"
+                                                data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $todoID; ?>">
                                                 Delete
                                             </button>
                                         </li>
@@ -219,18 +227,22 @@ $showDropdowns = $assessmentCount > 0
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="transform: scale(0.8);"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                                    style="transform: scale(0.8);"></button>
                             </div>
                             <div class="modal-body d-flex flex-column justify-content-center align-items-center text-center">
                                 <span class="mt-4 text-bold text-22">This action cannot be undone.</span>
                                 <span class="mb-4 text-reg text-14">Are you sure you want to delete this assessment?</span>
                             </div>
                             <div class="modal-footer text-sbold text-18">
-                                <button type="button" class="btn rounded-pill px-4" style="background-color: var(--primaryColor); border: 1px solid var(--black);" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn rounded-pill px-4"
+                                    style="background-color: var(--primaryColor); border: 1px solid var(--black);"
+                                    data-bs-dismiss="modal">Cancel</button>
 
                                 <form method="POST" class="m-0">
                                     <input type="hidden" name="deleteAssessmentID" value="<?php echo $todoID; ?>">
-                                    <input type="hidden" name="deleteAssessmentType" value="<?php echo htmlspecialchars($todo['type']); ?>">
+                                    <input type="hidden" name="deleteAssessmentType"
+                                        value="<?php echo htmlspecialchars($todo['type']); ?>">
                                     <input type="hidden" name="activeTab" value="todo">
                                     <?php if (isset($courseID)): ?>
                                         <input type="hidden" name="courseID" value="<?php echo $courseID; ?>">
