@@ -197,10 +197,15 @@ $announcementResult = executeQuery($announcementQuery);
                     </p>
 
                     <!-- View Attachments Button -->
-                    <?php if (!empty($attachmentsArray)): ?>
-                        <button type="button" class="btn btn-attachments mt-3 text-med text-12"
-                            data-bs-toggle="modal" data-bs-target="#attachmentsModal<?php echo $announcementID; ?>">
-                            View <?php echo count($attachmentsArray); ?> Attachments
+                    <?php if (!empty($attachmentsArray) || !empty($linksArray)): ?>
+                        <?php
+                        $totalItems = count($attachmentsArray) + count($linksArray);
+                        ?>
+                        <button type="button"
+                            class="btn btn-attachments mt-3 text-med text-12"
+                            data-bs-toggle="modal"
+                            data-bs-target="#attachmentsModal<?php echo $announcementID; ?>">
+                            View <?php echo $totalItems; ?> File<?php echo $totalItems > 1 ? 's' : ''; ?>
                         </button>
                     <?php endif; ?>
 
@@ -241,40 +246,74 @@ $announcementResult = executeQuery($announcementQuery);
                                 id="attachmentsModalLabel<?php echo $announcementID; ?>">
                                 Attachments
                             </div>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
 
                         <!-- Body -->
                         <div class="modal-body flex-grow-1 overflow-y-auto" style="max-height: 40vh;">
-                            <?php foreach ($attachmentsArray as $file):
-                                $filePath = $file;
-                                if (!preg_match('/^https?:\/\//', $filePath)) {
-                                    $filePath = "../shared/assets/files/" . $file;
-                                }
-                                $fileExt = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
-                                $fileSize = (file_exists("../shared/assets/files/" . $file)) ? filesize("../shared/assets/files/" . $file) : 0;
-                                $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
-                                $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
-                            ?>
-                                <a href="<?php echo $filePath; ?>" class="text-decoration-none d-block mb-2"
-                                    style="color: var(--black);" <?php if (!preg_match('/^https?:\/\//', $filePath)): ?>
-                                    download="<?php echo htmlspecialchars($file); ?>" <?php endif; ?>>
-                                    <div class="cardFile d-flex align-items-start w-100" style="cursor:pointer;">
-                                        <i class="px-4 py-3 fa-solid fa-file"></i>
-                                        <div class="ms-2">
-                                            <div class="text-sbold text-16 mt-1 pe-4 file-name">
-                                                <?php echo $fileNameOnly ?>
-                                            </div>
-                                            <div class="due text-reg text-14 mb-1">
-                                                <?php echo $fileExt ?> · <?php echo $fileSizeMB ?>
+
+                            <!-- Files Section -->
+                            <?php if (!empty($attachmentsArray)): ?>
+                                <div class="text-sbold text-16 mb-2">Files</div>
+                                <?php foreach ($attachmentsArray as $attachment): ?>
+
+                                    <?php
+                                    $decodedAttachment = htmlspecialchars($attachment);
+                                    $fileExtension = strtolower(pathinfo($decodedAttachment, PATHINFO_EXTENSION));
+                                    ?>
+
+                                    <a href="../shared/assets/fileStorage/<?php echo $decodedAttachment; ?>"
+                                        download
+                                        class="text-decoration-none d-block mb-2"
+                                        style="color: var(--black);">
+
+                                        <div class="cardFile d-flex align-items-start w-100" style="cursor:pointer;">
+                                            <span class="px-4 py-3 material-symbols-outlined">draft</span>
+                                            <div class="ms-2">
+                                                <div class="text-sbold text-16 mt-1 pe-4 file-name">
+                                                    <?php echo $decodedAttachment; ?>
+                                                </div>
+                                                <div class="due text-reg text-14 mb-1">
+                                                    <?php echo strtoupper($fileExtension); ?> file
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </a>
-                            <?php endforeach; ?>
+                                    </a>
+
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+
+                            <!-- Links Section -->
+                            <?php if (!empty($linksArray)): ?>
+                                <div class="text-sbold text-16 mt-4 mb-2">Links</div>
+                                <?php foreach ($linksArray as $link): ?>
+
+                                    <a href="<?php echo htmlspecialchars($link); ?>"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="text-decoration-none d-block mb-2"
+                                        style="color: var(--black);">
+
+                                        <div class="cardFile d-flex align-items-start w-100" style="cursor:pointer;">
+                                            <span class="px-4 py-3 material-symbols-outlined">public</span>
+                                            <div class="ms-2">
+                                                <div class="text-sbold text-16 mt-1 pe-4">
+                                                    <?php echo htmlspecialchars($link); ?>
+                                                </div>
+                                                <div class="due text-reg text-14 mb-1">
+                                                    External Link
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+
                         </div>
 
                         <div class="modal-footer border-top" style="padding-top: 45px;"></div>
+
                     </div>
                 </div>
             </div>
