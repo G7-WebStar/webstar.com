@@ -276,8 +276,8 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                                 </div>
 
                                 <div id="alertContainer" style="display: none;" class="mb-3">
-                                    <div class="alert alert-danger d-flex align-items-center mb-0" role="alert">
-                                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                    <div class="alert alert-danger d-flex align-items-center mb-0" role="alert" id="alertStyle">
+                                        <i class="bi bi-exclamation-triangle-fill me-2" id="exclamation"></i>
                                         <div class="text-reg text-14" id="alertMessage"></div>
                                     </div>
                                 </div>
@@ -358,58 +358,72 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                     const input = document.getElementById('accessCodeInput');
                     const form = document.getElementById('enrollForm');
                     const alertContainer = document.getElementById('alertContainer');
+                    const alertStyle = document.getElementById('alertStyle');
+                    const exclamation = document.getElementById('exclamation');
+                    const alertMessage = document.getElementById('alertMessage');
                     const modal = document.getElementById('enrollCourseModal');
-                    // Hide alert when user starts typing
-                    if (input) {
-                        input.addEventListener('input', function() {
-                            if (alertContainer) {
-                                alertContainer.style.display = 'none';
-                            }
-                        });
-                    }
 
-                    // Handle form submission
-                    if (form) {
-                        form.addEventListener('submit', function(e) {
-                            e.preventDefault();
-                            const code = input ? input.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '') : '';
+                    // Hide alert when typing
+                    input.addEventListener('input', function() {
+                        alertContainer.style.display = 'none';
+                    });
 
-                            if (code.length !== 6) {
-                                if (alertContainer) {
-                                    document.getElementById('alertMessage').textContent = 'Please enter a complete 6-character access code.';
-                                    alertContainer.style.display = 'block';
+                    // Handle form submission via AJAX
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+
+                        const code = input.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+                        if (code.length !== 6) {
+                            alertMessage.textContent = 'Please enter a complete 6-character access code.';
+                            alertContainer.style.display = 'block';
+                            input.focus();
+                            return;
+                        }
+
+                        // Send AJAX request to PHP handler
+                        fetch('shared/assets/processes/enroll-course.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                },
+                                body: 'access_code=' + encodeURIComponent(code)
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                alertMessage.textContent = data.message;
+                                alertContainer.style.display = 'block';
+
+                                if (data.success) {
+                                    alertStyle.classList.remove('alert-danger');
+                                    alertStyle.classList.add('alert-success');
+                                    exclamation.remove();
+                                    // Reload page after short delay to show updated courses
+                                    setTimeout(() => location.reload(), 1000);
+                                } else {
+                                    alertContainer.classList.remove('alert-success');
+                                    alertContainer.classList.add('alert-danger');
                                 }
-                                if (input) {
-                                    input.focus();
-                                }
-                                return false;
-                            }
+                            })
+                            .catch(err => {
+                                alertMessage.textContent = 'An error occurred. Please try again.';
+                                alertContainer.style.display = 'block';
+                                alertContainer.classList.remove('alert-success');
+                                alertContainer.classList.add('alert-danger');
+                            });
+                    });
 
-                            // Here you can add your enrollment logic
-                            console.log('Access code:', code);
-                            // Example: You can make an AJAX call here to submit the code
-                        });
-                    }
+                    // Reset modal when closed
+                    modal.addEventListener('hidden.bs.modal', function() {
+                        input.value = '';
+                        alertContainer.style.display = 'none';
+                        alertContainer.classList.remove('alert-success', 'alert-danger');
+                    });
 
-                    // Reset form when modal is closed
-                    if (modal) {
-                        modal.addEventListener('hidden.bs.modal', function() {
-                            if (input) {
-                                input.value = '';
-                            }
-                            if (alertContainer) {
-                                alertContainer.style.display = 'none';
-                            }
-                        });
-
-                        // Focus input when modal opens
-                        modal.addEventListener('shown.bs.modal', function() {
-                            if (input) {
-                                input.focus();
-                            }
-                        });
-                    }
-
+                    // Focus input when modal opens
+                    modal.addEventListener('shown.bs.modal', function() {
+                        input.focus();
+                    });
                 });
             </script>
 
