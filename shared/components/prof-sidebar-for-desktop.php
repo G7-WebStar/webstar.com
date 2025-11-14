@@ -260,7 +260,7 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
 
                         <!-- Sign Out -->
                         <li>
-                            <a class="dropdown-item d-flex align-items-center text-med text-14" href="../login.php"
+                            <a class="dropdown-item d-flex align-items-center text-med text-14" href="#" onclick="logout();"
                                 style="color:var(--highlight);">
                                 <span class="material-symbols-rounded"
                                     style="font-size:18px; display: inline-flex; width: 1.5em; ">logout</span>
@@ -319,13 +319,19 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
         }
 
         fetch('../shared/assets/processes/search-modal-prof.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'searchTerm=' + encodeURIComponent(query)
-        })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'searchTerm=' + encodeURIComponent(query)
+            })
             .then(res => res.text())
             .then(html => searchResults.innerHTML = html)
             .catch(() => searchResults.innerHTML = '<div class="text-center text-muted p-3">Error loading results.</div>');
     });
 
+    function logout() {
+        fetch('../shared/assets/processes/sign-out.php');
+        window.location.reload();
+    }
 </script>

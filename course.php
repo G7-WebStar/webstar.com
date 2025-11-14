@@ -120,14 +120,12 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                                 <div
                                     class="col-12 col-lg-6 px-0 px-xl-auto me-2 my-1 d-flex justify-content-center justify-content-md-start">
                                     <div class="search-container d-flex me-0">
-                                        <form method="GET" class="form-control bg-transparent border-0 p-0">
-                                            <input type="text" placeholder="Search" name="search"
-                                                value="<?php echo $search ?>"
-                                                class="form-control py-1 text-reg text-14">
-                                            <button type="submit" class="btn-outline-secondary">
-                                                <i class="bi bi-search me-2"></i>
-                                            </button>
-                                        </form>
+                                        <input type="text" placeholder="Search" name="search"
+                                            value="<?php echo $search ?>"
+                                            class="form-control py-1 text-reg text-14">
+                                        <button type="button" class="btn-outline-secondary">
+                                            <i class="bi bi-search me-2"></i>
+                                        </button>
                                     </div>
                                 </div>
                                 <div
@@ -159,12 +157,12 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                         </div>
 
                         <!-- Start of Cards Section -->
-                        <div class="row my-2 mx-3 mx-md-0 mt-3">
+                        <div class="row my-2 mx-3 mx-md-0 mt-3" id="courseContainer">
                             <!-- Card -->
                             <?php
                             if (mysqli_num_rows($selectCourseResult) > 0 && !$noResult) {
                                 while ($courses = mysqli_fetch_assoc($selectCourseResult)) {
-                                    ?>
+                            ?>
                                     <div class="col-12 col-md-6 col-lg-4 col-xl-3 mt-2 m-0 p-0 pe-0 pe-md-2">
                                         <div class="card border border-black rounded-4 d-flex flex-column h-100">
                                             <a href="course-info.php?courseID=<?php echo $courses['courseID']; ?>">
@@ -219,17 +217,17 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                                             </div>
                                         </div>
                                     </div>
-                                    <?php
+                                <?php
                                 }
                             } else if ($noResult) { ?>
-                                    <div class="text-reg h1 text-center mt-5">No Result.</div>
-                                <?php
+                                <div class="text-reg h1 text-center mt-5">No Result.</div>
+                            <?php
                             } else {
-                                ?>
-                                    <script>
-                                        window.location.href = "course-join.php";
-                                    </script>
-                                <?php
+                            ?>
+                                <script>
+                                    window.location.href = "course-join.php";
+                                </script>
+                            <?php
                             }
                             ?>
                         </div>
@@ -238,49 +236,49 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                 </div>
             </div>
 
-        <!-- Enroll Course Modal -->
-        <div class="modal fade" id="enrollCourseModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered py-4" style="max-width: 500px;">
-                <div class="modal-content">
-                    <div class="modal-header border-bottom d-flex justify-content-between align-items-center">
-                        <h5 class="modal-title enroll-modal-title mb-0 text-sbold">Enter access code</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <!-- Enroll Course Modal -->
+            <div class="modal fade" id="enrollCourseModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered py-4" style="max-width: 500px;">
+                    <div class="modal-content">
+                        <div class="modal-header border-bottom d-flex justify-content-between align-items-center">
+                            <h5 class="modal-title enroll-modal-title mb-0 text-sbold">Enter access code</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <form id="enrollForm">
+                            <div class="modal-body p-4">
+                                <div class="mx-auto" style="width: 100%; max-width: 420px;">
+                                    <p class="text-med enroll-modal-description text-start mt-3 mb-2">
+                                        Enter the access code provided by your professor.
+                                    </p>
+                                    <div class="d-flex justify-content-center mb-3">
+                                        <input type="text" name="access_code"
+                                            class="input-style form-control rounded-4 border-blue"
+                                            id="accessCodeInput" placeholder="0 0 0 0 0 0" required
+                                            inputmode="text" pattern="^[A-Z0-9]{6}$" maxlength="6"
+                                            oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0,6);">
+                                    </div>
+                                </div>
+
+                                <div id="alertContainer" style="display: none;" class="mb-3">
+                                    <div class="alert alert-danger d-flex align-items-center mb-0" role="alert">
+                                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                        <div class="text-reg text-14" id="alertMessage"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer border-top">
+                                <button type="submit"
+                                    class="btn btn-sm px-3 py-1 rounded-pill text-sbold text-md-14 d-inline-flex align-items-center justify-content-center criteria-add-btn"
+                                    style="background-color: var(--primaryColor); border: 1px solid var(--black);">
+                                    Enroll
+                                </button>
+                            </div>
+                        </form>
                     </div>
-
-                    <form id="enrollForm">
-                        <div class="modal-body p-4">
-                            <div class="mx-auto" style="width: 100%; max-width: 420px;">
-                                <p class="text-med enroll-modal-description text-start mt-3 mb-2">
-                                    Enter the access code provided by your professor.
-                                </p>
-                                <div class="d-flex justify-content-center mb-3">
-                                    <input type="text" name="access_code"
-                                        class="input-style form-control rounded-4 border-blue"
-                                        id="accessCodeInput" placeholder="0 0 0 0 0 0" required
-                                        inputmode="text" pattern="^[A-Z0-9]{6}$" maxlength="6"
-                                        oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0,6);">
-                                </div>
-                            </div>
-
-                            <div id="alertContainer" style="display: none;" class="mb-3">
-                                <div class="alert alert-danger d-flex align-items-center mb-0" role="alert">
-                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                    <div class="text-reg text-14" id="alertMessage"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="modal-footer border-top">
-                            <button type="submit"
-                                class="btn btn-sm px-3 py-1 rounded-pill text-sbold text-md-14 d-inline-flex align-items-center justify-content-center criteria-add-btn"
-                                style="background-color: var(--primaryColor); border: 1px solid var(--black);">
-                                Enroll
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
-        </div>
 
             <!-- Dropdown js -->
             <script>
@@ -309,7 +307,7 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
             </script>
 
             <script>
-                document.addEventListener("DOMContentLoaded", function () {
+                document.addEventListener("DOMContentLoaded", function() {
                     const filterToggle = document.getElementById("filterToggle");
                     const mobileFilters = document.getElementById("mobileFilters");
                     const icon = filterToggle.querySelector(".material-symbols-rounded");
@@ -340,67 +338,88 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                 });
             </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const input = document.getElementById('accessCodeInput');
-            const form = document.getElementById('enrollForm');
-            const alertContainer = document.getElementById('alertContainer');
-            const modal = document.getElementById('enrollCourseModal');
-            // Hide alert when user starts typing
-            if (input) {
-                input.addEventListener('input', function() {
-                    if (alertContainer) {
-                        alertContainer.style.display = 'none';
-                    }
-                });
-            }
-
-            // Handle form submission
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    const code = input ? input.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '') : '';
-
-                    if (code.length !== 6) {
-                        if (alertContainer) {
-                            document.getElementById('alertMessage').textContent = 'Please enter a complete 6-character access code.';
-                            alertContainer.style.display = 'block';
-                        }
-                        if (input) {
-                            input.focus();
-                        }
-                        return false;
-                    }
-
-                    // Here you can add your enrollment logic
-                    console.log('Access code:', code);
-                    // Example: You can make an AJAX call here to submit the code
-                });
-            }
-
-            // Reset form when modal is closed
-            if (modal) {
-                modal.addEventListener('hidden.bs.modal', function() {
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const input = document.getElementById('accessCodeInput');
+                    const form = document.getElementById('enrollForm');
+                    const alertContainer = document.getElementById('alertContainer');
+                    const modal = document.getElementById('enrollCourseModal');
+                    // Hide alert when user starts typing
                     if (input) {
-                        input.value = '';
+                        input.addEventListener('input', function() {
+                            if (alertContainer) {
+                                alertContainer.style.display = 'none';
+                            }
+                        });
                     }
-                    if (alertContainer) {
-                        alertContainer.style.display = 'none';
-                    }
-                });
 
-                // Focus input when modal opens
-                modal.addEventListener('shown.bs.modal', function() {
-                    if (input) {
-                        input.focus();
-                    }
-                });
-            }
+                    // Handle form submission
+                    if (form) {
+                        form.addEventListener('submit', function(e) {
+                            e.preventDefault();
+                            const code = input ? input.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '') : '';
 
-        });
-    </script>
+                            if (code.length !== 6) {
+                                if (alertContainer) {
+                                    document.getElementById('alertMessage').textContent = 'Please enter a complete 6-character access code.';
+                                    alertContainer.style.display = 'block';
+                                }
+                                if (input) {
+                                    input.focus();
+                                }
+                                return false;
+                            }
+
+                            // Here you can add your enrollment logic
+                            console.log('Access code:', code);
+                            // Example: You can make an AJAX call here to submit the code
+                        });
+                    }
+
+                    // Reset form when modal is closed
+                    if (modal) {
+                        modal.addEventListener('hidden.bs.modal', function() {
+                            if (input) {
+                                input.value = '';
+                            }
+                            if (alertContainer) {
+                                alertContainer.style.display = 'none';
+                            }
+                        });
+
+                        // Focus input when modal opens
+                        modal.addEventListener('shown.bs.modal', function() {
+                            if (input) {
+                                input.focus();
+                            }
+                        });
+                    }
+
+                });
+            </script>
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const searchInput = document.querySelector('input[name="search"]');
+                    const courseContainer = document.getElementById('courseContainer');
+
+                    if (searchInput) {
+                        searchInput.addEventListener('input', function() {
+                            const searchTerm = searchInput.value.trim();
+
+                            fetch('shared/assets/processes/search-course.php?search=' + encodeURIComponent(searchTerm))
+                                .then(response => response.text())
+                                .then(html => {
+                                    courseContainer.innerHTML = html;
+                                })
+                                .catch(err => console.error('Fetch error:', err));
+                        });
+                    }
+                });
+            </script>
+
 </body>
 
 </html>
