@@ -78,6 +78,13 @@ $courses = executeQuery($course);
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
 
+    <style>
+        @media screen and (max-width: 767px) {
+            .mobile-view {
+                margin-bottom: calc(1.5rem + 80px) !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -99,7 +106,7 @@ $courses = executeQuery($course);
                     <!-- Navbar (mobile) -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top mobile-view">
 
                         <div class="row header-section align-items-center">
                             <!-- Title -->
@@ -155,7 +162,7 @@ $courses = executeQuery($course);
                                 </div>
                             </div>
                         </div>
-                        <div class="row my-2 mx-3 mx-md-0 mt-3">
+                        <div class="row my-2 mx-3 mx-md-0 mt-3" id="courseContainer">
                             <?php if ($courses && mysqli_num_rows($courses) > 0) { ?>
                                 <?php while ($row = mysqli_fetch_assoc($courses)) { ?>
                                     <div class="col-12 col-md-6 col-lg-4 col-xl-3 mt-2 m-0 p-0 pe-0 pe-md-2">
@@ -291,11 +298,10 @@ $courses = executeQuery($course);
                 });
             });
         });
-
     </script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const filterToggle = document.getElementById("filterToggle");
             const mobileFilters = document.getElementById("mobileFilters");
             const icon = filterToggle.querySelector(".material-symbols-rounded");
@@ -365,6 +371,25 @@ $courses = executeQuery($course);
         });
     </script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.querySelector('input[name="search"]');
+            const courseContainer = document.getElementById('courseContainer');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = searchInput.value.trim();
+
+                    fetch('../shared/assets/processes/search-course-prof.php?search=' + encodeURIComponent(searchTerm) + "<?php echo (isset($_GET['status'])) ? "&status=" . $filter : ''; ?>")
+                        .then(response => response.text())
+                        .then(html => {
+                            courseContainer.innerHTML = html;
+                        })
+                        .catch(err => console.error('Fetch error:', err));
+                });
+            }
+        });
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 </body>

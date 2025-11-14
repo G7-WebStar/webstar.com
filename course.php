@@ -2,6 +2,21 @@
 $activePage = 'course';
 include('shared/assets/database/connect.php');
 include("shared/assets/processes/session-process.php");
+if (isset($_POST['markUnarchived'])) {
+    $courseID = $_POST['courseID'];
+    $update = "UPDATE courses SET isActive = '1' WHERE courseID = '$courseID'";
+    executeQuery($update);
+}
+
+if (isset($_POST['markArchived'])) {
+    $courseID = $_POST['courseID'];
+    $update = "UPDATE courses SET isActive = '0' WHERE courseID = '$courseID'";
+    executeQuery($update);
+}
+
+$filter = isset($_GET['status']) ? $_GET['status'] : 'active';
+$isActive = ($filter == 'archived') ? '0' : '1';
+
 $noResult = false;
 $selectCourseQuery = "
 SELECT 
@@ -26,7 +41,7 @@ INNER JOIN enrollments
     ON courses.courseID = enrollments.courseID
 LEFT JOIN courseSchedule
     ON courses.courseID = courseSchedule.courseID
-WHERE enrollments.userID = '$userID'
+WHERE enrollments.userID = '$userID' AND isActive = '$isActive'
 GROUP BY courses.courseID
 ";
 
@@ -135,10 +150,10 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                                         <div class="custom-dropdown">
                                             <button class="dropdown-btn text-reg text-14">Active</button>
                                             <ul class="dropdown-list text-reg text-14">
-                                                <li data-value="Active" onclick="console.log('Active clicked')">Active
-                                                </li>
-                                                <li data-value="Archived" onclick="console.log('Archived clicked')">
-                                                    Archived</li>
+                                                <li data-value="Active" onclick="window.location.href='?status=active'">
+                                                    Active</li>
+                                                <li data-value="Archived"
+                                                    onclick="window.location.href='?status=archived'">Archived</li>
                                             </ul>
                                         </div>
                                     </div>
@@ -409,7 +424,7 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                         searchInput.addEventListener('input', function() {
                             const searchTerm = searchInput.value.trim();
 
-                            fetch('shared/assets/processes/search-course.php?search=' + encodeURIComponent(searchTerm))
+                            fetch('shared/assets/processes/search-course.php?search=' + encodeURIComponent(searchTerm) + "<?php echo (isset($_GET['status'])) ? "&status=" . $filter : ''; ?>")
                                 .then(response => response.text())
                                 .then(html => {
                                     courseContainer.innerHTML = html;
