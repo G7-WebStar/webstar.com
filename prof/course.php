@@ -61,7 +61,7 @@ $courses = executeQuery($course);
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | Assign Task</title>
+    <title>Webstar | Courses</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="../shared/assets/css/global-styles.css">
@@ -70,6 +70,8 @@ $courses = executeQuery($course);
     <link rel="stylesheet" href="../shared/assets/css/inbox.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
 
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
@@ -253,6 +255,20 @@ $courses = executeQuery($course);
             </div>
         </div>
     </div>
+    <div id="toastContainer" class="position-absolute d-flex flex-column align-items-center ms-5"
+        style="top: 3rem; left: 25%; transform: translateX(80%); z-index:1100; pointer-events:none;">
+
+        <?php if (isset($_GET['deleted']) && $_GET['deleted'] == 1): ?>
+            <div
+                class="alert alert-success fade show mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 mt-2">
+
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Course deleted successfully!</span>
+
+            </div>
+        <?php endif; ?>
+
+    </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -333,6 +349,19 @@ $courses = executeQuery($course);
                     list.style.display = 'none';
                 }
             });
+        });
+    </script>
+    <script>
+        // Toast of delete
+        document.addEventListener('DOMContentLoaded', () => {
+            const alertEl = document.querySelector('.alert.alert-success');
+            if (alertEl) {
+                setTimeout(() => {
+                    alertEl.style.transition = "opacity 0.5s ease-out";
+                    alertEl.style.opacity = 0;
+                    setTimeout(() => alertEl.remove(), 500);
+                }, 3000);
+            }
         });
     </script>
 

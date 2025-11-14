@@ -73,29 +73,148 @@ if (isset($userID)) {
         }
     }
 
-    // for submission record
-    $recordQuery = "
+    $onTimePercentage = '-';
+    $overallPerformance = '-';
+
+    // Get all submissions (assignments and tests) for this student
+    $submissionQuery = "
     SELECT 
-        submissions.submittedAt,
         assessments.assessmentID,
         assessments.assessmentTitle,
         assessments.type,
+        assessments.deadline,
         scores.score,
-        assignments.assignmentID,
-        assignments.assignmentPoints
-    FROM submissions
-    INNER JOIN scores 
-        ON submissions.scoreID = scores.scoreID
-    INNER JOIN assessments 
-        ON submissions.assessmentID = assessments.assessmentID
-    INNER JOIN assignments 
-        ON assignments.assessmentID = assessments.assessmentID
-    WHERE scores.userID = '$userID'
-      AND assessments.courseID = '$courseID'
-    ORDER BY submissions.submittedAt DESC
+        assignments.assignmentPoints AS totalPoints,
+        submissions.submittedAt
+    FROM assessments
+    LEFT JOIN assignments ON assignments.assessmentID = assessments.assessmentID
+    LEFT JOIN submissions ON submissions.assessmentID = assessments.assessmentID
+    LEFT JOIN scores ON scores.scoreID = submissions.scoreID
+    WHERE assessments.courseID = '$courseID' AND scores.userID = '$userID'
+
+    UNION ALL
+
+    SELECT
+        assessments.assessmentID,
+        assessments.assessmentTitle,
+        assessments.type,
+        assessments.deadline,
+        scores.score,
+        (
+            SELECT SUM(testquestions.testQuestionPoints) 
+            FROM testquestions
+            INNER JOIN tests ON testquestions.testID = tests.testID
+            WHERE tests.assessmentID = assessments.assessmentID
+        ) AS totalPoints,
+        scores.gradedAt AS submittedAt
+    FROM assessments
+    INNER JOIN tests ON tests.assessmentID = assessments.assessmentID
+    INNER JOIN scores ON scores.testID = tests.testID
+    WHERE assessments.courseID = '$courseID' AND scores.userID = '$userID'
+    ";
+    $submissionResult = executeQuery($submissionQuery);
+
+    if ($submissionResult && mysqli_num_rows($submissionResult) > 0) {
+        $totalCount = 0;
+        $onTimeCount = 0;
+        $totalScore = 0;
+        $totalPoints = 0;
+
+        while ($row = mysqli_fetch_assoc($submissionResult)) {
+            $totalCount++;
+
+            // Check on-time submission
+            $submittedAt = $row['type'] === 'assignment' ? $row['submittedAt'] ?? null : $row['gradedAt'] ?? null;
+            if (!$submittedAt && isset($row['score'])) {
+                // For tests, use gradedAt
+                $submittedAt = $row['gradedAt'] ?? date('Y-m-d H:i:s');
+            }
+            if ($row['submittedAt'] && $row['deadline'] && strtotime($row['submittedAt']) <= strtotime($row['deadline'])) {
+                $onTimeCount++;
+            }
+
+            // Compute overall performance
+            if (isset($row['score']) && isset($row['totalPoints']) && $row['totalPoints'] > 0) {
+                $totalScore += $row['score'];
+                $totalPoints += $row['totalPoints'];
+            }
+        }
+
+        // Calculate percentages
+        $onTimePercentage = $totalCount > 0 ? round(($onTimeCount / $totalCount) * 100) . '%' : '-';
+        $overallPerformance = $totalPoints > 0 ? round(($totalScore / $totalPoints) * 100) . '%' : '-';
+    }
+
+    // for submission record
+    $recordQuery = "
+SELECT 
+    submissions.submittedAt,
+    assessments.assessmentID,
+    assessments.assessmentTitle,
+    assessments.type,
+    scores.score,
+    assignments.assignmentID,
+    COALESCE(rubric.totalPoints, assignments.assignmentPoints) AS totalPoints
+FROM submissions
+INNER JOIN scores 
+    ON submissions.scoreID = scores.scoreID
+INNER JOIN assessments 
+    ON submissions.assessmentID = assessments.assessmentID
+INNER JOIN assignments 
+    ON assignments.assessmentID = assessments.assessmentID
+LEFT JOIN rubric 
+    ON assignments.rubricID = rubric.rubricID
+WHERE scores.userID = '$userID'
+  AND assessments.courseID = '$courseID'
+ORDER BY submissions.submittedAt DESC
 ";
     $recordResult = executeQuery($recordQuery);
+
+    // TEST RESULT RECORD
+    $testRecordQuery = "
+    SELECT 
+        scores.gradedAt AS testDate,
+        assessments.assessmentID,
+        assessments.assessmentTitle,
+        assessments.type,
+        tests.testID,
+        scores.score,
+        (
+            SELECT SUM(testQuestionPoints)
+            FROM testquestions
+            WHERE testquestions.testID = tests.testID
+        ) AS totalPoints
+    FROM scores
+    INNER JOIN tests 
+        ON scores.testID = tests.testID
+    INNER JOIN assessments 
+        ON tests.assessmentID = assessments.assessmentID
+    WHERE scores.userID = '$userID'
+      AND assessments.courseID = '$courseID'
+    ORDER BY scores.gradedAt DESC
+";
+    $testRecordResult = executeQuery($testRecordQuery);
+
+    // BADGES QUERY
+    $studentCourseBadges = [];
+    if (!empty($userID)) {
+        $badgeQuery = "
+        SELECT badges.badgeName, badges.badgeIcon, badges.badgeDescription, COUNT(*) AS badgeCount
+        FROM studentbadges
+        INNER JOIN badges ON studentbadges.badgeID = badges.badgeID
+        WHERE studentbadges.userID = '$userID'
+          AND studentbadges.courseID = '$courseID'
+        GROUP BY studentbadges.badgeID
+    ";
+        $badgeQueryResult = executeQuery($badgeQuery);
+        if ($badgeQueryResult && mysqli_num_rows($badgeQueryResult) > 0) {
+            while ($badgeRow = mysqli_fetch_assoc($badgeQueryResult)) {
+                $studentCourseBadges[] = $badgeRow;
+            }
+        }
+    }
 }
+
 ?>
 <div class="row mt-3">
     <div class="mx-1 mb-3">
@@ -173,10 +292,10 @@ if (isset($userID)) {
     <div class="row ms-2 justify-content-center align-items-center mt-3 text-center">
         <div class="col-12 col-sm-6 mb-3 mb-sm-0 d-flex flex-column align-items-center">
             <div class="percent d-flex justify-content-center align-items-center text-sbold text-20">
-                <span id="status-icon" class="material-symbols-outlined" style="margin-right:6px; font-size:23px;">
+                <span class="material-symbols-outlined" style="margin-right:6px; font-size:23px;">
                     assignment_turned_in
                 </span>
-                <span id="status-text">100%</span>
+                <span id="onTimePercentage"><?php echo $onTimePercentage; ?></span>
             </div>
             <div class="title text-sbold text-16">On-Time Submissions</div>
             <div class="sub text-reg text-12">Percentage of tasks and <br> exams submitted on time.</div>
@@ -184,14 +303,13 @@ if (isset($userID)) {
 
         <div class="col-12 col-sm-6 d-flex flex-column align-items-center">
             <div class="percent d-flex justify-content-center align-items-center text-sbold text-20">
-                <span id="status-icon" class="material-symbols-outlined" style="margin-right:6px; font-size:23px;">
+                <span class="material-symbols-outlined" style="margin-right:6px; font-size:23px;">
                     assignment
                 </span>
-                <span id="status-text">100%</span>
+                <span id="overallPerformance"><?php echo $overallPerformance; ?></span>
             </div>
             <div class="title text-sbold text-16">Overall Performance</div>
-            <div class="sub text-reg text-12">Based on your submission rate and <br> scores in tasks and
-                exams.</div>
+            <div class="sub text-reg text-12">Based on your submission rate and <br> scores in tasks and exams.</div>
         </div>
     </div>
 
@@ -233,29 +351,73 @@ if (isset($userID)) {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if ($recordResult && mysqli_num_rows($recordResult) > 0): ?>
-                                <?php while ($record = mysqli_fetch_assoc($recordResult)): ?>
+                            <?php
+                            $hasRecords = false;
+
+                            // --- Combine all records into one array for easier handling ---
+                            $allRecords = [];
+                            if ($recordResult && mysqli_num_rows($recordResult) > 0) {
+                                while ($record = mysqli_fetch_assoc($recordResult)) {
+                                    $allRecords[] = [
+                                        'date' => $record['submittedAt'],
+                                        'title' => $record['assessmentTitle'],
+                                        'link' => "assignment.php?assignmentID={$record['assignmentID']}",
+                                        'type' => $record['type'],
+                                        'score' => $record['score'],
+                                        'total' => $record['totalPoints']   // <-- updated to totalPoints
+                                    ];
+                                }
+                            }
+
+                            if ($testRecordResult && mysqli_num_rows($testRecordResult) > 0) {
+                                while ($test = mysqli_fetch_assoc($testRecordResult)) {
+                                    $allRecords[] = [
+                                        'date' => $test['testDate'],
+                                        'title' => $test['assessmentTitle'],
+                                        'link' => "test-result.php?testID={$test['testID']}",
+                                        'type' => $test['type'],
+                                        'score' => $test['score'],
+                                        'total' => $test['totalPoints']
+                                    ];
+                                }
+                            }
+
+                            $totalRows = count($allRecords);
+                            if ($totalRows > 0):
+                                $hasRecords = true;
+                                foreach ($allRecords as $index => $row):
+                                    $isLast = ($index === $totalRows - 1); // check last row
+                                    ?>
                                     <tr class="text-med text-12">
-                                        <td style="border-right:1px solid var(--black);">
-                                            <?php echo date('F d, Y', strtotime($record['submittedAt'])); ?>
+                                        <td
+                                            style="border-right:1px solid var(--black); <?php echo $isLast ? '' : 'border-bottom:1px solid var(--black);'; ?>">
+                                            <?php echo date('F d, Y', strtotime($row['date'])); ?>
                                         </td>
-                                        <td style="border-right:1px solid var(--black);">
-                                            <a href="assignment.php?assignmentID=<?php echo $record['assignmentID']; ?>"
+                                        <td
+                                            style="border-right:1px solid var(--black); <?php echo $isLast ? '' : 'border-bottom:1px solid var(--black);'; ?>">
+                                            <a href="<?php echo $row['link']; ?>"
                                                 style="text-decoration:none; color:var(--black); font-weight:500;">
-                                                <?php echo $record['assessmentTitle']; ?>
+                                                <?php echo $row['title']; ?>
                                             </a>
                                         </td>
-                                        <td style="border-right:1px solid var(--black); text-align:center;">
+                                        <td
+                                            style="border-right:1px solid var(--black); text-align:center; <?php echo $isLast ? '' : 'border-bottom:1px solid var(--black);'; ?>">
                                             <span class="course-badge rounded-pill px-3 text-reg text-12">
-                                                <?php echo ucfirst($record['type']); ?>
+                                                <?php echo ucfirst($row['type']); ?>
                                             </span>
                                         </td>
-                                        <td><?php echo $record['score']; ?>/<?php echo $record['assignmentPoints']; ?></td>
+                                        <td style="<?php echo $isLast ? '' : 'border-bottom:1px solid var(--black);'; ?>">
+                                            <?php echo $row['score']; ?>/<?php echo $row['total']; ?>
+                                        </td>
                                     </tr>
-                                <?php endwhile; ?>
-                            <?php else: ?>
+                                    <?php
+                                endforeach;
+                            endif;
+
+                            if (!$hasRecords):
+                                ?>
                                 <tr>
-                                    <td colspan="4" class="text-center text-reg text-12">No submission records found.</td>
+                                    <td colspan="4" class="text-center text-reg text-12">No records found.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -268,21 +430,28 @@ if (isset($userID)) {
     <!-- Mobile Cards -->
     <div class="row">
         <div class="col d-block d-md-none">
+
             <?php
-            $recordResultMobile = executeQuery($recordQuery);
-            if ($recordResultMobile && mysqli_num_rows($recordResultMobile) > 0):
-                while ($record = mysqli_fetch_assoc($recordResultMobile)):
+            $hasRecords = false;
+
+            if (!empty($allRecords)):
+                $hasRecords = true;
+
+                foreach ($allRecords as $record):
                     ?>
                     <div class="card p-3 ms-2 mb-2" style="border: 1px solid var(--black); border-radius: 15px; width: 290px;">
                         <div class="d-flex justify-content-between align-items-center">
-                            <a href="assignment.php?assignmentID=<?php echo $record['assignmentID']; ?>"
+                            <a href="<?php echo $record['link']; ?>"
                                 style="text-decoration:none; color:var(--black); font-weight:500;">
-                                <?php echo $record['assessmentTitle']; ?>
+                                <?php echo $record['title']; ?>
                             </a>
-                            <span class="text-sbold text-16"><?php echo $record['score']; ?>/100</span>
+                            <span class="text-sbold text-16">
+                                <?php echo $record['score']; ?>/<?php echo $record['total']; ?>
+                            </span>
                         </div>
                         <div class="justify-content-start align-items-start">
-                            <div class="text-reg text-14 mb-2"><?php echo date('F d, Y', strtotime($record['submittedAt'])); ?>
+                            <div class="text-reg text-14 mb-2">
+                                <?php echo date('F d, Y', strtotime($record['date'])); ?>
                             </div>
                             <div class="course-badge rounded-pill px-3 text-reg text-12" style="width: 60px;">
                                 <?php echo ucfirst($record['type']); ?>
@@ -290,10 +459,12 @@ if (isset($userID)) {
                         </div>
                     </div>
                     <?php
-                endwhile;
-            else:
+                endforeach;
+            endif;
+
+            if (!$hasRecords):
                 ?>
-                <div class="text-center text-muted">No submission records found.</div>
+                <div class="text-center text-muted">No submission or test records found.</div>
             <?php endif; ?>
         </div>
     </div>
@@ -306,32 +477,47 @@ if (isset($userID)) {
             </div>
         </div>
     </div>
+
     <div class="row mx-1">
-        <div class="card py-2 py-sm-0" style="border: 1px solid var(--black); border-radius: 15px; width: 100%;">
-            <div class="col-12 d-flex flex-row align-items-center justify-content-between flex-nowrap">
+        <?php if (!empty($studentCourseBadges)): ?>
+            <?php foreach ($studentCourseBadges as $b): ?>
+                <div class="col-12 mb-2">
+                    <div class="card py-2 py-sm-0" style="border: 1px solid var(--black); border-radius: 15px; width: 100%;">
+                        <div class="col-12 d-flex flex-row align-items-center justify-content-between flex-nowrap px-3 py-1">
 
-                <!-- Left Side -->
-                <div class="d-flex flex-row align-items-center flex-nowrap" style="min-width: 0;">
+                            <!-- Left Side: Badge icon + details -->
+                            <div class="d-flex flex-row align-items-center flex-nowrap" style="min-width: 0;">
+                                <div class="d-flex justify-content-center align-items-center flex-shrink-0">
+                                    <img src="shared/assets/img/badge/<?php echo $b['badgeIcon']; ?>"
+                                        style="width:60px; height:62px; object-fit:contain;" data-bs-toggle="tooltip"
+                                        data-bs-placement="top" title="<?php echo $b['badgeName']; ?>">
+                                </div>
 
-                    <!-- Badge -->
-                    <div class="d-flex justify-content-center align-items-center flex-shrink-0">
-                        <img src="shared/assets/img/badge/Badge.png"
-                            style="width:60px; height:62px; object-fit:contain;">
+                                <div class="ms-2 flex-grow-1"
+                                    style="min-width:0; word-break: break-word; white-space: normal; text-align: justify;">
+                                    <div class="text-bold text-16"><?php echo $b['badgeName']; ?></div>
+
+                                    <?php if (!empty($b['badgeDescription'])): ?>
+                                        <div class="text-med text-12"><?php echo $b['badgeDescription']; ?></div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <!-- Right Side: Count -->
+                            <?php if (!empty($b['badgeCount']) && $b['badgeCount'] > 1): ?>
+                                <div class="text-end flex-shrink-0" style="line-height: 1.2; margin-left: 5px;">
+                                    <div class="text-bold text-22 justify-content-end">
+                                        x<?php echo $b['badgeCount']; ?></div>
+                                </div>
+                            <?php endif; ?>
+
+                        </div>
                     </div>
-
-                    <!-- Details -->
-                    <div class="ms-2" style="min-width: 0; word-break: break-word; white-space: normal;">
-                        <div class="text-bold text-16">Ahead of the Curve</div>
-                        <div class="text-med text-12">You submitted before the deadline—way to stay ahead!</div>
-                    </div>
-
                 </div>
-
-                <!-- Right Side -->
-                <div class="text-end flex-shrink-0" style="line-height: 1.2; margin-right: 15px;">
-                    <div class="text-bold text-22 justify-content-end">x3</div>
-                </div>
-            </div>
-        </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="col-12 text-center text-muted">No badges earned yet.</div>
+        <?php endif; ?>
     </div>
+
 </div>

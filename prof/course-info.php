@@ -6,6 +6,111 @@ include('../shared/assets/database/connect.php');
 date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
 
+if (isset($_POST['deleteCourse'])) {
+    $courseID = $_POST['courseID'];
+
+    // --- Delete Assessments and all their children ---
+    $selectAssessments = executeQuery("SELECT assessmentID FROM assessments WHERE courseID = '$courseID'");
+    while ($assessment = mysqli_fetch_assoc($selectAssessments)) {
+        $assessmentID = $assessment['assessmentID'];
+
+        // Delete assignments and their files
+        $selectAssignments = executeQuery("SELECT assignmentID FROM assignments WHERE assessmentID = '$assessmentID'");
+        while ($assignment = mysqli_fetch_assoc($selectAssignments)) {
+            $assignmentID = $assignment['assignmentID'];
+            executeQuery("DELETE FROM files WHERE assignmentID = '$assignmentID'");
+        }
+        executeQuery("DELETE FROM assignments WHERE assessmentID = '$assessmentID'");
+
+        // Delete tests and their children
+        $selectTests = executeQuery("SELECT testID FROM tests WHERE assessmentID = '$assessmentID'");
+        while ($test = mysqli_fetch_assoc($selectTests)) {
+            $testID = $test['testID'];
+
+            // Delete test questions
+            $selectQuestions = executeQuery("SELECT testQuestionID FROM testquestions WHERE testID = '$testID'");
+            while ($question = mysqli_fetch_assoc($selectQuestions)) {
+                $questionID = $question['testQuestionID'];
+
+                executeQuery("DELETE FROM testquestionchoices WHERE testQuestionID = '$questionID'");
+                executeQuery("DELETE FROM testresponses WHERE testQuestionID = '$questionID'");
+            }
+            executeQuery("DELETE FROM testquestions WHERE testID = '$testID'");
+
+            // Delete scores linked to test
+            executeQuery("DELETE FROM scores WHERE testID = '$testID'");
+        }
+        executeQuery("DELETE FROM tests WHERE assessmentID = '$assessmentID'");
+
+        // Delete submissions and their files and scores
+        $selectSubmissions = executeQuery("SELECT submissionID FROM submissions WHERE assessmentID = '$assessmentID'");
+        while ($submission = mysqli_fetch_assoc($selectSubmissions)) {
+            $submissionID = $submission['submissionID'];
+            // Delete selected rubric levels
+            executeQuery("DELETE FROM selectedlevels WHERE submissionID = '$submissionID'");
+            // Delete files linked to submission
+            executeQuery("DELETE FROM files WHERE submissionID = '$submissionID'");
+            // Delete scores for submission
+            executeQuery("DELETE FROM scores WHERE submissionID = '$submissionID'");
+        }
+        // Finally delete submissions
+        executeQuery("DELETE FROM submissions WHERE assessmentID = '$assessmentID'");
+
+        // Delete todos
+        executeQuery("DELETE FROM todo WHERE assessmentID = '$assessmentID'");
+
+        // Delete files linked directly to assessment
+        executeQuery("DELETE FROM files WHERE assessmentID = '$assessmentID'");
+    }
+
+    // Delete assessments
+    executeQuery("DELETE FROM assessments WHERE courseID = '$courseID'");
+
+    // --- Delete announcements and their children ---
+    $selectAnnouncements = executeQuery("SELECT announcementID FROM announcements WHERE courseID = '$courseID'");
+    while ($announcement = mysqli_fetch_assoc($selectAnnouncements)) {
+        $announcementID = $announcement['announcementID'];
+        executeQuery("DELETE FROM announcementnotes WHERE noteID IN (SELECT noteID FROM announcementnotes WHERE announcementID = '$announcementID')");
+        executeQuery("DELETE FROM files WHERE announcementID = '$announcementID'");
+    }
+    executeQuery("DELETE FROM announcements WHERE courseID = '$courseID'");
+
+    // --- Delete lessons and their files ---
+    $selectLessons = executeQuery("SELECT lessonID FROM lessons WHERE courseID = '$courseID'");
+    while ($lesson = mysqli_fetch_assoc($selectLessons)) {
+        $lessonID = $lesson['lessonID'];
+        executeQuery("DELETE FROM files WHERE lessonID = '$lessonID'");
+    }
+    executeQuery("DELETE FROM lessons WHERE courseID = '$courseID'");
+
+    // --- Delete student badges ---
+    executeQuery("DELETE FROM studentbadges WHERE courseID = '$courseID'");
+
+    // --- Delete enrollments and children (leaderboard, inbox, report, files) ---
+    $selectEnrollments = executeQuery("SELECT enrollmentID FROM enrollments WHERE courseID = '$courseID'");
+    while ($enrollment = mysqli_fetch_assoc($selectEnrollments)) {
+        $enrollmentID = $enrollment['enrollmentID'];
+        executeQuery("DELETE FROM leaderboard WHERE enrollmentID = '$enrollmentID'");
+        executeQuery("DELETE FROM inbox WHERE enrollmentID = '$enrollmentID'");
+        executeQuery("DELETE FROM report WHERE enrollmentID = '$enrollmentID'");
+        executeQuery("DELETE FROM files WHERE enrollmentID = '$enrollmentID'");
+    }
+    executeQuery("DELETE FROM enrollments WHERE courseID = '$courseID'");
+
+    // --- Delete files directly linked to course ---
+    executeQuery("DELETE FROM files WHERE courseID = '$courseID'");
+
+    // --- Delete course schedules ---
+    executeQuery("DELETE FROM courseschedule WHERE courseID = '$courseID'");
+
+    // --- Finally delete the course itself ---
+    executeQuery("DELETE FROM courses WHERE courseID = '$courseID'");
+
+    // Redirect after deletion
+    header("Location: course.php?deleted=1");
+    exit();
+}
+
 if (isset($_GET['courseID'])) {
     $courseID = $_GET['courseID'];
     $selectCourseQuery = "SELECT 
@@ -204,7 +309,6 @@ if (!$result) {
 }
 
 $user = mysqli_fetch_assoc($result);
-
 ?>
 
 <!doctype html>
@@ -213,7 +317,7 @@ $user = mysqli_fetch_assoc($result);
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | <?php echo $courseCode['courseCode']; ?></title>
+    <title>Webstar | Course Info<?php echo $courseCode['courseCode']; ?></title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
@@ -262,7 +366,7 @@ $user = mysqli_fetch_assoc($result);
                                     <?php
                                     if (mysqli_num_rows($selectCourseResult) > 0) {
                                         while ($courses = mysqli_fetch_assoc($selectCourseResult)) {
-                                    ?>
+                                            ?>
 
                                             <!-- Mobile Dropdown Course Card -->
                                             <div class="course-card-mobile d-block d-md-none w-100">
@@ -298,19 +402,38 @@ $user = mysqli_fetch_assoc($result);
                                                         id="mobileCourseCard<?php echo $courses['courseID']; ?>">
 
                                                         <div class="p-3">
-                                                            <!-- Course Image -->
-                                                            <div class="course-image w-100 mb-3 mt-1"
-                                                                style="position: relative; overflow: hidden; border-radius: 10px; min-height: 150px; background-color:var(--primaryColor)">
+                                                            <!-- Course Image with Three-dot menu -->
+                                                            <div class="course-image w-100 mb-3 mt-1 position-relative"
+                                                                style="overflow: hidden; border-radius: 10px; min-height: 150px; background-color:var(--primaryColor)">
                                                                 <img src="../shared/assets/img/course-images/<?php echo $courses['courseImage']; ?>"
                                                                     alt="Course Image"
                                                                     style="width: 100%; height: 100%; object-fit: cover;">
+
+                                                                <!-- Three-dot menu -->
+                                                                <div class="dropdown position-absolute top-0 end-0 m-2">
+                                                                    <button class="btn btn-sm border-0 bg-transparent"
+                                                                        type="button" data-bs-toggle="dropdown"
+                                                                        aria-expanded="false">
+                                                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                                    </button>
+                                                                    <ul class="dropdown-menu border-0 shadow-none">
+                                                                        <li>
+                                                                            <a class="dropdown-item"
+                                                                                href="edit-course.php?id=<?php echo $courses['courseID']; ?>">Edit</a>
+                                                                        </li>
+                                                                        <li><a class="dropdown-item text-danger"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#deleteModal">Delete</a></li>
+                                                                    </ul>
+                                                                </div>
                                                             </div>
+
 
                                                             <!-- Prof -->
                                                             <div class="d-flex align-items-center text-decoration-none">
                                                                 <div class="rounded-circle me-2 flex-shrink-0" style="width: 25px; height: 25px; background-color: #5ba9ff;
-                                                    background: url('../shared/assets/pfp-uploads/<?php echo $courses['profPFP']; ?>') no-repeat center center;
-                                                    background-size: cover;">
+                                                                background: url('../shared/assets/pfp-uploads/<?php echo $courses['profPFP']; ?>') no-repeat center center;
+                                                                background-size: cover;">
                                                                 </div>
                                                                 <div class="d-flex flex-column justify-content-center">
                                                                     <span class="text-sbold text-12" style="line-height: 1.2">
@@ -353,7 +476,7 @@ $user = mysqli_fetch_assoc($result);
                                                                         if (mysqli_num_rows($selectLeaderboardResult) > 0) {
                                                                             mysqli_data_seek($selectLeaderboardResult, 0);
                                                                             while ($points = mysqli_fetch_assoc($selectLeaderboardResult)) {
-                                                                        ?>
+                                                                                ?>
                                                                                 <div class="d-flex align-items-center">
                                                                                     <img class="me-1" src="shared/assets/img/xp.png"
                                                                                         alt="Description of Image" width="15">
@@ -362,7 +485,7 @@ $user = mysqli_fetch_assoc($result);
                                                                                         XPs</span>
                                                                                 </div>
 
-                                                                        <?php
+                                                                                <?php
                                                                             }
                                                                         }
                                                                         ?>
@@ -406,7 +529,7 @@ $user = mysqli_fetch_assoc($result);
                                                                     <?php if (mysqli_num_rows($selectLimitAssessmentResult) > 0) {
                                                                         mysqli_data_seek($selectLimitAssessmentResult, 0);
                                                                         while ($activities = mysqli_fetch_assoc($selectLimitAssessmentResult)) {
-                                                                    ?>
+                                                                            ?>
                                                                             <div
                                                                                 class="todo-card-course-info d-flex align-items-stretch rounded-2 mt-2 w-100">
                                                                                 <div class="date-section text-sbold text-12 px-3"
@@ -441,7 +564,7 @@ $user = mysqli_fetch_assoc($result);
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
-                                                                    <?php
+                                                                            <?php
                                                                         }
                                                                     } ?>
                                                                 </div>
@@ -457,11 +580,28 @@ $user = mysqli_fetch_assoc($result);
                                                 <div class="course-card-desktop w-100 p-4"
                                                     style="outline: 1px solid var(--black); border-radius: 10px; ">
 
-                                                    <!-- Back Button -->
-                                                    <div class="mb-3">
-                                                        <a href="course.php" class="text-reg">
-                                                            <i class="fas fa-arrow-left"></i>
+                                                    <!-- Back Button + Three-dot menu -->
+                                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                                        <!-- Back Button -->
+                                                        <a href="course.php" class="text-reg"> <i class="fas fa-arrow-left"></i>
                                                         </a>
+
+                                                        <!-- Three-dot menu -->
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-sm border-0 bg-transparent" type="button"
+                                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                            </button>
+                                                            <ul class="dropdown-menu border-0 shadow-none">
+                                                                <li>
+                                                                    <a class="dropdown-item text-reg text-14"
+                                                                        href="edit-course.php?id=<?php echo $courses['courseID']; ?>">Edit</a>
+                                                                </li>
+                                                                <li><a class="dropdown-item text-danger" data-bs-toggle="modal"
+                                                                        data-bs-target="#deleteModal">Delete</a></li>
+                                                            </ul>
+                                                        </div>
+
                                                     </div>
 
                                                     <!-- Course Image -->
@@ -515,7 +655,7 @@ $user = mysqli_fetch_assoc($result);
                                                             <?php if (mysqli_num_rows($selectLimitAssessmentResult) > 0) {
                                                                 mysqli_data_seek($selectLimitAssessmentResult, 0);
                                                                 while ($activities = mysqli_fetch_assoc($selectLimitAssessmentResult)) {
-                                                            ?>
+                                                                    ?>
                                                                     <div
                                                                         class="todo-card-course-info d-flex align-items-stretch rounded-2 mt-2 w-100">
                                                                         <div class="date-section text-sbold text-14 px-1"
@@ -539,20 +679,20 @@ $user = mysqli_fetch_assoc($result);
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                            <?php
+                                                                    <?php
                                                                 }
                                                             } ?>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        <?php
+                                            <?php
                                         }
                                     } else { ?>
                                         <script>
                                             window.location.href = "404.php"
                                         </script>
-                                    <?php
+                                        <?php
                                     }
                                     ?>
                                 </div>
@@ -689,10 +829,37 @@ $user = mysqli_fetch_assoc($result);
             </div>
         </div>
     </div>
+    <!-- Delete Modal -->
+    <div class="modal" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form method="POST" action="">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="transform: scale(0.8); border:none !important; box-shadow:none !important;"></button>
+                    </div>
+                    <div class="modal-body d-flex flex-column justify-content-center align-items-center text-center">
+                        <span class="mt-4 text-bold text-22">This action cannot be undone.</span>
+                        <span class="mb-4 text-reg text-14">Are you sure you want to delete this course?</span>
+                        <input type="hidden" name="courseID" value="<?php echo $courseID; ?>">
+                    </div>
+                    <div class="modal-footer text-sbold text-18">
+                        <button type="button" class="btn rounded-pill px-4"
+                            style="background-color: var(--primaryColor); border: 1px solid var(--black);"
+                            data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" name="deleteCourse" class="btn rounded-pill px-4"
+                            style="background-color: rgba(255, 80, 80, 1); border: 1px solid var(--black); color: var(--black);">
+                            Delete
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const tabContainer = document.getElementById('mobileTabScroll');
             const scrollLeftBtn = document.getElementById('scrollLeftBtn');
             const scrollRightBtn = document.getElementById('scrollRightBtn');
@@ -723,7 +890,7 @@ $user = mysqli_fetch_assoc($result);
             updateArrowVisibility(); // Initial check
         });
 
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             // Select all headers with collapse triggers
             const headers = document.querySelectorAll('.course-card-mobile [data-bs-toggle="collapse"]');
 
@@ -734,12 +901,12 @@ $user = mysqli_fetch_assoc($result);
 
                 if (!collapseEl) return;
 
-                collapseEl.addEventListener("show.bs.collapse", function() {
+                collapseEl.addEventListener("show.bs.collapse", function () {
                     icon.classList.remove("fa-chevron-down");
                     icon.classList.add("fa-chevron-up");
                 });
 
-                collapseEl.addEventListener("hide.bs.collapse", function() {
+                collapseEl.addEventListener("hide.bs.collapse", function () {
                     icon.classList.remove("fa-chevron-up");
                     icon.classList.add("fa-chevron-down");
                 });
@@ -749,7 +916,7 @@ $user = mysqli_fetch_assoc($result);
 
     <!-- JS for Desktop Scroll Buttons -->
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const desktopTabScroll = document.querySelector(".tab-scroll");
             const desktopScrollLeftBtn = document.getElementById("desktopScrollLeftBtn");
             const desktopScrollRightBtn = document.getElementById("desktopScrollRightBtn");
@@ -784,7 +951,7 @@ $user = mysqli_fetch_assoc($result);
 
         // JS For Course Card Sticky
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const courseCardDesktop = document.querySelector('.course-card-desktop');
 
             if (courseCardDesktop) {
