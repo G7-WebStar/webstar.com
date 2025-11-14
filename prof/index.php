@@ -46,7 +46,7 @@ DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline
 FROM assessments
 INNER JOIN courses
 	ON assessments.courseID = courses.courseID
-WHERE assessments.deadline > CURRENT_DATE
+WHERE assessments.deadline >= CURRENT_DATE
 ";
 $activeAssessmentsTabResult = executeQuery($activeAssessmentsTabQuery);
 if ($activeAssessmentsTabResult && mysqli_num_rows($activeAssessmentsTabResult) > 0) {

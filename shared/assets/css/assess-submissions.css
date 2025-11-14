@@ -20,8 +20,10 @@
 
 
 .chart-container {
-    width: 100px; /* slightly smaller */
-    height: 100px; /* slightly smaller */
+    width: 100px;
+    /* slightly smaller */
+    height: 100px;
+    /* slightly smaller */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -35,7 +37,7 @@
 /* Dropdown container styling */
 .dropdown-container {
     gap: 16px;
-    margin-top: 40px; 
+    margin-top: 40px;
 }
 
 .btn-action {
@@ -44,9 +46,9 @@
     border-radius: 16px;
     color: var(--black);
     font-size: 13px;
-    width: 150px; 
+    width: 150px;
     height: 35px;
-    padding: 0 16px; 
+    padding: 0 16px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -102,6 +104,12 @@
 }
 
 .badge-submitted {
+    background-color: #3DA8FF;
+    border-color: #3DA8FF;
+    color: #5B6D58;
+}
+
+.badge-graded {
     background-color: #C8ECC1;
     border-color: #C8ECC1;
     color: #5B6D58;
@@ -130,13 +138,13 @@
 /* Mobile adjustments */
 @media (max-width: 768px) {
     .cardSticky {
-        margin-top: 20px; 
+        margin-top: 20px;
     }
 }
 
 /* Space between icon and text */
 .btn-action i {
-    padding-right: 6px; 
+    padding-right: 6px;
 }
 
 
@@ -149,7 +157,7 @@
 }
 
 .content-scroll-container {
-    max-height: calc(100vh - 200px); 
+    max-height: calc(100vh - 200px);
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -187,9 +195,18 @@
     }
 
     /* Center tabs on mobile */
-    .tab-scroll { overflow-x: visible; }
-    .custom-nav-tabs { justify-content: center; gap: 16px; }
-    .custom-nav-tabs .nav-link { margin-right: 0; }
+    .tab-scroll {
+        overflow-x: visible;
+    }
+
+    .custom-nav-tabs {
+        justify-content: center;
+        gap: 16px;
+    }
+
+    .custom-nav-tabs .nav-link {
+        margin-right: 0;
+    }
 }
 
 /* Nav tabs styling (aligned with course-Info.css) */
@@ -197,7 +214,11 @@
     border-bottom: 1px solid var(--black);
     gap: 24px;
 }
-.custom-nav-tabs .nav-item { white-space: nowrap; }
+
+.custom-nav-tabs .nav-item {
+    white-space: nowrap;
+}
+
 .custom-nav-tabs .nav-link {
     font-family: var(--SemiBold);
     color: #2c2c2cbf;
@@ -209,15 +230,16 @@
     padding: 8px 0 10px 0;
     margin-right: 24px;
 }
+
 .custom-nav-tabs .nav-link:hover {
     color: var(--black);
     text-decoration: none;
     background-color: transparent !important;
 }
+
 .custom-nav-tabs .nav-link.active {
     border-bottom: 3px solid var(--black);
     color: var(--black);
     font-weight: bold;
     background-color: transparent !important;
 }
-
