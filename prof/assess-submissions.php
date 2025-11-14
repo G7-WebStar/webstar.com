@@ -31,6 +31,45 @@ $countGradedQuery = "SELECT COUNT(*) AS graded FROM todo
                      WHERE assessmentID = '$assessmentID' AND status = 'Graded'";
 $countGradedResult = executeQuery($countGradedQuery);
 $graded = mysqli_fetch_assoc($countGradedResult);
+
+$studentIDs = [];
+$studentTodoStatusQuery = "SELECT todo.userID, userinfo.firstName, userinfo.middleName, userinfo.lastName, todo.status, submissions.submissionID FROM todo
+INNER JOIN userinfo
+	ON todo.userID = userinfo.userID
+INNER JOIN assessments
+	ON todo.assessmentID = assessments.assessmentID
+INNER JOIN courses
+	ON assessments.courseID = courses.courseID
+INNER JOIN submissions
+    ON todo.userID = submissions.userID
+WHERE courses.userID = '$userID' AND todo.assessmentID = '$assessmentID' AND submissions.assessmentID = '$assessmentID';";
+$studentTodoStatusResult = executeQuery($studentTodoStatusQuery);
+
+if (mysqli_num_rows($studentTodoStatusResult) > 0) {
+    while ($studentIDRow = mysqli_fetch_assoc($studentTodoStatusResult)) {
+        $studentIDs[] = ["studentID" => $studentIDRow['userID']];
+    }
+}
+
+$getAssessmentStatusQuery = "SELECT * FROM assessments WHERE CURRENT_DATE <= deadline AND assessmentID = $assessmentID;";
+$getAssessmentStatusResult = executeQuery($getAssessmentStatusQuery);
+
+if (mysqli_num_rows($getAssessmentStatusResult) > 0) {
+    $statusText = 'pending';
+} else {
+    $statusText = 'did not submit';
+}
+
+$getSubmissionIDQuery = "SELECT submissions.submissionID 
+        FROM submissions 
+        INNER JOIN todo 
+            ON todo.userID = submissions.userID
+        WHERE todo.status != 'Graded' AND todo.assessmentID = '$assessmentID' AND submissions.assessmentID = '$assessmentID'
+        ORDER BY todo.updatedAt ASC
+        LIMIT 1";
+$getSubmissionIDResult = executeQuery($getSubmissionIDQuery);
+$submissionIDRow = mysqli_fetch_assoc($getSubmissionIDResult);
+$submissionID = $submissionIDRow['submissionID'];
 ?>
 
 <!doctype html>
@@ -83,7 +122,7 @@ $graded = mysqli_fetch_assoc($countGradedResult);
                             <!-- DESKTOP VIEW -->
                             <div class="row desktop-header d-none d-sm-flex">
                                 <div class="col-auto me-2">
-                                    <a href="#" class="text-decoration-none">
+                                    <a href="assess.php" class="text-decoration-none">
                                         <i class="fa-solid fa-arrow-left text-reg text-16"
                                             style="color: var(--black);"></i>
                                     </a>
@@ -107,7 +146,7 @@ $graded = mysqli_fetch_assoc($countGradedResult);
                             <div class="d-block d-sm-none mobile-assignment">
                                 <div class="mobile-top">
                                     <div class="arrow">
-                                        <a href="#" class="text-decoration-none">
+                                        <a href="assess.php" class="text-decoration-none">
                                             <i class="fa-solid fa-arrow-left text-reg text-16"
                                                 style="color: var(--black);"></i>
                                         </a>
@@ -173,7 +212,7 @@ $graded = mysqli_fetch_assoc($countGradedResult);
                                                             <li><a class="dropdown-item text-reg" href="#">Other courses</a>
                                                             </li>
                                                         </ul>
-                                                        <button class="btn btn-action btn-return-all">
+                                                        <button class="btn btn-action btn-return-all" onclick="returnAll();">
                                                             <img src="../shared/assets/img/assess/assignment.png"
                                                                 alt="Assess Icon"
                                                                 style="width: 18px; height: 18px; margin-right: 5px; object-fit: contain;">Return All
@@ -182,65 +221,30 @@ $graded = mysqli_fetch_assoc($countGradedResult);
 
                                                     <!-- Submissions List -->
                                                     <div class="submissions-list mt-4">
-                                                        <div class="submission-item d-flex align-items-center py-3 border-bottom">
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
-                                                                    <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
-                                                                </div>
-                                                                <span class="text-sbold text-16">Christian James D. Torrillo</span>
-                                                            </div>
-                                                            <div class="flex-grow-1 d-flex justify-content-center">
-                                                                <span class="badge badge-pending">Pending</span>
-                                                            </div>
-                                                            <div class="d-flex align-items-center">
-                                                                <img src="../shared/assets/img/assess/arrow.png" alt="Arrow" style="width: 20px; height: 20px;">
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="submission-item d-flex align-items-center py-3 border-bottom">
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
-                                                                    <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
-                                                                </div>
-                                                                <span class="text-sbold text-16">Christian James D. Torrillo</span>
-                                                            </div>
-                                                            <div class="flex-grow-1 d-flex justify-content-center">
-                                                                <span class="badge badge-submitted">Submitted</span>
-                                                            </div>
-                                                            <div class="d-flex align-items-center">
-                                                                <img src="../shared/assets/img/assess/arrow.png" alt="Arrow" style="width: 20px; height: 20px;">
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="submission-item d-flex align-items-center py-3 border-bottom">
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
-                                                                    <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
-                                                                </div>
-                                                                <span class="text-sbold text-16">Christian James D. Torrillo</span>
-                                                            </div>
-                                                            <div class="flex-grow-1 d-flex justify-content-center">
-                                                                <span class="badge badge-missing">Missing</span>
-                                                            </div>
-                                                            <div class="d-flex align-items-center">
-                                                                <img src="../shared/assets/img/assess/arrow.png" alt="Arrow" style="width: 20px; height: 20px;">
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="submission-item d-flex align-items-center py-3">
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
-                                                                    <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
-                                                                </div>
-                                                                <span class="text-sbold text-16">Christian James D. Torrillo</span>
-                                                            </div>
-                                                            <div class="flex-grow-1 d-flex justify-content-center">
-                                                                <span class="badge badge-score">100/100</span>
-                                                            </div>
-                                                            <div class="d-flex align-items-center">
-                                                                <img src="../shared/assets/img/assess/arrow.png" alt="Arrow" style="width: 20px; height: 20px;">
-                                                            </div>
-                                                        </div>
+                                                        <?php
+                                                        if (mysqli_num_rows($studentTodoStatusResult) > 0) {
+                                                            mysqli_data_seek($studentTodoStatusResult, 0);
+                                                            while ($studentsTodoRow = mysqli_fetch_assoc($studentTodoStatusResult)) {
+                                                        ?>
+                                                                <a class="text-decoration-none" href="grading-sheet-pdf-with-image.php?submissionID=<?php echo $studentsTodoRow['submissionID']; ?>">
+                                                                    <div class="submission-item d-flex align-items-center py-3 border-bottom">
+                                                                        <div class="d-flex align-items-center">
+                                                                            <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
+                                                                                <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                                                                            </div>
+                                                                            <span class="text-sbold text-16"><?php echo $studentsTodoRow['firstName'] . " " . $studentsTodoRow['middleName'] . " " . $studentsTodoRow['lastName']; ?></span>
+                                                                        </div>
+                                                                        <div class="flex-grow-1 d-flex justify-content-center">
+                                                                            <span class="badge badge-<?php echo strtolower($studentsTodoRow['status']) ?>"><?php echo $studentsTodoRow['status']; ?></span>
+                                                                        </div>
+                                                                        <div class="d-flex align-items-center">
+                                                                            <img src="../shared/assets/img/assess/arrow.png" alt="Arrow" style="width: 20px; height: 20px;">
+                                                                        </div>
+                                                                    </div>
+                                                                </a>
+                                                        <?php
+                                                            }
+                                                        } ?>
                                                     </div>
                                                 </div>
                                             </div>
@@ -264,7 +268,7 @@ $graded = mysqli_fetch_assoc($countGradedResult);
                                                             <div class="text-reg text-14 mb-1"><span
                                                                     class="stat-value"><?php echo $submitted['submittedTodo']; ?></span> submitted</div>
                                                             <div class="text-reg text-14 mb-1"><span
-                                                                    class="stat-value"><?php echo $pending['pending']; ?></span> did not submit</div>
+                                                                    class="stat-value"><?php echo $pending['pending']; ?></span> <?php echo $statusText; ?></div>
                                                             <div class="text-reg text-14 mb-1"><span
                                                                     class="stat-value"><?php echo $graded['graded']; ?></span>
                                                                 graded</div>
@@ -273,12 +277,14 @@ $graded = mysqli_fetch_assoc($countGradedResult);
                                                 </div>
 
                                                 <div class="d-flex justify-content-center pt-3">
-                                                    <button class="btn btn-action">
-                                                        <img src="../shared/assets/img/assess/assess.png"
-                                                            alt="Assess Icon"
-                                                            style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
-                                                        Sheet
-                                                    </button>
+                                                    <a class="text-decoration-none" href="grading-sheet-pdf-with-image.php?submissionID=<?php echo $submissionID; ?>">
+                                                        <button class="btn btn-action">
+                                                            <img src="../shared/assets/img/assess/assess.png"
+                                                                alt="Assess Icon"
+                                                                style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
+                                                            Sheet
+                                                        </button>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -301,7 +307,7 @@ $graded = mysqli_fetch_assoc($countGradedResult);
                     data: {
                         datasets: [{
                             data: [submitted, pending, graded],
-                            backgroundColor: ['#3DA8FF', '#C7C7C7', '#E0E0E0'],
+                            backgroundColor: ['#3DA8FF', '#C7C7C7', '#d9ffe4ff'],
                             borderWidth: 0,
                         }]
                     },
@@ -320,6 +326,30 @@ $graded = mysqli_fetch_assoc($countGradedResult);
             }
 
             createDoughnutChart('taskChart', <?php echo $submitted['submittedTodo']; ?>, <?php echo $pending['pending']; ?>, <?php echo $graded['graded']; ?>);
+
+            const studentIDs = <?php echo json_encode($studentIDs); ?>;
+            console.log(studentIDs);
+
+            function returnAll() {
+                fetch('../shared/assets/processes/return-all.php?assessmentID=' + <?php echo $assessmentID; ?>, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            studentID: studentIDs
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert("Successfully Returned All");
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        window.location.reload();
+                    });
+            }
         </script>
 </body>
 

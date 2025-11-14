@@ -1,11 +1,24 @@
 <?php
 $activePage = 'todo';
 include('shared/assets/database/connect.php');
-
 include("shared/assets/processes/session-process.php");
 $testID = $_GET['testID'];
+
 if ($testID == null) {
-    header("Location: 404.php");
+    header("Location: 404.html");
+    exit();
+}
+
+$testExistenceQuery = "SELECT tests.testID FROM tests 
+INNER JOIN assessments 
+    ON tests.assessmentID = assessments.assessmentID 
+INNER JOIN todo 
+    ON assessments.assessmentID = todo.assessmentID 
+WHERE tests.testID = '$testID' AND todo.userID = '$userID'";
+$testExistenceResult = executeQuery($testExistenceQuery);
+
+if (mysqli_num_rows($testExistenceResult) <= 0) {
+    echo "Test doesn't exists.";
     exit();
 }
 
@@ -14,35 +27,43 @@ $selectTestQuery = "SELECT assessmentTitle FROM tests
                         ON tests.assessmentID = assessments.assessmentID
                     WHERE testID = $testID";
 $selectTestResult = executeQuery($selectTestQuery);
+$pageTitleRow = mysqli_fetch_assoc($selectTestResult);
+$pageTitle = $pageTitleRow['assessmentTitle'];
 
-$selectQuestionsQuery = "SELECT 
-testquestions.*
-FROM tests 
-INNER JOIN testquestions 
-    ON tests.testID = testquestions.testID 
-WHERE tests.testID = $testID";
-$selectQuestionsResult = executeQuery($selectQuestionsQuery);
-$todoStatus = 'Submitted';
 $validateTestIDQuery = "SELECT 
                         todo.* 
                         FROM todo 
                         INNER JOIN tests 
                         ON todo.assessmentID = tests.assessmentID 
-                        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = '$todoStatus';";
+                        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = 'Submitted';";
 $validateTestIDResult = executeQuery($validateTestIDQuery);
 
 if (mysqli_num_rows($validateTestIDResult) <= 0) {
-    $todoStatus = 'Pending';
     $checkStatusQuery = "SELECT 
                         todo.* 
                         FROM todo 
                         INNER JOIN tests 
                         ON todo.assessmentID = tests.assessmentID 
-                        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = '$todoStatus';";
+                        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = 'Pending';";
     $checkStatusResult = executeQuery($checkStatusQuery);
     if (mysqli_num_rows($checkStatusResult) > 0) {
         header("Location: test.php?testID=" . $testID);
         exit();
+    } else {
+        $checkStatusQuery = "SELECT 
+                            todo.* FROM todo 
+                            INNER JOIN tests 
+                                ON todo.assessmentID = tests.assessmentID 
+                            WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = 'Graded';";
+        $checkStatusResult = executeQuery($checkStatusQuery);
+
+        if (mysqli_num_rows($checkStatusResult) > 0) {
+            header("Location: test-result.php?testID=" . $testID);
+            exit();
+        } else {
+            echo "Test doesn't exists.";
+            exit();
+        }
     }
 }
 
@@ -74,20 +95,42 @@ $totalItems = $totalItemsRow['totalItems'];
 $timeFactorQuery = "SELECT tests.testTimeLimit, todo.timeSpent FROM tests INNER JOIN todo ON tests.assessmentID = todo.assessmentID WHERE tests.testID = '$testID'";
 $timeFactorResult = executeQuery($timeFactorQuery);
 $timeFactorRow = mysqli_fetch_assoc($timeFactorResult);
-$timelimit = $timeFactorRow['testTimeLimit'];
-$timeSpent = $timeFactorRow['timeSpent'];
+$timelimit = (mysqli_num_rows($timeFactorResult) > 0) ? $timeFactorRow['testTimeLimit'] : '0';
+$timeSpent = (mysqli_num_rows($timeFactorResult) > 0) ? $timeFactorRow['timeSpent'] : '0';
+
 
 $baseXP = 10 * $totalPoints;
 $baseWebstars = 1 * $totalPoints;
-$correctBonusXP =  $baseXP * ($score / $totalPoints);
-$correctBonusWebstars = $baseWebstars * ($score / $totalPoints);
-$timeFactor = 1 + ($timelimit - $timeSpent) / $timelimit;
+
+if ($totalPoints == 0) {
+    $correctBonusXP =  0;
+    $correctBonusWebstars = 0;
+} else {
+    $correctBonusXP =  $baseXP * ($score / $totalPoints);
+    $correctBonusWebstars = $baseWebstars * ($score / $totalPoints);
+}
+
+if ($timelimit == 0) {
+    $timeFactor = 0;
+} else {
+    $timeFactor = 1 + ($timelimit - $timeSpent) / $timelimit;
+}
 $finalXP = $baseXP + ($correctBonusXP * $timeFactor);
 $finalWebstars = $baseWebstars + ($correctBonusWebstars * $timeFactor);
-$multipliedXP = $finalXP * 2;
+$multipliedXP = round($finalXP) * 2;
 
 $bonusXP = $finalXP - $baseXP;
 $bonusWebstars = $finalWebstars - $baseWebstars;
+
+//Get Assessment ID of current test
+$assessmentIDQuery = "SELECT assessmentID FROM tests WHERE testID = '$testID'";
+$assessmentIDResult = executeQuery($assessmentIDQuery);
+$assessmentIDRow = mysqli_fetch_assoc($assessmentIDResult);
+$assessmentID = (mysqli_num_rows($assessmentIDResult) > 0) ? $assessmentIDRow['assessmentID'] : null;
+
+//Checks if multiplier is already used
+$checkMultiplierUseQuery = "SELECT * FROM webstars WHERE userID = '$userID' AND assessmentID = '$assessmentID' AND sourceType = 'XP Multiplier Usage'";
+$checkMultiplierUseResult = executeQuery($checkMultiplierUseQuery);
 
 echo "<script>console.log(" . $baseXP . ");</script>";
 echo "<script>console.log(" . $baseWebstars . ");</script>";
@@ -106,7 +149,7 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | Index</title>
+    <title>Webstar | <?php echo $pageTitle; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
@@ -211,10 +254,11 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
                                         style="color: var(--black);"></i>
                                     <div class="quiz-nav col-12 d-flex flex-column flex-md-row align-items-center justify-content-between my-2 px-3 px-md-5 py-2 py-md-3">
                                         <div class="d-flex flex-row align-items-center mb-0">
-                                            <a href="todo.php" class="text-decoration-none"><i class="d-none d-md-block announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 me-3"
+                                            <a href="exam-info.php?testID=<?php echo $testID; ?>" class="text-decoration-none"><i class="d-none d-md-block announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 me-3"
                                                     style="color: var(--black);"></i></a>
                                             <?php
                                             if (mysqli_num_rows($selectTestResult) > 0) {
+                                                mysqli_data_seek($selectTestResult, 0);
                                                 while ($guideLines = mysqli_fetch_assoc($selectTestResult)) {
                                             ?>
                                                     <div class="text-center text-md-auto h2 m-0">
@@ -244,6 +288,7 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
                                                         <img class="img-fluid object-fit-contain mx-0" width="20px" src="shared/assets/img/xp.png" alt="xp">
                                                         <span class="text-bold text-20 text-sm-18">+<?php echo round($baseXP); ?> XPs</span>
                                                         <span class="text-sbold text-16 text-sm-14">+<?php echo round($bonusXP); ?> Bonus XPs</span>
+                                                        <?php echo (mysqli_num_rows($checkMultiplierUseResult) > 0) ? '<span class="text-sbold text-16 text-sm-14">+' . round($finalXP) . ' XPs boosted!</span>' : ''; ?>
                                                     </div>
                                                 </div>
                                                 <div class="row mt-0">
@@ -263,15 +308,16 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
                                     </div>
                                     <div class="mt-auto text-sbold">
                                         <div class="d-flex justify-content-center align-items-center btn-mobile mb-4 gap-3 mt-5" id="buttonSection">
-                                            <button class="gradient-bg btn d-flex align-items-center justify-content-end gap-2 border border-black rounded-5 px-lg-4 py-lg-2 interactable" id="prevBtn"
+                                            <button class="gradient-bg btn d-flex align-items-center justify-content-end gap-2 border border-black rounded-5 px-lg-4 py-lg-2 interactable" id="useBtn"
                                                 style="background-color: var(--primaryColor);" data-bs-toggle="modal" data-bs-target="#multiplier">
                                                 <span class="m-0 fs-sm-6 text-16 text-sm-12">Use XP Multiplier</span>
                                             </button>
 
-                                            <button class="btn d-flex align-items-center justify-content-start gap-2 border border-black rounded-5 px-lg-4 py-lg-2 interactable" id="nextBtn"
-                                                style="background-color: var(--primaryColor);">
-                                                <span class="m-0 fs-sm-6 text-16 text-sm-12">Return to Test Info</span>
-                                            </button>
+                                            <a href="exam-info.php?testID=<?php echo $testID; ?>" class="text-decoration-none text-dark">
+                                                <button class="btn d-flex align-items-center justify-content-start gap-2 border border-black rounded-5 px-lg-4 py-lg-2 interactable" id="returnBtn"
+                                                    style="background-color: var(--primaryColor);">
+                                                    <span class="m-0 fs-sm-6 text-16 text-sm-12">Return to Test Info</span>
+                                                </button></a>
                                         </div>
                                     </div>
                                 </div>
@@ -294,37 +340,37 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <form class="my-0" id="feedbackForm" action="" method="POST">
-                    <div class="modal-body">
-                        <div class="container">
-                            <div class="row justify-content-center">
-                                <div class="col-12 d-flex justify-content-center flex-column text-center text-30">
-                                    <p class="text-bold">Multiply your XPs</p>
+
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-12 d-flex justify-content-center flex-column text-center text-30">
+                                <p class="text-bold">Multiply your XPs</p>
+                            </div>
+                            <div class="row">
+                                <div class="mx-auto col-8 text-center">
+                                    <p class="text-reg text-18 text-reg mb-0">Cost: <span class="text-sbold">1000 Webstars</span></p>
+                                    <p class="text-reg text-18 text-reg">Current XPs: <span class="text-sbold"><?php echo round($finalXP); ?> → <?php echo $multipliedXP; ?> XPs </span>after boost</p>
                                 </div>
-                                <div class="row">
-                                    <div class="mx-auto col-8 text-center">
-                                        <p class="text-reg text-18 text-reg mb-0">Cost: <span class="text-sbold">1000 Webstars</span></p>
-                                        <p class="text-reg text-18 text-reg">Current XPs: <span class="text-sbold">120 → 240 XPs </span>after boost</p>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <span class="text-16 text-center text-reg mb-3">
-                                        Are you sure you want to use
-                                        <span class="text-sbold">1000 Webstars</span> to activate this multiplier?
-                                    </span>
-                                </div>
+                            </div>
+                            <div class="row">
+                                <span class="text-16 text-center text-reg mb-3">
+                                    Are you sure you want to use
+                                    <span class="text-sbold">1000 Webstars</span> to activate this multiplier?
+                                </span>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- FOOTER -->
-                    <div class="modal-footer justify-content-center">
-                        <button class="gradient-bg my-auto text-sbold btn d-flex align-items-center justify-content-center border border-black rounded-5 px-lg-4 py-lg-2 interactable"
-                            data-bs-toggle="modal" data-bs-target="#multiplier">
-                            <span class="m-0 fs-sm-6 text-16 text-sm-12">Use XP Multiplier</span>
-                        </button>
-                    </div>
-                </form>
+                <!-- FOOTER -->
+                <div class="modal-footer justify-content-center">
+                    <button id="multiplierBtn" class="gradient-bg my-auto text-sbold btn d-flex align-items-center justify-content-center border border-black rounded-5 px-lg-4 py-lg-2 interactable"
+                        data-bs-toggle="modal" data-bs-target="#multiplier" <?php echo (mysqli_num_rows($checkMultiplierUseResult) <= 0) ? 'onclick="applyXPMultiplier();"' : ''; ?>>
+                        <span class="m-0 fs-sm-6 text-16 text-sm-12">Use XP Multiplier</span>
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>
@@ -376,6 +422,35 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
         }
 
         timerHtml.innerHTML = `<i class="bi bi-clock fa-xs me-2" style="color: var(--black);"></i>` + formatTime(seconds);
+
+        <?php
+        if (mysqli_num_rows($checkMultiplierUseResult) <= 0) {
+            echo "async function applyXPMultiplier() {
+            try {
+                const response = await fetch('shared/assets/processes/xp-multiplier.php?testID=" . $testID . "');
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(result.message);
+                    window.location.reload();
+                } else {
+                    alert('Failed to apply multiplier: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error applying XP multiplier:', error);
+            }
+        
+        }";
+        } else {
+            echo "document.getElementById('multiplierBtn').disabled = true;
+                  document.getElementById('useBtn').disabled = true;";
+        }
+        ?>
     </script>
 </body>
 

@@ -34,7 +34,13 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                 WHERE assessmentID = '$assessmentID' AND status = 'Graded'";
         $countGradedResult = executeQuery($countGradedQuery);
 
-        $getSubmissionIDQuery = "SELECT submissionID FROM submissions WHERE assessmentID = $assessmentID";
+        $getSubmissionIDQuery = "SELECT submissions.submissionID 
+        FROM submissions 
+        INNER JOIN todo 
+            ON todo.userID = submissions.userID
+        WHERE todo.status != 'Graded' AND todo.assessmentID = '$assessmentID' AND submissions.assessmentID = '$assessmentID'
+        ORDER BY todo.updatedAt ASC
+        LIMIT 1";
         $getSubmissionIDResult = executeQuery($getSubmissionIDQuery);
 
         $submittedTodoCount = 0;

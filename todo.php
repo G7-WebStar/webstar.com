@@ -202,7 +202,7 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                                 if ($type === 'task') {
                                                     $link = "assignment.php?assignmentID=" . $todo['assignmentID'];
                                                 } elseif ($type === 'test') {
-                                                    $link = "test.php?testID=" . $todo['testID'];
+                                                    $link = "exam-info.php?testID=" . $todo['testID'];
                                                 }
                                                 ?>
                                                 <a href="<?php echo $link; ?>" class="text-decoration-none"

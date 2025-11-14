@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 13, 2025 at 05:36 PM
+-- Generation Time: Nov 14, 2025 at 02:35 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -390,28 +390,27 @@ CREATE TABLE `enrollments` (
   `enrollmentID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
   `courseID` int(5) NOT NULL,
-  `yearSection` int(11) NOT NULL,
-  `xpPoints` int(11) NOT NULL
+  `yearSection` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `enrollments`
 --
 
-INSERT INTO `enrollments` (`enrollmentID`, `userID`, `courseID`, `yearSection`, `xpPoints`) VALUES
-(1, 2, 1, 2023, 0),
-(2, 2, 2, 2023, 0),
-(3, 3, 1, 2023, 0),
-(4, 4, 1, 2023, 0),
-(5, 5, 1, 2023, 0),
-(6, 6, 1, 2023, 0),
-(7, 7, 1, 2023, 0),
-(8, 8, 1, 2023, 0),
-(9, 9, 1, 2023, 0),
-(10, 10, 1, 2023, 0),
-(11, 11, 1, 2023, 0),
-(12, 12, 1, 2023, 0),
-(13, 2, 3, 1, 0);
+INSERT INTO `enrollments` (`enrollmentID`, `userID`, `courseID`, `yearSection`) VALUES
+(1, 2, 1, 2023),
+(2, 2, 2, 2023),
+(3, 3, 1, 2023),
+(4, 4, 1, 2023),
+(5, 5, 1, 2023),
+(6, 6, 1, 2023),
+(7, 7, 1, 2023),
+(8, 8, 1, 2023),
+(9, 9, 1, 2023),
+(10, 10, 1, 2023),
+(11, 11, 1, 2023),
+(12, 12, 1, 2023),
+(13, 2, 3, 1);
 
 -- --------------------------------------------------------
 
@@ -488,27 +487,28 @@ CREATE TABLE `leaderboard` (
   `enrollmentID` int(11) NOT NULL,
   `timeRange` varchar(10) NOT NULL,
   `periodStart` date NOT NULL,
-  `updatedAt` datetime NOT NULL DEFAULT current_timestamp()
+  `updatedAt` datetime NOT NULL DEFAULT current_timestamp(),
+  `xpPoints` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `leaderboard`
 --
 
-INSERT INTO `leaderboard` (`leaderboardID`, `enrollmentID`, `timeRange`, `periodStart`, `updatedAt`) VALUES
-(1, 1, 'Weekly', '2025-08-25', '2025-08-30 12:00:00'),
-(2, 2, 'Weekly', '2025-08-25', '2025-08-30 12:00:00'),
-(3, 1, 'Weekly', '2025-09-28', '2025-09-28 16:50:22'),
-(4, 3, 'Weekly', '2025-09-28', '2025-09-28 16:58:09'),
-(5, 4, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
-(6, 5, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
-(7, 6, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
-(8, 7, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
-(9, 8, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
-(10, 9, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
-(11, 10, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
-(12, 11, 'Weekly', '2025-09-01', '2025-09-28 21:03:44'),
-(13, 12, 'Monthly', '2025-09-01', '2025-09-28 21:34:51');
+INSERT INTO `leaderboard` (`leaderboardID`, `enrollmentID`, `timeRange`, `periodStart`, `updatedAt`, `xpPoints`) VALUES
+(1, 1, 'Weekly', '2025-08-25', '2025-08-30 12:00:00', 0),
+(2, 2, 'Weekly', '2025-08-25', '2025-08-30 12:00:00', 0),
+(3, 1, 'Weekly', '2025-09-28', '2025-09-28 16:50:22', 0),
+(4, 3, 'Weekly', '2025-09-28', '2025-09-28 16:58:09', 0),
+(5, 4, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
+(6, 5, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
+(7, 6, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
+(8, 7, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
+(9, 8, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
+(10, 9, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
+(11, 10, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
+(12, 11, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
+(13, 12, 'Monthly', '2025-09-01', '2025-09-28 21:34:51', 0);
 
 -- --------------------------------------------------------
 
@@ -936,7 +936,7 @@ CREATE TABLE `testquestions` (
   `testID` int(5) NOT NULL,
   `testQuestion` varchar(100) NOT NULL,
   `questionType` enum('Multiple Choice','Identification') NOT NULL DEFAULT 'Multiple Choice',
-  `testQuestionImage` varchar(50) DEFAULT NULL,
+  `testQuestionImage` varchar(256) DEFAULT NULL,
   `correctAnswer` varchar(50) NOT NULL,
   `testQuestionPoints` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

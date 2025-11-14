@@ -47,6 +47,93 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $scoreRow = mysqli_fetch_assoc($scoreResult);
     $score = $scoreRow['correct'];
 
-    $insertScoreQuery = "INSERT INTO scores (userID, testID, score, gradedAt) VALUES ('$userID','$testID','$score')";
-    $insertScoreResult = executeQuery($insertQuery);
+    $insertScoreQuery = "INSERT INTO scores (userID, testID, score) VALUES ('$userID','$testID','$score')";
+    $insertScoreResult = executeQuery($insertScoreQuery);
+
+    $assessmentIDQuery = "SELECT assessmentID FROM tests WHERE testID = '$testID'";
+    $assessmentIDResult = executeQuery($assessmentIDQuery);
+    $assessmentIDRow = mysqli_fetch_assoc($assessmentIDResult);
+    $assessmentID = $assessmentIDRow['assessmentID'];
+
+    $scoreIDQuery = "SELECT scoreID FROM scores WHERE testID = '$testID' AND userID = '$userID'";
+    $scoreIDResult = executeQuery($scoreIDQuery);
+    $scoreIDRow = mysqli_fetch_assoc($scoreIDResult);
+    $scoreID = $scoreIDRow['scoreID'];
+
+    $insertSubmissionQuery = "INSERT INTO submissions (userID, assessmentID, scoreID, isSubmitted) 
+                                                VALUES ('$userID','$assessmentID','$scoreID', 'Yes')";
+    $insertSubmissionResult = executeQuery($insertSubmissionQuery);
+
+    $submissionIDQuery = "SELECT submissionID FROM submissions WHERE scoreID = '$scoreID'";
+    $submissionIDResult = executeQuery($submissionIDQuery);
+    $submissionIDRow = mysqli_fetch_assoc($submissionIDResult);
+    $submissionID = $submissionIDRow['submissionID'];
+
+    $submissionIDInScoresQuery = "UPDATE scores SET submissionID = '$submissionID'";
+    $submissionIDInScoresResult = executeQuery($submissionIDInScoresQuery);
+
+    $totalPointsQuery = "SELECT SUM(testQuestionPoints) AS totalPoints FROM testquestions WHERE testID = '$testID'";
+    $totalPointsResult = executeQuery($totalPointsQuery);
+    $totalPointsRow = mysqli_fetch_assoc($totalPointsResult);
+    $totalPoints = $totalPointsRow['totalPoints'];
+
+    $scoreQuery = "SELECT COUNT(isCorrect) AS correct FROM testresponses WHERE isCorrect = '1' AND userID = '$userID' AND testID = '$testID'";
+    $scoreResult = executeQuery($scoreQuery);
+    $scoreRow = mysqli_fetch_assoc($scoreResult);
+    $score = $scoreRow['correct'];
+
+    $timeFactorQuery = "SELECT tests.testTimeLimit, todo.timeSpent FROM tests INNER JOIN todo ON tests.assessmentID = todo.assessmentID WHERE tests.testID = '$testID'";
+    $timeFactorResult = executeQuery($timeFactorQuery);
+    $timeFactorRow = mysqli_fetch_assoc($timeFactorResult);
+    $timelimit = $timeFactorRow['testTimeLimit'];
+    $getTimeSpent = $timeFactorRow['timeSpent'];
+
+    $baseWebstars = 1 * $totalPoints;
+    $correctBonusWebstars = $baseWebstars * ($score / $totalPoints);
+    $timeFactor = 1 + ($timelimit - $getTimeSpent) / $timelimit;
+    $finalWebstars = $baseWebstars + ($correctBonusWebstars * $timeFactor);
+    $earnedWebstars = round($finalWebstars);
+
+    $earnedWebstarsQuery = "INSERT INTO webstars (userID, assessmentID, sourceType, pointsChanged, dateEarned) VALUES ('$userID','$assessmentID','Tests','$earnedWebstars', CURRENT_TIME)";
+    $earnedWebstarsResult = executeQuery($earnedWebstarsQuery);
+
+    $getUserWebstarsQuery = "SELECT webstars FROM profile WHERE userID = '$userID'";
+    $getUserWebstarsResult = executeQuery($getUserWebstarsQuery);
+    $webstarRow = mysqli_fetch_assoc($getUserWebstarsResult);
+    $webstars = $webstarRow['webstars'];
+
+    $pointsChangedQuery = "SELECT pointsChanged FROM webstars WHERE userID = '$userID' AND assessmentID = '$assessmentID'";
+    $pointsChangedResult = executeQuery($pointsChangedQuery);
+    $pointsChangedRow = mysqli_fetch_assoc($pointsChangedResult);
+    $pointsChanged = $pointsChangedRow['pointsChanged'];
+
+    $newWebstars = $webstars + $pointsChanged;
+
+    $updateCurrentWebstarsQuery = "UPDATE profile SET webstars = '$newWebstars' WHERE userID = '$userID'";
+    $updateCurrentWebstarsResult = executeQuery($updateCurrentWebstarsQuery);
+
+    $baseXP = 10 * $totalPoints;
+    $correctBonusXP =  $baseXP * ($score / $totalPoints);
+    $finalXP = $baseXP + ($correctBonusXP * $timeFactor);
+
+    $courseIDQuery = "SELECT courseID FROM assessments WHERE assessmentID = '$assessmentID'";
+    $courseIDResult = executeQuery($courseIDQuery);
+    $courseIDRow = mysqli_fetch_assoc($courseIDResult);
+    $courseID = $courseIDRow['courseID'];
+
+    $currentXPQuery = "SELECT leaderboard.xpPoints, enrollments.enrollmentID FROM leaderboard 
+                       INNER JOIN enrollments
+                        ON leaderboard.enrollmentID = enrollments.enrollmentID
+                       WHERE enrollments.userID = '$userID' AND enrollments.courseID = '$courseID'";
+    $currentXPResult = executeQuery($currentXPQuery);
+    $currentXPRow = mysqli_fetch_assoc($currentXPResult);
+    $currentXP = $currentXPRow['xpPoints'];
+
+    $updatedXP = $currentXP + $finalXP;
+
+    $enrollmentID = $currentXPRow['enrollmentID'];
+
+    //Update xpPoints of the current user 
+    $updateLeaderboardXPQuery = "UPDATE leaderboard SET xpPoints = '$updatedXP' WHERE enrollmentID = '$enrollmentID'";
+    $updateLeaderboardXPResult = executeQuery($updateLeaderboardXPQuery);
 }
