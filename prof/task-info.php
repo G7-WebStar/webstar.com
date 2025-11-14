@@ -11,7 +11,8 @@ $userQuery = "SELECT * FROM users
               WHERE users.userID = $userID";
 $userResult = executeQuery($userQuery);
 
-$assignmentQuery = "SELECT 
+$assignmentQuery = "SELECT
+                    assessments.assessmentID, 
                     assessments.assessmentTitle,
                     assessments.deadline,
                     assignments.assignmentDescription,
@@ -30,7 +31,7 @@ $assignmentResult = executeQuery($assignmentQuery);
 
 $assignmentRow = mysqli_fetch_assoc($assignmentResult);
 
-
+$assessmentID = $assignmentRow['assessmentID'];
 $assignmentTitle = $assignmentRow['assessmentTitle'];
 $assignmentDescription = $assignmentRow['assignmentDescription'];
 $profName = $assignmentRow['firstName'] . ' ' . $assignmentRow['lastName'];
