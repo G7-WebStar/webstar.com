@@ -77,7 +77,7 @@
                         <hr class="dropdown-divider">
                     </li>
                     <li><a class="dropdown-item" style="font-family: var(--Bold); color:var(--highlight)"
-                            href="../login.php"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign
+                            href="#" onclick="logout();"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign
                             out</a></li>
                 </ul>
             </div>
@@ -129,10 +129,12 @@
         }
 
         fetch('../shared/assets/processes/search-modal-prof.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'searchTerm=' + encodeURIComponent(query)
-        })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'searchTerm=' + encodeURIComponent(query)
+            })
             .then(res => res.text())
             .then(html => searchResultsMobile.innerHTML = html)
             .catch(() => searchResultsMobile.innerHTML = '<div class="text-center text-muted p-3">Error loading results.</div>');

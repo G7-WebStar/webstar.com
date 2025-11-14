@@ -66,7 +66,7 @@
                             <hr class="dropdown-divider">
                         </li>
                         <li><a class="dropdown-item" style="font-family: var(--Bold); color:var(--highlight)"
-                                href="../login.php"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign
+                                href="#" onclick="logout();"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign
                                 out</a></li>
                     </ul>
                 </div>
@@ -75,3 +75,10 @@
         </div>
     </div>
 </div>
+
+<script>
+    function logout() {
+        fetch('../shared/assets/processes/sign-out.php');
+        window.location.reload();
+    }
+</script>
