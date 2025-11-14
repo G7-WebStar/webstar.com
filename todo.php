@@ -5,7 +5,7 @@ include("shared/assets/processes/session-process.php");
 // Get filter parameters from URL
 $sortBy = isset($_GET['sortBy']) ? $_GET['sortBy'] : 'Newest';
 $courseFilter = isset($_GET['course']) ? $_GET['course'] : 'All';
-$statusFilter = isset($_GET['status']) ? $_GET['status'] : 'All';
+$statusFilter = isset($_GET['status']) ? $_GET['status'] : 'Pending';
 
 // Get enrolled courses for dropdown
 $selectEnrolledQuery = "SELECT DISTINCT courses.courseCode
@@ -177,7 +177,6 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                                         <?php echo $statusFilter; ?>
                                                     </button>
                                                     <ul class="dropdown-list text-reg text-14">
-                                                        <li data-value="All">All</li>
                                                         <li data-value="Pending">Pending</li>
                                                         <li data-value="Missing">Missing</li>
                                                         <li data-value="Done">Done</li>

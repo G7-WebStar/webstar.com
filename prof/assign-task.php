@@ -1,8 +1,17 @@
 <?php $activePage = 'assign-task';
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 include('../shared/assets/database/connect.php');
 date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
+
+if (!class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
+    require '../shared/assets/phpmailer/src/Exception.php';
+    require '../shared/assets/phpmailer/src/PHPMailer.php';
+    require '../shared/assets/phpmailer/src/SMTP.php';
+}
 
 $mode = '';
 $taskID = 0;
@@ -25,8 +34,10 @@ if (isset($_POST['saveAssignment'])) {
     $mode = $_POST['mode'] ?? 'new';
     $taskID = intval($_POST['taskID'] ?? 0);
 
-    $title = mysqli_real_escape_string($conn, $_POST['assignmentTitle'] ?? '');
-    $desc = mysqli_real_escape_string($conn, $_POST['assignmentContent'] ?? '');
+    $titleRaw = $_POST['assignmentTitle'] ?? '';
+    $title = mysqli_real_escape_string($conn, $titleRaw);
+    $descRaw = $_POST['assignmentContent'] ?? '';
+    $desc = mysqli_real_escape_string($conn, $descRaw);
     $deadline = !empty($_POST['deadline']) ? $_POST['deadline'] : null;
     $points = !empty($_POST['points']) ? $_POST['points'] : 0;
     $rubricID = !empty($_POST['selectedRubricID']) ? intval($_POST['selectedRubricID']) : null;
@@ -52,12 +63,6 @@ if (isset($_POST['saveAssignment'])) {
             executeQuery($insertAssignment);
 
             $assignmentID = mysqli_insert_id($conn);
-
-            // Insert into todo
-            $insertTodo = "INSERT INTO todo 
-                (userID, assessmentID, status, isRead)
-                VALUES ('$userID', '$assignmentID', 'Pending', 0)";
-            executeQuery($insertTodo);
 
         } elseif ($mode === 'edit') {
             // UPDATE existing assessment + assignment
@@ -128,6 +133,169 @@ if (isset($_POST['saveAssignment'])) {
                     VALUES 
                     ('$selectedCourseID', '$userID', '$assignmentID', '', '" . mysqli_real_escape_string($conn, $fileTitle) . "', '$link')";
                 executeQuery($insertLink);
+            }
+        }
+
+        if ($mode === 'new' || $mode === 'reuse') {
+            // Insert todos for each student enrolled in the course
+            $studentsQuery = "SELECT userID, enrollmentID FROM enrollments WHERE courseID = '$selectedCourseID'";
+            $studentsResult = executeQuery($studentsQuery);
+            if ($studentsResult) {
+                while ($student = mysqli_fetch_assoc($studentsResult)) {
+                    $studentUserID = $student['userID'];
+                    $todoQuery = "INSERT INTO todo (userID, assessmentID, status, isRead)
+                        VALUES ('$studentUserID', '$assessmentID', 'Pending', 0)";
+                    executeQuery($todoQuery);
+                }
+            }
+
+            // --- Notifications & Email ---
+            $notificationMessage = "A new task has been assigned: " . $titleRaw;
+            $notifType = 'Course Update';
+            $courseCode = "";
+
+            // Fetch course code for email
+            $selectCourseDetailsQuery = "SELECT courseCode FROM courses WHERE courseID = '$selectedCourseID'";
+            $courseDetailsResult = executeQuery($selectCourseDetailsQuery);
+            if ($courseDetailsResult && mysqli_num_rows($courseDetailsResult) > 0) {
+                $courseData = mysqli_fetch_assoc($courseDetailsResult);
+                $courseCode = $courseData['courseCode'];
+            }
+
+            $escapedNotificationMessage = mysqli_real_escape_string($conn, $notificationMessage);
+            $escapedNotifType = mysqli_real_escape_string($conn, $notifType);
+
+            // Prevent duplicate notifications per student within 5 minutes
+            $insertNotificationQuery = "
+                INSERT INTO inbox 
+                (enrollmentID, messageText, notifType, createdAt)
+                SELECT
+                    e.enrollmentID,
+                    '$escapedNotificationMessage',
+                    '$escapedNotifType',
+                    NOW()
+                FROM
+                    enrollments e
+                WHERE
+                    e.courseID = '$selectedCourseID'
+                    AND NOT EXISTS (
+                        SELECT 1 
+                        FROM inbox i2 
+                        WHERE i2.enrollmentID = e.enrollmentID 
+                            AND i2.messageText = '$escapedNotificationMessage'
+                            AND i2.notifType = '$escapedNotifType'
+                            AND i2.createdAt > DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+                    )
+            ";
+            executeQuery($insertNotificationQuery);
+
+            // Email enrolled students who opted-in
+            $selectEmailsQuery = "
+                SELECT u.email, u.userID,
+                       COALESCE(s.courseUpdateEnabled, 0) as courseUpdateEnabled
+                FROM users u
+                INNER JOIN enrollments e ON u.userID = e.userID
+                LEFT JOIN settings s ON u.userID = s.userID
+                WHERE e.courseID = '$selectedCourseID'
+            ";
+            $emailsResult = executeQuery($selectEmailsQuery);
+
+            try {
+                $mail = new PHPMailer(true);
+                $mail->isSMTP();
+                $mail->Host       = 'smtp.gmail.com';
+                $mail->SMTPAuth   = true;
+                $mail->Username   = 'learn.webstar@gmail.com';
+                $mail->Password   = 'mtls vctd rhai cdem';
+                $mail->SMTPSecure = 'tls';
+                $mail->Port       = 587;
+                $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
+                $logoPath = __DIR__ . '/../shared/assets/img/webstar-logo-black.png';
+                if (file_exists($logoPath)) {
+                    $mail->AddEmbeddedImage($logoPath, 'logoWebstar');
+                }
+
+                $mail->isHTML(true);
+                $mail->CharSet = 'UTF-8';
+                $mail->Encoding = 'base64';
+                $mail->Subject = "[NEW TASK] " . $titleRaw . " for Course " . $courseCode;
+
+                $recipientsFound = false;
+                while ($student = mysqli_fetch_assoc($emailsResult)) {
+                    if ($student['courseUpdateEnabled'] == 1 && !empty($student['email'])) {
+                        $mail->addAddress($student['email']);
+                        $recipientsFound = true;
+                    }
+                }
+
+                if ($recipientsFound) {
+                    $deadlineDisplay = 'Not set';
+                    if (!empty($deadline)) {
+                        try {
+                            $deadlineDate = new DateTime($deadline);
+                            $deadlineDisplay = $deadlineDate->format('F j, Y \\a\\t g:i A');
+                        } catch (Exception $e) {
+                            $deadlineDisplay = $deadline;
+                        }
+                    }
+
+                    $pointsDisplay = ($points !== '' && $points !== null) ? $points : 'Ungraded';
+                    $descHtml = nl2br(htmlspecialchars($descRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                    $emailTitleEsc = htmlspecialchars($titleRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                    $courseCodeEsc = htmlspecialchars($courseCode, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+                    $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
+                            <tr>
+                                <td align="center">
+                                    <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                                        <tr style="background-color: #FDDF94;">
+                                            <td align="center" style="padding: 20px;">
+                                                <img src="cid:logoWebstar" alt="Webstar Logo" style="height:80px;">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 30px;">
+                                                <p style="font-size:15px; color:#333;">Hello Learner,</p>
+                                                <p style="font-size:15px; color:#333;">
+                                                    A new task has been assigned in your course <strong>' . $courseCodeEsc . '</strong>.
+                                                </p>
+                                                <h2 style="text-align:center; font-size:24px; color:#2C2C2C; margin:20px 0;">' . $emailTitleEsc . '</h2>
+                                                <p style="font-size:15px; color:#333; margin-top: 25px;">
+                                                    <strong>Task Instructions:</strong>
+                                                </p>
+                                                <div style="font-size:15px; color:#333; margin-bottom: 20px; line-height: 22px;">
+                                                    ' . $descHtml . '
+                                                </div>
+                                                <div style="background-color:#f9f9f9; padding:15px; border-radius:5px; margin:20px 0;">
+                                                    <p style="font-size:14px; color:#666; margin:5px 0;"><strong>Deadline:</strong> ' . htmlspecialchars($deadlineDisplay, ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</p>
+                                                    <p style="font-size:14px; color:#666; margin:5px 0;"><strong>Points:</strong> ' . htmlspecialchars($pointsDisplay, ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</p>
+                                                </div>
+                                                <p style="font-size:15px; color:#333;">
+                                                    Please log in to your Webstar account to review the task details and submit on time.
+                                                </p>
+                                                <p style="margin-top:30px; color:#333;">
+                                                    Warm regards,<br>
+                                                    <strong>The Webstar Team</strong><br>
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color:#FDDF94;">
+                                            <td align="center" style="padding:15px; color:black; font-size:13px;">
+                                                © 2025 Webstar. All Rights Reserved.
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>';
+
+                    $mail->send();
+                }
+            } catch (Exception $e) {
+                $errorMsg = isset($mail) && is_object($mail) ? $mail->ErrorInfo : $e->getMessage();
+                error_log("PHPMailer failed for Course ID $selectedCourseID: " . $errorMsg);
             }
         }
     }
