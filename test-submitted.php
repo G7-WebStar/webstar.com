@@ -375,7 +375,39 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <script>
+        // Trigger confetti when the page loads
+        window.onload = function() {
+            const duration = 5000; // Duration in milliseconds
+            const animationEnd = Date.now() + duration;
+            const defaults = {
+                startVelocity: 25, // slower fall
+                spread: 360,
+                ticks: 200, // longer visibility (higher = stays longer)
+                zIndex: 9999
+            };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            (function frame() {
+                confetti({
+                    ...defaults,
+                    particleCount: 5,
+                    origin: {
+                        x: randomInRange(0, 1), // random horizontal positions
+                        y: 0 // start at top
+                    }
+                });
+
+                if (Date.now() < animationEnd) {
+                    requestAnimationFrame(frame);
+                }
+            })();
+        };
+        
         let timerHtml = document.getElementById('timer');
         let seconds = <?php echo $timeStartRow['remainingTime']; ?>;
         //Format time
