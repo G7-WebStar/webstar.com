@@ -1,4 +1,4 @@
-<?php $activePage = 'profCourses'; ?>
+<?php $activePage = 'course'; ?>
 <?php
 include('../shared/assets/database/connect.php');
 include("../shared/assets/processes/prof-session-process.php");
@@ -245,7 +245,7 @@ $courses = executeQuery($course);
                                     </div>
                                 <?php } ?>
                             <?php } else { ?>
-                                <p class="text-center text-white mt-4">No courses found.</p>
+                                <p class="text-center text-reg mt-4">No courses found.</p>
                             <?php } ?>
                         </div>
                     </div>

@@ -84,3 +84,58 @@
         </div>
     </div>
 </div>
+
+<!-- Search Modal -->
+<div class="modal fade text-reg" id="searchModalMobile" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow"
+            style="background: transparent !important; box-shadow: none !important;">
+
+            <!-- Search Bar -->
+            <form class="p-3 position-relative">
+                <input type="text" id="searchInputMobile" class="form-control rounded-pill pt-3 pb-3"
+                    placeholder="Search"
+                    style="border: 1.5px solid #2c2c2c; padding-right: 5rem; padding-left: 27px;">
+                <span class="material-symbols-rounded pe-3" style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%);
+          color: #2c2c2c; font-size: 24px;">search</span>
+            </form>
+
+            <!-- Search Results -->
+            <div class="p-3">
+                <div class="rounded-4 shadow-sm scroll-box" style="border: 1.5px solid #2c2c2c;
+          border-radius: 16px; height: 350px; background-color: #fff; padding:10px;">
+                    <div id="searchResultsMobile" class="scroll-content"
+                        style="height: 100%; overflow-y: auto; border-radius: 12px;">
+                        <div class="text-center text-muted p-3">Type a name or username to search.</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Search Modal JS -->
+<script>
+    const searchInputMobile = document.getElementById('searchInputMobile');
+    const searchResultsMobile = document.getElementById('searchResultsMobile');
+
+    searchInputMobile.addEventListener('input', () => {
+        const query = searchInputMobile.value.trim();
+
+        if (query === '') {
+            searchResultsMobile.innerHTML = '<div class="text-center text-muted p-3">Type a name or username to search.</div>';
+            return;
+        }
+
+        fetch('../shared/assets/processes/search-modal-prof.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'searchTerm=' + encodeURIComponent(query)
+        })
+            .then(res => res.text())
+            .then(html => searchResultsMobile.innerHTML = html)
+            .catch(() => searchResultsMobile.innerHTML = '<div class="text-center text-muted p-3">Error loading results.</div>');
+    });
+
+</script>

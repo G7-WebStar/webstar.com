@@ -12,7 +12,6 @@ $toastType = '';
 if (isset($_POST['saveBio'])) {
     $bio = $_POST['bio'];
     $update = $conn->query("UPDATE profile SET bio = '$bio' WHERE userID = $userID");
-    header("Location: settings.php?tab=customization");
     if ($update) {
         $toastMessage = 'Bio updated successfully!';
         $toastType = 'alert-success';

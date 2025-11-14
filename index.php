@@ -194,7 +194,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                     <div
                                                         class="p-4 pb-0 d-flex justify-content-between align-items-center mb-3">
                                                         <div class="d-flex align-items-center">
-                                                            <span class="material-symbols-outlined" style="color: var(--black); margin-right: 5px;">
+                                                            <span class="material-symbols-rounded" style="color: var(--black); margin-right: 5px;">
                                                                 folder
                                                             </span>
                                                             <span>Your Courses</span>
@@ -269,7 +269,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                     <!-- Top Header  -->
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                                         <div class="d-flex align-items-center">
-                                                            <span class="material-symbols-outlined" style="color: var(--black); margin-right: 5px;">
+                                                            <span class="material-symbols-rounded me-2" style="color: var(--black); margin-right: 5px;">
                                                                 campaign
                                                             </span>
                                                             <span>Recent Announcements</span>
@@ -470,10 +470,10 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                     <!-- Top Header -->
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                                         <div class="d-flex align-items-center">
-                                                            <span class="material-symbols-outlined" style="color: var(--black); margin-right: 10px;">
+                                                            <span class="material-symbols-rounded" style="color: var(--black); margin-right: 10px;">
                                                                 leaderboard
                                                             </span>
-                                                            <span>Lederboard Rank</span>
+                                                            <span>Leaderboard Rank</span>
                                                         </div>
                                                     </div>
                                                     <!-- Scrollable leaderboard -->

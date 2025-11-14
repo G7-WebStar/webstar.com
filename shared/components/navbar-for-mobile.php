@@ -26,10 +26,13 @@ $webstars = mysqli_fetch_assoc($webstarsResult);
       <img src="shared/assets/img/webstar-logo-black.png" alt="Webstar" style="height: 25px;">
     </a>
 
-    <div class="text-sbold mt-1 text-18" style="margin-right: 0;">
-      <img class="me-1" src="shared/assets/img/webstar.png" alt="Description of Image" width="18">
-      <?php echo $webstars['webstars'] ?>
-    </div>
+    <a href="transactions.php" style="text-decoration: none; color: inherit;">
+      <div class="text-sbold mt-1 text-18" style="margin-right: 0;">
+        <img class="me-1" src="shared/assets/img/webstar.png" alt="Description of Image" width="18">
+        <?php echo $webstars['webstars'] ?>
+      </div>
+    </a>
+
 
   </div>
 </nav>
