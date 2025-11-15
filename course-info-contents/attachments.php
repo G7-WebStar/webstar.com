@@ -47,53 +47,79 @@ mysqli_data_seek($fileResult, 0);
     <!-- Attachments List -->
     <div class="d-flex flex-column flex-nowrap overflow-x-hidden">
         <?php while ($file = mysqli_fetch_assoc($fileResult)): ?>
-            <?php if (empty($file['fileAttachment'])) continue; // skip empty titles 
-            ?>
+            <?php if (empty($file['fileAttachment']))
+                continue; ?>
 
             <?php
+            $fileName = $file['fileAttachment'];
             $filePath = $file['fileLink'];
             if (!preg_match('/^https?:\/\//', $filePath)) {
-                $filePath = $file['fileLink']; // local path
+                $filePath = "shared/assets/files/" . $fileName; // local path
             }
             ?>
+
             <div class="row mb-0 mt-2">
                 <div class="col">
-                    <a href="<?php echo $filePath; ?>"
-                        <?php if (!preg_match('/^https?:\/\//', $filePath)) : ?>
-                        download="<?php echo htmlspecialchars($file['fileAttachment']); ?>"
-                        <?php endif; ?>
-                        style="text-decoration: none; color: inherit; display: block;">
-                        <div class="todo-card d-flex align-items-stretch p-2">
-                            <div class="d-flex w-100 align-items-center justify-content-between">
-                                <!-- Attachment Info -->
-                                <div class="d-flex align-items-center flex-grow-1">
-                                    <div class="mx-4 d-flex align-items-center">
-                                        <span class="material-symbols-outlined" style="line-height: 1;">
-                                            draft
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <div class="text-sbold text-16 py-1" style="line-height: 1;">
-                                            <?php echo htmlspecialchars($file['fileAttachment']); ?>
-                                        </div>
-                                        <div class="text-reg text-12" style="line-height: 1;">
-                                            Uploaded <?php echo date("F d, Y", strtotime($file['uploadedAt'])); ?>
-                                        </div>
-                                    </div>
-                                </div>
+                    <div class="todo-card d-flex align-items-stretch p-2">
+                        <div class="d-flex w-100 align-items-center justify-content-between">
 
-                                <!-- Download Icon -->
+                            <!-- Attachment Info (click opens modal) -->
+                            <div class="d-flex align-items-center flex-grow-1" style="cursor:pointer;"
+                                onclick="openTodoViewer('<?php echo addslashes($fileName); ?>', '<?php echo addslashes($filePath); ?>')">
                                 <div class="mx-4 d-flex align-items-center">
-                                    <span class="material-symbols-outlined">
-                                        download_2
+                                    <span class="material-symbols-outlined" style="line-height: 1;">
+                                        draft
                                     </span>
                                 </div>
+                                <div>
+                                    <div class="text-sbold text-16 py-1" style="line-height: 1;">
+                                        <?php echo htmlspecialchars($fileName); ?>
+                                    </div>
+                                    <div class="text-reg text-12" style="line-height: 1;">
+                                        Uploaded <?php echo date("F d, Y", strtotime($file['uploadedAt'])); ?>
+                                    </div>
+                                </div>
                             </div>
+
+                            <!-- Download Icon (click downloads file) -->
+                            <div class="mx-4 d-flex align-items-center">
+                                <a href="<?php echo $filePath; ?>" download="<?php echo htmlspecialchars($fileName); ?>"
+                                    style="color:inherit;">
+                                    <span class="material-symbols-outlined" style="cursor:pointer;">
+                                        download_2
+                                    </span>
+                                </a>
+                            </div>
+
                         </div>
-                    </a>
+                    </div>
                 </div>
             </div>
         <?php endwhile; ?>
+    </div>
+
+    <!-- FILE VIEWER MODAL -->
+    <div class="modal fade" id="todoViewerModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content" style="border-radius:12px; overflow:hidden;">
+                <div class="modal-header d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <h5 class="modal-title text-sbold text-16 mb-0" id="todoViewerModalLabel">File Viewer</h5>
+                        <a id="todoModalDownloadBtn" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
+                            style="background-color: var(--primaryColor); border: 1px solid var(--black);" download>
+                            <span class="" style="display:flex;align-items:center;gap:4px;">
+                                <span class="material-symbols-outlined" style="font-size:18px;">download_2</span>
+                                Download
+                            </span>
+                        </a>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0" style="background:#2e2e2e; height:75vh;">
+                    <div id="todoViewerContainer" style="width:100%; height:100%;"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
 <?php else: ?>
@@ -140,4 +166,28 @@ mysqli_data_seek($fileResult, 0);
             });
         });
     });
+
+    
+    function openTodoViewer(fileName, filePath) {
+        document.getElementById("todoViewerModalLabel").textContent = fileName;
+        document.getElementById("todoModalDownloadBtn").href = filePath;
+
+        const viewer = document.getElementById("todoViewerContainer");
+        viewer.innerHTML = "";
+        const ext = fileName.split(".").pop().toLowerCase();
+
+        if (["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"].includes(ext)) {
+            viewer.innerHTML = `<img src="${filePath}" style="width:100%; height:100%; object-fit:contain; background:#333;">`;
+        } else if (ext === "pdf") {
+            viewer.innerHTML = `<iframe src="${filePath}" width="100%" height="100%" style="border:none; border-radius:10px;"></iframe>`;
+        } else {
+            viewer.innerHTML = `<div class="text-white text-center mt-5">
+                <p>This file type cannot be previewed.</p>
+                <a href="${filePath}" download class="btn btn-warning">Download File</a>
+            </div>`;
+        }
+
+        new bootstrap.Modal(document.getElementById("todoViewerModal")).show();
+    }
+</script>
 </script>

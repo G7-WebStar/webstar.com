@@ -835,6 +835,8 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet" />
 
 </head>
 
@@ -957,7 +959,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                     <div class="text-sbold text-14 mt-3">Instructions</div>
                                     <p class="mb-3 mt-3 text-med text-14"><?php echo nl2br($assignmentDescription) ?>
                                     </p>
-                                    
+
                                     <?php if (!empty($taskFilesArray) || !empty($taskLinksArray)): ?>
                                         <hr>
                                         <div class="text-sbold text-14 mt-4">Task Materials</div>
@@ -970,14 +972,16 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                             $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
                                             ?>
                                             <div class="rubricCard my-3 py-1 d-flex align-items-start justify-content-between"
-                                                style="max-width:100%; min-width:310px; cursor:pointer;">
+                                                style="max-width:100%; min-width:310px; cursor:pointer;"
+                                                onclick="openViewerModal('<?php echo $file ?>', '<?php echo $filePath ?>')">
                                                 <div class="d-flex align-items-start">
                                                     <span class="material-symbols-outlined p-2 pe-2 mt-1 ms-1"
                                                         style="font-variation-settings:'FILL' 1;">draft</span>
                                                     <div class="ms-2">
                                                         <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
                                                         <div class="due text-reg text-14 mb-1"><?php echo $fileExt ?> ·
-                                                            <?php echo $fileSizeMB ?></div>
+                                                            <?php echo $fileSizeMB ?>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <a href="<?php echo $filePath ?>" download="<?php echo $file ?>"
@@ -988,24 +992,23 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                             </div>
                                         <?php endforeach; ?>
 
+
                                         <?php foreach ($taskLinksArray as $item): ?>
                                             <div class="rubricCard my-3 py-1 w-lg-25 d-flex align-items-start"
-                                                style="max-width:100%; min-width:310px;">
+                                                style="max-width:100%; min-width:310px; cursor:pointer;"
+                                                onclick="openLinkViewerModal('<?php echo addslashes($item['title']) ?>', '<?php echo $item['link'] ?>')">
                                                 <span class="material-symbols-outlined p-2 pe-2 mt-1"
                                                     style="font-variation-settings:'FILL' 1;">link</span>
                                                 <div class="ms-2" style="flex: 1 1 0; min-width: 0;">
                                                     <div class="text-sbold text-16 mt-1"><?php echo $item['title'] ?></div>
                                                     <div class="text-reg link text-12 mt-0"
                                                         style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                                        <a href="<?php echo $item['link'] ?>" target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            style="text-decoration: none; color: var(--black); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                                            <?php echo $item['link'] ?>
-                                                        </a>
+                                                        <?php echo $item['link'] ?>
                                                     </div>
                                                 </div>
                                             </div>
                                         <?php endforeach; ?>
+
                                     <?php endif; ?>
 
                                     <?php if (!empty($rubricID) && !empty($rubricTitle)): ?>
@@ -1377,7 +1380,8 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
 
                 <form id="unsubmitForm" action="" method="POST">
                     <div class="modal-footer border-top d-flex justify-content-center gap-2">
-                        <button type="submit" id="confirmUnsubmitBtn" name="unsubmit" class="btn rounded-5 px-4 text-sbold text-14 me-1"
+                        <button type="submit" id="confirmUnsubmitBtn" name="unsubmit"
+                            class="btn rounded-5 px-4 text-sbold text-14 me-1"
                             style="background-color: var(--primaryColor); border: 1px solid var(--black);">
                             Unsubmit
                         </button>
@@ -1441,6 +1445,58 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                 </div>
 
                 <div class="modal-footer border-top py-4">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILE VIEWER MODAL -->
+    <div class="modal fade" id="viewerModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content" style="border-radius:12px; overflow:hidden;">
+                <div class="modal-header d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <h5 class="modal-title text-sbold text-16 mb-0" id="viewerModalLabel">File Viewer</h5>
+                        <a id="modalDownloadBtn" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
+                            style="background-color: var(--primaryColor); border: 1px solid var(--black);" download>
+                            <span class="" style="display:flex;align-items:center;gap:4px;">
+                                <span class="material-symbols-outlined"
+                                    style="font-variation-settings:'FILL' 1; font-size:18px;">download_2</span>
+                                Download
+                            </span>
+                        </a>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0" style="background:#2e2e2e; height:75vh;">
+                    <div id="viewerContainer" style="width:100%; height:100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LINK VIEWER MODAL -->
+    <div class="modal fade" id="linkViewerModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content" style="border-radius:12px; overflow:hidden;">
+                <div class="modal-header d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <h5 class="modal-title text-sbold text-16 mb-0" id="linkViewerModalLabel">Link Viewer</h5>
+                        <a id="modalOpenInNewTab" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
+                            style="background-color: var(--primaryColor); border: 1px solid var(--black);"
+                            target="_blank">
+                            <span class="" style="display:flex;align-items:center;gap:4px;">
+                                <span class="material-symbols-outlined"
+                                    style="font-size:18px;">open_in_new</span>
+                                Open
+                            </span>
+                        </a>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0" style="background:#2e2e2e; height:75vh;">
+                    <iframe id="linkViewerIframe"
+                        style="width:100%; height:100%; border:none; border-radius:10px;"></iframe>
                 </div>
             </div>
         </div>
@@ -1941,6 +1997,32 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                 workName.textContent = linkText;
                 myWorkContainer.style.display = 'block';
             }
+        }
+
+        function openViewerModal(fileName, filePath) {
+            document.getElementById("viewerModalLabel").textContent = fileName;
+            document.getElementById("modalDownloadBtn").href = filePath;
+            let viewer = document.getElementById("viewerContainer");
+            viewer.innerHTML = "";
+            let ext = fileName.split(".").pop().toLowerCase();
+            if (["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"].includes(ext)) {
+                viewer.innerHTML = `<img src="${filePath}" style="width:100%; height:100%; object-fit:contain; background:#333;">`;
+            } else if (ext === "pdf") {
+                viewer.innerHTML = `<iframe src="${filePath}" width="100%" height="100%" style="border:none; border-radius:10px;"></iframe>`;
+            } else {
+                viewer.innerHTML = `<div class="text-white text-center mt-5">
+                    <p>This file type cannot be previewed.</p>
+                    <a href="${filePath}" download class="btn btn-warning">Download File</a>
+                </div>`;
+            }
+            new bootstrap.Modal(document.getElementById("viewerModal")).show();
+        }
+
+        function openLinkViewerModal(title, url) {
+            document.getElementById("linkViewerModalLabel").textContent = title;
+            document.getElementById("modalOpenInNewTab").href = url;
+            document.getElementById("linkViewerIframe").src = url;
+            new bootstrap.Modal(document.getElementById("linkViewerModal")).show();
         }
     </script>
 </body>
