@@ -3,10 +3,10 @@
 include("../shared/assets/database/connect.php");
 include("../shared/assets/processes/prof-session-process.php");
 
-// ✅ Get submissionID
+// Get submissionID
 $submissionID = isset($_GET['submissionID']) ? intval($_GET['submissionID']) : 0;
 
-// ✅ Automatically fetch userID from the submissions table
+// Automatically fetch userID from the submissions table
 $getInfo = $conn->prepare("
     SELECT s.userID
     FROM submissions s
@@ -70,7 +70,7 @@ if ($detailsResult && $detailsResult->num_rows > 0) {
     $studentDisplay = $details['studentName'] . ' · ' . $details['programInitial'] . ' ' . $details['yearLevel'] . '-' . $details['yearSection'];
 }
 
-// ✅ Fetch all files under this submissionID
+// Fetch all files under this submissionID
 $fileQuery = $conn->prepare("SELECT fileAttachment, fileLink, fileTitle FROM files WHERE submissionID = ?");
 $fileQuery->bind_param("i", $submissionID);
 $fileQuery->execute();
@@ -89,7 +89,7 @@ if ($fileResult && $fileResult->num_rows > 0) {
     }
 }
 
-// ✅ Helper functions
+// Helper functions
 function is_image_ext($ext)
 {
     $ext = strtolower($ext);
@@ -100,7 +100,7 @@ function is_pdf_ext($ext)
     return strtolower($ext) === 'pdf';
 }
 
-// ✅ Determine view type
+// Determine view type
 $viewType = 'none';
 if (!empty($fileLinks)) {
     $firstExt = pathinfo($fileLinks[0]['name'], PATHINFO_EXTENSION);
@@ -112,7 +112,7 @@ if (!empty($fileLinks)) {
         $viewType = 'other';
 }
 
-// ✅ Fetch badges (11–21)
+// Fetch badges (11–21)
 $badges = [];
 $badgeQuery = $conn->query("SELECT badgeID, badgeName, badgeDescription, badgeIcon FROM badges WHERE badgeID BETWEEN 11 AND 21");
 if ($badgeQuery && $badgeQuery->num_rows > 0) {
@@ -315,11 +315,11 @@ $nextSubmissionID = $submissionIDs[$nextIndex];
 $prevSubmissionID = $submissionIDs[$prevIndex];
 
 
-// ✅ Get submissionID and userID dynamically (assuming from URL or session)
+// Get submissionID and userID dynamically (assuming from URL or session)
 $submissionID = isset($_GET['submissionID']) ? intval($_GET['submissionID']) : 0;
 $userID = isset($_SESSION['userID']) ? intval($_SESSION['userID']) : 0;
 
-// ✅ Get assessmentID linked to this submission
+// Get assessmentID linked to this submission
 $assessmentQuery = $conn->prepare("
     SELECT assessmentID 
     FROM submissions 
@@ -332,7 +332,7 @@ $assessmentResult = $assessmentQuery->get_result();
 $assessmentRow = $assessmentResult->fetch_assoc();
 $assessmentID = intval($assessmentRow['assessmentID'] ?? 0);
 
-// ✅ Get rubricID linked to this assessment
+// Get rubricID linked to this assessment
 $rubricQuery = $conn->prepare("
     SELECT rubricID 
     FROM assignments
@@ -345,7 +345,7 @@ $rubricResult = $rubricQuery->get_result();
 $rubricRow = $rubricResult->fetch_assoc();
 $rubricID = intval($rubricRow['rubricID'] ?? 0);
 
-// ✅ Pull only criteria for this rubric dynamically
+// Pull only criteria for this rubric dynamically
 $criterionQuery = $conn->prepare("
     SELECT c.criterionID, c.criteriaTitle, l.levelID, l.levelTitle, l.levelDescription, l.points
     FROM criteria c
@@ -616,7 +616,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
 
                                     <?php if (!empty($images) || !empty($pdfs) || !empty($others)): ?>
 
-                                        <!-- 📄 PDF SECTION -->
+                                        <!-- PDF SECTION -->
                                         <?php if (!empty($pdfs)): ?>
                                             <?php foreach ($pdfs as $f): ?>
                                                 <div class="mt-4 mb-4">
@@ -626,7 +626,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                                             <?php endforeach; ?>
                                         <?php endif; ?>
 
-                                        <!-- 🖼 IMAGE SECTION -->
+                                        <!-- IMAGE SECTION -->
                                         <?php if (!empty($images)): ?>
                                             <div class="container mt-3">
                                                 <div class="row g-4">
@@ -670,7 +670,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                                             </div>
                                         <?php endif; ?>
 
-                                        <!-- 🔗 OTHER FILES & LINKS SECTION -->
+                                        <!-- OTHER FILES & LINKS SECTION -->
                                         <?php if (!empty($linkFiles)): ?>
                                             <p class="text-sbold text-14 mt-4">Link Attachments</p>
 
@@ -716,6 +716,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                                             <input type="hidden" name="submissionID" value="<?= $submissionID ?>">
                                             <input type="hidden" name="selectedLevels" id="selectedLevelsInput">
                                             <input type="hidden" name="score" id="scoreInput">
+                                            <input type="hidden" id="selectedBadgeIDs" name="selectedBadgeIDs" value="">
 
                                             <div class="d-flex align-items-center justify-content-center mb-5">
                                                 <div class="text-reg"><i>Grade</i></div>
@@ -1181,19 +1182,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
             const selectedInput = document.getElementById("selectedBadgeIDs");
 
             // Store multiple selected badge IDs
-            let selectedBadges = JSON.parse(localStorage.getItem("selectedBadgeIDs")) || [];
+            let selectedBadges = [];
 
             // Add data-badge-id dynamically (from PHP)
             const badgeIDs = <?php echo json_encode(array_column($badges, 'badgeID')); ?>;
 
             badgeOptions.forEach((badge, index) => {
-                const badgeId = String(badgeIDs[index]); // ensure string for matching
+                const badgeId = String(badgeIDs[index]);
                 badge.dataset.badgeId = badgeId;
-
-                // Highlight previously selected badges
-                if (selectedBadges.includes(badgeId)) {
-                    highlightBadge(badge);
-                }
 
                 // Toggle selection on click
                 badge.addEventListener("click", function () {
@@ -1210,32 +1206,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                         resetBadge(this);
                     }
 
-                    // Update hidden input + localStorage
+                    // Update hidden input
                     selectedInput.value = selectedBadges.join(",");
-                    localStorage.setItem("selectedBadgeIDs", JSON.stringify(selectedBadges));
                 });
             });
 
-            // ✅ Highlight selected badge
+            // Highlight selected badge
             function highlightBadge(badge) {
                 badge.style.backgroundColor = "var(--primaryColor)";
                 badge.classList.add("selected-badge");
             }
 
-            // ✅ Reset unselected badge
+            // Reset badge
             function resetBadge(badge) {
                 badge.style.backgroundColor = "var(--pureWhite)";
                 badge.classList.remove("selected-badge");
             }
 
-            // ✅ Clear saved selections when form is submitted
+            // On form submit: only submit selected badges, then deselect all visually
             const form = document.querySelector("form");
             if (form) {
                 form.addEventListener("submit", () => {
-                    localStorage.removeItem("selectedBadgeIDs");
+                    // Set hidden input value for only selected badges
+                    selectedInput.value = selectedBadges.join(",");
+
+                    // Immediately reset all badges visually
+                    badgeOptions.forEach(resetBadge);
+
+                    // Clear the selection array
+                    selectedBadges = [];
                 });
             }
         });
+
 
         // next and previous button
         document.addEventListener("DOMContentLoaded", () => {
@@ -1280,9 +1283,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
         });
 
 
-        // ---------------------------
-        // 4. Rubric level selection and total score
-        // ---------------------------
+        // Rubric level selection and total score
         const levelButtons = document.querySelectorAll(".level-btn");
         const totalGradeEl = document.getElementById("totalGrade"); // top display
         const totalScoreEl = document.getElementById("totalScore");   // bottom display
@@ -1296,9 +1297,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
 
                 const criterionID = this.dataset.criterion;
                 const points = parseInt(this.dataset.points);
-                const levelID = parseInt(this.dataset.levelId); // <- make sure your button has data-level-id
+                const levelID = parseInt(this.dataset.levelId);
 
-                // Deselect other buttons in the same criterion
+                // Check if already selected
+                const isAlreadySelected = this.classList.contains("btn-active");
+
+                // Deselect all buttons in this criterion
                 levelButtons.forEach(b => {
                     if (b.dataset.criterion === criterionID) {
                         b.classList.remove("btn-active");
@@ -1307,15 +1311,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                     }
                 });
 
-                // Select current button
-                this.classList.add("btn-active");
-                this.style.backgroundColor = "var(--primaryColor";
-                this.style.border = "1px solid var(--black)";
+                if (!isAlreadySelected) {
+                    // Select current button
+                    this.classList.add("btn-active");
+                    this.style.backgroundColor = "var(--primaryColor)";
+                    this.style.border = "1px solid var(--black)";
 
-                // Save selection
-                criterionSelections[criterionID] = { points: points, levelID: levelID };
+                    // Save selection
+                    criterionSelections[criterionID] = { points: points, levelID: levelID };
+                } else {
+                    // If unselected, remove from criterionSelections
+                    delete criterionSelections[criterionID];
+                }
 
-                // Calculate total score
+                // Recalculate total
                 const total = Object.values(criterionSelections).reduce((a, b) => a + b.points, 0);
 
                 // Update displays
@@ -1359,6 +1368,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
 
             rubricForm.submit();
         });
+
+        submitBtn.addEventListener("click", function () {
+            // Collect selected badge IDs
+            const badgeOptions = document.querySelectorAll(".badge-option");
+            const selectedBadges = [];
+
+            badgeOptions.forEach(badge => {
+                if (badge.classList.contains("selected-badge")) {
+                    selectedBadges.push(badge.dataset.badgeId);
+                }
+            });
+
+            // Set hidden input value before submitting
+            const badgeIDsInput = document.getElementById("selectedBadgeIDs");
+            badgeIDsInput.value = selectedBadges.join(",");
+
+            // The rest of your submit logic (rubric levels, total score) stays the same
+        });
+
 
     </script>
 </body>
