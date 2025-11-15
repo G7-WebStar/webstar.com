@@ -88,6 +88,11 @@ $getSubmissionIDQuery = "SELECT submissions.submissionID
 $getSubmissionIDResult = executeQuery($getSubmissionIDQuery);
 $submissionIDRow = (mysqli_num_rows($getSubmissionIDResult) > 0) ? mysqli_fetch_assoc($getSubmissionIDResult) : null;
 $submissionID = ($submissionIDRow == null) ? null : $submissionIDRow['submissionID'];
+
+$checkRubricQuery = "SELECT rubricID FROM assignments WHERE assessmentID = '$assessmentID'";
+$checkRubricResult = executeQuery($checkRubricQuery);
+$rubricIDRow = (mysqli_num_rows($checkRubricResult) > 0) ? mysqli_fetch_assoc($checkRubricResult) : null;
+$rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
 ?>
 
 <!doctype html>
@@ -246,7 +251,10 @@ $submissionID = ($submissionIDRow == null) ? null : $submissionIDRow['submission
                                                             mysqli_data_seek($studentTodoStatusResult, 0);
                                                             while ($studentsTodoRow = mysqli_fetch_assoc($studentTodoStatusResult)) {
                                                         ?>
-                                                                <a class="text-decoration-none" href="<?php echo ($studentsTodoRow['status'] != 'Graded') ? "grading-sheet.php?submissionID=" . $studentsTodoRow['submissionID'] : '#'; ?>">
+                                                                <?php
+                                                                $gradingLink = ($rubricID == null) ? 'grading-sheet.php?submissionID=' : 'grading-sheet-rubrics.php?submissionID=';
+                                                                ?>
+                                                                <a class="text-decoration-none" href="<?php echo ($studentsTodoRow['status'] != 'Graded') ? $gradingLink . $studentsTodoRow['submissionID'] : '#'; ?>">
                                                                     <div class="submission-item d-flex align-items-center py-3 border-bottom">
                                                                         <div class="d-flex align-items-center">
                                                                             <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
@@ -297,7 +305,7 @@ $submissionID = ($submissionIDRow == null) ? null : $submissionIDRow['submission
                                                 </div>
 
                                                 <div class="d-flex justify-content-center pt-3">
-                                                    <a class="text-decoration-none" href="grading-sheet.php?submissionID=<?php echo $submissionID; ?>">
+                                                    <a class="text-decoration-none" href="<?php echo ($rubricID == null) ? 'grading-sheet.php?submissionID=' . $submissionID : 'grading-sheet-rubrics.php?submissionID=' . $submissionID; ?>">
                                                         <button class="btn btn-action">
                                                             <img src="../shared/assets/img/assess/assess.png"
                                                                 alt="Assess Icon"
@@ -398,7 +406,7 @@ $submissionID = ($submissionIDRow == null) ? null : $submissionIDRow['submission
                             data.results.forEach(function(result) {
                                 document.getElementById('submission-container').innerHTML +=
                                     `
-                                <a class="text-decoration-none" href="` + ((result.status != 'Graded') ? `grading-sheet.php?submissionID=` + result.submissionID : '#') + `">
+                                <a class="text-decoration-none" href="` + ((result.status != 'Graded') ? `<?php echo ($rubricID == null) ? 'grading-sheet.php?submissionID=' . $submissionID : 'grading-sheet-rubrics.php?submissionID='?>` + result.submissionID : '#') + `">
                                     <div class="submission-item d-flex align-items-center py-3 border-bottom">
                                         <div class="d-flex align-items-center">
                                             <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">

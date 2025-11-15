@@ -35,6 +35,10 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                 WHERE assessmentID = '$assessmentID' AND status = 'Graded'";
         $countGradedResult = executeQuery($countGradedQuery);
 
+        $countMissingQuery = "SELECT COUNT(*) AS missing FROM todo 
+                                WHERE assessmentID = '$assessmentID' AND status = 'Missing'";
+        $countMissingResult = executeQuery($countMissingQuery);
+
         $getSubmissionIDQuery = "SELECT submissions.submissionID 
         FROM submissions 
         INNER JOIN todo 
@@ -43,6 +47,9 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
         ORDER BY todo.updatedAt ASC
         LIMIT 1";
         $getSubmissionIDResult = executeQuery($getSubmissionIDQuery);
+
+        $checkRubricQuery = "SELECT rubricID FROM assignments WHERE assessmentID = '$assessmentID'";
+        $checkRubricResult = executeQuery($checkRubricQuery);
 
         $submittedTodoCount = 0;
 
@@ -56,6 +63,13 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
         if (mysqli_num_rows($countGradedResult) > 0) {
             $countRowGraded = mysqli_fetch_assoc($countGradedResult);
             $gradedTodoCount = $countRowGraded['graded'];
+        }
+
+        $missingTodoCount = 0;
+
+        if (mysqli_num_rows($countMissingResult) > 0) {
+            $countRowMissing = mysqli_fetch_assoc($countMissingResult);
+            $missingTodoCount = $countRowMissing['missing'];
         }
 
         $pendingTodoCount = 0;
@@ -72,10 +86,17 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
             $submissionID = $submissionIDRow['submissionID'];
         }
 
+        if (mysqli_num_rows($checkRubricResult) > 0) {
+            $rubricRow = mysqli_fetch_assoc($checkRubricResult);
+            $rubricID = $rubricRow['rubricID'];
+        }
+
         $rowAssessment['graded'] = $gradedTodoCount;
         $rowAssessment['submittedTodo'] = $submittedTodoCount;
         $rowAssessment['pending'] = $pendingTodoCount;
+        $rowAssessment['missing'] = $missingTodoCount;
         $rowAssessment['submissionID'] = $submissionID;
+        $rowAssessment['rubricID'] = $rubricID;
         $assessments[] = $rowAssessment;
     }
 }
@@ -217,13 +238,16 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                         $submittedCount = $assessment['submittedTodo'];
                                         $pendingCount = $assessment['pending'];
                                         $gradedCount = $assessment['graded'];
+                                        $missingCount = $assessment['missing'];
                                         $cardSubmissionID = $assessment['submissionID'];
                                         $archiveStatus = $assessment['isArchived'];
+                                        $rubricIDs = $assessment['rubricID'];
 
                                         $chartsIDs[] = "chart$i";
                                         $submitted[] = $submittedCount;
                                         $pending[] = $pendingCount;
                                         $graded[] = $gradedCount;
+                                        $missing[] = $missingCount;
                                         $isArchived[] = $archiveStatus;
                                 ?>
                                         <div class="assessment-card mb-3">
@@ -266,14 +290,18 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                                                     alt="Assess Icon"
                                                                     style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;"><?php echo ($type == 'Task') ? 'Task' : 'Test'; ?> Details
                                                             </button></a>
-                                                        <a href="grading-sheet-pdf-with-image.php?submissionID=<?php echo $cardSubmissionID; ?>">
-                                                            <button class="btn btn-action">
-                                                                <img src="../shared/assets/img/assess/assess.png"
-                                                                    alt="Assess Icon"
-                                                                    style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
-                                                                Sheet
-                                                            </button>
-                                                        </a>
+                                                        <?php if ($type == 'Task') { ?>
+                                                            <a href="<?php echo ($rubricIDs == null) ? 'grading-sheet.php?' : 'grading-sheet-rubrics.php?'; ?>submissionID=<?php echo $cardSubmissionID; ?>">
+                                                                <button class="btn btn-action">
+                                                                    <img src="../shared/assets/img/assess/assess.png"
+                                                                        alt="Assess Icon"
+                                                                        style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
+                                                                    Sheet
+                                                                </button>
+                                                            </a>
+                                                        <?php
+                                                        }
+                                                        ?>
                                                     </div>
                                                     <!-- More Options aligned with buttons on the right -->
                                                     <div class="options-container">
@@ -310,14 +338,14 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        function createDoughnutChart(canvasId, submitted, pending, graded) {
+        function createDoughnutChart(canvasId, submitted, pending, graded, missing) {
             const ctx = document.getElementById(canvasId).getContext('2d');
             new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     datasets: [{
-                        data: [submitted, pending, graded],
-                        backgroundColor: ['#3DA8FF', '#C7C7C7', '#d9ffe4ff'],
+                        data: [submitted, pending, graded, missing],
+                        backgroundColor: ['#3DA8FF', '#C7C7C7', '#d9ffe4ff', '#ffd9d9ff'],
                         borderWidth: 0,
                     }]
                 },
@@ -341,11 +369,12 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                 const submitted = <?php echo json_encode($submitted); ?>;
                 const pending = <?php echo json_encode($pending); ?>;
                 const graded = <?php echo json_encode($graded); ?>;
+                const missing = <?php echo json_encode($missing); ?>;
                 const isArchived = <?php echo json_encode($isArchived); ?>
 
                 chartsIDs.forEach(function(id, index) {
                     if (isArchived[index] == 0) {
-                        createDoughnutChart(id, submitted[index], pending[index], graded[index])
+                        createDoughnutChart(id, submitted[index], pending[index], graded[index], missing[index])
                     } else {
                         const archiveLabel = document.getElementById('chart-container' + (index + 1));
                         archiveLabel.innerHTML = `<span class="badge rounded-pill text-bg-secondary text-reg">Archived</span>`;

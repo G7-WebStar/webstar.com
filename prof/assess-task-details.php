@@ -96,6 +96,11 @@ $getSubmissionIDQuery = "SELECT submissions.submissionID
 $getSubmissionIDResult = executeQuery($getSubmissionIDQuery);
 $submissionIDRow = (mysqli_num_rows($getSubmissionIDResult) > 0) ? mysqli_fetch_assoc($getSubmissionIDResult) : null;
 $submissionID = ($submissionIDRow == null) ? null : $submissionIDRow['submissionID'];
+
+$checkRubricQuery = "SELECT rubricID FROM assignments WHERE assessmentID = '$assessmentID'";
+$checkRubricResult = executeQuery($checkRubricQuery);
+$rubricIDRow = (mysqli_num_rows($checkRubricResult) > 0) ? mysqli_fetch_assoc($checkRubricResult) : null;
+$rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
 ?>
 
 <!doctype html>
@@ -352,7 +357,7 @@ $submissionID = ($submissionIDRow == null) ? null : $submissionIDRow['submission
                                                 </div>
 
                                                 <div class="d-flex justify-content-center pt-3">
-                                                    <a class="text-decoration-none" href="grading-sheet.php?submissionID=<?php echo $submissionID; ?>">
+                                                    <a class="text-decoration-none" href="<?php echo ($rubricID == null) ? 'grading-sheet.php?submissionID=' . $submissionID : 'grading-sheet-rubrics.php?submissionID=' . $submissionID; ?>">
                                                         <button class="btn btn-action">
                                                             <img src="../shared/assets/img/assess/assess.png"
                                                                 alt="Assess Icon"
