@@ -1,9 +1,20 @@
 <?php $activePage = 'sheet-rubrics'; ?>
 <?php
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 include("../shared/assets/database/connect.php");
+date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
 
-// Get submissionID
+if (!class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
+    require '../shared/assets/phpmailer/src/Exception.php';
+    require '../shared/assets/phpmailer/src/PHPMailer.php';
+    require '../shared/assets/phpmailer/src/SMTP.php';
+}
+
+// ✅ Get submissionID
 $submissionID = isset($_GET['submissionID']) ? intval($_GET['submissionID']) : 0;
 
 // Automatically fetch userID from the submissions table
@@ -439,6 +450,142 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
         $updateSubmission->bind_param("ii", $scoreID, $submissionID);
         $updateSubmission->execute();
         $updateSubmission->close();
+
+        // --- Notifications & Email ---
+        // Get enrollmentID for the student
+        $enrollmentQuery = $conn->prepare("
+            SELECT e.enrollmentID 
+            FROM enrollments e
+            WHERE e.userID = ? AND e.courseID = ?
+            LIMIT 1
+        ");
+        $enrollmentQuery->bind_param("ii", $userID, $details['courseID']);
+        $enrollmentQuery->execute();
+        $enrollmentResult = $enrollmentQuery->get_result();
+        
+        if ($enrollmentResult && $enrollmentResult->num_rows > 0) {
+            $enrollmentData = $enrollmentResult->fetch_assoc();
+            $enrollmentID = intval($enrollmentData['enrollmentID']);
+            
+            // Prepare notification message
+            $assessmentTitleEscaped = mysqli_real_escape_string($conn, $details['assessmentTitle']);
+            $notificationMessage = "Your submission for \"" . $assessmentTitleEscaped . "\" has been graded.";
+            $notifType = 'Submissions Update';
+            
+            $escapedNotificationMessage = mysqli_real_escape_string($conn, $notificationMessage);
+            $escapedNotifType = mysqli_real_escape_string($conn, $notifType);
+            
+            // Insert notification into inbox
+            $insertNotificationQuery = "
+                INSERT INTO inbox (enrollmentID, messageText, notifType, createdAt)
+                VALUES ('$enrollmentID', '$escapedNotificationMessage', '$escapedNotifType', NOW())
+            ";
+            executeQuery($insertNotificationQuery);
+            
+            // Get student email and check if they have courseUpdateEnabled
+            $selectEmailQuery = "
+                SELECT u.email, COALESCE(s.courseUpdateEnabled, 0) as courseUpdateEnabled
+                FROM users u
+                LEFT JOIN settings s ON u.userID = s.userID
+                WHERE u.userID = ?
+            ";
+            $emailStmt = $conn->prepare($selectEmailQuery);
+            $emailStmt->bind_param("i", $userID);
+            $emailStmt->execute();
+            $emailResult = $emailStmt->get_result();
+            
+            if ($emailResult && $emailResult->num_rows > 0) {
+                $studentData = $emailResult->fetch_assoc();
+                
+                if ($studentData['courseUpdateEnabled'] == 1 && !empty($studentData['email'])) {
+                    try {
+                        $mail = new PHPMailer(true);
+                        $mail->isSMTP();
+                        $mail->Host       = 'smtp.gmail.com';
+                        $mail->SMTPAuth   = true;
+                        $mail->Username   = 'learn.webstar@gmail.com';
+                        $mail->Password   = 'mtls vctd rhai cdem';
+                        $mail->SMTPSecure = 'tls';
+                        $mail->Port       = 587;
+                        $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
+                        $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
+                        if (file_exists($headerPath)) {
+                            $mail->AddEmbeddedImage($headerPath, 'emailHeader');
+                        }
+                        $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
+                        if (file_exists($footerPath)) {
+                            $mail->AddEmbeddedImage($footerPath, 'emailFooter');
+                        }
+                        
+                        $mail->isHTML(true);
+                        $mail->CharSet = 'UTF-8';
+                        $mail->Encoding = 'base64';
+                        $mail->Subject = "[GRADED] " . $details['assessmentTitle'] . " - " . $details['courseCode'];
+                        $mail->addAddress($studentData['email']);
+                        
+                        $assessmentTitleEsc = htmlspecialchars($details['assessmentTitle'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        $courseCodeEsc = htmlspecialchars($details['courseCode'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        $courseTitleEsc = htmlspecialchars($details['courseTitle'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        $scoreDisplay = number_format($score, 2);
+                        $feedbackHtml = !empty($feedback) ? nl2br(htmlspecialchars($feedback, ENT_QUOTES | ENT_HTML5, 'UTF-8')) : '<em>No feedback provided.</em>';
+                        
+                        $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
+                                <tr>
+                                    <td align="center">
+                                        <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                                            <tr>
+                                                <td align="center" style="padding: 0;">
+                                                    <img src="cid:emailHeader" alt="Webstar Header" style="width:600px; height:auto; display:block;">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 30px;">
+                                                    <p style="font-size:15px; color:#333;">Hello Learner,</p>
+                                                    <p style="font-size:15px; color:#333;">
+                                                        Your submission for <strong>' . $assessmentTitleEsc . '</strong> in <strong>' . $courseCodeEsc . '</strong> has been graded.
+                                                    </p>
+                                                    <div style="background-color:#f9f9f9; padding:15px; border-radius:5px; margin:20px 0;">
+                                                        <p style="font-size:14px; color:#666; margin:5px 0;"><strong>Course:</strong> ' . $courseCodeEsc . ' - ' . $courseTitleEsc . '</p>
+                                                        <p style="font-size:14px; color:#666; margin:5px 0;"><strong>Assessment:</strong> ' . $assessmentTitleEsc . '</p>
+                                                        <p style="font-size:18px; color:#2C2C2C; margin:10px 0;"><strong>Score: ' . $scoreDisplay . '/100</strong></p>
+                                                    </div>
+                                                    <p style="font-size:15px; color:#333; margin-top: 25px;">
+                                                        <strong>Feedback:</strong>
+                                                    </p>
+                                                    <div style="font-size:15px; color:#333; margin-bottom: 20px; line-height: 22px; background-color:#f9f9f9; padding:15px; border-radius:5px;">
+                                                        ' . $feedbackHtml . '
+                                                    </div>
+                                                    <p style="font-size:15px; color:#333;">
+                                                        Please log in to your Webstar account to view your detailed results.
+                                                    </p>
+                                                    <p style="margin-top:30px; color:#333;">
+                                                        Warm regards,<br>
+                                                        <strong>The Webstar Team</strong><br>
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="center" style="padding: 0;">
+                                                    <img src="cid:emailFooter" alt="Webstar Footer" style="width:600px; height:auto; display:block; border:0; outline:none; text-decoration:none;" />
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>';
+                        
+                        $mail->send();
+                    } catch (Exception $e) {
+                        $errorMsg = isset($mail) && is_object($mail) ? $mail->ErrorInfo : $e->getMessage();
+                        error_log("PHPMailer failed for Submission ID $submissionID: " . $errorMsg);
+                    }
+                }
+            }
+            $emailStmt->close();
+        }
+        $enrollmentQuery->close();
     }
 
     if (!empty($_POST['selectedBadgeIDs'])) {
