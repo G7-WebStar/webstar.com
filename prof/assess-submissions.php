@@ -260,7 +260,7 @@ $rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
                                                                             <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
                                                                                 <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
                                                                             </div>
-                                                                            <span class="text-sbold text-16"><?php echo $studentsTodoRow['firstName'] . " " . $studentsTodoRow['middleName'] . " " . $studentsTodoRow['lastName']; ?></span>
+                                                                            <span class="text-sbold text-16"><?php echo $studentsTodoRow['lastName'] . ", " . $studentsTodoRow['firstName'] . " " . $studentsTodoRow['middleName']; ?></span>
                                                                         </div>
                                                                         <div class="flex-grow-1 d-flex justify-content-center">
                                                                             <span class="badge badge-<?php echo strtolower($studentsTodoRow['status']) ?>"><?php echo $studentsTodoRow['status']; ?></span>
@@ -305,14 +305,14 @@ $rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
                                                 </div>
 
                                                 <div class="d-flex justify-content-center pt-3">
-                                                    <a class="text-decoration-none" href="<?php echo ($rubricID == null) ? 'grading-sheet.php?submissionID=' . $submissionID : 'grading-sheet-rubrics.php?submissionID=' . $submissionID; ?>">
-                                                        <button class="btn btn-action">
+                                                    <?php if ($submissionID != null) { ?><a class="text-decoration-none" href="<?php echo ($rubricID == null) ? 'grading-sheet.php?submissionID=' . $submissionID : 'grading-sheet-rubrics.php?submissionID=' . $submissionID; ?>"><?php } ?>
+                                                        <button class="btn btn-action <?php echo ($submissionID == null) ? 'disabled' : '' ?>">
                                                             <img src="../shared/assets/img/assess/assess.png"
                                                                 alt="Assess Icon"
                                                                 style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
                                                             Sheet
                                                         </button>
-                                                    </a>
+                                                        <?php if ($submissionID != null) { ?></a><?php } ?>
                                                 </div>
                                             </div>
                                         </div>
@@ -406,13 +406,13 @@ $rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
                             data.results.forEach(function(result) {
                                 document.getElementById('submission-container').innerHTML +=
                                     `
-                                <a class="text-decoration-none" href="` + ((result.status != 'Graded') ? `<?php echo ($rubricID == null) ? 'grading-sheet.php?submissionID=' . $submissionID : 'grading-sheet-rubrics.php?submissionID='?>` + result.submissionID : '#') + `">
+                                <a class="text-decoration-none" href="` + ((result.status != 'Graded') ? `<?php echo ($rubricID == null) ? 'grading-sheet.php?submissionID=' . $submissionID : 'grading-sheet-rubrics.php?submissionID=' ?>` + result.submissionID : '#') + `">
                                     <div class="submission-item d-flex align-items-center py-3 border-bottom">
                                         <div class="d-flex align-items-center">
                                             <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
                                                 <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
                                             </div>
-                                            <span class="text-sbold text-16">` + result.firstName + ` ` + result.middleName + ` ` + result.lastName + `</span>
+                                            <span class="text-sbold text-16">` + result.lastname + `, ` + result.firstName + ` ` + result.middleName + `</span>
                                         </div>
                                         <div class="flex-grow-1 d-flex justify-content-center">
                                             <span class="badge badge-` + result.status.toLowerCase() + `">` + result.status + `</span>

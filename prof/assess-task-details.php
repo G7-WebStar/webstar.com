@@ -357,14 +357,14 @@ $rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
                                                 </div>
 
                                                 <div class="d-flex justify-content-center pt-3">
-                                                    <a class="text-decoration-none" href="<?php echo ($rubricID == null) ? 'grading-sheet.php?submissionID=' . $submissionID : 'grading-sheet-rubrics.php?submissionID=' . $submissionID; ?>">
-                                                        <button class="btn btn-action">
+                                                    <?php if ($submissionID != null) { ?><a class="text-decoration-none" href="<?php echo ($rubricID == null) ? 'grading-sheet.php?submissionID=' . $submissionID : 'grading-sheet-rubrics.php?submissionID=' . $submissionID; ?>"><?php } ?>
+                                                        <button class="btn btn-action" <?php echo ($submissionID == null) ? 'disabled' : '' ?>>
                                                             <img src="../shared/assets/img/assess/assess.png"
                                                                 alt="Assess Icon"
                                                                 style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
                                                             Sheet
                                                         </button>
-                                                    </a>
+                                                        <?php if ($submissionID != null) { ?></a><?php } ?>
                                                 </div>
                                             </div>
                                         </div>
