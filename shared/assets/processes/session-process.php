@@ -7,6 +7,7 @@ session_start();
 
 if (isset($_SESSION['userID'])) {
     $userID = $_SESSION['userID'];
+    include('assessment-redirection.php');
 } else {
     header("Location: login.php");
     exit();

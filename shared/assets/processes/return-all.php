@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($data['studentID'] as $studentIDs) {
         $studentID = $studentIDs['studentID'];
 
-        $returnAllQuery = "UPDATE todo SET status = 'Graded' WHERE assessmentID = '$assessmentID' AND userID = '$studentID'";
+        $returnAllQuery = "UPDATE todo SET status = 'Graded' WHERE assessmentID = '$assessmentID' AND userID = '$studentID' AND status != 'Graded'";
         $returnAllResult = executeQuery($returnAllQuery);
     }
 
