@@ -16,6 +16,7 @@ include("shared/assets/processes/registration-profile-process.php");
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="shared/assets/css/global-styles.css">
     <link rel="stylesheet" href="shared/assets/css/registration-profile.css">
+    <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
@@ -205,7 +206,7 @@ include("shared/assets/processes/registration-profile-process.php");
 
         // Auto-lowercase username and remove spaces
         usernameInput.addEventListener('input', () => {
-            usernameInput.value = usernameInput.value.toLowerCase().replace(/[^a-z0-9.]/g, '');
+            usernameInput.value = usernameInput.value.toLowerCase().replace(/[^a-z0-9._]/g, '');
         });
 
         // Trigger file input

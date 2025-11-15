@@ -307,10 +307,11 @@ body {
     color: var(--black);
     margin: 0;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    text-decoration: none;
 }
 
 /* Arrow Back Icon Styles */
@@ -321,4 +322,8 @@ body {
         'GRAD' 200,
         'opsz' 24;
     font-size: 20px;
+    line-height: 1;
+    display: inline-flex;       /* ensures proper flex alignment */
+    align-items: center;        /* vertically centers the icon */
+    justify-content: center;    /* optional, horizontal centering */
 }

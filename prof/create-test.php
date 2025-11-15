@@ -43,7 +43,8 @@ if (isset($_POST['save_exam'])) {
     $generalGuidance = mysqli_real_escape_string($conn, $generalGuidanceRaw);
 
     $testDeadline = !empty($_POST['deadline']) ? $_POST['deadline'] : null;
-    $testTimeLimit = !empty($_POST['testTimeLimit']) ? $_POST['testTimeLimit'] : null;
+    $testTimeLimitMinutes = !empty($_POST['testTimeLimit']) ? max(1, intval($_POST['testTimeLimit'])) : null;
+    $testTimeLimitSeconds = $testTimeLimitMinutes !== null ? $testTimeLimitMinutes * 60 : null;
     $testTypeRaw = $_POST['testType'] ?? 'Test';
     $testType = mysqli_real_escape_string($conn, $testTypeRaw);
     $createdAt = date("Y-m-d H:i:s");
@@ -76,9 +77,9 @@ if (isset($_POST['save_exam'])) {
             }
 
             $testQuery = "INSERT INTO tests 
-                (assessmentID, generalGuidance, testTimeLimit) 
-                VALUES 
-                ('$assessmentID', '$generalGuidance', " . ($testTimeLimit ? "'" . mysqli_real_escape_string($conn, $testTimeLimit) . "'" : "NULL") . ")";
+            (assessmentID, generalGuidance, testTimeLimit) 
+            VALUES 
+            ('$assessmentID', '$generalGuidance', " . ($testTimeLimitSeconds !== null ? "'$testTimeLimitSeconds'" : "NULL") . ")";
 
             executeQuery($testQuery);
 
@@ -606,7 +607,7 @@ if (!empty($reusedData)) {
                                                 </label>
                                                 <input type="number" name="testTimeLimit"
                                                     class="form-control textbox text-reg text-16"
-                                                    placeholder="No time limit if left blank" />
+                                                    placeholder="No time limit if left blank" min="1" />
                                             </div>
                                         </div>
                                         <!-- wala pa to -->

@@ -9,6 +9,14 @@ require '../shared/assets/phpmailer/src/Exception.php';
 require '../shared/assets/phpmailer/src/PHPMailer.php';
 require '../shared/assets/phpmailer/src/SMTP.php';
 
+// LOGOUT
+if (isset($_GET['logout'])) {
+    session_unset();
+    session_destroy();
+    header("Location: ../login.php");
+    exit();
+}
+
 $errorMessages = [
     "emailExists" => "The email address you entered is already registered.",
     "emailSendFail" => "Error sending email. Please try again later."
@@ -49,9 +57,15 @@ if (isset($_POST['sendCode'])) {
             $mail->Password = 'mtls vctd rhai cdem';
             $mail->SMTPSecure = 'tls';
             $mail->Port = 587;
-            $mail->AddEmbeddedImage('../shared/assets/img/webstar-logo-black.png', 'logoWebstar');
-
             $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
+            $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
+            if (file_exists($headerPath)) {
+                $mail->AddEmbeddedImage($headerPath, 'emailHeader');
+            }
+            $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
+            if (file_exists($footerPath)) {
+                $mail->AddEmbeddedImage($footerPath, 'emailFooter');
+            }
             $mail->addAddress($email);
             $mail->isHTML(true);
             $mail->Subject = "Reset Password";
@@ -60,9 +74,9 @@ if (isset($_POST['sendCode'])) {
                         <tr>
                             <td align="center">
                                 <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-                                    <tr style="background-color: #FDDF94;">
-                                        <td align="center" style="padding: 20px;">
-                                            <img src="cid:logoWebstar" alt="Webstar Logo" style="height:80px;">
+                                    <tr>
+                                        <td align="center" style="padding: 0;">
+                                            <img src="cid:emailHeader" alt="Webstar Header" style="width:600px; height:auto; display:block;">
                                         </td>
                                     </tr>
                                     <tr>
@@ -97,9 +111,9 @@ if (isset($_POST['sendCode'])) {
                                             </div>
                                         </td>
                                     </tr>
-                                    <tr style="background-color:#FDDF94;">
-                                        <td align="center" style="padding:15px; color:black; font-size:13px;">
-                                            © 2025 Webstar. All Rights Reserved.
+                                    <tr>
+                                        <td align="center" style="padding: 0;">
+                                            <img src="cid:emailFooter" alt="Webstar Footer" style="width:600px; height:auto; display:block; border:0; outline:none; text-decoration:none;" />
                                         </td>
                                     </tr>
                                 </table>
@@ -201,7 +215,7 @@ if (isset($_POST['sendCode'])) {
 
                 <!-- Back to Login Redirect -->
                 <div class="container text-center text-small">
-                    <a href="" class="text-decoration-none">
+                    <a href="temporary-credentials.php?logout=true" class="text-decoration-none">
                         <span class="back-to-login">
                             <span class="material-symbols-outlined arrow-back-icon">arrow_back</span>
                             Back to login

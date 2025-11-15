@@ -234,6 +234,12 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                             </div>
                         </div>
                     </div>
+                    <!-- Toast Container -->
+                    <div id="toastContainer"
+                        class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center text-med text-14"
+                        style="z-index:1100; pointer-events:none;">
+                    </div>
+
                 </div> <!-- End Card -->
             </div>
         </div>
@@ -254,6 +260,34 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Function to show toast with icon
+        function showToast(message, type = 'success') {
+            const alert = document.createElement('div');
+            alert.className = `alert mb-2 shadow-lg d-flex align-items-center gap-2 px-3 py-2 
+                       ${type === 'success' ? 'alert-success' : 'alert-danger'}`;
+            alert.style.opacity = "0";
+            alert.style.transition = "opacity 0.3s ease";
+            alert.style.pointerEvents = "none";
+
+            alert.innerHTML = `
+                <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
+                <span>${message}</span>
+            `;
+
+            document.getElementById('toastContainer').appendChild(alert);
+
+            // Fade in
+            setTimeout(() => alert.style.opacity = "1", 10);
+
+            // Fade out & remove after 3s
+            setTimeout(() => {
+                alert.style.opacity = "0";
+                setTimeout(() => alert.remove(), 300);
+            }, 3000);
+        }
+    </script>
+
     <script>
         //Fetch Questions and Choices from DB
         const questions = [
@@ -394,7 +428,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             seconds--;
             if (seconds <= 0) {
                 clearInterval(interval);
-                console.log("Time's up!");
+                showToast("Time's up! Your quiz is being submitted.", "danger");
                 choiceText.forEach(unanswered => {
                     if (unanswered.userAnswer == null) {
                         unanswered.userAnswer = "No Answer";
@@ -678,16 +712,16 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                     .then(response => response.json())
                     .then(data => {
                         console.log(data);
-                        alert("Quiz submitted successfully!");
+                        showToast("Quiz submitted successfully!", "success");
                     })
                     .catch(error => {
-                        console.error('Error:', error);
+                        showToast("An error occurred while submitting the quiz.", "danger");
                     });
                 localStorage.removeItem("choiceText<?php echo $testID; ?>");
                 localStorage.removeItem("selectedAnswers<?php echo $testID; ?>");
                 window.location.href = 'test-submitted.php?testID=<?php echo $testID; ?>';
             } else {
-                console.log("Please answer all items");
+                showToast("Please answer all items before submitting.", "danger");
             }
             console.log(timeSpent);
         }
