@@ -99,7 +99,7 @@ if (isset($_POST['returnAll']) && isset($_POST['assessmentID'])) {
         AND todo.status = 'Submitted'
     ";
     executeQuery($updateQuery);
-    
+
     // Get professor name
     $profNameQuery = "
         SELECT CONCAT(userinfo.firstName, ' ', userinfo.lastName) AS profName
@@ -111,10 +111,10 @@ if (isset($_POST['returnAll']) && isset($_POST['assessmentID'])) {
     $profNameResult = executeQuery($profNameQuery);
     $profNameRow = mysqli_fetch_assoc($profNameResult);
     $profName = mysqli_real_escape_string($conn, $profNameRow['profName'] ?? 'Professor');
-    
+
     // Escape test title for SQL
     $testTitleEscaped = mysqli_real_escape_string($conn, $testTitle);
-    
+
     // Insert notifications for all students who have submissions
     $notificationQuery = "
         INSERT INTO inbox (enrollmentID, messageText, notifType, createdAt)
@@ -129,10 +129,10 @@ if (isset($_POST['returnAll']) && isset($_POST['assessmentID'])) {
         AND todo.status = 'Returned'
     ";
     executeQuery($notificationQuery);
-    
+
     // Set success message in session
     $_SESSION['success'] = 'All submissions have been returned successfully!';
-    
+
     // Redirect to prevent form resubmission
     header("Location: assess-exam-submissions.php?assessmentID=" . $assessmentID . "&tab=submissions");
     exit();
@@ -294,7 +294,7 @@ if ($pendingCount < 0) $pendingCount = 0;
                                                             <input type="hidden" name="assessmentID" value="<?php echo $assessmentID; ?>">
                                                             <button type="submit" name="returnAll"
                                                                 class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 d-inline-flex align-items-center btn-return-all"
-                                                                style="background-color: var(--primaryColor); border: 1px solid var(--black); margin-right: auto; height: 27px;"
+                                                                style="background-color: var(--primaryColor); border: 1px solid var(--black); margin-right: auto; height: 27px; pointer-events:auto;"
                                                                 <?php echo ($currentDate < $deadline) ? 'disabled title="Return All available after deadline"' : ''; ?>>
                                                                 <span class="material-symbols-outlined">assignment_return</span>
                                                                 Return All
@@ -516,7 +516,7 @@ if ($pendingCount < 0) $pendingCount = 0;
 
                 setTimeout(function() {
                     alertEl.style.opacity = '0';
-                    setTimeout(function() { 
+                    setTimeout(function() {
                         if (alertEl && alertEl.parentNode) {
                             alertEl.parentNode.removeChild(alertEl);
                         }

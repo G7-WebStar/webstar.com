@@ -54,9 +54,16 @@ if (isset($_POST['signUpBtn'])) {
             $mail->Password   = 'mtls vctd rhai cdem';
             $mail->SMTPSecure = 'tls';
             $mail->Port       = 587;
-            $mail->AddEmbeddedImage('shared/assets/img/webstar-logo-black.png', 'logoWebstar');
-
             $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
+            $headerPath = __DIR__ . '/../img/email/email-header.png';
+            if (file_exists($headerPath)) {
+                $mail->AddEmbeddedImage($headerPath, 'emailHeader');
+            }
+            $footerPath = __DIR__ . '/../img/email/email-footer.png';
+            if (file_exists($footerPath)) {
+                $mail->AddEmbeddedImage($footerPath, 'emailFooter');
+            }
+
             $mail->addAddress($email);
 
             $mail->isHTML(true);
@@ -66,9 +73,9 @@ if (isset($_POST['signUpBtn'])) {
                         <tr>
                             <td align="center">
                                 <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-                                    <tr style="background-color: #FDDF94;">
-                                        <td align="center" style="padding: 20px;">
-                                            <img src="cid:logoWebstar" alt="Webstar Logo" style="height:80px;">
+                                    <tr>
+                                        <td align="center" style="padding: 0;">
+                                            <img src="cid:emailHeader" alt="Webstar Header" style="width:600px; height:auto; display:block;">
                                         </td>
                                     </tr>
                                     <tr>
@@ -103,9 +110,9 @@ if (isset($_POST['signUpBtn'])) {
                                             </div>
                                         </td>
                                     </tr>
-                                    <tr style="background-color:#FDDF94;">
-                                        <td align="center" style="padding:15px; color:black; font-size:13px;">
-                                            © 2025 Webstar. All Rights Reserved.
+                                    <tr>
+                                        <td align="center" style="padding: 0;">
+                                            <img src="cid:emailFooter" alt="Webstar Footer" style="width:600px; height:auto; display:block; border:0; outline:none; text-decoration:none;" />
                                         </td>
                                     </tr>
                                 </table>

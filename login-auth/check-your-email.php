@@ -3,6 +3,14 @@ include('../shared/assets/database/connect.php');
 
 session_start();
 
+// LOGOUT
+if (isset($_GET['logout'])) {
+    session_unset();
+    session_destroy();
+    header("Location: ../login.php");
+    exit();
+}
+
 $errorMessages = [
     "invalidCode" => "Invalid code. Please try again.",
     "verificationCodeExpired" => "Your verification code has expired. Please resend a new one."
@@ -69,9 +77,15 @@ if (isset($_POST['resend'])) {
         $mail->Password   = 'mtls vctd rhai cdem';
         $mail->SMTPSecure = 'tls';
         $mail->Port       = 587;
-        $mail->AddEmbeddedImage('../shared/assets/img/webstar-logo-black.png', 'logoWebstar');
-
         $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
+        $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
+        if (file_exists($headerPath)) {
+            $mail->AddEmbeddedImage($headerPath, 'emailHeader');
+        }
+        $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
+        if (file_exists($footerPath)) {
+            $mail->AddEmbeddedImage($footerPath, 'emailFooter');
+        }
         $mail->addAddress($email);
 
         $mail->isHTML(true);
@@ -81,9 +95,9 @@ if (isset($_POST['resend'])) {
                         <tr>
                             <td align="center">
                                 <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-                                    <tr style="background-color: #FDDF94;">
-                                        <td align="center" style="padding: 20px;">
-                                            <img src="cid:logoWebstar" alt="Webstar Logo" style="height:80px;">
+                                    <tr>
+                                        <td align="center" style="padding: 0;">
+                                            <img src="cid:emailHeader" alt="Webstar Header" style="width:600px; height:auto; display:block;">
                                         </td>
                                     </tr>
                                     <tr>
@@ -118,9 +132,9 @@ if (isset($_POST['resend'])) {
                                             </div>
                                         </td>
                                     </tr>
-                                    <tr style="background-color:#FDDF94;">
-                                        <td align="center" style="padding:15px; color:black; font-size:13px;">
-                                            © 2025 Webstar. All Rights Reserved.
+                                    <tr>
+                                        <td align="center" style="padding: 0;">
+                                            <img src="cid:emailFooter" alt="Webstar Footer" style="width:600px; height:auto; display:block; border:0; outline:none; text-decoration:none;" />
                                         </td>
                                     </tr>
                                 </table>
@@ -164,7 +178,7 @@ if (isset($_POST['resend'])) {
 
 <body>
     <?php if (isset($_SESSION['success'])): ?>
-        <div class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+        <div id="successToast" class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
             style="z-index:1100; pointer-events:none;">
             <div class="alert alert-success mb-2 shadow-lg text-med text-12
             d-flex align-items-center justify-content-center gap-2 px-3 py-2"
@@ -229,14 +243,14 @@ if (isset($_POST['resend'])) {
 
                     <div class="container d-flex justify-content-center mb-3 text-16">
                         <span class="text-reg" style="color: black;">Didn’t get the code?</span>
-                        <button type="submit" name="resend" formnovalidate class="btn btn-link p-0 text-bold"
-                            style="color: var(--black); text-decoration: none;"> Resend Code</button>
+                        <button type="submit" name="resend" formnovalidate class="btn btn-link p-0 text-bold ms-1"
+                            style="color: var(--black); text-decoration: none; border: none;"> Resend Code</button>
                     </div>
                 </form>
 
                 <!-- Back to Login Redirect -->
                 <div class="container text-center text-small">
-                    <a href="../login.php" class="text-decoration-none">
+                    <a href="check-your-email.php?logout=true" class="text-decoration-none">
                         <span class="back-to-login">
                             <span class="material-symbols-outlined arrow-back-icon">arrow_back</span>
                             Back to login
