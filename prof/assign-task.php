@@ -1,8 +1,92 @@
 <?php $activePage = 'assign-task';
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 include('../shared/assets/database/connect.php');
 date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
+
+// --- Google Link Processor ---
+function processGoogleLink($link)
+{
+    $link = trim($link);
+
+    // Case 1: Google Drive folder
+    if (preg_match('/drive\.google\.com\/drive\/folders\/([a-zA-Z0-9_-]+)/', $link, $matches)) {
+        $folderId = $matches[1];
+        return "https://drive.google.com/embeddedfolderview?id={$folderId}#grid";
+    }
+
+    // Case 2: Google Drive file
+    if (preg_match('/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/', $link, $matches)) {
+        $fileId = $matches[1];
+        return "https://drive.google.com/file/d/{$fileId}/preview";
+    }
+
+    // Case 3: Google Docs, Sheets, Slides, etc.
+    if (preg_match('/(https:\/\/docs\.google\.com\/[a-z]+\/d\/[a-zA-Z0-9_-]+)/', $link, $matches)) {
+        $baseUrl = $matches[1];
+        if (str_contains($link, '/preview')) {
+            return preg_replace('/\?.*/', '', $link);
+        }
+        return "{$baseUrl}/preview";
+    }
+
+    // Case 4: Already preview link
+    if (str_contains($link, '/preview')) {
+        return preg_replace('/\?.*/', '', $link);
+    }
+
+    // Fallback
+    return preg_replace('/\?.*/', '', $link);
+}
+
+function fetchLinkTitle($link)
+{
+    $link = trim($link);
+    $title = '';
+
+    // Process Google links
+    $link = processGoogleLink($link);
+
+    // Ensure the link has a scheme
+    if (!preg_match('/^https?:\/\//', $link)) {
+        $link = 'http://' . $link;
+    }
+
+    // Set context for user-agent
+    $options = [
+        "http" => [
+            "header" => "User-Agent: Mozilla/5.0\r\n",
+            "timeout" => 5
+        ]
+    ];
+    $context = stream_context_create($options);
+
+    try {
+        $html = @file_get_contents($link, false, $context);
+        if ($html && preg_match("/<title>(.*?)<\/title>/is", $html, $matches)) {
+            $title = trim($matches[1]);
+        }
+    } catch (Exception $e) {
+        $title = '';
+    }
+
+    // Fallback to domain if title is empty
+    if (empty($title)) {
+        $parsedUrl = parse_url($link);
+        $title = isset($parsedUrl['host']) ? ucfirst(str_replace('www.', '', $parsedUrl['host'])) : 'Link';
+    }
+
+    return $title;
+}
+
+if (!class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
+    require '../shared/assets/phpmailer/src/Exception.php';
+    require '../shared/assets/phpmailer/src/PHPMailer.php';
+    require '../shared/assets/phpmailer/src/SMTP.php';
+}
 
 $mode = '';
 $taskID = 0;
@@ -25,8 +109,10 @@ if (isset($_POST['saveAssignment'])) {
     $mode = $_POST['mode'] ?? 'new';
     $taskID = intval($_POST['taskID'] ?? 0);
 
-    $title = mysqli_real_escape_string($conn, $_POST['assignmentTitle'] ?? '');
-    $desc = mysqli_real_escape_string($conn, $_POST['assignmentContent'] ?? '');
+    $titleRaw = $_POST['assignmentTitle'] ?? '';
+    $title = mysqli_real_escape_string($conn, $titleRaw);
+    $descRaw = $_POST['assignmentContent'] ?? '';
+    $desc = mysqli_real_escape_string($conn, $descRaw);
     $deadline = !empty($_POST['deadline']) ? $_POST['deadline'] : null;
     $points = !empty($_POST['points']) ? $_POST['points'] : 0;
     $rubricID = !empty($_POST['selectedRubricID']) ? intval($_POST['selectedRubricID']) : null;
@@ -52,12 +138,6 @@ if (isset($_POST['saveAssignment'])) {
             executeQuery($insertAssignment);
 
             $assignmentID = mysqli_insert_id($conn);
-
-            // Insert into todo
-            $insertTodo = "INSERT INTO todo 
-                (userID, assessmentID, status, isRead)
-                VALUES ('$userID', '$assignmentID', 'Pending', 0)";
-            executeQuery($insertTodo);
 
         } elseif ($mode === 'edit') {
             // UPDATE existing assessment + assignment
@@ -111,23 +191,177 @@ if (isset($_POST['saveAssignment'])) {
                 if ($link === '')
                     continue;
 
-                $fileTitle = $link;
-                $context = stream_context_create(["http" => ["header" => "User-Agent: Mozilla/5.0"]]);
-                $html = @file_get_contents($link, false, $context);
+                $processedLink = processGoogleLink($link);
+                $fileTitle = fetchLinkTitle($link);
 
-                if ($html !== false) {
-                    if (preg_match('/<meta property="og:title" content="([^"]+)"/i', $html, $matches)) {
-                        $fileTitle = $matches[1];
-                    } elseif (preg_match("/<title>(.*?)<\/title>/i", $html, $matches)) {
-                        $fileTitle = $matches[1];
+                $insertLink = "INSERT INTO files 
+                (courseID, userID, assignmentID, fileAttachment, fileTitle, fileLink) 
+                VALUES 
+                ('$selectedCourseID', '$userID', '$assignmentID', '', '" . mysqli_real_escape_string($conn, $fileTitle) . "', '$processedLink')";
+                executeQuery($insertLink);
+            }
+        }
+
+        if ($mode === 'new' || $mode === 'reuse') {
+            // Insert todos for each student enrolled in the course
+            $studentsQuery = "SELECT userID, enrollmentID FROM enrollments WHERE courseID = '$selectedCourseID'";
+            $studentsResult = executeQuery($studentsQuery);
+            if ($studentsResult) {
+                while ($student = mysqli_fetch_assoc($studentsResult)) {
+                    $studentUserID = $student['userID'];
+                    $todoQuery = "INSERT INTO todo (userID, assessmentID, status, isRead)
+                        VALUES ('$studentUserID', '$assessmentID', 'Pending', 0)";
+                    executeQuery($todoQuery);
+                }
+            }
+
+            // --- Notifications & Email ---
+            $notificationMessage = "A new task has been assigned: " . $titleRaw;
+            $notifType = 'Course Update';
+            $courseCode = "";
+
+            // Fetch course code for email
+            $selectCourseDetailsQuery = "SELECT courseCode FROM courses WHERE courseID = '$selectedCourseID'";
+            $courseDetailsResult = executeQuery($selectCourseDetailsQuery);
+            if ($courseDetailsResult && mysqli_num_rows($courseDetailsResult) > 0) {
+                $courseData = mysqli_fetch_assoc($courseDetailsResult);
+                $courseCode = $courseData['courseCode'];
+            }
+
+            $escapedNotificationMessage = mysqli_real_escape_string($conn, $notificationMessage);
+            $escapedNotifType = mysqli_real_escape_string($conn, $notifType);
+
+            // Prevent duplicate notifications per student within 5 minutes
+            $insertNotificationQuery = "
+                INSERT INTO inbox 
+                (enrollmentID, messageText, notifType, createdAt)
+                SELECT
+                    e.enrollmentID,
+                    '$escapedNotificationMessage',
+                    '$escapedNotifType',
+                    NOW()
+                FROM
+                    enrollments e
+                WHERE
+                    e.courseID = '$selectedCourseID'
+                    AND NOT EXISTS (
+                        SELECT 1 
+                        FROM inbox i2 
+                        WHERE i2.enrollmentID = e.enrollmentID 
+                            AND i2.messageText = '$escapedNotificationMessage'
+                            AND i2.notifType = '$escapedNotifType'
+                            AND i2.createdAt > DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+                    )
+            ";
+            executeQuery($insertNotificationQuery);
+
+            // Email enrolled students who opted-in
+            $selectEmailsQuery = "
+                SELECT u.email, u.userID,
+                       COALESCE(s.courseUpdateEnabled, 0) as courseUpdateEnabled
+                FROM users u
+                INNER JOIN enrollments e ON u.userID = e.userID
+                LEFT JOIN settings s ON u.userID = s.userID
+                WHERE e.courseID = '$selectedCourseID'
+            ";
+            $emailsResult = executeQuery($selectEmailsQuery);
+
+            try {
+                $mail = new PHPMailer(true);
+                $mail->isSMTP();
+                $mail->Host       = 'smtp.gmail.com';
+                $mail->SMTPAuth   = true;
+                $mail->Username   = 'learn.webstar@gmail.com';
+                $mail->Password   = 'mtls vctd rhai cdem';
+                $mail->SMTPSecure = 'tls';
+                $mail->Port       = 587;
+                $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
+                $logoPath = __DIR__ . '/../shared/assets/img/webstar-logo-black.png';
+                if (file_exists($logoPath)) {
+                    $mail->AddEmbeddedImage($logoPath, 'logoWebstar');
+                }
+
+                $mail->isHTML(true);
+                $mail->CharSet = 'UTF-8';
+                $mail->Encoding = 'base64';
+                $mail->Subject = "[NEW TASK] " . $titleRaw . " for Course " . $courseCode;
+
+                $recipientsFound = false;
+                while ($student = mysqli_fetch_assoc($emailsResult)) {
+                    if ($student['courseUpdateEnabled'] == 1 && !empty($student['email'])) {
+                        $mail->addAddress($student['email']);
+                        $recipientsFound = true;
                     }
                 }
 
-                $insertLink = "INSERT INTO files 
-                    (courseID, userID, assignmentID, fileAttachment, fileTitle, fileLink) 
-                    VALUES 
-                    ('$selectedCourseID', '$userID', '$assignmentID', '', '" . mysqli_real_escape_string($conn, $fileTitle) . "', '$link')";
-                executeQuery($insertLink);
+                if ($recipientsFound) {
+                    $deadlineDisplay = 'Not set';
+                    if (!empty($deadline)) {
+                        try {
+                            $deadlineDate = new DateTime($deadline);
+                            $deadlineDisplay = $deadlineDate->format('F j, Y \\a\\t g:i A');
+                        } catch (Exception $e) {
+                            $deadlineDisplay = $deadline;
+                        }
+                    }
+
+                    $pointsDisplay = ($points !== '' && $points !== null) ? $points : 'Ungraded';
+                    $descHtml = nl2br(htmlspecialchars($descRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                    $emailTitleEsc = htmlspecialchars($titleRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                    $courseCodeEsc = htmlspecialchars($courseCode, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+                    $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
+                            <tr>
+                                <td align="center">
+                                    <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                                        <tr style="background-color: #FDDF94;">
+                                            <td align="center" style="padding: 20px;">
+                                                <img src="cid:logoWebstar" alt="Webstar Logo" style="height:80px;">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 30px;">
+                                                <p style="font-size:15px; color:#333;">Hello Learner,</p>
+                                                <p style="font-size:15px; color:#333;">
+                                                    A new task has been assigned in your course <strong>' . $courseCodeEsc . '</strong>.
+                                                </p>
+                                                <h2 style="text-align:center; font-size:24px; color:#2C2C2C; margin:20px 0;">' . $emailTitleEsc . '</h2>
+                                                <p style="font-size:15px; color:#333; margin-top: 25px;">
+                                                    <strong>Task Instructions:</strong>
+                                                </p>
+                                                <div style="font-size:15px; color:#333; margin-bottom: 20px; line-height: 22px;">
+                                                    ' . $descHtml . '
+                                                </div>
+                                                <div style="background-color:#f9f9f9; padding:15px; border-radius:5px; margin:20px 0;">
+                                                    <p style="font-size:14px; color:#666; margin:5px 0;"><strong>Deadline:</strong> ' . htmlspecialchars($deadlineDisplay, ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</p>
+                                                    <p style="font-size:14px; color:#666; margin:5px 0;"><strong>Points:</strong> ' . htmlspecialchars($pointsDisplay, ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</p>
+                                                </div>
+                                                <p style="font-size:15px; color:#333;">
+                                                    Please log in to your Webstar account to review the task details and submit on time.
+                                                </p>
+                                                <p style="margin-top:30px; color:#333;">
+                                                    Warm regards,<br>
+                                                    <strong>The Webstar Team</strong><br>
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color:#FDDF94;">
+                                            <td align="center" style="padding:15px; color:black; font-size:13px;">
+                                                © 2025 Webstar. All Rights Reserved.
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>';
+
+                    $mail->send();
+                }
+            } catch (Exception $e) {
+                $errorMsg = isset($mail) && is_object($mail) ? $mail->ErrorInfo : $e->getMessage();
+                error_log("PHPMailer failed for Course ID $selectedCourseID: " . $errorMsg);
             }
         }
     }
@@ -446,9 +680,8 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                     </div>
                                 </div>
 
-
                                 <!-- Form starts -->
-                                <form action="" method="POST" enctype="multipart/form-data">
+                                <form action="" id="assignTaskForm" method="POST" enctype="multipart/form-data">
                                     <input type="hidden" name="selectedRubricID" id="selectedRubricID"
                                         value="<?= $activeRubric['rubricID'] ?? '' ?>">
                                     <input type="hidden" name="mode"
@@ -936,7 +1169,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                 </div>
                                                 <div class="text-med text-12"
                                                     style="display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;">
-                                                    <?php echo htmlspecialchars($task['assignmentDescription']); ?>
+                                                    <?php echo strip_tags($task['assignmentDescription']); ?>
                                                 </div>
                                                 <div class="text-med text-muted text-12"
                                                     style="display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;">
@@ -1003,19 +1236,22 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
         });
 
         // Sync Quill content to hidden input before form submit
-        document.querySelector('form').addEventListener('submit', function (e) {
-            let text = quill.getText().trim(); // plain text
-            let html = quill.root.innerHTML;
+        const form = document.querySelector('#assignTaskForm'); // use your form ID
+        form.addEventListener('submit', function (e) {
             const taskInput = document.querySelector('#task');
 
-            // Convert Quill HTML
+            // Get plain text from Quill
+            let text = quill.getText().trim();
+
+            // Convert Quill HTML to plain text with bullets/line breaks
+            let html = quill.root.innerHTML;
             html = html.replace(/<p>/g, '').replace(/<\/p>/g, '<br>');
             html = html.replace(/<li>/g, '• ').replace(/<\/li>/g, '<br>');
             html = html.replace(/<\/?(ul|ol)>/g, '');
             html = html.replace(/(<br>)+$/g, '');
             taskInput.value = html.trim();
 
-            // Validation for task instructions
+            // Validation
             if (text.length === 0) {
                 e.preventDefault();
                 quill.root.focus();

@@ -1,44 +1,46 @@
 <?php
 include_once 'shared/assets/database/connect.php';
 if (session_status() === PHP_SESSION_NONE) {
-	session_start();
+    session_start();
 }
 
 if (!function_exists('sidebar_resolve_user_id')) {
-	function sidebar_resolve_user_id() {
-		$conn = $GLOBALS['conn'];
-		if (isset($_SESSION['userID'])) return (int) $_SESSION['userID'];
-		if (isset($_SESSION['email'])) {
-			$emailEsc = mysqli_real_escape_string($conn, $_SESSION['email']);
-			$res = executeQuery("SELECT userID, userName FROM users WHERE email = '$emailEsc' LIMIT 1");
-			if ($res && ($u = mysqli_fetch_assoc($res))) {
-				$_SESSION['userID'] = (int) $u['userID'];
-				if (!isset($_SESSION['userName']) && isset($u['userName'])) {
-					$_SESSION['userName'] = $u['userName'];
-				}
-				return (int) $u['userID'];
-			}
-		}
-		if (isset($_SESSION['userName'])) {
-			$userNameEsc = mysqli_real_escape_string($conn, $_SESSION['userName']);
-			$res = executeQuery("SELECT userID FROM users WHERE userName = '$userNameEsc' LIMIT 1");
-			if ($res && ($u = mysqli_fetch_assoc($res))) {
-				$_SESSION['userID'] = (int) $u['userID'];
-				return (int) $u['userID'];
-			}
-		}
-		return null;
-	}
+    function sidebar_resolve_user_id()
+    {
+        $conn = $GLOBALS['conn'];
+        if (isset($_SESSION['userID'])) return (int) $_SESSION['userID'];
+        if (isset($_SESSION['email'])) {
+            $emailEsc = mysqli_real_escape_string($conn, $_SESSION['email']);
+            $res = executeQuery("SELECT userID, userName FROM users WHERE email = '$emailEsc' LIMIT 1");
+            if ($res && ($u = mysqli_fetch_assoc($res))) {
+                $_SESSION['userID'] = (int) $u['userID'];
+                if (!isset($_SESSION['userName']) && isset($u['userName'])) {
+                    $_SESSION['userName'] = $u['userName'];
+                }
+                return (int) $u['userID'];
+            }
+        }
+        if (isset($_SESSION['userName'])) {
+            $userNameEsc = mysqli_real_escape_string($conn, $_SESSION['userName']);
+            $res = executeQuery("SELECT userID FROM users WHERE userName = '$userNameEsc' LIMIT 1");
+            if ($res && ($u = mysqli_fetch_assoc($res))) {
+                $_SESSION['userID'] = (int) $u['userID'];
+                return (int) $u['userID'];
+            }
+        }
+        return null;
+    }
 }
 
 if (!function_exists('sidebar_fetch_count')) {
-	function sidebar_fetch_count($sql) {
-		$result = executeQuery($sql);
-		if ($result && ($row = mysqli_fetch_assoc($result)) && isset($row['c'])) {
-			return (int) $row['c'];
-		}
-		return 0;
-	}
+    function sidebar_fetch_count($sql)
+    {
+        $result = executeQuery($sql);
+        if ($result && ($row = mysqli_fetch_assoc($result)) && isset($row['c'])) {
+            return (int) $row['c'];
+        }
+        return 0;
+    }
 }
 
 $isInboxPage = isset($activePage) && $activePage === 'inbox';
@@ -51,32 +53,32 @@ $newTodoCount = 0;
 // Get enrollmentIDs for the user
 $enrollmentIds = [];
 if ($userId !== null) {
-	$enrollmentQuery = "SELECT enrollmentID FROM enrollments WHERE userID = $userId";
-	$enrollmentResult = executeQuery($enrollmentQuery);
-	if ($enrollmentResult) {
-		while ($row = mysqli_fetch_assoc($enrollmentResult)) {
-			$enrollmentIds[] = $row['enrollmentID'];
-		}
-	}
+    $enrollmentQuery = "SELECT enrollmentID FROM enrollments WHERE userID = $userId";
+    $enrollmentResult = executeQuery($enrollmentQuery);
+    if ($enrollmentResult) {
+        while ($row = mysqli_fetch_assoc($enrollmentResult)) {
+            $enrollmentIds[] = $row['enrollmentID'];
+        }
+    }
 }
 
 // Inbox: clear and count using enrollmentID only
 if (!empty($enrollmentIds)) {
-	$enrollmentIdsStr = implode(',', $enrollmentIds);
-	if ($isInboxPage) executeQuery("UPDATE inbox SET isRead = 1 WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
-	$unreadInboxCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
+    $enrollmentIdsStr = implode(',', $enrollmentIds);
+    if ($isInboxPage) executeQuery("UPDATE inbox SET isRead = 1 WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
+    $unreadInboxCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
 } else {
-	if ($isInboxPage) executeQuery("UPDATE inbox SET isRead = 1 WHERE isRead = 0");
-	$unreadInboxCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE isRead = 0");
+    if ($isInboxPage) executeQuery("UPDATE inbox SET isRead = 1 WHERE isRead = 0");
+    $unreadInboxCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE isRead = 0");
 }
 
 // To-do: clear and count
 if ($userId !== null) {
-	if ($isTodoPage) executeQuery("UPDATE todo SET isRead = 1 WHERE userID = $userId AND isRead = 0");
-	$newTodoCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM todo WHERE userID = $userId AND isRead = 0");
+    if ($isTodoPage) executeQuery("UPDATE todo SET isRead = 1 WHERE userID = $userId AND isRead = 0");
+    $newTodoCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM todo WHERE userID = $userId AND isRead = 0");
 } else {
-	if ($isTodoPage) executeQuery("UPDATE todo SET isRead = 1 WHERE isRead = 0");
-	$newTodoCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM todo WHERE isRead = 0");
+    if ($isTodoPage) executeQuery("UPDATE todo SET isRead = 1 WHERE isRead = 0");
+    $newTodoCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM todo WHERE isRead = 0");
 }
 
 // Share to session for view fallback
@@ -185,7 +187,7 @@ $_SESSION['TodoNewCount'] = $newTodoCount;
                         <hr class="dropdown-divider">
                     </li>
                     <li><a class="dropdown-item" style="font-family: var(--Bold); color:var(--highlight)"
-                            href="login.php"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign
+                            href="#" onclick="logout();"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign
                             out</a></li>
                 </ul>
             </div>
@@ -237,10 +239,12 @@ $_SESSION['TodoNewCount'] = $newTodoCount;
         }
 
         fetch('shared/assets/processes/search-modal.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'searchTerm=' + encodeURIComponent(query)
-        })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'searchTerm=' + encodeURIComponent(query)
+            })
             .then(res => res.text())
             .then(html => searchResultsMobile.innerHTML = html)
             .catch(() => searchResultsMobile.innerHTML = '<div class="text-center text-muted p-3">Error loading results.</div>');

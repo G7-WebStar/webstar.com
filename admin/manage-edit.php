@@ -1,7 +1,7 @@
 <?php $activePage = 'manage'; ?>
 <?php
 include('../shared/assets/database/connect.php');
-// include("../shared/assets/processes/prof-session-process.php");
+include("../shared/assets/processes/admin-session-process.php");
 
 ?>
 

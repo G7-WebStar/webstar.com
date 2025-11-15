@@ -1,8 +1,93 @@
 <?php $activePage = 'post-announcement'; ?>
 <?php
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 include('../shared/assets/database/connect.php');
 date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
+
+// --- Google Link Processor ---
+function processGoogleLink($link)
+{
+    $link = trim($link);
+
+    // Case 1: Google Drive folder
+    if (preg_match('/drive\.google\.com\/drive\/folders\/([a-zA-Z0-9_-]+)/', $link, $matches)) {
+        $folderId = $matches[1];
+        return "https://drive.google.com/embeddedfolderview?id={$folderId}#grid";
+    }
+
+    // Case 2: Google Drive file
+    if (preg_match('/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/', $link, $matches)) {
+        $fileId = $matches[1];
+        return "https://drive.google.com/file/d/{$fileId}/preview";
+    }
+
+    // Case 3: Google Docs, Sheets, Slides, etc.
+    if (preg_match('/(https:\/\/docs\.google\.com\/[a-z]+\/d\/[a-zA-Z0-9_-]+)/', $link, $matches)) {
+        $baseUrl = $matches[1];
+        if (str_contains($link, '/preview')) {
+            return preg_replace('/\?.*/', '', $link);
+        }
+        return "{$baseUrl}/preview";
+    }
+
+    // Case 4: Already preview link
+    if (str_contains($link, '/preview')) {
+        return preg_replace('/\?.*/', '', $link);
+    }
+
+    // Fallback
+    return preg_replace('/\?.*/', '', $link);
+}
+
+function fetchLinkTitle($link)
+{
+    $link = trim($link);
+    $title = '';
+
+    // Process Google links
+    $link = processGoogleLink($link);
+
+    // Ensure the link has a scheme
+    if (!preg_match('/^https?:\/\//', $link)) {
+        $link = 'http://' . $link;
+    }
+
+    // Set context for user-agent
+    $options = [
+        "http" => [
+            "header" => "User-Agent: Mozilla/5.0\r\n",
+            "timeout" => 5
+        ]
+    ];
+    $context = stream_context_create($options);
+
+    try {
+        $html = @file_get_contents($link, false, $context);
+        if ($html && preg_match("/<title>(.*?)<\/title>/is", $html, $matches)) {
+            $title = trim($matches[1]);
+        }
+    } catch (Exception $e) {
+        $title = '';
+    }
+
+    // Fallback to domain if title is empty
+    if (empty($title)) {
+        $parsedUrl = parse_url($link);
+        $title = isset($parsedUrl['host']) ? ucfirst(str_replace('www.', '', $parsedUrl['host'])) : 'Link';
+    }
+
+    return $title;
+}
+
+if (!class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
+    require '../shared/assets/phpmailer/src/Exception.php';
+    require '../shared/assets/phpmailer/src/PHPMailer.php';
+    require '../shared/assets/phpmailer/src/SMTP.php';
+}
 
 $mode = '';
 $announcementID = 0;
@@ -23,7 +108,8 @@ $courses = executeQuery($sql);
 if (isset($_POST['save_announcement'])) {
     $mode = $_POST['mode'] ?? 'new'; // new, reuse, or edit
     $announcementID = intval($_POST['announcementID'] ?? 0); // used in edit mode
-    $content = mysqli_real_escape_string($conn, $_POST['announcement'] ?? '');
+    $contentRaw = $_POST['announcement'] ?? '';
+    $content = mysqli_real_escape_string($conn, $contentRaw);
     $links = $_POST['links'] ?? [];
     $uploadedFiles = !empty($_FILES['materials']['name'][0]);
     $date = date("Y-m-d");
@@ -86,23 +172,160 @@ if (isset($_POST['save_announcement'])) {
                 if ($link === '')
                     continue;
 
-                $fileTitle = $link;
-                $context = stream_context_create(["http" => ["header" => "User-Agent: Mozilla/5.0"]]);
-                $html = @file_get_contents($link, false, $context);
+                // Process Google links to preview/embed
+                $processedLink = processGoogleLink($link);
 
-                if ($html !== false) {
-                    if (preg_match('/<meta property="og:title" content="([^"]+)"/i', $html, $matches)) {
-                        $fileTitle = $matches[1];
-                    } elseif (preg_match("/<title>(.*?)<\/title>/i", $html, $matches)) {
-                        $fileTitle = $matches[1];
+                // Fetch page title
+                $fileTitle = fetchLinkTitle($link);
+
+                $insertLink = "INSERT INTO files 
+                (courseID, userID, announcementID, fileAttachment, fileTitle, fileLink) 
+                VALUES 
+                ('$selectedCourseID', '$userID', '$announcementID', '', '" . mysqli_real_escape_string($conn, $fileTitle) . "', '$processedLink')";
+                executeQuery($insertLink);
+            }
+        }
+
+        // --- Notifications & Email (only for new/reuse) ---
+        if ($mode === 'new' || $mode === 'reuse') {
+            // Prepare notification message using first five words (plain text)
+            $contentText = strip_tags($contentRaw);
+            $contentText = html_entity_decode($contentText, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $contentText = preg_replace('/\s+/', ' ', $contentText);
+            $contentText = trim($contentText);
+
+            $firstWords = '';
+            if (!empty($contentText)) {
+                $words = preg_split('/\s+/', $contentText, -1, PREG_SPLIT_NO_EMPTY);
+                if (!empty($words)) {
+                    $firstWords = implode(' ', array_slice($words, 0, min(5, count($words))));
+                }
+            }
+
+            $notificationMessage = "A new announcement has been posted : \"" . $firstWords . "\"...";
+            $notifType = 'Course Update';
+            $courseCode = "";
+
+            // Fetch course code for email
+            $selectCourseDetailsQuery = "SELECT courseCode FROM courses WHERE courseID = '$selectedCourseID'";
+            $courseDetailsResult = executeQuery($selectCourseDetailsQuery);
+            if ($courseData = mysqli_fetch_assoc($courseDetailsResult)) {
+                $courseCode = $courseData['courseCode'];
+            }
+
+            $escapedNotificationMessage = mysqli_real_escape_string($conn, $notificationMessage);
+            $escapedNotifType = mysqli_real_escape_string($conn, $notifType);
+
+            // Insert notifications only if they don't already exist for each student (prevents duplicates)
+            $insertNotificationQuery = "
+                INSERT INTO inbox 
+                (enrollmentID, messageText, notifType, createdAt)
+                SELECT
+                    e.enrollmentID,
+                    '$escapedNotificationMessage',
+                    '$escapedNotifType',
+                    NOW()
+                FROM
+                    enrollments e
+                WHERE
+                    e.courseID = '$selectedCourseID'
+                    AND NOT EXISTS (
+                        SELECT 1 
+                        FROM inbox i2 
+                        WHERE i2.enrollmentID = e.enrollmentID 
+                            AND i2.messageText = '$escapedNotificationMessage'
+                            AND i2.notifType = '$escapedNotifType'
+                            AND i2.createdAt > DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+                    )
+            ";
+            executeQuery($insertNotificationQuery);
+
+            // Email enrolled students who opted-in
+            $selectEmailsQuery = "
+                SELECT u.email, u.userID,
+                       COALESCE(s.courseUpdateEnabled, 0) as courseUpdateEnabled
+                FROM users u
+                INNER JOIN enrollments e ON u.userID = e.userID
+                LEFT JOIN settings s ON u.userID = s.userID
+                WHERE e.courseID = '$selectedCourseID'
+            ";
+            $emailsResult = executeQuery($selectEmailsQuery);
+
+            try {
+                $mail = new PHPMailer(true);
+                $mail->isSMTP();
+                $mail->Host       = 'smtp.gmail.com';
+                $mail->SMTPAuth   = true;
+                $mail->Username   = 'learn.webstar@gmail.com';
+                $mail->Password   = 'mtls vctd rhai cdem';
+                $mail->SMTPSecure = 'tls';
+                $mail->Port       = 587;
+                $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
+                $logoPath = __DIR__ . '/../shared/assets/img/webstar-logo-black.png';
+                if (file_exists($logoPath)) {
+                    $mail->AddEmbeddedImage($logoPath, 'logoWebstar');
+                }
+
+                $mail->isHTML(true);
+                $mail->CharSet = 'UTF-8';
+                $mail->Encoding = 'base64';
+                $mail->Subject = "[NEW ANNOUNCEMENT] Course $courseCode";
+
+                $recipientsFound = false;
+                while ($student = mysqli_fetch_assoc($emailsResult)) {
+                    if ($student['courseUpdateEnabled'] == 1 && !empty($student['email'])) {
+                        $mail->addAddress($student['email']);
+                        $recipientsFound = true;
                     }
                 }
 
-                $insertLink = "INSERT INTO files 
-                    (courseID, userID, announcementID, fileAttachment, fileTitle, fileLink) 
-                    VALUES 
-                    ('$selectedCourseID', '$userID', '$announcementID', '', '" . mysqli_real_escape_string($conn, $fileTitle) . "', '$link')";
-                executeQuery($insertLink);
+                if ($recipientsFound) {
+                    $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
+                            <tr>
+                                <td align="center">
+                                    <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                                        <tr style="background-color: #FDDF94;">
+                                            <td align="center" style="padding: 20px;">
+                                                <img src="cid:logoWebstar" alt="Webstar Logo" style="height:80px;">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 30px;">
+                                                <p style="font-size:15px; color:#333;">Hello Learner,</p>
+                                                <p style="font-size:15px; color:#333;">
+                                                    A new announcement has been posted in your course <strong>' . htmlspecialchars($courseCode, ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</strong>.
+                                                </p>
+                                                <div style="background-color:#f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #FDDF94;">
+                                                    <div style="font-size:15px; color:#333; line-height: 1.6;">
+                                                        ' . $contentRaw . '
+                                                    </div>
+                                                </div>
+                                                <p style="font-size:15px; color:#333;">
+                                                    Please log in to your Webstar account to view the full announcement and any attached materials.
+                                                </p>
+                                                <p style="margin-top:30px; color:#333;">
+                                                    Warm regards,<br>
+                                                    <strong>The Webstar Team</strong><br>
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color:#FDDF94;">
+                                            <td align="center" style="padding:15px; color:black; font-size:13px;">
+                                                © 2025 Webstar. All Rights Reserved.
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>';
+
+                    $mail->send();
+                }
+            } catch (Exception $e) {
+                $errorMsg = isset($mail) && is_object($mail) ? $mail->ErrorInfo : $e->getMessage();
+                error_log("PHPMailer failed for Course ID $selectedCourseID: " . $errorMsg);
             }
         }
     }
@@ -347,7 +570,7 @@ if (!empty($reusedData)) {
                                 </div>
 
                                 <!-- Form starts -->
-                                <form action="" method="POST" enctype="multipart/form-data">
+                                <form id="announcementForm" method="POST" enctype="multipart/form-data">
                                     <input type="hidden" name="mode"
                                         value="<?= isset($_GET['edit']) ? 'edit' : (isset($_GET['reuse']) ? 'reuse' : 'new') ?>">
                                     <input type="hidden" name="announcementID"
@@ -558,7 +781,7 @@ if (!empty($reusedData)) {
                                             <div style="line-height: 1.5; padding:10px 15px;">
                                                 <div class="text-sbold text-14"
                                                     style="display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;">
-                                                    <?php echo htmlspecialchars(substr($announcement['announcementContent'], 0, 100)); ?>
+                                                    <?php echo substr(strip_tags($announcement['announcementContent']), 0, 100); ?>
                                                 </div>
                                                 <div class="text-med text-muted text-12"
                                                     style="display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;">
@@ -630,7 +853,9 @@ if (!empty($reusedData)) {
         });
 
         // Sync Quill content to hidden input before form submit
-        document.querySelector('form').addEventListener('submit', function () {
+        const form = document.querySelector('#announcementForm');
+        form.addEventListener('submit', function () {
+            const hiddenInput = document.querySelector('#announcement');
             let html = quill.root.innerHTML;
             html = html.replace(/<p>/g, '').replace(/<\/p>/g, '<br>');
             html = html.replace(/<li>/g, '• ').replace(/<\/li>/g, '<br>');

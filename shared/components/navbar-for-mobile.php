@@ -150,7 +150,7 @@ $webstars = mysqli_fetch_assoc($webstarsResult);
 
         <!-- Sign Out -->
         <li>
-          <a class="dropdown-item d-flex align-items-center text-med text-14" href="login.php"
+          <a class="dropdown-item d-flex align-items-center text-med text-14" href="#" onclick="logout();"
             style="color:var(--highlight);">
             <span class="material-symbols-rounded me-2" style="font-size:18px;">logout</span>
             Sign out

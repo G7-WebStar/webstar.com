@@ -2,6 +2,21 @@
 $activePage = 'course';
 include('shared/assets/database/connect.php');
 include("shared/assets/processes/session-process.php");
+if (isset($_POST['markUnarchived'])) {
+    $courseID = $_POST['courseID'];
+    $update = "UPDATE courses SET isActive = '1' WHERE courseID = '$courseID'";
+    executeQuery($update);
+}
+
+if (isset($_POST['markArchived'])) {
+    $courseID = $_POST['courseID'];
+    $update = "UPDATE courses SET isActive = '0' WHERE courseID = '$courseID'";
+    executeQuery($update);
+}
+
+$filter = isset($_GET['status']) ? $_GET['status'] : 'active';
+$isActive = ($filter == 'archived') ? '0' : '1';
+
 $noResult = false;
 $selectCourseQuery = "
 SELECT 
@@ -26,7 +41,7 @@ INNER JOIN enrollments
     ON courses.courseID = enrollments.courseID
 LEFT JOIN courseSchedule
     ON courses.courseID = courseSchedule.courseID
-WHERE enrollments.userID = '$userID'
+WHERE enrollments.userID = '$userID' AND isActive = '$isActive'
 GROUP BY courses.courseID
 ";
 
@@ -120,14 +135,12 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                                 <div
                                     class="col-12 col-lg-6 px-0 px-xl-auto me-2 my-1 d-flex justify-content-center justify-content-md-start">
                                     <div class="search-container d-flex me-0">
-                                        <form method="GET" class="form-control bg-transparent border-0 p-0">
-                                            <input type="text" placeholder="Search" name="search"
-                                                value="<?php echo $search ?>"
-                                                class="form-control py-1 text-reg text-14">
-                                            <button type="submit" class="btn-outline-secondary">
-                                                <i class="bi bi-search me-2"></i>
-                                            </button>
-                                        </form>
+                                        <input type="text" placeholder="Search" name="search"
+                                            value="<?php echo $search ?>"
+                                            class="form-control py-1 text-reg text-14">
+                                        <button type="button" class="btn-outline-secondary">
+                                            <i class="bi bi-search me-2"></i>
+                                        </button>
                                     </div>
                                 </div>
                                 <div
@@ -137,10 +150,10 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                                         <div class="custom-dropdown">
                                             <button class="dropdown-btn text-reg text-14">Active</button>
                                             <ul class="dropdown-list text-reg text-14">
-                                                <li data-value="Active" onclick="console.log('Active clicked')">Active
-                                                </li>
-                                                <li data-value="Archived" onclick="console.log('Archived clicked')">
-                                                    Archived</li>
+                                                <li data-value="Active" onclick="window.location.href='?status=active'">
+                                                    Active</li>
+                                                <li data-value="Archived"
+                                                    onclick="window.location.href='?status=archived'">Archived</li>
                                             </ul>
                                         </div>
                                     </div>
@@ -159,12 +172,12 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                         </div>
 
                         <!-- Start of Cards Section -->
-                        <div class="row my-2 mx-3 mx-md-0 mt-3">
+                        <div class="row my-2 mx-3 mx-md-0 mt-3" id="courseContainer">
                             <!-- Card -->
                             <?php
                             if (mysqli_num_rows($selectCourseResult) > 0 && !$noResult) {
                                 while ($courses = mysqli_fetch_assoc($selectCourseResult)) {
-                                    ?>
+                            ?>
                                     <div class="col-12 col-md-6 col-lg-4 col-xl-3 mt-2 m-0 p-0 pe-0 pe-md-2">
                                         <div class="card border border-black rounded-4 d-flex flex-column h-100">
                                             <a href="course-info.php?courseID=<?php echo $courses['courseID']; ?>">
@@ -219,17 +232,17 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                                             </div>
                                         </div>
                                     </div>
-                                    <?php
+                                <?php
                                 }
                             } else if ($noResult) { ?>
-                                    <div class="text-reg h1 text-center mt-5">No Result.</div>
-                                <?php
+                                <div class="text-reg h1 text-center mt-5">No Result.</div>
+                            <?php
                             } else {
-                                ?>
-                                    <script>
-                                        window.location.href = "course-join.php";
-                                    </script>
-                                <?php
+                            ?>
+                                <script>
+                                    window.location.href = "course-join.php";
+                                </script>
+                            <?php
                             }
                             ?>
                         </div>
@@ -238,49 +251,49 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                 </div>
             </div>
 
-        <!-- Enroll Course Modal -->
-        <div class="modal fade" id="enrollCourseModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered py-4" style="max-width: 500px;">
-                <div class="modal-content">
-                    <div class="modal-header border-bottom d-flex justify-content-between align-items-center">
-                        <h5 class="modal-title enroll-modal-title mb-0 text-sbold">Enter access code</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <!-- Enroll Course Modal -->
+            <div class="modal fade" id="enrollCourseModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered py-4" style="max-width: 500px;">
+                    <div class="modal-content">
+                        <div class="modal-header border-bottom d-flex justify-content-between align-items-center">
+                            <h5 class="modal-title enroll-modal-title mb-0 text-sbold">Enter access code</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <form id="enrollForm">
+                            <div class="modal-body p-4">
+                                <div class="mx-auto" style="width: 100%; max-width: 420px;">
+                                    <p class="text-med enroll-modal-description text-start mt-3 mb-2">
+                                        Enter the access code provided by your professor.
+                                    </p>
+                                    <div class="d-flex justify-content-center mb-3">
+                                        <input type="text" name="access_code"
+                                            class="input-style form-control rounded-4 border-blue"
+                                            id="accessCodeInput" placeholder="0 0 0 0 0 0" required
+                                            inputmode="text" pattern="^[A-Z0-9]{6}$" maxlength="6"
+                                            oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0,6);">
+                                    </div>
+                                </div>
+
+                                <div id="alertContainer" style="display: none;" class="mb-3">
+                                    <div class="alert alert-danger d-flex align-items-center mb-0" role="alert" id="alertStyle">
+                                        <i class="bi bi-exclamation-triangle-fill me-2" id="exclamation"></i>
+                                        <div class="text-reg text-14" id="alertMessage"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer border-top">
+                                <button type="submit"
+                                    class="btn btn-sm px-3 py-1 rounded-pill text-sbold text-md-14 d-inline-flex align-items-center justify-content-center criteria-add-btn"
+                                    style="background-color: var(--primaryColor); border: 1px solid var(--black);">
+                                    Enroll
+                                </button>
+                            </div>
+                        </form>
                     </div>
-
-                    <form id="enrollForm">
-                        <div class="modal-body p-4">
-                            <div class="mx-auto" style="width: 100%; max-width: 420px;">
-                                <p class="text-med enroll-modal-description text-start mt-3 mb-2">
-                                    Enter the access code provided by your professor.
-                                </p>
-                                <div class="d-flex justify-content-center mb-3">
-                                    <input type="text" name="access_code"
-                                        class="input-style form-control rounded-4 border-blue"
-                                        id="accessCodeInput" placeholder="0 0 0 0 0 0" required
-                                        inputmode="text" pattern="^[A-Z0-9]{6}$" maxlength="6"
-                                        oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0,6);">
-                                </div>
-                            </div>
-
-                            <div id="alertContainer" style="display: none;" class="mb-3">
-                                <div class="alert alert-danger d-flex align-items-center mb-0" role="alert">
-                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                    <div class="text-reg text-14" id="alertMessage"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="modal-footer border-top">
-                            <button type="submit"
-                                class="btn btn-sm px-3 py-1 rounded-pill text-sbold text-md-14 d-inline-flex align-items-center justify-content-center criteria-add-btn"
-                                style="background-color: var(--primaryColor); border: 1px solid var(--black);">
-                                Enroll
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
-        </div>
 
             <!-- Dropdown js -->
             <script>
@@ -309,7 +322,7 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
             </script>
 
             <script>
-                document.addEventListener("DOMContentLoaded", function () {
+                document.addEventListener("DOMContentLoaded", function() {
                     const filterToggle = document.getElementById("filterToggle");
                     const mobileFilters = document.getElementById("mobileFilters");
                     const icon = filterToggle.querySelector(".material-symbols-rounded");
@@ -340,67 +353,102 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                 });
             </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const input = document.getElementById('accessCodeInput');
-            const form = document.getElementById('enrollForm');
-            const alertContainer = document.getElementById('alertContainer');
-            const modal = document.getElementById('enrollCourseModal');
-            // Hide alert when user starts typing
-            if (input) {
-                input.addEventListener('input', function() {
-                    if (alertContainer) {
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const input = document.getElementById('accessCodeInput');
+                    const form = document.getElementById('enrollForm');
+                    const alertContainer = document.getElementById('alertContainer');
+                    const alertStyle = document.getElementById('alertStyle');
+                    const exclamation = document.getElementById('exclamation');
+                    const alertMessage = document.getElementById('alertMessage');
+                    const modal = document.getElementById('enrollCourseModal');
+
+                    // Hide alert when typing
+                    input.addEventListener('input', function() {
                         alertContainer.style.display = 'none';
-                    }
-                });
-            }
+                    });
 
-            // Handle form submission
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    const code = input ? input.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '') : '';
+                    // Handle form submission via AJAX
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
 
-                    if (code.length !== 6) {
-                        if (alertContainer) {
-                            document.getElementById('alertMessage').textContent = 'Please enter a complete 6-character access code.';
+                        const code = input.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+                        if (code.length !== 6) {
+                            alertMessage.textContent = 'Please enter a complete 6-character access code.';
                             alertContainer.style.display = 'block';
-                        }
-                        if (input) {
                             input.focus();
+                            return;
                         }
-                        return false;
-                    }
 
-                    // Here you can add your enrollment logic
-                    console.log('Access code:', code);
-                    // Example: You can make an AJAX call here to submit the code
-                });
-            }
+                        // Send AJAX request to PHP handler
+                        fetch('shared/assets/processes/enroll-course.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                },
+                                body: 'access_code=' + encodeURIComponent(code)
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                alertMessage.textContent = data.message;
+                                alertContainer.style.display = 'block';
 
-            // Reset form when modal is closed
-            if (modal) {
-                modal.addEventListener('hidden.bs.modal', function() {
-                    if (input) {
+                                if (data.success) {
+                                    alertStyle.classList.remove('alert-danger');
+                                    alertStyle.classList.add('alert-success');
+                                    exclamation.remove();
+                                    // Reload page after short delay to show updated courses
+                                    setTimeout(() => location.reload(), 1000);
+                                } else {
+                                    alertContainer.classList.remove('alert-success');
+                                    alertContainer.classList.add('alert-danger');
+                                }
+                            })
+                            .catch(err => {
+                                alertMessage.textContent = 'An error occurred. Please try again.';
+                                alertContainer.style.display = 'block';
+                                alertContainer.classList.remove('alert-success');
+                                alertContainer.classList.add('alert-danger');
+                            });
+                    });
+
+                    // Reset modal when closed
+                    modal.addEventListener('hidden.bs.modal', function() {
                         input.value = '';
-                    }
-                    if (alertContainer) {
                         alertContainer.style.display = 'none';
-                    }
-                });
+                        alertContainer.classList.remove('alert-success', 'alert-danger');
+                    });
 
-                // Focus input when modal opens
-                modal.addEventListener('shown.bs.modal', function() {
-                    if (input) {
+                    // Focus input when modal opens
+                    modal.addEventListener('shown.bs.modal', function() {
                         input.focus();
-                    }
+                    });
                 });
-            }
-
-        });
-    </script>
+            </script>
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const searchInput = document.querySelector('input[name="search"]');
+                    const courseContainer = document.getElementById('courseContainer');
+
+                    if (searchInput) {
+                        searchInput.addEventListener('input', function() {
+                            const searchTerm = searchInput.value.trim();
+
+                            fetch('shared/assets/processes/search-course.php?search=' + encodeURIComponent(searchTerm) + "<?php echo (isset($_GET['status'])) ? "&status=" . $filter : ''; ?>")
+                                .then(response => response.text())
+                                .then(html => {
+                                    courseContainer.innerHTML = html;
+                                })
+                                .catch(err => console.error('Fetch error:', err));
+                        });
+                    }
+                });
+            </script>
+
 </body>
 
 </html>

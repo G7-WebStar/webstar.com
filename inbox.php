@@ -12,28 +12,21 @@ ORDER BY courses.courseCode ASC
 ";
 $selectEnrolledResult = executeQuery($selectEnrolledQuery);
 
-$selectInboxQuery = "SELECT 
+$selectInboxQuery = "SELECT DISTINCT
+inbox.inboxID,
 inbox.createdAt AS inboxCreatedAt,
 inbox.messageText,
 inbox.notifType,
 courses.courseCode,
-assessments.assessmentTitle AS assessmentTitle,
 userinfo.profilePicture AS profPFP
 FROM inbox
 INNER JOIN enrollments
-	ON inbox.enrollmentID = enrollments.enrollmentID
-INNER JOIN todo
-	ON enrollments.userID = todo.userID
-    AND enrollments.courseID = (SELECT courseID 
-                               FROM assessments 
-                               WHERE assessments.assessmentID = todo.assessmentID)
-INNER JOIN assessments
-	ON todo.assessmentID = assessments.assessmentID
+    ON inbox.enrollmentID = enrollments.enrollmentID
 INNER JOIN courses
-	ON assessments.courseID = courses.courseID
+    ON enrollments.courseID = courses.courseID
 INNER JOIN userinfo
-	ON courses.userID = userinfo.userID
-WHERE enrollments.userID = '$userID' AND todo.status = 'Pending'
+    ON courses.userID = userinfo.userID
+WHERE enrollments.userID = '$userID'
 ORDER BY inbox.inboxID DESC
 ";
 $selectInboxResult = executeQuery($selectInboxQuery);

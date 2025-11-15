@@ -15,51 +15,51 @@
         </a>
 
         <div class="dropdown d-flex justify-content-center">
-                        <button class="btn btn-custom text-sbold rounded-3 px-2 d-flex justify-content-center align-items-center" type="button"
-                            id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="background: var(--primaryColor) !important;
+            <button class="btn btn-custom text-sbold rounded-3 px-2 d-flex justify-content-center align-items-center" type="button"
+                id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="background: var(--primaryColor) !important;
                              border: 1px solid var(--black);">
-                            <span class="material-symbols-rounded">add</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow text-med" aria-labelledby="dropdownMenuButton"
-                            style="width: auto; min-width: 0;">
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center mt-1" href="create-course.php">
-                                    <span class="material-symbols-rounded me-2"
-                                        style="color:#2c2c2c;font-size:16px">folder</span>
-                                    Course
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center" href="post-announcement.php">
-                                    <span class="material-symbols-rounded me-2"
-                                        style="color:#2c2c2c;font-size:16px">campaign</span>
-                                    Announce
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center" href="add-lesson.php">
-                                    <span class="material-symbols-rounded me-2"
-                                        style="color:#2c2c2c;font-size:16px">notes</span>
-                                    Lesson
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center" href="create-test.php">
-                                    <span class="material-symbols-rounded me-2"
-                                        style="color:#2c2c2c;font-size:16px">quiz</span>
-                                    Test
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center" href="assign-task.php">
-                                    <span class="material-symbols-rounded me-2"
-                                        style="color:#2c2c2c;font-size:16px">add_task</span>
-                                    Task
-                                </a>
-                            </li>
-                        </ul>
+                <span class="material-symbols-rounded">add</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow text-med" aria-labelledby="dropdownMenuButton"
+                style="width: auto; min-width: 0;">
+                <li>
+                    <a class="dropdown-item d-flex align-items-center mt-1" href="create-course.php">
+                        <span class="material-symbols-rounded me-2"
+                            style="color:#2c2c2c;font-size:16px">folder</span>
+                        Course
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item d-flex align-items-center" href="post-announcement.php">
+                        <span class="material-symbols-rounded me-2"
+                            style="color:#2c2c2c;font-size:16px">campaign</span>
+                        Announce
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item d-flex align-items-center" href="add-lesson.php">
+                        <span class="material-symbols-rounded me-2"
+                            style="color:#2c2c2c;font-size:16px">notes</span>
+                        Lesson
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item d-flex align-items-center" href="create-test.php">
+                        <span class="material-symbols-rounded me-2"
+                            style="color:#2c2c2c;font-size:16px">quiz</span>
+                        Test
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item d-flex align-items-center" href="assign-task.php">
+                        <span class="material-symbols-rounded me-2"
+                            style="color:#2c2c2c;font-size:16px">add_task</span>
+                        Task
+                    </a>
+                </li>
+            </ul>
 
-                    </div>
+        </div>
 
     </div>
 </nav>
@@ -141,7 +141,7 @@
                         Support
                     </a>
                 </li>
-                
+
                 <!-- Search -->
                 <li style="margin-bottom:6px;">
                     <a class="dropdown-item d-flex align-items-center text-med text-14" href="search.php"
@@ -169,7 +169,7 @@
 
                 <!-- Sign Out -->
                 <li>
-                    <a class="dropdown-item d-flex align-items-center text-med text-14" href="login.php"
+                    <a class="dropdown-item d-flex align-items-center text-med text-14" href="#" onclick="logout();"
                         style="color:var(--highlight);">
                         <span class="material-symbols-rounded me-2" style="font-size:18px;">logout</span>
                         Sign out
