@@ -93,7 +93,6 @@ if (isset($_POST['deleteCourse'])) {
         executeQuery("DELETE FROM leaderboard WHERE enrollmentID = '$enrollmentID'");
         executeQuery("DELETE FROM inbox WHERE enrollmentID = '$enrollmentID'");
         executeQuery("DELETE FROM report WHERE enrollmentID = '$enrollmentID'");
-        executeQuery("DELETE FROM files WHERE enrollmentID = '$enrollmentID'");
     }
     executeQuery("DELETE FROM enrollments WHERE courseID = '$courseID'");
 

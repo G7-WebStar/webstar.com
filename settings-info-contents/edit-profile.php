@@ -118,7 +118,7 @@ if (isset($_POST['saveChanges'])) {
         $result = executeQuery($updateInfoQuery);
 
         if ($result) {
-            $profileUpdated = true; 
+            $profileUpdated = true;
         }
     }
 }
@@ -500,7 +500,7 @@ if (isset($_POST['deleteAccount'])) {
 
     // Auto-lowercase username and remove spaces
     usernameInput.addEventListener('input', () => {
-        usernameInput.value = usernameInput.value.toLowerCase().replace(/[^a-z0-9.]/g, '');
+        usernameInput.value = usernameInput.value.toLowerCase().replace(/[^a-z0-9._]/g, '');
     });
 
     // Desktop upload
