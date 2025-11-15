@@ -6,8 +6,14 @@ include("../shared/assets/processes/prof-session-process.php");
 // --- Get enrollmentID from GET (professor selects a student) ---
 $enrollmentID = intval($_GET['enrollmentID'] ?? 0);
 
+// If no enrollmentID or invalid → 404
+if ($enrollmentID <= 0) {
+    header("Location: 404.php");
+    exit;
+}
+
 if ($enrollmentID > 0) {
-    // --- Fetch student info based on enrollmentID ---
+    // Fetch student info based on enrollmentID
     $studentQuery = "
         SELECT 
             users.userName,
@@ -27,21 +33,24 @@ if ($enrollmentID > 0) {
         INNER JOIN userInfo ON users.userID = userInfo.userID
         INNER JOIN program ON userInfo.programID = program.programID
         WHERE enrollments.enrollmentID = '$enrollmentID'
-        ";
+    ";
 
     $studentQueryResult = mysqli_query($conn, $studentQuery);
-    if ($studentQueryResult && mysqli_num_rows($studentQueryResult) > 0) {
-        $student = mysqli_fetch_assoc($studentQueryResult);
-        $userID = $student['userID'];
-        $courseID = $student['courseID']; // <-- now $courseID is defined!
 
-
-    } else {
-        $student = null;
+    // If enrollmentID not found in DB → 404
+    if (!$studentQueryResult || mysqli_num_rows($studentQueryResult) === 0) {
+        header("Location: 404.php");
+        exit;
     }
-    // --- LEADERBOARD + REPORT LOGIC ---
-    if (!empty($student)) {
-        $leaderboardQuery = "
+
+    // Valid student found
+    $student = mysqli_fetch_assoc($studentQueryResult);
+    $userID = $student['userID'];
+    $courseID = $student['courseID'];
+}
+// --- LEADERBOARD + REPORT LOGIC ---
+if (!empty($student)) {
+    $leaderboardQuery = "
             SELECT leaderboard.enrollmentID, SUM(leaderboard.xpPoints) AS totalXP
             FROM leaderboard
             INNER JOIN enrollments
@@ -50,51 +59,51 @@ if ($enrollmentID > 0) {
             GROUP BY leaderboard.enrollmentID
             ORDER BY totalXP DESC
         ";
-        $leaderboardResult = executeQuery($leaderboardQuery);
+    $leaderboardResult = executeQuery($leaderboardQuery);
 
-        $rank = 1;
-        $studentTotalXP = 0;
-        $studentRank = 0;
+    $rank = 1;
+    $studentTotalXP = 0;
+    $studentRank = 0;
 
-        while ($row = mysqli_fetch_assoc($leaderboardResult)) {
-            $id = $row['enrollmentID'];
-            $totalXP = $row['totalXP'];
+    while ($row = mysqli_fetch_assoc($leaderboardResult)) {
+        $id = $row['enrollmentID'];
+        $totalXP = $row['totalXP'];
 
-            // Update or insert report
-            $checkQuery = "SELECT * FROM report WHERE enrollmentID = '$id'";
-            $checkResult = executeQuery($checkQuery);
+        // Update or insert report
+        $checkQuery = "SELECT * FROM report WHERE enrollmentID = '$id'";
+        $checkResult = executeQuery($checkQuery);
 
-            if (mysqli_num_rows($checkResult) > 0) {
-                $updateReport = "
+        if (mysqli_num_rows($checkResult) > 0) {
+            $updateReport = "
                     UPDATE report 
                     SET totalXP = '$totalXP',
                         allTimeRank = '$rank',
                         generatedAt = NOW()
                     WHERE enrollmentID = '$id'
                 ";
-                executeQuery($updateReport);
-            } else {
-                $insertReport = "
+            executeQuery($updateReport);
+        } else {
+            $insertReport = "
                     INSERT INTO report (enrollmentID, totalXP, allTimeRank, generatedAt)
                     VALUES ('$id', '$totalXP', '$rank', NOW())
                 ";
-                executeQuery($insertReport);
-            }
-
-            // Capture the selected student's XP and rank
-            if ($id == $enrollmentID) {
-                $studentTotalXP = $totalXP;
-                $studentRank = $rank;
-            }
-
-            $rank++;
+            executeQuery($insertReport);
         }
 
-        // --- On-time and overall performance ---
-        $onTimePercentage = '-';
-        $overallPerformance = '-';
+        // Capture the selected student's XP and rank
+        if ($id == $enrollmentID) {
+            $studentTotalXP = $totalXP;
+            $studentRank = $rank;
+        }
 
-        $submissionQuery = "
+        $rank++;
+    }
+
+    // --- On-time and overall performance ---
+    $onTimePercentage = '-';
+    $overallPerformance = '-';
+
+    $submissionQuery = "
             SELECT 
                 assessments.assessmentID,
                 assessments.assessmentTitle,
@@ -129,34 +138,34 @@ if ($enrollmentID > 0) {
             INNER JOIN scores ON scores.testID = tests.testID
             WHERE assessments.courseID = '$courseID' AND scores.userID = '$userID'
             ";
-        $submissionResult = executeQuery($submissionQuery);
+    $submissionResult = executeQuery($submissionQuery);
 
-        if ($submissionResult && mysqli_num_rows($submissionResult) > 0) {
-            $totalCount = 0;
-            $onTimeCount = 0;
-            $totalScore = 0;
-            $totalPoints = 0;
+    if ($submissionResult && mysqli_num_rows($submissionResult) > 0) {
+        $totalCount = 0;
+        $onTimeCount = 0;
+        $totalScore = 0;
+        $totalPoints = 0;
 
-            while ($row = mysqli_fetch_assoc($submissionResult)) {
-                $totalCount++;
+        while ($row = mysqli_fetch_assoc($submissionResult)) {
+            $totalCount++;
 
-                $submittedAt = $row['submittedAt'] ?? null;
-                if ($submittedAt && $row['deadline'] && strtotime($submittedAt) <= strtotime($row['deadline'])) {
-                    $onTimeCount++;
-                }
-
-                if (isset($row['score']) && isset($row['totalPoints']) && $row['totalPoints'] > 0) {
-                    $totalScore += $row['score'];
-                    $totalPoints += $row['totalPoints'];
-                }
+            $submittedAt = $row['submittedAt'] ?? null;
+            if ($submittedAt && $row['deadline'] && strtotime($submittedAt) <= strtotime($row['deadline'])) {
+                $onTimeCount++;
             }
 
-            $onTimePercentage = $totalCount > 0 ? round(($onTimeCount / $totalCount) * 100) . '%' : '-';
-            $overallPerformance = $totalPoints > 0 ? round(($totalScore / $totalPoints) * 100) . '%' : '-';
+            if (isset($row['score']) && isset($row['totalPoints']) && $row['totalPoints'] > 0) {
+                $totalScore += $row['score'];
+                $totalPoints += $row['totalPoints'];
+            }
         }
 
-        // --- Submission records ---
-        $recordQuery = "
+        $onTimePercentage = $totalCount > 0 ? round(($onTimeCount / $totalCount) * 100) . '%' : '-';
+        $overallPerformance = $totalPoints > 0 ? round(($totalScore / $totalPoints) * 100) . '%' : '-';
+    }
+
+    // --- Submission records ---
+    $recordQuery = "
             SELECT 
                 submissions.submittedAt,
                 assessments.assessmentID,
@@ -174,10 +183,10 @@ if ($enrollmentID > 0) {
             AND assessments.courseID = '$courseID'
             ORDER BY submissions.submittedAt DESC
             ";
-        $recordResult = executeQuery($recordQuery);
+    $recordResult = executeQuery($recordQuery);
 
-        // --- Test records ---
-        $testRecordQuery = "
+    // --- Test records ---
+    $testRecordQuery = "
             SELECT 
                 scores.gradedAt AS testDate,
                 assessments.assessmentID,
@@ -197,9 +206,9 @@ if ($enrollmentID > 0) {
             AND assessments.courseID = '$courseID'
             ORDER BY scores.gradedAt DESC
             ";
-        $testRecordResult = executeQuery($testRecordQuery);
-    }
+    $testRecordResult = executeQuery($testRecordQuery);
 }
+
 if (!empty($student)) {
     $userID = $student['userID'];
     $courseID = $student['courseID'];
