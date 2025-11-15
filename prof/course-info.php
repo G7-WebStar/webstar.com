@@ -1,5 +1,5 @@
 <?php
-$activePage = 'courseInfo';
+$activePage = 'course';
 $activeTab = $_POST['activeTab'] ?? 'announcements';
 
 include('../shared/assets/database/connect.php');

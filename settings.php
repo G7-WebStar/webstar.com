@@ -4,7 +4,10 @@ $activePage = 'settings';
 include("shared/assets/database/connect.php");
 include("shared/assets/processes/session-process.php");
 
-$activeTab = $_GET['tab'] ?? 'edit-profile';
+$activeTab = 'edit-profile';
+if (isset($_POST['activeTab'])) {
+    $activeTab = $_POST['activeTab'];
+}
 
 $toastMessage = '';
 $toastType = '';
@@ -44,6 +47,23 @@ if (isset($_POST['saveProfile'])) {
         $toastType = 'alert-success';
     }
 }
+
+
+if (isset($_POST['selectedCourse'])) {
+    $selectedCourseID = intval($_POST['selectedCourse']);
+
+    $update = $conn->query("
+        UPDATE profile 
+        SET starCard = '$selectedCourseID' 
+        WHERE userID = '$userID'
+    ");
+
+    if ($update) {
+        $toastMessage = 'Star Card display updated successfully!';
+        $toastType = 'alert-success';
+    }
+}
+
 ?>
 
 <!doctype html>
@@ -69,6 +89,13 @@ if (isset($_POST['saveProfile'])) {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:FILL@1" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+
+    <style>
+        #desktopScrollRightBtn {
+            visibility: hidden;
+            /* hidden by default */
+        }
+    </style>
 </head>
 
 <body>
@@ -290,10 +317,7 @@ if (isset($_POST['saveProfile'])) {
             function updateDesktopArrowVisibility() {
                 if (!desktopTabScroll) return;
                 desktopScrollLeftBtn.classList.toggle("d-none", desktopTabScroll.scrollLeft === 0);
-                desktopScrollRightBtn.classList.toggle(
-                    "d-none",
-                    desktopTabScroll.scrollLeft + desktopTabScroll.clientWidth >= desktopTabScroll.scrollWidth
-                );
+                desktopScrollRightBtn.style.visibility = desktopTabScroll.scrollLeft + desktopTabScroll.clientWidth >= desktopTabScroll.scrollWidth ? 'hidden' : 'visible';
             }
 
             desktopScrollLeftBtn.addEventListener("click", () => {

@@ -39,6 +39,9 @@ if (isset($_POST['save'])) {
     // Refresh settings after update
     $result = executeQuery("SELECT * FROM settings WHERE userID = '$userID'");
     $settings = mysqli_fetch_assoc($result);
+
+    // Keep the tab as preferences
+    $activeTab = 'preferences';
 }
 ?>
 
@@ -46,9 +49,9 @@ if (isset($_POST['save'])) {
 <div class="container">
     <form id="notificationForm" method="POST">
         <input type="hidden" name="activeTab" value="preferences">
-        <div class="row mb-3 mt-2">
-            <div class="col-12 col-md-6 mt-2 mb-4 d-flex align-items-center">
-                <button type="submit" name="save" id="saveBtn" class="btn rounded-5 text-reg text-12"
+        <div class="row mb-2">
+            <div class="col-12 col-md-6 mb-4 d-flex align-items-center">
+                <button type="submit" name="save" id="saveBtn" class="btn rounded-5 text-reg text-12 mt-3"
                     style="background-color: var(--primaryColor); border: 1px solid var(--black); display:none;">
                     Save changes
                 </button>

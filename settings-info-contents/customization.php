@@ -33,7 +33,7 @@ $profile = $conn->query($profileQuery)->fetch_assoc();
 
 ?>
 
-<div class="container">
+<div class="container" style="overflow-x: hidden;">
 
     <!-- Bio -->
     <form method="POST" id="bioForm">
@@ -89,7 +89,7 @@ $profile = $conn->query($profileQuery)->fetch_assoc();
                     </button>
                 </div>
                 <div class="col position-relative w-100 overflow-hidden" style="height: 200px;">
-                    <div id="carouselWrapperEmblem" style="overflow: hidden; width: 100%;">
+                    <div id="carouselWrapperEmblem" style="overflow-x: auto; overflow-y: hidden; width: 100%; scroll-behavior: smooth;scrollbar-width:none; -ms-overflow-style:none;">
                         <div id="thumbnailCarouselEmblem" style="display: flex; transition: transform 0.6s ease;">
                             <?php if (!empty($myEmblems)): ?>
                                 <?php
@@ -170,7 +170,7 @@ $profile = $conn->query($profileQuery)->fetch_assoc();
                     </button>
                 </div>
                 <div class="col position-relative w-100 overflow-hidden" style="height: 130px;">
-                    <div id="carouselWrapperCover" style="overflow: hidden; width: 100%;">
+                    <div id="carouselWrapperCover" style="overflow-x: auto; overflow-y: hidden; width: 100%; scroll-behavior: smooth;scrollbar-width:none; -ms-overflow-style:none;">
                         <div id="thumbnailCarouselCover" style="display: flex; transition: transform 0.6s ease;">
                             <?php if (!empty($myCovers)): ?>
                                 <?php
@@ -254,7 +254,7 @@ $profile = $conn->query($profileQuery)->fetch_assoc();
 
                 <div class="col d-flex justify-content-start align-items-center position-relative overflow-hidden"
                     style="height: 200px;">
-                    <div id="carouselWrapperProfile" style="overflow: hidden; width: 100%;">
+                    <div id="carouselWrapperProfile" style="overflow-x: auto; overflow-y: hidden; width: 100%; scroll-behavior: smooth;scrollbar-width:none; -ms-overflow-style:none;">
                         <div id="thumbnailCarouselProfile" style="display: flex; transition: transform 0.6s ease;">
                             <?php if (!empty($myThemes)): ?>
                                 <?php
@@ -371,7 +371,7 @@ $profile = $conn->query($profileQuery)->fetch_assoc();
             currentIndex = Math.min(Math.max(0, currentIndex), maxIndex);
             const offset = currentIndex * itemWidth;
 
-            carousel.style.transform = `translateX(-${offset}px)`;
+            wrapper.scrollLeft = offset;
             prevBtn.disabled = currentIndex === 0;
             nextBtn.disabled = currentIndex === maxIndex;
             prevBtn.style.opacity = currentIndex === 0 ? "0.4" : "1";
