@@ -411,23 +411,27 @@ $user = mysqli_fetch_assoc($result);
 
                                                                 <!-- Three-dot menu -->
                                                                 <div class="dropdown position-absolute top-0 end-0 m-2">
-                                                                    <button class="btn btn-sm border-0 bg-transparent"
+                                                                    <button
+                                                                        class="btn p-1 rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center"
                                                                         type="button" data-bs-toggle="dropdown"
-                                                                        aria-expanded="false">
-                                                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                                        aria-expanded="false"
+                                                                        style="width: 32px; height: 32px;">
+                                                                        <i class="fa-solid fa-ellipsis-vertical text-dark"></i>
                                                                     </button>
-                                                                    <ul class="dropdown-menu border-0 shadow-none">
+
+                                                                    <ul class="dropdown-menu border-0 shadow-sm">
                                                                         <li>
                                                                             <a class="dropdown-item"
                                                                                 href="edit-course.php?id=<?php echo $courses['courseID']; ?>">Edit</a>
                                                                         </li>
-                                                                        <li><a class="dropdown-item text-danger"
+                                                                        <li>
+                                                                            <a class="dropdown-item text-danger"
                                                                                 data-bs-toggle="modal"
-                                                                                data-bs-target="#deleteModal">Delete</a></li>
+                                                                                data-bs-target="#deleteModal">Delete</a>
+                                                                        </li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
-
 
                                                             <!-- Prof -->
                                                             <div class="d-flex align-items-center text-decoration-none">

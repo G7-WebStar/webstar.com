@@ -632,9 +632,9 @@ SELECT
     userinfo.lastName,
     userinfo.profilePicture
 FROM assignments
-INNER JOIN assessments ON assignments.assignmentID = assessments.assessmentID
-INNER JOIN courses ON assessments.courseID = courses.courseID
-INNER JOIN userinfo ON courses.userID = userinfo.userID
+LEFT JOIN assessments ON assignments.assessmentID = assessments.assessmentID
+LEFT JOIN courses ON assessments.courseID = courses.courseID
+LEFT JOIN userinfo ON courses.userID = userinfo.userID
 LEFT JOIN rubric ON assignments.rubricID = rubric.rubricID
 WHERE assignments.assignmentID = '$assignmentID'
 ";
@@ -645,7 +645,7 @@ $assignmentRow = mysqli_fetch_assoc($assignmentResult);
 if ($assignmentRow) {
     $assignmentTitle = $assignmentRow['assessmentTitle'];
     $assignmentDescription = $assignmentRow['assignmentDescription'];
-    $profName = $assignmentRow['firstName'] . ' ' . $assignmentRow['lastName']; // <-- define $profName
+    $profName = $assignmentRow['firstName'] . ' ' . $assignmentRow['lastName'];
     $profProfile = $assignmentRow['profilePicture'];
     $deadline = $assignmentRow['deadline'];
 
@@ -955,69 +955,58 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                             <div class="col-12 col-lg-8">
                                 <div class="p-0 px-lg-5">
                                     <div class="text-sbold text-14 mt-3">Instructions</div>
-                                    <p class="mb-5 mt-3 text-med text-14"><?php echo nl2br($assignmentDescription) ?>
+                                    <p class="mb-3 mt-3 text-med text-14"><?php echo nl2br($assignmentDescription) ?>
                                     </p>
+                                    
+                                    <?php if (!empty($taskFilesArray) || !empty($taskLinksArray)): ?>
+                                        <hr>
+                                        <div class="text-sbold text-14 mt-4">Task Materials</div>
 
-                                    <hr>
+                                        <?php foreach ($taskFilesArray as $file):
+                                            $filePath = "shared/assets/files/" . $file;
+                                            $fileExt = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
+                                            $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
+                                            $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
+                                            $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
+                                            ?>
+                                            <div class="rubricCard my-3 py-1 d-flex align-items-start justify-content-between"
+                                                style="max-width:100%; min-width:310px; cursor:pointer;">
+                                                <div class="d-flex align-items-start">
+                                                    <span class="material-symbols-outlined p-2 pe-2 mt-1 ms-1"
+                                                        style="font-variation-settings:'FILL' 1;">draft</span>
+                                                    <div class="ms-2">
+                                                        <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
+                                                        <div class="due text-reg text-14 mb-1"><?php echo $fileExt ?> ·
+                                                            <?php echo $fileSizeMB ?></div>
+                                                    </div>
+                                                </div>
+                                                <a href="<?php echo $filePath ?>" download="<?php echo $file ?>"
+                                                    class="text-dark d-flex align-items-center" style="text-decoration: none;">
+                                                    <span class="material-symbols-outlined p-2 pe-2 mt-1 me-3"
+                                                        style="font-variation-settings:'FILL' 1;">download_2</span>
+                                                </a>
+                                            </div>
+                                        <?php endforeach; ?>
 
-                                    <div class="text-sbold text-14 mt-4">Task Materials</div>
-                                    <?php foreach ($taskFilesArray as $file):
-                                        $filePath = "shared/assets/files/" . $file;
-                                        $fileExt = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
-                                        $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
-                                        $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
-
-                                        // Remove extension from display name
-                                        $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
-                                        ?>
-                                        <div class="rubricCard my-3 py-1 d-flex align-items-start justify-content-between"
-                                            style="max-width:100%; min-width:310px; cursor:pointer;">
-
-                                            <div class="d-flex align-items-start">
-                                                <span class="material-symbols-outlined p-2 pe-2 mt-1 ms-1"
-                                                    style="font-variation-settings:'FILL' 1;">draft</span>
-                                                <div class="ms-2">
-                                                    <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
-                                                    <div class="due text-reg text-14 mb-1"><?php echo $fileExt ?> ·
-                                                        <?php echo $fileSizeMB ?>
+                                        <?php foreach ($taskLinksArray as $item): ?>
+                                            <div class="rubricCard my-3 py-1 w-lg-25 d-flex align-items-start"
+                                                style="max-width:100%; min-width:310px;">
+                                                <span class="material-symbols-outlined p-2 pe-2 mt-1"
+                                                    style="font-variation-settings:'FILL' 1;">link</span>
+                                                <div class="ms-2" style="flex: 1 1 0; min-width: 0;">
+                                                    <div class="text-sbold text-16 mt-1"><?php echo $item['title'] ?></div>
+                                                    <div class="text-reg link text-12 mt-0"
+                                                        style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                        <a href="<?php echo $item['link'] ?>" target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            style="text-decoration: none; color: var(--black); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                            <?php echo $item['link'] ?>
+                                                        </a>
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            <!-- Download button -->
-                                            <a href="<?php echo $filePath ?>" download="<?php echo $file ?>"
-                                                class="text-dark d-flex align-items-center" style="text-decoration: none;">
-                                                <span class="material-symbols-outlined p-2 pe-2 mt-1 me-3"
-                                                    style="font-variation-settings:'FILL' 1;">
-                                                    download_2
-                                                </span>
-                                            </a>
-                                        </div>
-                                    <?php endforeach; ?>
-
-                                    <?php foreach ($taskLinksArray as $item): ?>
-                                        <div class="rubricCard my-3 py-1 w-lg-25 d-flex align-items-start"
-                                            style="max-width:100%; min-width:310px;">
-
-                                            <span class="material-symbols-outlined p-2 pe-2 mt-1"
-                                                style="font-variation-settings:'FILL' 1;">link</span>
-
-                                            <div class="ms-2" style="flex: 1 1 0; min-width: 0;">
-                                                <div class="text-sbold text-16 mt-1">
-                                                    <?php echo $item['title'] ?>
-                                                </div>
-
-                                                <div class="text-reg link text-12 mt-0"
-                                                    style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                                    <a href="<?php echo $item['link'] ?>" target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        style="text-decoration: none; color: var(--black); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                                        <?php echo $item['link'] ?>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
 
                                     <?php if (!empty($rubricID) && !empty($rubricTitle)): ?>
                                         <hr>
@@ -1388,7 +1377,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
 
                 <form id="unsubmitForm" action="" method="POST">
                     <div class="modal-footer border-top d-flex justify-content-center gap-2">
-                        <button type="submit" name="unsubmit" class="btn rounded-5 px-4 text-sbold text-14 me-1"
+                        <button type="submit" id="confirmUnsubmitBtn" name="unsubmit" class="btn rounded-5 px-4 text-sbold text-14 me-1"
                             style="background-color: var(--primaryColor); border: 1px solid var(--black);">
                             Unsubmit
                         </button>
@@ -1583,7 +1572,35 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                     alert.classList.remove("show");
                     alert.classList.add("fade");
                     setTimeout(() => alert.remove(), 500);
-                }, 4000);
+                }, 3000);
+            }
+
+            // --- Success toast for downloads ---
+            document.querySelectorAll('a[download]').forEach(downloadLink => {
+                downloadLink.addEventListener('click', function (e) {
+                    const fileName = this.getAttribute('download');
+                    showDownloadToast(`"${fileName}" downloaded successfully!`);
+                });
+            });
+
+            function showDownloadToast(message) {
+                const container = document.getElementById('toastContainer');
+                if (!container) return;
+
+                const alert = document.createElement('div');
+                alert.setAttribute('role', 'alert');
+                alert.className = "alert alert-success fade show mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2";
+                alert.innerHTML = `
+                    <i class="bi bi-check-circle-fill me-2 fs-6"></i>
+                    <span>${message}</span>`;
+
+                container.appendChild(alert);
+
+                setTimeout(() => {
+                    alert.classList.remove("show");
+                    alert.classList.add("fade");
+                    setTimeout(() => alert.remove(), 500);
+                }, 3000);
             }
 
             // --- Show Submitted Modal on initial submission ---
