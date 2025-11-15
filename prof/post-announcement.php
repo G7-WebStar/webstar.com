@@ -8,6 +8,81 @@ include('../shared/assets/database/connect.php');
 date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
 
+// --- Google Link Processor ---
+function processGoogleLink($link)
+{
+    $link = trim($link);
+
+    // Case 1: Google Drive folder
+    if (preg_match('/drive\.google\.com\/drive\/folders\/([a-zA-Z0-9_-]+)/', $link, $matches)) {
+        $folderId = $matches[1];
+        return "https://drive.google.com/embeddedfolderview?id={$folderId}#grid";
+    }
+
+    // Case 2: Google Drive file
+    if (preg_match('/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/', $link, $matches)) {
+        $fileId = $matches[1];
+        return "https://drive.google.com/file/d/{$fileId}/preview";
+    }
+
+    // Case 3: Google Docs, Sheets, Slides, etc.
+    if (preg_match('/(https:\/\/docs\.google\.com\/[a-z]+\/d\/[a-zA-Z0-9_-]+)/', $link, $matches)) {
+        $baseUrl = $matches[1];
+        if (str_contains($link, '/preview')) {
+            return preg_replace('/\?.*/', '', $link);
+        }
+        return "{$baseUrl}/preview";
+    }
+
+    // Case 4: Already preview link
+    if (str_contains($link, '/preview')) {
+        return preg_replace('/\?.*/', '', $link);
+    }
+
+    // Fallback
+    return preg_replace('/\?.*/', '', $link);
+}
+
+function fetchLinkTitle($link)
+{
+    $link = trim($link);
+    $title = '';
+
+    // Process Google links
+    $link = processGoogleLink($link);
+
+    // Ensure the link has a scheme
+    if (!preg_match('/^https?:\/\//', $link)) {
+        $link = 'http://' . $link;
+    }
+
+    // Set context for user-agent
+    $options = [
+        "http" => [
+            "header" => "User-Agent: Mozilla/5.0\r\n",
+            "timeout" => 5
+        ]
+    ];
+    $context = stream_context_create($options);
+
+    try {
+        $html = @file_get_contents($link, false, $context);
+        if ($html && preg_match("/<title>(.*?)<\/title>/is", $html, $matches)) {
+            $title = trim($matches[1]);
+        }
+    } catch (Exception $e) {
+        $title = '';
+    }
+
+    // Fallback to domain if title is empty
+    if (empty($title)) {
+        $parsedUrl = parse_url($link);
+        $title = isset($parsedUrl['host']) ? ucfirst(str_replace('www.', '', $parsedUrl['host'])) : 'Link';
+    }
+
+    return $title;
+}
+
 if (!class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
     require '../shared/assets/phpmailer/src/Exception.php';
     require '../shared/assets/phpmailer/src/PHPMailer.php';
@@ -97,22 +172,16 @@ if (isset($_POST['save_announcement'])) {
                 if ($link === '')
                     continue;
 
-                $fileTitle = $link;
-                $context = stream_context_create(["http" => ["header" => "User-Agent: Mozilla/5.0"]]);
-                $html = @file_get_contents($link, false, $context);
+                // Process Google links to preview/embed
+                $processedLink = processGoogleLink($link);
 
-                if ($html !== false) {
-                    if (preg_match('/<meta property="og:title" content="([^"]+)"/i', $html, $matches)) {
-                        $fileTitle = $matches[1];
-                    } elseif (preg_match("/<title>(.*?)<\/title>/i", $html, $matches)) {
-                        $fileTitle = $matches[1];
-                    }
-                }
+                // Fetch page title
+                $fileTitle = fetchLinkTitle($link);
 
                 $insertLink = "INSERT INTO files 
-                    (courseID, userID, announcementID, fileAttachment, fileTitle, fileLink) 
-                    VALUES 
-                    ('$selectedCourseID', '$userID', '$announcementID', '', '" . mysqli_real_escape_string($conn, $fileTitle) . "', '$link')";
+                (courseID, userID, announcementID, fileAttachment, fileTitle, fileLink) 
+                VALUES 
+                ('$selectedCourseID', '$userID', '$announcementID', '', '" . mysqli_real_escape_string($conn, $fileTitle) . "', '$processedLink')";
                 executeQuery($insertLink);
             }
         }
@@ -501,7 +570,7 @@ if (!empty($reusedData)) {
                                 </div>
 
                                 <!-- Form starts -->
-                                <form action="" method="POST" enctype="multipart/form-data">
+                                <form id="announcementForm" method="POST" enctype="multipart/form-data">
                                     <input type="hidden" name="mode"
                                         value="<?= isset($_GET['edit']) ? 'edit' : (isset($_GET['reuse']) ? 'reuse' : 'new') ?>">
                                     <input type="hidden" name="announcementID"
@@ -712,7 +781,7 @@ if (!empty($reusedData)) {
                                             <div style="line-height: 1.5; padding:10px 15px;">
                                                 <div class="text-sbold text-14"
                                                     style="display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;">
-                                                    <?php echo htmlspecialchars(substr($announcement['announcementContent'], 0, 100)); ?>
+                                                    <?php echo substr(strip_tags($announcement['announcementContent']), 0, 100); ?>
                                                 </div>
                                                 <div class="text-med text-muted text-12"
                                                     style="display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;">
@@ -784,7 +853,9 @@ if (!empty($reusedData)) {
         });
 
         // Sync Quill content to hidden input before form submit
-        document.querySelector('form').addEventListener('submit', function () {
+        const form = document.querySelector('#announcementForm');
+        form.addEventListener('submit', function () {
+            const hiddenInput = document.querySelector('#announcement');
             let html = quill.root.innerHTML;
             html = html.replace(/<p>/g, '').replace(/<\/p>/g, '<br>');
             html = html.replace(/<li>/g, '• ').replace(/<\/li>/g, '<br>');
