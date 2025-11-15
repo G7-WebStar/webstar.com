@@ -25,7 +25,7 @@ $count = mysqli_num_rows($result);
     <!-- Search bar -->
     <div class="row align-items-center justify-content-start flex-column flex-md-row">
         <div class="col-8 col-sm-6 col-md-12 col-lg-6 d-flex search-container mb-2 mb-lg-0 p-0 position-relative">
-            <input type="text" id="mysearchinput" placeholder="Search classmates"
+            <input type="text" id="mysearchinput" placeholder="Search students"
                 class="form-control ps-3 py-1 text-reg text-lg-12 text-14"
                 style="padding-right: 45px; padding-left: 27px;">
             <span class="material-symbols-outlined" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
