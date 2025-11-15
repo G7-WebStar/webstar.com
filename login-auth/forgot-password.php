@@ -44,9 +44,15 @@ if (isset($_POST['send'])) { // Send Code button
             $mail->Password = 'mtls vctd rhai cdem';
             $mail->SMTPSecure = 'tls';
             $mail->Port = 587;
-            $mail->AddEmbeddedImage('../shared/assets/img/webstar-logo-black.png', 'logoWebstar');
-
             $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
+            $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
+            if (file_exists($headerPath)) {
+                $mail->AddEmbeddedImage($headerPath, 'emailHeader');
+            }
+            $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
+            if (file_exists($footerPath)) {
+                $mail->AddEmbeddedImage($footerPath, 'emailFooter');
+            }
             $mail->addAddress($email);
             $mail->isHTML(true);
             $mail->Subject = "Reset Password";
@@ -55,9 +61,9 @@ if (isset($_POST['send'])) { // Send Code button
                         <tr>
                             <td align="center">
                                 <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-                                    <tr style="background-color: #FDDF94;">
-                                        <td align="center" style="padding: 20px;">
-                                            <img src="cid:logoWebstar" alt="Webstar Logo" style="height:80px;">
+                                    <tr>
+                                        <td align="center" style="padding: 0;">
+                                            <img src="cid:emailHeader" alt="Webstar Header" style="width:600px; height:auto; display:block;">
                                         </td>
                                     </tr>
                                     <tr>
@@ -92,9 +98,9 @@ if (isset($_POST['send'])) { // Send Code button
                                             </div>
                                         </td>
                                     </tr>
-                                    <tr style="background-color:#FDDF94;">
-                                        <td align="center" style="padding:15px; color:black; font-size:13px;">
-                                            © 2025 Webstar. All Rights Reserved.
+                                    <tr>
+                                        <td align="center" style="padding: 0;">
+                                            <img src="cid:emailFooter" alt="Webstar Footer" style="width:600px; height:auto; display:block; border:0; outline:none; text-decoration:none;" />
                                         </td>
                                     </tr>
                                 </table>
@@ -130,6 +136,7 @@ if (isset($_POST['send'])) { // Send Code button
     <link rel="stylesheet" href="../shared/assets/css/forgot-password.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
