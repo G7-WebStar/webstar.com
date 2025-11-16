@@ -254,12 +254,12 @@ if (isset($_POST['save_announcement'])) {
             try {
                 $mail = new PHPMailer(true);
                 $mail->isSMTP();
-                $mail->Host       = 'smtp.gmail.com';
-                $mail->SMTPAuth   = true;
-                $mail->Username   = 'learn.webstar@gmail.com';
-                $mail->Password   = 'mtls vctd rhai cdem';
+                $mail->Host = 'smtp.gmail.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = 'learn.webstar@gmail.com';
+                $mail->Password = 'mtls vctd rhai cdem';
                 $mail->SMTPSecure = 'tls';
-                $mail->Port       = 587;
+                $mail->Port = 587;
                 $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
                 $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
                 if (file_exists($headerPath)) {
@@ -335,6 +335,20 @@ if (isset($_POST['save_announcement'])) {
             }
         }
     }
+    if ($insertAnnouncement) {
+        $_SESSION['toast'] = [
+            'type' => 'alert-success',
+            'message' => 'Announcement posted successfully!'
+        ];
+    }
+    if ($updateAnnouncement) {
+        $_SESSION['toast'] = [
+            'type' => 'alert-success',
+            'message' => 'Announcement edited successfully!'
+        ];
+    }
+    header("Location: course-info.php?courseID=" . intval($_POST['courses'][0]));
+    exit();
 }
 
 //Fetch the Title of link
@@ -668,62 +682,58 @@ if (!empty($reusedData)) {
                                                 style="margin-bottom: <?php echo ($courses && $courses->num_rows > 0) ? ($courses->num_rows * 50) : 0; ?>px;">
                                                 <!-- Dynamic Border Bottom based on the number of courses hehe -->
                                                 <!-- Add to Course -->
-                                                <?php if (!isset($_GET['edit'])): ?>
-                                                    <div
-                                                        class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center flex-nowrap justify-content-center justify-content-md-start">
-                                                        <span class="me-2 text-med text-16 pe-3">Add to
-                                                            Course</span>
-                                                        <div class="dropdown">
-                                                            <button
-                                                                class="btn dropdown-toggle dropdown-shape text-med text-16 me-md-5"
-                                                                type="button" data-bs-toggle="dropdown"
-                                                                aria-expanded="false">
-                                                                <span class="me-2">Select Course</span>
-                                                            </button>
-                                                            <ul class="dropdown-menu p-2 mt-2"
-                                                                style="min-width: 200px; border: 1px solid var(--black);">
-                                                                <?php
-                                                                if ($courses && $courses->num_rows > 0) {
-                                                                    // If editing, get the assigned courses for this task
-                                                                    $assignedCourseIDs = [];
-                                                                    if (isset($_GET['edit'])) {
-                                                                        $editID = intval($_GET['edit']);
-                                                                        $assignedQuery = "SELECT courseID FROM announcements WHERE announcementID = '$editID'";
-                                                                        $assignedResult = executeQuery($assignedQuery);
-                                                                        if ($assignedResult && $assignedResult->num_rows > 0) {
-                                                                            while ($row = $assignedResult->fetch_assoc()) {
-                                                                                $assignedCourseIDs[] = $row['courseID'];
-                                                                            }
+                                                <div
+                                                    class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center flex-nowrap justify-content-center justify-content-md-start <?php echo isset($_GET['edit']) ? 'invisible' : ''; ?>">
+                                                    <span class="me-2 text-med text-16 pe-3">Add to Course</span>
+                                                    <div class="dropdown">
+                                                        <button
+                                                            class="btn dropdown-toggle dropdown-shape text-med text-16 me-md-5"
+                                                            type="button" data-bs-toggle="dropdown"
+                                                            aria-expanded="false">
+                                                            <span class="me-2">Select Course</span>
+                                                        </button>
+                                                        <ul class="dropdown-menu p-2 mt-2"
+                                                            style="min-width: 200px; border: 1px solid var(--black);">
+                                                            <?php
+                                                            if ($courses && $courses->num_rows > 0) {
+                                                                $assignedCourseIDs = [];
+                                                                if (isset($_GET['edit'])) {
+                                                                    $editID = intval($_GET['edit']);
+                                                                    $assignedQuery = "SELECT courseID FROM announcements WHERE announcementID = '$editID'";
+                                                                    $assignedResult = executeQuery($assignedQuery);
+                                                                    if ($assignedResult && $assignedResult->num_rows > 0) {
+                                                                        while ($row = $assignedResult->fetch_assoc()) {
+                                                                            $assignedCourseIDs[] = $row['courseID'];
                                                                         }
                                                                     }
+                                                                }
 
-                                                                    while ($course = $courses->fetch_assoc()) {
-                                                                        $checked = in_array($course['courseID'], $assignedCourseIDs) ? 'checked' : '';
-                                                                        ?>
-                                                                        <li>
-                                                                            <div class="form-check">
-                                                                                <input class="form-check-input course-checkbox"
-                                                                                    type="checkbox" name="courses[]"
-                                                                                    style="border: 1px solid var(--black);"
-                                                                                    value="<?= $course['courseID'] ?>"
-                                                                                    id="course<?= $course['courseID'] ?>"
-                                                                                    <?= $checked ?>>
-                                                                                <label class="form-check-label text-reg"
-                                                                                    for="course<?= $course['courseID'] ?>">
-                                                                                    <?= $course['courseCode'] ?>
-                                                                                </label>
-                                                                            </div>
-                                                                        </li>
-                                                                    <?php }
-                                                                } else { ?>
-                                                                    <li><span class="dropdown-item-text text-muted">No
-                                                                            courses found</span></li>
-                                                                <?php } ?>
-                                                            </ul>
-
-                                                        </div>
+                                                                while ($course = $courses->fetch_assoc()) {
+                                                                    $checked = in_array($course['courseID'], $assignedCourseIDs) ? 'checked' : '';
+                                                                    ?>
+                                                                    <li>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input course-checkbox"
+                                                                                type="checkbox" name="courses[]"
+                                                                                style="border: 1px solid var(--black);"
+                                                                                value="<?= $course['courseID'] ?>"
+                                                                                id="course<?= $course['courseID'] ?>"
+                                                                                <?= $checked ?>>
+                                                                            <label class="form-check-label text-reg"
+                                                                                for="course<?= $course['courseID'] ?>">
+                                                                                <?= $course['courseCode'] ?>
+                                                                            </label>
+                                                                        </div>
+                                                                    </li>
+                                                                    <?php
+                                                                }
+                                                            } else { ?>
+                                                                <li><span class="dropdown-item-text text-muted">No courses
+                                                                        found</span></li>
+                                                            <?php } ?>
+                                                        </ul>
                                                     </div>
-                                                <?php endif; ?>
+                                                </div>
 
                                                 <!-- Assign Button -->
                                                 <div class="col-12 col-md-auto mt-3 mt-md-0 text-center">
@@ -849,6 +859,7 @@ if (!empty($reusedData)) {
             let text = quill.getText().trim();
             let words = text.length > 0 ? text.split(/\s+/).length : 0;
 
+
             if (words > maxWords) {
                 let limited = text.split(/\s+/).slice(0, maxWords).join(" ");
                 quill.setText(limited + " ");
@@ -858,26 +869,38 @@ if (!empty($reusedData)) {
             counter.textContent = `${Math.min(words, maxWords)}/${maxWords}`;
         });
 
-        // Sync Quill content to hidden input before form submit
         const form = document.querySelector('#announcementForm');
-        form.addEventListener('submit', function () {
+        form.addEventListener('submit', function (e) {
             const hiddenInput = document.querySelector('#announcement');
+            const text = quill.getText().trim();
+
+            // Validate Quill editor
+            if (text.length === 0) {
+                e.preventDefault();
+                quill.root.focus();
+                hiddenInput.setCustomValidity('Please fill out this field.');
+                hiddenInput.reportValidity();
+                return false;
+            } else {
+                hiddenInput.setCustomValidity('');
+            }
+
+            // Validate at least one course selected (only in NEW mode)
+            let checkboxes = form.querySelectorAll(".course-checkbox");
+            let checked = Array.from(checkboxes).some(cb => cb.checked);
+            if (!checked && !window.location.search.includes("edit")) {
+                e.preventDefault();
+                alert("Please select at least one course before submitting.");
+                return false;
+            }
+
+            // Sync Quill content to hidden input
             let html = quill.root.innerHTML;
             html = html.replace(/<p>/g, '').replace(/<\/p>/g, '<br>');
             html = html.replace(/<li>/g, '• ').replace(/<\/li>/g, '<br>');
             html = html.replace(/<\/?(ul|ol)>/g, '');
             html = html.replace(/(<br>)+$/g, '');
-            document.querySelector('#announcement').value = html.trim();
-        });
-
-        // Ensure at least one course is selected
-        document.querySelector("form").addEventListener("submit", function (e) {
-            let checkboxes = document.querySelectorAll(".course-checkbox");
-            let checked = Array.from(checkboxes).some(cb => cb.checked);
-            if (!checked) {
-                e.preventDefault();
-                alert("Please select at least one course before submitting.");
-            }
+            hiddenInput.value = html.trim();
         });
 
         // File & Link preview logic with total limit of 10
@@ -918,24 +941,25 @@ if (!empty($reusedData)) {
                         let displayTitle = "Loading...";
 
                         const previewHTML = `
-                    <div class="col-12 mt-2" data-id="${uniqueID}">
-                        <div class="materials-card d-flex align-items-stretch p-2 w-100">
+                    <div class="col-12 my-1" data-id="${uniqueID}">
+                        <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
                             <div class="d-flex w-100 align-items-center justify-content-between">
                                 <div class="d-flex align-items-center flex-grow-1">
-                                    <div class="mx-4">
+                                    <div class="mx-3 d-flex align-items-center">
                                         <img src="${faviconURL}" alt="${domain} Icon" 
                                             onerror="this.onerror=null;this.src='../shared/assets/img/web.png';" 
                                             style="width: 30px; height: 30px;">
                                     </div>
                                     <div>
-                                        <div id="title-${uniqueID}" class="text-sbold text-16 py-1">${displayTitle}</div>
-                                        <div class="text-reg text-12 text-break">
+                                        <div id="title-${uniqueID}" class="text-sbold text-16" style="line-height: 1.5;">${displayTitle}</div>
+                                        <div class="text-reg text-12 text-break" style="line-height: 1.5;">
                                             <a href="${linkValue}" target="_blank">${linkValue}</a>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="mx-4 delete-file" style="cursor:pointer;">
-                                    <img src="../shared/assets/img/trash.png" alt="Delete Icon">
+                                <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">
+                                    <span
+                                    class="material-symbols-outlined">close</span>
                                 </div>
                             </div>
                         </div>
@@ -979,7 +1003,7 @@ if (!empty($reusedData)) {
                 fileInput.files = dt.files;
                 allFiles = Array.from(fileInput.files); // update allFiles list
 
-                // 🔹 Remove only file previews, keep links
+                // Remove only file previews, keep links
                 container.querySelectorAll('.file-preview').forEach(el => el.remove());
 
                 // Rebuild file previews
@@ -987,20 +1011,23 @@ if (!empty($reusedData)) {
                     const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
                     const ext = file.name.split('.').pop().toUpperCase();
                     const fileHTML = `
-                <div class="col-12 mt-2 file-preview">
-                    <div class="materials-card d-flex align-items-stretch p-2 w-100">
+                <div class="col-12 my-1 file-preview">
+                    <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
                         <div class="d-flex w-100 align-items-center justify-content-between">
                             <div class="d-flex align-items-center flex-grow-1">
-                                <div class="mx-4">
-                                    <i class="bi bi-file-earmark-fill" style="font-size: 22px;"></i>
+                                <div class="mx-3 d-flex align-items-center">
+                                    <span class="material-symbols-rounded">
+                                        description
+                                    </span>
                                 </div>
                                 <div>
-                                    <div class="text-sbold text-16 py-1">${file.name}</div>
-                                    <div class="text-reg text-12">${ext} · ${fileSizeMB} MB</div>
+                                    <div class="text-sbold text-16" style="line-height: 1.5;">${file.name}</div>
+                                    <div class="text-reg text-12 " style="line-height: 1.5;">${ext} · ${fileSizeMB} MB</div>
                                 </div>
                             </div>
-                            <div class="mx-4 delete-file" style="cursor:pointer;" data-index="${index}">
-                                <img src="../shared/assets/img/trash.png" alt="Delete Icon">
+                            <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;" data-index="${index}">
+                                <span
+                                    class="material-symbols-outlined">close</span>
                             </div>
                         </div>
                     </div>
@@ -1082,7 +1109,7 @@ if (!empty($reusedData)) {
                                 ?>
 
                                 const html = `
-                    <div class="col-12 my-1 file-preview">
+                   <div class="col-12 my-1 file-preview">
                         <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
                             <div class="d-flex w-100 align-items-center justify-content-between">
                                 <div class="d-flex align-items-center flex-grow-1">

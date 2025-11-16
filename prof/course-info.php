@@ -1,10 +1,28 @@
 <?php
 $activePage = 'course';
-$activeTab = $_POST['activeTab'] ?? 'announcements';
 
 include('../shared/assets/database/connect.php');
 date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
+
+$activeTab = 'announcements'; // default
+
+if (isset($_POST['activeTab'])) {
+    $activeTab = $_POST['activeTab'];
+} elseif (isset($_SESSION['activeTab'])) {
+    $activeTab = $_SESSION['activeTab'];
+    unset($_SESSION['activeTab']); // clear after using
+}
+
+$toastMessage = '';
+$toastType = '';
+
+if (isset($_SESSION['toast'])) {
+    $toastMessage = $_SESSION['toast']['message'];
+    $toastType = $_SESSION['toast']['type'];
+    unset($_SESSION['toast']);
+}
+
 
 if (isset($_POST['deleteCourse'])) {
     $courseID = $_POST['courseID'];
@@ -83,9 +101,6 @@ if (isset($_POST['deleteCourse'])) {
     }
     executeQuery("DELETE FROM lessons WHERE courseID = '$courseID'");
 
-    // --- Delete student badges ---
-    executeQuery("DELETE FROM studentbadges WHERE courseID = '$courseID'");
-
     // --- Delete enrollments and children (leaderboard, inbox, report, files) ---
     $selectEnrollments = executeQuery("SELECT enrollmentID FROM enrollments WHERE courseID = '$courseID'");
     while ($enrollment = mysqli_fetch_assoc($selectEnrollments)) {
@@ -106,14 +121,14 @@ if (isset($_POST['deleteCourse'])) {
     $deleteFromCourseTableQuery = executeQuery("DELETE FROM courses WHERE courseID = '$courseID'");
 
     // Redirect after deletion
-    if ($deleteFromCourseTableQuery) { 
-                $_SESSION['toast'] = [
-                    'type' => 'alert-success',
-                    'message' => 'Course deleted successfully!'
-                ];
-                header("Location: course.php");
-                exit();
-            }
+    if ($deleteFromCourseTableQuery) {
+        $_SESSION['toast'] = [
+            'type' => 'alert-success',
+            'message' => 'Course deleted successfully!'
+        ];
+        header("Location: course.php");
+        exit();
+    }
 }
 
 if (isset($_GET['courseID'])) {
@@ -365,6 +380,11 @@ $user = mysqli_fetch_assoc($result);
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
 
+                    <div id="toastContainer"
+                        class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+                        style="z-index: 1100;">
+                    </div>
+
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
                     <div class="container-fluid py-3 overflow-y-auto row-padding-top" style="white-space: nowrap; ">
@@ -602,14 +622,14 @@ $user = mysqli_fetch_assoc($result);
 
                                                         <!-- Three-dot menu -->
                                                         <div class="dropdown">
-                                                            <button class="btn btn-sm border-0 bg-transparent" type="button"
+                                                            <button class="btn p-0 btn-sm border-0 bg-transparent" type="button"
                                                                 data-bs-toggle="dropdown" aria-expanded="false">
                                                                 <i class="fa-solid fa-ellipsis-vertical"></i>
                                                             </button>
                                                             <ul class="dropdown-menu border shadow-none text-reg ">
                                                                 <li>
                                                                     <a class="dropdown-item text-14"
-                                                                        href="create-course.php?edit=<?php echo $courses['courseID']; ?>" >Edit</a>
+                                                                        href="create-course.php?edit=<?php echo $courses['courseID']; ?>">Edit</a>
                                                                 </li>
                                                                 <li><a class="dropdown-item text-danger" data-bs-toggle="modal"
                                                                         data-bs-target="#deleteModal">Delete</a></li>
@@ -731,43 +751,43 @@ $user = mysqli_fetch_assoc($result);
                                                         style="display: inline-flex; white-space: nowrap; justify-content: space-between;">
                                                         <li class="nav-item">
                                                             <a class="nav-link text-14 <?php echo ($activeTab == 'announcements') ? 'active' : ''; ?>"
-                                                                data-bs-toggle="tab"
+                                                                data-bs-toggle="tab" data-bs-target="#announcements" 
                                                                 href="#announcements">Announcements</a>
                                                         </li>
 
                                                         <li class="nav-item">
                                                             <a class="nav-link text-14 <?php echo ($activeTab == 'lessons') ? 'active' : ''; ?>"
-                                                                data-bs-toggle="tab" href="#lessons">Lessons</a>
+                                                                data-bs-toggle="tab" data-bs-target="#lessons" href="#lessons">Lessons</a>
                                                         </li>
 
                                                         <li class="nav-item">
                                                             <a class="nav-link text-14 <?php echo ($activeTab == 'todo') ? 'active' : ''; ?>"
-                                                                data-bs-toggle="tab" href="#todo">To-do</a>
+                                                                data-bs-toggle="tab" data-bs-target="#todo" href="#todo">To-do</a>
                                                         </li>
 
                                                         <li class="nav-item">
                                                             <a class="nav-link text-14 <?php echo ($activeTab == 'attachments') ? 'active' : ''; ?>"
-                                                                data-bs-toggle="tab" href="#attachments">Files</a>
+                                                                data-bs-toggle="tab" data-bs-target="#attachments" href="#attachments">Files</a>
                                                         </li>
 
                                                         <li class="nav-item">
                                                             <a class="nav-link text-14 <?php echo ($activeTab == 'link') ? 'active' : ''; ?>"
-                                                                data-bs-toggle="tab" href="#link">Links</a>
+                                                                data-bs-toggle="tab" data-bs-target="#link" href="#link">Links</a>
                                                         </li>
 
                                                         <li class="nav-item">
                                                             <a class="nav-link text-14 <?php echo ($activeTab == 'records') ? 'active' : ''; ?>"
-                                                                data-bs-toggle="tab" href="#records">Records</a>
+                                                                data-bs-toggle="tab" data-bs-target="#records" href="#records">Records</a>
                                                         </li>
 
                                                         <li class="nav-item nav-leaderboard">
                                                             <a class="nav-link text-14 <?php echo ($activeTab == 'leaderboard') ? 'active' : ''; ?>"
-                                                                data-bs-toggle="tab" href="#leaderboard">Leaderboard</a>
+                                                                data-bs-toggle="tab" data-bs-target="#leaderboard" href="#leaderboard">Leaderboard</a>
                                                         </li>
 
                                                         <li class="nav-item nav-student">
                                                             <a class="nav-link text-14 <?php echo ($activeTab == 'student') ? 'active' : ''; ?>"
-                                                                data-bs-toggle="tab" href="#student">Students</a>
+                                                                data-bs-toggle="tab" data-bs-target="#student" href="#student">Students</a>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -988,6 +1008,26 @@ $user = mysqli_fetch_assoc($result);
         });
     </script>
 
+    <!-- Toast Handling -->
+    <?php if (!empty($toastMessage)): ?>
+        <script>
+            window.addEventListener('DOMContentLoaded', () => {
+                const container = document.getElementById("toastContainer");
+                if (!container) return;
+
+                const alert = document.createElement("div");
+                alert.className = `alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 <?= $toastType ?>`;
+                alert.role = "alert";
+                alert.innerHTML = `
+            <i class="bi <?= ($toastType === 'alert-success') ? 'bi-check-circle-fill' : 'bi-x-circle-fill'; ?> fs-6"></i>
+            <span><?= addslashes($toastMessage) ?></span>
+        `;
+                container.appendChild(alert);
+
+                setTimeout(() => alert.remove(), 3000);
+            });
+        </script>
+    <?php endif; ?>
 
 
 </body>
