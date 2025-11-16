@@ -358,12 +358,15 @@ $rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
 
                                                 <div class="d-flex justify-content-center pt-3">
                                                     <?php if ($submissionID != null) { ?><a class="text-decoration-none" href="<?php echo ($rubricID == null) ? 'grading-sheet.php?submissionID=' . $submissionID : 'grading-sheet-rubrics.php?submissionID=' . $submissionID; ?>"><?php } ?>
-                                                        <button class="btn btn-action" <?php echo ($submissionID == null) ? 'disabled' : '' ?>>
-                                                            <img src="../shared/assets/img/assess/assess.png"
-                                                                alt="Assess Icon"
-                                                                style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
-                                                            Sheet
-                                                        </button>
+                                                        <?php if ($submissionID == null) { ?><div title="No submissions in this assessment yet"><?php } ?>
+                                                            <button class="btn btn-action" <?php echo ($submissionID == null) ? 'disabled' : '' ?>>
+                                                                <img src="../shared/assets/img/assess/assess.png"
+                                                                    alt="Assess Icon"
+                                                                    style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
+                                                                Sheet
+                                                            </button>
+                                                            <?php if ($submissionID == null) { ?>
+                                                            </div><?php } ?>
                                                         <?php if ($submissionID != null) { ?></a><?php } ?>
                                                 </div>
                                             </div>
