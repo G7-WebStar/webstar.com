@@ -4,6 +4,36 @@ include('../shared/assets/database/connect.php');
 include("../shared/assets/processes/admin-session-process.php");
 
 ?>
+<?php
+// GET TOTAL USERS
+$totalUsersQuery = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users");
+$totalUsers = mysqli_fetch_assoc($totalUsersQuery)['total'];
+
+// GET TOTAL PROFESSORS
+$totalProfQuery = mysqli_query($conn, "SELECT COUNT(*) AS totalProf FROM users WHERE role = 'professor'");
+$totalProfessors = mysqli_fetch_assoc($totalProfQuery)['totalProf'];
+
+// GET TOTAL STUDENTS
+$totalStudQuery = mysqli_query($conn, "SELECT COUNT(*) AS totalStud FROM users WHERE role = 'student'");
+$totalStudents = mysqli_fetch_assoc($totalStudQuery)['totalStud'];
+
+// TOTAL COURSES (ALL-TIME)
+$totalCoursesQuery = mysqli_query($conn, "SELECT COUNT(*) AS total FROM courses");
+$totalCourses = mysqli_fetch_assoc($totalCoursesQuery)['total'];
+
+// ACTIVE COURSES
+$activeCoursesQuery = mysqli_query($conn, "SELECT COUNT(*) AS active FROM courses WHERE isActive = 1");
+$activeCourses = mysqli_fetch_assoc($activeCoursesQuery)['active'];
+
+// TOTAL FEEDBACK
+$totalFeedbackQuery = mysqli_query($conn, "SELECT COUNT(*) AS totalFeedback FROM feedback");
+$totalFeedback = mysqli_fetch_assoc($totalFeedbackQuery)['totalFeedback'];
+
+// IF YOU WANT TO COUNT "UNREAD"
+// (Only works if you add a `status` column later)
+$unreadFeedback = 0; // default for now
+?>
+
 
 <!doctype html>
 <html lang="en">
@@ -78,10 +108,15 @@ include("../shared/assets/processes/admin-session-process.php");
                                         <span class="material-symbols-outlined me-2" style="font-size: 30px;">
                                             supervisor_account
                                         </span>
-                                        <div class="stats-count text-22 text-bold">55</div>
+                                        <div class="stats-count text-22 text-bold"><?php echo $totalUsers; ?></div>
+
                                     </div>
                                     <div class="stats-label text-18 text-sbold">total users</div>
-                                    <div class="text-reg text-16">50 instructors; 5 students</div>
+                                    <div class="text-reg text-16">
+                                        <?php echo $totalProfessors; ?> instructors;
+                                        <?php echo $totalStudents; ?> students
+                                    </div>
+
                                 </div>
 
                                 <div class="col-12 col-md-3 mb-3">
@@ -89,10 +124,16 @@ include("../shared/assets/processes/admin-session-process.php");
                                         <span class="material-symbols-outlined me-2" style="font-size: 30px;">
                                             folder
                                         </span>
-                                        <div class="stats-count text-22 text-bold">2</div>
+                                        <div class="stats-count text-22 text-bold">
+                                            <?php echo $activeCourses; ?>
+                                        </div>
+
                                     </div>
                                     <div class="stats-label text-18 text-sbold">active courses</div>
-                                    <div class="text-reg text-16">55 courses created all-time</div>
+                                    <div class="text-reg text-16">
+                                        <?php echo $totalCourses; ?> courses created all-time
+                                    </div>
+
                                 </div>
 
                                 <div class="col-12 col-md-3 mb-3">
@@ -100,10 +141,16 @@ include("../shared/assets/processes/admin-session-process.php");
                                         <span class="material-symbols-outlined me-2" style="font-size: 30px;">
                                             feedback
                                         </span>
-                                        <div class="stats-count text-22 text-bold">55</div>
+                                        <div class="stats-count text-22 text-bold">
+                                            <?php echo $totalFeedback; ?>
+                                        </div>
+
                                     </div>
                                     <div class="stats-label text-18 text-sbold">feedbacks</div>
-                                    <div class="text-reg text-16">20 unread feedbacks</div>
+                                    <div class="text-reg text-16">
+                                        <?php echo $unreadFeedback; ?> unread feedbacks
+                                    </div>
+
                                 </div>
 
                                 <div class="col-12 col-md-3 mb-3">
