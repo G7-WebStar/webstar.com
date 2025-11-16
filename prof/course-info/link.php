@@ -67,11 +67,13 @@ mysqli_data_seek($fileResult, 0);
                                             public
                                         </span>
                                     </div>
-                                    <div>
-                                        <div class="text-sbold text-16 py-1" style="line-height: 1;">
+                                    <div class="file-info">
+                                        <div class="text-sbold text-16 text-truncate"
+                                            title="<?php echo htmlspecialchars($fileTitle); ?>">
                                             <?php echo htmlspecialchars($fileTitle); ?>
                                         </div>
-                                        <div class="text-reg text-12" style="line-height: 1;">
+                                        <div class="text-reg text-12 text-truncate"
+                                            title="<?php echo htmlspecialchars($fileLink); ?>">
                                             <?php echo htmlspecialchars($fileLink); ?>
                                         </div>
                                     </div>
