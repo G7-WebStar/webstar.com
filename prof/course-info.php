@@ -167,16 +167,28 @@ if (isset($_GET['courseID'])) {
 
     // Status filter
     $todoWhereStatus = "";
+    $deadlineCondition = "";
+    
     if ($statusFilter === 'Pending') {
         $todoWhereStatus = "AND (todo.status IS NULL OR todo.status = 'Pending')";
+        $deadlineCondition = "AND NOW() < assessments.deadline";
     } elseif ($statusFilter === 'Missing') {
-        $todoWhereStatus = "AND todo.status = 'Missing'";
+        // Show assessments with past deadlines that are missing (or have no todo record yet)
+        $todoWhereStatus = "AND (todo.status = 'Missing' OR (todo.status IS NULL AND NOW() >= assessments.deadline))";
+        $deadlineCondition = "AND NOW() >= assessments.deadline";
     } elseif ($statusFilter === 'Done') {
         $todoWhereStatus = "AND todo.status IN ('Submitted', 'Returned', 'Graded')";
+        $deadlineCondition = ""; // Show done items regardless of deadline
+    } else {
+        // Default: show pending items with future deadlines
+        $todoWhereStatus = "AND (todo.status IS NULL OR todo.status = 'Pending')";
+        $deadlineCondition = "AND NOW() < assessments.deadline";
     }
 
     if ($sortTodo === 'Missing') {
-        $todoWhereStatus = "AND todo.status = 'Missing'";
+        // Show assessments with past deadlines that are missing (or have no todo record yet)
+        $todoWhereStatus = "AND (todo.status = 'Missing' OR (todo.status IS NULL AND NOW() >= assessments.deadline))";
+        $deadlineCondition = "AND NOW() >= assessments.deadline";
     }
 
     $selectAssessmentQuery = "  SELECT
@@ -198,7 +210,7 @@ if (isset($_GET['courseID'])) {
         ON todo.assessmentID = assessments.assessmentID
         AND todo.userID = '$userID'
     WHERE courses.courseID = '$courseID'
-      AND NOW() < assessments.deadline
+      $deadlineCondition
       $todoWhereStatus
     ORDER BY $todoOrderBy;
 ";

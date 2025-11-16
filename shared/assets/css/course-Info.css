@@ -189,15 +189,14 @@ a.btn:hover {
     background-color: var(--dirtyWhite);
     color: var(--black);
     position: relative;
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+    box-shadow: 1px 0 0 0 var(--black);
 }
 
+/* Override global-styles.css .date::after to prevent double border */
 .date::after {
-    content: "";
-    border: 1px solid var(--black);
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
+    display: none;
 }
 
 /* Checkbox */
