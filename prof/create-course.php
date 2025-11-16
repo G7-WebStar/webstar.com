@@ -1,80 +1,157 @@
-<?php $activePage = 'create-course'; ?>
 <?php
+$activePage = 'create-course';
 include('../shared/assets/database/connect.php');
 date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
 
+$mode = '';
+$courseID = 0;
+
+if (isset($_GET['edit'])) {
+    $mode = 'edit';
+    $courseID = intval($_GET['edit']);
+} else {
+    $mode = 'new';
+}
+
+$courseData = null;
+
+if ($mode === 'edit') {
+    $query = "SELECT * FROM courses WHERE courseID = $courseID AND userID = $userID LIMIT 1";
+    $result = mysqli_query($conn, $query);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        $courseData = mysqli_fetch_assoc($result);
+    } else {
+        header("Location: create-course.php");
+        exit();
+    }
+}
+
+$scheduleData = [];
+if ($mode === 'edit') {
+    $schedQuery = "SELECT * FROM courseschedule WHERE courseID = $courseID ORDER BY day";
+    $schedResult = mysqli_query($conn, $schedQuery);
+    if ($schedResult && mysqli_num_rows($schedResult) > 0) {
+        while ($row = mysqli_fetch_assoc($schedResult)) {
+            $scheduleData[] = $row;
+        }
+    }
+}
+
 if (isset($_POST['createCourse'])) {
     $courseTitle = $_POST['courseTitle'];
-    $courseCode = strtoupper($_POST['courseCode']); // Convert to uppercase
+    $courseCode = strtoupper($_POST['courseCode']);
     $section = strtoupper($_POST['section']);
     $userID = $_SESSION['userID'];
 
-    // Handle image
-    $courseImage = '';
+    $courseImage = $_FILES['fileUpload']['error'] === 0 ? $_FILES['fileUpload']['name'] : 'default.png';
     if (isset($_FILES['fileUpload']) && $_FILES['fileUpload']['error'] === 0) {
         $courseImage = $_FILES['fileUpload']['name'];
         $tmpFile = $_FILES['fileUpload']['tmp_name'];
         $folder = "../shared/assets/img/course-images/";
         move_uploaded_file($tmpFile, $folder . $courseImage);
+    } elseif ($mode === 'edit') {
+        $courseImage = $courseData['courseImage'];
     }
 
-    // Generate unique 6-character access code
-    function generateAccessCode($length = 6)
-    {
-        $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $charactersLength = strlen($characters);
-        $randomCode = '';
-        for ($i = 0; $i < $length; $i++) {
-            $randomCode .= $characters[rand(0, $charactersLength - 1)];
-        }
-        return $randomCode;
-    }
+    if ($mode === 'edit') {
+        $updateQuery = "
+            UPDATE courses 
+            SET courseTitle = '$courseTitle',
+                courseCode = '$courseCode',
+                section = '$section',
+                courseImage = '$courseImage'
+            WHERE courseID = $courseID
+        ";
+        $result = executeQuery($updateQuery);
 
-    // Generate a random 6 alphanumeric code
-    do {
-        $accessCode = generateAccessCode(6); 
-        $checkCodeQuery = "SELECT * FROM courses WHERE code = '$accessCode'";
-        $codeExists = executeQuery($checkCodeQuery);
-    } while (mysqli_num_rows($codeExists) > 0);
+        if ($result) {
+            $deleteSchedule = "DELETE FROM courseschedule WHERE courseID = $courseID";
+            executeQuery($deleteSchedule);
 
+            $days = $_POST['selectedDay'] ?? [];
+            $startTimes = $_POST['startTime'] ?? [];
+            $endTimes = $_POST['endTime'] ?? [];
 
-    // Insert Query
-    $insertCourse = "
-        INSERT INTO courses (userID, courseTitle, courseCode, section, courseImage, code)
-        VALUES ('$userID', '$courseTitle', '$courseCode', '$section', '$courseImage', '$accessCode')
-    ";
-    $courseResult = executeQuery($insertCourse);
-
-    if ($courseResult) {
-        $courseID = mysqli_insert_id($conn);
-
-        // Insert schedule
-        $days = $_POST['selectedDay'] ?? [];
-        $startTimes = $_POST['startTime'] ?? [];
-        $endTimes = $_POST['endTime'] ?? [];
-
-        for ($i = 0; $i < count($days); $i++) {
-            $day = mysqli_real_escape_string($conn, $days[$i]);
-            $start = mysqli_real_escape_string($conn, $startTimes[$i]);
-            $end = mysqli_real_escape_string($conn, $endTimes[$i]);
-
-            if (!empty($day) && !empty($start) && !empty($end)) {
-                $insertSchedule = "
-                    INSERT INTO courseschedule (courseID, day, startTime, endTime, createdAt)
-                    VALUES ('$courseID', '$day', '$start', '$end', NOW())
-                ";
-                executeQuery($insertSchedule);
+            for ($i = 0; $i < count($days); $i++) {
+                $day = mysqli_real_escape_string($conn, $days[$i]);
+                $start = mysqli_real_escape_string($conn, $startTimes[$i]);
+                $end = mysqli_real_escape_string($conn, $endTimes[$i]);
+                if (!empty($day) && !empty($start) && !empty($end)) {
+                    $insertSchedule = "
+                        INSERT INTO courseschedule (courseID, day, startTime, endTime, createdAt)
+                        VALUES ('$courseID', '$day', '$start', '$end', NOW())
+                    ";
+                    executeQuery($insertSchedule);
+                }
             }
+            if ($result) { 
+                $_SESSION['toast'] = [
+                    'type' => 'alert-success',
+                    'message' => 'Course edited successfully!'
+                ];
+                header("Location: course.php");
+                exit();
+            }
+
+        } else {
+            echo "<script>alert('Error updating course.');</script>";
+        }
+    } else {
+        function generateAccessCode($length = 6)
+        {
+            $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $randomCode = '';
+            for ($i = 0; $i < $length; $i++) {
+                $randomCode .= $characters[rand(0, strlen($characters) - 1)];
+            }
+            return $randomCode;
         }
 
-        header("Location: courses.php");
-        exit();
-    } else {
-        echo "<script>alert('Error creating course. Please try again.');</script>";
+        do {
+            $accessCode = generateAccessCode(6);
+            $checkCodeQuery = "SELECT * FROM courses WHERE code = '$accessCode'";
+            $codeExists = executeQuery($checkCodeQuery);
+        } while (mysqli_num_rows($codeExists) > 0);
+
+        $insertCourse = "
+            INSERT INTO courses (userID, courseTitle, courseCode, section, courseImage, code)
+            VALUES ('$userID', '$courseTitle', '$courseCode', '$section', '$courseImage', '$accessCode')
+        ";
+        $courseResult = executeQuery($insertCourse);
+
+        if ($courseResult) {
+            $courseID = mysqli_insert_id($conn);
+            $days = $_POST['selectedDay'] ?? [];
+            $startTimes = $_POST['startTime'] ?? [];
+            $endTimes = $_POST['endTime'] ?? [];
+
+            for ($i = 0; $i < count($days); $i++) {
+                $day = mysqli_real_escape_string($conn, $days[$i]);
+                $start = mysqli_real_escape_string($conn, $startTimes[$i]);
+                $end = mysqli_real_escape_string($conn, $endTimes[$i]);
+                if (!empty($day) && !empty($start) && !empty($end)) {
+                    $insertSchedule = "
+                        INSERT INTO courseschedule (courseID, day, startTime, endTime, createdAt)
+                        VALUES ('$courseID', '$day', '$start', '$end', NOW())
+                    ";
+                    executeQuery($insertSchedule);
+                }
+            }
+            if ($courseResult) { 
+                $_SESSION['toast'] = [
+                    'type' => 'alert-success',
+                    'message' => 'Course created successfully!'
+                ];
+                header("Location: course.php");
+                exit();
+            }
+        } else {
+            echo "<script>alert('Error creating course.');</script>";
+        }
     }
 }
-
 ?>
 <!doctype html>
 <html lang="en">
@@ -82,7 +159,9 @@ if (isset($_POST['createCourse'])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | Create Course</title>
+    <title><?php
+    echo isset($_GET['reuse']) ? 'Repost Announcement' : (isset($_GET['edit']) ? 'Edit Course' : 'Create Course');
+    ?> ✦ Webstar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="../shared/assets/css/global-styles.css">
@@ -334,7 +413,13 @@ if (isset($_POST['createCourse'])) {
 
                                             <!-- Page Title -->
                                             <div class="col text-center text-md-start">
-                                                <span class="text-sbold text-20">Create Course</span>
+                                                <span class="text-sbold text-20"><?php
+                                                if (isset($_GET['edit'])) {
+                                                    echo 'Edit Course';
+                                                } else {
+                                                    echo 'Create Course';
+                                                }
+                                                ?></span>
                                             </div>
                                         </div>
                                     </div>
@@ -350,17 +435,17 @@ if (isset($_POST['createCourse'])) {
                                             <input type="text"
                                                 class="form-control textbox mb-2 px-3 py-2 text-reg text-16"
                                                 id="taskInfo" name="courseTitle" placeholder="Course Title *"
-                                                value="<?php echo isset($reusedData) ? htmlspecialchars($reusedData['assessmentTitle']) : ''; ?>"
+                                                value="<?php echo isset($courseData) ? htmlspecialchars($courseData['courseTitle']) : ''; ?>"
                                                 required>
                                             <input type="text"
                                                 class="form-control textbox mb-2 px-3 py-2 text-reg text-16"
                                                 id="taskInfo" name="courseCode" placeholder="Course Code *"
-                                                value="<?php echo isset($reusedData) ? htmlspecialchars($reusedData['assessmentTitle']) : ''; ?>"
+                                                value="<?php echo isset($courseData) ? htmlspecialchars($courseData['courseCode']) : ''; ?>"
                                                 required>
                                             <input type="text"
                                                 class="form-control textbox mb-2 px-3 py-2 text-reg text-16"
                                                 id="taskInfo" name="section" placeholder="Section *"
-                                                value="<?php echo isset($reusedData) ? htmlspecialchars($reusedData['assessmentTitle']) : ''; ?>"
+                                                value="<?php echo isset($courseData) ? htmlspecialchars($courseData['section']) : ''; ?>"
                                                 required>
                                         </div>
                                         <!-- Course Image -->
@@ -369,7 +454,9 @@ if (isset($_POST['createCourse'])) {
                                                 <div style="margin-bottom:.5rem">Course Image</div>
                                                 <div class="course-image-upload">
                                                     <div class="image-preview-wrapper rounded-4 mb-3">
-                                                        <img id="profilePreview" />
+                                                        <img id="profilePreview"
+                                                            src="../shared/assets/img/course-images/<?php echo isset($courseData) && $courseData['courseImage'] ? $courseData['courseImage'] : 'default.png'; ?>" />
+
                                                     </div>
                                                     <input type="file" id="fileInput" name="fileUpload"
                                                         class="form-control" accept=".png, .jpg, .jpeg"
@@ -412,49 +499,68 @@ if (isset($_POST['createCourse'])) {
                                         </div>
                                         <!-- Class Schedule Input -->
                                         <div id="schedule-wrapper">
-                                            <div class="row text-16 text-reg schedule-row">
-                                                <div class="col-12 col-md-3 class-sched-col">
-                                                    <label for="dropdown-btn"
-                                                        class="form-label text-med sched-mobile">Class Schedule
-                                                        *</label>
-                                                    <div class="custom-dropdown day-select mb-3">
-                                                        <div class="dropdown-btn" id="dayDropdownBtn"
-                                                            data-value="Monday">Monday</div>
-                                                        <ul class="dropdown-list py-1" id="dayDropdownList">
-                                                            <li data-value="Monday">Monday</li>
-                                                            <li data-value="Tuesday">Tuesday</li>
-                                                            <li data-value="Wednesday">Wednesday</li>
-                                                            <li data-value="Thursday">Thursday</li>
-                                                            <li data-value="Friday">Friday</li>
-                                                            <li data-value="Saturday">Saturday</li>
-                                                            <li data-value="Sunday">Sunday</li>
-                                                        </ul>
+                                            <?php
+                                            if (!empty($scheduleData)) {
+                                                foreach ($scheduleData as $sched) {
+                                                    $day = htmlspecialchars($sched['day']);
+                                                    $start = htmlspecialchars($sched['startTime']);
+                                                    $end = htmlspecialchars($sched['endTime']);
+                                                    echo '
+                                                    <div class="row text-16 text-reg schedule-row">
+                                                        <div class="col-12 col-md-3 class-sched-col">
+                                                            <div class="custom-dropdown day-select mb-3">
+                                                                <div class="dropdown-btn">' . $day . '</div>
+                                                                <ul class="dropdown-list py-1">
+                                                                    <li data-value="Monday">Monday</li>
+                                                                    <li data-value="Tuesday">Tuesday</li>
+                                                                    <li data-value="Wednesday">Wednesday</li>
+                                                                    <li data-value="Thursday">Thursday</li>
+                                                                    <li data-value="Friday">Friday</li>
+                                                                    <li data-value="Saturday">Saturday</li>
+                                                                    <li data-value="Sunday">Sunday</li>
+                                                                </ul>
+                                                                <input type="hidden" name="selectedDay[]" value="' . $day . '">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-12 col-md-4 start-time-col">
+                                                            <input type="time" class="form-control start-time" name="startTime[]" value="' . $start . '" required>
+                                                        </div>
+                                                        <div class="col-10 col-md-4 end-time-col">
+                                                            <input type="time" class="form-control end-time" name="endTime[]" value="' . $end . '" required>
+                                                        </div>
+                                                    </div>
+                                                    ';
+                                                }
+                                            } else {
+                                                echo '
+                                                <div class="row text-16 text-reg schedule-row">
+                                                    <div class="col-12 col-md-3 class-sched-col">
+                                                        <div class="custom-dropdown day-select mb-3">
+                                                            <div class="dropdown-btn">Monday</div>
+                                                            <ul class="dropdown-list py-1">
+                                                                <li data-value="Monday">Monday</li>
+                                                                <li data-value="Tuesday">Tuesday</li>
+                                                                <li data-value="Wednesday">Wednesday</li>
+                                                                <li data-value="Thursday">Thursday</li>
+                                                                <li data-value="Friday">Friday</li>
+                                                                <li data-value="Saturday">Saturday</li>
+                                                                <li data-value="Sunday">Sunday</li>
+                                                            </ul>
+                                                            <input type="hidden" name="selectedDay[]" value="Monday">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-md-4 start-time-col">
+                                                        <input type="time" class="form-control start-time" name="startTime[]" required>
+                                                    </div>
+                                                    <div class="col-10 col-md-4 end-time-col">
+                                                        <input type="time" class="form-control end-time" name="endTime[]" required>
                                                     </div>
                                                 </div>
-
-                                                <!-- Start Time -->
-                                                <div class="col-12 col-md-4 start-time-col">
-                                                    <div class="mb-3">
-                                                        <label for="timeInput"
-                                                            class="form-label text-med sched-mobile">Start Time
-                                                            *</label>
-                                                        <input type="time" class="form-control start-time"
-                                                            id="timeInput" name="startTime[]" required>
-                                                    </div>
-                                                </div>
-
-                                                <!-- End Time -->
-                                                <div class="col-10 col-md-4 end-time-col">
-                                                    <div class="mb-3">
-                                                        <label for="timeInput"
-                                                            class="form-label text-med sched-mobile">End Time
-                                                            *</label>
-                                                        <input type="time" class="form-control end-time" id="timeInput"
-                                                            name="endTime[]" required>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                ';
+                                            }
+                                            ?>
                                         </div>
+
 
                                         <div class="row">
                                             <div class="text-med text-12 mt-1 mb-3"
@@ -483,7 +589,7 @@ if (isset($_POST['createCourse'])) {
                                                 <button type="submit" name="createCourse"
                                                     class="px-4 py-2 rounded-5 text-sbold text-md-14 mt-4 mt-md-0"
                                                     style="background-color: var(--primaryColor); border: 1px solid var(--black);">
-                                                    <?php echo isset($reusedData) ? 'Recreate Course' : 'Create'; ?>
+                                                    <?php echo ($mode === 'edit') ? 'Edit' : 'Create'; ?>
                                                 </button>
                                             </div>
                                         </div>

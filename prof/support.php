@@ -40,11 +40,11 @@ $supportProfResult = executeQuery($supportProfQuery);
         <div class="row w-100">
             <?php include '../shared/components/prof-sidebar-for-mobile.php'; ?>
             <?php include '../shared/components/prof-sidebar-for-desktop.php'; ?>
-
-            <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-md-4 overflow-y-auto">
+            <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
+            <div class="col main-container m-0 mx-0 mx-md-2 p-md-4 overflow-y-auto">
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
-                    <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
+
 
                     <div class="container-fluid py-3 row-padding-top">
                         <div class="row">
@@ -66,11 +66,12 @@ $supportProfResult = executeQuery($supportProfQuery);
                                                 if (mysqli_num_rows($supportProfResult) > 0) {
                                                     while ($faq = mysqli_fetch_assoc($supportProfResult)) {
                                                         $collapseID = 'faq' . $counter;
-                                                ?>
+                                                        ?>
                                                         <div class="col-12 col-md-8 mb-2">
                                                             <button
                                                                 class="btn w-100 d-flex flex-column align-items-start text-med text-14"
-                                                                type="button" data-bs-toggle="collapse" data-bs-target="#<?php echo $collapseID; ?>"
+                                                                type="button" data-bs-toggle="collapse"
+                                                                data-bs-target="#<?php echo $collapseID; ?>"
                                                                 aria-expanded="false" aria-controls="<?php echo $collapseID; ?>"
                                                                 style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black); text-align: left; white-space: normal; word-wrap: break-word;">
 
@@ -78,10 +79,12 @@ $supportProfResult = executeQuery($supportProfQuery);
                                                                     <span class="flex-grow-1 text-start text-16 text-sbold">
                                                                         <?php echo htmlspecialchars($faq['supportQuestion']); ?>
                                                                     </span>
-                                                                    <span class="material-symbols-rounded transition">expand_more</span>
+                                                                    <span
+                                                                        class="material-symbols-rounded transition">expand_more</span>
                                                                 </div>
 
-                                                                <div class="collapse w-100" id="<?php echo $collapseID; ?>" data-bs-parent="#ratingAccordion">
+                                                                <div class="collapse w-100" id="<?php echo $collapseID; ?>"
+                                                                    data-bs-parent="#ratingAccordion">
                                                                     <p class="mb-0 text-reg text-14 text-start pe-4 pb-2"
                                                                         style="white-space: normal; word-wrap: break-word;">
                                                                         <?php echo $faq['supportAnswer'];
@@ -90,7 +93,7 @@ $supportProfResult = executeQuery($supportProfQuery);
                                                                 </div>
                                                             </button>
                                                         </div>
-                                                <?php
+                                                        <?php
                                                         $counter++;
                                                     }
                                                 } else {
@@ -150,7 +153,7 @@ $supportProfResult = executeQuery($supportProfQuery);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const buttons = document.querySelectorAll('[data-bs-toggle="collapse"]');
 
             buttons.forEach(button => {

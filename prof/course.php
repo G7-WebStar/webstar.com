@@ -3,16 +3,42 @@
 include('../shared/assets/database/connect.php');
 include("../shared/assets/processes/prof-session-process.php");
 
+
+$toastMessage = '';
+$toastType = '';
+
+if (isset($_SESSION['toast'])) {
+    $toastMessage = $_SESSION['toast']['message'];
+    $toastType = $_SESSION['toast']['type'];
+    unset($_SESSION['toast']);
+}
+
 if (isset($_POST['markUnarchived'])) {
     $courseID = $_POST['courseID'];
     $update = "UPDATE courses SET isActive = '1' WHERE courseID = '$courseID'";
     executeQuery($update);
+    if ($update) {
+        $_SESSION['toast'] = [
+            'type' => 'alert-success',
+            'message' => 'Course unarchived.'
+        ];
+        header("Location: course.php?status=archived");
+        exit();
+    }
 }
 
 if (isset($_POST['markArchived'])) {
     $courseID = $_POST['courseID'];
     $update = "UPDATE courses SET isActive = '0' WHERE courseID = '$courseID'";
     executeQuery($update);
+    if ($update) {
+        $_SESSION['toast'] = [
+            'type' => 'alert-success',
+            'message' => 'Course archived.'
+        ];
+        header("Location: course.php?status=active");
+        exit();
+    }
 }
 
 $filter = isset($_GET['status']) ? $_GET['status'] : 'active';
@@ -103,6 +129,11 @@ $courses = executeQuery($course);
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
 
+                    <div id="toastContainer"
+                        class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+                        style="z-index: 1100;">
+                    </div>
+
                     <!-- Navbar (mobile) -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
@@ -174,7 +205,7 @@ $courses = executeQuery($course);
                                             </a>
                                             <div class="card-body border-top border-black">
                                                 <div class="row lh-1 mb-2">
-                                                    <a href="courses-info.php?courseID=<?php echo $row['courseID']; ?>"
+                                                    <a href="course-info.php?courseID=<?php echo $row['courseID']; ?>"
                                                         class="text-decoration-none text-black">
                                                         <p class="card-text text-sbold text-18 m-0 course-code">
                                                             <?php echo $row['courseCode']; ?>
@@ -262,20 +293,7 @@ $courses = executeQuery($course);
             </div>
         </div>
     </div>
-    <div id="toastContainer" class="position-absolute d-flex flex-column align-items-center ms-5"
-        style="top: 3rem; left: 25%; transform: translateX(80%); z-index:1100; pointer-events:none;">
 
-        <?php if (isset($_GET['deleted']) && $_GET['deleted'] == 1): ?>
-            <div
-                class="alert alert-success fade show mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 mt-2">
-
-                <i class="bi bi-check-circle-fill"></i>
-                <span>Course deleted successfully!</span>
-
-            </div>
-        <?php endif; ?>
-
-    </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -301,7 +319,7 @@ $courses = executeQuery($course);
     </script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const filterToggle = document.getElementById("filterToggle");
             const mobileFilters = document.getElementById("mobileFilters");
             const icon = filterToggle.querySelector(".material-symbols-rounded");
@@ -357,27 +375,14 @@ $courses = executeQuery($course);
             });
         });
     </script>
-    <script>
-        // Toast of delete
-        document.addEventListener('DOMContentLoaded', () => {
-            const alertEl = document.querySelector('.alert.alert-success');
-            if (alertEl) {
-                setTimeout(() => {
-                    alertEl.style.transition = "opacity 0.5s ease-out";
-                    alertEl.style.opacity = 0;
-                    setTimeout(() => alertEl.remove(), 500);
-                }, 3000);
-            }
-        });
-    </script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const searchInput = document.querySelector('input[name="search"]');
             const courseContainer = document.getElementById('courseContainer');
 
             if (searchInput) {
-                searchInput.addEventListener('input', function() {
+                searchInput.addEventListener('input', function () {
                     const searchTerm = searchInput.value.trim();
 
                     fetch('../shared/assets/processes/search-course-prof.php?search=' + encodeURIComponent(searchTerm) + "<?php echo (isset($_GET['status'])) ? "&status=" . $filter : ''; ?>")
@@ -390,6 +395,27 @@ $courses = executeQuery($course);
             }
         });
     </script>
+
+    <!-- Toast Handling -->
+    <?php if (!empty($toastMessage)): ?>
+        <script>
+            window.addEventListener('DOMContentLoaded', () => {
+                const container = document.getElementById("toastContainer");
+                if (!container) return;
+
+                const alert = document.createElement("div");
+                alert.className = `alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 <?= $toastType ?>`;
+                alert.role = "alert";
+                alert.innerHTML = `
+            <i class="bi <?= ($toastType === 'alert-success') ? 'bi-check-circle-fill' : 'bi-x-circle-fill'; ?> fs-6"></i>
+            <span><?= addslashes($toastMessage) ?></span>
+        `;
+                container.appendChild(alert);
+
+                setTimeout(() => alert.remove(), 3000);
+            });
+        </script>
+    <?php endif; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 </body>

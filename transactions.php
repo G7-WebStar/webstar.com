@@ -43,11 +43,23 @@ $result = mysqli_query($conn, $query);
             color: var(--black) !important;
         }
 
-        .webstars-table,
-        .webstars-table th,
-        .webstars-table td {
-            border: 1px solid var(--black) !important;
-            border-collapse: collapse !important;
+        .table-inner-borders th,
+        .table-inner-borders td {
+            border-right: 1px solid var(--black);
+            border-bottom: 1px solid var(--black);
+        }
+
+        .table-inner-borders th:last-child,
+        .table-inner-borders td:last-child {
+            border-right: none;
+        }
+
+        .table-inner-borders tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-inner-borders thead tr:first-child th {
+            border-top: none;
         }
     </style>
 
@@ -60,14 +72,14 @@ $result = mysqli_query($conn, $query);
             <?php include 'shared/components/sidebar-for-mobile.php'; ?>
             <?php include 'shared/components/sidebar-for-desktop.php'; ?>
 
-            <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-md-4 overflow-y-auto">
+            <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-md-4">
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 row-padding-top" >
+                    <div class="container-fluid py-3 row-padding-top  overflow-y-auto">
                         <div class="row">
-                            <div class="col-12"style="padding-bottom:50px">
+                            <div class="col-12" style="padding-bottom:50px">
                                 <!-- Header Section -->
                                 <div class="row align-items-center mb-3 text-center text-md-start">
                                     <div class="col-12 col-md-auto text-center text-md-start position-relative">
@@ -79,9 +91,10 @@ $result = mysqli_query($conn, $query);
 
                                     <!-- Table -->
                                     <div class="message-container mt-3 pb-4">
-                                        <div class="table-responsive">
+                                        <div class="table-responsive"
+                                            style="border-radius:10px; border: 1px solid var(--black);">
                                             <table
-                                                class="table table-bordered text-center align-middle text-reg text-14 mb-0 webstars-table">
+                                                class="table table-inner-borders text-center align-middle text-reg text-14 mb-0 webstars-table">
                                                 <thead>
                                                     <tr>
                                                         <th>Date</th>
@@ -93,7 +106,8 @@ $result = mysqli_query($conn, $query);
                                                     <?php if (mysqli_num_rows($result) > 0): ?>
                                                         <?php while ($row = mysqli_fetch_assoc($result)): ?>
                                                             <tr>
-                                                                <td><?= htmlspecialchars(date('M d, Y', strtotime($row['dateEarned']))) ?>
+                                                                <td><?= htmlspecialchars(date('M d, Y h:i A', strtotime($row['dateEarned']))) ?>
+                                                                </td>
                                                                 </td>
                                                                 <td><?= htmlspecialchars($row['sourceType']) ?></td>
                                                                 <td>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 14, 2025 at 07:49 AM
+-- Generation Time: Nov 16, 2025 at 05:36 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -80,13 +80,6 @@ CREATE TABLE `announcements` (
   `isRequired` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `announcements`
---
-
-INSERT INTO `announcements` (`announcementID`, `courseID`, `userID`, `announcementTitle`, `announcementContent`, `announcementDate`, `announcementTime`, `isRequired`) VALUES
-(1, 1, 1, 'Project Deadline Reminder', 'Final project is due next week. Submit via LMS.', '2025-08-30', '09:00:00', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -104,16 +97,6 @@ CREATE TABLE `assessments` (
   `isArchived` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `assessments`
---
-
-INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `type`, `deadline`, `deadlineEnabled`, `createdAt`, `isArchived`) VALUES
-(1, 1, 'Activity #1', 'Task', '2025-10-15', 0, '2025-09-09 23:00:15', 0),
-(2, 1, 'Test #1', 'Test', '2025-11-06', 0, '2025-09-04 22:00:15', 0),
-(3, 2, 'Activity #2', 'Task', '2025-10-23', 0, '2025-10-22 22:00:15', 0),
-(4, 2, 'Activity #1', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15', 0);
-
 -- --------------------------------------------------------
 
 --
@@ -127,15 +110,6 @@ CREATE TABLE `assignments` (
   `assignmentPoints` int(5) NOT NULL,
   `rubricID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `assignments`
---
-
-INSERT INTO `assignments` (`assignmentID`, `assessmentID`, `assignmentDescription`, `assignmentPoints`, `rubricID`) VALUES
-(1, 1, 'Attached is a Google Doc that you can edit.\n\nIn Figma, design a “404 Not Found” page.\n\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\n\nTurn in when done.\n\n', 100, 1),
-(2, 4, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100, 1),
-(3, 2, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100, NULL);
 
 -- --------------------------------------------------------
 
@@ -233,7 +207,7 @@ CREATE TABLE `courses` (
   `userID` int(11) NOT NULL,
   `courseCode` varchar(50) NOT NULL,
   `courseTitle` varchar(255) NOT NULL,
-  `courseImage` varchar(255) NOT NULL,
+  `courseImage` varchar(255) NOT NULL DEFAULT 'default.png',
   `isActive` int(3) NOT NULL DEFAULT 1,
   `code` varchar(20) NOT NULL,
   `section` varchar(20) NOT NULL
@@ -244,7 +218,7 @@ CREATE TABLE `courses` (
 --
 
 INSERT INTO `courses` (`courseID`, `userID`, `courseCode`, `courseTitle`, `courseImage`, `isActive`, `code`, `section`) VALUES
-(1, 1, 'COMP-006', 'Web Development', 'webdev.jpg', 1, '123456', 'BSIT 4-1'),
+(1, 1, 'COMP-006', 'Web Developmentt', '07450aa2-65e2-4fc0-a1f0-2678bffdee7a.jpg', 1, '123456', 'BSIT 4-1'),
 (2, 1, 'GEED-007', 'Web Development 2', 'webdev.jpg', 1, '789ABC', 'BSIT 4-1'),
 (3, 1, 'MM-102', 'Multimedia', '72793b45-c2cc-4ad2-ad29-5b395ca0c24d.jpg', 1, '1Z8AQ8', 'BSIT 4-1');
 
@@ -268,9 +242,10 @@ CREATE TABLE `courseschedule` (
 --
 
 INSERT INTO `courseschedule` (`courseScheduleID`, `courseID`, `day`, `startTime`, `endTime`, `createdAt`) VALUES
-(1, 3, 'Monday', '18:06:00', '06:06:00', '2025-11-03 18:07:13'),
-(2, 3, 'Monday', '18:07:00', '19:07:00', '2025-11-03 18:07:13'),
-(3, 3, 'Monday', '18:08:00', '20:07:00', '2025-11-03 18:07:13');
+(2, 2, 'Monday', '18:07:00', '19:07:00', '2025-11-03 18:07:13'),
+(3, 3, 'Monday', '18:08:00', '20:07:00', '2025-11-03 18:07:13'),
+(7, 6, 'Monday', '12:12:00', '14:12:00', '2025-11-16 00:12:28'),
+(47, 1, 'Monday', '01:18:00', '01:19:00', '2025-11-16 03:27:27');
 
 -- --------------------------------------------------------
 
@@ -348,9 +323,49 @@ CREATE TABLE `criteria` (
 --
 
 INSERT INTO `criteria` (`criterionID`, `rubricID`, `criteriaTitle`, `criteriaDescription`) VALUES
-(1, 1, 'Voice, Style, and Imagery', 'Assesses the development of a distinct and compelling writer\'s voice, the effectiveness of word choice (diction), and the use of sensory details and figurative language (imagery) to create a vivid experience for the reader.'),
-(2, 1, 'Narrative Structure and Pacing', 'Assesses the effective management of the plot (beginning, rising action, climax, resolution), character development (if applicable), and the manipulation of time and speed (pacing) to build tension and interest.'),
-(3, 2, 'Participation and Initiative', 'Assesses the student\'s level of engagement, attendance at meetings, willingness to take on tasks, and proactive approach to contributing ideas and effort to the team\'s goals.');
+(1, 1, 'Introduction & Background', 'Clarity of purpose, hypothesis, and scientific context'),
+(2, 1, 'Methods & Procedures', 'Detail and clarity enabling replication'),
+(3, 1, 'Data Presentation', 'Accuracy and organization of data'),
+(4, 1, 'Analysis & Discussion', 'Quality of interpretation and reasoning'),
+(5, 1, 'Structure & Mechanics', 'Organization, formatting, grammar'),
+(6, 2, 'Depth of Reflection', 'Level of personal insight and critical thinking'),
+(7, 2, 'Connection to Experience', 'Quality of linking experience to learning'),
+(8, 2, 'Organization', 'Logical flow and structure'),
+(9, 2, 'Writing Quality', 'Grammar, clarity, and coherence'),
+(10, 3, 'Breadth of Sources', 'Quantity & relevance of scholarly sources'),
+(11, 3, 'Synthesis of Information', 'Integration into themes'),
+(12, 3, 'Critical Evaluation', 'Assessment of strengths & weaknesses'),
+(13, 3, 'Organization', 'Structure and flow'),
+(14, 3, 'Citation Accuracy', 'Correct use of citation style'),
+(15, 4, 'Thesis Statement', 'Clarity and strength of main argument'),
+(16, 4, 'Argument Development', 'Evidence & reasoning'),
+(17, 4, 'Organization', 'Structural flow'),
+(18, 4, 'Grammar & Mechanics', 'Writing correctness'),
+(19, 5, 'Problem Identification', 'Recognition of key issues'),
+(20, 5, 'Analysis', 'Use of concepts and reasoning'),
+(21, 5, 'Solutions/Recommendations', 'Quality & feasibility'),
+(22, 5, 'Evidence Use', 'Support from case data'),
+(23, 6, 'Summary Accuracy', 'Correctness of key points'),
+(24, 6, 'Critical Analysis', 'Depth of evaluation'),
+(25, 6, 'Evidence Integration', 'Use of examples from article'),
+(26, 6, 'Writing Quality', 'Clarity and structure'),
+(27, 7, 'Originality', 'Creativity and uniqueness'),
+(28, 7, 'Technique', 'Skill in chosen medium'),
+(29, 7, 'Purpose/Message', 'Clarity of intention'),
+(30, 7, 'Presentation', 'Overall quality'),
+(31, 8, 'Clarity of Concept', 'Definition and focus of idea'),
+(32, 8, 'Rationale', 'Significance and justification'),
+(33, 8, 'Feasibility', 'Practicality of idea'),
+(34, 8, 'Organization', 'Logical structure'),
+(35, 9, 'Usability', 'Ease of navigation and interaction'),
+(36, 9, 'Visual Design', 'Aesthetics and consistency'),
+(37, 9, 'Accessibility', 'Inclusiveness and compliance'),
+(38, 9, 'Information Architecture', 'Logical arrangement of content'),
+(39, 10, 'Functionality', 'Working features and performance'),
+(40, 10, 'Design & Layout', 'Aesthetics and responsiveness'),
+(41, 10, 'Code Quality', 'Structure and efficiency'),
+(42, 10, 'Content Quality', 'Clarity and accuracy of text/media'),
+(43, 10, 'User Experience', 'Overall interaction quality');
 
 -- --------------------------------------------------------
 
@@ -463,7 +478,7 @@ CREATE TABLE `inbox` (
   `inboxID` int(11) NOT NULL,
   `enrollmentID` int(11) NOT NULL,
   `messageText` text NOT NULL,
-  `notifType` int(11) NOT NULL,
+  `notifType` varchar(50) NOT NULL,
   `createdAt` datetime DEFAULT current_timestamp(),
   `isRead` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -473,8 +488,8 @@ CREATE TABLE `inbox` (
 --
 
 INSERT INTO `inbox` (`inboxID`, `enrollmentID`, `messageText`, `notifType`, `createdAt`, `isRead`) VALUES
-(1, 1, 'Prof. Christian James has posted a new assignment.', 0, '2024-01-31 08:04:00', 1),
-(2, 2, 'Prof. Christian James has posted a new assignment.', 0, '2024-01-31 08:04:00', 1);
+(1, 1, 'Prof. Christian James has posted a new assignment.', '0', '2024-01-31 08:04:00', 1),
+(2, 2, 'Prof. Christian James has posted a new assignment.', '0', '2024-01-31 08:04:00', 1);
 
 -- --------------------------------------------------------
 
@@ -550,9 +565,178 @@ CREATE TABLE `level` (
 --
 
 INSERT INTO `level` (`levelID`, `criterionID`, `levelTitle`, `levelDescription`, `points`) VALUES
-(1, 1, 'Exemplary (A)', 'The writing demonstrates a unique, sophisticated, and memorable voice. Imagery is fresh, powerful, and deeply evocative, seamlessly integrating figurative language (metaphor, simile) that enriches the meaning. Diction is precise and masterful.', 30.00),
-(2, 2, 'Exemplary (A)', 'The structure is innovative and perfectly paced, maintaining tension and emotional resonance throughout. Characters (if present) are complex and fully realized, undergoing believable development. The ending is highly satisfying and meaningful.', 50.00),
-(3, 3, 'Exemplary (A)', 'Is a driving force in the group; consistently attends and is highly prepared for all meetings. Proactively seeks out complex tasks and offers creative solutions, motivating others to contribute effectively.', 50.00);
+(1, 1, 'Excellent', 'Hypothesis clear, insightful; strong background connections', 20.00),
+(2, 1, 'Proficient', 'Clear hypothesis, adequate background', 15.00),
+(3, 1, 'Basic', 'Hypothesis present but unclear or underdeveloped', 10.00),
+(4, 1, 'Needs Improvement', 'Missing or inaccurate introduction elements', 5.00),
+(5, 2, 'Excellent', 'Detailed, organized, replicable procedure', 20.00),
+(6, 2, 'Proficient', 'Mostly clear with minor gaps', 15.00),
+(7, 2, 'Basic', 'Partially explained; difficult to replicate', 10.00),
+(8, 2, 'Needs Improvement', 'Missing or unclear procedure', 5.00),
+(9, 3, 'Excellent', 'Complete, accurate, professional data displays', 20.00),
+(10, 3, 'Proficient', 'Clear with minor errors', 15.00),
+(11, 3, 'Basic', 'Noticeable inaccuracies or disorder', 10.00),
+(12, 3, 'Needs Improvement', 'Missing or inaccurate data', 5.00),
+(13, 4, 'Excellent', 'Insightful analysis linked to scientific concepts', 20.00),
+(14, 4, 'Proficient', 'Logical interpretation with adequate depth', 15.00),
+(15, 4, 'Basic', 'General or superficial discussion', 10.00),
+(16, 4, 'Needs Improvement', 'Weak, incorrect, or missing analysis', 5.00),
+(17, 5, 'Excellent', 'Clear, polished, error-free', 20.00),
+(18, 5, 'Proficient', 'Minor writing issues', 15.00),
+(19, 5, 'Basic', 'Frequent errors but readable', 10.00),
+(20, 5, 'Needs Improvement', 'Disorganized, many writing issues', 5.00),
+(21, 6, 'Exceptional', 'Deep, meaningful connections and insights', 25.00),
+(22, 6, 'Strong', 'Clear insights with thoughtful reflection', 20.00),
+(23, 6, 'Adequate', 'Basic reflection; surface level', 15.00),
+(24, 6, 'Limited', 'Minimal insight', 10.00),
+(25, 7, 'Exceptional', 'Strong integration between experience and concepts', 25.00),
+(26, 7, 'Strong', 'Relevant, clear connections', 20.00),
+(27, 7, 'Adequate', 'Somewhat connected but general', 15.00),
+(28, 7, 'Limited', 'Few or no links to learning', 10.00),
+(29, 8, 'Exceptional', 'Smooth, logical organization', 25.00),
+(30, 8, 'Strong', 'Well-organized with minor issues', 20.00),
+(31, 8, 'Adequate', 'Some inconsistencies', 15.00),
+(32, 8, 'Limited', 'Poor organization', 10.00),
+(33, 9, 'Exceptional', 'Polished, error-free', 25.00),
+(34, 9, 'Strong', 'Minor errors', 20.00),
+(35, 9, 'Adequate', 'Noticeable errors', 15.00),
+(36, 9, 'Limited', 'Many errors making reading difficult', 10.00),
+(37, 10, 'Excellent', 'Wide, diverse, highly relevant sources', 20.00),
+(38, 10, 'Good', 'Adequate number of sources', 15.00),
+(39, 10, 'Fair', 'Limited or partially relevant sources', 10.00),
+(40, 10, 'Poor', 'Few or irrelevant sources', 5.00),
+(41, 11, 'Excellent', 'Synthesizes studies into coherent themes', 20.00),
+(42, 11, 'Good', 'Shows connections with minor gaps', 15.00),
+(43, 11, 'Fair', 'Mostly summaries; limited synthesis', 10.00),
+(44, 11, 'Poor', 'No integration', 5.00),
+(45, 12, 'Excellent', 'Deep critique with strong reasoning', 20.00),
+(46, 12, 'Good', 'Adequate assessment', 15.00),
+(47, 12, 'Fair', 'Minimal critique', 10.00),
+(48, 12, 'Poor', 'No evaluation', 5.00),
+(49, 13, 'Excellent', 'Clear, logical thematic structure', 20.00),
+(50, 13, 'Good', 'Mostly organized', 15.00),
+(51, 13, 'Fair', 'Noticeable structural issues', 10.00),
+(52, 13, 'Poor', 'Disorganized', 5.00),
+(53, 14, 'Excellent', 'Accurate and consistent', 20.00),
+(54, 14, 'Good', 'Minor errors', 15.00),
+(55, 14, 'Fair', 'Several errors', 10.00),
+(56, 14, 'Poor', 'Frequent or missing citations', 5.00),
+(57, 15, 'Excellent', 'Clear, arguable, insightful thesis', 25.00),
+(58, 15, 'Good', 'Clear and focused', 15.00),
+(59, 15, 'Fair', 'Present but weak', 10.00),
+(60, 15, 'Poor', 'Unclear or missing', 5.00),
+(61, 16, 'Excellent', 'Strong supporting evidence and logic', 25.00),
+(62, 16, 'Good', 'Adequate support', 15.00),
+(63, 16, 'Fair', 'Limited reasoning', 10.00),
+(64, 16, 'Poor', 'Unsupported ideas', 5.00),
+(65, 17, 'Excellent', 'Well-structured and cohesive', 25.00),
+(66, 17, 'Good', 'Mostly organized', 15.00),
+(67, 17, 'Fair', 'Some disorder', 10.00),
+(68, 17, 'Poor', 'Hard to follow', 5.00),
+(69, 18, 'Excellent', 'Polished, error-free', 25.00),
+(70, 18, 'Good', 'Minor issues', 15.00),
+(71, 18, 'Fair', 'Multiple errors', 10.00),
+(72, 18, 'Poor', 'Frequent mechanical errors', 5.00),
+(73, 19, 'Excellent', 'Thorough, accurate identification of all issues', 25.00),
+(74, 19, 'Good', 'Identifies major issues', 15.00),
+(75, 19, 'Fair', 'Partially identifies issues', 10.00),
+(76, 19, 'Poor', 'Issues unclear or misunderstood', 5.00),
+(77, 20, 'Excellent', 'Deep, theory-based analysis', 25.00),
+(78, 20, 'Good', 'Solid analysis', 15.00),
+(79, 20, 'Fair', 'General or limited analysis', 10.00),
+(80, 20, 'Poor', 'Weak or incorrect', 5.00),
+(81, 21, 'Excellent', 'Practical, well-supported solutions', 25.00),
+(82, 21, 'Good', 'Reasonable recommendations', 15.00),
+(83, 21, 'Fair', 'Vague or general', 10.00),
+(84, 21, 'Poor', 'Unsupported or unrealistic', 5.00),
+(85, 22, 'Excellent', 'Strong, appropriate evidence', 25.00),
+(86, 22, 'Good', 'Adequate support', 15.00),
+(87, 22, 'Fair', 'Some evidence', 10.00),
+(88, 22, 'Poor', 'Lacks evidence', 5.00),
+(89, 23, 'Excellent', 'Complete, accurate summary', 25.00),
+(90, 23, 'Good', 'Mostly accurate', 15.00),
+(91, 23, 'Fair', 'Minor misinterpretations', 10.00),
+(92, 23, 'Poor', 'Incorrect or incomplete', 5.00),
+(93, 24, 'Excellent', 'Insightful, well-reasoned critique', 25.00),
+(94, 24, 'Good', 'Clear critique', 15.00),
+(95, 24, 'Fair', 'Limited critical thinking', 10.00),
+(96, 24, 'Poor', 'Minimal or no critique', 5.00),
+(97, 25, 'Excellent', 'Strong, relevant evidence', 25.00),
+(98, 25, 'Good', 'Adequate examples', 15.00),
+(99, 25, 'Fair', 'Some evidence', 10.00),
+(100, 25, 'Poor', 'Weak or no evidence', 5.00),
+(101, 26, 'Excellent', 'Clear, organized, error-free', 25.00),
+(102, 26, 'Good', 'Minor clarity or grammar issues', 15.00),
+(103, 26, 'Fair', 'Multiple errors', 10.00),
+(104, 26, 'Poor', 'Disorganized, error-ridden', 5.00),
+(105, 27, 'Outstanding', 'Highly original and imaginative', 25.00),
+(106, 27, 'Strong', 'Good originality', 15.00),
+(107, 27, 'Basic', 'Some creativity', 10.00),
+(108, 27, 'Limited', 'Lacks originality', 5.00),
+(109, 28, 'Outstanding', 'Exceptional technique', 25.00),
+(110, 28, 'Strong', 'Solid skills', 15.00),
+(111, 28, 'Basic', 'Adequate technique', 10.00),
+(112, 28, 'Limited', 'Weak execution', 5.00),
+(113, 29, 'Outstanding', 'Strong, meaningful message', 25.00),
+(114, 29, 'Strong', 'Clear purpose', 15.00),
+(115, 29, 'Basic', 'Some meaning', 10.00),
+(116, 29, 'Limited', 'Unclear message', 5.00),
+(117, 30, 'Outstanding', 'Outstanding', 25.00),
+(118, 30, 'Outstanding', 'Neat and complete', 15.00),
+(119, 30, 'Basic', 'Some presentation issues', 10.00),
+(120, 30, 'Limited', 'Poor presentation', 5.00),
+(121, 31, 'Excellent', 'Clear, strongly articulated concept', 25.00),
+(122, 31, 'Excellent', 'Mostly clear', 15.00),
+(123, 31, 'Fair', 'Concept somewhat unclear', 10.00),
+(124, 31, 'Poor', 'Vague or undeveloped', 5.00),
+(125, 32, 'Excellent', 'Strong justification', 25.00),
+(126, 32, 'Good', 'Adequate rationale', 15.00),
+(127, 32, 'Fair', 'Weak explanation', 10.00),
+(128, 32, 'Poor', 'Missing rationale', 5.00),
+(129, 33, 'Excellent', 'Highly feasible and well-supported', 25.00),
+(130, 33, 'Good', 'Mostly feasible', 15.00),
+(131, 33, 'Fair', 'Some feasibility concerns', 10.00),
+(132, 33, 'Poor', 'Not feasible', 5.00),
+(133, 34, 'Excellent', 'Well-organized', 25.00),
+(134, 34, 'Good', 'Minor issues', 15.00),
+(135, 34, 'Fair', 'Some disorganization', 10.00),
+(136, 34, 'Poor', 'Poorly structured', 5.00),
+(137, 35, 'Excellent', 'Highly intuitive, user-friendly', 25.00),
+(138, 35, 'Good', 'Mostly intuitive', 15.00),
+(139, 35, 'Fair', 'Some usability issues', 10.00),
+(140, 35, 'Poor', 'Hard to use', 5.00),
+(141, 36, 'Excellent', 'Professional, cohesive visual design', 25.00),
+(142, 36, 'Good', 'Attractive and consistent', 15.00),
+(143, 36, 'Fair', 'Minor inconsistencies', 10.00),
+(144, 36, 'Poor', 'Unappealing or messy', 5.00),
+(145, 37, 'Excellent', 'Fully accessible', 25.00),
+(146, 37, 'Good', 'Mostly accessible', 15.00),
+(147, 37, 'Fair', 'Limited accessibility', 10.00),
+(148, 37, 'Poor', 'Not accessible', 5.00),
+(149, 38, 'Excellent', 'Clear structure and flow', 25.00),
+(150, 38, 'Good', 'Mostly clear', 15.00),
+(151, 38, 'Fair', 'Some confusion in structure', 10.00),
+(152, 38, 'Poor', 'Poorly organized', 5.00),
+(153, 39, 'Excellent', 'Fully functional with no errors', 20.00),
+(154, 39, 'Good', 'Minor issues', 15.00),
+(155, 39, 'Fair', 'Some features broken', 10.00),
+(156, 39, 'Poor', 'Major issues or nonfunctional', 5.00),
+(157, 40, 'Excellent', 'Clean, responsive, visually appealing', 20.00),
+(158, 40, 'Good', 'Mostly strong design', 15.00),
+(159, 40, 'Fair', 'Some layout issues', 10.00),
+(160, 40, 'Poor', 'Poor design or non-responsive', 5.00),
+(161, 41, 'Excellent', 'Clean, documented, efficient code', 20.00),
+(162, 41, 'Good', 'Minor inefficiencies', 15.00),
+(163, 41, 'Fair', 'Some code issues', 10.00),
+(164, 41, 'Poor', 'Poorly structured code', 5.00),
+(165, 42, 'Excellent', 'Accurate, clear, engaging content', 20.00),
+(166, 42, 'Good', 'Mostly clear', 15.00),
+(167, 42, 'Fair', 'Some unclear or inaccurate info', 10.00),
+(168, 42, 'Poor', 'Incomplete or poorly written', 5.00),
+(169, 43, 'Excellent', 'Excellent', 20.00),
+(170, 43, 'Good', 'Mostly smooth', 15.00),
+(171, 43, 'Fair', 'Some issues', 10.00),
+(172, 43, 'Poor', 'Frustrating experience', 5.00);
 
 -- --------------------------------------------------------
 
@@ -583,7 +767,11 @@ INSERT INTO `myitems` (`myItemID`, `userID`, `emblemID`, `coverImageID`, `colorT
 (155, 4, NULL, 14, NULL, '2025-11-06 17:43:34'),
 (156, 4, 2, NULL, NULL, '2025-11-06 17:43:39'),
 (157, 2, NULL, NULL, 2, '2025-11-06 17:46:35'),
-(158, 2, NULL, NULL, 3, '2025-11-06 17:56:42');
+(158, 2, NULL, NULL, 3, '2025-11-06 17:56:42'),
+(161, 2, NULL, NULL, 4, '2025-11-16 02:50:00'),
+(162, 2, 7, NULL, NULL, '2025-11-16 02:51:21'),
+(163, 2, NULL, 17, NULL, '2025-11-16 02:51:32'),
+(164, 2, NULL, NULL, 9, '2025-11-16 02:51:39');
 
 -- --------------------------------------------------------
 
@@ -598,16 +786,17 @@ CREATE TABLE `profile` (
   `webstars` int(11) DEFAULT 0,
   `emblemID` int(11) NOT NULL DEFAULT 1,
   `coverImageID` int(11) NOT NULL DEFAULT 1,
-  `colorThemeID` int(11) NOT NULL DEFAULT 1
+  `colorThemeID` int(11) NOT NULL DEFAULT 1,
+  `starCard` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `profile`
 --
 
-INSERT INTO `profile` (`profileID`, `userID`, `bio`, `webstars`, `emblemID`, `coverImageID`, `colorThemeID`) VALUES
-(1, 2, 'Welcome to my Webstar profile!', 5599, 1, 1, 1),
-(2, 4, 'Welcome to my Webstar profile!', 700, 1, 1, 1);
+INSERT INTO `profile` (`profileID`, `userID`, `bio`, `webstars`, `emblemID`, `coverImageID`, `colorThemeID`, `starCard`) VALUES
+(1, 2, 'Welcome to my Webstar profile!', 5049, 7, 17, 9, 2),
+(2, 4, 'Welcome to my Webstar profile!', 700, 1, 1, 1, 2);
 
 -- --------------------------------------------------------
 
@@ -656,17 +845,17 @@ CREATE TABLE `report` (
 --
 
 INSERT INTO `report` (`reportID`, `enrollmentID`, `totalXP`, `allTimeRank`, `generatedAt`) VALUES
-(1, 1, 0, 9, '2025-11-14 14:22:45'),
-(2, 3, 0, 10, '2025-11-14 14:22:45'),
-(3, 8, 0, 4, '2025-11-14 14:22:45'),
-(4, 6, 0, 2, '2025-11-14 14:22:45'),
-(5, 11, 0, 7, '2025-11-14 14:22:45'),
-(6, 10, 0, 6, '2025-11-14 14:22:45'),
-(7, 5, 0, 1, '2025-11-14 14:22:45'),
-(8, 7, 0, 3, '2025-11-14 14:22:45'),
-(9, 9, 0, 5, '2025-11-14 14:22:45'),
-(10, 4, 0, 11, '2025-11-14 14:22:45'),
-(11, 12, 0, 8, '2025-11-14 14:22:45'),
+(1, 1, 0, 8, '2025-11-15 23:37:58'),
+(2, 3, 0, 9, '2025-11-15 23:37:58'),
+(3, 8, 0, 3, '2025-11-15 23:37:57'),
+(4, 6, 0, 1, '2025-11-15 23:37:57'),
+(5, 11, 0, 6, '2025-11-15 23:37:58'),
+(6, 10, 0, 5, '2025-11-15 23:37:57'),
+(7, 5, 0, 11, '2025-11-15 23:37:58'),
+(8, 7, 0, 2, '2025-11-15 23:37:57'),
+(9, 9, 0, 4, '2025-11-15 23:37:57'),
+(10, 4, 0, 10, '2025-11-15 23:37:58'),
+(11, 12, 0, 7, '2025-11-15 23:37:58'),
 (12, 2, 450, 1, '2025-11-06 15:51:29');
 
 -- --------------------------------------------------------
@@ -688,8 +877,16 @@ CREATE TABLE `rubric` (
 --
 
 INSERT INTO `rubric` (`rubricID`, `rubricTitle`, `rubricType`, `userID`, `totalPoints`) VALUES
-(1, 'Creative Writing Assessment', 'Created', 1, 80),
-(2, 'Group Collaboration and Contribution', 'Preset', 1, 50);
+(1, 'Laboratory Report Rubric', 'Preset', NULL, 100),
+(2, 'Reflection Paper Rubric', 'Preset', NULL, 100),
+(3, 'Literature Review Rubric', 'Preset', NULL, 100),
+(4, 'Essay Rubric', 'Preset', NULL, 100),
+(5, 'Case Study Rubric', 'Preset', NULL, 100),
+(6, 'Article Review Rubric', 'Preset', NULL, 100),
+(7, 'Creative Work Rubric', 'Preset', NULL, 100),
+(8, 'Concept Paper Rubric', 'Preset', NULL, 100),
+(9, 'UI/UX Design Rubric', 'Preset', NULL, 100),
+(10, 'Website Development Rubric', 'Preset', NULL, 100);
 
 -- --------------------------------------------------------
 
@@ -879,52 +1076,6 @@ CREATE TABLE `testquestionchoices` (
   `choiceText` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `testquestionchoices`
---
-
-INSERT INTO `testquestionchoices` (`choiceID`, `testQuestionID`, `choiceText`) VALUES
-(1, 1, '&lt;h3&gt;'),
-(2, 1, '&lt;h6&gt;'),
-(3, 1, '&lt;h1&gt;'),
-(4, 1, '&lt;head&gt;'),
-(5, 2, '&lt;link&gt;'),
-(6, 2, '&lt;a&gt;'),
-(7, 2, '&lt;href&gt;'),
-(8, 2, '&lt;hyper&gt;'),
-(9, 3, 'src'),
-(10, 3, 'href'),
-(11, 3, 'alt'),
-(12, 3, 'path'),
-(13, 4, '&lt;break&gt;'),
-(14, 4, '&lt;br&gt;'),
-(15, 4, '&lt;lb&gt;'),
-(16, 4, '&lt;line&gt;'),
-(17, 5, '&lt;ol&gt;'),
-(18, 5, '&lt;ul&gt;'),
-(19, 5, '&lt;li&gt;'),
-(20, 5, '&lt;list&gt;'),
-(21, 6, 'The title shown inside the page'),
-(22, 6, 'The title shown on the browser tab'),
-(23, 6, 'A tooltip on hover'),
-(24, 6, 'A paragraph heading'),
-(25, 7, '&lt;ol&gt;'),
-(26, 7, '&lt;ul&gt;'),
-(27, 7, '&lt;li&gt;'),
-(28, 7, '&lt;dl&gt;'),
-(29, 8, 'style'),
-(30, 8, 'class'),
-(31, 8, 'font'),
-(32, 8, 'css'),
-(33, 9, '&lt;img&gt;'),
-(34, 9, '&lt;image&gt;'),
-(35, 9, '&lt;pic&gt;'),
-(36, 9, '&lt;src&gt;'),
-(37, 10, '&lt;tr&gt;'),
-(38, 10, '&lt;td&gt;'),
-(39, 10, '&lt;th&gt;'),
-(40, 10, '&lt;table&gt;');
-
 -- --------------------------------------------------------
 
 --
@@ -940,22 +1091,6 @@ CREATE TABLE `testquestions` (
   `correctAnswer` varchar(50) NOT NULL,
   `testQuestionPoints` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `testquestions`
---
-
-INSERT INTO `testquestions` (`testQuestionID`, `testID`, `testQuestion`, `questionType`, `testQuestionImage`, `correctAnswer`, `testQuestionPoints`) VALUES
-(1, 1, 'Which HTML tag is used to define the largest heading?', 'Multiple Choice', NULL, '&lt;h1&gt;', 100),
-(2, 1, 'Which tag is used to define a hyperlink in HTML?', 'Multiple Choice', NULL, '&lt;a&gt;', 100),
-(3, 1, 'Which HTML attribute specifies an image source?', 'Multiple Choice', NULL, 'src', 100),
-(4, 1, 'Which element is used to insert a line break?', 'Multiple Choice', NULL, '&lt;br&gt;', 100),
-(5, 1, 'Which tag is used to create an unordered list?', 'Multiple Choice', NULL, '&lt;ul&gt;', 100),
-(6, 1, 'What does the &lt;title&gt; tag define?', 'Multiple Choice', NULL, 'The title shown on the browser tab', 100),
-(7, 1, 'Which HTML element is used to display a numbered list?', 'Multiple Choice', NULL, '&lt;ol&gt;', 100),
-(8, 1, 'Which HTML attribute is used to define inline CSS styles?', 'Multiple Choice', NULL, 'style', 100),
-(9, 1, 'What is the correct HTML tag for inserting an image?', 'Multiple Choice', NULL, '&lt;img&gt;', 100),
-(10, 1, 'Which tag is used to create a table row?', 'Multiple Choice', NULL, '&lt;tr&gt;', 100);
 
 -- --------------------------------------------------------
 
@@ -985,14 +1120,6 @@ CREATE TABLE `tests` (
   `testTimelimit` int(5) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `tests`
---
-
-INSERT INTO `tests` (`testID`, `assessmentID`, `generalGuidance`, `testTimelimit`) VALUES
-(1, 2, 'Read each question carefully and choose the best answer from the given options. Only one option is correct for each question. Once you move to the next question, you will not be able to return to the previous one, so review your answer before proceeding. The exam will automatically submit when the timer ends. Avoid refreshing or closing the browser during the exam to prevent submission issues.', 1200),
-(2, 6, '', 12);
-
 -- --------------------------------------------------------
 
 --
@@ -1009,15 +1136,6 @@ CREATE TABLE `todo` (
   `timeSpent` int(11) DEFAULT NULL,
   `timeStart` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `todo`
---
-
-INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `status`, `updatedAt`, `isRead`, `timeSpent`, `timeStart`) VALUES
-(1, 2, 1, 'Missing', '2025-11-11 02:36:50', 1, NULL, NULL),
-(2, 2, 4, 'Submitted', '2025-11-13 19:59:36', 1, NULL, NULL),
-(3, 2, 2, 'Pending', '2025-11-04 18:16:16', 1, 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -1050,7 +1168,7 @@ CREATE TABLE `userinfo` (
 --
 
 INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `middleName`, `lastName`, `studentID`, `programID`, `gender`, `yearLevel`, `yearSection`, `schoolEmail`, `facebookLink`, `linkedInLink`, `githubLink`, `createdAt`, `isNewUser`) VALUES
-(1, 2, 'prof.png', 'Jane', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 1, 'jane.smith@university.edu', '', '', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
+(1, 2, 'prof.png', 'James', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 1, 'jane.smith@university.edu', '', '', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
 (2, 1, 'prof.png', 'Christopher Jay', '', 'De Claro', '202310002', '1', 'Male', '2', 1, 'james.dom@university.edu', 'https://facebook.com/james.dom', 'https://linkedin.com/in/james-dom', 'https://instagram.com/james.dom', '2025-08-30 08:18:53', 1),
 (3, 3, 'prof.png', 'John', 'Cruz', 'Doe', '202310003', '1', 'Male', '2', 1, 'john.doe@university.edu', '', '', '', '2025-09-28 11:58:33', 0),
 (4, 4, 'prof.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 1, 'michael.lee@school.edu', NULL, NULL, NULL, '2025-09-28 20:59:48', 0),
@@ -1110,6 +1228,41 @@ INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`, `status`
 (23, 'devpassword5', 'shane@example.com', 'developer', 'shanesilverio', 'active'),
 (24, 'devpassword6', 'kimberly@example.com', 'developer', 'kimberlypalla', 'active');
 
+--
+-- Triggers `users`
+--
+DELIMITER $$
+CREATE TRIGGER `populate_profile_table` AFTER INSERT ON `users` FOR EACH ROW BEGIN
+    INSERT INTO profile (
+        userID,
+        webstars,
+        emblemID,
+        coverImageID,
+        colorThemeID,
+        starCard
+    ) VALUES (
+        NEW.userID,
+        1000,
+        1,
+        1,
+        1,
+        ''
+    );
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `visits`
+--
+
+CREATE TABLE `visits` (
+  `visitID` int(11) NOT NULL,
+  `dateVisited` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
 
 --
@@ -1130,7 +1283,11 @@ CREATE TABLE `webstars` (
 --
 
 INSERT INTO `webstars` (`webstarsID`, `userID`, `assessmentID`, `sourceType`, `pointsChanged`, `dateEarned`) VALUES
-(22, 2, NULL, 'Shop Purchase', -150, '2025-11-06 17:56:42');
+(22, 2, NULL, 'Shop Purchase', -150, '2025-11-06 17:56:42'),
+(25, 2, NULL, 'Shop Purchase', -150, '2025-11-16 02:50:00'),
+(26, 2, NULL, 'Shop Purchase', -250, '2025-11-16 02:51:21'),
+(27, 2, NULL, 'Shop Purchase', -100, '2025-11-16 02:51:32'),
+(28, 2, NULL, 'Shop Purchase', -50, '2025-11-16 02:51:39');
 
 --
 -- Indexes for dumped tables
@@ -1370,6 +1527,12 @@ ALTER TABLE `users`
   ADD PRIMARY KEY (`userID`);
 
 --
+-- Indexes for table `visits`
+--
+ALTER TABLE `visits`
+  ADD PRIMARY KEY (`visitID`);
+
+--
 -- Indexes for table `webstars`
 --
 ALTER TABLE `webstars`
@@ -1395,19 +1558,19 @@ ALTER TABLE `announcementnotes`
 -- AUTO_INCREMENT for table `announcements`
 --
 ALTER TABLE `announcements`
-  MODIFY `announcementID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `announcementID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `assessments`
 --
 ALTER TABLE `assessments`
-  MODIFY `assessmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `assessmentID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `assignments`
 --
 ALTER TABLE `assignments`
-  MODIFY `assignmentID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `assignmentID` int(5) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `badges`
@@ -1425,13 +1588,13 @@ ALTER TABLE `colortheme`
 -- AUTO_INCREMENT for table `courses`
 --
 ALTER TABLE `courses`
-  MODIFY `courseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `courseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `courseschedule`
 --
 ALTER TABLE `courseschedule`
-  MODIFY `courseScheduleID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `courseScheduleID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT for table `coverimage`
@@ -1443,7 +1606,7 @@ ALTER TABLE `coverimage`
 -- AUTO_INCREMENT for table `criteria`
 --
 ALTER TABLE `criteria`
-  MODIFY `criterionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `criterionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `emblem`
@@ -1491,19 +1654,19 @@ ALTER TABLE `lessons`
 -- AUTO_INCREMENT for table `level`
 --
 ALTER TABLE `level`
-  MODIFY `levelID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `levelID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=173;
 
 --
 -- AUTO_INCREMENT for table `myitems`
 --
 ALTER TABLE `myitems`
-  MODIFY `myItemID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=161;
+  MODIFY `myItemID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=165;
 
 --
 -- AUTO_INCREMENT for table `profile`
 --
 ALTER TABLE `profile`
-  MODIFY `profileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `profileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `program`
@@ -1521,7 +1684,7 @@ ALTER TABLE `report`
 -- AUTO_INCREMENT for table `rubric`
 --
 ALTER TABLE `rubric`
-  MODIFY `rubricID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `rubricID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `scores`
@@ -1563,13 +1726,13 @@ ALTER TABLE `supports`
 -- AUTO_INCREMENT for table `testquestionchoices`
 --
 ALTER TABLE `testquestionchoices`
-  MODIFY `choiceID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `choiceID` int(5) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `testquestions`
 --
 ALTER TABLE `testquestions`
-  MODIFY `testQuestionID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `testQuestionID` int(5) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `testresponses`
@@ -1581,13 +1744,13 @@ ALTER TABLE `testresponses`
 -- AUTO_INCREMENT for table `tests`
 --
 ALTER TABLE `tests`
-  MODIFY `testID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `testID` int(5) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `todo`
 --
 ALTER TABLE `todo`
-  MODIFY `todoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `todoID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `userinfo`
@@ -1599,13 +1762,19 @@ ALTER TABLE `userinfo`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+
+--
+-- AUTO_INCREMENT for table `visits`
+--
+ALTER TABLE `visits`
+  MODIFY `visitID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `webstars`
 --
 ALTER TABLE `webstars`
-  MODIFY `webstarsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `webstarsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- Constraints for dumped tables

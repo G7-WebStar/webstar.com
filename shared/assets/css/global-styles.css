@@ -38,6 +38,7 @@
 .main-container {
   opacity: 0;
   animation: fadeInUp 0.4s ease-out forwards;
+  will-change: opacity;
 }
 
 @keyframes fadeInUp {
