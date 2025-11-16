@@ -43,7 +43,8 @@ if (isset($_POST['save_exam'])) {
     $generalGuidance = mysqli_real_escape_string($conn, $generalGuidanceRaw);
 
     $testDeadline = !empty($_POST['deadline']) ? $_POST['deadline'] : null;
-    $testTimeLimit = !empty($_POST['testTimeLimit']) ? $_POST['testTimeLimit'] : null;
+    $testTimeLimitMinutes = !empty($_POST['testTimeLimit']) ? max(1, intval($_POST['testTimeLimit'])) : null;
+    $testTimeLimitSeconds = $testTimeLimitMinutes !== null ? $testTimeLimitMinutes * 60 : null;
     $testTypeRaw = $_POST['testType'] ?? 'Test';
     $testType = mysqli_real_escape_string($conn, $testTypeRaw);
     $createdAt = date("Y-m-d H:i:s");
@@ -76,9 +77,9 @@ if (isset($_POST['save_exam'])) {
             }
 
             $testQuery = "INSERT INTO tests 
-                (assessmentID, generalGuidance, testTimeLimit) 
-                VALUES 
-                ('$assessmentID', '$generalGuidance', " . ($testTimeLimit ? "'" . mysqli_real_escape_string($conn, $testTimeLimit) . "'" : "NULL") . ")";
+            (assessmentID, generalGuidance, testTimeLimit) 
+            VALUES 
+            ('$assessmentID', '$generalGuidance', " . ($testTimeLimitSeconds !== null ? "'$testTimeLimitSeconds'" : "NULL") . ")";
 
             executeQuery($testQuery);
 
@@ -200,9 +201,13 @@ if (isset($_POST['save_exam'])) {
                     $mail->SMTPSecure = 'tls';
                     $mail->Port       = 587;
                     $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
-                    $logoPath = __DIR__ . '/../shared/assets/img/webstar-logo-black.png';
-                    if (file_exists($logoPath)) {
-                        $mail->AddEmbeddedImage($logoPath, 'logoWebstar');
+                    $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
+                    if (file_exists($headerPath)) {
+                        $mail->AddEmbeddedImage($headerPath, 'emailHeader');
+                    }
+                    $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
+                    if (file_exists($footerPath)) {
+                        $mail->AddEmbeddedImage($footerPath, 'emailFooter');
                     }
 
                     $mail->isHTML(true);
@@ -243,9 +248,9 @@ if (isset($_POST['save_exam'])) {
                                 <tr>
                                     <td align="center">
                                         <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-                                            <tr style="background-color: #FDDF94;">
-                                                <td align="center" style="padding: 20px;">
-                                                    <img src="cid:logoWebstar" alt="Webstar Logo" style="height:80px;">
+                                            <tr>
+                                                <td align="center" style="padding: 0;">
+                                                    <img src="cid:emailHeader" alt="Webstar Header" style="width:600px; height:auto; display:block;">
                                                 </td>
                                             </tr>
                                             <tr>
@@ -274,9 +279,9 @@ if (isset($_POST['save_exam'])) {
                                                     </p>
                                                 </td>
                                             </tr>
-                                            <tr style="background-color:#FDDF94;">
-                                                <td align="center" style="padding:15px; color:black; font-size:13px;">
-                                                    © 2025 Webstar. All Rights Reserved.
+                                            <tr>
+                                                <td align="center" style="padding: 0;">
+                                                    <img src="cid:emailFooter" alt="Webstar Footer" style="width:600px; height:auto; display:block; border:0; outline:none; text-decoration:none;" />
                                                 </td>
                                             </tr>
                                         </table>
@@ -602,7 +607,7 @@ if (!empty($reusedData)) {
                                                 </label>
                                                 <input type="number" name="testTimeLimit"
                                                     class="form-control textbox text-reg text-16"
-                                                    placeholder="No time limit if left blank" />
+                                                    placeholder="No time limit if left blank" min="1" />
                                             </div>
                                         </div>
                                         <!-- wala pa to -->

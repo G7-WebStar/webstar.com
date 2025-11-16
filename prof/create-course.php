@@ -590,7 +590,6 @@ if (isset($_POST['createCourse'])) {
                                                     class="px-4 py-2 rounded-5 text-sbold text-md-14 mt-4 mt-md-0"
                                                     style="background-color: var(--primaryColor); border: 1px solid var(--black);">
                                                     <?php echo ($mode === 'edit') ? 'Edit' : 'Create'; ?>
-
                                                 </button>
                                             </div>
                                         </div>

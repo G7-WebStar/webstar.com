@@ -94,11 +94,48 @@ if (isset($_POST['returnAll']) && isset($_POST['assessmentID'])) {
     $updateAssessmentID = intval($_POST['assessmentID']);
     $updateQuery = "
         UPDATE todo
-        JOIN scores ON scores.userID = todo.userID AND scores.testID = $testID
         SET todo.status = 'Returned'
         WHERE todo.assessmentID = $assessmentID
+        AND todo.status = 'Submitted'
     ";
     executeQuery($updateQuery);
+
+    // Get professor name
+    $profNameQuery = "
+        SELECT CONCAT(userinfo.firstName, ' ', userinfo.lastName) AS profName
+        FROM courses
+        INNER JOIN userinfo ON courses.userID = userinfo.userID
+        WHERE courses.courseID = $courseID
+        LIMIT 1
+    ";
+    $profNameResult = executeQuery($profNameQuery);
+    $profNameRow = mysqli_fetch_assoc($profNameResult);
+    $profName = mysqli_real_escape_string($conn, $profNameRow['profName'] ?? 'Professor');
+
+    // Escape test title for SQL
+    $testTitleEscaped = mysqli_real_escape_string($conn, $testTitle);
+
+    // Insert notifications for all students who have submissions
+    $notificationQuery = "
+        INSERT INTO inbox (enrollmentID, messageText, notifType, createdAt)
+        SELECT 
+            enrollments.enrollmentID,
+            CONCAT('\"', '$testTitleEscaped', '\" was returned by your instructor. You can now view the results.'),
+            'Submissions Update',
+            NOW()
+        FROM todo
+        INNER JOIN enrollments ON todo.userID = enrollments.userID AND enrollments.courseID = $courseID
+        WHERE todo.assessmentID = $assessmentID 
+        AND todo.status = 'Returned'
+    ";
+    executeQuery($notificationQuery);
+
+    // Set success message in session
+    $_SESSION['success'] = 'All submissions have been returned successfully!';
+
+    // Redirect to prevent form resubmission
+    header("Location: assess-exam-submissions.php?assessmentID=" . $assessmentID . "&tab=submissions");
+    exit();
 }
 
 // Fetch submissions **after** potential update
@@ -131,6 +168,7 @@ if ($pendingCount < 0) $pendingCount = 0;
     <link rel="stylesheet" href="../shared/assets/css/profIndex.css">
     <link rel="stylesheet" href="../shared/assets/css/assess-exam-submissions.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=assignment_return">
     <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
@@ -156,6 +194,12 @@ if ($pendingCount < 0) $pendingCount = 0;
 
                     <!-- Navbar (mobile) -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
+
+                    <!-- Toast Container -->
+                    <div id="toastContainer"
+                        class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+                        style="z-index:1100; pointer-events:none;">
+                    </div>
 
                     <!-- Fixed Header -->
                     <div class="row mb-3">
@@ -250,7 +294,7 @@ if ($pendingCount < 0) $pendingCount = 0;
                                                             <input type="hidden" name="assessmentID" value="<?php echo $assessmentID; ?>">
                                                             <button type="submit" name="returnAll"
                                                                 class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 d-inline-flex align-items-center btn-return-all"
-                                                                style="background-color: var(--primaryColor); border: 1px solid var(--black); margin-right: auto; height: 27px;"
+                                                                style="background-color: var(--primaryColor); border: 1px solid var(--black); margin-right: auto; height: 27px; pointer-events:auto;"
                                                                 <?php echo ($currentDate < $deadline) ? 'disabled title="Return All available after deadline"' : ''; ?>>
                                                                 <span class="material-symbols-outlined">assignment_return</span>
                                                                 Return All
@@ -444,6 +488,49 @@ if ($pendingCount < 0) $pendingCount = 0;
                     }
                 });
             });
+        </script>
+
+        <!-- Toast Script -->
+        <script>
+            function showSuccessToast(message) {
+                var container = document.getElementById('toastContainer');
+                if (!container) return;
+
+                var alertEl = document.createElement('div');
+                alertEl.className = 'alert alert-success mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2';
+                alertEl.role = 'alert';
+                alertEl.style.borderRadius = '8px';
+                alertEl.style.display = 'flex';
+                alertEl.style.alignItems = 'center';
+                alertEl.style.gap = '8px';
+                alertEl.style.padding = '0.5rem 0.75rem';
+                alertEl.style.textAlign = 'center';
+                alertEl.style.backgroundColor = '#d1e7dd';
+                alertEl.style.color = '#0f5132';
+                alertEl.style.transition = 'opacity 0.5s ease-out';
+                alertEl.style.opacity = '1';
+                alertEl.innerHTML = '<i class="bi bi-check-circle-fill fs-6" style="color: var(--black);"></i>' +
+                    '<span style="color: var(--black);">' + message + '</span>';
+
+                container.appendChild(alertEl);
+
+                setTimeout(function() {
+                    alertEl.style.opacity = '0';
+                    setTimeout(function() {
+                        if (alertEl && alertEl.parentNode) {
+                            alertEl.parentNode.removeChild(alertEl);
+                        }
+                    }, 500);
+                }, 3000);
+            }
+
+            // Show toast on page load if success message exists
+            <?php if (isset($_SESSION['success'])): ?>
+                document.addEventListener('DOMContentLoaded', function() {
+                    showSuccessToast('<?php echo addslashes($_SESSION['success']); ?>');
+                });
+                <?php unset($_SESSION['success']); ?>
+            <?php endif; ?>
         </script>
 
 </body>
