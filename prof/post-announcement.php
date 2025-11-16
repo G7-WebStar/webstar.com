@@ -216,28 +216,46 @@ if (isset($_POST['save_announcement'])) {
             $escapedNotificationMessage = mysqli_real_escape_string($conn, $notificationMessage);
             $escapedNotifType = mysqli_real_escape_string($conn, $notifType);
 
-            // Insert notifications only if they don't already exist for each student (prevents duplicates)
-            $insertNotificationQuery = "
-                INSERT INTO inbox 
-                (enrollmentID, messageText, notifType, createdAt)
-                SELECT
-                    e.enrollmentID,
-                    '$escapedNotificationMessage',
-                    '$escapedNotifType',
-                    NOW()
-                FROM
-                    enrollments e
-                WHERE
-                    e.courseID = '$selectedCourseID'
-                    AND NOT EXISTS (
-                        SELECT 1 
-                        FROM inbox i2 
-                        WHERE i2.enrollmentID = e.enrollmentID 
-                            AND i2.messageText = '$escapedNotificationMessage'
-                            AND i2.notifType = '$escapedNotifType'
-                            AND i2.createdAt > DATE_SUB(NOW(), INTERVAL 5 MINUTE)
-                    )
-            ";
+            // Insert notifications for each student
+            if ($mode === 'reuse') {
+                // Always insert for reuse - it's a new posting event
+                $insertNotificationQuery = "
+                    INSERT INTO inbox 
+                    (enrollmentID, messageText, notifType, createdAt)
+                    SELECT
+                        e.enrollmentID,
+                        '$escapedNotificationMessage',
+                        '$escapedNotifType',
+                        NOW()
+                    FROM
+                        enrollments e
+                    WHERE
+                        e.courseID = '$selectedCourseID'
+                ";
+            } else {
+                // For 'new' mode, prevent duplicates within 5 minutes
+                $insertNotificationQuery = "
+                    INSERT INTO inbox 
+                    (enrollmentID, messageText, notifType, createdAt)
+                    SELECT
+                        e.enrollmentID,
+                        '$escapedNotificationMessage',
+                        '$escapedNotifType',
+                        NOW()
+                    FROM
+                        enrollments e
+                    WHERE
+                        e.courseID = '$selectedCourseID'
+                        AND NOT EXISTS (
+                            SELECT 1 
+                            FROM inbox i2 
+                            WHERE i2.enrollmentID = e.enrollmentID 
+                                AND i2.messageText = '$escapedNotificationMessage'
+                                AND i2.notifType = '$escapedNotifType'
+                                AND i2.createdAt > DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+                        )
+                ";
+            }
             executeQuery($insertNotificationQuery);
 
             // Email enrolled students who opted-in
