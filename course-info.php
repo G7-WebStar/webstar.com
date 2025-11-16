@@ -849,6 +849,33 @@ $user = mysqli_fetch_assoc($result);
                 }
             }
         });
+
+
+        (() => {
+            const searchInput = document.getElementById('leaderboardSearch');
+            const items = document.querySelectorAll('.leaderboard-item');
+            const noResults = document.getElementById('leaderboard-no-results');
+
+            searchInput.addEventListener('keyup', () => {
+                const term = searchInput.value.toLowerCase();
+                let anyVisible = false;
+
+                items.forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    const isMatch = text.includes(term);
+
+                    if (isMatch) {
+                        anyVisible = true;
+                        item.classList.add('w-100');
+                        item.style.setProperty("display", "", "important");
+                    } else {
+                        item.style.setProperty("display", "none", "important");
+                    }
+                });
+
+                noResults.style.display = anyVisible ? 'none' : 'block';
+            });
+        })();
     </script>
 
 

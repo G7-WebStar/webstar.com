@@ -10,7 +10,7 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
     <div class="container-fluid">
         <div class="row align-items-center justify-content-start flex-column flex-md-row">
             <div class="col-8 col-sm-6 col-md-12 col-lg-6 d-flex search-container mb-2 mb-lg-0">
-                <input type="text" placeholder="Search classmates" class="form-control py-1 text-reg text-lg-12 text-14">
+                <input type="text" id="leaderboardSearch" placeholder="Search classmates" class="form-control py-1 text-reg text-lg-12 text-14">
                 <button type="button" class="btn-outline-secondary">
                     <i class="bi bi-search me-2"></i>
                 </button>
@@ -18,7 +18,7 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
         </div>
     </div>
     <div class="customCard text-sbold p-3">
-        <div class="row">
+        <div class="row" id="topThree">
             <?php
             if (mysqli_num_rows($selectTopOneResult) > 0) {
                 while ($topOne = mysqli_fetch_assoc($selectTopOneResult)) {
@@ -31,7 +31,7 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                         $updatePreviousRankResult = executeQuery($updatePreviousRankQuery);
                     }
             ?>
-                    <div class="col-12 col-xl-4 mt-3 px-0 mx-auto mx-md-0 d-flex d-md-block justify-content-center justify-content-md-auto px-1">
+                    <div class="col-12 col-xl-4 mt-3 px-0 mx-auto mx-md-0 d-flex d-md-block justify-content-center justify-content-md-auto px-1 leaderboard-item">
                         <div class="card rounded-4 col-6 col-md-12">
                             <div class="card-body border border-black rounded-4">
                                 <div class="row">
@@ -70,6 +70,10 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                                     </div>
                                 </div>
                             </div>
+                            <p id="leaderboard-no-results" class="text-muted text-center mt-3" style="display:none;">
+                                No matches found.
+                            </p>
+
                         </div>
                     </div>
             <?php
@@ -89,7 +93,7 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                         $updatePreviousRankResult = executeQuery($updatePreviousRankQuery);
                     }
             ?>
-                    <div class="col-6 col-md-12 col-xl-4 mt-3 px-0 px-1">
+                    <div class="col-6 col-md-12 col-xl-4 mt-3 px-0 px-1 leaderboard-item">
                         <div class="card rounded-4">
                             <div class="card-body border border-black rounded-4">
                                 <div class="row">
@@ -142,6 +146,10 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                                     </div>
                                 </div>
                             </div>
+                            <p id="leaderboard-no-results" class="text-muted text-center mt-3" style="display:none;">
+                                No matches found.
+                            </p>
+
                         </div>
                     </div>
             <?php
@@ -164,7 +172,7 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
             ?>
                     <div class="container-fluid">
                         <div class="row px-1">
-                            <div class="col-12 border border-black mx-auto mt-3 rounded-4 px-4 py-2 bg-white">
+                            <div class="col-12 border border-black mx-auto mt-3 rounded-4 px-4 py-2 bg-white leaderboard-item">
                                 <div class="row">
                                     <div class="col-3 d-flex align-items-center justify-content-around">
                                         <span class="text-xl-36 text-xs-28 text-30">
@@ -216,6 +224,10 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                                     </div>
                                 </div>
                             </div>
+                            <p id="leaderboard-no-results" class="text-muted text-center mt-3" style="display:none;">
+                                No matches found.
+                            </p>
+
                         </div>
                     </div>
             <?php
