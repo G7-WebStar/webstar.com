@@ -542,9 +542,9 @@ $tpGroupList = $hasTotalPoints ? ", r.totalPoints" : "";
 $rubricsQuery = "SELECT r.rubricID, r.rubricTitle, r.rubricType, $tpSelectList, COUNT(c.criterionID) AS criteriaCount
                  FROM rubric r
                  LEFT JOIN criteria c ON c.rubricID = r.rubricID
-                 WHERE r.userID = '$userID'
+                 WHERE (r.rubricType = 'Preset' OR (r.userID = '$userID' AND r.rubricType = 'Created'))
                  GROUP BY r.rubricID, r.rubricTitle, r.rubricType$tpGroupList
-                 ORDER BY r.rubricID DESC";
+                 ORDER BY r.rubricType DESC, r.rubricID DESC";
 
 $rubricsRes = executeQuery($rubricsQuery);
 if ($rubricsRes && $rubricsRes->num_rows > 0) {
