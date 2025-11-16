@@ -343,7 +343,12 @@ $user = mysqli_fetch_assoc($result);
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
         rel="stylesheet" />
-
+    <style>
+        .my-student-item:hover {
+            background-color: var(--highlight50);
+            cursor: pointer;
+        }
+    </style>
 
 </head>
 
@@ -371,7 +376,7 @@ $user = mysqli_fetch_assoc($result);
                                     <?php
                                     if (mysqli_num_rows($selectCourseResult) > 0) {
                                         while ($courses = mysqli_fetch_assoc($selectCourseResult)) {
-                                            ?>
+                                    ?>
 
                                             <!-- Mobile Dropdown Course Card -->
                                             <div class="course-card-mobile d-block d-md-none w-100">
@@ -485,7 +490,7 @@ $user = mysqli_fetch_assoc($result);
                                                                         if (mysqli_num_rows($selectLeaderboardResult) > 0) {
                                                                             mysqli_data_seek($selectLeaderboardResult, 0);
                                                                             while ($points = mysqli_fetch_assoc($selectLeaderboardResult)) {
-                                                                                ?>
+                                                                        ?>
                                                                                 <div class="d-flex align-items-center">
                                                                                     <img class="me-1" src="shared/assets/img/xp.png"
                                                                                         alt="Description of Image" width="15">
@@ -494,7 +499,7 @@ $user = mysqli_fetch_assoc($result);
                                                                                         XPs</span>
                                                                                 </div>
 
-                                                                                <?php
+                                                                        <?php
                                                                             }
                                                                         }
                                                                         ?>
@@ -538,7 +543,7 @@ $user = mysqli_fetch_assoc($result);
                                                                     <?php if (mysqli_num_rows($selectLimitAssessmentResult) > 0) {
                                                                         mysqli_data_seek($selectLimitAssessmentResult, 0);
                                                                         while ($activities = mysqli_fetch_assoc($selectLimitAssessmentResult)) {
-                                                                            ?>
+                                                                    ?>
                                                                             <div
                                                                                 class="todo-card-course-info d-flex align-items-stretch rounded-2 mt-2 w-100">
                                                                                 <div class="date-section text-sbold text-12 px-3"
@@ -573,7 +578,7 @@ $user = mysqli_fetch_assoc($result);
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
-                                                                            <?php
+                                                                    <?php
                                                                         }
                                                                     } ?>
                                                                 </div>
@@ -664,7 +669,7 @@ $user = mysqli_fetch_assoc($result);
                                                             <?php if (mysqli_num_rows($selectLimitAssessmentResult) > 0) {
                                                                 mysqli_data_seek($selectLimitAssessmentResult, 0);
                                                                 while ($activities = mysqli_fetch_assoc($selectLimitAssessmentResult)) {
-                                                                    ?>
+                                                            ?>
                                                                     <div
                                                                         class="todo-card-course-info d-flex align-items-stretch rounded-2 mt-2 w-100">
                                                                         <div class="date-section text-sbold text-14 px-1"
@@ -688,20 +693,20 @@ $user = mysqli_fetch_assoc($result);
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    <?php
+                                                            <?php
                                                                 }
                                                             } ?>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <?php
+                                        <?php
                                         }
                                     } else { ?>
                                         <script>
                                             window.location.href = "404.php"
                                         </script>
-                                        <?php
+                                    <?php
                                     }
                                     ?>
                                 </div>
@@ -868,7 +873,7 @@ $user = mysqli_fetch_assoc($result);
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const tabContainer = document.getElementById('mobileTabScroll');
             const scrollLeftBtn = document.getElementById('scrollLeftBtn');
             const scrollRightBtn = document.getElementById('scrollRightBtn');
@@ -899,7 +904,7 @@ $user = mysqli_fetch_assoc($result);
             updateArrowVisibility(); // Initial check
         });
 
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             // Select all headers with collapse triggers
             const headers = document.querySelectorAll('.course-card-mobile [data-bs-toggle="collapse"]');
 
@@ -910,12 +915,12 @@ $user = mysqli_fetch_assoc($result);
 
                 if (!collapseEl) return;
 
-                collapseEl.addEventListener("show.bs.collapse", function () {
+                collapseEl.addEventListener("show.bs.collapse", function() {
                     icon.classList.remove("fa-chevron-down");
                     icon.classList.add("fa-chevron-up");
                 });
 
-                collapseEl.addEventListener("hide.bs.collapse", function () {
+                collapseEl.addEventListener("hide.bs.collapse", function() {
                     icon.classList.remove("fa-chevron-up");
                     icon.classList.add("fa-chevron-down");
                 });
@@ -925,7 +930,7 @@ $user = mysqli_fetch_assoc($result);
 
     <!-- JS for Desktop Scroll Buttons -->
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const desktopTabScroll = document.querySelector(".tab-scroll");
             const desktopScrollLeftBtn = document.getElementById("desktopScrollLeftBtn");
             const desktopScrollRightBtn = document.getElementById("desktopScrollRightBtn");
@@ -960,7 +965,7 @@ $user = mysqli_fetch_assoc($result);
 
         // JS For Course Card Sticky
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const courseCardDesktop = document.querySelector('.course-card-desktop');
 
             if (courseCardDesktop) {
