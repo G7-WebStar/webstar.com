@@ -39,6 +39,13 @@ if (isset($_POST['access_code'])) {
             // Enroll user
             $enrollQuery = "INSERT INTO enrollments (userID, courseID, yearSection) VALUES ('$userID', '$courseID', '$yearSection')";
             if (mysqli_query($conn, $enrollQuery)) {
+                $getEnrollmentIDQuery = "SELECT enrollmentID FROM enrollments WHERE userID = '$userID' AND courseID = '$courseID'";
+                $getEnrollmentIDResult = executeQuery($getEnrollmentIDQuery);
+                if (mysqli_num_rows($getEnrollmentIDResult) > 0) {
+                    $enrollentIDRow = mysqli_fetch_assoc($getEnrollmentIDResult);
+                    $enrollmentID = $enrollentIDRow['enrollmentID'];
+                    executeQuery("INSERT INTO leaderboard (enrollmentID, xpPoints) VALUES ('$enrollmentID', '0')");
+                }
                 echo json_encode(['success' => true, 'message' => 'Successfully enrolled!']);
             } else {
                 echo json_encode(['success' => false, 'message' => 'Enrollment failed. Try again later.']);

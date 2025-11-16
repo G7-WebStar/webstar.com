@@ -9,3 +9,7 @@ INNER JOIN courses
     ON enrollments.courseID = courses.courseID
 WHERE enrollments.enrollmentID = '$enrollmentID' AND courses.userID = '$userID'";
 $kickoutStudentResult = executeQuery($kickoutStudentQuery);
+
+$deleteLeaderboardEntryQuery = "DELETE leaderboard FROM leaderboard 
+WHERE enrollmentID = '$enrollmentID'";
+$deleteLeaderboardEntryResult = executeQuery($deleteLeaderboardEntryQuery);

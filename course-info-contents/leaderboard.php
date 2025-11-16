@@ -8,23 +8,12 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
 ?>
 <?php if ($hasLeaderboardResults): ?>
 <div class="container-fluid">
-    <div class="row align-items-center justify-content-center flex-column flex-md-row">
+    <div class="row align-items-center justify-content-start flex-column flex-md-row">
         <div class="col-8 col-sm-6 col-md-12 col-lg-6 d-flex search-container mb-2 mb-lg-0">
             <input type="text" placeholder="Search classmates" class="form-control py-1 text-reg text-lg-12 text-14">
             <button type="button" class="btn-outline-secondary">
                 <i class="bi bi-search me-2"></i>
             </button>
-        </div>
-        <div class="col-6 d-flex justify-content-center justify-content-lg-start align-items-center">
-            <span class="dropdown-label me-2 text-reg text-14">View by:</span>
-            <form method="POST">
-                <input type="hidden" name="activeTab" value="leaderboard">
-                <select class="select-modern text-reg text-14" name="dateFilter" onchange="this.form.submit()">
-                    <option value="Monthly" <?php echo $dateFilter == 'Monthly' ? 'selected' : ''; ?> class="dropdown-item text-reg">Monthly</option>
-                    <option value="Weekly" <?php echo ($dateFilter == 'Weekly' || empty($dateFilter)) ? 'selected' : ''; ?> class="dropdown-item text-reg">Weekly</option>
-                    <option value="Daily" <?php echo $dateFilter == 'Daily' ? 'selected' : ''; ?> class="dropdown-item text-reg">Daily</option>
-                </select>
-            </form>
         </div>
     </div>
 </div>
@@ -50,8 +39,7 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                                     </div>
                                     <div class="badge rounded-pill text-dark text-reg float-end d-flex flex-row d-xxs-none"
                                         style="background-color: #C8ECC1;">
-                                        <i class="bi bi-caret-up-fill me-1"></i>
-                                        <div class="me-1">2</div>
+                                        <i class="bi bi-caret-up-fill"></i>
                                     </div>
                                 </div>
                                 <div class="col-12 mt-3 text-xl-12 text-lg-16 text-xs-12 text-wrap">
@@ -89,8 +77,8 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                                     </div>
                                     <div class="badge rounded-pill text-dark text-reg float-end d-flex flex-row d-xxs-none"
                                         style="background-color: #ECC1C1;">
-                                        <i class="bi bi-caret-down-fill me-1"></i>
-                                        <div class="me-1">1</div>
+                                        <i class="bi bi-caret-down-fill"></i>
+                                        
                                     </div>
                                 </div>
                                 <div class="col-12 mt-3 text-xl-12 text-lg-16 text-xs-12 text-wrap">
@@ -124,8 +112,7 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                                     <span
                                         class="badge rounded-pill text-dark text-reg float-end d-flex flex-row d-xs-none d-md-none d-lg-flex"
                                         style="background-color: #C8ECC1;">
-                                        <i class="bi bi-caret-up-fill me-1"></i>
-                                        <div class="me-1">2</div>
+                                        <i class="bi bi-caret-up-fill"></i>
                                     </span>
                                 </div>
                                 <div class="col-9 d-flex align-items-center justify-content-between">
@@ -172,8 +159,7 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                                     <span
                                         class="badge rounded-pill text-dark text-reg float-end d-flex flex-row d-xs-none d-md-none d-lg-flex"
                                         style="background-color: #C8ECC1;">
-                                        <i class="bi bi-caret-up-fill me-1"></i>
-                                        <div class="me-1">2</div>
+                                        <i class="bi bi-caret-up-fill"></i>
                                     </span>
                                 </div>
                                 <div class="col-9 d-flex align-items-center justify-content-between">
