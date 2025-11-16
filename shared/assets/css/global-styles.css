@@ -35,10 +35,10 @@
   font-style: normal;
 }
 
-.main-container {
+/* .main-container {
   opacity: 0;
-  animation: fadeInUp 0.4s ease-out forwards;
-  will-change: opacity;
+  animation: fadeInUp 0.4s ease-out forwards !important;
+  will-change: opacity !important;
 }
 
 @keyframes fadeInUp {
@@ -47,9 +47,9 @@
   }
 
   to {
-    opacity: 1;
+    opacity: 1 ;
   }
-}
+} */
 
 :root {
   /* Color Branding */

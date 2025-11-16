@@ -245,12 +245,12 @@ if (isset($_POST['save_lesson'])) {
                 try {
                     $mail = new PHPMailer(true);
                     $mail->isSMTP();
-                    $mail->Host       = 'smtp.gmail.com';
-                    $mail->SMTPAuth   = true;
-                    $mail->Username   = 'learn.webstar@gmail.com';
-                    $mail->Password   = 'mtls vctd rhai cdem';
+                    $mail->Host = 'smtp.gmail.com';
+                    $mail->SMTPAuth = true;
+                    $mail->Username = 'learn.webstar@gmail.com';
+                    $mail->Password = 'mtls vctd rhai cdem';
                     $mail->SMTPSecure = 'tls';
-                    $mail->Port       = 587;
+                    $mail->Port = 587;
                     $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
                     $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
                     if (file_exists($headerPath)) {
@@ -331,7 +331,23 @@ if (isset($_POST['save_lesson'])) {
             }
 
         }
+
     }
+    if ($lessons) {
+        $_SESSION['toast'] = [
+            'type' => 'alert-success',
+            'message' => 'Lesson added successfully!'
+        ];
+    }
+    if ($updateLesson) {
+        $_SESSION['toast'] = [
+            'type' => 'alert-success',
+            'message' => 'Lesson edited successfully!'
+        ];
+    }
+    $_SESSION['activeTab'] = 'lessons';
+    header("Location: course-info.php?courseID=" . intval($_POST['courses'][0]));
+    exit();
 }
 
 
@@ -573,6 +589,7 @@ if (!empty($reusedData)) {
                                         value="<?= isset($_GET['edit']) ? 'edit' : (isset($_GET['reuse']) ? 'reuse' : 'new') ?>">
                                     <input type="hidden" name="lessonID"
                                         value="<?= $_GET['edit'] ?? $_GET['reuse'] ?? '' ?>">
+                                    <input type="hidden" name="activeTab" value="lessons">
                                     <div class="row">
                                         <div class="col-12 pt-3">
                                             <label for="lessonInfo" class="form-label text-med text-16">Lesson
@@ -672,62 +689,58 @@ if (!empty($reusedData)) {
                                                 style="margin-bottom: <?php echo ($courses && $courses->num_rows > 0) ? ($courses->num_rows * 50) : 0; ?>px;">
                                                 <!-- Dynamic Border Bottom based on the number of courses hehe -->
                                                 <!-- Add to Course -->
-                                                <?php if (!isset($_GET['edit'])): ?>
-                                                    <div
-                                                        class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center flex-nowrap justify-content-center justify-content-md-start">
-                                                        <span class="me-2 text-med text-16 pe-3">Add to
-                                                            Course</span>
-                                                        <div class="dropdown">
-                                                            <button
-                                                                class="btn dropdown-toggle dropdown-shape text-med text-16 me-md-5"
-                                                                type="button" data-bs-toggle="dropdown"
-                                                                aria-expanded="false">
-                                                                <span class="me-2">Select Course</span>
-                                                            </button>
-                                                            <ul class="dropdown-menu p-2 mt-2"
-                                                                style="min-width: 200px; border: 1px solid var(--black);">
-                                                                <?php
-                                                                if ($courses && $courses->num_rows > 0) {
-                                                                    // If editing, get the assigned courses for this task
-                                                                    $assignedCourseIDs = [];
-                                                                    if (isset($_GET['edit'])) {
-                                                                        $editID = intval($_GET['edit']);
-                                                                        $assignedQuery = "SELECT courseID FROM lessons WHERE lessonID = '$editID'";
-                                                                        $assignedResult = executeQuery($assignedQuery);
-                                                                        if ($assignedResult && $assignedResult->num_rows > 0) {
-                                                                            while ($row = $assignedResult->fetch_assoc()) {
-                                                                                $assignedCourseIDs[] = $row['courseID'];
-                                                                            }
+                                                <div
+                                                    class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center flex-nowrap justify-content-center justify-content-md-start <?php echo isset($_GET['edit']) ? 'invisible' : ''; ?>">
+                                                    <span class="me-2 text-med text-16 pe-3">Add to Course</span>
+                                                    <div class="dropdown">
+                                                        <button
+                                                            class="btn dropdown-toggle dropdown-shape text-med text-16 me-md-5"
+                                                            type="button" data-bs-toggle="dropdown"
+                                                            aria-expanded="false">
+                                                            <span class="me-2">Select Course</span>
+                                                        </button>
+                                                        <ul class="dropdown-menu p-2 mt-2"
+                                                            style="min-width: 200px; border: 1px solid var(--black);">
+                                                            <?php
+                                                            if ($courses && $courses->num_rows > 0) {
+                                                                $assignedCourseIDs = [];
+                                                                if (isset($_GET['edit'])) {
+                                                                    $editID = intval($_GET['edit']);
+                                                                    $assignedQuery = "SELECT courseID FROM lessons WHERE lessonID = '$editID'";
+                                                                    $assignedResult = executeQuery($assignedQuery);
+                                                                    if ($assignedResult && $assignedResult->num_rows > 0) {
+                                                                        while ($row = $assignedResult->fetch_assoc()) {
+                                                                            $assignedCourseIDs[] = $row['courseID'];
                                                                         }
                                                                     }
+                                                                }
 
-                                                                    while ($course = $courses->fetch_assoc()) {
-                                                                        $checked = in_array($course['courseID'], $assignedCourseIDs) ? 'checked' : '';
-                                                                        ?>
-                                                                        <li>
-                                                                            <div class="form-check">
-                                                                                <input class="form-check-input course-checkbox"
-                                                                                    type="checkbox" name="courses[]"
-                                                                                    style="border: 1px solid var(--black);"
-                                                                                    value="<?= $course['courseID'] ?>"
-                                                                                    id="course<?= $course['courseID'] ?>"
-                                                                                    <?= $checked ?>>
-                                                                                <label class="form-check-label text-reg"
-                                                                                    for="course<?= $course['courseID'] ?>">
-                                                                                    <?= $course['courseCode'] ?>
-                                                                                </label>
-                                                                            </div>
-                                                                        </li>
-                                                                    <?php }
-                                                                } else { ?>
-                                                                    <li><span class="dropdown-item-text text-muted">No
-                                                                            courses found</span></li>
-                                                                <?php } ?>
-                                                            </ul>
-
-                                                        </div>
+                                                                while ($course = $courses->fetch_assoc()) {
+                                                                    $checked = in_array($course['courseID'], $assignedCourseIDs) ? 'checked' : '';
+                                                                    ?>
+                                                                    <li>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input course-checkbox"
+                                                                                type="checkbox" name="courses[]"
+                                                                                style="border: 1px solid var(--black);"
+                                                                                value="<?= $course['courseID'] ?>"
+                                                                                id="course<?= $course['courseID'] ?>"
+                                                                                <?= $checked ?>>
+                                                                            <label class="form-check-label text-reg"
+                                                                                for="course<?= $course['courseID'] ?>">
+                                                                                <?= $course['courseCode'] ?>
+                                                                            </label>
+                                                                        </div>
+                                                                    </li>
+                                                                    <?php
+                                                                }
+                                                            } else { ?>
+                                                                <li><span class="dropdown-item-text text-muted">No courses
+                                                                        found</span></li>
+                                                            <?php } ?>
+                                                        </ul>
                                                     </div>
-                                                <?php endif; ?>
+                                                </div>
 
                                                 <!-- Assign Button -->
                                                 <div class="col-12 col-md-auto mt-3 mt-md-0 text-center">
@@ -843,7 +856,7 @@ if (!empty($reusedData)) {
         // Initialize Quill editor
         var quill = new Quill('#editor', {
             theme: 'snow',
-            placeholder: 'Lesson Description / Objectives',
+            placeholder: 'Lesson Description / Objectives *',
             modules: {
                 toolbar: '#toolbar'
             }
@@ -873,26 +886,38 @@ if (!empty($reusedData)) {
         // Sync Quill content to hidden input before form submit
         const form = document.querySelector('#addLessonForm'); // form ID
         form.addEventListener('submit', function (e) {
-            const lessonInput = document.querySelector('#lesson'); // hidden input
+            const hiddenInput = document.querySelector('#lesson');
+            const text = quill.getText().trim();
 
-            // Convert Quill HTML to plain text with bullets/line breaks
+            // Validate Quill editor
+            if (text.length === 0) {
+                e.preventDefault();
+                quill.root.focus();
+                hiddenInput.setCustomValidity('Please fill out this field.');
+                hiddenInput.reportValidity();
+                return false;
+            } else {
+                hiddenInput.setCustomValidity('');
+            }
+
+            // Validate at least one course selected (only in NEW mode)
+            let checkboxes = form.querySelectorAll(".course-checkbox");
+            let checked = Array.from(checkboxes).some(cb => cb.checked);
+            if (!checked && !window.location.search.includes("edit")) {
+                e.preventDefault();
+                alert("Please select at least one course before submitting.");
+                return false;
+            }
+
+            // Sync Quill content to hidden input
             let html = quill.root.innerHTML;
             html = html.replace(/<p>/g, '').replace(/<\/p>/g, '<br>');
             html = html.replace(/<li>/g, '• ').replace(/<\/li>/g, '<br>');
             html = html.replace(/<\/?(ul|ol)>/g, '');
             html = html.replace(/(<br>)+$/g, '');
-            lessonInput.value = html.trim();
+            hiddenInput.value = html.trim();
         });
 
-        // Ensure at least one course is selected
-        document.querySelector("form").addEventListener("submit", function (e) {
-            let checkboxes = document.querySelectorAll(".course-checkbox");
-            let checked = Array.from(checkboxes).some(cb => cb.checked);
-            if (!checked) {
-                e.preventDefault();
-                alert("Please select at least one course before submitting.");
-            }
-        });
 
         // File & Link preview logic with total limit of 10
         document.addEventListener('DOMContentLoaded', function () {

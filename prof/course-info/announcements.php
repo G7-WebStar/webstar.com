@@ -170,7 +170,7 @@ $announcementResult = executeQuery($announcementQuery);
 
                             <ul class="dropdown-menu dropdown-menu-end"
                                 aria-labelledby="dropdownMenuButton<?php echo $announcementID; ?>">
-                                <li><a class="dropdown-item text-reg text-14" href="#">Edit</a></li>
+                                <li><a class="dropdown-item text-reg text-14" href="post-announcement.php?edit=<?php echo $announcementID; ?>">Edit</a></li>
                                 <li>
                                     <button type="button" class="dropdown-item text-reg text-14 text-danger"
                                         data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $announcementID; ?>">
