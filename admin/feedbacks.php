@@ -3,6 +3,29 @@
 include('../shared/assets/database/connect.php');
 include("../shared/assets/processes/admin-session-process.php");
 
+// Get total feedback count
+$feedbackCountQuery = "SELECT COUNT(*) AS totalFeedback FROM feedback";
+$feedbackCountResult = mysqli_query($conn, $feedbackCountQuery);
+$feedbackCountRow = mysqli_fetch_assoc($feedbackCountResult);
+$totalFeedbacks = $feedbackCountRow['totalFeedback'];
+
+$feedbackQuery = "
+    SELECT 
+        f.feedbackID,
+        f.message,
+        f.created_at,
+        u.userID,
+        u.role,
+        ui.firstName,
+        ui.middleName,
+        ui.lastName
+    FROM feedback f
+    INNER JOIN users u ON f.senderID = u.userID
+    INNER JOIN userinfo ui ON u.userID = ui.userID
+    ORDER BY f.created_at DESC
+";
+$feedbackResult = mysqli_query($conn, $feedbackQuery);
+
 ?>
 
 <!doctype html>
@@ -60,7 +83,7 @@ include("../shared/assets/processes/admin-session-process.php");
                                     <span class="material-symbols-outlined ms-4" style="font-size: 30px;">
                                         feedback
                                     </span>
-                                    <div class="stats-count text-22 text-bold ms-1">2</div>
+                                    <div class="stats-count text-22 text-bold ms-1"><?= $totalFeedbacks ?></div>
                                 </div>
                             </div>
 
@@ -148,62 +171,73 @@ include("../shared/assets/processes/admin-session-process.php");
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <form>
-                                                            <input type="checkbox" class="form-check-input ms-2">
-                                                        </form>
-                                                    </td>
-                                                    <td>Torrillo, Christian James D. </td>
-                                                    <td>Student</td>
-                                                    <!-- Lalabas ang modal pag-pinindot 'to -->
-                                                    <td data-bs-toggle="modal" data-bs-target="#feedbackModal">The
-                                                        lessons are engaging!</td>
-                                                    <td>10-21-25 00:11:11</td>
-                                                    <td>Pending</td>
-                                                    <td>
-                                                        <div class="dropdown">
-                                                            <button class="btn btn-link text-dark p-0" type="button"
-                                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                                <i class="bi bi-three-dots-vertical fs-5"></i>
-                                                            </button>
-                                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                                <li><a class="dropdown-item" href="#">Mark as
-                                                                        reviewed</a></li>
-                                                                <li><a class="dropdown-item" href="#">Mark as
-                                                                        pending</a></li>
-                                                            </ul>
+                                                <?php while ($f = mysqli_fetch_assoc($feedbackResult)): ?>
+                                                    <tr>
+                                                        <td>
+                                                            <form>
+                                                                <input type="checkbox"
+                                                                    class="form-check-input ms-2 feedback-checkbox"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#feedbackModal<?= $f['feedbackID'] ?>">
+                                                            </form>
+                                                        </td>
+                                                        <td><?= htmlspecialchars($f['lastName'] . ', ' . $f['firstName'] . ' ' . $f['middleName']) ?>
+                                                        </td>
+                                                        <td><?= ucfirst($f['role']) ?></td>
+                                                        <td data-bs-toggle="modal"
+                                                            data-bs-target="#feedbackModal<?= $f['feedbackID'] ?>">
+                                                            <?= htmlspecialchars($f['message']) ?>
+                                                        </td>
+                                                        <td><?= date("m-d-Y H:i:s", strtotime($f['created_at'])) ?></td>
+                                                        <td>Pending</td>
+                                                        <td>
+                                                            <div class="dropdown">
+                                                                <button class="btn btn-link text-dark p-0" type="button"
+                                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                                    <i class="bi bi-three-dots-vertical fs-5"></i>
+                                                                </button>
+                                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                                    <li><a class="dropdown-item" href="#">Mark as
+                                                                            reviewed</a></li>
+                                                                    <li><a class="dropdown-item" href="#">Mark as
+                                                                            pending</a></li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+
+                                                    <!-- Modal for this feedback -->
+                                                    <div class="modal" id="feedbackModal<?= $f['feedbackID'] ?>"
+                                                        tabindex="-1">
+                                                        <div class="modal-dialog modal-dialog-centered">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header border-bottom">
+                                                                    <div class="text-sbold text-22">Feedback</div>
+                                                                    <button type="button" class="btn-close"
+                                                                        data-bs-dismiss="modal" aria-label="Close"
+                                                                        style="transform: scale(0.8);"></button>
+                                                                </div>
+                                                                <div class="modal-body d-flex flex-column justify-content-start align-items-start mt-2 text-medium text-14 w-100"
+                                                                    style="text-align: justify;">
+                                                                    <p class="mb-0">
+                                                                        <?= htmlspecialchars($f['lastName'] . ', ' . $f['firstName'] . ' ' . $f['middleName']) ?>
+                                                                    </p>
+                                                                    <p class="mb-0">
+                                                                        <?= date("m-d-Y H:i:s", strtotime($f['created_at'])) ?>
+                                                                    </p>
+                                                                    <p class="mb-0"><?= ucfirst($f['role']) ?></p>
+                                                                    <p class="mt-3 mb-4">
+                                                                        <?= htmlspecialchars($f['message']) ?>
+                                                                    </p>
+                                                                </div>
+                                                                <div class="modal-footer border-top"
+                                                                    style="padding-top: 45px;"></div>
+                                                            </div>
                                                         </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <form>
-                                                            <input type="checkbox" class="form-check-input ms-2">
-                                                        </form>
-                                                    </td>
-                                                    <td>Torrillo, Christian James D. </td>
-                                                    <td>Student</td>
-                                                    <td data-bs-toggle="modal" data-bs-target="#feedbackModal">The
-                                                        lessons are engaging!</td>
-                                                    <td>10-21-25 00:11:11</td>
-                                                    <td>Pending</td>
-                                                    <td>
-                                                        <div class="dropdown">
-                                                            <button class="btn btn-link text-dark p-0" type="button"
-                                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                                <i class="bi bi-three-dots-vertical fs-5"></i>
-                                                            </button>
-                                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                                <li><a class="dropdown-item" href="#">Mark as
-                                                                        reviewed</a></li>
-                                                                <li><a class="dropdown-item" href="#">Mark as
-                                                                        pending</a></li>
-                                                            </ul>
-                                                        </div>
-                                                    </td>
-                                                </tr>
+                                                    </div>
+                                                <?php endwhile; ?>
                                             </tbody>
+
                                         </table>
                                     </div>
                                 </div>
@@ -274,6 +308,43 @@ include("../shared/assets/processes/admin-session-process.php");
             });
         });
     </script>
+
+    <script>
+        document.querySelectorAll('[id^="feedbackModal"]').forEach(modal => {
+            const modalID = modal.id;
+
+            // When modal is about to show
+            modal.addEventListener('show.bs.modal', () => {
+                // Remove any existing backdrop
+                document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+                document.body.classList.remove('modal-open');
+
+                // Ensure no new backdrop is added
+                setTimeout(() => {
+                    document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+                    document.body.classList.remove('modal-open');
+                }, 50);
+            });
+
+            // When modal is fully shown
+            modal.addEventListener('shown.bs.modal', () => {
+                document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+                document.body.classList.remove('modal-open');
+            });
+
+            // When modal is hidden (close button or outside click)
+            modal.addEventListener('hidden.bs.modal', () => {
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+
+                // Uncheck the associated checkbox
+                const checkbox = document.querySelector(`.feedback-checkbox[data-bs-target="#${modalID}"]`);
+                if (checkbox) checkbox.checked = false;
+            });
+        });
+    </script>
+
+
 
 </body>
 

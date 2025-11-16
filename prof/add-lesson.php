@@ -43,44 +43,40 @@ function processGoogleLink($link)
     return preg_replace('/\?.*/', '', $link);
 }
 
-function fetchLinkTitle($link)
+function fetchLinkTitle($url)
 {
-    $link = trim($link);
-    $title = '';
+    $url = trim($url);
 
-    // Process Google links
-    $link = processGoogleLink($link);
-
-    // Ensure the link has a scheme
-    if (!preg_match('/^https?:\/\//', $link)) {
-        $link = 'http://' . $link;
+    // Ensure original link is used for title fetch (important for Google Drive)
+    if (!preg_match('/^https?:\/\//', $url)) {
+        $url = 'https://' . $url;
     }
 
-    // Set context for user-agent
-    $options = [
-        "http" => [
-            "header" => "User-Agent: Mozilla/5.0\r\n",
-            "timeout" => 5
-        ]
-    ];
-    $context = stream_context_create($options);
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0");
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 
-    try {
-        $html = @file_get_contents($link, false, $context);
-        if ($html && preg_match("/<title>(.*?)<\/title>/is", $html, $matches)) {
-            $title = trim($matches[1]);
+    $html = curl_exec($ch);
+    curl_close($ch);
+
+    if ($html) {
+
+        // Try to get OG Title (works for most modern sites)
+        if (preg_match('/<meta property="og:title" content="([^"]+)"\/?>/i', $html, $matches)) {
+            return trim($matches[1]);
         }
-    } catch (Exception $e) {
-        $title = '';
+
+        // Try <title>
+        if (preg_match("/<title>(.*?)<\/title>/is", $html, $matches)) {
+            return trim($matches[1]);
+        }
     }
 
-    // Fallback to domain if title is empty
-    if (empty($title)) {
-        $parsedUrl = parse_url($link);
-        $title = isset($parsedUrl['host']) ? ucfirst(str_replace('www.', '', $parsedUrl['host'])) : 'Link';
-    }
-
-    return $title;
+    // If still no luck → fallback to domain
+    $parsedUrl = parse_url($url);
+    return isset($parsedUrl['host']) ? ucfirst(str_replace('www.', '', $parsedUrl['host'])) : 'Link';
 }
 
 if (!class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
@@ -176,8 +172,8 @@ if (isset($_POST['save_lesson'])) {
                         $link = trim($link);
                         if ($link !== '') {
                             // Process Google links and fetch title
-                            $processedLink = processGoogleLink($link);
                             $fileTitle = fetchLinkTitle($link);
+                            $processedLink = processGoogleLink($link);
 
                             $insertLink = "INSERT INTO files 
                     (courseID, userID, lessonID, fileAttachment, fileTitle, fileLink) 
@@ -206,29 +202,46 @@ if (isset($_POST['save_lesson'])) {
                 $escapedNotificationMessage = mysqli_real_escape_string($conn, $notificationMessage);
                 $escapedNotifType = mysqli_real_escape_string($conn, $notifType);
 
-                // Insert notifications only if they don't already exist for each student
-                // This prevents duplicates when a lesson is assigned to multiple courses
-                $insertNotificationQuery = "
-                    INSERT INTO inbox 
-                    (enrollmentID, messageText, notifType, createdAt)
-                    SELECT
-                        e.enrollmentID,
-                        '$escapedNotificationMessage',
-                        '$escapedNotifType',
-                        NOW()
-                    FROM
-                        enrollments e
-                    WHERE
-                        e.courseID = '$selectedCourseID'
-                        AND NOT EXISTS (
-                            SELECT 1 
-                            FROM inbox i2 
-                            WHERE i2.enrollmentID = e.enrollmentID 
-                                AND i2.messageText = '$escapedNotificationMessage'
-                                AND i2.notifType = '$escapedNotifType'
-                                AND i2.createdAt > DATE_SUB(NOW(), INTERVAL 5 MINUTE)
-                        )
-                ";
+                // Insert notifications for each student
+                if ($mode === 'reuse') {
+                    // Always insert for reuse - it's a new posting event
+                    $insertNotificationQuery = "
+                        INSERT INTO inbox 
+                        (enrollmentID, messageText, notifType, createdAt)
+                        SELECT
+                            e.enrollmentID,
+                            '$escapedNotificationMessage',
+                            '$escapedNotifType',
+                            NOW()
+                        FROM
+                            enrollments e
+                        WHERE
+                            e.courseID = '$selectedCourseID'
+                    ";
+                } else {
+                    // For 'new' mode, prevent duplicates within 5 minutes
+                    $insertNotificationQuery = "
+                        INSERT INTO inbox 
+                        (enrollmentID, messageText, notifType, createdAt)
+                        SELECT
+                            e.enrollmentID,
+                            '$escapedNotificationMessage',
+                            '$escapedNotifType',
+                            NOW()
+                        FROM
+                            enrollments e
+                        WHERE
+                            e.courseID = '$selectedCourseID'
+                            AND NOT EXISTS (
+                                SELECT 1 
+                                FROM inbox i2 
+                                WHERE i2.enrollmentID = e.enrollmentID 
+                                    AND i2.messageText = '$escapedNotificationMessage'
+                                    AND i2.notifType = '$escapedNotifType'
+                                    AND i2.createdAt > DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+                            )
+                    ";
+                }
                 executeQuery($insertNotificationQuery);
 
                 // Email enrolled students who opted-in
@@ -279,7 +292,7 @@ if (isset($_POST['save_lesson'])) {
                         $courseCodeEsc = htmlspecialchars($courseCode, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
                         $contentHtml = nl2br(htmlspecialchars($contentRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-                    $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+                        $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
                             <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
                                 <tr>
                                     <td align="center">
@@ -950,6 +963,11 @@ if (!empty($reusedData)) {
                         }
 
                         // Get domain and favicon
+                        function truncate(text, maxLength = 30) {
+                            if (!text) return '';
+                            return text.length > maxLength ? text.slice(0, maxLength - 1) + '…' : text;
+                        }
+
                         const urlObj = new URL(linkValue);
                         const domain = urlObj.hostname;
                         const faviconURL = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
@@ -958,31 +976,29 @@ if (!empty($reusedData)) {
                         let displayTitle = "Loading...";
 
                         const previewHTML = `
-                    <div class="col-12 my-1" data-id="${uniqueID}">
-                        <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
-                            <div class="d-flex w-100 align-items-center justify-content-between">
-                                <div class="d-flex align-items-center flex-grow-1">
-                                    <div class="mx-3 d-flex align-items-center">
-                                        <img src="${faviconURL}" alt="${domain} Icon" 
-                                            onerror="this.onerror=null;this.src='../shared/assets/img/web.png';" 
-                                            style="width: 30px; height: 30px;">
-                                    </div>
-                                    <div>
-                                        <div id="title-${uniqueID}" class="text-sbold text-16" style="line-height: 1.5;">${displayTitle}</div>
-                                        <div class="text-reg text-12 text-break" style="line-height: 1.5;">
-                                            <a href="${linkValue}" target="_blank">${linkValue}</a>
+                        <div class="col-12 my-1" data-id="${uniqueID}">
+                            <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
+                                <div class="d-flex w-100 align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center flex-grow-1">
+                                        <div class="mx-3 d-flex align-items-center">
+                                            <img src="${faviconURL}" alt="${domain} Icon" 
+                                                onerror="this.onerror=null;this.src='../shared/assets/img/web.png';" 
+                                                style="width: 30px; height: 30px;">
+                                        </div>
+                                        <div>
+                                            <div id="title-${uniqueID}" class="text-sbold text-16" style="line-height: 1.5;">${displayTitle}</div>
+                                            <div class="text-reg text-12 text-break" style="line-height: 1.5;">
+                                                <a href="${linkValue}" target="_blank">${truncate(linkValue, 50)}</a>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">
-                                    <span
-                                    class="material-symbols-outlined">close</span>
+                                    <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <input type="hidden" name="links[]" value="${linkValue}" class="link-hidden">
-                    </div>
-                `;
+                            <input type="hidden" name="links[]" value="${linkValue}" class="link-hidden">
+                        </div>`;
                         container.insertAdjacentHTML('beforeend', previewHTML);
 
                         // Fetch page title
@@ -990,10 +1006,11 @@ if (!empty($reusedData)) {
                             .then(res => res.json())
                             .then(data => {
                                 const titleEl = document.getElementById(`title-${uniqueID}`);
-                                if (titleEl) titleEl.textContent = data.title || linkValue;
-                            }).catch(() => {
+                                if (titleEl) titleEl.textContent = truncate(data.title || linkValue, 50);
+                            })
+                            .catch(() => {
                                 const titleEl = document.getElementById(`title-${uniqueID}`);
-                                if (titleEl) titleEl.textContent = linkValue.split('/').pop() || "Link";
+                                if (titleEl) titleEl.textContent = truncate(linkValue.split('/').pop() || "Link", 50);
                             });
 
                         // Delete handler
@@ -1024,31 +1041,36 @@ if (!empty($reusedData)) {
                 container.querySelectorAll('.file-preview').forEach(el => el.remove());
 
                 // Rebuild file previews
+                function truncate(text, maxLength = 50) {
+                    if (!text) return '';
+                    return text.length > maxLength ? text.slice(0, maxLength - 1) + '…' : text;
+                }
+
                 allFiles.forEach((file, index) => {
                     const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
                     const ext = file.name.split('.').pop().toUpperCase();
+                    const truncatedName = truncate(file.name, 50);
+
                     const fileHTML = `
-               <div class="col-12 my-1 file-preview">
-                    <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
-                        <div class="d-flex w-100 align-items-center justify-content-between">
-                            <div class="d-flex align-items-center flex-grow-1">
-                                <div class="mx-3 d-flex align-items-center">
-                                    <span class="material-symbols-rounded">
-                                        description
-                                    </span>
+                    <div class="col-12 my-1 file-preview">
+                        <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
+                            <div class="d-flex w-100 align-items-center justify-content-between">
+                                <div class="d-flex align-items-center flex-grow-1">
+                                    <div class="mx-3 d-flex align-items-center">
+                                        <span class="material-symbols-rounded">description</span>
+                                    </div>
+                                    <div>
+                                        <div class="text-sbold text-16" style="line-height: 1.5;">${truncatedName}</div>
+                                        <div class="text-reg text-12" style="line-height: 1.5;">${ext} · ${fileSizeMB} MB</div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <div class="text-sbold text-16" style="line-height: 1.5;">${file.name}</div>
-                                    <div class="text-reg text-12 " style="line-height: 1.5;">${ext} · ${fileSizeMB} MB</div>
+                                <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;" data-index="${index}">
+                                    <span class="material-symbols-outlined">close</span>
                                 </div>
-                            </div>
-                            <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;" data-index="${index}">
-                                <span
-                                    class="material-symbols-outlined">close</span>
                             </div>
                         </div>
-                    </div>
-                </div>`;
+                    </div>`;
+
                     container.insertAdjacentHTML('beforeend', fileHTML);
                 });
 

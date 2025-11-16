@@ -167,16 +167,28 @@ if (isset($_GET['courseID'])) {
 
     // Status filter
     $todoWhereStatus = "";
+    $deadlineCondition = "";
+    
     if ($statusFilter === 'Pending') {
         $todoWhereStatus = "AND (todo.status IS NULL OR todo.status = 'Pending')";
+        $deadlineCondition = "AND NOW() < assessments.deadline";
     } elseif ($statusFilter === 'Missing') {
-        $todoWhereStatus = "AND todo.status = 'Missing'";
+        // Show assessments with past deadlines that are missing (or have no todo record yet)
+        $todoWhereStatus = "AND (todo.status = 'Missing' OR (todo.status IS NULL AND NOW() >= assessments.deadline))";
+        $deadlineCondition = "AND NOW() >= assessments.deadline";
     } elseif ($statusFilter === 'Done') {
         $todoWhereStatus = "AND todo.status IN ('Submitted', 'Returned', 'Graded')";
+        $deadlineCondition = ""; // Show done items regardless of deadline
+    } else {
+        // Default: show pending items with future deadlines
+        $todoWhereStatus = "AND (todo.status IS NULL OR todo.status = 'Pending')";
+        $deadlineCondition = "AND NOW() < assessments.deadline";
     }
 
     if ($sortTodo === 'Missing') {
-        $todoWhereStatus = "AND todo.status = 'Missing'";
+        // Show assessments with past deadlines that are missing (or have no todo record yet)
+        $todoWhereStatus = "AND (todo.status = 'Missing' OR (todo.status IS NULL AND NOW() >= assessments.deadline))";
+        $deadlineCondition = "AND NOW() >= assessments.deadline";
     }
 
     $selectAssessmentQuery = "  SELECT
@@ -198,7 +210,7 @@ if (isset($_GET['courseID'])) {
         ON todo.assessmentID = assessments.assessmentID
         AND todo.userID = '$userID'
     WHERE courses.courseID = '$courseID'
-      AND NOW() < assessments.deadline
+      $deadlineCondition
       $todoWhereStatus
     ORDER BY $todoOrderBy;
 ";
@@ -751,7 +763,7 @@ $user = mysqli_fetch_assoc($result);
                                                         style="display: inline-flex; white-space: nowrap; justify-content: space-between;">
                                                         <li class="nav-item">
                                                             <a class="nav-link text-14 <?php echo ($activeTab == 'announcements') ? 'active' : ''; ?>"
-                                                                data-bs-toggle="tab" data-bs-target="#announcements" 
+                                                                data-bs-toggle="tab" data-bs-target="#announcements"
                                                                 href="#announcements">Announcements</a>
                                                         </li>
 
@@ -1029,6 +1041,37 @@ $user = mysqli_fetch_assoc($result);
         </script>
     <?php endif; ?>
 
+    <script>
+        (() => {
+            const searchInput = document.getElementById('leaderboardSearch');
+            const items = document.querySelectorAll('.leaderboard-item');
+            const noResults = document.getElementById('leaderboard-no-results');
+
+            searchInput.addEventListener('keyup', () => {
+                const term = searchInput.value.toLowerCase();
+                let anyVisible = false;
+
+                items.forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    const isMatch = text.includes(term);
+
+                    if (isMatch) {
+                        anyVisible = true;
+                        item.classList.add('w-100');
+                        item.style.setProperty("display", "", "important");
+                    } else {
+                        item.style.setProperty("display", "none", "important");
+                    }
+
+                    if (term == '') {
+                        item.classList.remove('w-100');
+                    }
+                });
+
+                noResults.style.display = anyVisible ? 'none' : 'block';
+            });
+        })();
+    </script>
 
 </body>
 
