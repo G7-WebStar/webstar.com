@@ -278,7 +278,8 @@ if (isset($_POST['save_lesson'])) {
                         $emailTitleEsc = htmlspecialchars($titleRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
                         $courseCodeEsc = htmlspecialchars($courseCode, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-                        $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+                        $contentHtml = nl2br(htmlspecialchars($contentRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                    $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
                             <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
                                 <tr>
                                     <td align="center">
@@ -299,7 +300,7 @@ if (isset($_POST['save_lesson'])) {
                                                         <strong>Lesson Description:</strong>
                                                     </p>
                                                     <div style="font-size:15px; color:#333; margin-bottom: 20px; line-height: 22px;">
-                                                        ' . $contentRaw . '
+                                                        ' . $contentHtml . '
                                                     </div>
                                                     <p style="font-size:15px; color:#333;">
                                                         Please log in to your Webstar account to access and view the lesson materials.

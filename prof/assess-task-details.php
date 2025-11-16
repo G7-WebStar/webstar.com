@@ -72,6 +72,11 @@ $countGradedQuery = "SELECT COUNT(*) AS graded FROM todo
 $countGradedResult = executeQuery($countGradedQuery);
 $graded = mysqli_fetch_assoc($countGradedResult);
 
+$countMissingQuery = "SELECT COUNT(*) AS missing FROM todo 
+                     WHERE assessmentID = '$assessmentID' AND status = 'Missing'";
+$countMissingResult = executeQuery($countMissingQuery);
+$missing = mysqli_fetch_assoc($countMissingResult);
+
 $getAssessmentStatusQuery = "SELECT * FROM assessments WHERE CURRENT_DATE <= deadline AND assessmentID = $assessmentID;";
 $getAssessmentStatusResult = executeQuery($getAssessmentStatusQuery);
 
@@ -91,6 +96,11 @@ $getSubmissionIDQuery = "SELECT submissions.submissionID
 $getSubmissionIDResult = executeQuery($getSubmissionIDQuery);
 $submissionIDRow = (mysqli_num_rows($getSubmissionIDResult) > 0) ? mysqli_fetch_assoc($getSubmissionIDResult) : null;
 $submissionID = ($submissionIDRow == null) ? null : $submissionIDRow['submissionID'];
+
+$checkRubricQuery = "SELECT rubricID FROM assignments WHERE assessmentID = '$assessmentID'";
+$checkRubricResult = executeQuery($checkRubricQuery);
+$rubricIDRow = (mysqli_num_rows($checkRubricResult) > 0) ? mysqli_fetch_assoc($checkRubricResult) : null;
+$rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
 ?>
 
 <!doctype html>
@@ -347,14 +357,17 @@ $submissionID = ($submissionIDRow == null) ? null : $submissionIDRow['submission
                                                 </div>
 
                                                 <div class="d-flex justify-content-center pt-3">
-                                                    <a class="text-decoration-none" href="grading-sheet-pdf-with-image.php?submissionID=<?php echo $submissionID; ?>">
-                                                        <button class="btn btn-action">
-                                                            <img src="../shared/assets/img/assess/assess.png"
-                                                                alt="Assess Icon"
-                                                                style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
-                                                            Sheet
-                                                        </button>
-                                                    </a>
+                                                    <?php if ($submissionID != null) { ?><a class="text-decoration-none" href="<?php echo ($rubricID == null) ? 'grading-sheet.php?submissionID=' . $submissionID : 'grading-sheet-rubrics.php?submissionID=' . $submissionID; ?>"><?php } ?>
+                                                        <?php if ($submissionID == null) { ?><div title="No submissions in this assessment yet"><?php } ?>
+                                                            <button class="btn btn-action" <?php echo ($submissionID == null) ? 'disabled' : '' ?>>
+                                                                <img src="../shared/assets/img/assess/assess.png"
+                                                                    alt="Assess Icon"
+                                                                    style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
+                                                                Sheet
+                                                            </button>
+                                                            <?php if ($submissionID == null) { ?>
+                                                            </div><?php } ?>
+                                                        <?php if ($submissionID != null) { ?></a><?php } ?>
                                                 </div>
                                             </div>
                                         </div>
@@ -371,14 +384,14 @@ $submissionID = ($submissionIDRow == null) ? null : $submissionIDRow['submission
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        function createDoughnutChart(canvasId, submitted, pending, graded) {
+        function createDoughnutChart(canvasId, submitted, pending, graded, missing) {
             const ctx = document.getElementById(canvasId).getContext('2d');
             new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     datasets: [{
-                        data: [submitted, pending, graded],
-                        backgroundColor: ['#3DA8FF', '#C7C7C7', '#d9ffe4ff'],
+                        data: [submitted, pending, graded, missing],
+                        backgroundColor: ['#3DA8FF', '#C7C7C7', '#d9ffe4ff', '#ffd9d9ff'],
                         borderWidth: 0,
                     }]
                 },
@@ -396,7 +409,7 @@ $submissionID = ($submissionIDRow == null) ? null : $submissionIDRow['submission
             });
         }
 
-        createDoughnutChart('taskChart', <?php echo $submitted['submittedTodo']; ?>, <?php echo $pending['pending']; ?>, <?php echo $graded['graded']; ?>);
+        createDoughnutChart('taskChart', <?php echo $submitted['submittedTodo']; ?>, <?php echo $pending['pending']; ?>, <?php echo $graded['graded']; ?>, <?php echo $missing['missing']; ?>);
     </script>
 </body>
 

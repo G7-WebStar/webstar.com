@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $filters = $data['selected']['selected'];
 
-    if (in_array($filters, ['Pending', 'Graded', 'Submitted', 'Missing'])) {
+    if (in_array($filters, ['Pending', 'Graded', 'Submitted'])) {
         $filterQuery = "SELECT todo.userID, userinfo.firstName, userinfo.middleName, userinfo.lastName, todo.status, submissions.submissionID FROM todo
                         INNER JOIN userinfo
                         	ON todo.userID = userinfo.userID
@@ -19,6 +19,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         INNER JOIN submissions
                             ON todo.userID = submissions.userID
                         WHERE courses.userID = '$userID' AND todo.assessmentID = '$assessmentID' AND submissions.assessmentID = '$assessmentID' AND todo.status = '$filters'";
+        $filterResult = executeQuery($filterQuery);
+    } else if (in_array($filters, ['Did not submit'])) {
+        $filterQuery = "SELECT todo.userID, userinfo.firstName, userinfo.middleName, userinfo.lastName, todo.status, submissions.submissionID FROM todo
+                        INNER JOIN userinfo
+                        	ON todo.userID = userinfo.userID
+                        INNER JOIN assessments
+                        	ON todo.assessmentID = assessments.assessmentID
+                        INNER JOIN courses
+                        	ON assessments.courseID = courses.courseID
+                        INNER JOIN submissions
+                            ON todo.userID = submissions.userID
+                        WHERE courses.userID = '$userID' AND todo.assessmentID = '$assessmentID' AND submissions.assessmentID = '$assessmentID' AND todo.status = 'Missing'";
         $filterResult = executeQuery($filterQuery);
     } else if (in_array($filters, ['Newest'])) {
         $filterQuery = "SELECT todo.userID, userinfo.firstName, userinfo.middleName, userinfo.lastName, todo.status, submissions.submissionID FROM todo

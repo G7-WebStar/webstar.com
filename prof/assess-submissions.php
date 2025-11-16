@@ -44,6 +44,11 @@ $countGradedQuery = "SELECT COUNT(*) AS graded FROM todo
 $countGradedResult = executeQuery($countGradedQuery);
 $graded = mysqli_fetch_assoc($countGradedResult);
 
+$countMissingQuery = "SELECT COUNT(*) AS missing FROM todo 
+                     WHERE assessmentID = '$assessmentID' AND status = 'Missing'";
+$countMissingResult = executeQuery($countMissingQuery);
+$missing = mysqli_fetch_assoc($countMissingResult);
+
 $studentIDs = [];
 $studentTodoStatusQuery = "SELECT todo.userID, userinfo.firstName, userinfo.middleName, userinfo.lastName, todo.status, submissions.submissionID FROM todo
 INNER JOIN userinfo
@@ -70,7 +75,7 @@ $getAssessmentStatusResult = executeQuery($getAssessmentStatusQuery);
 if (mysqli_num_rows($getAssessmentStatusResult) > 0) {
     $statusText = 'pending';
 } else {
-    $statusText = 'missing';
+    $statusText = 'did not submit';
 }
 
 $getSubmissionIDQuery = "SELECT submissions.submissionID 
@@ -83,6 +88,11 @@ $getSubmissionIDQuery = "SELECT submissions.submissionID
 $getSubmissionIDResult = executeQuery($getSubmissionIDQuery);
 $submissionIDRow = (mysqli_num_rows($getSubmissionIDResult) > 0) ? mysqli_fetch_assoc($getSubmissionIDResult) : null;
 $submissionID = ($submissionIDRow == null) ? null : $submissionIDRow['submissionID'];
+
+$checkRubricQuery = "SELECT rubricID FROM assignments WHERE assessmentID = '$assessmentID'";
+$checkRubricResult = executeQuery($checkRubricQuery);
+$rubricIDRow = (mysqli_num_rows($checkRubricResult) > 0) ? mysqli_fetch_assoc($checkRubricResult) : null;
+$rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
 ?>
 
 <!doctype html>
@@ -241,13 +251,16 @@ $submissionID = ($submissionIDRow == null) ? null : $submissionIDRow['submission
                                                             mysqli_data_seek($studentTodoStatusResult, 0);
                                                             while ($studentsTodoRow = mysqli_fetch_assoc($studentTodoStatusResult)) {
                                                         ?>
-                                                                <a class="text-decoration-none" href="grading-sheet-pdf-with-image.php?submissionID=<?php echo $studentsTodoRow['submissionID']; ?>">
+                                                                <?php
+                                                                $gradingLink = ($rubricID == null) ? 'grading-sheet.php?submissionID=' : 'grading-sheet-rubrics.php?submissionID=';
+                                                                ?>
+                                                                <a class="text-decoration-none" href="<?php echo ($studentsTodoRow['status'] != 'Graded') ? $gradingLink . $studentsTodoRow['submissionID'] : '#'; ?>">
                                                                     <div class="submission-item d-flex align-items-center py-3 border-bottom">
                                                                         <div class="d-flex align-items-center">
                                                                             <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
                                                                                 <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
                                                                             </div>
-                                                                            <span class="text-sbold text-16"><?php echo $studentsTodoRow['firstName'] . " " . $studentsTodoRow['middleName'] . " " . $studentsTodoRow['lastName']; ?></span>
+                                                                            <span class="text-sbold text-16"><?php echo $studentsTodoRow['lastName'] . ", " . $studentsTodoRow['firstName'] . " " . $studentsTodoRow['middleName']; ?></span>
                                                                         </div>
                                                                         <div class="flex-grow-1 d-flex justify-content-center">
                                                                             <span class="badge badge-<?php echo strtolower($studentsTodoRow['status']) ?>"><?php echo $studentsTodoRow['status']; ?></span>
@@ -292,14 +305,17 @@ $submissionID = ($submissionIDRow == null) ? null : $submissionIDRow['submission
                                                 </div>
 
                                                 <div class="d-flex justify-content-center pt-3">
-                                                    <a class="text-decoration-none" href="grading-sheet-pdf-with-image.php?submissionID=<?php echo $submissionID; ?>">
-                                                        <button class="btn btn-action">
-                                                            <img src="../shared/assets/img/assess/assess.png"
-                                                                alt="Assess Icon"
-                                                                style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
-                                                            Sheet
-                                                        </button>
-                                                    </a>
+                                                    <?php if ($submissionID != null) { ?><a class="text-decoration-none" href="<?php echo ($rubricID == null) ? 'grading-sheet.php?submissionID=' . $submissionID : 'grading-sheet-rubrics.php?submissionID=' . $submissionID; ?>"><?php } ?>
+                                                        <?php if ($submissionID == null) { ?><div title="No submissions in this assessment yet"><?php } ?>
+                                                            <button class="btn btn-action <?php echo ($submissionID == null) ? 'disabled' : '' ?>">
+                                                                <img src="../shared/assets/img/assess/assess.png"
+                                                                    alt="Assess Icon"
+                                                                    style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
+                                                                Sheet
+                                                            </button>
+                                                            <?php if ($submissionID == null) { ?>
+                                                            </div><?php } ?>
+                                                        <?php if ($submissionID != null) { ?></a><?php } ?>
                                                 </div>
                                             </div>
                                         </div>
@@ -315,14 +331,14 @@ $submissionID = ($submissionIDRow == null) ? null : $submissionIDRow['submission
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
-            function createDoughnutChart(canvasId, submitted, pending, graded) {
+            function createDoughnutChart(canvasId, submitted, pending, graded, missing) {
                 const ctx = document.getElementById(canvasId).getContext('2d');
                 new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         datasets: [{
-                            data: [submitted, pending, graded],
-                            backgroundColor: ['#3DA8FF', '#C7C7C7', '#d9ffe4ff'],
+                            data: [submitted, pending, graded, missing],
+                            backgroundColor: ['#3DA8FF', '#C7C7C7', '#d9ffe4ff', '#ffd9d9ff'],
                             borderWidth: 0,
                         }]
                     },
@@ -340,7 +356,7 @@ $submissionID = ($submissionIDRow == null) ? null : $submissionIDRow['submission
                 });
             }
 
-            createDoughnutChart('taskChart', <?php echo $submitted['submittedTodo']; ?>, <?php echo $pending['pending']; ?>, <?php echo $graded['graded']; ?>);
+            createDoughnutChart('taskChart', <?php echo $submitted['submittedTodo']; ?>, <?php echo $pending['pending']; ?>, <?php echo $graded['graded']; ?>, <?php echo $missing['missing']; ?>);
 
             const studentIDs = <?php echo json_encode($studentIDs); ?>;
             console.log(studentIDs);
@@ -393,13 +409,13 @@ $submissionID = ($submissionIDRow == null) ? null : $submissionIDRow['submission
                             data.results.forEach(function(result) {
                                 document.getElementById('submission-container').innerHTML +=
                                     `
-                                <a class="text-decoration-none" href="grading-sheet-pdf-with-image.php?submissionID=` + result.submissionID + `">
+                                <a class="text-decoration-none" href="` + ((result.status != 'Graded') ? `<?php echo ($rubricID == null) ? 'grading-sheet.php?submissionID=' . $submissionID : 'grading-sheet-rubrics.php?submissionID=' ?>` + result.submissionID : '#') + `">
                                     <div class="submission-item d-flex align-items-center py-3 border-bottom">
                                         <div class="d-flex align-items-center">
                                             <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
                                                 <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
                                             </div>
-                                            <span class="text-sbold text-16">` + result.firstName + ` ` + result.middleName + ` ` + result.lastName + `</span>
+                                            <span class="text-sbold text-16">` + result.lastname + `, ` + result.firstName + ` ` + result.middleName + `</span>
                                         </div>
                                         <div class="flex-grow-1 d-flex justify-content-center">
                                             <span class="badge badge-` + result.status.toLowerCase() + `">` + result.status + `</span>

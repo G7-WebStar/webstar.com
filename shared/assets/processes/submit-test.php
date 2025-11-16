@@ -47,9 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $scoreRow = mysqli_fetch_assoc($scoreResult);
     $score = $scoreRow['correct'];
 
-    $insertScoreQuery = "INSERT INTO scores (userID, testID, score) VALUES ('$userID','$testID','$score')";
-    $insertScoreResult = executeQuery($insertScoreQuery);
-
     $assessmentIDQuery = "SELECT assessmentID FROM tests WHERE testID = '$testID'";
     $assessmentIDResult = executeQuery($assessmentIDQuery);
     $assessmentIDRow = mysqli_fetch_assoc($assessmentIDResult);
