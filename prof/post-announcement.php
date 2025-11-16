@@ -202,7 +202,7 @@ if (isset($_POST['save_announcement'])) {
                 }
             }
 
-            $notificationMessage = "A new announcement has been posted : \"" . $firstWords . "\"...";
+            $notificationMessage = "A new announcement has been posted : \"" . $firstWords . "...\"";
             $notifType = 'Course Update';
             $courseCode = "";
 
@@ -284,6 +284,8 @@ if (isset($_POST['save_announcement'])) {
                 }
 
                 if ($recipientsFound) {
+                    $contentHtml = nl2br(htmlspecialchars($contentRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                    $courseCodeEsc = htmlspecialchars($courseCode, ENT_QUOTES | ENT_HTML5, 'UTF-8');
                     $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
                         <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
                             <tr>
@@ -298,11 +300,11 @@ if (isset($_POST['save_announcement'])) {
                                             <td style="padding: 30px;">
                                                 <p style="font-size:15px; color:#333;">Hello Learner,</p>
                                                 <p style="font-size:15px; color:#333;">
-                                                    A new announcement has been posted in your course <strong>' . htmlspecialchars($courseCode, ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</strong>.
+                                                    A new announcement has been posted in your course <strong>' . $courseCodeEsc . '</strong>.
                                                 </p>
                                                 <div style="background-color:#f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #FDDF94;">
                                                     <div style="font-size:15px; color:#333; line-height: 1.6;">
-                                                        ' . $contentRaw . '
+                                                        ' . $contentHtml . '
                                                     </div>
                                                 </div>
                                                 <p style="font-size:15px; color:#333;">
