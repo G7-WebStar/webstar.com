@@ -22,27 +22,7 @@ if (!$settings) {
     $settings = mysqli_fetch_assoc($result);
 }
 
-// --- Handle save action ---
-if (isset($_POST['save'])) {
-    $courseUpdateEnabled = isset($_POST['courseUpdateEnabled']) ? 1 : 0;
-    $questDeadlineEnabled = isset($_POST['questDeadlineEnabled']) ? 1 : 0;
-    $announcementEnabled = isset($_POST['announcementEnabled']) ? 1 : 0;
 
-    executeQuery("
-        UPDATE settings SET 
-            courseUpdateEnabled = '$courseUpdateEnabled',
-            questDeadlineEnabled = '$questDeadlineEnabled',
-            announcementEnabled = '$announcementEnabled'
-        WHERE userID = '$userID'
-    ");
-
-    // Refresh settings after update
-    $result = executeQuery("SELECT * FROM settings WHERE userID = '$userID'");
-    $settings = mysqli_fetch_assoc($result);
-
-    // Keep the tab as preferences
-    $activeTab = 'preferences';
-}
 ?>
 
 

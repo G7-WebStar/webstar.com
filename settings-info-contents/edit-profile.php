@@ -46,82 +46,6 @@ if ($userResult && mysqli_num_rows($userResult) > 0) {
 $usernameTaken = false;
 $usernameTakenMessage = '';
 
-if (isset($_POST['saveChanges'])) {
-    $firstName = $_POST['firstName'] ?? '';
-    $middleName = $_POST['middleName'] ?? '';
-    $lastName = $_POST['lastName'] ?? '';
-    $userName = strtolower($_POST['userName']) ?? '';
-    $studentID = strtoupper($_POST['studentID']) ?? '';
-    $programID = $_POST['program'] ?? '';
-    $gender = $_POST['gender'] ?? '';
-    $yearLevel = $_POST['yearLevel'] ?? '';
-    $yearSection = $_POST['yearSection'] ?? '';
-    $schoolEmail = $_POST['schoolEmail'] ?? '';
-    $fbLink = $_POST['fbLink'] ?? '';
-    $linkedInLink = $_POST['linkedInLink'] ?? '';
-    $githubLink = $_POST['githubLink'] ?? '';
-
-    // Handle profile picture upload
-    $uploadField = isset($_FILES['fileUpload']) ? 'fileUpload' : (isset($_FILES['fileUploadMobile']) ? 'fileUploadMobile' : null);
-    if ($uploadField && isset($_FILES[$uploadField]) && $_FILES[$uploadField]['error'] === UPLOAD_ERR_OK) {
-        $fileTmp = $_FILES[$uploadField]['tmp_name'];
-        $fileName = basename($_FILES[$uploadField]['name']);
-        $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $allowedExt = ['jpg', 'jpeg', 'png'];
-        if (in_array($fileExt, $allowedExt)) {
-            $newFileName = 'profile_' . $userID . '_' . time() . '.' . $fileExt;
-            $uploadDir = "shared/assets/pfp-uploads/";
-            if (!is_dir($uploadDir))
-                mkdir($uploadDir, 0777, true);
-            $uploadPath = $uploadDir . $newFileName;
-            if (move_uploaded_file($fileTmp, $uploadPath)) {
-                $profilePicture = $newFileName;
-            }
-        }
-    }
-
-    // Check if username is taken by another user
-    $userNameEscaped = mysqli_real_escape_string($conn, $userName);
-    $userIDInt = intval($userID);
-    $checkQuery = "SELECT userID FROM users WHERE username='$userNameEscaped' AND userID != $userIDInt";
-    $checkResult = mysqli_query($conn, $checkQuery);
-
-    if ($checkResult && mysqli_num_rows($checkResult) > 0) {
-        $usernameTaken = true;
-        $usernameTakenMessage = "Username has already been taken";
-    } else {
-        // Update users table
-        executeQuery("UPDATE users SET username='$userName' WHERE userID='$userID'");
-
-        // Update userinfo table
-        $updateInfoQuery = "
-            UPDATE userinfo SET
-                firstName='$firstName',
-                middleName='$middleName',
-                lastName='$lastName',
-                studentID='$studentID',
-                gender='$gender',
-                yearLevel='$yearLevel',
-                yearSection='$yearSection',
-                schoolEmail='$schoolEmail',
-                facebookLink='$fbLink',
-                linkedInLink='$linkedInLink',
-                githubLink='$githubLink',
-                programID='$programID'
-        ";
-        if (!empty($profilePicture))
-            $updateInfoQuery .= ", profilePicture='$profilePicture'";
-        $updateInfoQuery .= " WHERE userID='$userID'";
-
-        $result = executeQuery($updateInfoQuery);
-
-        $result = executeQuery($updateInfoQuery);
-
-        if ($result) {
-            $profileUpdated = true; 
-        }
-    }
-}
 
 if (isset($_POST['deleteAccount'])) {
     $userID = $_SESSION['userID'];
@@ -422,7 +346,7 @@ if (isset($_POST['deleteAccount'])) {
                         <div class="col-auto text-center">
                             <form action="" method="post">
                                 <button type="button" class="btn rounded-5 text-med text-12 px-5 mt-2 mt-md-0"
-                                    style="background-color: rgba(255, 80, 80, 1); border: 1px solid var(--black);"
+                                    style="background-color: rgba(248, 142, 142, 1); border: 1px solid var(--black);"
                                     data-bs-toggle="modal" data-bs-target="#deleteModal">
                                     Delete Account
                                 </button>

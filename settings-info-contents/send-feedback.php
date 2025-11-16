@@ -1,25 +1,3 @@
-<?php
-// Handle feedback form submission
-if (isset($_POST['feedback'])) {
-    $feedback = trim($_POST['feedback']);
-
-    if ($userID && !empty($feedback)) {
-        // Find the admin (receiver)
-        $adminResult = executeQuery("SELECT userID FROM users WHERE role = 'admin' LIMIT 1");
-        $adminData = mysqli_fetch_assoc($adminResult);
-
-        if ($adminData) {
-            $receiverID = $adminData['userID'];
-
-            // Insert feedback directly (simple version)
-            executeQuery("
-                INSERT INTO feedback (senderID, receiverID, message)
-                VALUES ('$userID', '$receiverID', '$feedback')
-            ");
-        }
-    }
-}
-?>
 
 <div class="container">
     <div class="row mt-4">
@@ -31,6 +9,7 @@ if (isset($_POST['feedback'])) {
     </div>
     <div class="row">
         <form action="" method="POST" class="col-12 d-flex flex-column align-items-start" style="max-width:600px;">
+            <input type="hidden" name="activeTab" value="send-feedback">
             <textarea name="feedback" class="form-control mb-3 text-reg p-3" placeholder="Feedback"
                 style="width:100%; height:200px; border-radius:10px; border:1px solid var(--black);"></textarea>
 

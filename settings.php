@@ -64,6 +64,139 @@ if (isset($_POST['selectedCourse'])) {
     }
 }
 
+if (isset($_POST['saveChanges'])) {
+    $firstName = $_POST['firstName'] ?? '';
+    $middleName = $_POST['middleName'] ?? '';
+    $lastName = $_POST['lastName'] ?? '';
+    $userName = strtolower($_POST['userName']) ?? '';
+    $studentID = strtoupper($_POST['studentID']) ?? '';
+    $programID = $_POST['program'] ?? '';
+    $gender = $_POST['gender'] ?? '';
+    $yearLevel = $_POST['yearLevel'] ?? '';
+    $yearSection = $_POST['yearSection'] ?? '';
+    $schoolEmail = $_POST['schoolEmail'] ?? '';
+    $fbLink = $_POST['fbLink'] ?? '';
+    $linkedInLink = $_POST['linkedInLink'] ?? '';
+    $githubLink = $_POST['githubLink'] ?? '';
+
+    // Handle profile picture upload
+    $uploadField = isset($_FILES['fileUpload']) ? 'fileUpload' : (isset($_FILES['fileUploadMobile']) ? 'fileUploadMobile' : null);
+    if ($uploadField && isset($_FILES[$uploadField]) && $_FILES[$uploadField]['error'] === UPLOAD_ERR_OK) {
+        $fileTmp = $_FILES[$uploadField]['tmp_name'];
+        $fileName = basename($_FILES[$uploadField]['name']);
+        $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        $allowedExt = ['jpg', 'jpeg', 'png'];
+        if (in_array($fileExt, $allowedExt)) {
+            $newFileName = 'profile_' . $userID . '_' . time() . '.' . $fileExt;
+            $uploadDir = "shared/assets/pfp-uploads/";
+            if (!is_dir($uploadDir))
+                mkdir($uploadDir, 0777, true);
+            $uploadPath = $uploadDir . $newFileName;
+            if (move_uploaded_file($fileTmp, $uploadPath)) {
+                $profilePicture = $newFileName;
+            }
+        }
+    }
+
+    // Check if username is taken by another user
+    $userNameEscaped = mysqli_real_escape_string($conn, $userName);
+    $userIDInt = intval($userID);
+    $checkQuery = "SELECT userID FROM users WHERE username='$userNameEscaped' AND userID != $userIDInt";
+    $checkResult = mysqli_query($conn, $checkQuery);
+
+    if ($checkResult && mysqli_num_rows($checkResult) > 0) {
+        $usernameTaken = true;
+        $usernameTakenMessage = "Username has already been taken";
+        $toastMessage = 'Username has already been taken.';
+        $toastType = 'alert-danger';
+    } else {
+        // Update users table
+        executeQuery("UPDATE users SET username='$userName' WHERE userID='$userID'");
+
+        // Update userinfo table
+        $updateInfoQuery = "
+            UPDATE userinfo SET
+                firstName='$firstName',
+                middleName='$middleName',
+                lastName='$lastName',
+                studentID='$studentID',
+                gender='$gender',
+                yearLevel='$yearLevel',
+                yearSection='$yearSection',
+                schoolEmail='$schoolEmail',
+                facebookLink='$fbLink',
+                linkedInLink='$linkedInLink',
+                githubLink='$githubLink',
+                programID='$programID'
+        ";
+        if (!empty($profilePicture))
+            $updateInfoQuery .= ", profilePicture='$profilePicture'";
+        $updateInfoQuery .= " WHERE userID='$userID'";
+
+        $result = executeQuery($updateInfoQuery);
+
+        $result = executeQuery($updateInfoQuery);
+
+        if ($result) {
+            $profileUpdated = true;
+            $toastMessage = 'Profile updated successfully!';
+            $toastType = 'alert-success';
+        }
+    }
+}
+// --- Handle save action ---
+if (isset($_POST['save'])) {
+    $courseUpdateEnabled = isset($_POST['courseUpdateEnabled']) ? 1 : 0;
+    $questDeadlineEnabled = isset($_POST['questDeadlineEnabled']) ? 1 : 0;
+    $announcementEnabled = isset($_POST['announcementEnabled']) ? 1 : 0;
+
+    executeQuery("
+        UPDATE settings SET 
+            courseUpdateEnabled = '$courseUpdateEnabled',
+            questDeadlineEnabled = '$questDeadlineEnabled',
+            announcementEnabled = '$announcementEnabled'
+        WHERE userID = '$userID'
+    ");
+
+    // Refresh settings after update
+    $result = executeQuery("SELECT * FROM settings WHERE userID = '$userID'");
+    $settings = mysqli_fetch_assoc($result);
+
+    // Keep the tab as preferences
+    $activeTab = 'preferences';
+
+     if ($result) {
+            $toastMessage = 'Preferences updated successfully!';
+            $toastType = 'alert-success';
+        }
+}
+
+// Handle feedback form submission
+if (isset($_POST['feedback'])) {
+    $feedback = trim($_POST['feedback']);
+
+    if ($userID && !empty($feedback)) {
+        // Find the admin (receiver)
+        $adminResult = executeQuery("SELECT userID FROM users WHERE role = 'admin' LIMIT 1");
+        $adminData = mysqli_fetch_assoc($adminResult);
+
+        if ($adminData) {
+            $receiverID = $adminData['userID'];
+
+            // Insert feedback directly (simple version)
+            executeQuery("
+                INSERT INTO feedback (senderID, receiverID, message)
+                VALUES ('$userID', '$receiverID', '$feedback')
+            ");
+        }
+
+         if ($adminResult) {
+            $toastMessage = 'Thanks for your feedback! We’ll review it carefully and use it to improve your experience.';
+            $toastType = 'alert-success';
+        }
+    }
+}
+
 ?>
 
 <!doctype html>
