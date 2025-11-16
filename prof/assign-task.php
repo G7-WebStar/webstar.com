@@ -269,21 +269,21 @@ if (isset($_POST['saveAssignment'])) {
             try {
                 $mail = new PHPMailer(true);
                 $mail->isSMTP();
-                $mail->Host       = 'smtp.gmail.com';
-                $mail->SMTPAuth   = true;
-                $mail->Username   = 'learn.webstar@gmail.com';
-                $mail->Password   = 'mtls vctd rhai cdem';
+                $mail->Host = 'smtp.gmail.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = 'learn.webstar@gmail.com';
+                $mail->Password = 'mtls vctd rhai cdem';
                 $mail->SMTPSecure = 'tls';
-                $mail->Port       = 587;
+                $mail->Port = 587;
                 $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
-                    $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
-                    if (file_exists($headerPath)) {
-                        $mail->AddEmbeddedImage($headerPath, 'emailHeader');
-                    }
-                    $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
-                    if (file_exists($footerPath)) {
-                        $mail->AddEmbeddedImage($footerPath, 'emailFooter');
-                    }
+                $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
+                if (file_exists($headerPath)) {
+                    $mail->AddEmbeddedImage($headerPath, 'emailHeader');
+                }
+                $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
+                if (file_exists($footerPath)) {
+                    $mail->AddEmbeddedImage($footerPath, 'emailFooter');
+                }
 
                 $mail->isHTML(true);
                 $mail->CharSet = 'UTF-8';
@@ -369,6 +369,21 @@ if (isset($_POST['saveAssignment'])) {
             }
         }
     }
+    if ($insertAssignment) {
+        $_SESSION['toast'] = [
+            'type' => 'alert-success',
+            'message' => 'Assignment posted successfully!'
+        ];
+    }
+    if ($updateAssignment) {
+        $_SESSION['toast'] = [
+            'type' => 'alert-success',
+            'message' => 'Assignment edited successfully!'
+        ];
+    }
+    $_SESSION['activeTab'] = 'todo';
+    header("Location: course-info.php?courseID=" . intval($_POST['courses'][0]));
+    exit();
 }
 
 //Fetch the Title of link
@@ -943,63 +958,61 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                         style="margin-bottom: <?php echo ($courses && $courses->num_rows > 0) ? ($courses->num_rows * 50) : 0; ?>px;">
                                                         <!-- Dynamic Border Bottom based on the number of courses hehe -->
                                                         <!-- Add to Course -->
-                                                        <?php if (!isset($_GET['edit'])): ?>
-                                                            <div
-                                                                class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center flex-nowrap justify-content-center justify-content-md-start">
-                                                                <span class="me-2 text-med text-16 pe-3">Add to
-                                                                    Course</span>
-                                                                <div class="dropdown">
-                                                                    <button
-                                                                        class="btn dropdown-toggle dropdown-shape text-med text-16 me-md-5"
-                                                                        type="button" data-bs-toggle="dropdown"
-                                                                        aria-expanded="false">
-                                                                        <span class="me-2">Select Course</span>
-                                                                    </button>
-                                                                    <ul class="dropdown-menu p-2 mt-2"
-                                                                        style="min-width: 200px; border: 1px solid var(--black);">
-                                                                        <?php
-                                                                        if ($courses && $courses->num_rows > 0) {
-                                                                            // If editing, get the assigned courses for this task
-                                                                            $assignedCourseIDs = [];
-                                                                            if (isset($_GET['edit'])) {
-                                                                                $editID = intval($_GET['edit']);
-                                                                                $assignedQuery = "SELECT courseID FROM assessments WHERE assessmentID = '$editID'";
-                                                                                $assignedResult = executeQuery($assignedQuery);
-                                                                                if ($assignedResult && $assignedResult->num_rows > 0) {
-                                                                                    while ($row = $assignedResult->fetch_assoc()) {
-                                                                                        $assignedCourseIDs[] = $row['courseID'];
-                                                                                    }
+                                                        <div
+                                                            class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center flex-nowrap justify-content-center justify-content-md-start <?php echo isset($_GET['edit']) ? 'invisible' : ''; ?>">
+                                                            <span class="me-2 text-med text-16 pe-3">Add to
+                                                                Course</span>
+                                                            <div class="dropdown">
+                                                                <button
+                                                                    class="btn dropdown-toggle dropdown-shape text-med text-16 me-md-5"
+                                                                    type="button" data-bs-toggle="dropdown"
+                                                                    aria-expanded="false">
+                                                                    <span class="me-2">Select Course</span>
+                                                                </button>
+                                                                <ul class="dropdown-menu p-2 mt-2"
+                                                                    style="min-width: 200px; border: 1px solid var(--black);">
+                                                                    <?php
+                                                                    if ($courses && $courses->num_rows > 0) {
+                                                                        $assignedCourseIDs = [];
+                                                                        if (isset($_GET['edit'])) {
+                                                                            $editID = intval($_GET['edit']);
+                                                                            $assignedQuery = "SELECT courseID FROM assessment WHERE assessmentID = '$editID'";
+                                                                            $assignedResult = executeQuery($assignedQuery);
+                                                                            if ($assignedResult && $assignedResult->num_rows > 0) {
+                                                                                while ($row = $assignedResult->fetch_assoc()) {
+                                                                                    $assignedCourseIDs[] = $row['courseID'];
                                                                                 }
                                                                             }
+                                                                        }
 
-                                                                            while ($course = $courses->fetch_assoc()) {
-                                                                                $checked = in_array($course['courseID'], $assignedCourseIDs) ? 'checked' : '';
-                                                                                ?>
-                                                                                <li>
-                                                                                    <div class="form-check">
-                                                                                        <input
-                                                                                            class="form-check-input course-checkbox"
-                                                                                            type="checkbox" name="courses[]"
-                                                                                            style="border: 1px solid var(--black);"
-                                                                                            value="<?= $course['courseID'] ?>"
-                                                                                            id="course<?= $course['courseID'] ?>"
-                                                                                            <?= $checked ?>>
-                                                                                        <label class="form-check-label text-reg"
-                                                                                            for="course<?= $course['courseID'] ?>">
-                                                                                            <?= $course['courseCode'] ?>
-                                                                                        </label>
-                                                                                    </div>
-                                                                                </li>
-                                                                            <?php }
-                                                                        } else { ?>
-                                                                            <li><span class="dropdown-item-text text-muted">No
-                                                                                    courses found</span></li>
-                                                                        <?php } ?>
-                                                                    </ul>
-
-                                                                </div>
+                                                                        while ($course = $courses->fetch_assoc()) {
+                                                                            $checked = in_array($course['courseID'], $assignedCourseIDs) ? 'checked' : '';
+                                                                            ?>
+                                                                            <li>
+                                                                                <div class="form-check">
+                                                                                    <input
+                                                                                        class="form-check-input course-checkbox"
+                                                                                        type="checkbox" name="courses[]"
+                                                                                        style="border: 1px solid var(--black);"
+                                                                                        value="<?= $course['courseID'] ?>"
+                                                                                        id="course<?= $course['courseID'] ?>"
+                                                                                        <?= $checked ?>>
+                                                                                    <label class="form-check-label text-reg"
+                                                                                        for="course<?= $course['courseID'] ?>">
+                                                                                        <?= $course['courseCode'] ?>
+                                                                                    </label>
+                                                                                </div>
+                                                                            </li>
+                                                                            <?php
+                                                                        }
+                                                                    } else { ?>
+                                                                        <li><span class="dropdown-item-text text-muted">No
+                                                                                courses
+                                                                                found</span></li>
+                                                                    <?php } ?>
+                                                                </ul>
                                                             </div>
-                                                        <?php endif; ?>
+                                                        </div>
 
                                                         <!-- Assign Button -->
                                                         <div class="col-12 col-md-auto mt-3 mt-md-0 text-center">

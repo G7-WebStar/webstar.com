@@ -1,12 +1,9 @@
 <?php
-// Ensure $courseID and $conn are already defined
 
-// Get POST values or set default
 $filter = $_POST['filterRecords'] ?? 'All';
 $order = $_POST['orderByRecords'] ?? 'Ascending';
 $orderDirection = $order === 'Ascending' ? 'ASC' : 'DESC';
 
-// === Fetch assessments for dropdown dynamically ===
 $assessmentQuery = "SELECT assessmentTitle FROM assessments WHERE courseID = '$courseID' ORDER BY assessmentTitle ASC";
 $assessmentResult = executeQuery($assessmentQuery);
 $assessmentsList = ['All']; // Default option
@@ -16,7 +13,6 @@ if ($assessmentResult && mysqli_num_rows($assessmentResult) > 0) {
     }
 }
 
-// === Build main record query dynamically ===
 $recordQuery = "
 SELECT 
     userInfo.userInfoID,
@@ -46,8 +42,14 @@ LEFT JOIN submissions
     ON submissions.userID = enrollments.userID 
     AND submissions.assessmentID = assignments.assessmentID
 LEFT JOIN scores 
-    ON scores.submissionID = submissions.submissionID
-    OR (scores.testID = tests.testID)
+    ON (
+        scores.submissionID = submissions.submissionID
+        OR (
+            scores.testID = tests.testID
+            AND scores.userID = enrollments.userID
+        )
+    )
+
 WHERE enrollments.courseID = '$courseID'
 ";
 
@@ -166,7 +168,8 @@ $displayAssessments = $filter === 'All' ? $assessments : [$filter];
                             <tbody>
                                 <?php foreach ($students as $studentName => $scores): ?>
                                     <tr class="text-med text-12">
-                                        <td style="position: sticky; left: 0; z-index: 2; background: #fff; border-right:1px solid var(--black);">
+                                        <td class="text-truncate" style="position: sticky; left: 0; z-index: 2; background: #fff; border-right:1px solid var(--black);"
+                                            title="<?php echo htmlspecialchars($studentName); ?>">
                                             <?php echo htmlspecialchars($studentName); ?>
                                         </td>
                                         <?php foreach ($displayAssessments as $assessmentTitle): ?>
@@ -195,22 +198,43 @@ $displayAssessments = $filter === 'All' ? $assessments : [$filter];
 
 <!-- SEARCH FUNCTIONALITY -->
 <script>
-    const searchInput = document.querySelector('.search-container input');
-    const tableRows = document.querySelectorAll('.records tbody tr');
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.querySelector('.search-container input');
+        const tableRows = document.querySelectorAll('.records tbody tr');
 
-    searchInput.addEventListener('input', () => {
-        const query = searchInput.value.toLowerCase().trim();
-        let anyVisible = false;
+        let searchEmptyState = document.querySelector('.search-empty-state');
+        if (!searchEmptyState) {
+            searchEmptyState = document.createElement('div');
+            searchEmptyState.className = 'search-empty-state text-center mt-3 text-14 d-none';
+            searchEmptyState.innerHTML = `
+            <img src="../shared/assets/img/empty/records.png" alt="No Records" class="empty-state-img">
+            <div class="empty-state-text d-flex flex-column align-items-center">
+                <p class="text-med mt-1 mb-0">No matching records found.</p>
+            </div>
+        `;
+            document.querySelector('.records').appendChild(searchEmptyState);
+        }
 
-        tableRows.forEach(row => {
-            const studentCell = row.querySelector('td:first-child');
-            if (!studentCell) return;
-            const studentName = studentCell.textContent.toLowerCase();
-            if (studentName.includes(query)) {
-                row.style.display = '';
-                anyVisible = true;
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase().trim();
+            let anyVisible = false;
+
+            tableRows.forEach(row => {
+                const studentCell = row.querySelector('td:first-child');
+                if (!studentCell) return;
+                const studentName = studentCell.textContent.toLowerCase();
+                if (studentName.includes(query)) {
+                    row.style.display = '';
+                    anyVisible = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            if (!anyVisible) {
+                searchEmptyState.classList.remove('d-none');
             } else {
-                row.style.display = 'none';
+                searchEmptyState.classList.add('d-none');
             }
         });
     });

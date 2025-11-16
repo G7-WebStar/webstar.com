@@ -148,7 +148,7 @@ mysqli_data_seek($lessonResult, 0);
                                         <ul class="dropdown-menu dropdown-menu-end"
                                             aria-labelledby="lessonDropdown<?php echo $lessonID; ?>">
                                             <li><a class="dropdown-item text-reg text-14"
-                                                    href="edit-lesson.php?lessonID=<?php echo $lessonID; ?>">Edit</a></li>
+                                                    href="add-lesson.php?edit=<?php echo $lessonID; ?>">Edit</a></li>
                                             <li>
                                                 <button type="button" class="dropdown-item text-reg text-14 text-danger"
                                                     data-bs-toggle="modal"

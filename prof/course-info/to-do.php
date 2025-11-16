@@ -99,7 +99,7 @@ $assessmentCount = mysqli_num_rows($selectAssessmentResult);
 
 // Determine if dropdowns should be visible
 $showDropdowns = $assessmentCount > 0
-    || (!empty($statusFilter) && $statusFilter != 'All')
+    || (!empty($statusFilter) && $statusFilter != 'Pending')
     || (!empty($sortTodo) && $sortTodo == 'Missing');
 ?>
 <?php if (isset($_SESSION['success'])): ?>
@@ -248,7 +248,7 @@ $showDropdowns = $assessmentCount > 0
         <?php endwhile; ?>
     </div>
 
-<?php elseif (!empty($statusFilter) && $statusFilter != 'All' || $sortTodo == 'Missing'): ?>
+<?php elseif (!empty($statusFilter) && $statusFilter != 'Pending' || $sortTodo == 'Missing'): ?>
     <div class="empty-state text-center">
         <?php if ($statusFilter == 'Pending'): ?>
             <img src="../shared/assets/img/empty/todo.png" alt="No Pending Quests" class="empty-state-img">

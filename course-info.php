@@ -85,7 +85,9 @@ if (isset($_GET['courseID'])) {
     LEFT JOIN tests
         ON tests.assessmentID = todo.assessmentID
     WHERE todo.userID = '$userID' 
-    AND courses.courseID = '$courseID' $todoWhereStatus
+    AND courses.courseID = '$courseID' 
+    AND (assessments.deadline >= NOW() OR todo.status = 'Missing')
+    $todoWhereStatus
     ORDER BY $todoOrderBy
 ";
     $selectAssessmentResult = executeQuery($selectAssessmentQuery);

@@ -266,7 +266,7 @@ a.btn:hover {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 70%;
+        max-width: 150px;
     }
 
     .todo-card .mx-4:last-child {
@@ -750,4 +750,43 @@ select.select-modern option {
     .truncate {
         width: 300px;
     }
+}
+
+/* Default desktop widths */
+.file-info .text-sbold {
+    width: 300px;
+}
+
+.file-info .text-reg {
+    width: 300px;
+}
+
+/* Small screens */
+@media (max-width: 576px) {
+    .file-info .text-sbold {
+        width: 200px;
+    }
+
+    .file-info .text-reg {
+        width: 2000px;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 380px) {
+    .file-info .text-sbold {
+        width: 200px;
+    }
+
+    .file-info .text-reg {
+        width: 200px;
+    }
+}
+
+/* Ensure ellipsis works */
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
 }
