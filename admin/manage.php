@@ -3,6 +3,48 @@ $activePage = 'manage';
 include('../shared/assets/database/connect.php');
 include("../shared/assets/processes/admin-session-process.php");
 
+if (isset($_POST['deleteUserID'])) {
+    $userID = intval($_POST['deleteUserID']);
+
+    // 1. AnnouncementNotes → Announcements
+    executeQuery("DELETE FROM announcementnotes WHERE announcementID IN (
+        SELECT announcementID FROM announcements WHERE userID = $userID
+    )");
+
+    // 2. Test-related tables
+    executeQuery("DELETE FROM testquestionchoices WHERE testQuestionID IN (SELECT testQuestionID FROM testquestions WHERE testID IN (SELECT testID FROM tests WHERE userID = $userID))");
+    executeQuery("DELETE FROM testresponse WHERE testID IN (SELECT testID FROM tests WHERE userID = $userID)");
+    executeQuery("DELETE FROM testquestions WHERE testID IN (SELECT testID FROM tests WHERE userID = $userID)");
+    executeQuery("DELETE FROM todo WHERE assessmentID IN (SELECT assessmentID FROM assessments WHERE courseID IN (SELECT courseID FROM courses WHERE userID = $userID))");
+    executeQuery("DELETE FROM assessments WHERE courseID IN (SELECT courseID FROM courses WHERE userID = $userID)");
+    executeQuery("DELETE FROM assignments WHERE assessmentID IN (SELECT assessmentID FROM assessments WHERE courseID IN (SELECT courseID FROM courses WHERE userID = $userID))");
+
+    // 3. Courses & lessons
+    executeQuery("DELETE FROM lesson WHERE courseID IN (SELECT courseID FROM courses WHERE userID = $userID)");
+    executeQuery("DELETE FROM courseschedule WHERE courseID IN (SELECT courseID FROM courses WHERE userID = $userID)");
+    executeQuery("DELETE FROM files WHERE userID = $userID OR courseID IN (SELECT courseID FROM courses WHERE userID = $userID)");
+
+    // 4. Rubrics, criteria, levels
+    executeQuery("DELETE FROM level WHERE criterionID IN (SELECT criterionID FROM criteria WHERE rubricID IN (SELECT rubricID FROM rubric WHERE userID = $userID))");
+    executeQuery("DELETE FROM criteria WHERE rubricID IN (SELECT rubricID FROM rubric WHERE userID = $userID)");
+    executeQuery("DELETE FROM rubric WHERE userID = $userID");
+
+    // 5. Courses
+    executeQuery("DELETE FROM courses WHERE userID = $userID");
+
+    // 6. MyItems & Settings
+    executeQuery("DELETE FROM myitems WHERE userID = $userID");
+    executeQuery("DELETE FROM settings WHERE userID = $userID");
+
+    // 7. User info and users
+    executeQuery("DELETE FROM userinfo WHERE userID = $userID");
+    executeQuery("DELETE FROM users WHERE userID = $userID");
+
+    $_SESSION['success'] = "Instructor and all their works deleted successfully!";
+    header("Location: manage.php");
+    exit();
+}
+
 // Get filters from GET request
 $search = trim($_GET['search'] ?? '');
 $sort = $_GET['sort'] ?? 'Newest';
@@ -93,6 +135,9 @@ $totalStudentsQuery = "
 $totalStudentsResult = mysqli_query($conn, $totalStudentsQuery);
 $totalStudentsRow = mysqli_fetch_assoc($totalStudentsResult);
 $totalStudents = $totalStudentsRow['total'] ?? 0;
+
+$successMessage = $_SESSION['success'] ?? '';
+unset($_SESSION['success']);
 ?>
 
 
@@ -112,6 +157,7 @@ $totalStudents = $totalStudentsRow['total'] ?? 0;
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css">
 
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
@@ -235,7 +281,7 @@ $totalStudents = $totalStudentsRow['total'] ?? 0;
                                 <div class="table-responsive-sm">
                                     <table class="custom-table align-middle mb-0 text-med text-14">
                                         <thead>
-                                            <tr>
+                                            <tr data-userid="<?= $p['userID'] ?>">
                                                 <th scope="col">Name</th>
                                                 <th scope="col">Username</th>
                                                 <th scope="col">Email</th>
@@ -256,7 +302,7 @@ $totalStudents = $totalStudentsRow['total'] ?? 0;
                                                 }
                                                 ?>
 
-                                                <tr>
+                                                <tr data-userid="<?= $p['userID'] ?>">
                                                     <td><?php echo $fullName; ?></td>
                                                     <td><?php echo $p['username']; ?></td>
                                                     <td><?php echo $p['email']; ?></td>
@@ -292,9 +338,13 @@ $totalStudents = $totalStudentsRow['total'] ?? 0;
                                                                 <li><a class="dropdown-item"
                                                                         href="manage-edit.php?userID=<?php echo $p['userID']; ?>">Edit</a>
                                                                 </li>
-                                                                <li><a class="dropdown-item text-danger"
+                                                                <li>
+                                                                    <button class="dropdown-item text-danger"
                                                                         data-bs-toggle="modal"
-                                                                        data-bs-target="#deleteModal">Delete</a></li>
+                                                                        data-bs-target="#deleteModal">
+                                                                        Delete
+                                                                    </button>
+                                                                </li>
                                                             </ul>
                                                         </div>
                                                     </td>
@@ -410,10 +460,10 @@ $totalStudents = $totalStudentsRow['total'] ?? 0;
     </div>
 
     <!-- Delete Modal-->
-    <div class="modal" id="deleteModal" tabindex="-1">
+    <div class="modal fade" id="deleteModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
+            <form method="POST" id="deleteUserForm" class="modal-content">
+                <div class="modal-header border-0">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         style="transform: scale(0.8);"></button>
                 </div>
@@ -422,19 +472,35 @@ $totalStudents = $totalStudentsRow['total'] ?? 0;
                         undone.</span>
                     <span class="mb-4 text-reg text-14">Are you sure you want to delete this
                         item?</span>
+                    <!-- Hidden input for userID -->
+                    <input type="hidden" name="deleteUserID" id="deleteUserID">
                 </div>
                 <div class="modal-footer text-sbold text-18">
                     <button type="button" class="btn rounded-pill px-4"
                         style="background-color: var(--primaryColor); border: 1px solid var(--black);"
                         data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn rounded-pill px-4"
+                    <button type="submit" class="btn rounded-pill px-4"
                         style="background-color: rgba(255, 80, 80, 1); border: 1px solid var(--black);">Delete</button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 
+    <!-- Toast Container -->
+    <div id="toastContainer" class="position-absolute d-flex flex-column align-items-center"
+        style="top: 3rem; left: 25%; transform: translateX(80%); z-index:1100; pointer-events:none;">
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.querySelectorAll('.dropdown-item.text-danger').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const tr = btn.closest('tr');
+                const userID = tr.dataset.userid;
+                document.getElementById('deleteUserID').value = userID;
+            });
+        });
+    </script>
 
     <script>
         // Live search for both professors and students
@@ -519,11 +585,32 @@ $totalStudents = $totalStudentsRow['total'] ?? 0;
                 if (!dropdown.contains(e.target)) list.style.display = 'none';
             });
         });
+
+        function showToast(message, type = 'success', duration = 3000) {
+            const container = document.getElementById('toastContainer');
+
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} fade show mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2`;
+            alert.style.pointerEvents = 'auto';
+            alert.innerHTML = `
+            <i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'} me-2 fs-6"></i>
+            <span>${message}</span>
+        `;
+
+            container.appendChild(alert);
+
+            setTimeout(() => {
+                alert.classList.remove('show');
+                alert.classList.add('hide');
+                alert.addEventListener('transitionend', () => alert.remove());
+            }, duration);
+        }
+
+        // Show toast if PHP has a success message
+        <?php if (!empty($successMessage)): ?>
+            showToast("<?= addslashes($successMessage) ?>", 'success', 4000);
+        <?php endif; ?>
     </script>
-
-
-
-
 </body>
 
 
