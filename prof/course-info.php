@@ -1,5 +1,5 @@
 <?php
-$activePage = 'courseInfo';
+$activePage = 'course';
 $activeTab = $_POST['activeTab'] ?? 'announcements';
 
 include('../shared/assets/database/connect.php');
@@ -93,7 +93,6 @@ if (isset($_POST['deleteCourse'])) {
         executeQuery("DELETE FROM leaderboard WHERE enrollmentID = '$enrollmentID'");
         executeQuery("DELETE FROM inbox WHERE enrollmentID = '$enrollmentID'");
         executeQuery("DELETE FROM report WHERE enrollmentID = '$enrollmentID'");
-        executeQuery("DELETE FROM files WHERE enrollmentID = '$enrollmentID'");
     }
     executeQuery("DELETE FROM enrollments WHERE courseID = '$courseID'");
 
@@ -104,11 +103,17 @@ if (isset($_POST['deleteCourse'])) {
     executeQuery("DELETE FROM courseschedule WHERE courseID = '$courseID'");
 
     // --- Finally delete the course itself ---
-    executeQuery("DELETE FROM courses WHERE courseID = '$courseID'");
+    $deleteFromCourseTableQuery = executeQuery("DELETE FROM courses WHERE courseID = '$courseID'");
 
     // Redirect after deletion
-    header("Location: course.php?deleted=1");
-    exit();
+    if ($deleteFromCourseTableQuery) { 
+                $_SESSION['toast'] = [
+                    'type' => 'alert-success',
+                    'message' => 'Course deleted successfully!'
+                ];
+                header("Location: course.php");
+                exit();
+            }
 }
 
 if (isset($_GET['courseID'])) {
@@ -424,13 +429,13 @@ $user = mysqli_fetch_assoc($result);
                                                                         <i class="fa-solid fa-ellipsis-vertical text-dark"></i>
                                                                     </button>
 
-                                                                    <ul class="dropdown-menu border-0 shadow-sm">
+                                                                    <ul class="dropdown-menu shadow-sm text-reg border">
                                                                         <li>
                                                                             <a class="dropdown-item"
-                                                                                href="edit-course.php?id=<?php echo $courses['courseID']; ?>">Edit</a>
+                                                                                href="create-course.php?edit=<?php echo $courses['courseID']; ?>">Edit</a>
                                                                         </li>
                                                                         <li>
-                                                                            <a class="dropdown-item text-danger"
+                                                                            <a class="dropdown-item text-danger "
                                                                                 data-bs-toggle="modal"
                                                                                 data-bs-target="#deleteModal">Delete</a>
                                                                         </li>
@@ -601,10 +606,10 @@ $user = mysqli_fetch_assoc($result);
                                                                 data-bs-toggle="dropdown" aria-expanded="false">
                                                                 <i class="fa-solid fa-ellipsis-vertical"></i>
                                                             </button>
-                                                            <ul class="dropdown-menu border-0 shadow-none">
+                                                            <ul class="dropdown-menu border shadow-none text-reg ">
                                                                 <li>
-                                                                    <a class="dropdown-item text-reg text-14"
-                                                                        href="edit-course.php?id=<?php echo $courses['courseID']; ?>">Edit</a>
+                                                                    <a class="dropdown-item text-14"
+                                                                        href="create-course.php?edit=<?php echo $courses['courseID']; ?>" >Edit</a>
                                                                 </li>
                                                                 <li><a class="dropdown-item text-danger" data-bs-toggle="modal"
                                                                         data-bs-target="#deleteModal">Delete</a></li>

@@ -22,33 +22,16 @@ if (!$settings) {
     $settings = mysqli_fetch_assoc($result);
 }
 
-// --- Handle save action ---
-if (isset($_POST['save'])) {
-    $courseUpdateEnabled = isset($_POST['courseUpdateEnabled']) ? 1 : 0;
-    $questDeadlineEnabled = isset($_POST['questDeadlineEnabled']) ? 1 : 0;
-    $announcementEnabled = isset($_POST['announcementEnabled']) ? 1 : 0;
 
-    executeQuery("
-        UPDATE settings SET 
-            courseUpdateEnabled = '$courseUpdateEnabled',
-            questDeadlineEnabled = '$questDeadlineEnabled',
-            announcementEnabled = '$announcementEnabled'
-        WHERE userID = '$userID'
-    ");
-
-    // Refresh settings after update
-    $result = executeQuery("SELECT * FROM settings WHERE userID = '$userID'");
-    $settings = mysqli_fetch_assoc($result);
-}
 ?>
 
 
 <div class="container">
     <form id="notificationForm" method="POST">
         <input type="hidden" name="activeTab" value="preferences">
-        <div class="row mb-3 mt-2">
-            <div class="col-12 col-md-6 mt-2 mb-4 d-flex align-items-center">
-                <button type="submit" name="save" id="saveBtn" class="btn rounded-5 text-reg text-12"
+        <div class="row mb-2">
+            <div class="col-12 col-md-6 mb-4 d-flex align-items-center">
+                <button type="submit" name="save" id="saveBtn" class="btn rounded-5 text-reg text-12 mt-3"
                     style="background-color: var(--primaryColor); border: 1px solid var(--black); display:none;">
                     Save changes
                 </button>

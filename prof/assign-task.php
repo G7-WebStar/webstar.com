@@ -1083,7 +1083,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                         </div>
                                     <?php }
                                 } else { ?>
-                                    <div class="text-muted text-reg text-14 px-3 py-2">No rubrics found. Create one.</div>
+                                    <div class="text-muted text-reg text-14 py-2">No rubrics found. Create one.</div>
                                 <?php } ?>
 
                                 <!-- Select Rubric Button -->

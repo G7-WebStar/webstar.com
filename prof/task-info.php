@@ -47,18 +47,36 @@ $formattedTime = !empty($displayTime) ? date("F j, Y g:i A", strtotime($displayT
 $filesQuery = "SELECT * FROM files WHERE assignmentID = '$assignmentID'";
 $filesResult = executeQuery($filesQuery);
 
-$attachmentsArray = [];
+$fileLinks = [];
 $linksArray = [];
 
 while ($file = mysqli_fetch_assoc($filesResult)) {
     if (!empty($file['fileAttachment'])) {
         $attachments = array_map('trim', explode(',', $file['fileAttachment']));
-        $attachmentsArray = array_merge($attachmentsArray, $attachments);
+        foreach ($attachments as $att) {
+            $fileName = basename($att);
+            $filePath = "../shared/assets/files/" . $fileName;
+
+            // Calculate size in MB
+            $fileSize = file_exists($filePath) ? filesize($filePath) : 0;
+            $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
+            $fileLinks[] = [
+                'name' => $fileName,
+                'path' => $filePath,
+                'ext' => strtolower(pathinfo($fileName, PATHINFO_EXTENSION)),
+                'size' => $fileSizeMB
+            ];
+        }
     }
 
     if (!empty($file['fileLink'])) {
         $links = array_map('trim', explode(',', $file['fileLink']));
-        $linksArray = array_merge($linksArray, $links);
+        foreach ($links as $l) {
+            $linksArray[] = [
+                'title' => $file['fileTitle'] ?? $l,
+                'url' => $l
+            ];
+        }
     }
 }
 
@@ -120,7 +138,8 @@ if (!empty($rubricID)) {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet" />
 
 </head>
 
@@ -152,18 +171,23 @@ if (!empty($rubricID)) {
                             <div class="row desktop-header d-none d-md-flex">
                                 <div class="col-auto me-2">
                                     <a href="assess.php" class="text-decoration-none">
-                                        <span class="material-symbols-outlined" style="color: var(--black); font-size: 22px;">
+                                        <span class="material-symbols-outlined"
+                                            style="color: var(--black); font-size: 22px;">
                                             arrow_back
                                         </span>
                                     </a>
                                 </div>
                                 <div class="col">
                                     <span class="text-sbold text-25"><?php echo $assignmentTitle ?></span>
-                                    <div class="text-reg text-18">Due <?php echo date("M d, Y", strtotime($deadline)); ?></div>
+                                    <div class="text-reg text-18">Due
+                                        <?php echo date("M d, Y", strtotime($deadline)); ?>
+                                    </div>
                                 </div>
                                 <div class="col-auto d-flex align-items-center">
-                                    <a href="assess-task-details.php?assessmentID=<?php echo $assessmentID; ?>" style="text-decoration: none;">
-                                        <button class="btn d-flex align-items-center justify-content-center text-med text-14"
+                                    <a href="assess-task-details.php?assessmentID=<?php echo $assessmentID; ?>"
+                                        style="text-decoration: none;">
+                                        <button
+                                            class="btn d-flex align-items-center justify-content-center text-med text-14"
                                             style="background-color: var(--primaryColor); border: 1px solid #000; border-radius: 50px; width: 120px; padding: 2px 5px; gap:5px; color: black;"
                                             onmouseover="this.style.color='black';"
                                             onmouseout="this.style.color='black';">
@@ -179,18 +203,23 @@ if (!empty($rubricID)) {
                                 <div class="mobile-top">
                                     <div class="arrow">
                                         <a href="assess.php" class="text-decoration-none">
-                                            <span class="material-symbols-outlined" style="color: var(--black); font-size: 22px;">
+                                            <span class="material-symbols-outlined"
+                                                style="color: var(--black); font-size: 22px;">
                                                 arrow_back
                                             </span>
                                         </a>
                                     </div>
                                     <div class="col">
                                         <span class="text-sbold text-25"><?php echo $assignmentTitle ?></span>
-                                        <div class="text-reg text-18">Due <?php echo date("M d, Y", strtotime($deadline)); ?></div>
+                                        <div class="text-reg text-18">Due
+                                            <?php echo date("M d, Y", strtotime($deadline)); ?>
+                                        </div>
                                     </div>
                                     <div class="col-auto d-flex align-items-center">
-                                        <a href="assess-task-details.php?assessmentID=<?php echo $assessmentID; ?>" style="text-decoration: none;">
-                                            <button class="btn d-flex align-items-center justify-content-center text-reg text-14"
+                                        <a href="assess-task-details.php?assessmentID=<?php echo $assessmentID; ?>"
+                                            style="text-decoration: none;">
+                                            <button
+                                                class="btn d-flex align-items-center justify-content-center text-reg text-14"
                                                 style="background-color: var(--primaryColor); border: 1px solid #000; border-radius: 50px; width: 120px; padding: 2px 5px; gap:5px; color: black;"
                                                 onmouseover="this.style.color='black';"
                                                 onmouseout="this.style.color='black';">
@@ -211,55 +240,52 @@ if (!empty($rubricID)) {
                                     <div class="col-12 col-lg-8">
                                         <div class="p-0 px-lg-5">
                                             <!-- Task Details Tab - Active -->
-                                            <div class="tab-pane fade show active" id="announcements"
-                                                role="tabpanel" aria-labelledby="announcements-tab">
+                                            <div class="tab-pane fade show active" id="announcements" role="tabpanel"
+                                                aria-labelledby="announcements-tab">
                                                 <div class="text-sbold text-14 mt-3">Task Instructions</div>
-                                                <p class="mb-1 mt-3 text-med text-14"><?php echo nl2br($assignmentDescription) ?></p>
+                                                <p class="mb-1 mt-3 text-med text-14">
+                                                    <?php echo nl2br($assignmentDescription) ?>
+                                                </p>
 
                                                 <hr>
 
                                                 <div class="text-sbold text-14 mt-4">Task Materials</div>
-                                                <?php foreach ($attachmentsArray as $file):
-                                                    $filePath = "shared/assets/files/" . $file;
-                                                    $fileExt = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
-                                                    $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
-                                                    $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
-
-                                                    // Remove extension from display name
-                                                    $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
-                                                ?>
-                                                    <a href="<?php echo $filePath; ?>"
-                                                        <?php if (!preg_match('/^https?:\/\//', $filePath)) : ?>
-                                                        download="<?php echo htmlspecialchars($file); ?>"
-                                                        <?php endif; ?>
-                                                        style="text-decoration:none; color:inherit;">
-
+                                                <!-- FILES -->
+                                                <?php foreach ($fileLinks as $f):
+                                                    $fileNameOnly = pathinfo($f['name'], PATHINFO_FILENAME);
+                                                    ?>
+                                                    <div onclick="openViewerModal('<?php echo $f['name']; ?>', '<?php echo $f['path']; ?>')"
+                                                        style="cursor:pointer;">
                                                         <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
                                                             style="width:400px; max-width:100%; min-width:310px;">
                                                             <span class="px-3 py-3 material-symbols-outlined">draft</span>
                                                             <div class="ms-2">
-                                                                <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
+                                                                <div class="text-sbold text-16 mt-1">
+                                                                    <?php echo $fileNameOnly; ?>
+                                                                </div>
                                                                 <div class="due text-reg text-14 mb-1">
-                                                                    <?php echo $fileExt ?> · <?php echo $fileSizeMB ?>
+                                                                    <?php echo strtoupper($f['ext']); ?> · <?php echo $f['size']; ?>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </a>
+                                                    </div>
                                                 <?php endforeach; ?>
 
-
-                                                <?php foreach ($linksArray as $link): ?>
-                                                    <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
-                                                        style="width:400px; max-width:100%; min-width:310px;">
-                                                        <span class="px-3 py-3 material-symbols-outlined">public</span>
-                                                        <div class="ms-2">
-                                                            <!-- temoparary lang ang filename here -->
-                                                            <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
-                                                            <div class="text-reg link text-12 mt-0">
-                                                                <a href="<?php echo $link ?>" target="_blank" rel="noopener noreferrer"
-                                                                    style="text-decoration: none; color: var(--black);">
-                                                                    <?php echo $link ?>
-                                                                </a>
+                                                <!-- LINKS -->
+                                                <?php foreach ($linksArray as $linkItem): ?>
+                                                    <div onclick="openLinkViewerModal('<?php echo htmlspecialchars($linkItem['title']); ?>', '<?php echo htmlspecialchars($linkItem['url']); ?>')"
+                                                        style="cursor:pointer;">
+                                                        <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
+                                                            style="width:400px; max-width:100%; min-width:310px;">
+                                                            <span class="px-3 py-3 material-symbols-outlined">public</span>
+                                                            <div class="ms-2">
+                                                                <div class="text-sbold text-16 mt-1">
+                                                                    <?php echo htmlspecialchars($linkItem['title']); ?>
+                                                                </div>
+                                                                <div class="text-reg text-12 mt-0"
+                                                                    style="color: var(--black);">
+                                                                    <?php echo htmlspecialchars($linkItem['url']); ?>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -270,8 +296,8 @@ if (!empty($rubricID)) {
                                                 <?php if (!empty($rubricID) && !empty($rubricTitle)): ?>
                                                     <div class="text-sbold text-14 mt-4">Rubric</div>
                                                     <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
-                                                        style="max-width:100%; min-width:310px; cursor:pointer;" data-bs-toggle="modal"
-                                                        data-bs-target="#rubricModal">
+                                                        style="max-width:100%; min-width:310px; cursor:pointer;"
+                                                        data-bs-toggle="modal" data-bs-target="#rubricModal">
 
                                                         <span class="material-symbols-outlined ps-3 pe-2 py-3"
                                                             style="font-variation-settings:'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;">
@@ -279,8 +305,10 @@ if (!empty($rubricID)) {
                                                         </span>
 
                                                         <div class="ms-2">
-                                                            <div class="text-sbold text-16 mt-1"><?php echo $rubricTitle; ?></div>
-                                                            <div class="due text-reg text-14 mb-1"><?php echo $rubricPoints; ?> points
+                                                            <div class="text-sbold text-16 mt-1"><?php echo $rubricTitle; ?>
+                                                            </div>
+                                                            <div class="due text-reg text-14 mb-1">
+                                                                <?php echo $rubricPoints; ?> points
                                                             </div>
                                                         </div>
                                                     </div>
@@ -298,7 +326,8 @@ if (!empty($rubricID)) {
                                                     </div>
                                                     <div>
                                                         <div class="text-sbold text-14"><?php echo $profName ?></div>
-                                                        <div class="text-med text-12"><?php echo $formattedTime; ?></div>
+                                                        <div class="text-med text-12"><?php echo $formattedTime; ?>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -308,6 +337,56 @@ if (!empty($rubricID)) {
                             </div>
                         </div>
                     </div> <!-- Close content-scroll-container -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILE VIEWER MODAL -->
+    <div class="modal fade" id="viewerModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content" style="border-radius:12px; overflow:hidden;">
+                <div class="modal-header d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <h5 class="modal-title text-sbold text-16 mb-0" id="viewerModalLabel">File Viewer</h5>
+                        <a id="modalDownloadBtn" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
+                            style="background-color: var(--primaryColor); border: 1px solid var(--black);" download>
+                            <span class="" style="display:flex;align-items:center;gap:4px;">
+                                <span class="material-symbols-outlined" style="font-size:18px;">download_2</span>
+                                Download
+                            </span>
+                        </a>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0" style="background:#2e2e2e; height:75vh;">
+                    <div id="viewerContainer" style="width:100%; height:100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LINK VIEWER MODAL -->
+    <div class="modal fade" id="linkViewerModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content" style="border-radius:12px; overflow:hidden;">
+                <div class="modal-header d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <h5 class="modal-title text-sbold text-16 mb-0" id="linkViewerModalLabel">Link Viewer</h5>
+                        <a id="modalOpenInNewTab" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
+                            style="background-color: var(--primaryColor); border: 1px solid var(--black);"
+                            target="_blank">
+                            <span class="" style="display:flex;align-items:center;gap:4px;">
+                                <span class="material-symbols-outlined" style="font-size:18px;">open_in_new</span>
+                                Open
+                            </span>
+                        </a>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0" style="background:#2e2e2e; height:75vh;">
+                    <iframe id="linkViewerIframe"
+                        style="width:100%; height:100%; border:none; border-radius:10px;"></iframe>
                 </div>
             </div>
         </div>
@@ -344,7 +423,7 @@ if (!empty($rubricID)) {
                                 <div class="col-12 col-md-10">
                                     <?php foreach ($levelsByCriterion[$criterion['criterionID']] as $levelIndex => $level):
                                         $collapseID = strtolower(preg_replace('/\s+/', '', $level['levelTitle'])) . $criterionIndex;
-                                    ?>
+                                        ?>
                                         <div class="mb-2">
                                             <div class="w-100 d-flex align-items-center justify-content-center flex-column text-med text-14"
                                                 style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black);">
@@ -416,6 +495,32 @@ if (!empty($rubricID)) {
                 });
             }
         });
+
+        function openViewerModal(fileName, filePath) {
+            document.getElementById("viewerModalLabel").textContent = fileName;
+            document.getElementById("modalDownloadBtn").href = filePath;
+            let viewer = document.getElementById("viewerContainer");
+            viewer.innerHTML = "";
+            let ext = fileName.split(".").pop().toLowerCase();
+            if (["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"].includes(ext)) {
+                viewer.innerHTML = `<img src="${filePath}" style="width:100%; height:100%; object-fit:contain; background:#333;">`;
+            } else if (ext === "pdf") {
+                viewer.innerHTML = `<iframe src="${filePath}" width="100%" height="100%" style="border:none; border-radius:10px;"></iframe>`;
+            } else {
+                viewer.innerHTML = `<div class="text-white text-center mt-5">
+                    <p>This file type cannot be previewed.</p>
+                    <a href="${filePath}" download class="btn btn-warning">Download File</a>
+                </div>`;
+            }
+            new bootstrap.Modal(document.getElementById("viewerModal")).show();
+        }
+
+        function openLinkViewerModal(title, url) {
+            document.getElementById("linkViewerModalLabel").textContent = title;
+            document.getElementById("modalOpenInNewTab").href = url;
+            document.getElementById("linkViewerIframe").src = url;
+            new bootstrap.Modal(document.getElementById("linkViewerModal")).show();
+        }
     </script>
 
 </body>

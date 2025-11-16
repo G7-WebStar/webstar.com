@@ -36,30 +36,50 @@ $formattedTime = !empty($displayTime) ? date("F j, Y g:i A", strtotime($displayT
 $filesQuery = "SELECT * FROM files WHERE lessonID = '$lessonID'";
 $filesResult = executeQuery($filesQuery);
 
-$attachmentsArray = [];
-$linksArray = [];
+// $filesQuery = "SELECT * FROM files WHERE lessonID = '$lessonID'";
+// $filesResult = executeQuery($filesQuery);
+
+$fileLinks = [];   // for viewer modal
+$linksArray = [];  // for link list display
 
 while ($file = mysqli_fetch_assoc($filesResult)) {
+
+    // ---------- FILE ATTACHMENTS ----------
     if (!empty($file['fileAttachment'])) {
+
         $attachments = array_map('trim', explode(',', $file['fileAttachment']));
-        $attachmentsArray = array_merge($attachmentsArray, $attachments);
+
+        foreach ($attachments as $att) {
+
+            $fileName = basename($att);
+            $filePath = "shared/assets/files/" . $fileName;
+
+            $fileLinks[] = [
+                'name' => $fileName,
+                'path' => $filePath,
+                'ext' => strtolower(pathinfo($fileName, PATHINFO_EXTENSION)),
+                'title' => $file['fileTitle']
+            ];
+        }
     }
 
+    // ---------- LINK ATTACHMENTS ----------
     if (!empty($file['fileLink'])) {
         $links = array_map('trim', explode(',', $file['fileLink']));
+
         foreach ($links as $l) {
             $linksArray[] = [
                 'title' => $file['fileTitle'],
-                'url'   => $l
+                'url' => $l
             ];
         }
     }
 }
 
-
-// Update counts
-$fileCount = count($attachmentsArray);
+$fileCount = count($fileLinks);
 $linkCount = count($linksArray);
+
+?>
 ?>
 
 
@@ -83,7 +103,8 @@ $linkCount = count($linksArray);
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet" />
 
 </head>
 
@@ -113,15 +134,19 @@ $linkCount = count($linksArray);
                                 <!-- DESKTOP VIEW -->
                                 <div class="row desktop-header d-none d-sm-flex">
                                     <div class="col-auto me-2">
-                                        <a href="course-info.php?courseID=<?= $courseID ?>" class="text-decoration-none">
-                                            <span class="material-symbols-outlined" style="color: var(--black); font-size: 22px;">
+                                        <a href="course-info.php?courseID=<?= $courseID ?>"
+                                            class="text-decoration-none">
+                                            <span class="material-symbols-outlined"
+                                                style="color: var(--black); font-size: 22px;">
                                                 arrow_back
                                             </span>
                                         </a>
                                     </div>
                                     <div class="col">
                                         <span class="text-sbold text-25"><?php echo $lessonTitle; ?></span>
-                                        <div class="text-reg text-18"><?php echo $fileCount ?> <?php echo $fileCount == 1 ? "file" : "files" ?> · <?php echo $linkCount ?> <?php echo $linkCount == 1 ? "link" : "links" ?></div>
+                                        <div class="text-reg text-18"><?php echo $fileCount ?>
+                                            <?php echo $fileCount == 1 ? "file" : "files" ?> · <?php echo $linkCount ?>
+                                            <?php echo $linkCount == 1 ? "link" : "links" ?></div>
                                     </div>
                                 </div>
 
@@ -129,15 +154,19 @@ $linkCount = count($linksArray);
                                 <div class="d-block d-sm-none mobile-assignment">
                                     <div class="mobile-top">
                                         <div class="arrow">
-                                            <a href="course-info.php?courseID=<?php echo $courseID ?>" class="text-decoration-none">
-                                                <span class="material-symbols-outlined" style="color: var(--black); font-size: 22px;">
+                                            <a href="course-info.php?courseID=<?php echo $courseID ?>"
+                                                class="text-decoration-none">
+                                                <span class="material-symbols-outlined"
+                                                    style="color: var(--black); font-size: 22px;">
                                                     arrow_back
                                                 </span>
                                             </a>
                                         </div>
                                         <div class="title text-sbold text-25"><?php echo $lessonTitle; ?></div>
                                     </div>
-                                    <div class="due text-reg text-18"><?php echo $fileCount ?> <?php echo $fileCount == 1 ? "file" : "files" ?> · <?php echo $linkCount ?> <?php echo $linkCount == 1 ? "link" : "links" ?></div>
+                                    <div class="due text-reg text-18"><?php echo $fileCount ?>
+                                        <?php echo $fileCount == 1 ? "file" : "files" ?> · <?php echo $linkCount ?>
+                                        <?php echo $linkCount == 1 ? "link" : "links" ?></div>
                                 </div>
                             </div>
                         </div>
@@ -151,22 +180,20 @@ $linkCount = count($linksArray);
                                     <hr>
 
                                     <div class="text-sbold text-14 mt-4">Learning Materials</div>
-                                    <?php foreach ($attachmentsArray as $file): ?>
-                                        <?php if (empty($file)) continue; ?>
+                                    <?php foreach ($fileLinks as $f): ?>
                                         <?php
-                                        $filePath = "shared/assets/files/" . $file;
+                                        $file = $f['name'];
+                                        $filePath = $f['path'];
+
                                         $fileExt = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
-                                        $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
+                                        $fileSize = file_exists($filePath) ? filesize($filePath) : 0;
                                         $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
 
                                         $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
                                         ?>
 
-                                        <a href="<?php echo $filePath; ?>"
-                                            <?php if (!preg_match('/^https?:\/\//', $filePath)) : ?>
-                                            download="<?php echo htmlspecialchars($file); ?>"
-                                            <?php endif; ?>
-                                            style="text-decoration:none; color:inherit;">
+                                        <div onclick="openViewerModal('<?php echo $file; ?>', '<?php echo $filePath; ?>')"
+                                            style="cursor:pointer; text-decoration:none; color:inherit;">
 
                                             <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
                                                 style="width:400px; max-width:100%; min-width:310px;">
@@ -180,31 +207,31 @@ $linkCount = count($linksArray);
                                                     </div>
                                                 </div>
                                             </div>
-                                        </a>
+                                        </div>
+
                                     <?php endforeach; ?>
 
+
                                     <?php foreach ($linksArray as $linkItem): ?>
-                                        <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
-                                            style="width:400px; max-width:100%; min-width:310px;">
+                                        <div onclick="openLinkViewerModal('<?php echo htmlspecialchars($linkItem['title']); ?>',
+                                      '<?php echo htmlspecialchars($linkItem['url']); ?>')"
+                                            style="cursor:pointer; text-decoration:none; color:inherit;">
 
-                                            <span class="px-3 py-3 material-symbols-outlined">public</span>
+                                            <div class="cardFile my-3 w-lg-25 d-flex align-items-start overflow-hidden"
+                                                style="width:400px; max-width:100%; min-width:310px;">
 
-                                            <div class="ms-2">
-                                                <!-- Title from DB -->
-                                                <div class="text-sbold text-16 mt-1">
-                                                    <?php echo htmlspecialchars($linkItem['title']); ?>
-                                                </div>
+                                                <span class="px-3 py-3 material-symbols-outlined">public</span>
 
-                                                <div class="text-reg link text-12 mt-0">
-                                                    <a href="<?php echo $linkItem['url']; ?>"
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        style="text-decoration: none; color: var(--black);">
-                                                        <?php echo $linkItem['url']; ?>
-                                                    </a>
+                                                <div class="ms-2">
+                                                    <div class="text-sbold text-16 mt-1">
+                                                        <?php echo htmlspecialchars($linkItem['title']); ?>
+                                                    </div>
+
+                                                    <div class="text-reg text-12 mt-0" style="color: var(--black);">
+                                                        <?php echo htmlspecialchars($linkItem['url']); ?>
+                                                    </div>
                                                 </div>
                                             </div>
-
                                         </div>
                                     <?php endforeach; ?>
 
@@ -213,9 +240,11 @@ $linkCount = count($linksArray);
 
                                     <div class="text-sbold text-14 pb-3">Prepared by</div>
                                     <div class="d-flex align-items-center pb-5">
-                                        <div class="rounded-circle me-2" style="width: 50px; height: 50px; background-color: var(--highlight75);">
+                                        <div class="rounded-circle me-2"
+                                            style="width: 50px; height: 50px; background-color: var(--highlight75);">
                                             <img src="<?php echo !empty($lesson['profilePicture']) ? 'shared/assets/pfp-uploads/' . $lesson['profilePicture'] : 'shared/assets/img/default-profile.png'; ?>"
-                                                alt="Prof Picture" class="rounded-circle" style="width:50px;height:50px;">
+                                                alt="Prof Picture" class="rounded-circle"
+                                                style="width:50px;height:50px;">
                                         </div>
                                         <div>
                                             <div class="text-sbold text-14"><?php echo $profName; ?></div>
@@ -227,6 +256,72 @@ $linkCount = count($linksArray);
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    <!-- FILE VIEWER MODAL -->
+    <div class="modal fade" id="viewerModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content" style="border-radius:12px; overflow:hidden;">
+
+                <!-- Header -->
+                <div class="modal-header d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <h5 class="modal-title text-sbold text-16 mb-0" id="viewerModalLabel">File Viewer</h5>
+
+                        <a id="modalDownloadBtn" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
+                            style="background-color: var(--primaryColor); border: 1px solid var(--black);" download>
+                            <span class="" style="display: flex; align-items: center; gap: 4px;">
+                                <span class="material-symbols-outlined" style="font-size:18px;">download_2</span>
+                                Download
+                            </span>
+                        </a>
+                    </div>
+
+                    <!-- Right side: close button -->
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body p-0" style="background:#2e2e2e; height:75vh;">
+                    <div id="viewerContainer" style="width:100%; height:100%;"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- LINK VIEWER MODAL -->
+    <div class="modal fade" id="linkViewerModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content" style="border-radius:12px; overflow:hidden;">
+
+                <!-- Header -->
+                <div class="modal-header d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <h5 class="modal-title text-sbold text-16 mb-0" id="linkViewerModalLabel">Link Viewer</h5>
+
+                        <a id="modalOpenInNewTab" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
+                            style="background-color: var(--primaryColor); border: 1px solid var(--black);"
+                            target="_blank">
+                            <span class="" style="display: flex; align-items: center; gap: 4px;">
+                                <span class="material-symbols-outlined" style="font-size:18px;">open_in_new</span>
+                                Open
+                            </span>
+                        </a>
+                    </div>
+
+                    <!-- Right side: close button -->
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body p-0" style="background:#2e2e2e; height:75vh;">
+                    <iframe id="linkViewerIframe"
+                        style="width:100%; height:100%; border:none; border-radius:10px;"></iframe>
+                </div>
+
             </div>
         </div>
     </div>
@@ -266,6 +361,42 @@ $linkCount = count($linksArray);
                 });
             });
         });
+
+        function openViewerModal(fileName, filePath) {
+            document.getElementById("viewerModalLabel").textContent = fileName;
+            document.getElementById("modalDownloadBtn").href = filePath;
+
+            let viewer = document.getElementById("viewerContainer");
+            viewer.innerHTML = "";
+
+            let ext = fileName.split(".").pop().toLowerCase();
+
+            if (["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"].includes(ext)) {
+                viewer.innerHTML = `<img src="${filePath}" style="width:100%; height:100%; object-fit:contain; background:#333;">`;
+            }
+            else if (ext === "pdf") {
+                viewer.innerHTML = `<iframe src="${filePath}" width="100%" height="100%" style="border:none; border-radius:10px;"></iframe>`;
+            }
+            else {
+                viewer.innerHTML = `
+            <div class="text-white text-center mt-5">
+                <p>This file type cannot be previewed.</p>
+                <a href="${filePath}" download class="btn btn-warning">Download File</a>
+            </div>`;
+            }
+
+            new bootstrap.Modal(document.getElementById("viewerModal")).show();
+        }
+
+        function openLinkViewerModal(title, url) {
+            document.getElementById("linkViewerModalLabel").textContent = title;
+            document.getElementById("modalOpenInNewTab").href = url;
+
+            let iframe = document.getElementById("linkViewerIframe");
+            iframe.src = url;
+
+            new bootstrap.Modal(document.getElementById("linkViewerModal")).show();
+        }
     </script>
 
 </body>
