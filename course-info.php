@@ -116,7 +116,7 @@ if (isset($_GET['courseID'])) {
 
     $selectLeaderboardQuery = "SELECT 
 	courses.courseTitle,
-    SUM(leaderboard.xpPoints) AS totalPoints
+    leaderboard.xpPoints AS totalPoints
     FROM leaderboard
     INNER JOIN enrollments
         ON leaderboard.enrollmentID = enrollments.enrollmentID
@@ -129,13 +129,21 @@ if (isset($_GET['courseID'])) {
 
     $whereTotalPlacementQuery = "WHERE enrollments.courseID = '$courseID'";
 
+    $countLimitQuery = "SELECT COUNT(*) AS limitCount FROM leaderboard";
+    $countLimitResult = executeQuery($countLimitQuery);
+    $limitRow = (mysqli_num_rows($countLimitResult) > 0) ? mysqli_fetch_assoc($countLimitResult) : 'null';
+    $limit = ($limitRow == null) ? null : $limitRow['limitCount'];
+
     $TotalPlacementQuery = "SELECT 
+    leaderboard.leaderboardID,
 	userinfo.profilePicture,
     userinfo.firstName,
     userinfo.middleName,
     userinfo.lastName,
     enrollments.userID,
-    SUM(leaderboard.xpPoints) AS totalPoints
+    leaderboard.xpPoints AS totalPoints,
+    leaderboard.previousRank,
+    leaderboard.currentRank
     FROM leaderboard
     INNER JOIN enrollments
         ON leaderboard.enrollmentID = enrollments.enrollmentID
@@ -152,32 +160,8 @@ if (isset($_GET['courseID'])) {
     $selectTopTwoToThreeQuery = $TotalPlacementQuery . " 2 OFFSET 1;";
     $selectTopTwoToThreeResult = executeQuery($selectTopTwoToThreeQuery);
 
-    $selectTopFourToTenQuery = $TotalPlacementQuery . " 7 OFFSET 3;";
+    $selectTopFourToTenQuery = $TotalPlacementQuery . " $limit OFFSET 3;";
     $selectTopFourToTenResult = executeQuery($selectTopFourToTenQuery);
-
-    $selectPlacementQuery = "SELECT
-    userinfo.profilePicture,
-    userinfo.firstName,
-    userinfo.middleName,
-    userinfo.lastName, 
-    ranked.userID,
-    ranked.totalPoints,
-    ranked.rank
-    FROM (SELECT 
-        enrollments.userID,
-        SUM(leaderboard.xpPoints) AS totalPoints,
-        RANK() OVER (ORDER BY SUM(leaderboard.xpPoints) DESC) AS rank
-        FROM leaderboard
-        INNER JOIN enrollments
-            ON leaderboard.enrollmentID = enrollments.enrollmentID
-        $whereTotalPlacementQuery
-        GROUP BY enrollments.userID
-        ) AS ranked
-    INNER JOIN userinfo
-    	ON ranked.userID = userinfo.userID
-    WHERE ranked.userID = '$userID' AND ranked.rank > 10
-    ";
-    $selectPlacementResult = executeQuery($selectPlacementQuery);
 } else {
     header("Location: 404.php");
     exit();
