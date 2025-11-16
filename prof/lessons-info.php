@@ -235,7 +235,10 @@ $linkCount = count($linksArray);
                                                 <span class="px-3 py-3 material-symbols-outlined">draft</span>
 
                                                 <div class="ms-2">
-                                                    <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
+                                                    <div class="text-sbold text-16 mt-1 text-truncate" style="width:225px;"
+                                                        title="<?php echo $fileNameOnly; ?>">
+                                                        <?php echo $fileNameOnly; ?>
+                                                    </div>
                                                     <div class="due text-reg text-14 mb-1">
                                                         <?php echo $fileExt ?> · <?php echo $fileSizeMB ?>
                                                     </div>
@@ -257,11 +260,13 @@ $linkCount = count($linksArray);
                                                 <span class="px-3 py-3 material-symbols-outlined">public</span>
 
                                                 <div class="ms-2">
-                                                    <div class="text-sbold text-16 mt-1">
+                                                    <div class="text-sbold text-16 mt-1 text-truncate" style="width: 250px;"
+                                                        title="<?php echo htmlspecialchars($linkItem['title']); ?>">
                                                         <?php echo htmlspecialchars($linkItem['title']); ?>
                                                     </div>
 
-                                                    <div class="text-reg text-12 mt-0" style="color: var(--black);">
+                                                    <div class="text-reg text-12 mt-0 text-truncate" style="color: var(--black); width: 230px;"
+                                                        title="<?php echo htmlspecialchars($linkItem['url']); ?>">
                                                         <?php echo htmlspecialchars($linkItem['url']); ?>
                                                     </div>
                                                 </div>
@@ -407,11 +412,9 @@ $linkCount = count($linksArray);
 
             if (["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"].includes(ext)) {
                 viewer.innerHTML = `<img src="${filePath}" style="width:100%; height:100%; object-fit:contain; background:#333;">`;
-            }
-            else if (ext === "pdf") {
+            } else if (ext === "pdf") {
                 viewer.innerHTML = `<iframe src="${filePath}" width="100%" height="100%" style="border:none; border-radius:10px;"></iframe>`;
-            }
-            else {
+            } else {
                 viewer.innerHTML = `
             <div class="text-white text-center mt-5">
                 <p>This file type cannot be previewed.</p>
@@ -431,8 +434,6 @@ $linkCount = count($linksArray);
 
             new bootstrap.Modal(document.getElementById("linkViewerModal")).show();
         }
-
-
     </script>
 
 </body>

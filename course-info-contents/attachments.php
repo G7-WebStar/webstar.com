@@ -71,8 +71,9 @@ mysqli_data_seek($fileResult, 0);
                                         draft
                                     </span>
                                 </div>
-                                <div>
-                                    <div class="text-sbold text-16 py-1" style="line-height: 1;">
+                                <div class="file-info">
+                                    <div class="text-sbold text-16 py-1 text-truncate" style="line-height: 1;"
+                                        title="<?php echo htmlspecialchars($fileName); ?>">
                                         <?php echo htmlspecialchars($fileName); ?>
                                     </div>
                                     <div class="text-reg text-12" style="line-height: 1;">
@@ -167,7 +168,7 @@ mysqli_data_seek($fileResult, 0);
         });
     });
 
-    
+
     function openTodoViewer(fileName, filePath) {
         document.getElementById("todoViewerModalLabel").textContent = fileName;
         document.getElementById("todoModalDownloadBtn").href = filePath;

@@ -127,8 +127,8 @@ $announcementResult = executeQuery($announcementQuery);
                     </div>
 
                     <!-- Desktop -->
-                    <p class="d-none d-md-block mb-0 mt-3 text-reg text-14" style="color: var(--black); line-height: 140%;">
-                        <?php echo $announcementContent; ?>
+                    <p class="d-none d-md-block mb-0 mt-3 text-reg text-14" style="color: var(--black); line-height: 140%; white-space: pre-line;">
+                        <?php echo nl2br($announcementContent); ?>
                     </p>
 
                     <!-- Mobile -->
@@ -146,7 +146,7 @@ $announcementResult = executeQuery($announcementQuery);
                             class="btn btn-attachments mt-3 text-med text-12"
                             data-bs-toggle="modal"
                             data-bs-target="#attachmentsModal<?php echo $announcementID; ?>">
-                            View <?php echo $totalItems; ?> File<?php echo $totalItems > 1 ? 's' : ''; ?>
+                            View <?php echo $totalItems; ?> Attachment<?php echo $totalItems > 1 ? 's' : ''; ?>
                         </button>
                     <?php endif; ?>
 
@@ -215,7 +215,8 @@ $announcementResult = executeQuery($announcementQuery);
                                         <div class="cardFile d-flex align-items-start w-100 overflow-hidden" style="cursor:pointer;">
                                             <span class="px-4 py-3 material-symbols-outlined">draft</span>
                                             <div class="ms-2">
-                                                <div class="text-sbold text-16 mt-1 pe-4 file-name">
+                                                <div class="text-sbold text-16 mt-1 pe-4 file-name text-truncate" style="max-width:330px;"
+                                                    title="<?php echo $decodedAttachment; ?>">
                                                     <?php echo $decodedAttachment; ?>
                                                 </div>
                                                 <div class="due text-reg text-14 mb-1">
@@ -232,28 +233,32 @@ $announcementResult = executeQuery($announcementQuery);
 
                             <!-- Links Section -->
                             <?php if (!empty($linksArray)): ?>
-                                <div class="text-sbold text-16 mt-4 mb-2">Links</div>
-                                <?php foreach ($linksArray as $link): ?>
-
+                                <div class="text-sbold text-16 <?php echo !empty($attachmentsArray) ? 'mt-4' : 'mt-0'; ?> mb-2">Links</div>
+                                <?php foreach ($linksArray as $index => $link): ?>
                                     <a href="#" class="openLinkViewer text-decoration-none d-block mb-2"
                                         data-url="<?php echo htmlspecialchars($link); ?>" style="color: var(--black);">
 
                                         <div class="cardFile d-flex align-items-start w-100 overflow-hidden" style="cursor:pointer;">
                                             <span class="px-4 py-3 material-symbols-outlined">public</span>
                                             <div class="ms-2">
-                                                <div class="text-sbold text-16 mt-1 pe-4">
+
+                                                <!-- FILE TITLE -->
+                                                <div class="text-sbold text-16 mt-1 pe-4 text-truncate" style="max-width:330px;"
+                                                    title="<?php echo htmlspecialchars($fileTitle); ?>">
+                                                    <?php echo htmlspecialchars($fileTitle); ?>
+                                                </div>
+
+                                                <!-- ACTUAL LINK BELOW -->
+                                                <div class="text-reg text-12 mb-1 text-truncate" style="max-width:330px;"
+                                                    title="<?php echo htmlspecialchars($link); ?>">
                                                     <?php echo htmlspecialchars($link); ?>
                                                 </div>
-                                                <div class="due text-reg text-14 mb-1">
-                                                    External Link
-                                                </div>
+
                                             </div>
                                         </div>
-
                                     </a>
-
-
                                 <?php endforeach; ?>
+
                             <?php endif; ?>
 
                         </div>
@@ -427,11 +432,10 @@ $announcementResult = executeQuery($announcementQuery);
 </script>
 
 <script>
-
     document.addEventListener("DOMContentLoaded", () => {
         // FILE VIEWER 
         document.querySelectorAll(".openFileViewer").forEach(fileBtn => {
-            fileBtn.addEventListener("click", function (e) {
+            fileBtn.addEventListener("click", function(e) {
                 e.preventDefault();
 
                 const fileName = this.dataset.file;
@@ -471,7 +475,7 @@ $announcementResult = executeQuery($announcementQuery);
 
         // LINK VIEWER 
         document.querySelectorAll(".openLinkViewer").forEach(linkBtn => {
-            linkBtn.addEventListener("click", function (e) {
+            linkBtn.addEventListener("click", function(e) {
                 e.preventDefault();
 
                 const url = this.dataset.url;
@@ -490,5 +494,4 @@ $announcementResult = executeQuery($announcementQuery);
         });
 
     });
-
 </script>
