@@ -871,6 +871,10 @@ $user = mysqli_fetch_assoc($result);
                     } else {
                         item.style.setProperty("display", "none", "important");
                     }
+
+                    if (term == '') {
+                        item.classList.remove('w-100');
+                    }
                 });
 
                 noResults.style.display = anyVisible ? 'none' : 'block';
