@@ -751,7 +751,7 @@ $user = mysqli_fetch_assoc($result);
                                                         style="display: inline-flex; white-space: nowrap; justify-content: space-between;">
                                                         <li class="nav-item">
                                                             <a class="nav-link text-14 <?php echo ($activeTab == 'announcements') ? 'active' : ''; ?>"
-                                                                data-bs-toggle="tab" data-bs-target="#announcements" 
+                                                                data-bs-toggle="tab" data-bs-target="#announcements"
                                                                 href="#announcements">Announcements</a>
                                                         </li>
 
@@ -1029,6 +1029,37 @@ $user = mysqli_fetch_assoc($result);
         </script>
     <?php endif; ?>
 
+    <script>
+        (() => {
+            const searchInput = document.getElementById('leaderboardSearch');
+            const items = document.querySelectorAll('.leaderboard-item');
+            const noResults = document.getElementById('leaderboard-no-results');
+
+            searchInput.addEventListener('keyup', () => {
+                const term = searchInput.value.toLowerCase();
+                let anyVisible = false;
+
+                items.forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    const isMatch = text.includes(term);
+
+                    if (isMatch) {
+                        anyVisible = true;
+                        item.classList.add('w-100');
+                        item.style.setProperty("display", "", "important");
+                    } else {
+                        item.style.setProperty("display", "none", "important");
+                    }
+
+                    if (term == '') {
+                        item.classList.remove('w-100');
+                    }
+                });
+
+                noResults.style.display = anyVisible ? 'none' : 'block';
+            });
+        })();
+    </script>
 
 </body>
 
