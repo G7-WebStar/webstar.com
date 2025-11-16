@@ -273,6 +273,19 @@ function getRelativeTime($datetime, $fullDateFallback = true)
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
         rel="stylesheet" />
 
+    <style>
+        .count-badge {
+            display: inline-block;
+            width: 50px;
+            padding: 5px 10px;
+            border: 1px solid var(--black);
+            background-color: <?= htmlspecialchars($profile['colorHex']) ?>;
+            color: var(--black);
+            text-align: center;
+            border-radius: 25px;
+        }
+    </style>
+
 </head>
 
 <body>
@@ -489,17 +502,17 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                         <!-- My Badges Col-->
                                         <div class="col m-0 p-0 ">
                                             <!-- My Badges Card-->
-                                            <div class="card second rounded-4 pt-4 ps-4 pe-4 pb-3 me-md-2"
+                                            <div class="card second rounded-4 pt-4 ps-4 pe-4 pb-4 me-md-2"
                                                 style="border: 1px solid var(--black);">
                                                 <!-- My Badges Header-->
-                                                <div class="d-flex justify-content-between align-items-start m-0 p-0 mb-2">
+                                                <div class="d-flex justify-content-between align-items-center m-0 p-0 mb-2">
                                                     <div class="d-flex align-items-center">
                                                         <span class="material-symbols-rounded me-2">
                                                             trophy
                                                         </span>
                                                         <span class="text-sbold">My Badges</span>
                                                     </div>
-                                                    <div class="text-bold text-med">
+                                                    <div class="count-badge text-bold text-med">
                                                         <?= htmlspecialchars($user['totalBadges']) ?>
                                                     </div>
                                                 </div>
@@ -556,17 +569,17 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                     <!-- My Courses Col-->
                                     <div class="col m-0 p-0 ">
                                         <!-- My Courses Card-->
-                                        <div class="card second rounded-4 pt-4 ps-4 pe-4 pb-2 me-md-2"
+                                        <div class="card second rounded-4 pt-4 ps-4 pe-4 pb-3 me-md-2"
                                             style="border: 1px solid var(--black);">
                                             <!-- My Courses Header-->
-                                            <div class="d-flex justify-content-between align-items-start m-0 p-0 mb-3">
+                                            <div class="d-flex justify-content-between align-items-center m-0 p-0 mb-3">
                                                 <div class="d-flex align-items-center">
                                                     <span class="material-symbols-rounded me-2">
                                                         folder
                                                     </span>
                                                     <span class="text-sbold">My Courses</span>
                                                 </div>
-                                                <div class="text-bold text-med">
+                                                <div class="count-badge text-bold text-med">
                                                     <?= htmlspecialchars($user['totalEnrollments']) ?>
                                                 </div>
                                             </div>
@@ -673,7 +686,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                                     style="width: 80px; height: 100%; object-fit: cover; margin-top:-5px"
                                                                     alt="Profile Picture">
                                                             </div>
-                                                            
+
                                                             <div
                                                                 class="d-flex justify-content-center text-decoration-none pb-2">
                                                                 <div class="rounded-circle flex-shrink-0 me-2 overflow-hidden d-flex justify-content-center align-items-center"
