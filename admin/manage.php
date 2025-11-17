@@ -7,37 +7,98 @@ if (isset($_POST['deleteUserID'])) {
     $userID = intval($_POST['deleteUserID']);
 
     // 1. AnnouncementNotes → Announcements
-    executeQuery("DELETE FROM announcementnotes WHERE announcementID IN (
-        SELECT announcementID FROM announcements WHERE userID = $userID
-    )");
+    executeQuery("
+        DELETE FROM announcementnotes
+        WHERE announcementID IN (
+            SELECT announcementID FROM announcements WHERE userID = $userID
+        )
+    ");
+    executeQuery("DELETE FROM announcements WHERE userID = $userID");
 
     // 2. Test-related tables
-    executeQuery("DELETE FROM testquestionchoices WHERE testQuestionID IN (SELECT testQuestionID FROM testquestions WHERE testID IN (SELECT testID FROM tests WHERE userID = $userID))");
-    executeQuery("DELETE FROM testresponse WHERE testID IN (SELECT testID FROM tests WHERE userID = $userID)");
+    executeQuery("
+        DELETE FROM testquestionchoices
+        WHERE testQuestionID IN (
+            SELECT testQuestionID FROM testquestions
+            WHERE testID IN (
+                SELECT testID FROM tests WHERE userID = $userID
+            )
+        )
+    ");
+    executeQuery("
+        DELETE FROM testresponse
+        WHERE testID IN (
+            SELECT testID FROM tests WHERE userID = $userID
+        )
+    ");
     executeQuery("DELETE FROM testquestions WHERE testID IN (SELECT testID FROM tests WHERE userID = $userID)");
-    executeQuery("DELETE FROM todo WHERE assessmentID IN (SELECT assessmentID FROM assessments WHERE courseID IN (SELECT courseID FROM courses WHERE userID = $userID))");
-    executeQuery("DELETE FROM assessments WHERE courseID IN (SELECT courseID FROM courses WHERE userID = $userID)");
-    executeQuery("DELETE FROM assignments WHERE assessmentID IN (SELECT assessmentID FROM assessments WHERE courseID IN (SELECT courseID FROM courses WHERE userID = $userID))");
+    executeQuery("DELETE FROM tests WHERE userID = $userID");
 
-    // 3. Courses & lessons
-    executeQuery("DELETE FROM lesson WHERE courseID IN (SELECT courseID FROM courses WHERE userID = $userID)");
-    executeQuery("DELETE FROM courseschedule WHERE courseID IN (SELECT courseID FROM courses WHERE userID = $userID)");
-    executeQuery("DELETE FROM files WHERE userID = $userID OR courseID IN (SELECT courseID FROM courses WHERE userID = $userID)");
+    // 3. Todo → Assessments → Courses
+    executeQuery("
+        DELETE FROM todo
+        WHERE assessmentID IN (
+            SELECT assessmentID FROM assessments
+            WHERE courseID IN (SELECT courseID FROM courses WHERE userID = $userID)
+        )
+    ");
+    executeQuery("
+        DELETE FROM assignments
+        WHERE assessmentID IN (
+            SELECT assessmentID FROM assessments
+            WHERE courseID IN (SELECT courseID FROM courses WHERE userID = $userID)
+        )
+    ");
+    executeQuery("
+        DELETE FROM assessments
+        WHERE courseID IN (SELECT courseID FROM courses WHERE userID = $userID)
+    ");
 
-    // 4. Rubrics, criteria, levels
-    executeQuery("DELETE FROM level WHERE criterionID IN (SELECT criterionID FROM criteria WHERE rubricID IN (SELECT rubricID FROM rubric WHERE userID = $userID))");
-    executeQuery("DELETE FROM criteria WHERE rubricID IN (SELECT rubricID FROM rubric WHERE userID = $userID)");
+    // 4. Lessons, CourseSchedule, Files
+    executeQuery("
+        DELETE FROM lesson
+        WHERE courseID IN (SELECT courseID FROM courses WHERE userID = $userID)
+    ");
+    executeQuery("
+        DELETE FROM courseschedule
+        WHERE courseID IN (SELECT courseID FROM courses WHERE userID = $userID)
+    ");
+    executeQuery("
+        DELETE FROM files
+        WHERE userID = $userID
+           OR courseID IN (SELECT courseID FROM courses WHERE userID = $userID)
+    ");
+
+    // 5. Rubrics → Criteria → Level
+    executeQuery("
+        DELETE FROM level
+        WHERE criterionID IN (
+            SELECT criterionID FROM criteria
+            WHERE rubricID IN (SELECT rubricID FROM rubric WHERE userID = $userID)
+        )
+    ");
+    executeQuery("
+        DELETE FROM criteria
+        WHERE rubricID IN (SELECT rubricID FROM rubric WHERE userID = $userID)
+    ");
     executeQuery("DELETE FROM rubric WHERE userID = $userID");
 
-    // 5. Courses
+    // 6. Dependent tables that reference courses directly
+    executeQuery("
+        DELETE FROM studentbadges
+        WHERE courseID IN (SELECT courseID FROM courses WHERE userID = $userID)
+    ");
+
+    // 7. Courses
     executeQuery("DELETE FROM courses WHERE userID = $userID");
 
-    // 6. MyItems & Settings
+    // 8. MyItems & Settings
     executeQuery("DELETE FROM myitems WHERE userID = $userID");
     executeQuery("DELETE FROM settings WHERE userID = $userID");
 
-    // 7. User info and users
+    // 9. User info, Profile, Users
     executeQuery("DELETE FROM userinfo WHERE userID = $userID");
+    executeQuery("DELETE FROM profile WHERE userID = $userID");
     executeQuery("DELETE FROM users WHERE userID = $userID");
 
     $_SESSION['success'] = "Instructor and all their works deleted successfully!";
