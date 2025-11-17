@@ -92,4 +92,34 @@
     .message-text {
         font-size: 14px !important;
     }
+
+    /* Center cards on small screens */
+    .message-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .inbox-card {
+        margin-right: 0 !important;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+/* Material Symbols */
+.material-symbols-outlined {
+    font-variation-settings:
+        'FILL' 0,
+        'wght' 300,
+        'GRAD' 200,
+        'opsz' 24;
+}
+
+/* Load More Button Hover */
+button.btn[style*="var(--primaryColor)"]:hover {
+    background-color: #fcd86f !important;
+    border: 1px solid var(--black) !important;
+    color: var(--black) !important;
+    transition: all 0.3s ease;
 }

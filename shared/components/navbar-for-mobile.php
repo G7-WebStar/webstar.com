@@ -1,4 +1,95 @@
 <?php
+include_once 'shared/assets/database/connect.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!function_exists('sidebar_resolve_user_id')) {
+    function sidebar_resolve_user_id()
+    {
+        $conn = $GLOBALS['conn'];
+        if (isset($_SESSION['userID']))
+            return (int) $_SESSION['userID'];
+        if (isset($_SESSION['email'])) {
+            $emailEsc = mysqli_real_escape_string($conn, $_SESSION['email']);
+            $res = executeQuery("SELECT userID, userName FROM users WHERE email = '$emailEsc' LIMIT 1");
+            if ($res && ($u = mysqli_fetch_assoc($res))) {
+                $_SESSION['userID'] = (int) $u['userID'];
+                if (!isset($_SESSION['userName']) && isset($u['userName'])) {
+                    $_SESSION['userName'] = $u['userName'];
+                }
+                return (int) $u['userID'];
+            }
+        }
+        if (isset($_SESSION['userName'])) {
+            $userNameEsc = mysqli_real_escape_string($conn, $_SESSION['userName']);
+            $res = executeQuery("SELECT userID FROM users WHERE userName = '$userNameEsc' LIMIT 1");
+            if ($res && ($u = mysqli_fetch_assoc($res))) {
+                $_SESSION['userID'] = (int) $u['userID'];
+                return (int) $u['userID'];
+            }
+        }
+        return null;
+    }
+}
+
+if (!function_exists('sidebar_fetch_count')) {
+    function sidebar_fetch_count($sql)
+    {
+        $result = executeQuery($sql);
+        if ($result && ($row = mysqli_fetch_assoc($result)) && isset($row['c'])) {
+            return (int) $row['c'];
+        }
+        return 0;
+    }
+}
+
+$isInboxPage = isset($activePage) && $activePage === 'inbox';
+$isTodoPage = isset($activePage) && $activePage === 'todo';
+
+$userId = sidebar_resolve_user_id();
+$unreadInboxCount = 0;
+$newTodoCount = 0;
+
+// Get enrollmentIDs for the user
+$enrollmentIds = [];
+if ($userId !== null) {
+    $enrollmentQuery = "SELECT enrollmentID FROM enrollments WHERE userID = $userId";
+    $enrollmentResult = executeQuery($enrollmentQuery);
+    if ($enrollmentResult) {
+        while ($row = mysqli_fetch_assoc($enrollmentResult)) {
+            $enrollmentIds[] = $row['enrollmentID'];
+        }
+    }
+}
+
+// Inbox: clear and count using enrollmentID only
+if (!empty($enrollmentIds)) {
+    $enrollmentIdsStr = implode(',', $enrollmentIds);
+    if ($isInboxPage)
+        executeQuery("UPDATE inbox SET isRead = 1 WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
+    $unreadInboxCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
+} else {
+    if ($isInboxPage)
+        executeQuery("UPDATE inbox SET isRead = 1 WHERE isRead = 0");
+    $unreadInboxCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE isRead = 0");
+}
+
+// To-do: clear and count
+if ($userId !== null) {
+    if ($isTodoPage)
+        executeQuery("UPDATE todo SET isRead = 1 WHERE userID = $userId AND isRead = 0");
+    $newTodoCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM todo WHERE userID = $userId AND isRead = 0");
+} else {
+    if ($isTodoPage)
+        executeQuery("UPDATE todo SET isRead = 1 WHERE isRead = 0");
+    $newTodoCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM todo WHERE isRead = 0");
+}
+
+// Share to session for view fallback
+$_SESSION['InboxCount'] = $unreadInboxCount;
+$_SESSION['TodoNewCount'] = $newTodoCount;
+
 $webstarsQuery = "
 SELECT
     p.webstars
@@ -64,12 +155,23 @@ $webstars = mysqli_fetch_assoc($webstarsResult);
 
     <!-- Quests -->
     <a href="todo.php"
-      class="btn d-flex nav-btn-navbar flex-column align-items-center <?php echo ($activePage == 'todo') ? 'selected-nav-item' : ''; ?>"
+      class="btn d-flex nav-btn-navbar flex-column align-items-center position-relative <?php echo ($activePage == 'todo') ? 'selected-nav-item' : ''; ?>"
       style="border-color:transparent; text-decoration:none;">
       <span class="material-symbols-rounded" style="font-size:20px">
         extension
       </span>
       <small class="text-med text-12">Quests</small>
+      <?php
+      $displayTodo = isset($newTodoCount) && is_numeric($newTodoCount)
+          ? (int) $newTodoCount
+          : (isset($_SESSION['TodoNewCount']) ? (int) $_SESSION['TodoNewCount'] : 0);
+      if ($displayTodo > 0) { ?>
+        <span
+          class="mt-1 position-absolute top-0 start-100 z-3 translate-middle badge rounded-pill bg-danger text-reg text-white"
+          style="color:white!important;">
+          <?php echo $displayTodo; ?>
+        </span>
+      <?php } ?>
     </a>
 
     <!-- Inbox -->
@@ -78,11 +180,17 @@ $webstars = mysqli_fetch_assoc($webstarsResult);
       style="border-color:transparent; text-decoration:none;">
       <i class="bi bi-inbox-fill" style="font-size:25px; color:var(--black); margin-top:-10px;"></i>
       <small class="text-med text-12" style="margin-top:-8px;">Inbox</small>
-      <span
-        class="mt-1 position-absolute top-0 start-100 z-3 translate-middle badge rounded-pill bg-danger text-reg text-white"
-        style="color:white!important;">
-        10
-      </span>
+      <?php
+      $displayInbox = isset($unreadInboxCount) && is_numeric($unreadInboxCount)
+          ? (int) $unreadInboxCount
+          : (isset($_SESSION['InboxCount']) ? (int) $_SESSION['InboxCount'] : 0);
+      if ($displayInbox > 0) { ?>
+        <span
+          class="mt-1 position-absolute top-0 start-100 z-3 translate-middle badge rounded-pill bg-danger text-reg text-white"
+          style="color:white!important;">
+          <?php echo $displayInbox; ?>
+        </span>
+      <?php } ?>
     </a>
 
 
