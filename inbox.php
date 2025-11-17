@@ -70,6 +70,7 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
 
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_downward_alt" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
 
@@ -187,7 +188,12 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                                     <div class="message-container mt-3 pb-4" <?php echo ($inboxCount == 0) ? 'style="min-height: 60vh; display: flex; align-items: center; justify-content: center; flex-direction: column;"' : 'style="min-height: auto;"'; ?>>
                                         <?php
                                         if ($inboxCount > 0) {
+                                            $cardIndex = 0;
+                                            $initialLimit = 20; // Show first 20 cards
                                             while ($inbox = mysqli_fetch_assoc($selectInboxResult)) {
+                                                $cardIndex++;
+                                                $shouldShow = $cardIndex <= $initialLimit;
+                                                $cardClass = $shouldShow ? 'inbox-card' : 'inbox-card d-none';
 
                                                 $timestamp = strtotime($inbox['inboxCreatedAt']);
                                                 $displayDate = $timestamp ? date('F j, Y g:iA', $timestamp) : '';
@@ -238,11 +244,12 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                                                     $dataAction = "course-info.php?courseID=" . $courseID;
                                                 }
                                                 ?>
-                                                <div class="card mb-1 me-3 w-100 mt-2 inbox-card"
+                                                <div class="card mb-1 me-3 w-100 mt-2 <?php echo $cardClass; ?>"
                                                     data-timestamp="<?php echo $timestamp ?: 0; ?>"
                                                     data-course="<?php echo $courseCode; ?>"
                                                     data-type="<?php echo $notificationType; ?>"
                                                     data-action="<?php echo $dataAction; ?>"
+                                                    data-card-index="<?php echo $cardIndex; ?>"
                                                     style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1; cursor:pointer;">
 
                                                     <div class="card-body py-2 px-4 px-md-3">
@@ -296,6 +303,21 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                                             </div>
                                         <?php } ?>
                                     </div>
+
+                                    <!-- Load More Button -->
+                                    <?php if ($inboxCount >= 20) { ?>
+                                        <div class="d-flex justify-content-center mt-4 mb-3">
+                                            <button type="button" id="loadMoreBtn"
+                                                class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 my-1 d-flex align-items-center gap-2"
+                                                style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);"
+                                                data-total-cards="<?php echo $inboxCount; ?>"
+                                                data-current-visible="20"
+                                                data-load-count="10">
+                                                <span class="material-symbols-outlined">arrow_downward_alt</span>
+                                                <span>Load More</span>
+                                            </button>
+                                        </div>
+                                    <?php } ?>
                                 </div>
                             </div>
                         </div>
@@ -542,6 +564,84 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                         }
                     });
                 });
+            });
+        </script>
+
+        <!-- Load More Button Functionality -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Get the Load More button
+                const loadMoreBtn = document.getElementById('loadMoreBtn');
+                if (!loadMoreBtn) {
+                    console.log('Load More button not found');
+                    return;
+                }
+
+                // Get the message container where cards are displayed
+                const messageContainer = document.querySelector('.message-container');
+                if (!messageContainer) {
+                    console.log('Message container not found');
+                    return;
+                }
+
+                // Function to update button state (enable/disable based on hidden cards)
+                function updateLoadMoreButton() {
+                    // Get all cards and separate visible from hidden
+                    const allCards = Array.from(messageContainer.querySelectorAll('.inbox-card'));
+                    const hiddenCards = allCards.filter(card => card.classList.contains('d-none'));
+
+                    // If no hidden cards, disable button
+                    if (hiddenCards.length === 0) {
+                        loadMoreBtn.disabled = true;
+                        loadMoreBtn.style.opacity = '0.5';
+                        loadMoreBtn.style.cursor = 'not-allowed';
+                        const textSpan = loadMoreBtn.querySelector('span:last-child');
+                        if (textSpan) {
+                            textSpan.textContent = 'All loaded';
+                        }
+                    } else {
+                        // If there are hidden cards, enable button
+                        loadMoreBtn.disabled = false;
+                        loadMoreBtn.style.opacity = '1';
+                        loadMoreBtn.style.cursor = 'pointer';
+                        const textSpan = loadMoreBtn.querySelector('span:last-child');
+                        if (textSpan) {
+                            textSpan.textContent = 'Load More';
+                        }
+                    }
+                }
+
+                // When button is clicked, show 10 more cards
+                loadMoreBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Get how many cards to load (10)
+                    const loadCount = parseInt(this.getAttribute('data-load-count') || '10', 10);
+
+                    // Get all hidden cards
+                    const allCards = Array.from(messageContainer.querySelectorAll('.inbox-card'));
+                    const hiddenCards = allCards.filter(card => card.classList.contains('d-none'));
+
+                    // If no hidden cards, update button and exit
+                    if (hiddenCards.length === 0) {
+                        updateLoadMoreButton();
+                        return;
+                    }
+
+                    // Show next 10 hidden cards
+                    let shown = 0;
+                    for (let i = 0; i < hiddenCards.length && shown < loadCount; i++) {
+                        hiddenCards[i].classList.remove('d-none');
+                        shown++;
+                    }
+
+                    // Update button state after showing cards
+                    updateLoadMoreButton();
+                });
+
+                // Check button state on page load
+                updateLoadMoreButton();
             });
         </script>
 </body>
