@@ -148,7 +148,7 @@ if (isset($_POST['save_announcement'])) {
                 $fileError = $_FILES['materials']['error'][$key];
 
                 if ($fileError === UPLOAD_ERR_OK) {
-                    $safeName = str_replace(" ", "_", basename($fileName));
+                    $safeName = str_replace([" ", ","], "_", basename($fileName));
                     $targetPath = $uploadDir . $safeName;
 
                     if (move_uploaded_file($tmpName, $targetPath)) {
