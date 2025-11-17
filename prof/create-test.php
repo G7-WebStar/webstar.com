@@ -194,12 +194,12 @@ if (isset($_POST['save_exam'])) {
                 try {
                     $mail = new PHPMailer(true);
                     $mail->isSMTP();
-                    $mail->Host       = 'smtp.gmail.com';
-                    $mail->SMTPAuth   = true;
-                    $mail->Username   = 'learn.webstar@gmail.com';
-                    $mail->Password   = 'mtls vctd rhai cdem';
+                    $mail->Host = 'smtp.gmail.com';
+                    $mail->SMTPAuth = true;
+                    $mail->Username = 'learn.webstar@gmail.com';
+                    $mail->Password = 'mtls vctd rhai cdem';
                     $mail->SMTPSecure = 'tls';
-                    $mail->Port       = 587;
+                    $mail->Port = 587;
                     $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
                     $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
                     if (file_exists($headerPath)) {
@@ -236,7 +236,7 @@ if (isset($_POST['save_exam'])) {
 
                         $timeLimitDisplay = 'No time limit';
                         if (!empty($testTimeLimit)) {
-                            $timeLimitDisplay = $testTimeLimit . ' minute' . ((int)$testTimeLimit === 1 ? '' : 's');
+                            $timeLimitDisplay = $testTimeLimit . ' minute' . ((int) $testTimeLimit === 1 ? '' : 's');
                         }
 
                         $guidanceHtml = nl2br(htmlspecialchars($generalGuidanceRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
@@ -362,7 +362,7 @@ if (isset($_GET['reuse']) || isset($_GET['edit'])) {
     if ($reuseResult && $reuseResult->num_rows > 0) {
         $reusedData = [];
         while ($row = $reuseResult->fetch_assoc()) {
-            $reusedData[] = $row; 
+            $reusedData[] = $row;
         }
     } else {
         // Invalid or unauthorized reuse/edit attempt
@@ -520,14 +520,14 @@ if (!empty($reusedData)) {
                                     <!-- Page Title -->
                                     <div class="col text-center text-md-start">
                                         <span class="text-sbold text-20"><?php
-                                                                            if (isset($_GET['edit'])) {
-                                                                                echo 'Edit Test';
-                                                                            } elseif (isset($_GET['reuse'])) {
-                                                                                echo 'Recreate Test';
-                                                                            } else {
-                                                                                echo 'Create Test';
-                                                                            }
-                                                                            ?></span>
+                                        if (isset($_GET['edit'])) {
+                                            echo 'Edit Test';
+                                        } elseif (isset($_GET['reuse'])) {
+                                            echo 'Recreate Test';
+                                        } else {
+                                            echo 'Create Test';
+                                        }
+                                        ?></span>
                                     </div>
 
                                     <!-- Assign Existing Task Button -->
@@ -544,7 +544,7 @@ if (!empty($reusedData)) {
                                 </div>
 
                                 <!-- Form starts -->
-                                <form action="" method="POST" enctype="multipart/form-data">
+                                <form action="" id="guidedanceForm" method="POST" enctype="multipart/form-data">
 
                                     <!-- Hidden input for test type -->
                                     <input type="hidden" name="mode"
@@ -696,7 +696,8 @@ if (!empty($reusedData)) {
                                                             <div class="text-reg mb-1">Correct Answers</div>
                                                             <div class="d-flex align-items-center overflow-auto answers-scroll"
                                                                 style="white-space: nowrap;">
-                                                                <div class="answers-container d-flex align-items-center flex-nowrap">
+                                                                <div
+                                                                    class="answers-container d-flex align-items-center flex-nowrap">
                                                                     <!-- Single answer input will be inserted here -->
                                                                 </div>
                                                                 <button type="button"
@@ -959,36 +960,38 @@ if (!empty($reusedData)) {
         const maxWords = 200;
         const counter = document.getElementById("word-counter");
 
-        quill.on('text-change', function() {
+        quill.on('text-change', function () {
             let text = quill.getText().trim();
             let words = text.length > 0 ? text.split(/\s+/).length : 0;
 
             if (words > maxWords) {
                 let limited = text.split(/\s+/).slice(0, maxWords).join(" ");
                 quill.setText(limited + " ");
-                quill.setSelection(quill.getLength()); 
+                quill.setSelection(quill.getLength());
             }
 
             counter.textContent = `${Math.min(words, maxWords)}/${maxWords}`;
         });
 
-        const form = document.querySelector("form");
+        const form = document.querySelector('#guidedanceForm');
 
-        form.addEventListener("submit", function(e) {
-            // --- Quill ---
-            let plainText = quill.getText().trim();
-            const guidelinesInput = document.getElementById("generalGuidance"); 
-            guidelinesInput.value = plainText;
+        form.addEventListener("submit", function (e) {
+            // --- Quill Validation & Save ---
+            const text = quill.getText().trim();
+            const html = quill.root.innerHTML.trim();
 
-            if (plainText.length === 0) {
+            const guidelinesInput = document.getElementById('generalGuidance'); // <-- correct element ID
+
+            // Check if empty
+            if (text.length === 0 || text === "") {
                 e.preventDefault();
-                quill.root.focus(); 
-                guidelinesInput.setCustomValidity('Please fill out this field.');
-                guidelinesInput.reportValidity();
-                return false;
-            } else {
-                guidelinesInput.setCustomValidity('');
+                showAlert("Please provide general guidance");
+                quill.root.focus();
+                return;
             }
+
+            // Save full HTML to hidden input
+            guidelinesInput.value = html;
 
             let valid = true;
             let message = "";
@@ -1116,7 +1119,7 @@ if (!empty($reusedData)) {
         });
 
         // Add answer (delegated)
-        document.addEventListener("click", function(e) {
+        document.addEventListener("click", function (e) {
             if (e.target.closest(".add-answer-btn")) {
                 const button = e.target.closest(".add-answer-btn");
                 const container = button.closest(".answers-scroll").querySelector(".answers-container");
@@ -1154,7 +1157,7 @@ if (!empty($reusedData)) {
 
 
         // Single Delete Handler for All Blocks
-        document.addEventListener("click", function(e) {
+        document.addEventListener("click", function (e) {
             const delBtn = e.target.closest(".delete-template");
             if (!delBtn) return;
 
@@ -1197,7 +1200,7 @@ if (!empty($reusedData)) {
         });
 
         // Add Multiple Choice Choices
-        document.getElementById("allQuestionsContainer").addEventListener("click", function(e) {
+        document.getElementById("allQuestionsContainer").addEventListener("click", function (e) {
             if (e.target.closest(".add-radio-btn")) {
                 const button = e.target.closest(".add-radio-btn");
                 const container = button.closest(".multiple-choice-item").querySelector(".radio-choices-container");
@@ -1251,7 +1254,7 @@ if (!empty($reusedData)) {
         });
 
         // Toggle Image Container
-        document.addEventListener("click", function(e) {
+        document.addEventListener("click", function (e) {
             if (e.target.closest(".image-icon")) {
                 const card = e.target.closest(".textbox");
                 const imageContainer = card.querySelector(".image-container");
@@ -1294,7 +1297,7 @@ if (!empty($reusedData)) {
 
         }
 
-        document.addEventListener("click", function(e) {
+        document.addEventListener("click", function (e) {
             const delImgBtn = e.target.closest(".delete-image");
             if (!delImgBtn) return;
 
@@ -1307,7 +1310,7 @@ if (!empty($reusedData)) {
 
             img.src = "../shared/assets/img/placeholder/placeholder.png";
             fileInput.value = "";
-            container.style.display = "none"; 
+            container.style.display = "none";
         });
 
         document.querySelectorAll(".question-image").forEach(img => bindImageUpload(img));
@@ -1339,7 +1342,7 @@ if (!empty($reusedData)) {
             });
         }
 
-        mainContainer.addEventListener('input', function(e) {
+        mainContainer.addEventListener('input', function (e) {
             if (e.target.type === "number") updateTotalPoints();
         });
 
