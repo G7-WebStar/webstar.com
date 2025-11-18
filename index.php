@@ -168,7 +168,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                             ?>
                                     <!-- left side -->
                                     <div class="col-12 col-sm-12 col-md-7">
-                                        <div class="row align-items-center ps-4">
+                                        <div class="row align-items-center ps-0 ps-md-4">
                                             <!-- Image column -->
                                             <div class="col-auto d-none d-sm-block">
                                                 <img src="./shared/assets/img/profIndex/folder.png" alt="Folder"

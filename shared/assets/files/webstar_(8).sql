@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 15, 2025 at 05:09 PM
+-- Generation Time: Nov 16, 2025 at 01:31 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -61,7 +61,8 @@ CREATE TABLE `announcementnotes` (
 --
 
 INSERT INTO `announcementnotes` (`noteID`, `announcementID`, `userID`, `notedAt`) VALUES
-(4, 1, 2, '2025-11-06 12:27:25');
+(4, 1, 2, '2025-11-06 12:27:25'),
+(5, 1, 26, '2025-11-16 12:44:03');
 
 -- --------------------------------------------------------
 
@@ -85,7 +86,8 @@ CREATE TABLE `announcements` (
 --
 
 INSERT INTO `announcements` (`announcementID`, `courseID`, `userID`, `announcementTitle`, `announcementContent`, `announcementDate`, `announcementTime`, `isRequired`) VALUES
-(1, 1, 1, 'Project Deadline Reminder', 'Final project is due next week. Submit via LMS.', '2025-08-30', '09:00:00', 1);
+(1, 1, 1, 'Project Deadline Reminder', 'Final project is due next week. Submit via LMS.Final project is due next week. Submit via LMS.Final project is due next week. Submit via LMS.Final project is due next week. Submit via LMS.Final project is due next week. Submit via LMS.Final project is due next week. Submit via LMS.Final project is due next week. Submit via LMS.Final project is due next week. Submit via LMS.', '2025-08-30', '09:00:00', 1),
+(3, 1, 1, 'Project Deadline Reminder', 'Final project is due next week. Submit via LMS.Final project is due next week. Submit via LMS.Final project is due next week. Submit via LMS.Final project is due next week. Submit via LMS.Final project is due next week. Submit via LMS.Final project is due next week. Submit via LMS.Final project is due next week. Submit via LMS.Final project is due next week. Submit via LMS.', '2025-08-30', '09:00:00', 1);
 
 -- --------------------------------------------------------
 
@@ -109,10 +111,8 @@ CREATE TABLE `assessments` (
 --
 
 INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `type`, `deadline`, `deadlineEnabled`, `createdAt`, `isArchived`) VALUES
-(1, 1, 'Activity #1', 'Task', '2025-10-15', 0, '2025-09-09 23:00:15', 0),
-(2, 1, 'Test #1', 'Test', '2025-11-06', 0, '2025-09-04 22:00:15', 0),
-(3, 2, 'Activity #2', 'Task', '2025-10-23', 0, '2025-10-22 22:00:15', 0),
-(4, 2, 'Activity #1', 'Task', '2025-09-11', 0, '2025-09-04 22:00:15', 0);
+(18, 1, 'Activity ngayon', 'Task', '2025-11-28', 0, '2025-11-16 20:06:15', 0),
+(19, 1, 'Test ngayon', 'Test', '2025-11-28', 0, '2025-11-16 20:24:33', 0);
 
 -- --------------------------------------------------------
 
@@ -133,9 +133,7 @@ CREATE TABLE `assignments` (
 --
 
 INSERT INTO `assignments` (`assignmentID`, `assessmentID`, `assignmentDescription`, `assignmentPoints`, `rubricID`) VALUES
-(1, 1, 'Attached is a Google Doc that you can edit.\n\nIn Figma, design a “404 Not Found” page.\n\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\n\nTurn in when done.\n\n', 100, 1),
-(2, 4, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100, 1),
-(3, 2, 'Attached is a Google Doc that you can edit.\r\n\r\nIn Figma, design a “404 Not Found” page.\r\n\r\nCreate two versions, one for the mobile and one for the desktop. Turn in when done.\r\n\r\nTurn in when done.\r\n\r\n', 100, NULL);
+(12, 18, 'test test', 20, 0);
 
 -- --------------------------------------------------------
 
@@ -246,7 +244,9 @@ CREATE TABLE `courses` (
 INSERT INTO `courses` (`courseID`, `userID`, `courseCode`, `courseTitle`, `courseImage`, `isActive`, `code`, `section`) VALUES
 (1, 1, 'COMP-006', 'Web Development', 'webdev.jpg', 1, '123456', 'BSIT 4-1'),
 (2, 1, 'GEED-007', 'Web Development 2', 'webdev.jpg', 1, '789ABC', 'BSIT 4-1'),
-(3, 1, 'MM-102', 'Multimedia', '72793b45-c2cc-4ad2-ad29-5b395ca0c24d.jpg', 1, '1Z8AQ8', 'BSIT 4-1');
+(3, 1, 'MM-102', 'Multimedia', '72793b45-c2cc-4ad2-ad29-5b395ca0c24d.jpg', 1, '1Z8AQ8', 'BSIT 4-1'),
+(4, 1, '246810', 'STS', '', 1, 'RSCP99', '4-1'),
+(5, 1, '246810', 'STS', '', 1, '0EV9XN', '4-1');
 
 -- --------------------------------------------------------
 
@@ -270,7 +270,9 @@ CREATE TABLE `courseschedule` (
 INSERT INTO `courseschedule` (`courseScheduleID`, `courseID`, `day`, `startTime`, `endTime`, `createdAt`) VALUES
 (1, 3, 'Monday', '18:06:00', '06:06:00', '2025-11-03 18:07:13'),
 (2, 3, 'Monday', '18:07:00', '19:07:00', '2025-11-03 18:07:13'),
-(3, 3, 'Monday', '18:08:00', '20:07:00', '2025-11-03 18:07:13');
+(3, 3, 'Monday', '18:08:00', '20:07:00', '2025-11-03 18:07:13'),
+(4, 4, 'Wednesday', '09:00:00', '23:00:00', '2025-11-16 12:47:16'),
+(5, 5, 'Wednesday', '09:00:00', '23:00:00', '2025-11-16 12:47:23');
 
 -- --------------------------------------------------------
 
@@ -348,49 +350,9 @@ CREATE TABLE `criteria` (
 --
 
 INSERT INTO `criteria` (`criterionID`, `rubricID`, `criteriaTitle`, `criteriaDescription`) VALUES
-(1, 1, 'Introduction & Background', 'Clarity of purpose, hypothesis, and scientific context'),
-(2, 1, 'Methods & Procedures', 'Detail and clarity enabling replication'),
-(3, 1, 'Data Presentation', 'Accuracy and organization of data'),
-(4, 1, 'Analysis & Discussion', 'Quality of interpretation and reasoning'),
-(5, 1, 'Structure & Mechanics', 'Organization, formatting, grammar'),
-(6, 2, 'Depth of Reflection', 'Level of personal insight and critical thinking'),
-(7, 2, 'Connection to Experience', 'Quality of linking experience to learning'),
-(8, 2, 'Organization', 'Logical flow and structure'),
-(9, 2, 'Writing Quality', 'Grammar, clarity, and coherence'),
-(10, 3, 'Breadth of Sources', 'Quantity & relevance of scholarly sources'),
-(11, 3, 'Synthesis of Information', 'Integration into themes'),
-(12, 3, 'Critical Evaluation', 'Assessment of strengths & weaknesses'),
-(13, 3, 'Organization', 'Structure and flow'),
-(14, 3, 'Citation Accuracy', 'Correct use of citation style'),
-(15, 4, 'Thesis Statement', 'Clarity and strength of main argument'),
-(16, 4, 'Argument Development', 'Evidence & reasoning'),
-(17, 4, 'Organization', 'Structural flow'),
-(18, 4, 'Grammar & Mechanics', 'Writing correctness'),
-(19, 5, 'Problem Identification', 'Recognition of key issues'),
-(20, 5, 'Analysis', 'Use of concepts and reasoning'),
-(21, 5, 'Solutions/Recommendations', 'Quality & feasibility'),
-(22, 5, 'Evidence Use', 'Support from case data'),
-(23, 6, 'Summary Accuracy', 'Correctness of key points'),
-(24, 6, 'Critical Analysis', 'Depth of evaluation'),
-(25, 6, 'Evidence Integration', 'Use of examples from article'),
-(26, 6, 'Writing Quality', 'Clarity and structure'),
-(27, 7, 'Originality', 'Creativity and uniqueness'),
-(28, 7, 'Technique', 'Skill in chosen medium'),
-(29, 7, 'Purpose/Message', 'Clarity of intention'),
-(30, 7, 'Presentation', 'Overall quality'),
-(31, 8, 'Clarity of Concept', 'Definition and focus of idea'),
-(32, 8, 'Rationale', 'Significance and justification'),
-(33, 8, 'Feasibility', 'Practicality of idea'),
-(34, 8, 'Organization', 'Logical structure'),
-(35, 9, 'Usability', 'Ease of navigation and interaction'),
-(36, 9, 'Visual Design', 'Aesthetics and consistency'),
-(37, 9, 'Accessibility', 'Inclusiveness and compliance'),
-(38, 9, 'Information Architecture', 'Logical arrangement of content'),
-(39, 10, 'Functionality', 'Working features and performance'),
-(40, 10, 'Design & Layout', 'Aesthetics and responsiveness'),
-(41, 10, 'Code Quality', 'Structure and efficiency'),
-(42, 10, 'Content Quality', 'Clarity and accuracy of text/media'),
-(43, 10, 'User Experience', 'Overall interaction quality');
+(1, 1, 'Voice, Style, and Imagery', 'Assesses the development of a distinct and compelling writer\'s voice, the effectiveness of word choice (diction), and the use of sensory details and figurative language (imagery) to create a vivid experience for the reader.'),
+(2, 1, 'Narrative Structure and Pacing', 'Assesses the effective management of the plot (beginning, rising action, climax, resolution), character development (if applicable), and the manipulation of time and speed (pacing) to build tension and interest.'),
+(3, 2, 'Participation and Initiative', 'Assesses the student\'s level of engagement, attendance at meetings, willingness to take on tasks, and proactive approach to contributing ideas and effort to the team\'s goals.');
 
 -- --------------------------------------------------------
 
@@ -450,7 +412,8 @@ INSERT INTO `enrollments` (`enrollmentID`, `userID`, `courseID`, `yearSection`) 
 (10, 10, 1, 2023),
 (11, 11, 1, 2023),
 (12, 12, 1, 2023),
-(13, 2, 3, 1);
+(13, 2, 3, 1),
+(14, 26, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -491,7 +454,8 @@ CREATE TABLE `files` (
 --
 
 INSERT INTO `files` (`fileID`, `courseID`, `userID`, `announcementID`, `lessonID`, `assignmentID`, `submissionID`, `fileAttachment`, `fileTitle`, `fileLink`, `uploadedAt`) VALUES
-(1, 1, 1, 1, 1, NULL, NULL, 'Web Development Course Material', 'Web Development', 'https://gmail.com/lesson1,https://gmail.com/lesson1.1', '2025-08-30 10:30:00');
+(1, 1, 1, 1, 1, NULL, NULL, '', 'Web DevelopmentWeb DevelopmentWeb Development', 'https://youtu.be/_Z-oh_dI15w?si=aYj4CxPk4BX9Vvdtdswdwferfevcevrgrgbefwqfegebthjrfgwqdqwd', '2025-08-30 10:30:00'),
+(3, 1, 1, NULL, 2, NULL, NULL, 'webstar_(7).sql', '', '', '2025-11-16 14:55:19');
 
 -- --------------------------------------------------------
 
@@ -503,7 +467,7 @@ CREATE TABLE `inbox` (
   `inboxID` int(11) NOT NULL,
   `enrollmentID` int(11) NOT NULL,
   `messageText` text NOT NULL,
-  `notifType` varchar(50) NOT NULL,
+  `notifType` int(11) NOT NULL,
   `createdAt` datetime DEFAULT current_timestamp(),
   `isRead` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -513,8 +477,114 @@ CREATE TABLE `inbox` (
 --
 
 INSERT INTO `inbox` (`inboxID`, `enrollmentID`, `messageText`, `notifType`, `createdAt`, `isRead`) VALUES
-(1, 1, 'Prof. Christian James has posted a new assignment.', '0', '2024-01-31 08:04:00', 1),
-(2, 2, 'Prof. Christian James has posted a new assignment.', '0', '2024-01-31 08:04:00', 1);
+(1, 1, 'Prof. Christian James has posted a new assignment.', 0, '2024-01-31 08:04:00', 1),
+(2, 2, 'Prof. Christian James has posted a new assignment.', 0, '2024-01-31 08:04:00', 1),
+(3, 1, 'A new test has been posted: Test 31', 0, '2025-11-16 03:29:41', 1),
+(4, 3, 'A new test has been posted: Test 31', 0, '2025-11-16 03:29:41', 1),
+(5, 4, 'A new test has been posted: Test 31', 0, '2025-11-16 03:29:41', 1),
+(6, 5, 'A new test has been posted: Test 31', 0, '2025-11-16 03:29:41', 1),
+(7, 6, 'A new test has been posted: Test 31', 0, '2025-11-16 03:29:41', 1),
+(8, 7, 'A new test has been posted: Test 31', 0, '2025-11-16 03:29:41', 1),
+(9, 8, 'A new test has been posted: Test 31', 0, '2025-11-16 03:29:41', 1),
+(10, 9, 'A new test has been posted: Test 31', 0, '2025-11-16 03:29:41', 1),
+(11, 10, 'A new test has been posted: Test 31', 0, '2025-11-16 03:29:41', 1),
+(12, 11, 'A new test has been posted: Test 31', 0, '2025-11-16 03:29:41', 1),
+(13, 12, 'A new test has been posted: Test 31', 0, '2025-11-16 03:29:41', 1),
+(18, 1, 'A new test has been posted: test 32', 0, '2025-11-16 03:31:31', 1),
+(19, 3, 'A new test has been posted: test 32', 0, '2025-11-16 03:31:31', 1),
+(20, 4, 'A new test has been posted: test 32', 0, '2025-11-16 03:31:31', 1),
+(21, 5, 'A new test has been posted: test 32', 0, '2025-11-16 03:31:31', 1),
+(22, 6, 'A new test has been posted: test 32', 0, '2025-11-16 03:31:31', 1),
+(23, 7, 'A new test has been posted: test 32', 0, '2025-11-16 03:31:31', 1),
+(24, 8, 'A new test has been posted: test 32', 0, '2025-11-16 03:31:31', 1),
+(25, 9, 'A new test has been posted: test 32', 0, '2025-11-16 03:31:31', 1),
+(26, 10, 'A new test has been posted: test 32', 0, '2025-11-16 03:31:31', 1),
+(27, 11, 'A new test has been posted: test 32', 0, '2025-11-16 03:31:31', 1),
+(28, 12, 'A new test has been posted: test 32', 0, '2025-11-16 03:31:31', 1),
+(29, 1, 'A new task has been assigned: Activity #4', 0, '2025-11-16 13:14:45', 1),
+(30, 3, 'A new task has been assigned: Activity #4', 0, '2025-11-16 13:14:45', 1),
+(31, 4, 'A new task has been assigned: Activity #4', 0, '2025-11-16 13:14:45', 1),
+(32, 5, 'A new task has been assigned: Activity #4', 0, '2025-11-16 13:14:45', 1),
+(33, 6, 'A new task has been assigned: Activity #4', 0, '2025-11-16 13:14:45', 1),
+(34, 7, 'A new task has been assigned: Activity #4', 0, '2025-11-16 13:14:45', 1),
+(35, 8, 'A new task has been assigned: Activity #4', 0, '2025-11-16 13:14:45', 1),
+(36, 9, 'A new task has been assigned: Activity #4', 0, '2025-11-16 13:14:45', 1),
+(37, 10, 'A new task has been assigned: Activity #4', 0, '2025-11-16 13:14:45', 1),
+(38, 11, 'A new task has been assigned: Activity #4', 0, '2025-11-16 13:14:45', 1),
+(39, 12, 'A new task has been assigned: Activity #4', 0, '2025-11-16 13:14:45', 1),
+(40, 14, 'A new task has been assigned: Activity #4', 0, '2025-11-16 13:14:45', 1),
+(44, 1, 'A new test has been posted: gwgeg', 0, '2025-11-16 14:11:04', 1),
+(45, 3, 'A new test has been posted: gwgeg', 0, '2025-11-16 14:11:04', 1),
+(46, 4, 'A new test has been posted: gwgeg', 0, '2025-11-16 14:11:04', 1),
+(47, 5, 'A new test has been posted: gwgeg', 0, '2025-11-16 14:11:04', 1),
+(48, 6, 'A new test has been posted: gwgeg', 0, '2025-11-16 14:11:04', 1),
+(49, 7, 'A new test has been posted: gwgeg', 0, '2025-11-16 14:11:04', 1),
+(50, 8, 'A new test has been posted: gwgeg', 0, '2025-11-16 14:11:04', 1),
+(51, 9, 'A new test has been posted: gwgeg', 0, '2025-11-16 14:11:04', 1),
+(52, 10, 'A new test has been posted: gwgeg', 0, '2025-11-16 14:11:04', 1),
+(53, 11, 'A new test has been posted: gwgeg', 0, '2025-11-16 14:11:04', 1),
+(54, 12, 'A new test has been posted: gwgeg', 0, '2025-11-16 14:11:04', 1),
+(55, 14, 'A new test has been posted: gwgeg', 0, '2025-11-16 14:11:04', 1),
+(59, 1, 'A new lesson has been added: Lesson #2', 0, '2025-11-16 14:55:19', 1),
+(60, 3, 'A new lesson has been added: Lesson #2', 0, '2025-11-16 14:55:19', 1),
+(61, 4, 'A new lesson has been added: Lesson #2', 0, '2025-11-16 14:55:19', 1),
+(62, 5, 'A new lesson has been added: Lesson #2', 0, '2025-11-16 14:55:19', 1),
+(63, 6, 'A new lesson has been added: Lesson #2', 0, '2025-11-16 14:55:19', 1),
+(64, 7, 'A new lesson has been added: Lesson #2', 0, '2025-11-16 14:55:19', 1),
+(65, 8, 'A new lesson has been added: Lesson #2', 0, '2025-11-16 14:55:19', 1),
+(66, 9, 'A new lesson has been added: Lesson #2', 0, '2025-11-16 14:55:19', 1),
+(67, 10, 'A new lesson has been added: Lesson #2', 0, '2025-11-16 14:55:19', 1),
+(68, 11, 'A new lesson has been added: Lesson #2', 0, '2025-11-16 14:55:19', 1),
+(69, 12, 'A new lesson has been added: Lesson #2', 0, '2025-11-16 14:55:19', 1),
+(70, 14, 'A new lesson has been added: Lesson #2', 0, '2025-11-16 14:55:19', 1),
+(74, 1, 'A new test has been posted: Test #16', 0, '2025-11-16 19:39:45', 0),
+(75, 3, 'A new test has been posted: Test #16', 0, '2025-11-16 19:39:45', 0),
+(76, 4, 'A new test has been posted: Test #16', 0, '2025-11-16 19:39:45', 0),
+(77, 5, 'A new test has been posted: Test #16', 0, '2025-11-16 19:39:45', 0),
+(78, 6, 'A new test has been posted: Test #16', 0, '2025-11-16 19:39:45', 0),
+(79, 7, 'A new test has been posted: Test #16', 0, '2025-11-16 19:39:45', 0),
+(80, 8, 'A new test has been posted: Test #16', 0, '2025-11-16 19:39:45', 0),
+(81, 9, 'A new test has been posted: Test #16', 0, '2025-11-16 19:39:45', 0),
+(82, 10, 'A new test has been posted: Test #16', 0, '2025-11-16 19:39:45', 0),
+(83, 11, 'A new test has been posted: Test #16', 0, '2025-11-16 19:39:45', 0),
+(84, 12, 'A new test has been posted: Test #16', 0, '2025-11-16 19:39:45', 0),
+(85, 14, 'A new test has been posted: Test #16', 0, '2025-11-16 19:39:45', 0),
+(89, 1, 'A new task has been assigned: Activity #16', 0, '2025-11-16 19:47:41', 0),
+(90, 3, 'A new task has been assigned: Activity #16', 0, '2025-11-16 19:47:41', 0),
+(91, 4, 'A new task has been assigned: Activity #16', 0, '2025-11-16 19:47:41', 0),
+(92, 5, 'A new task has been assigned: Activity #16', 0, '2025-11-16 19:47:41', 0),
+(93, 6, 'A new task has been assigned: Activity #16', 0, '2025-11-16 19:47:41', 0),
+(94, 7, 'A new task has been assigned: Activity #16', 0, '2025-11-16 19:47:41', 0),
+(95, 8, 'A new task has been assigned: Activity #16', 0, '2025-11-16 19:47:41', 0),
+(96, 9, 'A new task has been assigned: Activity #16', 0, '2025-11-16 19:47:41', 0),
+(97, 10, 'A new task has been assigned: Activity #16', 0, '2025-11-16 19:47:41', 0),
+(98, 11, 'A new task has been assigned: Activity #16', 0, '2025-11-16 19:47:41', 0),
+(99, 12, 'A new task has been assigned: Activity #16', 0, '2025-11-16 19:47:41', 0),
+(100, 14, 'A new task has been assigned: Activity #16', 0, '2025-11-16 19:47:41', 0),
+(104, 1, 'A new task has been assigned: Activity ngayon', 0, '2025-11-16 20:06:15', 0),
+(105, 3, 'A new task has been assigned: Activity ngayon', 0, '2025-11-16 20:06:15', 0),
+(106, 4, 'A new task has been assigned: Activity ngayon', 0, '2025-11-16 20:06:15', 0),
+(107, 5, 'A new task has been assigned: Activity ngayon', 0, '2025-11-16 20:06:15', 0),
+(108, 6, 'A new task has been assigned: Activity ngayon', 0, '2025-11-16 20:06:15', 0),
+(109, 7, 'A new task has been assigned: Activity ngayon', 0, '2025-11-16 20:06:15', 0),
+(110, 8, 'A new task has been assigned: Activity ngayon', 0, '2025-11-16 20:06:15', 0),
+(111, 9, 'A new task has been assigned: Activity ngayon', 0, '2025-11-16 20:06:15', 0),
+(112, 10, 'A new task has been assigned: Activity ngayon', 0, '2025-11-16 20:06:15', 0),
+(113, 11, 'A new task has been assigned: Activity ngayon', 0, '2025-11-16 20:06:15', 0),
+(114, 12, 'A new task has been assigned: Activity ngayon', 0, '2025-11-16 20:06:15', 0),
+(115, 14, 'A new task has been assigned: Activity ngayon', 0, '2025-11-16 20:06:15', 0),
+(119, 1, 'A new test has been posted: Test ngayon', 0, '2025-11-16 20:24:33', 0),
+(120, 3, 'A new test has been posted: Test ngayon', 0, '2025-11-16 20:24:33', 0),
+(121, 4, 'A new test has been posted: Test ngayon', 0, '2025-11-16 20:24:33', 0),
+(122, 5, 'A new test has been posted: Test ngayon', 0, '2025-11-16 20:24:33', 0),
+(123, 6, 'A new test has been posted: Test ngayon', 0, '2025-11-16 20:24:33', 0),
+(124, 7, 'A new test has been posted: Test ngayon', 0, '2025-11-16 20:24:33', 0),
+(125, 8, 'A new test has been posted: Test ngayon', 0, '2025-11-16 20:24:33', 0),
+(126, 9, 'A new test has been posted: Test ngayon', 0, '2025-11-16 20:24:33', 0),
+(127, 10, 'A new test has been posted: Test ngayon', 0, '2025-11-16 20:24:33', 0),
+(128, 11, 'A new test has been posted: Test ngayon', 0, '2025-11-16 20:24:33', 0),
+(129, 12, 'A new test has been posted: Test ngayon', 0, '2025-11-16 20:24:33', 0),
+(130, 14, 'A new test has been posted: Test ngayon', 0, '2025-11-16 20:24:33', 0);
 
 -- --------------------------------------------------------
 
@@ -536,9 +606,9 @@ CREATE TABLE `leaderboard` (
 --
 
 INSERT INTO `leaderboard` (`leaderboardID`, `enrollmentID`, `timeRange`, `periodStart`, `updatedAt`, `xpPoints`) VALUES
-(1, 1, 'Weekly', '2025-08-25', '2025-08-30 12:00:00', 0),
+(1, 1, 'Weekly', '2025-08-25', '2025-08-30 12:00:00', 40),
 (2, 2, 'Weekly', '2025-08-25', '2025-08-30 12:00:00', 0),
-(3, 1, 'Weekly', '2025-09-28', '2025-09-28 16:50:22', 0),
+(3, 1, 'Weekly', '2025-09-28', '2025-09-28 16:50:22', 40),
 (4, 3, 'Weekly', '2025-09-28', '2025-09-28 16:58:09', 0),
 (5, 4, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
 (6, 5, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
@@ -569,7 +639,8 @@ CREATE TABLE `lessons` (
 --
 
 INSERT INTO `lessons` (`lessonID`, `courseID`, `lessonTitle`, `lessonDescription`, `createdAt`) VALUES
-(1, 1, 'Lesson 1: Introduction to CSS Grid', '1. Explain what HTML is and its role in web development.\n2. Identify the basic structure of an HTML document.\n3. Use common HTML tags such as headings, paragraphs, and links. \n4. Create a simple webpage using basic HTML elements.', '2025-08-30 09:00:00');
+(1, 1, 'Lesson 1: Introduction to CSS Grid', '1. Explain what HTML is and its role in web development.\n2. Identify the basic structure of an HTML document.\n3. Use common HTML tags such as headings, paragraphs, and links. \n4. Create a simple webpage using basic HTML elements.', '2025-08-30 09:00:00'),
+(2, 1, 'Lesson #2', 'dwdwd', '2025-11-16 14:55:19');
 
 -- --------------------------------------------------------
 
@@ -590,178 +661,9 @@ CREATE TABLE `level` (
 --
 
 INSERT INTO `level` (`levelID`, `criterionID`, `levelTitle`, `levelDescription`, `points`) VALUES
-(1, 1, 'Excellent', 'Hypothesis clear, insightful; strong background connections', 20.00),
-(2, 1, 'Proficient', 'Clear hypothesis, adequate background', 15.00),
-(3, 1, 'Basic', 'Hypothesis present but unclear or underdeveloped', 10.00),
-(4, 1, 'Needs Improvement', 'Missing or inaccurate introduction elements', 5.00),
-(5, 2, 'Excellent', 'Detailed, organized, replicable procedure', 20.00),
-(6, 2, 'Proficient', 'Mostly clear with minor gaps', 15.00),
-(7, 2, 'Basic', 'Partially explained; difficult to replicate', 10.00),
-(8, 2, 'Needs Improvement', 'Missing or unclear procedure', 5.00),
-(9, 3, 'Excellent', 'Complete, accurate, professional data displays', 20.00),
-(10, 3, 'Proficient', 'Clear with minor errors', 15.00),
-(11, 3, 'Basic', 'Noticeable inaccuracies or disorder', 10.00),
-(12, 3, 'Needs Improvement', 'Missing or inaccurate data', 5.00),
-(13, 4, 'Excellent', 'Insightful analysis linked to scientific concepts', 20.00),
-(14, 4, 'Proficient', 'Logical interpretation with adequate depth', 15.00),
-(15, 4, 'Basic', 'General or superficial discussion', 10.00),
-(16, 4, 'Needs Improvement', 'Weak, incorrect, or missing analysis', 5.00),
-(17, 5, 'Excellent', 'Clear, polished, error-free', 20.00),
-(18, 5, 'Proficient', 'Minor writing issues', 15.00),
-(19, 5, 'Basic', 'Frequent errors but readable', 10.00),
-(20, 5, 'Needs Improvement', 'Disorganized, many writing issues', 5.00),
-(21, 6, 'Exceptional', 'Deep, meaningful connections and insights', 25.00),
-(22, 6, 'Strong', 'Clear insights with thoughtful reflection', 20.00),
-(23, 6, 'Adequate', 'Basic reflection; surface level', 15.00),
-(24, 6, 'Limited', 'Minimal insight', 10.00),
-(25, 7, 'Exceptional', 'Strong integration between experience and concepts', 25.00),
-(26, 7, 'Strong', 'Relevant, clear connections', 20.00),
-(27, 7, 'Adequate', 'Somewhat connected but general', 15.00),
-(28, 7, 'Limited', 'Few or no links to learning', 10.00),
-(29, 8, 'Exceptional', 'Smooth, logical organization', 25.00),
-(30, 8, 'Strong', 'Well-organized with minor issues', 20.00),
-(31, 8, 'Adequate', 'Some inconsistencies', 15.00),
-(32, 8, 'Limited', 'Poor organization', 10.00),
-(33, 9, 'Exceptional', 'Polished, error-free', 25.00),
-(34, 9, 'Strong', 'Minor errors', 20.00),
-(35, 9, 'Adequate', 'Noticeable errors', 15.00),
-(36, 9, 'Limited', 'Many errors making reading difficult', 10.00),
-(37, 10, 'Excellent', 'Wide, diverse, highly relevant sources', 20.00),
-(38, 10, 'Good', 'Adequate number of sources', 15.00),
-(39, 10, 'Fair', 'Limited or partially relevant sources', 10.00),
-(40, 10, 'Poor', 'Few or irrelevant sources', 5.00),
-(41, 11, 'Excellent', 'Synthesizes studies into coherent themes', 20.00),
-(42, 11, 'Good', 'Shows connections with minor gaps', 15.00),
-(43, 11, 'Fair', 'Mostly summaries; limited synthesis', 10.00),
-(44, 11, 'Poor', 'No integration', 5.00),
-(45, 12, 'Excellent', 'Deep critique with strong reasoning', 20.00),
-(46, 12, 'Good', 'Adequate assessment', 15.00),
-(47, 12, 'Fair', 'Minimal critique', 10.00),
-(48, 12, 'Poor', 'No evaluation', 5.00),
-(49, 13, 'Excellent', 'Clear, logical thematic structure', 20.00),
-(50, 13, 'Good', 'Mostly organized', 15.00),
-(51, 13, 'Fair', 'Noticeable structural issues', 10.00),
-(52, 13, 'Poor', 'Disorganized', 5.00),
-(53, 14, 'Excellent', 'Accurate and consistent', 20.00),
-(54, 14, 'Good', 'Minor errors', 15.00),
-(55, 14, 'Fair', 'Several errors', 10.00),
-(56, 14, 'Poor', 'Frequent or missing citations', 5.00),
-(57, 15, 'Excellent', 'Clear, arguable, insightful thesis', 25.00),
-(58, 15, 'Good', 'Clear and focused', 15.00),
-(59, 15, 'Fair', 'Present but weak', 10.00),
-(60, 15, 'Poor', 'Unclear or missing', 5.00),
-(61, 16, 'Excellent', 'Strong supporting evidence and logic', 25.00),
-(62, 16, 'Good', 'Adequate support', 15.00),
-(63, 16, 'Fair', 'Limited reasoning', 10.00),
-(64, 16, 'Poor', 'Unsupported ideas', 5.00),
-(65, 17, 'Excellent', 'Well-structured and cohesive', 25.00),
-(66, 17, 'Good', 'Mostly organized', 15.00),
-(67, 17, 'Fair', 'Some disorder', 10.00),
-(68, 17, 'Poor', 'Hard to follow', 5.00),
-(69, 18, 'Excellent', 'Polished, error-free', 25.00),
-(70, 18, 'Good', 'Minor issues', 15.00),
-(71, 18, 'Fair', 'Multiple errors', 10.00),
-(72, 18, 'Poor', 'Frequent mechanical errors', 5.00),
-(73, 19, 'Excellent', 'Thorough, accurate identification of all issues', 25.00),
-(74, 19, 'Good', 'Identifies major issues', 15.00),
-(75, 19, 'Fair', 'Partially identifies issues', 10.00),
-(76, 19, 'Poor', 'Issues unclear or misunderstood', 5.00),
-(77, 20, 'Excellent', 'Deep, theory-based analysis', 25.00),
-(78, 20, 'Good', 'Solid analysis', 15.00),
-(79, 20, 'Fair', 'General or limited analysis', 10.00),
-(80, 20, 'Poor', 'Weak or incorrect', 5.00),
-(81, 21, 'Excellent', 'Practical, well-supported solutions', 25.00),
-(82, 21, 'Good', 'Reasonable recommendations', 15.00),
-(83, 21, 'Fair', 'Vague or general', 10.00),
-(84, 21, 'Poor', 'Unsupported or unrealistic', 5.00),
-(85, 22, 'Excellent', 'Strong, appropriate evidence', 25.00),
-(86, 22, 'Good', 'Adequate support', 15.00),
-(87, 22, 'Fair', 'Some evidence', 10.00),
-(88, 22, 'Poor', 'Lacks evidence', 5.00),
-(89, 23, 'Excellent', 'Complete, accurate summary', 25.00),
-(90, 23, 'Good', 'Mostly accurate', 15.00),
-(91, 23, 'Fair', 'Minor misinterpretations', 10.00),
-(92, 23, 'Poor', 'Incorrect or incomplete', 5.00),
-(93, 24, 'Excellent', 'Insightful, well-reasoned critique', 25.00),
-(94, 24, 'Good', 'Clear critique', 15.00),
-(95, 24, 'Fair', 'Limited critical thinking', 10.00),
-(96, 24, 'Poor', 'Minimal or no critique', 5.00),
-(97, 25, 'Excellent', 'Strong, relevant evidence', 25.00),
-(98, 25, 'Good', 'Adequate examples', 15.00),
-(99, 25, 'Fair', 'Some evidence', 10.00),
-(100, 25, 'Poor', 'Weak or no evidence', 5.00),
-(101, 26, 'Excellent', 'Clear, organized, error-free', 25.00),
-(102, 26, 'Good', 'Minor clarity or grammar issues', 15.00),
-(103, 26, 'Fair', 'Multiple errors', 10.00),
-(104, 26, 'Poor', 'Disorganized, error-ridden', 5.00),
-(105, 27, 'Outstanding', 'Highly original and imaginative', 25.00),
-(106, 27, 'Strong', 'Good originality', 15.00),
-(107, 27, 'Basic', 'Some creativity', 10.00),
-(108, 27, 'Limited', 'Lacks originality', 5.00),
-(109, 28, 'Outstanding', 'Exceptional technique', 25.00),
-(110, 28, 'Strong', 'Solid skills', 15.00),
-(111, 28, 'Basic', 'Adequate technique', 10.00),
-(112, 28, 'Limited', 'Weak execution', 5.00),
-(113, 29, 'Outstanding', 'Strong, meaningful message', 25.00),
-(114, 29, 'Strong', 'Clear purpose', 15.00),
-(115, 29, 'Basic', 'Some meaning', 10.00),
-(116, 29, 'Limited', 'Unclear message', 5.00),
-(117, 30, 'Outstanding', 'Outstanding', 25.00),
-(118, 30, 'Outstanding', 'Neat and complete', 15.00),
-(119, 30, 'Basic', 'Some presentation issues', 10.00),
-(120, 30, 'Limited', 'Poor presentation', 5.00),
-(121, 31, 'Excellent', 'Clear, strongly articulated concept', 25.00),
-(122, 31, 'Excellent', 'Mostly clear', 15.00),
-(123, 31, 'Fair', 'Concept somewhat unclear', 10.00),
-(124, 31, 'Poor', 'Vague or undeveloped', 5.00),
-(125, 32, 'Excellent', 'Strong justification', 25.00),
-(126, 32, 'Good', 'Adequate rationale', 15.00),
-(127, 32, 'Fair', 'Weak explanation', 10.00),
-(128, 32, 'Poor', 'Missing rationale', 5.00),
-(129, 33, 'Excellent', 'Highly feasible and well-supported', 25.00),
-(130, 33, 'Good', 'Mostly feasible', 15.00),
-(131, 33, 'Fair', 'Some feasibility concerns', 10.00),
-(132, 33, 'Poor', 'Not feasible', 5.00),
-(133, 34, 'Excellent', 'Well-organized', 25.00),
-(134, 34, 'Good', 'Minor issues', 15.00),
-(135, 34, 'Fair', 'Some disorganization', 10.00),
-(136, 34, 'Poor', 'Poorly structured', 5.00),
-(137, 35, 'Excellent', 'Highly intuitive, user-friendly', 25.00),
-(138, 35, 'Good', 'Mostly intuitive', 15.00),
-(139, 35, 'Fair', 'Some usability issues', 10.00),
-(140, 35, 'Poor', 'Hard to use', 5.00),
-(141, 36, 'Excellent', 'Professional, cohesive visual design', 25.00),
-(142, 36, 'Good', 'Attractive and consistent', 15.00),
-(143, 36, 'Fair', 'Minor inconsistencies', 10.00),
-(144, 36, 'Poor', 'Unappealing or messy', 5.00),
-(145, 37, 'Excellent', 'Fully accessible', 25.00),
-(146, 37, 'Good', 'Mostly accessible', 15.00),
-(147, 37, 'Fair', 'Limited accessibility', 10.00),
-(148, 37, 'Poor', 'Not accessible', 5.00),
-(149, 38, 'Excellent', 'Clear structure and flow', 25.00),
-(150, 38, 'Good', 'Mostly clear', 15.00),
-(151, 38, 'Fair', 'Some confusion in structure', 10.00),
-(152, 38, 'Poor', 'Poorly organized', 5.00),
-(153, 39, 'Excellent', 'Fully functional with no errors', 20.00),
-(154, 39, 'Good', 'Minor issues', 15.00),
-(155, 39, 'Fair', 'Some features broken', 10.00),
-(156, 39, 'Poor', 'Major issues or nonfunctional', 5.00),
-(157, 40, 'Excellent', 'Clean, responsive, visually appealing', 20.00),
-(158, 40, 'Good', 'Mostly strong design', 15.00),
-(159, 40, 'Fair', 'Some layout issues', 10.00),
-(160, 40, 'Poor', 'Poor design or non-responsive', 5.00),
-(161, 41, 'Excellent', 'Clean, documented, efficient code', 20.00),
-(162, 41, 'Good', 'Minor inefficiencies', 15.00),
-(163, 41, 'Fair', 'Some code issues', 10.00),
-(164, 41, 'Poor', 'Poorly structured code', 5.00),
-(165, 42, 'Excellent', 'Accurate, clear, engaging content', 20.00),
-(166, 42, 'Good', 'Mostly clear', 15.00),
-(167, 42, 'Fair', 'Some unclear or inaccurate info', 10.00),
-(168, 42, 'Poor', 'Incomplete or poorly written', 5.00),
-(169, 43, 'Excellent', 'Excellent', 20.00),
-(170, 43, 'Good', 'Mostly smooth', 15.00),
-(171, 43, 'Fair', 'Some issues', 10.00),
-(172, 43, 'Poor', 'Frustrating experience', 5.00);
+(1, 1, 'Exemplary (A)', 'The writing demonstrates a unique, sophisticated, and memorable voice. Imagery is fresh, powerful, and deeply evocative, seamlessly integrating figurative language (metaphor, simile) that enriches the meaning. Diction is precise and masterful.', 30.00),
+(2, 2, 'Exemplary (A)', 'The structure is innovative and perfectly paced, maintaining tension and emotional resonance throughout. Characters (if present) are complex and fully realized, undergoing believable development. The ending is highly satisfying and meaningful.', 50.00),
+(3, 3, 'Exemplary (A)', 'Is a driving force in the group; consistently attends and is highly prepared for all meetings. Proactively seeks out complex tasks and offers creative solutions, motivating others to contribute effectively.', 50.00);
 
 -- --------------------------------------------------------
 
@@ -815,7 +717,7 @@ CREATE TABLE `profile` (
 --
 
 INSERT INTO `profile` (`profileID`, `userID`, `bio`, `webstars`, `emblemID`, `coverImageID`, `colorThemeID`) VALUES
-(1, 2, 'Welcome to my Webstar profile!', 5599, 1, 1, 1),
+(1, 2, 'Welcome to my Webstar profile!', 5603, 1, 1, 1),
 (2, 4, 'Welcome to my Webstar profile!', 700, 1, 1, 1);
 
 -- --------------------------------------------------------
@@ -865,17 +767,17 @@ CREATE TABLE `report` (
 --
 
 INSERT INTO `report` (`reportID`, `enrollmentID`, `totalXP`, `allTimeRank`, `generatedAt`) VALUES
-(1, 1, 0, 9, '2025-11-14 14:22:45'),
-(2, 3, 0, 10, '2025-11-14 14:22:45'),
-(3, 8, 0, 4, '2025-11-14 14:22:45'),
-(4, 6, 0, 2, '2025-11-14 14:22:45'),
-(5, 11, 0, 7, '2025-11-14 14:22:45'),
-(6, 10, 0, 6, '2025-11-14 14:22:45'),
-(7, 5, 0, 1, '2025-11-14 14:22:45'),
-(8, 7, 0, 3, '2025-11-14 14:22:45'),
-(9, 9, 0, 5, '2025-11-14 14:22:45'),
-(10, 4, 0, 11, '2025-11-14 14:22:45'),
-(11, 12, 0, 8, '2025-11-14 14:22:45'),
+(1, 1, 80, 1, '2025-11-16 20:26:52'),
+(2, 3, 0, 6, '2025-11-16 20:26:52'),
+(3, 8, 0, 11, '2025-11-16 20:26:52'),
+(4, 6, 0, 9, '2025-11-16 20:26:52'),
+(5, 11, 0, 4, '2025-11-16 20:26:52'),
+(6, 10, 0, 3, '2025-11-16 20:26:52'),
+(7, 5, 0, 8, '2025-11-16 20:26:52'),
+(8, 7, 0, 10, '2025-11-16 20:26:52'),
+(9, 9, 0, 2, '2025-11-16 20:26:52'),
+(10, 4, 0, 7, '2025-11-16 20:26:52'),
+(11, 12, 0, 5, '2025-11-16 20:26:52'),
 (12, 2, 450, 1, '2025-11-06 15:51:29');
 
 -- --------------------------------------------------------
@@ -897,16 +799,8 @@ CREATE TABLE `rubric` (
 --
 
 INSERT INTO `rubric` (`rubricID`, `rubricTitle`, `rubricType`, `userID`, `totalPoints`) VALUES
-(1, 'Laboratory Report Rubric', 'Preset', 1, 100),
-(2, 'Reflection Paper Rubric', 'Preset', 1, 100),
-(3, 'Literature Review Rubric', 'Preset', 1, 100),
-(4, 'Essay Rubric', 'Preset', 1, 100),
-(5, 'Case Study Rubric', 'Preset', 1, 100),
-(6, 'Article Review Rubric', 'Preset', 1, 100),
-(7, 'Creative Work Rubric', 'Preset', 1, 100),
-(8, 'Concept Paper Rubric', 'Preset', 1, 100),
-(9, 'UI/UX Design Rubric', 'Preset', 1, 100),
-(10, 'Website Development Rubric', 'Preset', 1, 100);
+(1, 'Creative Writing Assessment', 'Created', 1, 80),
+(2, 'Group Collaboration and Contribution', 'Preset', 1, 50);
 
 -- --------------------------------------------------------
 
@@ -965,7 +859,8 @@ INSERT INTO `settings` (`settingsID`, `userID`, `courseUpdateEnabled`, `questDea
 (9, 9, 0, 0, 0),
 (10, 10, 0, 0, 0),
 (11, 11, 0, 0, 0),
-(12, 12, 0, 0, 0);
+(12, 12, 0, 0, 0),
+(18, 26, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -1140,7 +1035,9 @@ INSERT INTO `testquestionchoices` (`choiceID`, `testQuestionID`, `choiceText`) V
 (37, 10, '&lt;tr&gt;'),
 (38, 10, '&lt;td&gt;'),
 (39, 10, '&lt;th&gt;'),
-(40, 10, '&lt;table&gt;');
+(40, 10, '&lt;table&gt;'),
+(41, 12, 'yes'),
+(42, 12, 'no');
 
 -- --------------------------------------------------------
 
@@ -1172,7 +1069,12 @@ INSERT INTO `testquestions` (`testQuestionID`, `testID`, `testQuestion`, `questi
 (7, 1, 'Which HTML element is used to display a numbered list?', 'Multiple Choice', NULL, '&lt;ol&gt;', 100),
 (8, 1, 'Which HTML attribute is used to define inline CSS styles?', 'Multiple Choice', NULL, 'style', 100),
 (9, 1, 'What is the correct HTML tag for inserting an image?', 'Multiple Choice', NULL, '&lt;img&gt;', 100),
-(10, 1, 'Which tag is used to create a table row?', 'Multiple Choice', NULL, '&lt;tr&gt;', 100);
+(10, 1, 'Which tag is used to create a table row?', 'Multiple Choice', NULL, '&lt;tr&gt;', 100),
+(11, 3, 'matutulog na ba ako?', 'Identification', NULL, 'mamaya na', 1),
+(12, 4, 'kakain na ba?', 'Multiple Choice', NULL, 'yes', 1),
+(13, 5, 'gwgwr', 'Identification', NULL, 'hrrh', 12),
+(14, 6, 'test', 'Identification', NULL, '1', 1),
+(15, 7, 'Kakain na ba ako?', 'Identification', NULL, 'yes', 2);
 
 -- --------------------------------------------------------
 
@@ -1188,6 +1090,14 @@ CREATE TABLE `testresponses` (
   `userAnswer` varchar(50) NOT NULL,
   `isCorrect` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `testresponses`
+--
+
+INSERT INTO `testresponses` (`testResponseID`, `testID`, `testQuestionID`, `userID`, `userAnswer`, `isCorrect`) VALUES
+(1, 3, 11, 2, 'oo', 0),
+(2, 4, 12, 2, 'yes', 1);
 
 -- --------------------------------------------------------
 
@@ -1208,7 +1118,12 @@ CREATE TABLE `tests` (
 
 INSERT INTO `tests` (`testID`, `assessmentID`, `generalGuidance`, `testTimelimit`) VALUES
 (1, 2, 'Read each question carefully and choose the best answer from the given options. Only one option is correct for each question. Once you move to the next question, you will not be able to return to the previous one, so review your answer before proceeding. The exam will automatically submit when the timer ends. Avoid refreshing or closing the browser during the exam to prevent submission issues.', 1200),
-(2, 6, '', 12);
+(2, 6, '', 12),
+(3, 12, '', 5),
+(4, 13, '', 60),
+(5, 15, '', 240),
+(6, 16, '', 180),
+(7, 19, '', 120);
 
 -- --------------------------------------------------------
 
@@ -1232,9 +1147,30 @@ CREATE TABLE `todo` (
 --
 
 INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `status`, `updatedAt`, `isRead`, `timeSpent`, `timeStart`) VALUES
-(1, 2, 1, 'Missing', '2025-11-11 02:36:50', 1, NULL, NULL),
-(2, 2, 4, 'Submitted', '2025-11-13 19:59:36', 1, NULL, NULL),
-(3, 2, 2, 'Pending', '2025-11-04 18:16:16', 1, 0, NULL);
+(96, 2, 18, 'Pending', '2025-11-16 20:06:15', 1, NULL, NULL),
+(97, 3, 18, 'Pending', '2025-11-16 20:06:15', 0, NULL, NULL),
+(98, 4, 18, 'Pending', '2025-11-16 20:06:15', 0, NULL, NULL),
+(99, 5, 18, 'Pending', '2025-11-16 20:06:15', 0, NULL, NULL),
+(100, 6, 18, 'Pending', '2025-11-16 20:06:15', 0, NULL, NULL),
+(101, 7, 18, 'Pending', '2025-11-16 20:06:15', 0, NULL, NULL),
+(102, 8, 18, 'Pending', '2025-11-16 20:06:15', 0, NULL, NULL),
+(103, 9, 18, 'Pending', '2025-11-16 20:06:15', 0, NULL, NULL),
+(104, 10, 18, 'Pending', '2025-11-16 20:06:15', 0, NULL, NULL),
+(105, 11, 18, 'Pending', '2025-11-16 20:06:15', 0, NULL, NULL),
+(106, 12, 18, 'Pending', '2025-11-16 20:06:15', 0, NULL, NULL),
+(107, 26, 18, 'Pending', '2025-11-16 20:06:15', 0, NULL, NULL),
+(108, 2, 19, 'Pending', '2025-11-16 20:24:33', 0, NULL, NULL),
+(109, 3, 19, 'Pending', '2025-11-16 20:24:33', 0, NULL, NULL),
+(110, 4, 19, 'Pending', '2025-11-16 20:24:33', 0, NULL, NULL),
+(111, 5, 19, 'Pending', '2025-11-16 20:24:33', 0, NULL, NULL),
+(112, 6, 19, 'Pending', '2025-11-16 20:24:33', 0, NULL, NULL),
+(113, 7, 19, 'Pending', '2025-11-16 20:24:33', 0, NULL, NULL),
+(114, 8, 19, 'Pending', '2025-11-16 20:24:33', 0, NULL, NULL),
+(115, 9, 19, 'Pending', '2025-11-16 20:24:33', 0, NULL, NULL),
+(116, 10, 19, 'Pending', '2025-11-16 20:24:33', 0, NULL, NULL),
+(117, 11, 19, 'Pending', '2025-11-16 20:24:33', 0, NULL, NULL),
+(118, 12, 19, 'Pending', '2025-11-16 20:24:33', 0, NULL, NULL),
+(119, 26, 19, 'Pending', '2025-11-16 20:24:33', 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1267,7 +1203,7 @@ CREATE TABLE `userinfo` (
 --
 
 INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `middleName`, `lastName`, `studentID`, `programID`, `gender`, `yearLevel`, `yearSection`, `schoolEmail`, `facebookLink`, `linkedInLink`, `githubLink`, `createdAt`, `isNewUser`) VALUES
-(1, 2, 'prof.png', 'Jane', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 1, 'jane.smith@university.edu', '', '', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
+(1, 2, 'prof.png', 'Jane Hannah', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 1, 'jane.smith@university.edu', '', '', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
 (2, 1, 'prof.png', 'Christopher Jay', '', 'De Claro', '202310002', '1', 'Male', '2', 1, 'james.dom@university.edu', 'https://facebook.com/james.dom', 'https://linkedin.com/in/james-dom', 'https://instagram.com/james.dom', '2025-08-30 08:18:53', 1),
 (3, 3, 'prof.png', 'John', 'Cruz', 'Doe', '202310003', '1', 'Male', '2', 1, 'john.doe@university.edu', '', '', '', '2025-09-28 11:58:33', 0),
 (4, 4, 'prof.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 1, 'michael.lee@school.edu', NULL, NULL, NULL, '2025-09-28 20:59:48', 0),
@@ -1285,7 +1221,8 @@ INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `
 (16, 21, 'default.png', 'Marielle Alyssa', '', 'Cato', NULL, '6', '', '4', 1, 'marielle@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1),
 (17, 22, 'default.png', 'Neil Jeferson', '', 'Vergara', NULL, '6', '', '4', 1, 'neil@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1),
 (18, 23, 'default.png', 'Shane Rhyder', '', 'Silverio', NULL, '6', '', '4', 1, 'shane@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 11),
-(19, 24, 'default.png', 'Kimberly Joan', '', 'Palla', NULL, '6', '', '4', 1, 'kimberly@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1);
+(19, 24, 'default.png', 'Kimberly Joan', '', 'Palla', NULL, '6', '', '4', 1, 'kimberly@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1),
+(21, 26, '', 'Cindy', 'L', 'Cato', '3243546576', '6', 'Female', '4', 1, 'cindy@pup.edu.ph', '', '', '', '2025-11-16 12:35:07', 0);
 
 -- --------------------------------------------------------
 
@@ -1325,7 +1262,8 @@ INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`, `status`
 (21, 'devpassword3', 'marielle@example.com', 'developer', 'mariellecato', 'active'),
 (22, 'devpassword4', 'neil@example.com', 'developer', 'neilvergara', 'active'),
 (23, 'devpassword5', 'shane@example.com', 'developer', 'shanesilverio', 'active'),
-(24, 'devpassword6', 'kimberly@example.com', 'developer', 'kimberlypalla', 'active');
+(24, 'devpassword6', 'kimberly@example.com', 'developer', 'kimberlypalla', 'active'),
+(26, 'Webstar-2025', 'webstar.archive@gmail.com', 'student', 'cindy_02', 'Active');
 
 -- --------------------------------------------------------
 
@@ -1347,7 +1285,9 @@ CREATE TABLE `webstars` (
 --
 
 INSERT INTO `webstars` (`webstarsID`, `userID`, `assessmentID`, `sourceType`, `pointsChanged`, `dateEarned`) VALUES
-(22, 2, NULL, 'Shop Purchase', -150, '2025-11-06 17:56:42');
+(22, 2, NULL, 'Shop Purchase', -150, '2025-11-06 17:56:42'),
+(25, 2, 12, 'Tests', 1, '2025-11-16 03:30:14'),
+(26, 2, 13, 'Tests', 3, '2025-11-16 03:32:18');
 
 --
 -- Indexes for dumped tables
@@ -1606,25 +1546,25 @@ ALTER TABLE `activities`
 -- AUTO_INCREMENT for table `announcementnotes`
 --
 ALTER TABLE `announcementnotes`
-  MODIFY `noteID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `noteID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `announcements`
 --
 ALTER TABLE `announcements`
-  MODIFY `announcementID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `announcementID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `assessments`
 --
 ALTER TABLE `assessments`
-  MODIFY `assessmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `assessmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `assignments`
 --
 ALTER TABLE `assignments`
-  MODIFY `assignmentID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `assignmentID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `badges`
@@ -1642,13 +1582,13 @@ ALTER TABLE `colortheme`
 -- AUTO_INCREMENT for table `courses`
 --
 ALTER TABLE `courses`
-  MODIFY `courseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `courseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `courseschedule`
 --
 ALTER TABLE `courseschedule`
-  MODIFY `courseScheduleID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `courseScheduleID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `coverimage`
@@ -1660,7 +1600,7 @@ ALTER TABLE `coverimage`
 -- AUTO_INCREMENT for table `criteria`
 --
 ALTER TABLE `criteria`
-  MODIFY `criterionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `criterionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `emblem`
@@ -1672,7 +1612,7 @@ ALTER TABLE `emblem`
 -- AUTO_INCREMENT for table `enrollments`
 --
 ALTER TABLE `enrollments`
-  MODIFY `enrollmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `enrollmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `feedback`
@@ -1684,13 +1624,13 @@ ALTER TABLE `feedback`
 -- AUTO_INCREMENT for table `files`
 --
 ALTER TABLE `files`
-  MODIFY `fileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `fileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `inbox`
 --
 ALTER TABLE `inbox`
-  MODIFY `inboxID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `inboxID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=134;
 
 --
 -- AUTO_INCREMENT for table `leaderboard`
@@ -1702,13 +1642,13 @@ ALTER TABLE `leaderboard`
 -- AUTO_INCREMENT for table `lessons`
 --
 ALTER TABLE `lessons`
-  MODIFY `lessonID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `lessonID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `level`
 --
 ALTER TABLE `level`
-  MODIFY `levelID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=173;
+  MODIFY `levelID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `myitems`
@@ -1738,13 +1678,13 @@ ALTER TABLE `report`
 -- AUTO_INCREMENT for table `rubric`
 --
 ALTER TABLE `rubric`
-  MODIFY `rubricID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `rubricID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `scores`
 --
 ALTER TABLE `scores`
-  MODIFY `scoreID` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `scoreID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `selectedlevels`
@@ -1756,7 +1696,7 @@ ALTER TABLE `selectedlevels`
 -- AUTO_INCREMENT for table `settings`
 --
 ALTER TABLE `settings`
-  MODIFY `settingsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `settingsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `studentbadges`
@@ -1768,7 +1708,7 @@ ALTER TABLE `studentbadges`
 -- AUTO_INCREMENT for table `submissions`
 --
 ALTER TABLE `submissions`
-  MODIFY `submissionID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `submissionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `supports`
@@ -1780,49 +1720,49 @@ ALTER TABLE `supports`
 -- AUTO_INCREMENT for table `testquestionchoices`
 --
 ALTER TABLE `testquestionchoices`
-  MODIFY `choiceID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `choiceID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `testquestions`
 --
 ALTER TABLE `testquestions`
-  MODIFY `testQuestionID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `testQuestionID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `testresponses`
 --
 ALTER TABLE `testresponses`
-  MODIFY `testResponseID` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `testResponseID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `tests`
 --
 ALTER TABLE `tests`
-  MODIFY `testID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `testID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `todo`
 --
 ALTER TABLE `todo`
-  MODIFY `todoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `todoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=120;
 
 --
 -- AUTO_INCREMENT for table `userinfo`
 --
 ALTER TABLE `userinfo`
-  MODIFY `userInfoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `userInfoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `webstars`
 --
 ALTER TABLE `webstars`
-  MODIFY `webstarsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `webstarsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- Constraints for dumped tables

@@ -39,7 +39,7 @@ $validateTestIDQuery = "SELECT
                         FROM todo 
                         INNER JOIN tests 
                         ON todo.assessmentID = tests.assessmentID 
-                        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = 'Graded';";
+                        WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = 'Returned';";
 $validateTestIDResult = executeQuery($validateTestIDQuery);
 
 if (mysqli_num_rows($validateTestIDResult) <= 0) {

@@ -200,7 +200,7 @@ $showDropdowns = $assessmentCount > 0
                                     <ul class="dropdown-menu dropdown-menu-end"
                                         aria-labelledby="dropdownMenuButton<?php echo $todoID; ?>"
                                         style="margin-top: 0.25rem;">
-                                        <li><a class="dropdown-item text-reg text-14" href="<?php echo $link; ?>">Edit</a></li>
+                                        <li><a class="dropdown-item text-reg text-14" href="assign-task.php?edit=<?php echo $link; ?>">Edit</a></li>
                                         <li>
                                             <button type="button"
                                                 class="dropdown-item text-reg text-14 text-danger"

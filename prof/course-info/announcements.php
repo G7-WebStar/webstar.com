@@ -348,7 +348,7 @@ $announcementResult = executeQuery($announcementQuery);
                 </div>
             </div>
             <!-- FILE VIEWER MODAL -->
-            <div class="modal fade" id="viewerModal" tabindex="-1">
+            <div class="modal fade" id="viewerModal" tabindex="-1"style="z-index:10000">
                 <div class="modal-dialog modal-xl modal-dialog-centered">
                     <div class="modal-content" style="border-radius:12px; overflow:hidden;">
 
@@ -381,7 +381,7 @@ $announcementResult = executeQuery($announcementQuery);
 
 
             <!-- LINK VIEWER MODAL -->
-            <div class="modal fade" id="linkViewerModal" tabindex="-1">
+            <div class="modal fade" id="linkViewerModal" tabindex="-1"style="z-index:10000">
                 <div class="modal-dialog modal-xl modal-dialog-centered">
                     <div class="modal-content" style="border-radius:12px; overflow:hidden;">
 
