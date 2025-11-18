@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 16, 2025 at 05:36 AM
+-- Generation Time: Nov 18, 2025 at 05:19 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `webstar`
+-- Database: `webstart`
 --
 
 -- --------------------------------------------------------
@@ -39,7 +39,7 @@ CREATE TABLE `activities` (
 --
 
 INSERT INTO `activities` (`activityID`, `userID`, `description`, `createdAt`) VALUES
-(1, 2, 'Christian James submitted “Activity #1” Quest.', '2025-10-22 10:37:06'),
+(1, 2, 'Christian James submitted “Activity #1” Quest.', '2025-11-16 10:37:06'),
 (2, 2, 'Christian James submitted “Activity #1” Quest.', '2025-10-28 22:37:06'),
 (3, 2, 'Christian James submitted “Activity #1” Quest.', '2025-10-28 22:37:06');
 
@@ -61,7 +61,9 @@ CREATE TABLE `announcementnotes` (
 --
 
 INSERT INTO `announcementnotes` (`noteID`, `announcementID`, `userID`, `notedAt`) VALUES
-(4, 1, 2, '2025-11-06 12:27:25');
+(5, 4, 2, '2025-11-17 15:05:48'),
+(6, 3, 2, '2025-11-17 15:05:49'),
+(7, 2, 2, '2025-11-17 15:05:51');
 
 -- --------------------------------------------------------
 
@@ -80,6 +82,15 @@ CREATE TABLE `announcements` (
   `isRequired` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `announcements`
+--
+
+INSERT INTO `announcements` (`announcementID`, `courseID`, `userID`, `announcementTitle`, `announcementContent`, `announcementDate`, `announcementTime`, `isRequired`) VALUES
+(2, 34, 1, '', 'PAPA MO', '2025-11-17', '14:11:00', 0),
+(3, 34, 1, '', 'Github', '2025-11-17', '14:17:42', 0),
+(4, 34, 1, '', 'SHEETS', '2025-11-17', '14:21:35', 0);
+
 -- --------------------------------------------------------
 
 --
@@ -91,7 +102,7 @@ CREATE TABLE `assessments` (
   `courseID` int(11) NOT NULL,
   `assessmentTitle` varchar(100) NOT NULL,
   `type` enum('Task','Test') DEFAULT 'Task',
-  `deadline` date NOT NULL,
+  `deadline` datetime NOT NULL,
   `deadlineEnabled` tinyint(1) NOT NULL DEFAULT 0,
   `createdAt` datetime DEFAULT current_timestamp(),
   `isArchived` tinyint(1) NOT NULL DEFAULT 0
@@ -218,9 +229,11 @@ CREATE TABLE `courses` (
 --
 
 INSERT INTO `courses` (`courseID`, `userID`, `courseCode`, `courseTitle`, `courseImage`, `isActive`, `code`, `section`) VALUES
-(1, 1, 'COMP-006', 'Web Developmentt', '07450aa2-65e2-4fc0-a1f0-2678bffdee7a.jpg', 1, '123456', 'BSIT 4-1'),
+(1, 1, 'COMP-006', 'Web Development', 'default.png', 1, '123456', 'BSIT 4-1'),
 (2, 1, 'GEED-007', 'Web Development 2', 'webdev.jpg', 1, '789ABC', 'BSIT 4-1'),
-(3, 1, 'MM-102', 'Multimedia', '72793b45-c2cc-4ad2-ad29-5b395ca0c24d.jpg', 1, '1Z8AQ8', 'BSIT 4-1');
+(3, 1, 'MM-102', 'Multimedia', 'AdobeStock_359419956.jpeg', 1, '1Z8AQ8', 'BSIT 4-1'),
+(33, 1, 'GEED-039', 'Capstone 2', 'default.png', 1, 'EKACOG', 'BSIT 2-1'),
+(34, 1, 'GEED-102', 'Principles of Accounting', 'AdobeStock_1428263864.jpeg', 1, '05TMQM', 'BSIT 4-1');
 
 -- --------------------------------------------------------
 
@@ -243,9 +256,11 @@ CREATE TABLE `courseschedule` (
 
 INSERT INTO `courseschedule` (`courseScheduleID`, `courseID`, `day`, `startTime`, `endTime`, `createdAt`) VALUES
 (2, 2, 'Monday', '18:07:00', '19:07:00', '2025-11-03 18:07:13'),
-(3, 3, 'Monday', '18:08:00', '20:07:00', '2025-11-03 18:07:13'),
 (7, 6, 'Monday', '12:12:00', '14:12:00', '2025-11-16 00:12:28'),
-(47, 1, 'Monday', '01:18:00', '01:19:00', '2025-11-16 03:27:27');
+(57, 3, 'Monday', '18:08:00', '20:07:00', '2025-11-18 13:09:10'),
+(59, 1, 'Monday', '01:18:00', '01:19:00', '2025-11-18 13:10:04'),
+(60, 33, 'Monday', '21:47:00', '21:47:00', '2025-11-18 17:45:35'),
+(61, 34, 'Tuesday', '16:00:00', '18:00:00', '2025-11-18 17:46:09');
 
 -- --------------------------------------------------------
 
@@ -425,7 +440,9 @@ INSERT INTO `enrollments` (`enrollmentID`, `userID`, `courseID`, `yearSection`) 
 (10, 10, 1, 2023),
 (11, 11, 1, 2023),
 (12, 12, 1, 2023),
-(13, 2, 3, 1);
+(13, 2, 3, 1),
+(14, 2, 34, 1),
+(15, 2, 33, 1);
 
 -- --------------------------------------------------------
 
@@ -440,6 +457,13 @@ CREATE TABLE `feedback` (
   `message` text NOT NULL,
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `feedback`
+--
+
+INSERT INTO `feedback` (`feedbackID`, `senderID`, `receiverID`, `message`, `created_at`) VALUES
+(3, 2, 18, 'heyyyy', '2025-11-17 17:44:05');
 
 -- --------------------------------------------------------
 
@@ -456,8 +480,8 @@ CREATE TABLE `files` (
   `assignmentID` int(5) DEFAULT NULL,
   `submissionID` int(11) DEFAULT NULL,
   `fileAttachment` varchar(255) NOT NULL,
-  `fileTitle` varchar(50) NOT NULL,
-  `fileLink` varchar(100) NOT NULL,
+  `fileTitle` varchar(255) NOT NULL,
+  `fileLink` varchar(500) NOT NULL,
   `uploadedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -466,7 +490,15 @@ CREATE TABLE `files` (
 --
 
 INSERT INTO `files` (`fileID`, `courseID`, `userID`, `announcementID`, `lessonID`, `assignmentID`, `submissionID`, `fileAttachment`, `fileTitle`, `fileLink`, `uploadedAt`) VALUES
-(1, 1, 1, 1, 1, NULL, NULL, 'Web Development Course Material', 'Web Development', 'https://gmail.com/lesson1,https://gmail.com/lesson1.1', '2025-08-30 10:30:00');
+(1, 34, 1, 2, NULL, NULL, NULL, 'Social_&_Professional_MIDTERM.pdf', '', '', '2025-11-17 14:11:00'),
+(2, 34, 1, 2, NULL, NULL, NULL, '', 'Youtu.be', 'https://youtu.be/Xejcpn3_atU', '2025-11-17 14:11:10'),
+(3, 34, 1, 3, NULL, NULL, NULL, '', 'Alyssify', 'https://mrllalyssacto.github.io/', '2025-11-17 14:17:43'),
+(4, 34, 1, 4, NULL, NULL, NULL, '', 'Webstar - Final Weeks', 'https://docs.google.com/spreadsheets/d/1zZneXyH61wTgs5ViQQ2IyHRC6wYjZIJ0NF8JspMBrOA/preview', '2025-11-17 14:21:37'),
+(5, 34, 1, NULL, 2, NULL, NULL, 'IAS_MIDTERM.pdf', '', '', '2025-11-17 14:37:12'),
+(6, 34, 1, NULL, 2, NULL, NULL, '', '[ Folk Dance Performance ] Tinikling', 'https://youtu.be/-powVSwYn0w', '2025-11-17 14:37:18'),
+(7, 34, 2, NULL, NULL, NULL, 8, '0c5dc8b9-b04b-4622-8730-0223ae22f9a5.jpg', '', '', '2025-11-17 17:18:17'),
+(9, 34, 2, NULL, NULL, NULL, 8, 'star-card-highres (41).png', '', '', '2025-11-17 17:24:44'),
+(10, 34, 1, NULL, NULL, 4, NULL, 'webstar_(8).sql', '', '', '2025-11-17 18:14:25');
 
 -- --------------------------------------------------------
 
@@ -488,8 +520,24 @@ CREATE TABLE `inbox` (
 --
 
 INSERT INTO `inbox` (`inboxID`, `enrollmentID`, `messageText`, `notifType`, `createdAt`, `isRead`) VALUES
-(1, 1, 'Prof. Christian James has posted a new assignment.', '0', '2024-01-31 08:04:00', 1),
-(2, 2, 'Prof. Christian James has posted a new assignment.', '0', '2024-01-31 08:04:00', 1);
+(1, 14, 'A new test has been posted: TEST NI DOM', 'Course Update', '2025-11-17 15:17:07', 1),
+(2, 1, 'A new test has been posted: TEST ni DOM AGAIN', 'Course Update', '2025-11-17 15:22:51', 1),
+(3, 3, 'A new test has been posted: TEST ni DOM AGAIN', 'Course Update', '2025-11-17 15:22:51', 1),
+(4, 4, 'A new test has been posted: TEST ni DOM AGAIN', 'Course Update', '2025-11-17 15:22:51', 1),
+(5, 5, 'A new test has been posted: TEST ni DOM AGAIN', 'Course Update', '2025-11-17 15:22:51', 1),
+(6, 6, 'A new test has been posted: TEST ni DOM AGAIN', 'Course Update', '2025-11-17 15:22:51', 1),
+(7, 7, 'A new test has been posted: TEST ni DOM AGAIN', 'Course Update', '2025-11-17 15:22:51', 1),
+(8, 8, 'A new test has been posted: TEST ni DOM AGAIN', 'Course Update', '2025-11-17 15:22:51', 1),
+(9, 9, 'A new test has been posted: TEST ni DOM AGAIN', 'Course Update', '2025-11-17 15:22:51', 1),
+(10, 10, 'A new test has been posted: TEST ni DOM AGAIN', 'Course Update', '2025-11-17 15:22:51', 1),
+(11, 11, 'A new test has been posted: TEST ni DOM AGAIN', 'Course Update', '2025-11-17 15:22:51', 1),
+(12, 12, 'A new test has been posted: TEST ni DOM AGAIN', 'Course Update', '2025-11-17 15:22:51', 1),
+(17, 14, 'A new test has been posted: TEST ni DOM AGAIN', 'Course Update', '2025-11-17 15:22:54', 1),
+(18, 14, 'A new test has been posted: TEST MULTIPLECHOICE', 'Course Update', '2025-11-17 15:33:20', 1),
+(19, 14, 'A new test has been posted: TEST W PICTURE', 'Course Update', '2025-11-17 15:38:24', 1),
+(20, 14, '\"TEST W PICTURE\" was returned by your instructor. You can now view the results.', 'Submissions Update', '2025-11-17 15:49:07', 1),
+(21, 14, 'A new task has been assigned: hahaha', 'Course Update', '2025-11-17 16:02:04', 1),
+(22, 14, 'A new task has been assigned: Activity #', 'Course Update', '2025-11-17 18:14:25', 1);
 
 -- --------------------------------------------------------
 
@@ -503,27 +551,32 @@ CREATE TABLE `leaderboard` (
   `timeRange` varchar(10) NOT NULL,
   `periodStart` date NOT NULL,
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `xpPoints` int(11) NOT NULL
+  `xpPoints` int(11) NOT NULL,
+  `previousRank` int(11) NOT NULL,
+  `currentRank` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `leaderboard`
 --
 
-INSERT INTO `leaderboard` (`leaderboardID`, `enrollmentID`, `timeRange`, `periodStart`, `updatedAt`, `xpPoints`) VALUES
-(1, 1, 'Weekly', '2025-08-25', '2025-08-30 12:00:00', 0),
-(2, 2, 'Weekly', '2025-08-25', '2025-08-30 12:00:00', 0),
-(3, 1, 'Weekly', '2025-09-28', '2025-09-28 16:50:22', 0),
-(4, 3, 'Weekly', '2025-09-28', '2025-09-28 16:58:09', 0),
-(5, 4, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
-(6, 5, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
-(7, 6, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
-(8, 7, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
-(9, 8, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
-(10, 9, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
-(11, 10, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
-(12, 11, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
-(13, 12, 'Monthly', '2025-09-01', '2025-09-28 21:34:51', 0);
+INSERT INTO `leaderboard` (`leaderboardID`, `enrollmentID`, `timeRange`, `periodStart`, `updatedAt`, `xpPoints`, `previousRank`, `currentRank`) VALUES
+(1, 1, 'Weekly', '2025-08-25', '2025-08-30 12:00:00', 240, 0, 1),
+(2, 2, 'Weekly', '2025-08-25', '2025-08-30 12:00:00', 0, 0, 1),
+(3, 1, 'Weekly', '2025-09-28', '2025-09-28 16:50:22', 240, 0, 0),
+(4, 3, 'Weekly', '2025-09-28', '2025-09-28 16:58:09', 0, 0, 2),
+(5, 4, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0, 0, 3),
+(6, 5, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0, 0, 4),
+(7, 6, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0, 0, 5),
+(8, 7, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0, 0, 6),
+(9, 8, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0, 0, 7),
+(10, 9, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0, 0, 8),
+(11, 10, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0, 0, 9),
+(12, 11, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0, 0, 10),
+(13, 12, 'Monthly', '2025-09-01', '2025-09-28 21:34:51', 0, 0, 11),
+(15, 14, '', '0000-00-00', '2025-11-17 14:08:20', 290, 0, 1),
+(16, 15, '', '0000-00-00', '2025-11-17 16:06:41', 0, 0, 1),
+(17, 14, '', '0000-00-00', '2025-11-17 17:18:33', 1044, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -544,7 +597,8 @@ CREATE TABLE `lessons` (
 --
 
 INSERT INTO `lessons` (`lessonID`, `courseID`, `lessonTitle`, `lessonDescription`, `createdAt`) VALUES
-(1, 1, 'Lesson 1: Introduction to CSS Grid', '1. Explain what HTML is and its role in web development.\n2. Identify the basic structure of an HTML document.\n3. Use common HTML tags such as headings, paragraphs, and links. \n4. Create a simple webpage using basic HTML elements.', '2025-08-30 09:00:00');
+(1, 1, 'Lesson 1: Introduction to CSS Grid', '1. Explain what HTML is and its role in web development.\n2. Identify the basic structure of an HTML document.\n3. Use common HTML tags such as headings, paragraphs, and links. \n4. Create a simple webpage using basic HTML elements.', '2025-08-30 09:00:00'),
+(2, 34, 'Lesson Mo', 'LESSONSSSS', '2025-11-17 14:37:12');
 
 -- --------------------------------------------------------
 
@@ -795,7 +849,7 @@ CREATE TABLE `profile` (
 --
 
 INSERT INTO `profile` (`profileID`, `userID`, `bio`, `webstars`, `emblemID`, `coverImageID`, `colorThemeID`, `starCard`) VALUES
-(1, 2, 'Welcome to my Webstar profile!', 5049, 7, 17, 9, 2),
+(1, 2, 'Welcome to my Webstar profile!', 2132, 7, 17, 9, 2),
 (2, 4, 'Welcome to my Webstar profile!', 700, 1, 1, 1, 2);
 
 -- --------------------------------------------------------
@@ -845,18 +899,20 @@ CREATE TABLE `report` (
 --
 
 INSERT INTO `report` (`reportID`, `enrollmentID`, `totalXP`, `allTimeRank`, `generatedAt`) VALUES
-(1, 1, 0, 8, '2025-11-15 23:37:58'),
-(2, 3, 0, 9, '2025-11-15 23:37:58'),
-(3, 8, 0, 3, '2025-11-15 23:37:57'),
-(4, 6, 0, 1, '2025-11-15 23:37:57'),
-(5, 11, 0, 6, '2025-11-15 23:37:58'),
-(6, 10, 0, 5, '2025-11-15 23:37:57'),
-(7, 5, 0, 11, '2025-11-15 23:37:58'),
-(8, 7, 0, 2, '2025-11-15 23:37:57'),
-(9, 9, 0, 4, '2025-11-15 23:37:57'),
-(10, 4, 0, 10, '2025-11-15 23:37:58'),
-(11, 12, 0, 7, '2025-11-15 23:37:58'),
-(12, 2, 450, 1, '2025-11-06 15:51:29');
+(1, 1, 480, 1, '2025-11-17 18:25:44'),
+(2, 3, 0, 2, '2025-11-17 18:25:44'),
+(3, 8, 0, 7, '2025-11-17 18:25:44'),
+(4, 6, 0, 5, '2025-11-17 18:25:44'),
+(5, 11, 0, 10, '2025-11-17 18:25:45'),
+(6, 10, 0, 9, '2025-11-17 18:25:44'),
+(7, 5, 0, 4, '2025-11-17 18:25:44'),
+(8, 7, 0, 6, '2025-11-17 18:25:44'),
+(9, 9, 0, 8, '2025-11-17 18:25:44'),
+(10, 4, 0, 3, '2025-11-17 18:25:44'),
+(11, 12, 0, 11, '2025-11-17 18:25:45'),
+(12, 2, 0, 1, '2025-11-17 18:25:49'),
+(13, 14, 1334, 1, '2025-11-17 18:28:07'),
+(14, 15, 0, 1, '2025-11-17 16:06:49');
 
 -- --------------------------------------------------------
 
@@ -904,6 +960,14 @@ CREATE TABLE `scores` (
   `gradedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `scores`
+--
+
+INSERT INTO `scores` (`scoreID`, `userID`, `submissionID`, `testID`, `score`, `feedback`, `gradedAt`) VALUES
+(1, 2, NULL, 5, 5, NULL, '2025-11-17 15:47:17'),
+(2, 1, 8, NULL, 65, 'Nice try', '2025-11-17 17:31:55');
+
 -- --------------------------------------------------------
 
 --
@@ -915,6 +979,17 @@ CREATE TABLE `selectedlevels` (
   `submissionID` int(11) NOT NULL,
   `levelID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `selectedlevels`
+--
+
+INSERT INTO `selectedlevels` (`selectedLevelID`, `submissionID`, `levelID`) VALUES
+(1, 8, 154),
+(2, 8, 160),
+(3, 8, 164),
+(4, 8, 165),
+(5, 8, 169);
 
 -- --------------------------------------------------------
 
@@ -986,6 +1061,19 @@ CREATE TABLE `submissions` (
   `isSubmitted` tinyint(4) NOT NULL,
   `modalShown` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `submissions`
+--
+
+INSERT INTO `submissions` (`submissionID`, `userID`, `assessmentID`, `scoreID`, `submittedAt`, `isSubmitted`, `modalShown`) VALUES
+(1, 2, 2, 0, '2025-11-17 14:47:08', 0, 0),
+(2, 2, 3, 0, '2025-11-17 14:53:54', 0, 0),
+(4, 2, 6, 0, '2025-11-17 15:00:46', 0, 0),
+(5, 2, 2, 0, '2025-11-17 15:25:26', 0, 0),
+(6, 2, 4, 0, '2025-11-17 15:36:13', 0, 0),
+(7, 2, 5, 0, '2025-11-17 15:42:31', 0, 0),
+(8, 2, 7, 2, '2025-11-17 17:24:43', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -1076,6 +1164,15 @@ CREATE TABLE `testquestionchoices` (
   `choiceText` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `testquestionchoices`
+--
+
+INSERT INTO `testquestionchoices` (`choiceID`, `testQuestionID`, `choiceText`) VALUES
+(1, 4, 'Mabaho'),
+(2, 4, 'Mabango'),
+(3, 4, 'DI ko alam, amuyin mo');
+
 -- --------------------------------------------------------
 
 --
@@ -1092,6 +1189,16 @@ CREATE TABLE `testquestions` (
   `testQuestionPoints` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `testquestions`
+--
+
+INSERT INTO `testquestions` (`testQuestionID`, `testID`, `testQuestion`, `questionType`, `testQuestionImage`, `correctAnswer`, `testQuestionPoints`) VALUES
+(1, 1, 'Anong pangalan ng aso ni marimar?', 'Identification', '1763363827_logo-removebg-preview.png', 'Pulgoso', 2),
+(3, 3, 'Anong pangalan ng aso ni marimar?', 'Identification', NULL, 'Pulgoso', 12),
+(4, 4, 'Anong amoy ng utot ni dom?', 'Multiple Choice', NULL, 'DI ko alam, amuyin mo', 2),
+(5, 5, 'Crush mo ba ako?', 'Identification', '1763365103_profile2.jpg', 'oo', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -1106,6 +1213,14 @@ CREATE TABLE `testresponses` (
   `userAnswer` varchar(50) NOT NULL,
   `isCorrect` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `testresponses`
+--
+
+INSERT INTO `testresponses` (`testResponseID`, `testID`, `testQuestionID`, `userID`, `userAnswer`, `isCorrect`) VALUES
+(2, 4, 4, 2, 'Mabaho', 0),
+(3, 5, 5, 2, 'oO', 0);
 
 -- --------------------------------------------------------
 
@@ -1136,6 +1251,18 @@ CREATE TABLE `todo` (
   `timeSpent` int(11) DEFAULT NULL,
   `timeStart` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `todo`
+--
+
+INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `status`, `updatedAt`, `isRead`, `timeSpent`, `timeStart`) VALUES
+(1, 2, 1, 'Pending', '2025-11-17 15:17:07', 1, NULL, NULL),
+(13, 2, 3, 'Pending', '2025-11-17 15:22:53', 1, NULL, NULL),
+(14, 2, 4, 'Submitted', '2025-11-17 15:36:13', 1, 60, '2025-11-17 15:35:13'),
+(15, 2, 5, 'Returned', '2025-11-17 15:42:31', 1, 120, '2025-11-17 15:38:34'),
+(16, 2, 7, 'Graded', '2025-11-17 17:40:23', 1, NULL, NULL),
+(17, 2, 8, 'Pending', '2025-11-17 18:20:10', 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1287,7 +1414,18 @@ INSERT INTO `webstars` (`webstarsID`, `userID`, `assessmentID`, `sourceType`, `p
 (25, 2, NULL, 'Shop Purchase', -150, '2025-11-16 02:50:00'),
 (26, 2, NULL, 'Shop Purchase', -250, '2025-11-16 02:51:21'),
 (27, 2, NULL, 'Shop Purchase', -100, '2025-11-16 02:51:32'),
-(28, 2, NULL, 'Shop Purchase', -50, '2025-11-16 02:51:39');
+(28, 2, NULL, 'Shop Purchase', -50, '2025-11-16 02:51:39'),
+(29, 2, 2, 'Tests', 3, '2025-11-17 14:47:08'),
+(31, 2, 3, 'Tests', 14, '2025-11-17 14:53:54'),
+(32, 2, 5, 'Tests', 3, '2025-11-17 14:59:45'),
+(33, 2, 6, 'Tests', 1, '2025-11-17 15:00:46'),
+(34, 2, 2, 'Tests', 12, '2025-11-17 15:25:26'),
+(35, 2, 2, 'XP Multiplier Usage', -1000, '2025-11-17 15:28:03'),
+(36, 2, 4, 'Tests', 2, '2025-11-17 15:36:13'),
+(37, 2, 4, 'XP Multiplier Usage', -1000, '2025-11-17 15:37:16'),
+(38, 2, 5, 'Tests', 1, '2025-11-17 15:42:31'),
+(39, 2, 7, 'Submission', 104, '2025-11-17 17:18:33'),
+(40, 2, 7, 'Unsubmit', -50, '2025-11-17 17:21:17');
 
 --
 -- Indexes for dumped tables
@@ -1552,13 +1690,13 @@ ALTER TABLE `activities`
 -- AUTO_INCREMENT for table `announcementnotes`
 --
 ALTER TABLE `announcementnotes`
-  MODIFY `noteID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `noteID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `announcements`
 --
 ALTER TABLE `announcements`
-  MODIFY `announcementID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `announcementID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `assessments`
@@ -1588,13 +1726,13 @@ ALTER TABLE `colortheme`
 -- AUTO_INCREMENT for table `courses`
 --
 ALTER TABLE `courses`
-  MODIFY `courseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `courseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `courseschedule`
 --
 ALTER TABLE `courseschedule`
-  MODIFY `courseScheduleID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `courseScheduleID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT for table `coverimage`
@@ -1618,37 +1756,37 @@ ALTER TABLE `emblem`
 -- AUTO_INCREMENT for table `enrollments`
 --
 ALTER TABLE `enrollments`
-  MODIFY `enrollmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `enrollmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `feedback`
 --
 ALTER TABLE `feedback`
-  MODIFY `feedbackID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `feedbackID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `files`
 --
 ALTER TABLE `files`
-  MODIFY `fileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `fileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `inbox`
 --
 ALTER TABLE `inbox`
-  MODIFY `inboxID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `inboxID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `leaderboard`
 --
 ALTER TABLE `leaderboard`
-  MODIFY `leaderboardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `leaderboardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `lessons`
 --
 ALTER TABLE `lessons`
-  MODIFY `lessonID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `lessonID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `level`
@@ -1678,7 +1816,7 @@ ALTER TABLE `program`
 -- AUTO_INCREMENT for table `report`
 --
 ALTER TABLE `report`
-  MODIFY `reportID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `reportID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `rubric`
@@ -1690,13 +1828,13 @@ ALTER TABLE `rubric`
 -- AUTO_INCREMENT for table `scores`
 --
 ALTER TABLE `scores`
-  MODIFY `scoreID` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `scoreID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `selectedlevels`
 --
 ALTER TABLE `selectedlevels`
-  MODIFY `selectedLevelID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `selectedLevelID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `settings`
@@ -1714,7 +1852,7 @@ ALTER TABLE `studentbadges`
 -- AUTO_INCREMENT for table `submissions`
 --
 ALTER TABLE `submissions`
-  MODIFY `submissionID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `submissionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `supports`
@@ -1726,19 +1864,19 @@ ALTER TABLE `supports`
 -- AUTO_INCREMENT for table `testquestionchoices`
 --
 ALTER TABLE `testquestionchoices`
-  MODIFY `choiceID` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `choiceID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `testquestions`
 --
 ALTER TABLE `testquestions`
-  MODIFY `testQuestionID` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `testQuestionID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `testresponses`
 --
 ALTER TABLE `testresponses`
-  MODIFY `testResponseID` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `testResponseID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tests`
@@ -1750,7 +1888,7 @@ ALTER TABLE `tests`
 -- AUTO_INCREMENT for table `todo`
 --
 ALTER TABLE `todo`
-  MODIFY `todoID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `todoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `userinfo`
@@ -1774,7 +1912,7 @@ ALTER TABLE `visits`
 -- AUTO_INCREMENT for table `webstars`
 --
 ALTER TABLE `webstars`
-  MODIFY `webstarsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `webstarsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- Constraints for dumped tables
