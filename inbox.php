@@ -549,6 +549,7 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
             });
         </script>
 
+        
         <script>
             document.addEventListener("DOMContentLoaded", () => {
                 document.querySelectorAll(".inbox-card").forEach(card => {
