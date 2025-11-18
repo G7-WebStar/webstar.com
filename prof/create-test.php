@@ -237,7 +237,12 @@ if (isset($_POST['save_exam'])) {
                     $mail->SMTPAuth = true;
                     $mail->Username = 'learn.webstar@gmail.com';
                     $mail->Password = 'mtls vctd rhai cdem';
+                    $mail->Host = 'smtp.gmail.com';
+                    $mail->SMTPAuth = true;
+                    $mail->Username = 'learn.webstar@gmail.com';
+                    $mail->Password = 'mtls vctd rhai cdem';
                     $mail->SMTPSecure = 'tls';
+                    $mail->Port = 587;
                     $mail->Port = 587;
                     $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
                     $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
@@ -531,6 +536,14 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                             echo 'Create Test';
                                         }
                                         ?></span>
+                                        if (isset($_GET['edit'])) {
+                                            echo 'Edit Test';
+                                        } elseif (isset($_GET['reuse'])) {
+                                            echo 'Recreate Test';
+                                        } else {
+                                            echo 'Create Test';
+                                        }
+                                        ?></span>
                                     </div>
 
                                     <!-- Assign Existing Task Button -->
@@ -547,7 +560,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                 </div>
 
                                 <!-- Form starts -->
-                                <form action="" method="POST" enctype="multipart/form-data">
+                                <form action="" id="guidedanceForm" method="POST" enctype="multipart/form-data">
 
                                     <!-- Hidden input for test type -->
                                     <input type="hidden" name="mode"
@@ -708,6 +721,8 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                             <div class="text-reg mb-1">Correct Answers</div>
                                                             <div class="d-flex align-items-center overflow-auto answers-scroll"
                                                                 style="white-space: nowrap;">
+                                                                <div
+                                                                    class="answers-container d-flex align-items-center flex-nowrap">
                                                                 <div
                                                                     class="answers-container d-flex align-items-center flex-nowrap">
                                                                     <!-- Single answer input will be inserted here -->
@@ -991,6 +1006,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
         const counter = document.getElementById("word-counter");
 
         quill.on('text-change', function () {
+        quill.on('text-change', function () {
             let text = quill.getText().trim();
             let words = text.length > 0 ? text.split(/\s+/).length : 0;
 
@@ -998,12 +1014,13 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                 let limited = text.split(/\s+/).slice(0, maxWords).join(" ");
                 quill.setText(limited + " ");
                 quill.setSelection(quill.getLength());
+                quill.setSelection(quill.getLength());
             }
 
             counter.textContent = `${Math.min(words, maxWords)}/${maxWords}`;
         });
 
-        const form = document.querySelector("form");
+        const form = document.querySelector('#guidedanceForm');
 
         form.addEventListener("submit", function (e) {
             // --- Quill ---
@@ -1148,6 +1165,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
 
         // Add answer (delegated)
         document.addEventListener("click", function (e) {
+        document.addEventListener("click", function (e) {
             if (e.target.closest(".add-answer-btn")) {
                 const button = e.target.closest(".add-answer-btn");
                 const container = button.closest(".answers-scroll").querySelector(".answers-container");
@@ -1185,6 +1203,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
 
 
         // Single Delete Handler for All Blocks
+        document.addEventListener("click", function (e) {
         document.addEventListener("click", function (e) {
             const delBtn = e.target.closest(".delete-template");
             if (!delBtn) return;
@@ -1228,6 +1247,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
         });
 
         // Add Multiple Choice Choices
+        document.getElementById("allQuestionsContainer").addEventListener("click", function (e) {
         document.getElementById("allQuestionsContainer").addEventListener("click", function (e) {
             if (e.target.closest(".add-radio-btn")) {
                 const button = e.target.closest(".add-radio-btn");
@@ -1283,6 +1303,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
 
         // Toggle Image Container
         document.addEventListener("click", function (e) {
+        document.addEventListener("click", function (e) {
             if (e.target.closest(".image-icon")) {
                 const card = e.target.closest(".textbox");
                 const imageContainer = card.querySelector(".image-container");
@@ -1326,6 +1347,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
         }
 
         document.addEventListener("click", function (e) {
+        document.addEventListener("click", function (e) {
             const delImgBtn = e.target.closest(".delete-image");
             if (!delImgBtn) return;
 
@@ -1338,6 +1360,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
 
             img.src = "../shared/assets/img/placeholder/placeholder.png";
             fileInput.value = "";
+            container.style.display = "none";
             container.style.display = "none";
         });
 
@@ -1370,6 +1393,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
             });
         }
 
+        mainContainer.addEventListener('input', function (e) {
         mainContainer.addEventListener('input', function (e) {
             if (e.target.type === "number") updateTotalPoints();
         });

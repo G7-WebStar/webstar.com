@@ -200,7 +200,7 @@ if (isset($_POST['save_rubric'])) {
                                                 style="color: var(--black);"></i>
                                         </a>
                                     </div>
-                                    <div class="col text-md-start">
+                                    <div class="col text-md-start rubric-header-title">
                                         <span class="text-sbold text-25">Create rubric</span>
                                     </div>
                                 </div>
@@ -546,11 +546,13 @@ if (isset($_POST['save_rubric'])) {
                         var container = wrapper ? wrapper.querySelector('.levelsContainer') : null;
                         if (!container) return;
                         var total = container.querySelectorAll('.criterion-description-card').length;
-                        if (total > 1) {
-                            card.parentNode.removeChild(card);
-                            updateCriterionPoints(wrapper);
-                            updateTotalPoints();
+                        if (total <= 1) {
+                            if (typeof showAlert === 'function') showAlert('Each criterion needs at least one level.');
+                            return;
                         }
+                        card.parentNode.removeChild(card);
+                        updateCriterionPoints(wrapper);
+                        updateTotalPoints();
                     });
                 }
                 attachRemoveHandler();
@@ -562,7 +564,10 @@ if (isset($_POST['save_rubric'])) {
                     var wrap = rbtn.closest ? rbtn.closest('.criterion-wrapper') : null;
                     if (!wrap) return;
                     var all = document.querySelectorAll('.criterion-wrapper');
-                    if (all.length <= 1) return; // keep at least one
+                    if (all.length <= 1) {
+                        if (typeof showAlert === 'function') showAlert('At least one criterion is required.');
+                        return;
+                    }
                     wrap.parentNode.removeChild(wrap);
                     // Re-index remaining criteria headers
                     var remaining = document.querySelectorAll('.criterion-wrapper');
