@@ -3,11 +3,25 @@
 include('../shared/assets/database/connect.php');
 include("../shared/assets/processes/admin-session-process.php");
 
-// Get total feedback count
+// Get total feedback count (keeps showing total feedbacks overall)
 $feedbackCountQuery = "SELECT COUNT(*) AS totalFeedback FROM feedback";
 $feedbackCountResult = mysqli_query($conn, $feedbackCountQuery);
 $feedbackCountRow = mysqli_fetch_assoc($feedbackCountResult);
 $totalFeedbacks = $feedbackCountRow['totalFeedback'];
+
+// Get filters from GET (defaults)
+$sort = $_GET['sort'] ?? 'Newest';
+$role = $_GET['role'] ?? 'All';
+
+// Build WHERE clause (case-insensitive)
+$where = "";
+if ($role !== 'All') {
+    $role_safe = mysqli_real_escape_string($conn, strtolower($role));
+    $where = "WHERE LOWER(u.role) = '" . $role_safe . "'";
+}
+
+// ORDER
+$orderBy = ($sort === "Oldest") ? "ASC" : "DESC";
 
 $feedbackQuery = "
     SELECT 
@@ -22,10 +36,10 @@ $feedbackQuery = "
     FROM feedback f
     INNER JOIN users u ON f.senderID = u.userID
     INNER JOIN userinfo ui ON u.userID = ui.userID
-    ORDER BY f.created_at DESC
+    $where
+    ORDER BY f.created_at $orderBy
 ";
 $feedbackResult = mysqli_query($conn, $feedbackQuery);
-
 ?>
 
 <!doctype html>
@@ -52,6 +66,14 @@ $feedbackResult = mysqli_query($conn, $feedbackQuery);
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
         rel="stylesheet" />
 
+    <style>
+        /* keep dropdown-list hidden by default (your existing CSS might already do this) */
+        .dropdown-list { display: none; position: absolute; z-index: 2000; list-style:none; padding:0; margin:6px 0 0 0; background:var(--white); border-radius:6px;}
+        .custom-dropdown { position: relative; }
+        .custom-dropdown .dropdown-btn { cursor: pointer; }
+        .custom-dropdown .dropdown-list li { padding:8px 12px; cursor:pointer; white-space:nowrap; }
+        .custom-dropdown .dropdown-list li:hover { background: rgba(0,0,0,0.04); }
+    </style>
 </head>
 
 <body>
@@ -93,27 +115,11 @@ $feedbackResult = mysqli_query($conn, $feedbackQuery);
                                 <div class="col-auto ms-3 mobile-dropdown">
                                     <div class="d-flex align-items-center flex-nowrap">
                                         <span class="dropdown-label me-2 text-reg">Sort by</span>
-                                        <div class="custom-dropdown">
-                                            <button class="dropdown-btn text-reg text-14">Newest</button>
-                                            <ul class="dropdown-list text-reg text-14">
+                                        <div class="custom-dropdown" data-filter="sort">
+                                            <button class="dropdown-btn text-reg text-14"><?= htmlspecialchars($sort) ?></button>
+                                            <ul class="dropdown-list text-reg text-14" style="background-color: white;">
                                                 <li data-value="Newest">Newest</li>
                                                 <li data-value="Oldest">Oldest</li>
-                                                <li data-value="Unread">Unread</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Status -->
-                                <div class="col-auto ms-3 mobile-dropdown">
-                                    <div class="d-flex align-items-center flex-nowrap">
-                                        <span class="dropdown-label me-2 text-reg">Status</span>
-                                        <div class="custom-dropdown">
-                                            <button class="dropdown-btn text-reg text-14">All</button>
-                                            <ul class="dropdown-list text-reg text-14">
-                                                <li data-value="Active">Active</li>
-                                                <li data-value="Created">Created</li>
-                                                <li data-value="Inactive">Inactive</li>
                                             </ul>
                                         </div>
                                     </div>
@@ -123,36 +129,15 @@ $feedbackResult = mysqli_query($conn, $feedbackQuery);
                                 <div class="col-auto ms-3 mobile-dropdown">
                                     <div class="d-flex align-items-center flex-nowrap">
                                         <span class="dropdown-label me-2 text-reg">Role</span>
-                                        <div class="custom-dropdown">
-                                            <button class="dropdown-btn text-reg text-14">All</button>
-                                            <ul class="dropdown-list text-reg text-14">
+                                        <div class="custom-dropdown" data-filter="role">
+                                            <button class="dropdown-btn text-reg text-14"><?= htmlspecialchars($role) ?></button>
+                                            <ul class="dropdown-list text-reg text-14" style="background-color: white;">
+                                                <li data-value="All">All</li>
                                                 <li data-value="Student">Student</li>
                                                 <li data-value="Professor">Professor</li>
                                             </ul>
                                         </div>
                                     </div>
-                                </div>
-
-                                <!-- Add Course Button -->
-                                <div class="col-auto d-none d-lg-flex align-items-center ms-auto">
-                                    <span class="me-3 text-reg text-md-14">1 selected</span>
-                                    <button
-                                        class="add-course-btn btn btn-primary px-3 py-1 rounded-pill text-reg text-md-14">
-                                        <div style="text-decoration: none; color: var(--black);">
-                                            Mark as reviewed
-                                        </div>
-                                    </button>
-                                </div>
-
-                                <!-- Mobile Button -->
-                                <div class="col-12 d-lg-none d-flex justify-content-center align-items-center mt-2">
-                                    <span class="me-3 text-reg text-md-14">1 selected</span>
-                                    <button
-                                        class="add-course-btn btn btn-primary px-3 py-1 rounded-pill text-reg text-md-14">
-                                        <div style="text-decoration: none; color: black;">
-                                            Mark as reviewed
-                                        </div>
-                                    </button>
                                 </div>
 
                                 <!-- Table Section -->
@@ -163,47 +148,31 @@ $feedbackResult = mysqli_query($conn, $feedbackQuery);
                                                 <tr>
                                                     <th scope="col"></th>
                                                     <th scope="col">Name</th>
+                                                    <th scope="col"></th>
                                                     <th scope="col">Role</th>
+                                                    <th scope="col"></th>
                                                     <th scope="col">Content</th>
+                                                    <th scope="col"></th>
                                                     <th scope="col">Date Submitted</th>
-                                                    <th scope="col">Status</th>
-                                                    <th scope="col" class="text-end"></th>
+
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <?php while ($f = mysqli_fetch_assoc($feedbackResult)): ?>
                                                     <tr>
-                                                        <td>
-                                                            <form>
-                                                                <input type="checkbox"
-                                                                    class="form-check-input ms-2 feedback-checkbox"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#feedbackModal<?= $f['feedbackID'] ?>">
-                                                            </form>
-                                                        </td>
+                                                        <td></td>
                                                         <td><?= htmlspecialchars($f['lastName'] . ', ' . $f['firstName'] . ' ' . $f['middleName']) ?>
                                                         </td>
+                                                        <td></td>
                                                         <td><?= ucfirst($f['role']) ?></td>
+                                                        <td></td>
                                                         <td data-bs-toggle="modal"
                                                             data-bs-target="#feedbackModal<?= $f['feedbackID'] ?>">
                                                             <?= htmlspecialchars($f['message']) ?>
                                                         </td>
+                                                        <td></td>
                                                         <td><?= date("m-d-Y H:i:s", strtotime($f['created_at'])) ?></td>
-                                                        <td>Pending</td>
-                                                        <td>
-                                                            <div class="dropdown">
-                                                                <button class="btn btn-link text-dark p-0" type="button"
-                                                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                                                    <i class="bi bi-three-dots-vertical fs-5"></i>
-                                                                </button>
-                                                                <ul class="dropdown-menu dropdown-menu-end">
-                                                                    <li><a class="dropdown-item" href="#">Mark as
-                                                                            reviewed</a></li>
-                                                                    <li><a class="dropdown-item" href="#">Mark as
-                                                                            pending</a></li>
-                                                                </ul>
-                                                            </div>
-                                                        </td>
+
                                                     </tr>
 
                                                     <!-- Modal for this feedback -->
@@ -258,7 +227,7 @@ $feedbackResult = mysqli_query($conn, $feedbackQuery);
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         style="transform: scale(0.8);"></button>
                 </div>
-                <div class="modal-body d-flex flex-column justify-content-start align-items-start mt-2 text-medium text-14 w-100"
+                <!-- <div class="modal-body d-flex flex-column justify-content-start align-items-start mt-2 text-medium text-14 w-100"
                     style="text-align: justify;">
                     <p class="mb-0">Torrillo, Christian James D.</p>
                     <p class="mb-0">10-21-25 00:11:21</p>
@@ -274,7 +243,7 @@ $feedbackResult = mysqli_query($conn, $feedbackQuery);
                         creates an enjoyable and efficient learning environment
                         for both teachers and students.
                     </p>
-                </div>
+                </div> -->
 
                 <div class="modal-footer border-top" style="padding-top: 45px;"></div>
             </div>
@@ -289,64 +258,74 @@ $feedbackResult = mysqli_query($conn, $feedbackQuery);
             const btn = dropdown.querySelector('.dropdown-btn');
             const list = dropdown.querySelector('.dropdown-list');
 
-            btn.addEventListener('click', () => {
+            // toggle dropdown
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // close other dropdowns first
+                document.querySelectorAll('.custom-dropdown .dropdown-list').forEach(l => {
+                    if (l !== list) l.style.display = 'none';
+                });
                 list.style.display = list.style.display === 'block' ? 'none' : 'block';
             });
 
+            // click on item
             list.querySelectorAll('li').forEach(item => {
-                item.addEventListener('click', () => {
-                    btn.textContent = item.dataset.value;
+                item.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    const value = item.dataset.value;
+                    btn.textContent = value;
                     list.style.display = 'none';
+
+                    // Build URL params and update correct filter
+                    const params = new URLSearchParams(window.location.search);
+
+                    const filterType = dropdown.dataset.filter; // "sort" or "role"
+                    if (filterType === 'sort') {
+                        params.set('sort', value);
+                    } else if (filterType === 'role') {
+                        params.set('role', value);
+                    }
+
+                    // Navigate with new params (preserve other params)
+                    window.location.search = params.toString();
                 });
             });
+        });
 
-            // Close dropdown if clicked outside
-            document.addEventListener('click', (e) => {
-                if (!dropdown.contains(e.target)) {
-                    list.style.display = 'none';
-                }
-            });
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.custom-dropdown .dropdown-list').forEach(l => l.style.display = 'none');
         });
     </script>
 
     <script>
+        // Modal backdrop cleanup (keeps your previous logic but scoped safely)
         document.querySelectorAll('[id^="feedbackModal"]').forEach(modal => {
             const modalID = modal.id;
 
-            // When modal is about to show
             modal.addEventListener('show.bs.modal', () => {
-                // Remove any existing backdrop
                 document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
                 document.body.classList.remove('modal-open');
-
-                // Ensure no new backdrop is added
                 setTimeout(() => {
                     document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
                     document.body.classList.remove('modal-open');
                 }, 50);
             });
 
-            // When modal is fully shown
             modal.addEventListener('shown.bs.modal', () => {
                 document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
                 document.body.classList.remove('modal-open');
             });
 
-            // When modal is hidden (close button or outside click)
             modal.addEventListener('hidden.bs.modal', () => {
                 document.body.classList.remove('modal-open');
                 document.body.style.overflow = '';
-
-                // Uncheck the associated checkbox
                 const checkbox = document.querySelector(`.feedback-checkbox[data-bs-target="#${modalID}"]`);
                 if (checkbox) checkbox.checked = false;
             });
         });
     </script>
 
-
-
 </body>
-
 
 </html>
