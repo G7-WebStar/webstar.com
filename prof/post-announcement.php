@@ -919,7 +919,7 @@ if (!empty($reusedData)) {
             let checkboxes = form.querySelectorAll(".course-checkbox");
             let checked = Array.from(checkboxes).some(cb => cb.checked);
             if (!checked && !window.location.search.includes("edit")) {
-                valid=false;
+                valid = false;
                 errorMessages.push("Please select at least one course before submitting.");
             }
 
@@ -974,13 +974,37 @@ if (!empty($reusedData)) {
                         const linkValue = linkInput.value.trim();
                         if (!linkValue) return;
 
+
+                        // Validation
+                        let valid = true;
+                        let errorMessages = [];
+                        
                         // Check total attachments limit
                         const totalAttachments = container.querySelectorAll('.col-12').length;
                         if (totalAttachments >= 10) {
-                            alert("You can only add up to 10 files or links total.");
-                            return;
+                            valid = false;
+                            errorMessages.push("Please select at least one course before submitting.");
                         }
 
+                        if (!valid) {
+                            e.preventDefault();
+
+                            const container = document.getElementById("toastContainer");
+                            container.innerHTML = "";
+
+                            errorMessages.forEach(msg => {
+                                const alert = document.createElement("div");
+                                alert.className = "alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 alert-danger";
+                                alert.role = "alert";
+                                alert.innerHTML = `
+                        <i class="bi bi-x-circle-fill fs-6"></i>
+                        <span>${msg}</span>
+                        `;
+                                container.appendChild(alert);
+                                setTimeout(() => alert.remove(), 3000);
+                            });
+
+                        }
                         // Get domain and favicon
                         function truncate(text, maxLength = 30) {
                             if (!text) return '';
