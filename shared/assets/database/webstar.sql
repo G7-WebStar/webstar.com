@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 18, 2025 at 05:19 PM
+-- Generation Time: Nov 19, 2025 at 07:50 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `webstart`
+-- Database: `webstar`
 --
 
 -- --------------------------------------------------------
@@ -381,6 +381,25 @@ INSERT INTO `criteria` (`criterionID`, `rubricID`, `criteriaTitle`, `criteriaDes
 (41, 10, 'Code Quality', 'Structure and efficiency'),
 (42, 10, 'Content Quality', 'Clarity and accuracy of text/media'),
 (43, 10, 'User Experience', 'Overall interaction quality');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `emailcredentials`
+--
+
+CREATE TABLE `emailcredentials` (
+  `credentialID` int(2) NOT NULL,
+  `email` varchar(30) NOT NULL,
+  `password` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `emailcredentials`
+--
+
+INSERT INTO `emailcredentials` (`credentialID`, `email`, `password`) VALUES
+(1, 'learn.webstar@gmail.com', 'mtls vctd rhai cdem');
 
 -- --------------------------------------------------------
 
@@ -899,17 +918,17 @@ CREATE TABLE `report` (
 --
 
 INSERT INTO `report` (`reportID`, `enrollmentID`, `totalXP`, `allTimeRank`, `generatedAt`) VALUES
-(1, 1, 480, 1, '2025-11-17 18:25:44'),
-(2, 3, 0, 2, '2025-11-17 18:25:44'),
-(3, 8, 0, 7, '2025-11-17 18:25:44'),
-(4, 6, 0, 5, '2025-11-17 18:25:44'),
-(5, 11, 0, 10, '2025-11-17 18:25:45'),
-(6, 10, 0, 9, '2025-11-17 18:25:44'),
-(7, 5, 0, 4, '2025-11-17 18:25:44'),
-(8, 7, 0, 6, '2025-11-17 18:25:44'),
-(9, 9, 0, 8, '2025-11-17 18:25:44'),
-(10, 4, 0, 3, '2025-11-17 18:25:44'),
-(11, 12, 0, 11, '2025-11-17 18:25:45'),
+(1, 1, 480, 1, '2025-11-20 02:45:43'),
+(2, 3, 0, 3, '2025-11-20 02:45:43'),
+(3, 8, 0, 8, '2025-11-20 02:45:43'),
+(4, 6, 0, 6, '2025-11-20 02:45:43'),
+(5, 11, 0, 11, '2025-11-20 02:45:43'),
+(6, 10, 0, 10, '2025-11-20 02:45:43'),
+(7, 5, 0, 5, '2025-11-20 02:45:43'),
+(8, 7, 0, 7, '2025-11-20 02:45:43'),
+(9, 9, 0, 9, '2025-11-20 02:45:43'),
+(10, 4, 0, 4, '2025-11-20 02:45:43'),
+(11, 12, 0, 2, '2025-11-20 02:45:43'),
 (12, 2, 0, 1, '2025-11-17 18:25:49'),
 (13, 14, 1334, 1, '2025-11-17 18:28:07'),
 (14, 15, 0, 1, '2025-11-17 16:06:49');
@@ -1273,7 +1292,7 @@ INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `status`, `updatedAt`, `
 CREATE TABLE `userinfo` (
   `userInfoID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
-  `profilePicture` varchar(100) NOT NULL,
+  `profilePicture` varchar(100) NOT NULL DEFAULT 'defaultProfile.png',
   `firstName` varchar(50) NOT NULL,
   `middleName` varchar(50) NOT NULL,
   `lastName` varchar(50) NOT NULL,
@@ -1295,25 +1314,25 @@ CREATE TABLE `userinfo` (
 --
 
 INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `middleName`, `lastName`, `studentID`, `programID`, `gender`, `yearLevel`, `yearSection`, `schoolEmail`, `facebookLink`, `linkedInLink`, `githubLink`, `createdAt`, `isNewUser`) VALUES
-(1, 2, 'prof.png', 'James', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 1, 'jane.smith@university.edu', '', '', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
-(2, 1, 'prof.png', 'Christopher Jay', '', 'De Claro', '202310002', '1', 'Male', '2', 1, 'james.dom@university.edu', 'https://facebook.com/james.dom', 'https://linkedin.com/in/james-dom', 'https://instagram.com/james.dom', '2025-08-30 08:18:53', 1),
-(3, 3, 'prof.png', 'John', 'Cruz', 'Doe', '202310003', '1', 'Male', '2', 1, 'john.doe@university.edu', '', '', '', '2025-09-28 11:58:33', 0),
-(4, 4, 'prof.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 1, 'michael.lee@school.edu', NULL, NULL, NULL, '2025-09-28 20:59:48', 0),
-(5, 5, 'prof.png', 'Sophia', 'B.', 'Garcia', '202310004', '1', 'Female', '2', 1, 'sophia.garcia@school.edu', 'facebook.com/sophia.garcia', 'linkedin.com/in/sophiagarcia', 'instagram.com/sophia.garcia', '2025-09-28 20:59:48', 1),
-(6, 6, 'prof.png', 'Daniel', 'C.', 'Kim', '202310005', '1', 'Male', '3', 2, 'daniel.kim@school.edu', 'facebook.com/daniel.kim', 'linkedin.com/in/danielkim', 'instagram.com/daniel.kim', '2025-09-28 20:59:48', 0),
-(7, 7, 'prof.png', 'Olivia', 'D.', 'Brown', '202310006', '1', 'Female', '2', 2, 'olivia.brown@school.edu', 'facebook.com/olivia.brown', 'linkedin.com/in/oliviabrown', 'instagram.com/olivia.brown', '2025-09-28 20:59:48', 0),
-(8, 8, 'prof.png', 'Ethan', 'E.', 'Wilson', '202310007', '1', 'Male', '2', 1, 'ethan.wilson@school.edu', 'facebook.com/ethan.wilson', 'linkedin.com/in/ethanwilson', 'instagram.com/ethan.wilson', '2025-09-28 20:59:48', 1),
-(9, 9, 'prof.png', 'Isabella', 'F.', 'Martin', '202310008', '1', 'Female', '2', 1, 'isabella.martin@school.edu', 'facebook.com/isabella.martin', 'linkedin.com/in/isabellamartin', 'instagram.com/isabella.martin', '2025-09-28 20:59:48', 1),
-(10, 10, 'prof.png', 'Liam', 'G.', 'Torres', '202310009', '1', 'Male', '1', 2, 'liam.torres@school.edu', 'facebook.com/liam.torres', 'linkedin.com/in/liamtorres', 'instagram.com/liam.torres', '2025-09-28 20:59:48', 1),
-(11, 11, 'prof.png', 'Emma', 'H.', 'Davis', '202310010', '1', 'Female', '2', 1, 'emma.davis@school.edu', 'facebook.com/emma.davis', 'linkedin.com/in/emmadavis', 'instagram.com/emma.davis', '2025-09-28 20:59:48', 1),
-(12, 12, 'prof.png', 'Chloe', 'I.', 'Nguyen', '202310011', '1', 'Female', '2', 1, 'chloe.nguyen@school.edu', 'facebook.com/chloe.nguyen', 'linkedin.com/in/chloenguyen', 'instagram.com/chloe.nguyen', '2025-09-28 21:34:51', 1),
-(13, 18, 'default.png', 'Admin', '', 'User', NULL, '6', '', '4', 4, 'admin@example.com', NULL, NULL, NULL, '2025-11-03 17:57:47', 1),
-(14, 19, 'default.png', 'Christian James', '', 'Torrillo', NULL, '6', '', '4', 1, 'christian@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1),
-(15, 20, 'default.png', 'Ayisha Sofhia', '', 'Estoque', NULL, '6', '', '4', 1, 'ayisha@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1),
-(16, 21, 'default.png', 'Marielle Alyssa', '', 'Cato', NULL, '6', '', '4', 1, 'marielle@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1),
-(17, 22, 'default.png', 'Neil Jeferson', '', 'Vergara', NULL, '6', '', '4', 1, 'neil@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1),
-(18, 23, 'default.png', 'Shane Rhyder', '', 'Silverio', NULL, '6', '', '4', 1, 'shane@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 11),
-(19, 24, 'default.png', 'Kimberly Joan', '', 'Palla', NULL, '6', '', '4', 1, 'kimberly@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1);
+(1, 2, 'defaultProfile.png', 'James', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 1, 'jane.smith@university.edu', '', '', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
+(2, 1, 'defaultProfile.png', 'Christopher Jay', '', 'De Claro', '202310002', '1', 'Male', '2', 1, 'james.dom@university.edu', 'https://facebook.com/james.dom', 'https://linkedin.com/in/james-dom', 'https://instagram.com/james.dom', '2025-08-30 08:18:53', 1),
+(3, 3, 'defaultProfile.png', 'John', 'Cruz', 'Doe', '202310003', '1', 'Male', '2', 1, 'john.doe@university.edu', '', '', '', '2025-09-28 11:58:33', 0),
+(4, 4, 'defaultProfile.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 1, 'michael.lee@school.edu', NULL, NULL, NULL, '2025-09-28 20:59:48', 0),
+(5, 5, 'defaultProfile.png', 'Sophia', 'B.', 'Garcia', '202310004', '1', 'Female', '2', 1, 'sophia.garcia@school.edu', 'facebook.com/sophia.garcia', 'linkedin.com/in/sophiagarcia', 'instagram.com/sophia.garcia', '2025-09-28 20:59:48', 1),
+(6, 6, 'defaultProfile.png', 'Daniel', 'C.', 'Kim', '202310005', '1', 'Male', '3', 2, 'daniel.kim@school.edu', 'facebook.com/daniel.kim', 'linkedin.com/in/danielkim', 'instagram.com/daniel.kim', '2025-09-28 20:59:48', 0),
+(7, 7, 'defaultProfile.png', 'Olivia', 'D.', 'Brown', '202310006', '1', 'Female', '2', 2, 'olivia.brown@school.edu', 'facebook.com/olivia.brown', 'linkedin.com/in/oliviabrown', 'instagram.com/olivia.brown', '2025-09-28 20:59:48', 0),
+(8, 8, 'defaultProfile.png', 'Ethan', 'E.', 'Wilson', '202310007', '1', 'Male', '2', 1, 'ethan.wilson@school.edu', 'facebook.com/ethan.wilson', 'linkedin.com/in/ethanwilson', 'instagram.com/ethan.wilson', '2025-09-28 20:59:48', 1),
+(9, 9, 'defaultProfile.png', 'Isabella', 'F.', 'Martin', '202310008', '1', 'Female', '2', 1, 'isabella.martin@school.edu', 'facebook.com/isabella.martin', 'linkedin.com/in/isabellamartin', 'instagram.com/isabella.martin', '2025-09-28 20:59:48', 1),
+(10, 10, 'defaultProfile.png', 'Liam', 'G.', 'Torres', '202310009', '1', 'Male', '1', 2, 'liam.torres@school.edu', 'facebook.com/liam.torres', 'linkedin.com/in/liamtorres', 'instagram.com/liam.torres', '2025-09-28 20:59:48', 1),
+(11, 11, 'defaultProfile.png', 'Emma', 'H.', 'Davis', '202310010', '1', 'Female', '2', 1, 'emma.davis@school.edu', 'facebook.com/emma.davis', 'linkedin.com/in/emmadavis', 'instagram.com/emma.davis', '2025-09-28 20:59:48', 1),
+(12, 12, 'defaultProfile.png', 'Chloe', 'I.', 'Nguyen', '202310011', '1', 'Female', '2', 1, 'chloe.nguyen@school.edu', '', 'linkedin.com/in/chloenguyen', 'instagram.com/chloe.nguyen', '2025-09-28 21:34:51', 1),
+(13, 18, 'defaultProfile.png', 'Admin', '', 'User', NULL, '6', '', '4', 4, 'admin@example.com', NULL, NULL, NULL, '2025-11-03 17:57:47', 1),
+(14, 19, 'defaultProfile.png', 'Christian James', '', 'Torrillo', NULL, '6', '', '4', 1, 'christian@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1),
+(15, 20, 'defaultProfile.png', 'Ayisha Sofhia', '', 'Estoque', NULL, '6', '', '4', 1, 'ayisha@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1),
+(16, 21, 'defaultProfile.png', 'Marielle Alyssa', '', 'Cato', NULL, '6', '', '4', 1, 'marielle@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1),
+(17, 22, 'defaultProfile.png', 'Neil Jeferson', '', 'Vergara', NULL, '6', '', '4', 1, 'neil@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1),
+(18, 23, 'defaultProfile.png', 'Shane Rhyder', '', 'Silverio', NULL, '6', '', '4', 1, 'shane@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 11),
+(19, 24, 'defaultProfile.png', 'Kimberly Joan', '', 'Palla', NULL, '6', '', '4', 1, 'kimberly@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1);
 
 -- --------------------------------------------------------
 
@@ -1389,6 +1408,13 @@ CREATE TABLE `visits` (
   `visitID` int(11) NOT NULL,
   `dateVisited` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `visits`
+--
+
+INSERT INTO `visits` (`visitID`, `dateVisited`) VALUES
+(1, '2025-11-20 02:45:32');
 
 -- --------------------------------------------------------
 
@@ -1500,6 +1526,12 @@ ALTER TABLE `coverimage`
 --
 ALTER TABLE `criteria`
   ADD PRIMARY KEY (`criterionID`);
+
+--
+-- Indexes for table `emailcredentials`
+--
+ALTER TABLE `emailcredentials`
+  ADD PRIMARY KEY (`credentialID`);
 
 --
 -- Indexes for table `emblem`
@@ -1747,6 +1779,12 @@ ALTER TABLE `criteria`
   MODIFY `criterionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
+-- AUTO_INCREMENT for table `emailcredentials`
+--
+ALTER TABLE `emailcredentials`
+  MODIFY `credentialID` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `emblem`
 --
 ALTER TABLE `emblem`
@@ -1906,7 +1944,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `visits`
 --
 ALTER TABLE `visits`
-  MODIFY `visitID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `visitID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `webstars`

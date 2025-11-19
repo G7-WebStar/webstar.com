@@ -12,7 +12,7 @@ if (!isset($_GET['assessmentID'])) {
 $assessmentID = intval($_GET['assessmentID']);
 
 $testInfoQuery = "
-    SELECT *
+    SELECT *, assessments.createdAt AS assessmentCreatedAt
     FROM tests
     LEFT JOIN assessments ON tests.assessmentID = assessments.assessmentID
     LEFT JOIN courses ON assessments.courseID = courses.courseID
@@ -46,7 +46,9 @@ $deadline = $test['deadline'];
 $currentDate = date("Y-m-d H:i:s");
 $isCompleted = (strtotime($currentDate) > strtotime($deadline));
 $examStatus = $isCompleted ? "Completed" : "Active";
-$examDuration = $test['testTimelimit'];
+$examDuration = (isset($test['testTimelimit']) && $test['testTimelimit'] > 0)
+    ? round($test['testTimelimit'] / 60)
+    : 0;
 $displayTime = !empty($test['updatedAt']) ? $test['updatedAt'] : $test['createdAt'];
 $formattedTime = !empty($displayTime) ? date("F j, Y g:i A", strtotime($displayTime)) : "";
 
