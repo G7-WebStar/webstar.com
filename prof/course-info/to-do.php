@@ -167,6 +167,12 @@ $showDropdowns = $assessmentCount > 0
                         $link = "test-info.php?testID=" . $todo['testID'];
                         $todoID = $todo['testID'];
                     }
+
+                     if ($type === 'task') {
+                        $editlink = "assign-task.php?edit=" . $todo['assignmentID'];
+                    } elseif ($type === 'test') {
+                        $editlink = "edit-test.php?edit=" . $todo['testID'];
+                    }
                     ?>
                     <div class="todo-card d-flex align-items-stretch" data-link="<?php echo htmlspecialchars($link); ?>">
                         <!-- Date -->
@@ -200,7 +206,7 @@ $showDropdowns = $assessmentCount > 0
                                     <ul class="dropdown-menu dropdown-menu-end"
                                         aria-labelledby="dropdownMenuButton<?php echo $todoID; ?>"
                                         style="margin-top: 0.25rem;">
-                                        <li><a class="dropdown-item text-reg text-14" href="assign-task.php?edit=<?php echo $link; ?>">Edit</a></li>
+                                        <li><a class="dropdown-item text-reg text-14" href="<?php echo $editlink; ?>">Edit</a></li>
                                         <li>
                                             <button type="button"
                                                 class="dropdown-item text-reg text-14 text-danger"

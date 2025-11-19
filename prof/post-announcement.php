@@ -8,6 +8,15 @@ include('../shared/assets/database/connect.php');
 date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
 
+$toastMessage = '';
+$toastType = '';
+
+if (isset($_SESSION['toast'])) {
+    $toastMessage = $_SESSION['toast']['message'];
+    $toastType = $_SESSION['toast']['type'];
+    unset($_SESSION['toast']);
+}
+
 // --- Google Link Processor ---
 function processGoogleLink($link)
 {
@@ -557,6 +566,11 @@ if (!empty($reusedData)) {
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
 
+                    <div id="toastContainer"
+                        class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+                        style="z-index: 1100;">
+                    </div>
+
                     <!-- Navbar (mobile) -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
@@ -897,13 +911,36 @@ if (!empty($reusedData)) {
                 hiddenInput.setCustomValidity('');
             }
 
+            // Validation
+            let valid = true;
+            let errorMessages = [];
+
             // Validate at least one course selected (only in NEW mode)
             let checkboxes = form.querySelectorAll(".course-checkbox");
             let checked = Array.from(checkboxes).some(cb => cb.checked);
             if (!checked && !window.location.search.includes("edit")) {
+                valid=false;
+                errorMessages.push("Please select at least one course before submitting.");
+            }
+
+            if (!valid) {
                 e.preventDefault();
-                alert("Please select at least one course before submitting.");
-                return false;
+
+                const container = document.getElementById("toastContainer");
+                container.innerHTML = "";
+
+                errorMessages.forEach(msg => {
+                    const alert = document.createElement("div");
+                    alert.className = "alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 alert-danger";
+                    alert.role = "alert";
+                    alert.innerHTML = `
+                        <i class="bi bi-x-circle-fill fs-6"></i>
+                        <span>${msg}</span>
+                        `;
+                    container.appendChild(alert);
+                    setTimeout(() => alert.remove(), 3000);
+                });
+
             }
 
             // Sync Quill content to hidden input

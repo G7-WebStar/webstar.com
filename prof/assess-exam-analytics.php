@@ -241,8 +241,8 @@ if ($pendingCount < 0) $pendingCount = 0;
                                                 <div class="analytics-summary mt-5">
                                                     <div class="text-center mb-3">
                                                         <div class="mb-2">
-                                                            <span class="material-symbols-outlined"
-                                                                style="vertical-align: middle;">analytics</span>
+                                                            <span class="material-symbols-rounded"
+                                                                style="vertical-align: middle;color: var(--black);">analytics</span>
                                                             <span class="analytics-score-value"
                                                                 style="margin-left: 6px;"><?php echo $averagePercent; ?>%</span>
                                                         </div>
@@ -259,8 +259,8 @@ if ($pendingCount < 0) $pendingCount = 0;
                                                         <div class="col-12 col-md-6">
                                                             <div class="analytics-metric text-center">
                                                                 <div class="mb-2">
-                                                                    <span class="material-symbols-outlined"
-                                                                        style="vertical-align: middle;">
+                                                                    <span class="material-symbols-rounded"
+                                                                        style="vertical-align: middle;color: var(--black);">
                                                                         check_circle
                                                                     </span>
                                                                     <span class="analytics-score-value"
@@ -275,14 +275,14 @@ if ($pendingCount < 0) $pendingCount = 0;
                                                         <div class="col-12 col-md-6">
                                                             <div class="analytics-metric text-center">
                                                                 <div class="mb-2">
-                                                                    <span class="material-symbols-outlined alarm-icon"
-                                                                        style="vertical-align: middle;">
+                                                                    <span class="material-symbols-rounded alarm-icon"
+                                                                        style="vertical-align: middle;color: var(--black);">
                                                                         alarm
                                                                     </span>
                                                                     <span class="analytics-score-value"
                                                                         style=" margin-left: 8px;"><?php echo $averageTimeSpent; ?> mins</span>
                                                                 </div>
-                                                                <div class="analytics-score-label">average time spent
+                                                                <div class="analytics-score-label" >average time spent
                                                                 </div>
                                                                 <div class="analytics-score-desc mt-3">
                                                                     typical completion time</div>
