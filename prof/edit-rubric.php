@@ -335,7 +335,15 @@ if (isset($_POST['update_rubric'])) {
     ";
     executeQuery($updateRubricQuery);
 
-    header('Location: assign-task.php?selectedRubricID=' . $rubricID);
+    // Check if this is an AJAX request
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+        header('Content-Type: application/json');
+        echo json_encode(array('success' => true, 'rubricID' => $rubricID));
+        exit;
+    }
+    
+    $serverSuccess = 'Rubric successfully updated.';
+    header('Location: assign-task.php?selectedRubricID=' . $rubricID . '&success=1');
     exit;
     }
 }
@@ -751,6 +759,27 @@ if (isset($_POST['update_rubric'])) {
                     }, 4000);
                 }
                 window.showAlert = showAlert;
+                window.showSuccessToast = showSuccessToast;
+
+                function showSuccessToast(message) {
+                    var container = document.getElementById('toastContainer');
+                    if (!container) return;
+
+                    var alertEl = document.createElement('div');
+                    alertEl.className = 'alert alert-success mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2';
+                    alertEl.role = 'alert';
+                    alertEl.style.transition = 'opacity 2s ease';
+                    alertEl.style.opacity = '1';
+                    alertEl.innerHTML = '<i class="bi bi-check-circle-fill fs-6"></i>' +
+                        '<span>' + message + '</span>';
+
+                    container.appendChild(alertEl);
+
+                    setTimeout(function() {
+                        alertEl.style.opacity = '0';
+                        setTimeout(function() { alertEl.remove(); }, 2000);
+                    }, 3000);
+                }
 
                 function isBlank(value) {
                     return value === undefined || value === null || value.trim() === '';
@@ -896,10 +925,49 @@ if (isset($_POST['update_rubric'])) {
                     try { document.getElementById('post_deletedCriteria').value = JSON.stringify(deletedCriteria); } catch (e) { document.getElementById('post_deletedCriteria').value = '[]'; }
                     try { document.getElementById('post_deletedLevels').value = JSON.stringify(deletedLevels); } catch (e) { document.getElementById('post_deletedLevels').value = '[]'; }
 
+                    // Submit via AJAX to show success toast before redirect
                     var form = document.getElementById('hiddenEditPost');
-                    if (form && form.submit) {
-                        form.submit();
-                    }
+                    if (!form) return;
+                    
+                    var formData = new FormData(form);
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', window.location.href, true);
+                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4) {
+                            if (xhr.status === 200) {
+                                try {
+                                    var response = JSON.parse(xhr.responseText);
+                                    if (response && response.success) {
+                                        // Success - show toast then redirect
+                                        if (typeof showSuccessToast === 'function') {
+                                            showSuccessToast('Rubric successfully updated.');
+                                        }
+                                        setTimeout(function() {
+                                            window.location.href = 'assign-task.php?selectedRubricID=' + (response.rubricID || '<?php echo $rubricID; ?>');
+                                        }, 1500);
+                                    } else {
+                                        if (typeof showAlert === 'function') {
+                                            showAlert(response.message || 'Failed to update rubric. Please try again.');
+                                        }
+                                    }
+                                } catch (e) {
+                                    // If response is not JSON, assume success (might be redirect HTML)
+                                    if (typeof showSuccessToast === 'function') {
+                                        showSuccessToast('Rubric successfully updated.');
+                                    }
+                                    setTimeout(function() {
+                                        window.location.href = 'assign-task.php?selectedRubricID=<?php echo $rubricID; ?>';
+                                    }, 1500);
+                                }
+                            } else {
+                                if (typeof showAlert === 'function') {
+                                    showAlert('Failed to update rubric. Please try again.');
+                                }
+                            }
+                        }
+                    };
+                    xhr.send(formData);
                 });
             })();
         </script>
@@ -1074,6 +1142,16 @@ if (isset($_POST['update_rubric'])) {
                     window.showAlert(msg);
                 } else {
                     alert(msg);
+                }
+            });
+        </script>
+        <?php } ?>
+
+        <?php if (isset($_GET['success']) && $_GET['success'] == '1') { ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                if (typeof window.showSuccessToast === 'function') {
+                    window.showSuccessToast('Rubric successfully updated.');
                 }
             });
         </script>

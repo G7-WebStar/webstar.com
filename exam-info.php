@@ -55,7 +55,7 @@ if ($status == 'Pending') {
 } else if ($status == 'Submitted') {
     $btnText = 'View Submission';
     $btnLink = 'test-submitted.php';
-} else if ($status == 'Graded') {
+} else if ($status == 'Returned') {
     $btnText = 'View Results';
     $btnLink = 'test-result.php';
 }

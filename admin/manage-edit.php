@@ -1,8 +1,58 @@
-<?php $activePage = 'manage'; ?>
-<?php
+<?php 
+$activePage = 'manage'; 
 include('../shared/assets/database/connect.php');
 include("../shared/assets/processes/admin-session-process.php");
 
+// Get userID from URL
+if (isset($_GET['userID'])) {
+    $userID = $_GET['userID'];
+
+    // Fetch user info and status only if role is 'professor'
+    $sql = "SELECT users.status, users.role, userinfo.firstName, userinfo.middleName, userinfo.lastName
+            FROM users
+            INNER JOIN userinfo ON users.userID = userinfo.userID
+            WHERE users.userID = '$userID' AND users.role = 'professor'";
+
+    $result = executeQuery($sql);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        $user = mysqli_fetch_assoc($result);
+        $firstName = $user['firstName'];
+        $middleName = $user['middleName'];
+        $lastName = $user['lastName'];
+        $status = $user['status'];
+    } else {
+        echo "User not found or is not a professor.";
+        exit;
+    }
+} else {
+    echo "No userID provided.";
+    exit;
+}
+
+// Handle form submission
+if (isset($_POST['updateBtn'])) {
+    $firstName = $_POST['firstName'];
+    $middleName = $_POST['middleName'];
+    $lastName = $_POST['lastName'];
+    $status = $_POST['status'];
+
+    // Update userinfo table
+    $updateInfo = "UPDATE userinfo 
+             SET firstName='$firstName', middleName='$middleName', lastName='$lastName'
+             WHERE userID='$userID'";
+    executeQuery($updateInfo);
+
+    // Update users table
+    $updateStatus = "UPDATE users 
+             SET status='$status'
+             WHERE userID='$userID'";
+    executeQuery($updateStatus);
+
+    // Redirect to manage-instructor.php
+    header("Location: manage.php");
+    exit();
+}
 ?>
 
 <!doctype html>
@@ -28,7 +78,8 @@ include("../shared/assets/processes/admin-session-process.php");
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet" />
 
 </head>
 
@@ -53,7 +104,7 @@ include("../shared/assets/processes/admin-session-process.php");
                     <?php include '../shared/components/admin-navbar-for-mobile.php'; ?>
 
 
-                    <div class="container-fluid py-1">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
                         <div class="row">
                             <!-- Header Title -->
                             <div class="col-12 mb-1">
@@ -77,7 +128,8 @@ include("../shared/assets/processes/admin-session-process.php");
                                 <!-- Left: Registration Form -->
                                 <div class="col-12 col-md-6">
                                     <div>
-                                        <div class="mb-3 text-med text-16 text-center text-md-start" style="color: var(--black);">
+                                        <div class="mb-3 text-med text-16 text-center text-md-start"
+                                            style="color: var(--black);">
                                             Basic Information
                                         </div>
 
@@ -85,13 +137,17 @@ include("../shared/assets/processes/admin-session-process.php");
                                         <div class="row mb-3 gx-3">
                                             <div class="col">
                                                 <div class="form-floating">
-                                                    <input type="text" name="firstName" class="form-control" id="firstName" placeholder=" ">
+                                                    <input type="text" name="firstName" class="form-control"
+                                                        id="firstName" placeholder=" "
+                                                        value="<?php echo $firstName; ?>">
                                                     <label for="firstName">First Name</label>
                                                 </div>
                                             </div>
                                             <div class="col">
                                                 <div class="form-floating">
-                                                    <input type="text" name="middleName" class="form-control" id="middleName" placeholder=" ">
+                                                    <input type="text" name="middleName" class="form-control"
+                                                        id="middleName" placeholder=" "
+                                                        value="<?php echo $middleName; ?>">
                                                     <label for="middleName">Middle Name</label>
                                                 </div>
                                             </div>
@@ -101,25 +157,29 @@ include("../shared/assets/processes/admin-session-process.php");
                                         <div class="row mb-4 gx-3">
                                             <div class="col">
                                                 <div class="form-floating">
-                                                    <input type="text" name="lastName" class="form-control" id="lastName" placeholder="Last Name">
+                                                    <input type="text" name="lastName" class="form-control"
+                                                        id="lastName" placeholder="Last Name"
+                                                        value="<?php echo $lastName; ?>">
                                                     <label for="lastName">Last Name</label>
                                                 </div>
                                             </div>
                                             <div class="col form-floating">
-                                                <select class="form-select" name="yearLevel" id="yearLevel"
-                                                    style=" width: 130px; height: 48px; line-height: 48px; text-align: center; padding: 0 2.5rem 0 0.5rem;">
-                                                    <option selected disabled style="color: gray;">Year Level</option>
-                                                    <option value="1st">1st Year</option>
-                                                    <option value="2nd">2nd Year</option>
-                                                    <option value="3rd">3rd Year</option>
-                                                    <option value="4th">4th Year</option>
+                                                <select class="form-select p-1 ps-3" name="status" id="status"
+                                                    style="width: 130px; height: 48px; line-height: 48px;">
+                                                    <option value="Active" <?php if ($status == 1)
+                                                        echo 'selected'; ?>>Active
+                                                    </option>
+                                                    <option value="Inactive" <?php if ($status == 0)
+                                                        echo 'selected'; ?>>Inactive
+                                                    </option>
                                                 </select>
                                             </div>
                                         </div>
 
                                         <!-- Update Button  -->
                                         <div class="text-center d-flex flex-column align-items-end justify-content-end">
-                                            <button type="submit" name="updateBtn" class="text-sbold text-12 btn btn-finish mt-3 mb-3">
+                                            <button type="submit" name="updateBtn"
+                                                class="text-sbold text-12 btn btn-finish mt-3 mb-3">
                                                 Update
                                             </button>
                                         </div>

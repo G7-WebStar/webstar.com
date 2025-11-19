@@ -82,10 +82,11 @@ if (isset($_POST['deleteAssessmentBtn']) && isset($_POST['deleteAssessmentID']) 
             // Set success message in session
             $_SESSION['success'] = 'Assessment deleted successfully!';
 
-            // Use JavaScript redirect since headers already sent
+            // Always redirect to todo tab when deleting from todo page
+            // Set activeTab in session so course-info.php picks it up
+            $_SESSION['activeTab'] = 'todo';
             $redirectCourseID = $_POST['courseID'] ?? $_GET['courseID'] ?? '';
-            $redirectActiveTab = $_POST['activeTab'] ?? 'todo';
-            echo '<script>window.location.href = "course-info.php?courseID=' . urlencode($redirectCourseID) . '&activeTab=' . urlencode($redirectActiveTab) . '";</script>';
+            echo '<script>window.location.href = "course-info.php?courseID=' . urlencode($redirectCourseID) . '";</script>';
             exit();
         } catch (Exception $e) {
             // Rollback on error
@@ -146,7 +147,7 @@ $showDropdowns = $assessmentCount > 0
 
 <?php if ($assessmentCount > 0): ?>
     <!-- To-Do List -->
-    <div class="d-flex flex-column flex-nowrap overflow-x-hidden" id="todo-list">
+    <div class="d-flex flex-column flex-nowrap" id="todo-list">
         <?php
         mysqli_data_seek($selectAssessmentResult, 0);
         while ($todo = mysqli_fetch_assoc($selectAssessmentResult)):
@@ -174,35 +175,38 @@ $showDropdowns = $assessmentCount > 0
                         </div>
 
                         <!-- Main content -->
-                        <div class="d-flex flex-grow-1 flex-wrap justify-content-between p-2 w-100">
-                            <div class="px-3 py-0">
-                                <div class="text-sbold text-16"><?php echo htmlspecialchars($todo['assessmentTitle']); ?></div>
+                        <div class="d-flex flex-grow-1 justify-content-between align-items-center p-2 w-100" style="min-width: 0;">
+                            <div class="px-3 py-0 flex-grow-1" style="min-width: 0; overflow: hidden;">
+                                <div class="text-sbold text-16" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?php echo htmlspecialchars($todo['assessmentTitle']); ?></div>
                                 <span class="course-badge rounded-pill px-3 text-reg text-12 mt-2 d-inline d-md-none">
                                     <?php echo htmlspecialchars($todo['type']); ?>
                                 </span>
                             </div>
 
-                            <div class="d-flex align-items-center gap-2 ms-auto">
+                            <div class="d-flex align-items-center gap-2 flex-shrink-0">
                                 <span class="course-badge rounded-pill px-3 text-reg text-12 d-none d-md-inline">
                                     <?php echo htmlspecialchars($todo['type']); ?>
                                 </span>
 
                                 <!-- DROPDOWN MENU -->
-                                <div class="d-flex align-items-center flex-nowrap" data-dropdown="true">
+                                <div class="dropdown" data-dropdown="true" style="position: relative;">
                                     <button class="btn btn-light btn-sm p-1 px-2 border-0 bg-transparent" type="button"
                                         id="dropdownMenuButton<?php echo $todoID; ?>"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        data-bs-toggle="dropdown" aria-expanded="false"
+                                        style="line-height: 1;">
                                         <i class="bi bi-three-dots-vertical"></i>
                                     </button>
 
                                     <ul class="dropdown-menu dropdown-menu-end"
-                                        aria-labelledby="dropdownMenuButton<?php echo $todoID; ?>">
-                                        <li><a class="dropdown-item text-reg text-14" href="<?php echo $link; ?>">Edit</a></li>
+                                        aria-labelledby="dropdownMenuButton<?php echo $todoID; ?>"
+                                        style="margin-top: 0.25rem;">
+                                        <li><a class="dropdown-item text-reg text-14" href="assign-task.php?edit=<?php echo $link; ?>">Edit</a></li>
                                         <li>
                                             <button type="button"
                                                 class="dropdown-item text-reg text-14 text-danger"
                                                 data-bs-toggle="modal"
-                                                data-bs-target="#deleteModal<?php echo $todoID; ?>">
+                                                data-bs-target="#deleteModal<?php echo $todoID; ?>"
+                                                onclick="event.stopPropagation();">
                                                 Delete
                                             </button>
                                         </li>
