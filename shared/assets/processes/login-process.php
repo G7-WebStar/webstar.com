@@ -25,6 +25,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
         $stmt->fetch();
 
         if ($password === $dbPassword || password_verify($password, $dbPassword)) {
+            // visits per day
+            $logVisit = $conn->prepare("INSERT INTO visits (dateVisited) VALUES (NOW())");
+            $logVisit->execute();
+            $logVisit->close();
+
             // Store session using email from DB
             $_SESSION['email'] = $emailFromDB;
             $_SESSION['userID'] = $userID;

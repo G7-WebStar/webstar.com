@@ -32,6 +32,44 @@ $totalFeedback = mysqli_fetch_assoc($totalFeedbackQuery)['totalFeedback'];
 // IF YOU WANT TO COUNT "UNREAD"
 // (Only works if you add a `status` column later)
 $unreadFeedback = 0; // default for now
+
+// GET TOTAL VISITS
+$totalVisitsQuery = mysqli_query($conn, "SELECT COUNT(*) AS totalVisits FROM visits");
+$totalVisits = mysqli_fetch_assoc($totalVisitsQuery)['totalVisits'];
+
+// GET VISITS THIS MONTH
+$currentMonth = date('m'); // current month
+$currentYear = date('Y');
+$monthVisitsQuery = mysqli_query($conn, "SELECT COUNT(*) AS monthVisits FROM visits WHERE MONTH(dateVisited) = $currentMonth AND YEAR(dateVisited) = $currentYear");
+$monthVisits = mysqli_fetch_assoc($monthVisitsQuery)['monthVisits'];
+
+// GET VISITS PER DAY FOR CHART (last 7 days)
+$visitsPerDayQuery = mysqli_query($conn, "
+    SELECT DATE(dateVisited) AS visitDate, COUNT(*) AS visitsCount 
+    FROM visits 
+    WHERE dateVisited >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+    GROUP BY DATE(dateVisited)
+    ORDER BY DATE(dateVisited)
+");
+
+$visitsChartLabels = [];
+$visitsChartData = [];
+
+// Fill missing days if no visits
+$last7Days = [];
+for ($i = 6; $i >= 0; $i--) {
+    $last7Days[date('Y-m-d', strtotime("-$i days"))] = 0;
+}
+
+while ($row = mysqli_fetch_assoc($visitsPerDayQuery)) {
+    $last7Days[$row['visitDate']] = $row['visitsCount'];
+}
+
+// Prepare labels and data arrays
+foreach ($last7Days as $date => $count) {
+    $visitsChartLabels[] = date('M d', strtotime($date));
+    $visitsChartData[] = $count;
+}
 ?>
 
 
@@ -158,10 +196,10 @@ $unreadFeedback = 0; // default for now
                                         <span class="material-symbols-outlined me-2" style="font-size: 30px;">
                                             assignment
                                         </span>
-                                        <div class="stats-count text-22 text-bold">5,000</div>
+                                        <div class="stats-count text-22 text-bold"><?php echo $totalVisits; ?></div>
                                     </div>
                                     <div class="stats-label text-18 text-sbold">website visits</div>
-                                    <div class="text-reg text-16">500 visits this month</div>
+                                    <div class="text-reg text-16"><?php echo $monthVisits; ?> visits this month</div>
                                 </div>
                             </div>
 
@@ -202,17 +240,18 @@ $unreadFeedback = 0; // default for now
         const visitsChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Oct 15', 'Oct 16', 'Oct 17', 'Oct 18', 'Oct 19', 'Oct 21'],
+                labels: <?php echo json_encode($visitsChartLabels); ?>,
                 datasets: [{
                     label: 'Visits',
-                    data: [55, 65, 75, 78, 70, 35],
+                    data: <?php echo json_encode($visitsChartData); ?>,
                     backgroundColor: 'rgba(90, 120, 255, 0.8)',
                     borderColor: 'rgba(90, 120, 255, 1)',
                     borderWidth: 1,
                     borderRadius: 2,
-                    barThickness: getBarThickness(), // dynamic based on screen size
+                    barThickness: getBarThickness(),
                 }]
-            },
+            }
+            ,
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
