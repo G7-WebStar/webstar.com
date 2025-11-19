@@ -1,5 +1,5 @@
 <?php
-$activePage = 'create-test';
+$activePage = 'edit-test';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -14,15 +14,26 @@ if (!class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
     require '../shared/assets/phpmailer/src/SMTP.php';
 }
 
+$toastMessage = '';
+$toastType = '';
+
+if (isset($_SESSION['toast'])) {
+    $toastMessage = $_SESSION['toast']['message'];
+    $toastType = $_SESSION['toast']['type'];
+    unset($_SESSION['toast']);
+}
+
 $mode = '';
 $testID = 0;
 
 if (isset($_GET['edit'])) {
+    $mode = 'edit';
     $testID = intval($_GET['edit']);
-    header('Location: edit-test.php?edit=' . $testID);
 } elseif (isset($_GET['reuse'])) {
+    $mode = 'reuse';
     $testID = intval($_GET['reuse']);
-    header('Location: edit-test.php?reuse=' . $testID);
+} else {
+    header('Location: create-test.php');
 }
 
 // Get all courses owned by this user
@@ -88,13 +99,15 @@ if (isset($_POST['save_exam'])) {
 
             } elseif ($mode === 'edit') {
 
-                /* UPDATE EXISTING ASSESSMENT*/
+                $deadlineEnabled = isset($_POST['stopSubmissions']) ? 1 : 0;
+
                 $updateAssessment = "UPDATE assessments SET 
                 assessmentTitle='$title',
-                deadline=" .
-                    ($testDeadline ? "'" . mysqli_real_escape_string($conn, $testDeadline) . "'" : "NULL") . "
+                deadline=" . ($testDeadline ? "'" . mysqli_real_escape_string($conn, $testDeadline) . "'" : "NULL") . ",
+                deadlineEnabled='$deadlineEnabled'
                 WHERE assessmentID='$testID'";
                 executeQuery($updateAssessment);
+
 
                 /* UPDATE EXISTING TEST*/
                 $updateTest = "UPDATE tests SET
@@ -133,12 +146,14 @@ if (isset($_POST['save_exam'])) {
                         : '';
 
                     /* IMAGE UPLOAD */
-                    $testQuestionImage = null;
+                    // Default: keep old image if editing
+                    $testQuestionImage = $question['existingImage'] ?? null; // existing image from DB
+
+                    // Replace only if user uploaded a new image
                     if (
                         isset($_FILES['fileUpload']['name'][$qIndex]) &&
                         $_FILES['fileUpload']['error'][$qIndex] === UPLOAD_ERR_OK
                     ) {
-
                         $file = $_FILES['fileUpload'];
                         $tmp = $file['tmp_name'][$qIndex];
                         $name = $file['name'][$qIndex];
@@ -151,9 +166,10 @@ if (isset($_POST['save_exam'])) {
                         $dest = $uploadDir . $newName;
 
                         if (move_uploaded_file($tmp, $dest)) {
-                            $testQuestionImage = $newName;
+                            $testQuestionImage = $newName; // only replace if uploaded
                         }
                     }
+
 
                     /* INSERT QUESTION*/
                     $insertQ = "INSERT INTO testQuestions
@@ -338,6 +354,21 @@ if (isset($_POST['save_exam'])) {
                 }
             }
         }
+        if ($testInsert) {
+            $_SESSION['toast'] = [
+                'type' => 'alert-success',
+                'message' => 'Test recreated successfully!'
+            ];
+        }
+        if ($updateTest) {
+            $_SESSION['toast'] = [
+                'type' => 'alert-success',
+                'message' => 'Test edited successfully!'
+            ];
+        }
+        $_SESSION['activeTab'] = 'todo';
+        header("Location: course-info.php?courseID=" . intval($_POST['courses'][0]));
+        exit();
     }
 }
 
@@ -378,9 +409,12 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
     // Fetch main test info
     $testInfoQuery = "SELECT a.assessmentTitle, t.generalGuidance, t.testTimeLimit,
                       a.deadline, a.deadlineEnabled, a.type AS testType, t.testID
-                      FROM assessments a
-                      JOIN tests t ON a.assessmentID = t.assessmentID
-                      WHERE a.assessmentID = '$reuseID' AND a.type='Test'";
+                  FROM assessments a
+                  JOIN tests t ON a.assessmentID = t.assessmentID
+                  JOIN courses crs ON a.courseID = crs.courseID
+                  JOIN users u ON crs.userID = u.userID
+                  WHERE a.assessmentID = '$reuseID' AND a.type='Test' AND u.userID = '$userID'";
+
     $infoResult = executeQuery($testInfoQuery);
     if ($infoResult && $row = $infoResult->fetch_assoc()) {
         $mainData['assessmentTitle'] = $row['assessmentTitle'];
@@ -390,6 +424,10 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
         $mainData['deadlineEnabled'] = $row['deadlineEnabled'];
         $mainData['testType'] = $row['testType'];
         $testID = $row['testID'];
+    } else {
+        // Invalid or unauthorized reuse/edit attempt
+        header("Location: create-test.php");
+        exit();
     }
 
     // Fetch questions and choices
@@ -415,8 +453,6 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
         }
     }
 }
-
-
 
 ?>
 
@@ -503,11 +539,10 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
 
-                    <!-- Alert Container Toasts -->
-                <div id="toastContainer"
-                    class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1  d-flex flex-column align-items-center"
-                    style="z-index:1100; pointer-events:none;">
-                </div>
+                    <div id="toastContainer"
+                        class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+                        style="z-index: 1100;">
+                    </div>
 
                     <!-- Navbar (mobile) -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
@@ -541,7 +576,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
 
                                     <!-- Assign Existing Task Button -->
                                     <div
-                                        class="col-12 col-md-auto text-center d-flex d-md-block justify-content-center justify-content-md-end mt-3 mt-md-0">
+                                        class="col-12 col-md-auto text-center d-none justify-content-center justify-content-md-end mt-3 mt-md-0">
                                         <button type="button"
                                             class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 my-1 d-flex align-items-center gap-2"
                                             style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black); width: auto!important;"
@@ -588,7 +623,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                         <button class="ql-underline"></button>
                                                         <button class="ql-list" value="bullet"></button>
                                                         <span id="word-counter"
-                                                            class="ms-auto text-muted text-med text-16 me-2">0/200</span>
+                                                            class="ms-auto text-muted text-med text-16 me-2">0/120</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -670,7 +705,8 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                         value="identification">
 
                                                     <div class="input-group text-reg text-14 text-muted mb-3 mt-2">
-                                                        <span class="input-group-text text-bold rounded-left ms-3 p-3"
+                                                        <span
+                                                            class="input-group-text text-bold rounded-left ms-3 p-3 question-number"
                                                             style="background-color: var(--primaryColor);">1</span>
                                                         <input type="text" class="question-box form-control text-reg"
                                                             placeholder="Question" name="questions[0][testQuestion]">
@@ -766,7 +802,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                     <!-- Image upload -->
                                                     <div class="mb-3 ms-3 image-container position-relative"
                                                         style="display: none; width: 300px; height: 200px;">
-                                                        <!-- Delete Button (inside upper right of image) -->
+                                                        <!-- Delete Button -->
                                                         <button type="button" class="delete-image"
                                                             style="position: absolute; top: 8px; right: 8px; background: white; border: none; color: var(--black); cursor: pointer; z-index: 2; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
                                                             <i class="fas fa-times"></i>
@@ -784,7 +820,6 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                             <div class="text-reg mb-1">Choices</div>
                                                             <div class="radio-choices-container ps-2"
                                                                 style="max-height: 200px; overflow-y: auto; padding-right: 5px;">
-                                                                <!-- Choices will be added here dynamically -->
                                                             </div>
                                                             <!-- Add button -->
                                                             <button type="button"
@@ -910,7 +945,11 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                         </div>
                     </div>
                 </div>
-                
+                <!-- Alert Container Toasts -->
+                <div id="toastContainer"
+                    class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1  d-flex flex-column align-items-center"
+                    style="z-index:1100; pointer-events:none;">
+                </div>
             </div>
         </div>
     </div>
@@ -974,310 +1013,137 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
 
 
     <!-- Quill JS -->
+
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script>
-        // Quill Editor
+        // --- Server Data from PHP ---
+        const serverData = <?php echo json_encode($mainData, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+
+        // --- Quill Editor Setup ---
         var quill = new Quill('#editor', {
             theme: 'snow',
             placeholder: 'Test General Guidelines',
-            modules: {
-                toolbar: '#toolbar'
-            }
+            modules: { toolbar: '#toolbar' }
         });
 
-        <?php if (isset($reusedData)) { ?>
-            quill.root.innerHTML = <?php echo json_encode($mainData['generalGuidance']); ?>;
-        <?php } ?>
+        if (serverData && serverData.generalGuidance) {
+            quill.root.innerHTML = serverData.generalGuidance;
+        }
 
         const maxWords = 200;
         const counter = document.getElementById("word-counter");
-
         quill.on('text-change', function () {
             let text = quill.getText().trim();
             let words = text.length > 0 ? text.split(/\s+/).length : 0;
-
             if (words > maxWords) {
                 let limited = text.split(/\s+/).slice(0, maxWords).join(" ");
                 quill.setText(limited + " ");
                 quill.setSelection(quill.getLength());
-                quill.setSelection(quill.getLength());
             }
-
             counter.textContent = `${Math.min(words, maxWords)}/${maxWords}`;
         });
 
         const form = document.querySelector('#guidedanceForm');
-
         form.addEventListener("submit", function (e) {
-            // --- Quill ---
-            const guidelinesInput = document.getElementById("generalGuidance");
-            const plainText = quill.getText().trim();
-            guidelinesInput.value = quill.root.innerHTML.trim();
+            // Save general guidance
+            document.getElementById("generalGuidance").value = quill.root.innerHTML.trim();
 
-            if (plainText === "") {
-                e.preventDefault();
-                quill.root.focus();
-                showAlert('Please fill out the general guidelines.');
-                return; // stop submission
+            // Validation
+            let valid = true;
+            let errorMessages = [];
+
+            let checkboxes = form.querySelectorAll(".course-checkbox");
+            let checked = Array.from(checkboxes).some(cb => cb.checked);
+            if (!checked && !window.location.search.includes("edit")) {
+                valid = false;
+                errorMessages.push("Please select at least one course before submitting.");
             }
 
-            let valid = true;
-            let message = "";
+            const questionBoxes = document.querySelectorAll("#allQuestionsContainer .textbox");
 
-            // --- Multiple Choice Validation ---
-            document.querySelectorAll(".multiple-choice-item").forEach(mc => {
-                if (!mc.offsetParent) return;
-                const radios = mc.querySelectorAll("input[type='radio']");
-                const oneChecked = Array.from(radios).some(r => r.checked);
-                const innerCard = mc.querySelector(".textbox, .card, .form-control");
-                if (!oneChecked) {
+            if (questionBoxes.length === 0) {
+                valid = false;
+                errorMessages.push("The test must have at least one question.");
+            }
+
+            questionBoxes.forEach((box, index) => {
+                const questionType = box.querySelector("input[type='hidden'][name*='questionType']").value;
+
+                // Question text validation
+                const questionInput = box.querySelector("input[name*='testQuestion']");
+                if (!questionInput || !questionInput.value.trim()) {
                     valid = false;
-                    if (!message) message = "Choose the correct answers for all multiple choice questions.";
-                    if (innerCard) innerCard.style.border = "2px solid red";
-                } else if (innerCard) {
-                    innerCard.style.border = "";
+                    errorMessages.push(`Question #${index + 1} must have a question text.`);
                 }
 
-                // Remove empty choices
-                mc.querySelectorAll("input.choice-input").forEach(input => {
-                    if (!input.value.trim()) input.closest(".form-check")?.remove();
-                });
-            });
-
-            // --- Identification Validation ---
-            document.querySelectorAll(".textbox").forEach(idBox => {
-                if (!idBox.offsetParent) return;
-                const type = idBox.querySelector("input[type='hidden'][name*='questionType']")?.value.toLowerCase();
-                if (type === "identification") {
-                    const answers = Array.from(idBox.querySelectorAll("input[name*='correctAnswer']"));
-                    const hasAnswer = answers.some(a => a.value.trim() !== "");
-                    if (!hasAnswer) {
+                if (questionType.toLowerCase().includes("identification")) {
+                    const answerInput = box.querySelector("input[name*='correctAnswer']");
+                    if (!answerInput || !answerInput.value.trim()) {
                         valid = false;
-                        if (!message) message = "Provide one correct answer for all identification questions.";
-                        idBox.style.border = "2px solid red";
+                        errorMessages.push(`Identification question #${index + 1} must have an answer.`);
+                        if (answerInput) answerInput.classList.add("is-invalid");
                     } else {
-                        idBox.style.border = "";
+                        answerInput.classList.remove("is-invalid");
+                    }
+                }
+
+                if (questionType.toLowerCase().includes("multiple")) {
+                    // Select only choices inside this question
+                    const choices = box.querySelectorAll(".radio-choices-container .choice-input");
+                    const checked = box.querySelector(".radio-choices-container input[type='radio']:checked");
+
+                    choices.forEach((choice, i) => {
+                        if (!choice.value.trim()) {
+                            valid = false;
+                            errorMessages.push(`Multiple Choice question #${index + 1}, choice #${i + 1} cannot be empty.`);
+                        }
+                    });
+
+                    if (!checked) {
+                        valid = false;
+                        errorMessages.push(`Multiple Choice question #${index + 1} must have a selected answer.`);
                     }
                 }
             });
 
-            // --- Deadline Validation ---
-            const deadlineInput = document.querySelector('input[name="deadline"]');
-            if (deadlineInput) {
-                const deadlineValue = new Date(deadlineInput.value);
-                const now = new Date();
-                now.setSeconds(0, 0);
-                if (!deadlineInput.value || deadlineValue < now) {
-                    valid = false;
-                    if (!message) message = "Please set the deadline to a future date or time within today.";
-                    deadlineInput.style.border = "2px solid red";
-                } else {
-                    deadlineInput.style.border = "";
-                }
-            }
-
-            // --- Course Selection Validation ---
-            const checkedCourses = document.querySelectorAll('.course-checkbox:checked');
-            if (checkedCourses.length === 0) {
-                valid = false;
-                if (!message) message = "Please select at least one course before submitting.";
-            }
 
             if (!valid) {
                 e.preventDefault();
-                showAlert(message); // show toast
+
+                const container = document.getElementById("toastContainer");
+                container.innerHTML = ""; 
+
+                // If more than 5 errors
+                if (errorMessages.length > 5) {
+                    const alert = document.createElement("div");
+                    alert.className = "alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 alert-danger";
+                    alert.role = "alert";
+                    alert.innerHTML = `
+                    <i class="bi bi-x-circle-fill fs-6"></i>
+                    <span>Too many errors!  Please review all questions carefully before submitting to ensure everything is filled out correctly.</span>
+                    `;
+                    container.appendChild(alert);
+                    setTimeout(() => alert.remove(), 3000);
+                } else {
+                    errorMessages.forEach(msg => {
+                        const alert = document.createElement("div");
+                        alert.className = "alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 alert-danger";
+                        alert.role = "alert";
+                        alert.innerHTML = `
+                        <i class="bi bi-x-circle-fill fs-6"></i>
+                        <span>${msg}</span>
+                        `;
+                        container.appendChild(alert);
+                        setTimeout(() => alert.remove(), 3000);
+                    });
+                }
             }
         });
 
-        // Show Alert
-        function showAlert(message) {
-            const container = document.getElementById("toastContainer");
 
-            const alert = document.createElement("div");
-            alert.className = "alert alert-danger fade show mb-2 text-center d-flex align-items-center justify-content-center shadow-lg px-3 py-2 text-med text-12";
-            alert.innerHTML = `
-            <i class="bi bi-x-circle-fill me-2 fs-6"></i>
-            <span>${message}</span>
-        `;
-
-            container.appendChild(alert);
-
-            setTimeout(() => {
-                alert.classList.remove("show");
-                alert.classList.add("fade");
-                setTimeout(() => alert.remove(), 500);
-            }, 4000);
-        }
-
-        // Identification / Multiple Choice Management
-        let questionCount = 0;
+        // Question Handling
         const mainContainer = document.getElementById("allQuestionsContainer");
-
-        function renumberQuestions() {
-            const allQuestions = mainContainer.querySelectorAll(".textbox");
-            let count = 0;
-            allQuestions.forEach(q => {
-                const hidden = q.querySelector("input[type='hidden'][name*='questionType']");
-                if (hidden) {
-                    count++;
-                    const numberSpan = q.querySelector(".question-number, .input-group-text");
-                    if (numberSpan) numberSpan.textContent = count;
-                }
-            });
-        }
-
-        // Add Identification
-        document.getElementById("addIdentification").addEventListener("click", () => {
-            const clone = document.getElementById("identificationTemplate").content.cloneNode(true);
-            const numberSpan = clone.querySelector(".input-group-text");
-            if (numberSpan) numberSpan.textContent = mainContainer.querySelectorAll(".textbox").length + 1;
-
-            clone.querySelectorAll("input, textarea, select").forEach(input => {
-                if (input.name) input.name = input.name.replace(/\[\d+\]/, `[${questionCount}]`);
-            });
-
-            const fileInput = clone.querySelector(".image-upload");
-            if (fileInput) fileInput.name = `fileUpload[${questionCount}]`;
-
-            mainContainer.appendChild(clone);
-            questionCount++;
-            renumberQuestions();
-        });
-
-
-        // document.addEventListener("click", function (e) {
-        //     if (e.target.closest(".add-answer-btn")) {
-        //         const button = e.target.closest(".add-answer-btn");
-        //         const container = button.closest(".answers-scroll").querySelector(".answers-container");
-
-        //         // Prevent adding more than one answer
-        //         if (container.querySelectorAll("input").length > 0) {
-        //             showAlert("Only one correct answer is allowed for identification questions.");
-        //             return;
-        //         }
-
-        //         const questionBox = button.closest(".textbox");
-        //         const questionIndexInput = questionBox.querySelector("input[type='hidden'][name*='questionType']");
-        //         const questionIndex = questionIndexInput.name.match(/questions\[(\d+)\]/)[1];
-
-        //         const wrapper = document.createElement("div");
-        //         wrapper.classList.add("answer-wrapper", "me-2", "d-inline-flex", "align-items-center");
-
-        //         const input = document.createElement("input");
-        //         input.type = "text";
-        //         input.placeholder = "Answer";
-        //         input.classList.add("border", "rounded", "p-2", "text-reg");
-        //         input.style.width = "120px";
-        //         input.name = `questions[${questionIndex}][correctAnswer]`;
-
-        //         const removeBtn = document.createElement("button");
-        //         removeBtn.type = "button";
-        //         removeBtn.innerHTML = `<i class="fas fa-times"></i>`;
-        //         removeBtn.onclick = () => wrapper.remove();
-
-        //         wrapper.appendChild(input);
-        //         wrapper.appendChild(removeBtn);
-        //         container.appendChild(wrapper);
-        //     }
-        // });
-
-
-        // Single Delete Handler for All Blocks
-        document.addEventListener("click", function (e) {
-            const delBtn = e.target.closest(".delete-template");
-            if (!delBtn) return;
-
-            const block =
-                delBtn.closest(".multiple-choice-item") ||
-                delBtn.closest(".textbox") ||
-                delBtn.closest(".row");
-
-            if (block) block.remove();
-
-            renumberQuestions();
-            updateTotalPoints();
-        });
-
-
-        // Multiple Choice
-        document.getElementById("addMultipleChoice").addEventListener("click", () => {
-            const clone = document.getElementById("multipleChoiceTemplate").content.cloneNode(true);
-            const numberSpan = clone.querySelector(".question-number");
-            if (numberSpan) numberSpan.textContent = mainContainer.querySelectorAll(".textbox").length + 1;
-
-            clone.querySelectorAll("input, select, textarea").forEach(input => {
-                if (input.name && !input.name.includes("questionType")) {
-                    input.name = input.name.replace(/\[\d+\]/g, `[${questionCount}]`);
-                }
-            });
-
-            const hiddenType = clone.querySelector("input[type='hidden'][name*='questionType']");
-            if (hiddenType) {
-                hiddenType.name = `questions[${questionCount}][questionType]`;
-                hiddenType.value = "Multiple Choice";
-            }
-
-            const fileInput = clone.querySelector(".image-upload");
-            if (fileInput) fileInput.name = `fileUpload[${questionCount}]`;
-
-            mainContainer.appendChild(clone);
-            questionCount++;
-            renumberQuestions();
-        });
-
-        // Add Multiple Choice Choices
-        document.getElementById("allQuestionsContainer").addEventListener("click", function (e) {
-            if (e.target.closest(".add-radio-btn")) {
-                const button = e.target.closest(".add-radio-btn");
-                const container = button.closest(".multiple-choice-item").querySelector(".radio-choices-container");
-                const existingChoices = container.querySelectorAll(".form-check").length;
-                if (existingChoices >= 4) return;
-
-                const questionIndex = button.closest(".multiple-choice-item").querySelector("input[type='hidden']").name.match(/\d+/)[0];
-                const newChoice = document.createElement("div");
-                newChoice.classList.add("form-check", "text-start", "d-flex", "align-items-center", "mb-2", "position-relative");
-
-                const radio = document.createElement("input");
-                radio.type = "radio";
-                radio.classList.add("form-check-input", "me-2");
-                radio.name = `questions[${questionIndex}][correctAnswer]`;
-                radio.value = "";
-
-                const input = document.createElement("input");
-                input.type = "text";
-                input.classList.add("choice-input", "text-reg", "me-4", "text-truncate", "text-14");
-                input.name = `questions[${questionIndex}][choices][]`;
-                input.placeholder = "Choice";
-                input.style.border = "none";
-                input.style.outline = "none";
-                input.style.width = "100%";
-                input.style.maxWidth = "200px";
-                input.style.background = "transparent";
-
-                input.addEventListener("input", () => {
-                    radio.value = input.value;
-                });
-
-                const deleteBtn = document.createElement("button");
-                deleteBtn.type = "button";
-                deleteBtn.classList.add("delete-template");
-                deleteBtn.style.position = "absolute";
-                deleteBtn.style.top = "2px";
-                deleteBtn.style.right = "1px";
-                deleteBtn.style.background = "none";
-                deleteBtn.style.border = "none";
-                deleteBtn.style.color = "var(--black)";
-                deleteBtn.style.cursor = "pointer";
-                deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
-                deleteBtn.addEventListener("click", () => newChoice.remove());
-
-                newChoice.appendChild(radio);
-                newChoice.appendChild(input);
-                newChoice.appendChild(deleteBtn);
-
-                container.appendChild(newChoice);
-            }
-        });
+        let questionCount = (serverData && Array.isArray(serverData.questions)) ? serverData.questions.length : 0;
 
         // Toggle Image Container
         document.addEventListener("click", function (e) {
@@ -1356,30 +1222,310 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
             subtree: true
         });
 
-        // Update Total Points
         function updateTotalPoints() {
             let total = 0;
-            document.querySelectorAll('#allQuestionsContainer input[type="number"]').forEach(input => {
-                const val = parseInt(input.value);
-                if (!isNaN(val)) total += val;
+            document.querySelectorAll("input[name$='[testQuestionPoints]']").forEach(inp => {
+                total += parseFloat(inp.value) || 0;
             });
+            document.getElementById("totalPoints").textContent = total;
+        }
 
-            document.querySelectorAll('label[for="TotalPoints"]').forEach(label => {
-                label.textContent = `Total Points: ${total}`;
+        function renumberQuestions() {
+            document.querySelectorAll("#allQuestionsContainer .textbox").forEach((box, index) => {
+                const qLabel = box.querySelector(".question-number");
+                if (qLabel) qLabel.textContent = index + 1;
             });
         }
 
-        mainContainer.addEventListener('input', function (e) {
-            if (e.target.type === "number") updateTotalPoints();
+        // Add Identification Question
+        document.getElementById("addIdentification").addEventListener("click", () => {
+            const clone = document.getElementById("identificationTemplate").content.cloneNode(true);
+            clone.querySelectorAll("input, textarea, select").forEach(input => {
+                if (input.name) input.name = input.name.replace(/questions\[\d+\]/, `questions[${questionCount}]`);
+            });
+            const hiddenType = clone.querySelector("input[type='hidden'][name*='questionType']");
+            if (hiddenType) hiddenType.value = "Identification";
+            hiddenType.name = `questions[${questionCount}][questionType]`;
+
+            const fileInput = clone.querySelector(".image-upload");
+            if (fileInput) fileInput.name = `fileUpload[${questionCount}]`;
+
+            const del = clone.querySelector(".delete-template");
+            if (del) del.addEventListener("click", e => {
+                e.target.closest(".textbox").remove();
+                updateTotalPoints();
+                renumberQuestions();
+            });
+
+            mainContainer.appendChild(clone);
+            questionCount++;
+            updateTotalPoints();
+            renumberQuestions();
         });
 
-        const totalPointsObserver = new MutationObserver(() => updateTotalPoints());
-        totalPointsObserver.observe(mainContainer, {
-            childList: true,
-            subtree: true
+        // Add Multiple Choice Question
+        document.getElementById("addMultipleChoice").addEventListener("click", () => {
+            const clone = document.getElementById("multipleChoiceTemplate").content.cloneNode(true);
+
+            // Set unique question number
+            const currentIndex = questionCount;
+
+            // Update all input names in this clone
+            clone.querySelectorAll("input, textarea, select").forEach(input => {
+                if (input.name) input.name = input.name.replace(/questions\[\d+\]/, `questions[${currentIndex}]`);
+            });
+
+            // Set question type
+            const hiddenType = clone.querySelector("input[type='hidden'][name*='questionType']");
+            hiddenType.value = "Multiple Choice";
+            hiddenType.name = `questions[${currentIndex}][questionType]`;
+
+            // File input
+            const fileInput = clone.querySelector(".image-upload");
+            if (fileInput) fileInput.name = `fileUpload[${currentIndex}]`;
+
+            // Add choice button
+            const addChoiceBtn = clone.querySelector(".add-radio-btn");
+            if (addChoiceBtn) {
+                addChoiceBtn.addEventListener("click", e => {
+                    const container = e.target.closest(".multiple-choice-item").querySelector(".radio-choices-container");
+                    if (container.children.length >= 4) return; // limit 4 choices
+
+                    const div = document.createElement("div");
+                    div.className = "form-check d-flex align-items-center mb-2 position-relative";
+
+                    const radio = document.createElement("input");
+                    radio.type = "radio";
+                    radio.name = `questions[${currentIndex}][correctAnswer]`; // important: uses currentIndex
+                    radio.className = "form-check-input me-2";
+
+                    const input = document.createElement("input");
+                    input.type = "text";
+                    input.name = `questions[${currentIndex}][choices][]`;
+                    input.className = "choice-input form-control me-2";
+                    input.placeholder = "Choice";
+                    input.addEventListener("input", () => { radio.value = input.value; });
+
+                    const delBtn = document.createElement("button");
+                    delBtn.type = "button";
+                    delBtn.innerHTML = '<i class="fas fa-times"></i>';
+                    delBtn.style.cssText = `
+                background: transparent; border: none; color: var(--black);
+                cursor: pointer; display: flex; align-items: center; justify-content: center;
+                position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+                height: 24px; width: 24px;
+            `;
+                    delBtn.addEventListener("click", () => div.remove());
+
+                    div.appendChild(radio);
+                    div.appendChild(input);
+                    div.appendChild(delBtn);
+
+                    container.appendChild(div);
+                });
+            }
+
+            // Delete question button
+            const del = clone.querySelector(".delete-template");
+            if (del) del.addEventListener("click", e => {
+                e.target.closest(".textbox").remove();
+                updateTotalPoints();
+                renumberQuestions();
+            });
+
+            mainContainer.appendChild(clone);
+            questionCount++;
+            updateTotalPoints();
+            renumberQuestions();
         });
 
-        updateTotalPoints();
+        // Event delegation for Add Choice buttons
+        document.querySelectorAll(".add-radio-btn").forEach(btn => {
+            if (btn.dataset.bound) return; 
+            btn.dataset.bound = "true";  
+
+            btn.addEventListener("click", e => {
+                const container = e.target.closest(".multiple-choice-item").querySelector(".radio-choices-container");
+                if (container.children.length >= 4) return;
+
+                const div = document.createElement("div");
+                div.className = "form-check d-flex align-items-center mb-2 position-relative";
+
+                const radio = document.createElement("input");
+                radio.type = "radio";
+                const questionIndex = e.target.closest(".textbox").dataset.index;
+                radio.name = `questions[${questionIndex}][correctAnswer]`;
+                radio.className = "form-check-input me-2";
+
+                const input = document.createElement("input");
+                input.type = "text";
+                input.name = `questions[${questionIndex}][choices][]`;
+                input.className = "choice-input form-control me-2";
+                input.placeholder = "Choice";
+                input.addEventListener("input", () => { radio.value = input.value; });
+
+                const delBtn = document.createElement("button");
+                delBtn.type = "button";
+                delBtn.innerHTML = '<i class="fas fa-times"></i>';
+                delBtn.addEventListener("click", () => div.remove());
+
+                div.appendChild(radio);
+                div.appendChild(input);
+                div.appendChild(delBtn);
+
+                container.appendChild(div);
+            });
+        });
+
+
+        // Populate Existing Questions
+        function populateExistingQuestions() {
+            if (!serverData || !Array.isArray(serverData.questions)) return;
+
+            serverData.questions.forEach(q => {
+                let clone;
+                const isMultipleChoice = (q.questionType || '').toLowerCase().includes('multiple');
+
+                if (isMultipleChoice) {
+                    clone = document.getElementById("multipleChoiceTemplate").content.cloneNode(true);
+                } else {
+                    clone = document.getElementById("identificationTemplate").content.cloneNode(true);
+                }
+
+                const currentIndex = questionCount;
+
+                // Rename all input names with the correct index
+                clone.querySelectorAll("input, textarea, select").forEach(input => {
+                    if (input.name) input.name = input.name.replace(/questions\[\d+\]/, `questions[${currentIndex}]`);
+                });
+
+                // Hidden input for question type
+                const hiddenType = clone.querySelector("input[type='hidden'][name*='questionType']");
+                hiddenType.value = q.questionType;
+                hiddenType.name = `questions[${currentIndex}][questionType]`;
+
+                // File input
+                const fileInput = clone.querySelector(".image-upload");
+                if (fileInput) fileInput.name = `fileUpload[${currentIndex}]`;
+
+                // Question text
+                const questionInput = clone.querySelector("input[name*='testQuestion']");
+                if (questionInput) questionInput.value = q.testQuestion || '';
+
+                // Points
+                const pointsInput = clone.querySelector("input[name*='testQuestionPoints']");
+                if (pointsInput) pointsInput.value = q.testQuestionPoints || 0;
+
+                // Image
+                if (q.testQuestionImage) {
+                    const img = clone.querySelector(".question-image");
+                    const container = clone.querySelector(".image-container");
+                    if (img && container) { img.src = "../shared/assets/prof-uploads/" + q.testQuestionImage; container.style.display = "block"; }
+                }
+
+                // Identification Answer
+                if (!isMultipleChoice) {
+                    const identAnswer = clone.querySelector("input[name*='correctAnswer']");
+                    if (identAnswer) identAnswer.value = q.correctAnswer || '';
+                }
+
+                // Multiple Choice
+                if (isMultipleChoice && Array.isArray(q.choices)) {
+                    const container = clone.querySelector(".radio-choices-container");
+                    container.innerHTML = '';
+
+                    q.choices.forEach(choiceObj => {
+                        const div = document.createElement("div");
+                        div.className = "form-check d-flex align-items-center mb-2 position-relative";
+
+                        const radio = document.createElement("input");
+                        radio.type = "radio";
+                        radio.className = "form-check-input me-2";
+                        radio.name = `questions[${currentIndex}][correctAnswer]`;
+                        radio.value = choiceObj.choiceText;
+                        if ((q.correctAnswer || '') === choiceObj.choiceText) radio.checked = true;
+
+                        const input = document.createElement("input");
+                        input.type = "text";
+                        input.value = choiceObj.choiceText;
+                        input.name = `questions[${currentIndex}][choices][]`;
+                        input.className = "choice-input form-control me-2";
+                        input.addEventListener("input", () => { radio.value = input.value; });
+
+                        const delBtn = document.createElement("button");
+                        delBtn.type = "button";
+                        delBtn.innerHTML = '<i class="fas fa-times"></i>';
+                        delBtn.style.cssText = 'background:transparent;border:none;color:var(--black);cursor:pointer;display:flex;align-items:center;justify-content:center;position:absolute;right:10px;top:50%;transform:translateY(-50%);height:24px;width:24px;';
+                        delBtn.addEventListener("click", () => div.remove());
+
+                        div.appendChild(radio);
+                        div.appendChild(input);
+                        div.appendChild(delBtn);
+
+                        container.appendChild(div);
+                    });
+
+                    // Add new choice dynamically for this existing question
+                    const addChoiceBtn = clone.querySelector(".add-radio-btn");
+                    if (addChoiceBtn) {
+                        addChoiceBtn.addEventListener("click", e => {
+                            const container = e.target.closest(".multiple-choice-item").querySelector(".radio-choices-container");
+                            if (container.children.length >= 4) return; // limit to 4 choices
+
+                            const div = document.createElement("div");
+                            div.className = "form-check d-flex align-items-center mb-2 position-relative";
+
+                            const radio = document.createElement("input");
+                            radio.type = "radio";
+                            radio.name = `questions[${currentIndex}][correctAnswer]`;
+                            radio.className = "form-check-input me-2";
+
+                            const input = document.createElement("input");
+                            input.type = "text";
+                            input.name = `questions[${currentIndex}][choices][]`;
+                            input.className = "choice-input form-control me-2";
+                            input.placeholder = "Choice";
+                            input.addEventListener("input", () => { radio.value = input.value; });
+
+                            const delBtn = document.createElement("button");
+                            delBtn.type = "button";
+                            delBtn.innerHTML = '<i class="fas fa-times"></i>';
+                            delBtn.style.cssText = 'background:transparent;border:none;color:var(--black);cursor:pointer;display:flex;align-items:center;justify-content:center;position:absolute;right:10px;top:50%;transform:translateY(-50%);height:24px;width:24px;';
+                            delBtn.addEventListener("click", () => div.remove());
+
+                            div.appendChild(radio);
+                            div.appendChild(input);
+                            div.appendChild(delBtn);
+
+                            container.appendChild(div);
+                        });
+                    }
+                }
+
+                // Delete question
+                const del = clone.querySelector(".delete-template");
+                if (del) del.addEventListener("click", e => {
+                    e.target.closest(".textbox").remove();
+                    updateTotalPoints();
+                    renumberQuestions();
+                });
+
+                mainContainer.appendChild(clone);
+                questionCount++;
+            });
+
+            updateTotalPoints();
+            renumberQuestions();
+        }
+
+        populateExistingQuestions();
+
+        // Recalculate total points on input change
+        document.addEventListener('input', (e) => {
+            if (e.target.name && e.target.name.endsWith('[testQuestionPoints]')) updateTotalPoints();
+        });
+
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
