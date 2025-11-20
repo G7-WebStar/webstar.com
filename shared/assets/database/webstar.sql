@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 19, 2025 at 07:50 PM
+-- Generation Time: Nov 20, 2025 at 04:38 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `webstar`
+-- Database: `webstart`
 --
 
 -- --------------------------------------------------------
@@ -108,6 +108,13 @@ CREATE TABLE `assessments` (
   `isArchived` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `assessments`
+--
+
+INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `type`, `deadline`, `deadlineEnabled`, `createdAt`, `isArchived`) VALUES
+(1, 34, 'aa', 'Task', '2025-11-19 21:27:00', 0, '2025-11-20 21:27:24', 0);
+
 -- --------------------------------------------------------
 
 --
@@ -121,6 +128,13 @@ CREATE TABLE `assignments` (
   `assignmentPoints` int(5) NOT NULL,
   `rubricID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `assignments`
+--
+
+INSERT INTO `assignments` (`assignmentID`, `assessmentID`, `assignmentDescription`, `assignmentPoints`, `rubricID`) VALUES
+(1, 1, 'aa', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -482,7 +496,8 @@ CREATE TABLE `feedback` (
 --
 
 INSERT INTO `feedback` (`feedbackID`, `senderID`, `receiverID`, `message`, `created_at`) VALUES
-(3, 2, 18, 'heyyyy', '2025-11-17 17:44:05');
+(3, 2, 18, 'heyyyy', '2025-11-17 17:44:05'),
+(4, 1, 18, 'hi', '2025-11-20 22:48:53');
 
 -- --------------------------------------------------------
 
@@ -556,7 +571,30 @@ INSERT INTO `inbox` (`inboxID`, `enrollmentID`, `messageText`, `notifType`, `cre
 (19, 14, 'A new test has been posted: TEST W PICTURE', 'Course Update', '2025-11-17 15:38:24', 1),
 (20, 14, '\"TEST W PICTURE\" was returned by your instructor. You can now view the results.', 'Submissions Update', '2025-11-17 15:49:07', 1),
 (21, 14, 'A new task has been assigned: hahaha', 'Course Update', '2025-11-17 16:02:04', 1),
-(22, 14, 'A new task has been assigned: Activity #', 'Course Update', '2025-11-17 18:14:25', 1);
+(22, 14, 'A new task has been assigned: Activity #', 'Course Update', '2025-11-17 18:14:25', 1),
+(23, 14, 'A new task has been assigned: aa', 'Course Update', '2025-11-20 21:27:24', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inboxprof`
+--
+
+CREATE TABLE `inboxprof` (
+  `inboxProfID` int(11) NOT NULL,
+  `courseID` int(11) NOT NULL,
+  `messageText` text NOT NULL,
+  `createdAt` datetime DEFAULT current_timestamp(),
+  `isRead` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `inboxprof`
+--
+
+INSERT INTO `inboxprof` (`inboxProfID`, `courseID`, `messageText`, `createdAt`, `isRead`) VALUES
+(1, 1, 'Test #1 is completed.', '2025-11-20 21:10:50', 0),
+(2, 2, 'Hello!', '2025-11-20 21:43:31', 0);
 
 -- --------------------------------------------------------
 
@@ -616,7 +654,7 @@ CREATE TABLE `lessons` (
 --
 
 INSERT INTO `lessons` (`lessonID`, `courseID`, `lessonTitle`, `lessonDescription`, `createdAt`) VALUES
-(1, 1, 'Lesson 1: Introduction to CSS Grid', '1. Explain what HTML is and its role in web development.\n2. Identify the basic structure of an HTML document.\n3. Use common HTML tags such as headings, paragraphs, and links. \n4. Create a simple webpage using basic HTML elements.', '2025-08-30 09:00:00'),
+(1, 1, 'Lesson 1: Introduction to CSS Grid', '<strong>1. Explain what HTML is and its role in web development.\r\n2. Identify the basic structure of an HTML document.\r\n3. Use common HTML tags such as headings, paragraphs, and links. \r\n4. Create a simple webpage using basic HTML elements.</strong>', '2025-11-20 22:45:50'),
 (2, 34, 'Lesson Mo', 'LESSONSSSS', '2025-11-17 14:37:12');
 
 -- --------------------------------------------------------
@@ -869,7 +907,7 @@ CREATE TABLE `profile` (
 
 INSERT INTO `profile` (`profileID`, `userID`, `bio`, `webstars`, `emblemID`, `coverImageID`, `colorThemeID`, `starCard`) VALUES
 (1, 2, 'Welcome to my Webstar profile!', 2132, 7, 17, 9, 2),
-(2, 4, 'Welcome to my Webstar profile!', 700, 1, 1, 1, 2);
+(2, 1, 'Welcome to my Webstar profile!!', 700, 7, 15, 11, 2);
 
 -- --------------------------------------------------------
 
@@ -918,19 +956,19 @@ CREATE TABLE `report` (
 --
 
 INSERT INTO `report` (`reportID`, `enrollmentID`, `totalXP`, `allTimeRank`, `generatedAt`) VALUES
-(1, 1, 480, 1, '2025-11-20 02:45:43'),
-(2, 3, 0, 3, '2025-11-20 02:45:43'),
-(3, 8, 0, 8, '2025-11-20 02:45:43'),
-(4, 6, 0, 6, '2025-11-20 02:45:43'),
-(5, 11, 0, 11, '2025-11-20 02:45:43'),
-(6, 10, 0, 10, '2025-11-20 02:45:43'),
-(7, 5, 0, 5, '2025-11-20 02:45:43'),
-(8, 7, 0, 7, '2025-11-20 02:45:43'),
-(9, 9, 0, 9, '2025-11-20 02:45:43'),
-(10, 4, 0, 4, '2025-11-20 02:45:43'),
-(11, 12, 0, 2, '2025-11-20 02:45:43'),
+(1, 1, 480, 1, '2025-11-20 22:33:28'),
+(2, 3, 0, 6, '2025-11-20 22:33:29'),
+(3, 8, 0, 11, '2025-11-20 22:33:29'),
+(4, 6, 0, 9, '2025-11-20 22:33:29'),
+(5, 11, 0, 4, '2025-11-20 22:33:28'),
+(6, 10, 0, 3, '2025-11-20 22:33:28'),
+(7, 5, 0, 8, '2025-11-20 22:33:29'),
+(8, 7, 0, 10, '2025-11-20 22:33:29'),
+(9, 9, 0, 2, '2025-11-20 22:33:28'),
+(10, 4, 0, 7, '2025-11-20 22:33:29'),
+(11, 12, 0, 5, '2025-11-20 22:33:28'),
 (12, 2, 0, 1, '2025-11-17 18:25:49'),
-(13, 14, 1334, 1, '2025-11-17 18:28:07'),
+(13, 14, 1334, 1, '2025-11-20 22:07:12'),
 (14, 15, 0, 1, '2025-11-17 16:06:49');
 
 -- --------------------------------------------------------
@@ -1039,7 +1077,8 @@ INSERT INTO `settings` (`settingsID`, `userID`, `courseUpdateEnabled`, `questDea
 (9, 9, 0, 0, 0),
 (10, 10, 0, 0, 0),
 (11, 11, 0, 0, 0),
-(12, 12, 0, 0, 0);
+(12, 12, 0, 0, 0),
+(18, 1, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -1276,12 +1315,13 @@ CREATE TABLE `todo` (
 --
 
 INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `status`, `updatedAt`, `isRead`, `timeSpent`, `timeStart`) VALUES
-(1, 2, 1, 'Pending', '2025-11-17 15:17:07', 1, NULL, NULL),
+(1, 2, 1, 'Missing', '2025-11-20 22:23:27', 1, NULL, NULL),
 (13, 2, 3, 'Pending', '2025-11-17 15:22:53', 1, NULL, NULL),
 (14, 2, 4, 'Submitted', '2025-11-17 15:36:13', 1, 60, '2025-11-17 15:35:13'),
 (15, 2, 5, 'Returned', '2025-11-17 15:42:31', 1, 120, '2025-11-17 15:38:34'),
 (16, 2, 7, 'Graded', '2025-11-17 17:40:23', 1, NULL, NULL),
-(17, 2, 8, 'Pending', '2025-11-17 18:20:10', 1, NULL, NULL);
+(17, 2, 8, 'Pending', '2025-11-17 18:20:10', 1, NULL, NULL),
+(19, 2, 1, 'Missing', '2025-11-20 22:23:27', 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1314,8 +1354,8 @@ CREATE TABLE `userinfo` (
 --
 
 INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `middleName`, `lastName`, `studentID`, `programID`, `gender`, `yearLevel`, `yearSection`, `schoolEmail`, `facebookLink`, `linkedInLink`, `githubLink`, `createdAt`, `isNewUser`) VALUES
-(1, 2, 'defaultProfile.png', 'James', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 1, 'jane.smith@university.edu', '', '', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
-(2, 1, 'defaultProfile.png', 'Christopher Jay', '', 'De Claro', '202310002', '1', 'Male', '2', 1, 'james.dom@university.edu', 'https://facebook.com/james.dom', 'https://linkedin.com/in/james-dom', 'https://instagram.com/james.dom', '2025-08-30 08:18:53', 1),
+(1, 2, 'profile_2_1763647453.jpg', 'James', 'Mendoza', 'Smith', '202310001', '1', 'Female', '2', 1, 'jane.smith@university.edu', '', '', 'https://instagram.com/jane.smith', '2025-08-30 08:18:53', 0),
+(2, 1, 'profile_1_1763650516.jpg', 'Christopher Jay', '', 'De Claro', '202310002', '1', 'Male', '1', 1, 'james.dom@university.edu', '', '', '', '2025-08-30 08:18:53', 1),
 (3, 3, 'defaultProfile.png', 'John', 'Cruz', 'Doe', '202310003', '1', 'Male', '2', 1, 'john.doe@university.edu', '', '', '', '2025-09-28 11:58:33', 0),
 (4, 4, 'defaultProfile.png', 'Michael', 'A.', 'Lee', '202310003', '1', 'Male', '2', 1, 'michael.lee@school.edu', NULL, NULL, NULL, '2025-09-28 20:59:48', 0),
 (5, 5, 'defaultProfile.png', 'Sophia', 'B.', 'Garcia', '202310004', '1', 'Female', '2', 1, 'sophia.garcia@school.edu', 'facebook.com/sophia.garcia', 'linkedin.com/in/sophiagarcia', 'instagram.com/sophia.garcia', '2025-09-28 20:59:48', 1),
@@ -1354,9 +1394,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`, `status`) VALUES
-(1, 'Password123', 'john.doe@gmail.com', 'professor', 'johndoe', 'Active'),
+(1, 'Password123', 'john.doe@gmail.com', 'professor', 'jay', 'Active'),
 (2, 'Hello@world', 'jane.smith@gmail.com', 'student', 'janesmith', 'Active'),
-(3, 'HelloWorld', 'john.doe2@gmail.com', 'student', 'JohnDoe', 'Active'),
+(3, 'HelloWorld', 'john.doe2@gmail.com', 'student', 'JohnDoee', 'Active'),
 (4, 'password123', 'michael.lee@gmail.com', 'student', 'michael_lee', 'Active'),
 (5, 'securePass!1', 'sophia.garcia@gmail.com', 'student', 'sophia_garcia', 'Active'),
 (6, 'helloWorld9', 'daniel.kim@gmail.com', 'student', 'daniel_kim', 'Active'),
@@ -1414,7 +1454,21 @@ CREATE TABLE `visits` (
 --
 
 INSERT INTO `visits` (`visitID`, `dateVisited`) VALUES
-(1, '2025-11-20 02:45:32');
+(1, '2025-11-20 02:45:32'),
+(2, '2025-11-20 21:27:05'),
+(3, '2025-11-20 22:01:45'),
+(4, '2025-11-20 22:33:37'),
+(5, '2025-11-20 22:43:11'),
+(6, '2025-11-20 22:43:20'),
+(7, '2025-11-20 22:46:08'),
+(8, '2025-11-20 22:52:45'),
+(9, '2025-11-20 22:52:56'),
+(10, '2025-11-20 22:53:20'),
+(11, '2025-11-20 22:53:31'),
+(12, '2025-11-20 22:55:30'),
+(13, '2025-11-20 23:03:12'),
+(14, '2025-11-20 23:17:47'),
+(15, '2025-11-20 23:23:49');
 
 -- --------------------------------------------------------
 
@@ -1562,6 +1616,12 @@ ALTER TABLE `files`
 --
 ALTER TABLE `inbox`
   ADD PRIMARY KEY (`inboxID`);
+
+--
+-- Indexes for table `inboxprof`
+--
+ALTER TABLE `inboxprof`
+  ADD PRIMARY KEY (`inboxProfID`);
 
 --
 -- Indexes for table `leaderboard`
@@ -1734,13 +1794,13 @@ ALTER TABLE `announcements`
 -- AUTO_INCREMENT for table `assessments`
 --
 ALTER TABLE `assessments`
-  MODIFY `assessmentID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `assessmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `assignments`
 --
 ALTER TABLE `assignments`
-  MODIFY `assignmentID` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `assignmentID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `badges`
@@ -1800,7 +1860,7 @@ ALTER TABLE `enrollments`
 -- AUTO_INCREMENT for table `feedback`
 --
 ALTER TABLE `feedback`
-  MODIFY `feedbackID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `feedbackID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `files`
@@ -1812,7 +1872,13 @@ ALTER TABLE `files`
 -- AUTO_INCREMENT for table `inbox`
 --
 ALTER TABLE `inbox`
-  MODIFY `inboxID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `inboxID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+
+--
+-- AUTO_INCREMENT for table `inboxprof`
+--
+ALTER TABLE `inboxprof`
+  MODIFY `inboxProfID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `leaderboard`
@@ -1878,7 +1944,7 @@ ALTER TABLE `selectedlevels`
 -- AUTO_INCREMENT for table `settings`
 --
 ALTER TABLE `settings`
-  MODIFY `settingsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `settingsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `studentbadges`
@@ -1926,7 +1992,7 @@ ALTER TABLE `tests`
 -- AUTO_INCREMENT for table `todo`
 --
 ALTER TABLE `todo`
-  MODIFY `todoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `todoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `userinfo`
@@ -1944,7 +2010,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `visits`
 --
 ALTER TABLE `visits`
-  MODIFY `visitID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `visitID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `webstars`

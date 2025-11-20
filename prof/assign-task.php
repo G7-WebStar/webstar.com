@@ -1472,31 +1472,28 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
-</body>
-
-</html>
-<script>
-    // Pass reused files from PHP to JavaScript
-    const reusedFiles = <?= json_encode($files) ?>;
-</script>
-
-<?php if (!empty($files)): ?>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const container = document.getElementById('filePreviewContainer');
-            if (!container) return;
+        // Pass reused files from PHP to JavaScript
+        const reusedFiles = <?= json_encode($files) ?>;
+    </script>
 
-            <?php foreach ($files as $file): ?>
-                <?php if (!empty($file['fileLink'])): ?>
-                        // Render Link Preview
-                        (function () {
-                            const linkValue = <?php echo json_encode($file['fileLink']); ?>;
-                            const uniqueID = Date.now() + Math.floor(Math.random() * 1000);
-                            try {
-                                const urlObj = new URL(linkValue);
-                                const domain = urlObj.hostname;
-                                const faviconURL = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
-                                const html = `
+    <?php if (!empty($files)): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const container = document.getElementById('filePreviewContainer');
+                if (!container) return;
+
+                <?php foreach ($files as $file): ?>
+                    <?php if (!empty($file['fileLink'])): ?>
+                            // Render Link Preview
+                            (function () {
+                                const linkValue = <?php echo json_encode($file['fileLink']); ?>;
+                                const uniqueID = Date.now() + Math.floor(Math.random() * 1000);
+                                try {
+                                    const urlObj = new URL(linkValue);
+                                    const domain = urlObj.hostname;
+                                    const faviconURL = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
+                                    const html = `
                         <div class="col-12 my-1" data-id="${uniqueID}">
                             <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
                                 <div class="d-flex w-100 align-items-center justify-content-between">
@@ -1520,23 +1517,23 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                             </div>
                             <input type="hidden" name="links[]" value="${linkValue}" class="link-hidden">
                         </div>`;
-                                container.insertAdjacentHTML('beforeend', html);
-                            } catch (e) { }
-                        })();
-                <?php elseif (!empty($file['fileAttachment'])): ?>
-                        // Render File Preview
-                        (function () {
-                            const fileName = <?php echo json_encode($file['fileTitle'] ?: basename($file['fileAttachment'])); ?>;
-                            const ext = fileName.split('.').pop().toUpperCase();
-                            const uniqueID = Date.now() + Math.floor(Math.random() * 1000);
-                            <?php
-                            $filePath = "../shared/assets/files/" . $file['fileAttachment'];
-                            $fileExt = strtoupper(pathinfo($file['fileAttachment'], PATHINFO_EXTENSION));
-                            $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
-                            $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
-                            ?>
+                                    container.insertAdjacentHTML('beforeend', html);
+                                } catch (e) { }
+                            })();
+                    <?php elseif (!empty($file['fileAttachment'])): ?>
+                            // Render File Preview
+                            (function () {
+                                const fileName = <?php echo json_encode($file['fileTitle'] ?: basename($file['fileAttachment'])); ?>;
+                                const ext = fileName.split('.').pop().toUpperCase();
+                                const uniqueID = Date.now() + Math.floor(Math.random() * 1000);
+                                <?php
+                                $filePath = "../shared/assets/files/" . $file['fileAttachment'];
+                                $fileExt = strtoupper(pathinfo($file['fileAttachment'], PATHINFO_EXTENSION));
+                                $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
+                                $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
+                                ?>
 
-                            const html = `
+                                const html = `
                     <div class="col-12 my-1 file-preview">
                         <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
                             <div class="d-flex w-100 align-items-center justify-content-between">
@@ -1559,530 +1556,533 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                         </div>
                         <input type="hidden" name="existingFiles[]" value="<?php echo htmlspecialchars($file['fileAttachment']); ?>">
                     </div>`;
-                            container.insertAdjacentHTML('beforeend', html);
-                        })();
-                <?php endif; ?>
-            <?php endforeach; ?>
-        });
-        //  Enable delete buttons for preloaded (reused) items
-        document.addEventListener('click', function (event) {
-            if (event.target.closest('.delete-file')) {
-                const col = event.target.closest('.col-12');
-                if (col) col.remove();
+                                container.insertAdjacentHTML('beforeend', html);
+                            })();
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            });
+            //  Enable delete buttons for preloaded (reused) items
+            document.addEventListener('click', function (event) {
+                if (event.target.closest('.delete-file')) {
+                    const col = event.target.closest('.col-12');
+                    if (col) col.remove();
+                }
+            });
+
+        </script>
+    <?php endif; ?>
+
+    <!-- Rubric JS -->
+    <script>
+        // Auto-open rubric modal when returning from create-rubric
+        (function () {
+            function openRubricModal() {
+                var modalEl = document.getElementById('selectRubricModal');
+                if (!modalEl) return;
+                var modal = new bootstrap.Modal(modalEl);
+                // slight delay to ensure layout ready
+                setTimeout(function () { modal.show(); }, 50);
             }
+            function needsOpen() {
+                try {
+                    var params = new URLSearchParams(window.location.search);
+                    if (params.get('openRubric') === '1') return true;
+                } catch (e) { }
+                // also support hash trigger
+                if (window.location.hash === '#openRubric') return true;
+                return false;
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function () { if (needsOpen()) openRubricModal(); });
+            } else {
+                if (needsOpen()) openRubricModal();
+            }
+        })();
+
+        var selectedRubric = null;
+        (function () {
+            // Only run if the card exists
+            var cardRow = document.querySelector('.row.mb-0.mt-3');
+            if (!cardRow) return;
+
+            var hiddenInput = document.getElementById('selectedRubricID');
+            var titleDiv = cardRow.querySelector('.text-sbold.text-16');
+            var infoDiv = cardRow.querySelector('.text-reg.text-12');
+
+            // Check if PHP has an active rubric
+            var hasActiveRubric = cardRow.dataset.hasRubric === '1';
+            if (hasActiveRubric && hiddenInput) {
+                // Populate hidden input
+                hiddenInput.value = "<?= $activeRubric['rubricID'] ?? '' ?>";
+
+                // Populate card content
+                titleDiv.textContent = "<?= addslashes($activeRubric['rubricTitle'] ?? '') ?>";
+                infoDiv.textContent = "<?= ($activeRubric['totalPoints'] ?? 0) ?> Points · <?= intval($activeRubric['criteriaCount'] ?? 0) ?> Criteria";
+
+                // Also set selectedRubric JS variable
+                window.selectedRubric = {
+                    id: "<?= $activeRubric['rubricID'] ?? '' ?>",
+                    title: "<?= addslashes($activeRubric['rubricTitle'] ?? '') ?>",
+                    points: "<?= ($activeRubric['totalPoints'] ?? 0) ?>",
+                    criteria: "<?= intval($activeRubric['criteriaCount'] ?? 0) ?>"
+                };
+
+                // Ensure card is visible
+                cardRow.style.display = '';
+            }
+        })();
+
+
+        // Click on a rubric option: highlight and store selection
+        document.addEventListener('click', function (e) {
+            var opt = e.target.closest && e.target.closest('.rubric-option');
+            if (!opt) return;
+
+            // Clear previous highlight
+            document.querySelectorAll('.rubric-option').forEach(function (el) {
+                el.style.backgroundColor = 'var(--pureWhite)';
+            });
+            // Highlight selected (yellow)
+            opt.style.backgroundColor = 'var(--primaryColor)';
+
+            selectedRubric = {
+                id: opt.getAttribute('data-rubric-id'),
+                title: opt.getAttribute('data-rubric-title'),
+                points: opt.getAttribute('data-rubric-points'),
+                criteria: opt.getAttribute('data-rubric-criteria')
+            };
+        });
+
+        // Confirm selection: apply to card and close modal
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest && e.target.closest('#confirmRubricBtn');
+            if (!btn) return;
+            if (!selectedRubric) return;
+
+            var cardRow = document.querySelector('.row.mb-0.mt-3');
+            if (cardRow) cardRow.style.display = '';
+            var titleEl = document.querySelector('.rubric-card .text-sbold.text-16');
+            var metaEl = document.querySelector('.rubric-card .text-reg.text-12');
+            if (titleEl) titleEl.textContent = selectedRubric.title;
+            if (metaEl) metaEl.textContent = selectedRubric.points + ' Points · ' + selectedRubric.criteria + ' Criteria';
+
+            // Also reflect total points into the Points input field
+            try {
+                var ptsInput = document.querySelector('#rubricPointsInput'); // add an ID to the points input
+                if (ptsInput) ptsInput.value = selectedRubric.points;
+
+            } catch (e) { }
+
+            var modalEl = document.getElementById('selectRubricModal');
+            if (modalEl) {
+                var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                modal.hide();
+            }
+        });
+
+        // Close rubric card
+        document.addEventListener('click', function (e) {
+            const closeIcon = e.target.closest('.rubric-card .material-symbols-outlined');
+            if (!closeIcon) return;
+
+            const cardRow = closeIcon.closest('.row.mb-0.mt-3');
+            if (cardRow) cardRow.style.display = 'none';
+
+            // Clear selection
+            selectedRubric = null;
+            const hiddenInput = document.getElementById('selectedRubricID');
+            if (hiddenInput) hiddenInput.value = '';
+
+            // Clear card text
+            const titleDiv = cardRow.querySelector('.text-sbold.text-16');
+            const infoDiv = cardRow.querySelector('.text-reg.text-12');
+            if (titleDiv) titleDiv.textContent = '';
+            if (infoDiv) infoDiv.textContent = '';
+
+            // Reset modal option highlights
+            document.querySelectorAll('.rubric-option').forEach(el => {
+                el.style.backgroundColor = 'var(--pureWhite)';
+            });
         });
 
     </script>
-<?php endif; ?>
 
-<!-- Rubric JS -->
-<script>
-    // Auto-open rubric modal when returning from create-rubric
-    (function () {
-        function openRubricModal() {
-            var modalEl = document.getElementById('selectRubricModal');
-            if (!modalEl) return;
-            var modal = new bootstrap.Modal(modalEl);
-            // slight delay to ensure layout ready
-            setTimeout(function () { modal.show(); }, 50);
-        }
-        function needsOpen() {
-            try {
-                var params = new URLSearchParams(window.location.search);
-                if (params.get('openRubric') === '1') return true;
-            } catch (e) { }
-            // also support hash trigger
-            if (window.location.hash === '#openRubric') return true;
-            return false;
-        }
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function () { if (needsOpen()) openRubricModal(); });
-        } else {
-            if (needsOpen()) openRubricModal();
-        }
-    })();
+    <!-- Assign Task JS -->
+    <script>
+        // Persist Assign Task form fields using localStorage so input survives navigating away and back
+        (function () {
+            var STORAGE_KEY = 'assignTaskDraft_v1';
+            var NAVIGATION_FLAG = 'assignTaskNavigatedAway_v1';
 
-    var selectedRubric = null;
-    (function () {
-        // Only run if the card exists
-        var cardRow = document.querySelector('.row.mb-0.mt-3');
-        if (!cardRow) return;
+            function getElementById(id) { return document.getElementById(id); }
 
-        var hiddenInput = document.getElementById('selectedRubricID');
-        var titleDiv = cardRow.querySelector('.text-sbold.text-16');
-        var infoDiv = cardRow.querySelector('.text-reg.text-12');
+            function getDeadlineInput() { return document.querySelector('input[name="deadline"]'); }
+            function getPointsInput() { return document.querySelector('input[name="points"]'); }
 
-        // Check if PHP has an active rubric
-        var hasActiveRubric = cardRow.dataset.hasRubric === '1';
-        if (hasActiveRubric && hiddenInput) {
-            // Populate hidden input
-            hiddenInput.value = "<?= $activeRubric['rubricID'] ?? '' ?>";
-
-            // Populate card content
-            titleDiv.textContent = "<?= addslashes($activeRubric['rubricTitle'] ?? '') ?>";
-            infoDiv.textContent = "<?= ($activeRubric['totalPoints'] ?? 0) ?> Points · <?= intval($activeRubric['criteriaCount'] ?? 0) ?> Criteria";
-
-            // Also set selectedRubric JS variable
-            window.selectedRubric = {
-                id: "<?= $activeRubric['rubricID'] ?? '' ?>",
-                title: "<?= addslashes($activeRubric['rubricTitle'] ?? '') ?>",
-                points: "<?= ($activeRubric['totalPoints'] ?? 0) ?>",
-                criteria: "<?= intval($activeRubric['criteriaCount'] ?? 0) ?>"
-            };
-
-            // Ensure card is visible
-            cardRow.style.display = '';
-        }
-    })();
-
-
-    // Click on a rubric option: highlight and store selection
-    document.addEventListener('click', function (e) {
-        var opt = e.target.closest && e.target.closest('.rubric-option');
-        if (!opt) return;
-
-        // Clear previous highlight
-        document.querySelectorAll('.rubric-option').forEach(function (el) {
-            el.style.backgroundColor = 'var(--pureWhite)';
-        });
-        // Highlight selected (yellow)
-        opt.style.backgroundColor = 'var(--primaryColor)';
-
-        selectedRubric = {
-            id: opt.getAttribute('data-rubric-id'),
-            title: opt.getAttribute('data-rubric-title'),
-            points: opt.getAttribute('data-rubric-points'),
-            criteria: opt.getAttribute('data-rubric-criteria')
-        };
-    });
-
-    // Confirm selection: apply to card and close modal
-    document.addEventListener('click', function (e) {
-        var btn = e.target.closest && e.target.closest('#confirmRubricBtn');
-        if (!btn) return;
-        if (!selectedRubric) return;
-
-        var cardRow = document.querySelector('.row.mb-0.mt-3');
-        if (cardRow) cardRow.style.display = '';
-        var titleEl = document.querySelector('.rubric-card .text-sbold.text-16');
-        var metaEl = document.querySelector('.rubric-card .text-reg.text-12');
-        if (titleEl) titleEl.textContent = selectedRubric.title;
-        if (metaEl) metaEl.textContent = selectedRubric.points + ' Points · ' + selectedRubric.criteria + ' Criteria';
-
-        // Also reflect total points into the Points input field
-        try {
-            var ptsInput = document.querySelector('#rubricPointsInput'); // add an ID to the points input
-            if (ptsInput) ptsInput.value = selectedRubric.points;
-
-        } catch (e) { }
-
-        var modalEl = document.getElementById('selectRubricModal');
-        if (modalEl) {
-            var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-            modal.hide();
-        }
-    });
-
-    // Close rubric card
-    document.addEventListener('click', function (e) {
-        const closeIcon = e.target.closest('.rubric-card .material-symbols-outlined');
-        if (!closeIcon) return;
-
-        const cardRow = closeIcon.closest('.row.mb-0.mt-3');
-        if (cardRow) cardRow.style.display = 'none';
-
-        // Clear selection
-        selectedRubric = null;
-        const hiddenInput = document.getElementById('selectedRubricID');
-        if (hiddenInput) hiddenInput.value = '';
-
-        // Clear card text
-        const titleDiv = cardRow.querySelector('.text-sbold.text-16');
-        const infoDiv = cardRow.querySelector('.text-reg.text-12');
-        if (titleDiv) titleDiv.textContent = '';
-        if (infoDiv) infoDiv.textContent = '';
-
-        // Reset modal option highlights
-        document.querySelectorAll('.rubric-option').forEach(el => {
-            el.style.backgroundColor = 'var(--pureWhite)';
-        });
-    });
-
-</script>
-
-<!-- Assign Task JS -->
-<script>
-    // Persist Assign Task form fields using localStorage so input survives navigating away and back
-    (function () {
-        var STORAGE_KEY = 'assignTaskDraft_v1';
-        var NAVIGATION_FLAG = 'assignTaskNavigatedAway_v1';
-
-        function getElementById(id) { return document.getElementById(id); }
-
-        function getDeadlineInput() { return document.querySelector('input[name="deadline"]'); }
-        function getPointsInput() { return document.querySelector('input[name="points"]'); }
-
-        function getSelectedCourseIds() {
-            var selectedIds = [];
-            var courseCheckboxes = document.querySelectorAll('.course-checkbox');
-            for (var i = 0; i < courseCheckboxes.length; i++) {
-                if (courseCheckboxes[i].checked) selectedIds.push(courseCheckboxes[i].value);
-            }
-            return selectedIds;
-        }
-
-        function getCurrentLinks() {
-            var links = [];
-            var hiddenLinkInputs = document.querySelectorAll('#filePreviewContainer input.link-hidden');
-            for (var i = 0; i < hiddenLinkInputs.length; i++) {
-                var value = hiddenLinkInputs[i].value;
-                if (value && value.trim() !== '') links.push(value.trim());
-            }
-            return links;
-        }
-
-        function saveDraftToStorage() {
-            try {
-                var titleInput = getElementById('taskInfo');
-                var deadlineInput = getDeadlineInput();
-                var pointsInput = getPointsInput();
-                var stopCheckbox = getElementById('stopSubmissions');
-                var draft = {
-                    assignmentTitle: titleInput ? titleInput.value : '',
-                    assignmentContentHtml: (typeof quill !== 'undefined' ? quill.root.innerHTML : ''),
-                    deadline: deadlineInput ? deadlineInput.value : '',
-                    points: pointsInput ? pointsInput.value : '',
-                    stopSubmissions: stopCheckbox ? !!stopCheckbox.checked : false,
-                    courses: getSelectedCourseIds(),
-                    links: getCurrentLinks()
-                };
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
-            } catch (e) { }
-        }
-
-        function clearDraftInStorage() {
-            try { localStorage.removeItem(STORAGE_KEY); } catch (e) { }
-        }
-
-        function appendLinkPreview(linkValue) {
-            var container = document.getElementById('filePreviewContainer');
-            if (!container || !linkValue) return;
-            var uniqueId = Date.now() + Math.floor(Math.random() * 1000);
-            var domain = '';
-            try { var urlObj = new URL(linkValue); domain = urlObj.hostname; } catch (e) { domain = linkValue; }
-            var faviconUrl = 'https://www.google.com/s2/favicons?sz=64&domain=' + domain;
-            var html = '' +
-                '<div class="col-12 my-1" data-id="' + uniqueId + '">' +
-                '  <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">' +
-                '    <div class="d-flex w-100 align-items-center justify-content-between">' +
-                '      <div class="d-flex align-items-center flex-grow-1">' +
-                '        <div class="mx-3 d-flex align-items-center">' +
-                '          <img src="' + faviconUrl + '" alt="' + domain + ' Icon" onerror="this.onerror=null;this.src=\'../shared/assets/img/web.png\';" style="width: 30px; height: 30px;">' +
-                '        </div>' +
-                '        <div>' +
-                '          <div id="title-' + uniqueId + '" class="text-sbold text-16" style="line-height: 1.5;">' + linkValue + '</div>' +
-                '          <div class="text-reg text-12 text-break" style="line-height: 1.5;"><a href="' + linkValue + '" target="_blank">' + linkValue + '</a></div>' +
-                '        </div>' +
-                '      </div>' +
-                '      <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">' +
-                '        <span class="material-symbols-outlined">close</span>' +
-                '      </div>' +
-                '    </div>' +
-                '  </div>' +
-                '  <input type="hidden" name="links[]" value="' + linkValue + '" class="link-hidden">' +
-                '</div>';
-            container.insertAdjacentHTML('beforeend', html);
-        }
-
-        function hasUserEnteredData(draft) {
-            if (!draft) return false;
-            var title = draft.assignmentTitle ? draft.assignmentTitle.trim() : '';
-            if (title !== '') return true;
-            var content = draft.assignmentContentHtml ? draft.assignmentContentHtml.trim() : '';
-            if (content !== '' && content !== '<p><br></p>' && content !== '<p></p>') return true;
-            var deadline = draft.deadline ? draft.deadline.trim() : '';
-            if (deadline !== '') return true;
-            var points = draft.points ? draft.points.trim() : '';
-            if (points !== '') return true;
-            if (draft.stopSubmissions === true) return true;
-            if (draft.courses && Array.isArray(draft.courses) && draft.courses.length > 0) return true;
-            if (draft.links && Array.isArray(draft.links) && draft.links.length > 0) return true;
-            return false;
-        }
-
-        function clearAllFormFields() {
-            try {
-                var titleInput = getElementById('taskInfo');
-                if (titleInput) titleInput.value = '';
-                var deadlineInput = getDeadlineInput();
-                if (deadlineInput) deadlineInput.value = '';
-                var pointsInput = getPointsInput();
-                if (pointsInput) pointsInput.value = '';
-                var stopCheckbox = getElementById('stopSubmissions');
-                if (stopCheckbox) stopCheckbox.checked = false;
+            function getSelectedCourseIds() {
+                var selectedIds = [];
                 var courseCheckboxes = document.querySelectorAll('.course-checkbox');
-                for (var i = 0; i < courseCheckboxes.length; i++) courseCheckboxes[i].checked = false;
-                var container = document.getElementById('filePreviewContainer');
-                if (container) container.innerHTML = '';
-                if (typeof quill !== 'undefined' && quill.root) {
-                    quill.root.innerHTML = '';
+                for (var i = 0; i < courseCheckboxes.length; i++) {
+                    if (courseCheckboxes[i].checked) selectedIds.push(courseCheckboxes[i].value);
                 }
-            } catch (e) { }
-        }
-
-        function restoreDraftFromStorage() {
-            var raw = null;
-            try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { }
-            if (!raw) {
-                clearAllFormFields();
-                return;
-            }
-            var draft = null;
-            try { draft = JSON.parse(raw); } catch (e) {
-                draft = null;
-                clearDraftInStorage();
-                clearAllFormFields();
-                return;
-            }
-            if (!draft) {
-                clearAllFormFields();
-                return;
+                return selectedIds;
             }
 
-            // Only restore if there's actual user-entered data (not just empty defaults)
-            if (!hasUserEnteredData(draft)) {
-                clearDraftInStorage();
-                clearAllFormFields();
-                return;
+            function getCurrentLinks() {
+                var links = [];
+                var hiddenLinkInputs = document.querySelectorAll('#filePreviewContainer input.link-hidden');
+                for (var i = 0; i < hiddenLinkInputs.length; i++) {
+                    var value = hiddenLinkInputs[i].value;
+                    if (value && value.trim() !== '') links.push(value.trim());
+                }
+                return links;
             }
 
-            try {
-                var titleInput = getElementById('taskInfo');
-                if (titleInput) titleInput.value = draft.assignmentTitle || '';
+            function saveDraftToStorage() {
+                try {
+                    var titleInput = getElementById('taskInfo');
+                    var deadlineInput = getDeadlineInput();
+                    var pointsInput = getPointsInput();
+                    var stopCheckbox = getElementById('stopSubmissions');
+                    var draft = {
+                        assignmentTitle: titleInput ? titleInput.value : '',
+                        assignmentContentHtml: (typeof quill !== 'undefined' ? quill.root.innerHTML : ''),
+                        deadline: deadlineInput ? deadlineInput.value : '',
+                        points: pointsInput ? pointsInput.value : '',
+                        stopSubmissions: stopCheckbox ? !!stopCheckbox.checked : false,
+                        courses: getSelectedCourseIds(),
+                        links: getCurrentLinks()
+                    };
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+                } catch (e) { }
+            }
 
-                if (typeof quill !== 'undefined' && draft.assignmentContentHtml) {
-                    var contentHtml = draft.assignmentContentHtml;
-                    if (contentHtml && contentHtml.trim() !== '' && contentHtml !== '<p><br></p>') {
-                        quill.root.innerHTML = contentHtml;
+            function clearDraftInStorage() {
+                try { localStorage.removeItem(STORAGE_KEY); } catch (e) { }
+            }
+
+            function appendLinkPreview(linkValue) {
+                var container = document.getElementById('filePreviewContainer');
+                if (!container || !linkValue) return;
+                var uniqueId = Date.now() + Math.floor(Math.random() * 1000);
+                var domain = '';
+                try { var urlObj = new URL(linkValue); domain = urlObj.hostname; } catch (e) { domain = linkValue; }
+                var faviconUrl = 'https://www.google.com/s2/favicons?sz=64&domain=' + domain;
+                var html = '' +
+                    '<div class="col-12 my-1" data-id="' + uniqueId + '">' +
+                    '  <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">' +
+                    '    <div class="d-flex w-100 align-items-center justify-content-between">' +
+                    '      <div class="d-flex align-items-center flex-grow-1">' +
+                    '        <div class="mx-3 d-flex align-items-center">' +
+                    '          <img src="' + faviconUrl + '" alt="' + domain + ' Icon" onerror="this.onerror=null;this.src=\'../shared/assets/img/web.png\';" style="width: 30px; height: 30px;">' +
+                    '        </div>' +
+                    '        <div>' +
+                    '          <div id="title-' + uniqueId + '" class="text-sbold text-16" style="line-height: 1.5;">' + linkValue + '</div>' +
+                    '          <div class="text-reg text-12 text-break" style="line-height: 1.5;"><a href="' + linkValue + '" target="_blank">' + linkValue + '</a></div>' +
+                    '        </div>' +
+                    '      </div>' +
+                    '      <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">' +
+                    '        <span class="material-symbols-outlined">close</span>' +
+                    '      </div>' +
+                    '    </div>' +
+                    '  </div>' +
+                    '  <input type="hidden" name="links[]" value="' + linkValue + '" class="link-hidden">' +
+                    '</div>';
+                container.insertAdjacentHTML('beforeend', html);
+            }
+
+            function hasUserEnteredData(draft) {
+                if (!draft) return false;
+                var title = draft.assignmentTitle ? draft.assignmentTitle.trim() : '';
+                if (title !== '') return true;
+                var content = draft.assignmentContentHtml ? draft.assignmentContentHtml.trim() : '';
+                if (content !== '' && content !== '<p><br></p>' && content !== '<p></p>') return true;
+                var deadline = draft.deadline ? draft.deadline.trim() : '';
+                if (deadline !== '') return true;
+                var points = draft.points ? draft.points.trim() : '';
+                if (points !== '') return true;
+                if (draft.stopSubmissions === true) return true;
+                if (draft.courses && Array.isArray(draft.courses) && draft.courses.length > 0) return true;
+                if (draft.links && Array.isArray(draft.links) && draft.links.length > 0) return true;
+                return false;
+            }
+
+            function clearAllFormFields() {
+                try {
+                    var titleInput = getElementById('taskInfo');
+                    if (titleInput) titleInput.value = '';
+                    var deadlineInput = getDeadlineInput();
+                    if (deadlineInput) deadlineInput.value = '';
+                    var pointsInput = getPointsInput();
+                    if (pointsInput) pointsInput.value = '';
+                    var stopCheckbox = getElementById('stopSubmissions');
+                    if (stopCheckbox) stopCheckbox.checked = false;
+                    var courseCheckboxes = document.querySelectorAll('.course-checkbox');
+                    for (var i = 0; i < courseCheckboxes.length; i++) courseCheckboxes[i].checked = false;
+                    var container = document.getElementById('filePreviewContainer');
+                    if (container) container.innerHTML = '';
+                    if (typeof quill !== 'undefined' && quill.root) {
+                        quill.root.innerHTML = '';
+                    }
+                } catch (e) { }
+            }
+
+            function restoreDraftFromStorage() {
+                var raw = null;
+                try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { }
+                if (!raw) {
+                    clearAllFormFields();
+                    return;
+                }
+                var draft = null;
+                try { draft = JSON.parse(raw); } catch (e) {
+                    draft = null;
+                    clearDraftInStorage();
+                    clearAllFormFields();
+                    return;
+                }
+                if (!draft) {
+                    clearAllFormFields();
+                    return;
+                }
+
+                // Only restore if there's actual user-entered data (not just empty defaults)
+                if (!hasUserEnteredData(draft)) {
+                    clearDraftInStorage();
+                    clearAllFormFields();
+                    return;
+                }
+
+                try {
+                    var titleInput = getElementById('taskInfo');
+                    if (titleInput) titleInput.value = draft.assignmentTitle || '';
+
+                    if (typeof quill !== 'undefined' && draft.assignmentContentHtml) {
+                        var contentHtml = draft.assignmentContentHtml;
+                        if (contentHtml && contentHtml.trim() !== '' && contentHtml !== '<p><br></p>') {
+                            quill.root.innerHTML = contentHtml;
+                        }
+                    }
+
+                    var deadlineInput = getDeadlineInput();
+                    if (deadlineInput) deadlineInput.value = draft.deadline || '';
+
+                    var pointsInput = getPointsInput();
+                    if (pointsInput) pointsInput.value = draft.points || '';
+
+                    var stopCheckbox = getElementById('stopSubmissions');
+                    if (stopCheckbox) stopCheckbox.checked = !!draft.stopSubmissions;
+
+                    var courseCheckboxes = document.querySelectorAll('.course-checkbox');
+                    var selectedMap = {};
+                    var i;
+                    if (draft.courses && draft.courses.length) {
+                        for (i = 0; i < draft.courses.length; i++) selectedMap[String(draft.courses[i])] = true;
+                    }
+                    for (i = 0; i < courseCheckboxes.length; i++) {
+                        var value = String(courseCheckboxes[i].value);
+                        courseCheckboxes[i].checked = !!selectedMap[value];
+                    }
+
+                    if (draft.links && draft.links.length) {
+                        for (i = 0; i < draft.links.length; i++) appendLinkPreview(draft.links[i]);
+                    }
+                } catch (e) { }
+            }
+
+            function bindDraftPersistenceListeners() {
+                var form = document.querySelector('form');
+                if (form) {
+                    form.addEventListener('input', function () { saveDraftToStorage(); });
+                    form.addEventListener('change', function () { saveDraftToStorage(); });
+                    form.addEventListener('submit', function () {
+                        clearDraftInStorage();
+                        clearNavigationFlag();
+                    });
+                }
+                try {
+                    if (typeof quill !== 'undefined') {
+                        quill.on('text-change', function () { saveDraftToStorage(); });
+                    }
+                } catch (e) { }
+                document.addEventListener('click', function (event) {
+                    var isAddLink = event.target && event.target.id === 'addLinkBtn';
+                    var isDelete = event.target && (event.target.closest ? event.target.closest('.delete-file') : null);
+                    if (isAddLink || isDelete) { setTimeout(function () { saveDraftToStorage(); }, 0); }
+                });
+            }
+
+            function setNavigationFlag() {
+                try { localStorage.setItem(NAVIGATION_FLAG, '1'); } catch (e) { }
+            }
+
+            function clearNavigationFlag() {
+                try { localStorage.removeItem(NAVIGATION_FLAG); } catch (e) { }
+            }
+
+            function hasNavigatedAway() {
+                try {
+                    var flag = localStorage.getItem(NAVIGATION_FLAG);
+                    return flag === '1';
+                } catch (e) { return false; }
+            }
+
+            function checkAndClearOrRestore() {
+                try {
+                    var params = new URLSearchParams(window.location.search);
+                    var hasReuse = params.get('reuse');
+                    var hasEdit = params.get('edit');
+                    if (hasReuse || hasEdit) {
+                        clearDraftInStorage();
+                        clearNavigationFlag();
+                        bindDraftPersistenceListeners();
+                        return;
+                    }
+
+
+                    var hasSelectedRubric = params.get('selectedRubricID');
+                    var shouldRestore = hasNavigatedAway() || hasSelectedRubric;
+
+                    if (!shouldRestore) {
+                        clearNavigationFlag();
+                        clearAllFormFields();
+                        bindDraftPersistenceListeners();
+                        return;
+                    }
+
+                    clearNavigationFlag();
+
+                    var raw = localStorage.getItem(STORAGE_KEY);
+                    if (!raw) {
+                        bindDraftPersistenceListeners();
+                        return;
+                    }
+
+                    var draft = null;
+                    try { draft = JSON.parse(raw); } catch (e) {
+                        clearDraftInStorage();
+                        bindDraftPersistenceListeners();
+                        return;
+                    }
+
+                    if (!draft) {
+                        bindDraftPersistenceListeners();
+                        return;
+                    }
+
+                    if (!hasUserEnteredData(draft)) {
+                        clearDraftInStorage();
+                        bindDraftPersistenceListeners();
+                        return;
+                    }
+
+                    restoreDraftFromStorage();
+                    bindDraftPersistenceListeners();
+                } catch (e) {
+                    bindDraftPersistenceListeners();
+                }
+            }
+
+            function bindNavigationAwayListeners() {
+                document.addEventListener('click', function (event) {
+                    var link = event.target.closest ? event.target.closest('a') : null;
+                    if (!link || !link.href) return;
+                    var href = link.href;
+                    if (href.indexOf('create-rubric.php') !== -1 || href.indexOf('edit-rubric.php') !== -1) {
+                        setNavigationFlag();
+                    }
+                }, true);
+
+                function bindEditLinks() {
+                    var editLinks = document.querySelectorAll('a[href*="edit-rubric.php"]');
+                    for (var i = 0; i < editLinks.length; i++) {
+                        var link = editLinks[i];
+                        if (link.dataset.navFlagSet) continue;
+                        link.dataset.navFlagSet = '1';
+                        link.addEventListener('click', function () {
+                            setNavigationFlag();
+                        });
                     }
                 }
 
-                var deadlineInput = getDeadlineInput();
-                if (deadlineInput) deadlineInput.value = draft.deadline || '';
+                bindEditLinks();
 
-                var pointsInput = getPointsInput();
-                if (pointsInput) pointsInput.value = draft.points || '';
-
-                var stopCheckbox = getElementById('stopSubmissions');
-                if (stopCheckbox) stopCheckbox.checked = !!draft.stopSubmissions;
-
-                var courseCheckboxes = document.querySelectorAll('.course-checkbox');
-                var selectedMap = {};
-                var i;
-                if (draft.courses && draft.courses.length) {
-                    for (i = 0; i < draft.courses.length; i++) selectedMap[String(draft.courses[i])] = true;
-                }
-                for (i = 0; i < courseCheckboxes.length; i++) {
-                    var value = String(courseCheckboxes[i].value);
-                    courseCheckboxes[i].checked = !!selectedMap[value];
-                }
-
-                if (draft.links && draft.links.length) {
-                    for (i = 0; i < draft.links.length; i++) appendLinkPreview(draft.links[i]);
-                }
-            } catch (e) { }
-        }
-
-        function bindDraftPersistenceListeners() {
-            var form = document.querySelector('form');
-            if (form) {
-                form.addEventListener('input', function () { saveDraftToStorage(); });
-                form.addEventListener('change', function () { saveDraftToStorage(); });
-                form.addEventListener('submit', function () {
-                    clearDraftInStorage();
-                    clearNavigationFlag();
-                });
-            }
-            try {
-                if (typeof quill !== 'undefined') {
-                    quill.on('text-change', function () { saveDraftToStorage(); });
-                }
-            } catch (e) { }
-            document.addEventListener('click', function (event) {
-                var isAddLink = event.target && event.target.id === 'addLinkBtn';
-                var isDelete = event.target && (event.target.closest ? event.target.closest('.delete-file') : null);
-                if (isAddLink || isDelete) { setTimeout(function () { saveDraftToStorage(); }, 0); }
-            });
-        }
-
-        function setNavigationFlag() {
-            try { localStorage.setItem(NAVIGATION_FLAG, '1'); } catch (e) { }
-        }
-
-        function clearNavigationFlag() {
-            try { localStorage.removeItem(NAVIGATION_FLAG); } catch (e) { }
-        }
-
-        function hasNavigatedAway() {
-            try {
-                var flag = localStorage.getItem(NAVIGATION_FLAG);
-                return flag === '1';
-            } catch (e) { return false; }
-        }
-
-        function checkAndClearOrRestore() {
-            try {
-                var params = new URLSearchParams(window.location.search);
-                var hasReuse = params.get('reuse');
-                var hasEdit = params.get('edit');
-                if (hasReuse || hasEdit) {
-                    clearDraftInStorage();
-                    clearNavigationFlag();
-                    bindDraftPersistenceListeners();
-                    return;
-                }
-
-
-                var hasSelectedRubric = params.get('selectedRubricID');
-                var shouldRestore = hasNavigatedAway() || hasSelectedRubric;
-
-                if (!shouldRestore) {
-                    clearNavigationFlag();
-                    clearAllFormFields();
-                    bindDraftPersistenceListeners();
-                    return;
-                }
-
-                clearNavigationFlag();
-
-                var raw = localStorage.getItem(STORAGE_KEY);
-                if (!raw) {
-                    bindDraftPersistenceListeners();
-                    return;
-                }
-
-                var draft = null;
-                try { draft = JSON.parse(raw); } catch (e) {
-                    clearDraftInStorage();
-                    bindDraftPersistenceListeners();
-                    return;
-                }
-
-                if (!draft) {
-                    bindDraftPersistenceListeners();
-                    return;
-                }
-
-                if (!hasUserEnteredData(draft)) {
-                    clearDraftInStorage();
-                    bindDraftPersistenceListeners();
-                    return;
-                }
-
-                restoreDraftFromStorage();
-                bindDraftPersistenceListeners();
-            } catch (e) {
-                bindDraftPersistenceListeners();
-            }
-        }
-
-        function bindNavigationAwayListeners() {
-            document.addEventListener('click', function (event) {
-                var link = event.target.closest ? event.target.closest('a') : null;
-                if (!link || !link.href) return;
-                var href = link.href;
-                if (href.indexOf('create-rubric.php') !== -1 || href.indexOf('edit-rubric.php') !== -1) {
-                    setNavigationFlag();
-                }
-            }, true);
-
-            function bindEditLinks() {
-                var editLinks = document.querySelectorAll('a[href*="edit-rubric.php"]');
-                for (var i = 0; i < editLinks.length; i++) {
-                    var link = editLinks[i];
-                    if (link.dataset.navFlagSet) continue;
-                    link.dataset.navFlagSet = '1';
-                    link.addEventListener('click', function () {
-                        setNavigationFlag();
+                var modalEl = document.getElementById('selectRubricModal');
+                if (modalEl) {
+                    modalEl.addEventListener('shown.bs.modal', function () {
+                        setTimeout(bindEditLinks, 100);
                     });
                 }
             }
 
-            bindEditLinks();
+            function initializeDraftPersistenceWithCleanStart() {
+                bindNavigationAwayListeners();
 
-            var modalEl = document.getElementById('selectRubricModal');
-            if (modalEl) {
-                modalEl.addEventListener('shown.bs.modal', function () {
-                    setTimeout(bindEditLinks, 100);
-                });
-            }
-        }
+                function attemptCheck() {
+                    if (typeof quill !== 'undefined' && quill.root) {
+                        checkAndClearOrRestore();
+                    } else {
+                        setTimeout(attemptCheck, 100);
+                    }
+                }
 
-        function initializeDraftPersistenceWithCleanStart() {
-            bindNavigationAwayListeners();
-
-            function attemptCheck() {
-                if (typeof quill !== 'undefined' && quill.root) {
-                    checkAndClearOrRestore();
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', function () { attemptCheck(); });
                 } else {
-                    setTimeout(attemptCheck, 100);
+                    attemptCheck();
                 }
             }
 
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', function () { attemptCheck(); });
-            } else {
-                attemptCheck();
-            }
-        }
+            initializeDraftPersistenceWithCleanStart();
+        })();
+    </script>
 
-        initializeDraftPersistenceWithCleanStart();
-    })();
-</script>
+    <!-- Change the selected rubric  -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const rubricOptions = document.querySelectorAll('.rubric-option');
+            const hiddenInput = document.getElementById('selectedRubricID');
+            const cardRow = document.querySelector('.rubric-card-row');
+            const titleDiv = cardRow.querySelector('.rubric-title');
+            const infoDiv = cardRow.querySelector('.rubric-info');
 
-<!-- Change the selected rubric  -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const rubricOptions = document.querySelectorAll('.rubric-option');
-        const hiddenInput = document.getElementById('selectedRubricID');
-        const cardRow = document.querySelector('.rubric-card-row');
-        const titleDiv = cardRow.querySelector('.rubric-title');
-        const infoDiv = cardRow.querySelector('.rubric-info');
+            // Track currently selected option
+            let selectedRubricId = hiddenInput.value;
 
-        // Track currently selected option
-        let selectedRubricId = hiddenInput.value;
+            rubricOptions.forEach(option => {
+                option.addEventListener('click', function () {
+                    // Highlight selected
+                    rubricOptions.forEach(o => o.style.backgroundColor = 'var(--pureWhite)');
+                    this.style.backgroundColor = 'var(--primaryColor)';
 
-        rubricOptions.forEach(option => {
-            option.addEventListener('click', function () {
-                // Highlight selected
-                rubricOptions.forEach(o => o.style.backgroundColor = 'var(--pureWhite)');
-                this.style.backgroundColor = 'var(--primaryColor)';
+                    // Update hidden input
+                    selectedRubricId = this.dataset.rubricId;
+                    hiddenInput.value = selectedRubricId;
+                });
+            });
 
-                // Update hidden input
-                selectedRubricId = this.dataset.rubricId;
-                hiddenInput.value = selectedRubricId;
+            document.getElementById('confirmRubricBtn').addEventListener('click', function () {
+                // Find selected option
+                const selectedOption = document.querySelector(`.rubric-option[data-rubric-id="${selectedRubricId}"]`);
+                if (selectedOption) {
+                    // Show card if hidden
+                    cardRow.style.display = '';
+
+                    // Update card content
+                    titleDiv.textContent = selectedOption.dataset.rubricTitle;
+                    infoDiv.textContent = `${selectedOption.dataset.rubricPoints} Points · ${selectedOption.dataset.rubricCriteria} Criteria`;
+                }
+
+                // Close modal
+                const modalEl = document.getElementById('selectRubricModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+
             });
         });
 
-        document.getElementById('confirmRubricBtn').addEventListener('click', function () {
-            // Find selected option
-            const selectedOption = document.querySelector(`.rubric-option[data-rubric-id="${selectedRubricId}"]`);
-            if (selectedOption) {
-                // Show card if hidden
-                cardRow.style.display = '';
 
-                // Update card content
-                titleDiv.textContent = selectedOption.dataset.rubricTitle;
-                infoDiv.textContent = `${selectedOption.dataset.rubricPoints} Points · ${selectedOption.dataset.rubricCriteria} Criteria`;
-            }
+    </script>
+</body>
 
-            // Close modal
-            const modalEl = document.getElementById('selectRubricModal');
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            if (modal) modal.hide();
-
-        });
-    });
-
-
-</script>
+</html>
