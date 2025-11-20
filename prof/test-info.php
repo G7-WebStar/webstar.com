@@ -34,7 +34,7 @@ $testDescription = $test['generalGuidance'];
 $profName = $test['firstName'] . " " . $test['lastName'];
 $profilePic = !empty($test['profilePicture'])
     ? '../shared/assets/pfp-uploads/' . $test['profilePicture']
-    : '../shared/assets/img/default-profile.png';
+    : '../shared/assets/pfp-uploads/defaultProfile.png';
 
 $deadline = $test['deadline'];
 $currentDate = date("Y-m-d H:i:s");

@@ -49,7 +49,7 @@ $examStatus = $isCompleted ? "Completed" : "Active";
 $examDuration = (isset($test['testTimelimit']) && $test['testTimelimit'] > 0)
     ? round($test['testTimelimit'] / 60)
     : 0;
-$displayTime = !empty($test['updatedAt']) ? $test['updatedAt'] : $test['createdAt'];
+$displayTime = $test['assessmentCreatedAt'];
 $formattedTime = !empty($displayTime) ? date("F j, Y g:i A", strtotime($displayTime)) : "";
 
 // Total exam items

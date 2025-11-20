@@ -37,7 +37,7 @@ $assignmentDescription = $assignmentRow['assignmentDescription'];
 $profName = $assignmentRow['firstName'] . ' ' . $assignmentRow['lastName'];
 $profilePic = !empty($assignmentRow['profilePicture'])
     ? '../shared/assets/pfp-uploads/' . $assignmentRow['profilePicture']
-    : '../shared/assets/img/default-profile.png';
+    : '../shared/assets/pfp-uploads/defaultProfile.png';
 
 $deadline = $assignmentRow['deadline'];
 $score = $assignmentRow['score'] ?? null;
