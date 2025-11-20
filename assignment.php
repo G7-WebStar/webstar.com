@@ -1142,7 +1142,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                                 style="flex: 1 1 0; min-width: 0;">
                                                                 <span class="material-symbols-outlined p-2 pe-2"
                                                                     style="font-variation-settings:'FILL' 1;">draft</span>
-                                                                <a href="shared/assets/img/files/<?= rawurlencode($file) ?>"
+                                                                <a href="shared/assets/files/<?= rawurlencode($file) ?>"
                                                                     target="_blank"
                                                                     class="ms-2 text-decoration-none text-dark"
                                                                     style="flex-shrink: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -1518,7 +1518,8 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
             <div class="modal-content" style="border-radius:12px; overflow:hidden;">
                 <div class="modal-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-2">
-                        <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;" id="viewerModalLabel">File Viewer</h5>
+                        <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;"
+                            id="viewerModalLabel">File Viewer</h5>
                         <a id="modalDownloadBtn" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
                             style="background-color: var(--primaryColor); border: 1px solid var(--black);" download>
                             <span class="" style="display:flex;align-items:center;gap:4px;">
@@ -1543,7 +1544,8 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
             <div class="modal-content" style="border-radius:12px; overflow:hidden;">
                 <div class="modal-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-2">
-                        <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;" id="linkViewerModalLabel">Link Viewer</h5>
+                        <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;"
+                            id="linkViewerModalLabel">Link Viewer</h5>
                         <a id="modalOpenInNewTab" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
                             style="background-color: var(--primaryColor); border: 1px solid var(--black);"
                             target="_blank">
@@ -2127,6 +2129,83 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
             new bootstrap.Modal(document.getElementById("linkViewerModal")).show();
         }
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const attachmentCards = document.querySelectorAll('.cardFile');
+
+            attachmentCards.forEach(card => {
+                <?php if ($isSubmitted == 1): ?>
+                    card.style.cursor = 'pointer';
+
+                    card.addEventListener('click', (e) => {
+                        e.preventDefault();
+
+                        const type = card.getAttribute('data-type');
+
+                        if (type === 'file') {
+                            const fileLink = card.querySelector('a').getAttribute('href');
+                            const fileTitle = card.querySelector('a').textContent; // <-- Use this as title
+                            const viewerContainer = document.getElementById('viewerContainer');
+                            const modalDownloadBtn = document.getElementById('modalDownloadBtn');
+                            const viewerModalLabel = document.getElementById('viewerModalLabel');
+
+                            // Set the modal header to the fileTitle
+                            viewerModalLabel.textContent = fileTitle;
+
+                            // Clear previous content
+                            viewerContainer.innerHTML = '';
+
+                            const extension = fileLink.split('.').pop().toLowerCase();
+
+                            if (['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(extension)) {
+                                const img = document.createElement('img');
+                                img.src = fileLink;
+                                img.style.width = '100%';
+                                img.style.height = '100%';
+                                img.style.objectFit = 'contain';
+                                viewerContainer.appendChild(img);
+                            } else if (extension === 'pdf') {
+                                const iframe = document.createElement('iframe');
+                                iframe.src = fileLink;
+                                iframe.style.width = '100%';
+                                iframe.style.height = '100%';
+                                iframe.style.border = 'none';
+                                viewerContainer.appendChild(iframe);
+                            } else {
+                                viewerContainer.innerHTML = `
+                            <div class="text-center mt-5">
+                                <p class="text-sbold text-16" style="color: var(--primaryColor);">
+                                    This file type cannot be previewed.
+                                </p>
+                                <a href="${fileLink}" download class="btn"
+                                   style="background-color: var(--primaryColor); color:#fff; border:none;">
+                                   Download File
+                                </a>
+                            </div>
+                        `;
+                            }
+
+                            modalDownloadBtn.href = fileLink;
+
+                            new bootstrap.Modal(document.getElementById('viewerModal')).show();
+
+                        } else if (type === 'link') {
+                            const link = card.getAttribute('data-link');
+                            const iframe = document.getElementById('linkViewerIframe');
+                            const openBtn = document.getElementById('modalOpenInNewTab');
+
+                            iframe.src = link;
+                            openBtn.href = link;
+
+                            new bootstrap.Modal(document.getElementById('linkViewerModal')).show();
+                        }
+                    });
+                <?php endif; ?>
+            });
+        });
+    </script>
+
+
 </body>
 
 </html>

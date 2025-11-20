@@ -279,50 +279,47 @@ if (!empty($rubricID)) {
                                                             <?php endif; ?>
 
                                                             <?php if (!empty($attachmentsArray) || !empty($linksArray)): ?>
-                                                                <div class="text-sbold text-14 mt-3">Task Materials</div>
-                                                                <?php foreach ($attachmentsArray as $file):
-                                                                    $filePath = "shared/assets/files/" . $file;
-                                                                    $fileExt = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
-                                                                    $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
-                                                                    $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
-
-                                                                    // Remove extension from display name
-                                                                    $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
-                                                                ?>
-                                                                    <a href="<?php echo $filePath; ?>"
-                                                                        <?php if (!preg_match('/^https?:\/\//', $filePath)) : ?>
-                                                                        download="<?php echo htmlspecialchars($file); ?>"
-                                                                        <?php endif; ?>
-                                                                        style="text-decoration:none; color:inherit;">
-
-                                                                        <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
+                                                               <div class="text-sbold text-14 mt-3">Task Materials</div>
+                                                               <!-- FILES -->
+                                                               <?php foreach ($attachmentsArray as $file): 
+                                                                   $filePath = "../shared/assets/files/" . $file;
+                                                                   $fileExt = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
+                                                                   $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
+                                                                   $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
+                                                                   $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
+                                                               ?>
+                                                                   <div onclick="openViewerModal('<?php echo addslashes($file); ?>', '<?php echo $filePath; ?>')"
+                                                                        style="cursor:pointer;">
+                                                                       <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
                                                                             style="width:400px; max-width:100%; min-width:310px;">
-                                                                            <span class="px-3 py-3 material-symbols-outlined">draft</span>
-                                                                            <div class="ms-2">
-                                                                                <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
-                                                                                <div class="due text-reg text-14 mb-1">
-                                                                                    <?php echo $fileExt ?> · <?php echo $fileSizeMB ?>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </a>
-                                                                <?php endforeach; ?>
+                                                                           <span class="px-3 py-3 material-symbols-outlined">draft</span>
+                                                                           <div class="ms-2">
+                                                                               <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
+                                                                               <div class="due text-reg text-14 mb-1">
+                                                                                   <?php echo $fileExt ?> · <?php echo $fileSizeMB ?>
+                                                                               </div>
+                                                                           </div>
+                                                                       </div>
+                                                                   </div>
+                                                               <?php endforeach; ?>
 
-                                                                <?php foreach ($linksArray as $link): ?>
-                                                                    <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
-                                                                        style="width:400px; max-width:100%; min-width:310px;">
-                                                                        <span class="px-3 py-3 material-symbols-outlined">public</span>
-                                                                        <div class="ms-2">
-                                                                            <!-- temoparary lang ang filename here -->
-                                                                            <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
-                                                                            <div class="text-reg link text-12 mt-0">
-                                                                                <a href="<?php echo $link ?>" target="_blank" rel="noopener noreferrer"
-                                                                                    style="text-decoration: none; color: var(--black);">
-                                                                                    <?php echo $link ?>
-                                                                                </a>
+                                                               <!-- LINKS -->
+                                                               <?php foreach ($linksArray as $link): ?>
+                                                                   <?php 
+                                                                       $linkTitle = htmlspecialchars($link);
+                                                                   ?>
+                                                                      <div onclick="openLinkViewerModal('<?php echo $linkTitle; ?>', '<?php echo $linkTitle; ?>')"
+                                                                        style="cursor:pointer;">
+                                                                       <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
+                                                                            style="width:400px; max-width:100%; min-width:310px;">
+                                                                           <span class="px-3 py-3 material-symbols-outlined">public</span>
+                                                                           <div class="ms-2">
+                                                                               <div class="text-sbold text-16 mt-1"><?php echo $linkTitle ?></div>
+                                                                                <div class="text-reg link text-12 mt-0"
+                                                                                     style="color: var(--black);"><?php echo $linkTitle ?></div>
                                                                             </div>
                                                                         </div>
-                                                                    </div>
+                                                                   </div>
                                                                 <?php endforeach; ?>
                                                                 <hr>
                                                             <?php endif; ?>
@@ -520,37 +517,114 @@ if (!empty($rubricID)) {
                 </div>
             </div>
         </div>
+    </div>
+    <!-- FILE VIEWER MODAL -->
+    <div class="modal fade" id="viewerModal" tabindex="-1">
+           <div class="modal-dialog modal-xl modal-dialog-centered">
+               <div class="modal-content" style="border-radius:12px; overflow:hidden;">
+                   <div class="modal-header d-flex justify-content-between align-items-center">
+                       <div class="d-flex align-items-center gap-2">
+                           <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;" id="viewerModalLabel">File Viewer</h5>
+                           <a id="modalDownloadBtn" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
+                              style="background-color: var(--primaryColor); border: 1px solid var(--black);" download>
+                               <span class="" style="display:flex;align-items:center;gap:4px;">
+                                   <span class="material-symbols-outlined" style="font-size:18px;">download_2</span>
+                                   Download
+                            </span>
+                           </a>
+                       </div>
+                       <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                   </div>
+                   <div class="modal-body p-0" style="background:#2e2e2e; height:75vh;">
+                       <div id="viewerContainer" style="width:100%; height:100%;"></div>
+                   </div>
+               </div>
+           </div>
+    </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script>
-            function createDoughnutChart(canvasId, submitted, pending, returned, missing) {
-                const ctx = document.getElementById(canvasId).getContext('2d');
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        datasets: [{
-                            data: [submitted, pending, returned, missing],
-                            backgroundColor: ['#3DA8FF', '#C7C7C7', '#d9ffe4ff', '#ffd9d9ff'],
-                            borderWidth: 0,
-                        }]
-                    },
-                    options: {
-                        cutout: '75%',
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                enabled: false
-                            }
+    <!-- LINK VIEWER MODAL -->
+    <div class="modal fade" id="linkViewerModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+               <div class="modal-content" style="border-radius:12px; overflow:hidden;">
+                <div class="modal-header d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;" id="linkViewerModalLabel">Link Viewer</h5>
+                        <a id="modalOpenInNewTab" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
+                           style="background-color: var(--primaryColor); border: 1px solid var(--black);" target="_blank">
+                            <span class="" style="display:flex;align-items:center;gap:4px;">
+                                <span class="material-symbols-outlined" style="font-size:18px;">open_in_new</span>
+                                Open
+                            </span>
+                        </a>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0" style="background:#2e2e2e; height:75vh;">
+                    <iframe id="linkViewerIframe"
+                            style="width:100%; height:100%; border:none; border-radius:10px;"></iframe>
+                   </div>
+               </div>
+           </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function createDoughnutChart(canvasId, submitted, pending, returned, missing) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [submitted, pending, returned, missing],
+                        backgroundColor: ['#3DA8FF', '#C7C7C7', '#d9ffe4ff', '#ffd9d9ff'],
+                        borderWidth: 0,
+                    }]
+                },
+                options: {
+                    cutout: '75%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: false
                         }
                     }
-                });
+                }
+            });
+        }
+           createDoughnutChart('taskChart', <?php echo $submitted['submittedTodo']; ?>, <?php echo $pending['pending']; ?>, <?php echo $returned['returned']; ?>, <?php echo $missing['missing']; ?>);
+    </script>
+    <script>
+        function openViewerModal(fileName, filePath) {
+            document.getElementById("viewerModalLabel").textContent = fileName;
+            document.getElementById("modalDownloadBtn").href = filePath;
+            let viewer = document.getElementById("viewerContainer");
+            viewer.innerHTML = "";
+            let ext = fileName.split(".").pop().toLowerCase();
+            if (["jpg","jpeg","png","gif","webp","bmp","svg"].includes(ext)) {
+                viewer.innerHTML = `<img src="${filePath}" style="width:100%; height:100%; object-fit:contain; background:#333;">`;
+            } else if (ext === "pdf") {
+                viewer.innerHTML = `<iframe src="${filePath}" width="100%" height="100%" style="border:none; border-radius:10px;"></iframe>`;
+            } else {
+                viewer.innerHTML = `<div class="text-white text-center mt-5">
+                    <p class="text-sbold text-16" style="color: var(--pureWhite);">This file type cannot be previewed.</p>
+                    <a href="${filePath}" download class="btn text-sbold text-16" style="background-color: var(--primaryColor); color: var(--black); border: none;"> Download File </a>
+                </div>`;
             }
+            new bootstrap.Modal(document.getElementById("viewerModal")).show();
+        }
 
-            createDoughnutChart('taskChart', <?php echo $submitted['submittedTodo']; ?>, <?php echo $pending['pending']; ?>, <?php echo $returned['returned']; ?>, <?php echo $missing['missing']; ?>);
-        </script>
+        function openLinkViewerModal(title, url) {
+            document.getElementById("linkViewerModalLabel").textContent = title;
+            document.getElementById("modalOpenInNewTab").href = url;
+            document.getElementById("linkViewerIframe").src = url;
+            new bootstrap.Modal(document.getElementById("linkViewerModal")).show();
+        }
+    </script>
+
+
 </body>
 
 </html>
