@@ -430,7 +430,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                 clearInterval(interval);
                 showToast("Time's up! Your quiz is being submitted.", "danger");
                 choiceText.forEach(unanswered => {
-                    if (unanswered.userAnswer == null) {
+                    if (unanswered.userAnswer == null || unanswered.userAnswer == '') {
                         unanswered.userAnswer = "No Answer";
                     }
                     console.log(choiceText);
@@ -671,13 +671,10 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             localStorage.setItem("choiceText<?php echo $testID; ?>", JSON.stringify(choiceText));
             localStorage.setItem("selectedAnswers<?php echo $testID; ?>", JSON.stringify(selectedAnswers));
 
-            //console.log(selectedAnswers[currentQuestionIndex]);
             console.log(choiceText);
-            console.log(currentQuestionIndex);
         }
 
         function identificationType() {
-            console.log("Identification Type");
             console.log(choiceText[currentQuestionIndex]);
             const inputField = document.getElementById('input' + currentQuestionIndex);
             const identificationAnswer = {
@@ -689,7 +686,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
         }
 
         function submitQuiz() {
-            if (questions[currentQuestionIndex].type == "Identification") {
+            if (questions[currentQuestionIndex].type == "Identification" && seconds > 0) {
                 identificationType();
             }
 
@@ -711,7 +708,6 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                     })
                     .then(response => response.json())
                     .then(data => {
-                        console.log(data);
                         showToast("Quiz submitted successfully!", "success");
                     })
                     .catch(error => {
@@ -723,7 +719,6 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             } else {
                 showToast("Please answer all items before submitting.", "danger");
             }
-            console.log(timeSpent);
         }
 
         console.log(choiceText);

@@ -115,6 +115,10 @@ $assessmentCreationDate = $assessmentCreationDateRow['creationDate']
     <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
 
     <style>
+        .interactable:hover {
+            cursor: pointer;
+        }
+
         @media screen and (max-width: 767px) {
             .mobile-view {
                 margin-bottom: calc(1.5rem + 80px) !important;
@@ -144,7 +148,7 @@ $assessmentCreationDate = $assessmentCreationDateRow['creationDate']
                                 <!-- DESKTOP VIEW -->
                                 <div class="row desktop-header d-none d-sm-flex">
                                     <div class="col-auto me-2">
-                                        <a href="#" class="text-decoration-none">
+                                        <a onclick="history.back()" class="text-decoration-none interactable">
                                             <i class="fa-solid fa-arrow-left text-reg text-16"
                                                 style="color: var(--black);"></i>
                                         </a>
@@ -173,7 +177,7 @@ $assessmentCreationDate = $assessmentCreationDateRow['creationDate']
                                 <div class="d-block d-sm-none mobile-assignment">
                                     <div class="mobile-top">
                                         <div class="arrow">
-                                            <a href="#" class="text-decoration-none">
+                                            <a onclick="history.back()" class="text-decoration-none">
                                                 <i class="fa-solid fa-arrow-left text-reg text-16"
                                                     style="color: var(--black);"></i>
                                             </a>
