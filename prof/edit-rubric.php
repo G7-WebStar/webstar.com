@@ -313,7 +313,7 @@ if (isset($_POST['update_rubric'])) {
         while ($criteriaCalculationRow = $criteriaCalculationResult->fetch_assoc()) {
             $criterionIdForCalculation = intval($criteriaCalculationRow['criterionID']);
             $totalPointsSql = "
-                SELECT SUM(points) AS totalPoints
+                SELECT IFNULL(MAX(points), 0) AS totalPoints
                 FROM level
                 WHERE criterionID = '$criterionIdForCalculation'
             ";
@@ -457,9 +457,9 @@ if (isset($_POST['update_rubric'])) {
                                             $criteriaTitleValue = $criteriaRow['criteriaTitle'];
                                             $criteriaDescriptionValue = $criteriaRow['criteriaDescription'];
                                             
-        	                                // Fetch levels once: collect rows and compute max points
+                                        // Fetch levels once: collect rows and compute max points
                                             $levelRows = [];
-                                            $pointsSumForCriterion = 0;
+                                        $maxPointsForCriterion = 0;
                                             $levelsSql = "
                                                 SELECT levelID,
                                                        levelTitle,
@@ -476,18 +476,20 @@ if (isset($_POST['update_rubric'])) {
                                                     $levelTitleVal = $levelRow['levelTitle'];
                                                     $levelDescVal = $levelRow['levelDescription'];
                                                     $levelPointsVal = isset($levelRow['points']) ? floatval($levelRow['points']) : 0;
-                                                    $pointsSumForCriterion += $levelPointsVal;
+                                                    if ($levelPointsVal > $maxPointsForCriterion) {
+                                                        $maxPointsForCriterion = $levelPointsVal;
+                                                    }
                                                     // store as numeric array to avoid associative arrow syntax
                                                     $levelRows[] = [$levelIdVal, $levelTitleVal, $levelDescVal, $levelPointsVal];
                                                 }
                                             }
-                                            $computedTotal += $pointsSumForCriterion;
+                                            $computedTotal += $maxPointsForCriterion;
                                 ?>
                                 <div class="criterion-wrapper" data-index="<?php echo $criterionIndex; ?>" data-criterion-id="<?php echo $criterionId; ?>">
                                 <div class="row">
                                     <div class="col-12 pt-0 mb-2">
                                         <div class="d-flex align-items-center">
-                                                <span class="form-label text-med text-16 m-0 criterion-header-points">Criterion <?php echo $criterionIndex; ?> · <?php echo $pointsSumForCriterion; ?> Points</span>
+                                                <span class="form-label text-med text-16 m-0 criterion-header-points">Criterion <?php echo $criterionIndex; ?> · <?php echo $maxPointsForCriterion; ?> Points</span>
                                                 <div class="flex" style="border-top: 1px solid transparent;"></div>
                                                 <button type="button" class="criterion-remove-btn" aria-label="Remove criterion">
                                                     <span class="material-symbols-outlined">close</span>
@@ -976,27 +978,30 @@ if (isset($_POST['update_rubric'])) {
             (function(){
                 // --- this part naman is para i-update ang header at total points ---
                 function parsePoints(val){ var n = parseFloat(val); return isNaN(n) ? 0 : n; }
-                function calculateCriterionSum(wrapper){
+                function calculateCriterionPoints(wrapper){
                     if (!wrapper) return 0;
                     var inputs = wrapper.getElementsByClassName('level-points');
-                    var sum = 0;
+                    var maxPoints = 0;
                     for (var i = 0; i < inputs.length; i++) {
-                        sum += parsePoints(inputs[i].value);
+                        var val = parsePoints(inputs[i].value);
+                        if (val > maxPoints) maxPoints = val;
                     }
-                    return sum;
+                    return maxPoints;
                 }
                 function updateCriterionHeader(wrapper){
                     if (!wrapper) return 0;
-                    var sum = calculateCriterionSum(wrapper);
+                    var highest = calculateCriterionPoints(wrapper);
                     var header = wrapper.querySelector('.criterion-header-points');
                     var idx = wrapper.dataset && wrapper.dataset.index ? wrapper.dataset.index : '1';
-                    if (header) header.textContent = 'Criterion ' + idx + ' · ' + sum + ' Points';
-                    return sum;
+                    if (header) header.textContent = 'Criterion ' + idx + ' · ' + highest + ' Points';
+                    return highest;
                 }
                 function updateTotal(){
                     var total = 0;
                     var wrappers = document.querySelectorAll('.criterion-wrapper');
-                    for (var i = 0; i < wrappers.length; i++) total += calculateCriterionSum(wrappers[i]);
+                    for (var i = 0; i < wrappers.length; i++) {
+                        total += calculateCriterionPoints(wrappers[i]);
+                    }
                     var lbl = document.querySelector('.total-points-label');
                     if (lbl) lbl.textContent = 'Total Points: ' + total;
                 }

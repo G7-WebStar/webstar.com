@@ -107,6 +107,7 @@
     }
 }
 
+
 /* Material Symbols */
 .material-symbols-outlined {
     font-variation-settings:
@@ -122,4 +123,23 @@ button.btn[style*="var(--primaryColor)"]:hover {
     border: 1px solid var(--black) !important;
     color: var(--black) !important;
     transition: all 0.3s ease;
+}
+
+@media (min-width: 1500px) {
+    .message-container {
+        display: flex !important;
+        flex-direction: column;
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
+    }
+
+    .message-container .card:not(.inbox-empty-state) {
+        margin-left: 0 !important;
+        margin-right: auto !important;
+    }
+
+    .message-container:has(.inbox-empty-state) {
+        align-items: center !important;
+        justify-content: center !important;
+    }
 }

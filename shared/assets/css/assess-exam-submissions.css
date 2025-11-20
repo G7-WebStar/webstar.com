@@ -26,6 +26,13 @@
     margin-top: 40px; 
 }
 
+.dropdown-container .dropdown-label {
+    letter-spacing: -0.03em;
+    font-size: 14px;
+    white-space: nowrap;
+    color: var(--black);
+}
+
 .material-symbols-outlined {
   font-variation-settings:
   'FILL' 1,
@@ -72,7 +79,7 @@
 }
 
 .submission-item:hover {
-    background-color: #f8f9fa;
+    background-color: var(--pureWhite);
 }
 
 .submission-item:last-child {

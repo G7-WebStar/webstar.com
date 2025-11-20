@@ -341,6 +341,15 @@ if (isset($_POST['save_exam'])) {
                 }
             }
         }
+         if ($testInsert) {
+            $_SESSION['toast'] = [
+                'type' => 'alert-success',
+                'message' => 'Test created successfully!'
+            ];
+        }
+        $_SESSION['activeTab'] = 'todo';
+        header("Location: course-info.php?courseID=" . intval($_POST['courses'][0]));
+        exit();
     }
 }
 
