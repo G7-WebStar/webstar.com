@@ -56,9 +56,7 @@ body {
 .badge-container {
   display: inline-flex;
   align-items: center;
-  margin-left: auto;
   flex: 0 0 auto;
-  /* keep badge from shrinking */
 }
 
 .text-dark {

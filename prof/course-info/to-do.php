@@ -297,7 +297,6 @@ $showDropdowns = $assessmentCount > 0
         </div>
     </div>
 <?php endif; ?>
-
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const alertEl = document.querySelector('.alert.alert-success');
@@ -328,6 +327,32 @@ $showDropdowns = $assessmentCount > 0
         document.querySelectorAll('[data-dropdown="true"]').forEach(dropdown => {
             dropdown.addEventListener('click', function (e) {
                 e.stopPropagation();
+            });
+        });
+
+        // Ensure only one dropdown stays open at a time
+        const dropdownToggles = document.querySelectorAll('[data-dropdown="true"] [data-bs-toggle="dropdown"]');
+        dropdownToggles.forEach(toggle => {
+            toggle.addEventListener('click', function (e) {
+                dropdownToggles.forEach(otherToggle => {
+                    if (otherToggle === toggle) return;
+                    const otherInstance = bootstrap.Dropdown.getInstance(otherToggle);
+                    if (otherInstance) {
+                        otherInstance.hide();
+                    }
+                });
+            });
+        });
+
+        // Close dropdown when a menu action is clicked (e.g., Delete -> opens modal)
+        document.querySelectorAll('[data-dropdown="true"] .dropdown-item, [data-dropdown="true"] button[data-bs-target]').forEach(item => {
+            item.addEventListener('click', function () {
+                const toggle = this.closest('[data-dropdown="true"]')?.querySelector('[data-bs-toggle="dropdown"]');
+                if (!toggle) return;
+                const instance = bootstrap.Dropdown.getInstance(toggle);
+                if (instance) {
+                    instance.hide();
+                }
             });
         });
     });

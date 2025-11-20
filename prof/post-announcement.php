@@ -272,11 +272,11 @@ if (isset($_POST['save_announcement'])) {
             // Email enrolled students who opted-in
             $selectEmailsQuery = "
                 SELECT u.email, u.userID,
-                       COALESCE(s.courseUpdateEnabled, 0) as courseUpdateEnabled
+                       COALESCE(s.announcementEnabled, 0) as announcementEnabled
                 FROM users u
                 INNER JOIN enrollments e ON u.userID = e.userID
                 LEFT JOIN settings s ON u.userID = s.userID
-                WHERE e.courseID = '$selectedCourseID'
+               WHERE e.courseID = '$selectedCourseID'
             ";
             $emailsResult = executeQuery($selectEmailsQuery);
 
@@ -306,7 +306,7 @@ if (isset($_POST['save_announcement'])) {
 
                 $recipientsFound = false;
                 while ($student = mysqli_fetch_assoc($emailsResult)) {
-                    if ($student['courseUpdateEnabled'] == 1 && !empty($student['email'])) {
+                    if ($student['announcementEnabled'] == 1 && !empty($student['email'])) {
                         $mail->addAddress($student['email']);
                         $recipientsFound = true;
                     }

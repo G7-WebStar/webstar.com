@@ -168,7 +168,7 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                             style="text-decoration: none; color:var(--black)"><strong>Quests</strong></a>
                         <?php $displayTodo = isset($newTodoCount) ? (int) $newTodoCount : (isset($_SESSION['TodoNewCount']) ? (int) $_SESSION['TodoNewCount'] : 0);
                         if ($displayTodo > 0) { ?>
-                            <span class="badge-container ms-auto me-1">
+                            <span class="badge-container">
                                 <span class="todo-badge"><?php echo $displayTodo; ?></span>
                             </span>
                         <?php } ?>

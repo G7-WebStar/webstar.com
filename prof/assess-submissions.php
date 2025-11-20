@@ -228,8 +228,8 @@ $profilePic = !empty($test['profilePicture'])
                                                 <div class="tab-pane fade show active" id="lessons" role="tabpanel" aria-labelledby="lessons-tab">
                                                     <!-- Sort By dropdown -->
                                                     <div class="d-flex align-items-center flex-nowrap dropdown-container">
-                                                        <span class="dropdown-label me-2">Sort By</span>
-                                                        <button class="btn dropdown-toggle dropdown-custom" type="button"
+                                                        <span class="dropdown-label text-reg me-2">Sort By</span>
+                                                        <button class="btn dropdown-toggle text-reg dropdown-custom" type="button"
                                                             data-bs-toggle="dropdown" aria-expanded="false">
                                                             <span>Newest</span>
                                                         </button>
