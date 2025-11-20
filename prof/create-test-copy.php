@@ -18,11 +18,11 @@ $mode = '';
 $testID = 0;
 
 if (isset($_GET['edit'])) {
+    $mode = 'edit';
     $testID = intval($_GET['edit']);
-    header('Location: edit-test.php?edit=' . $testID);
 } elseif (isset($_GET['reuse'])) {
+    $mode = 'reuse';
     $testID = intval($_GET['reuse']);
-    header('Location: edit-test.php?reuse=' . $testID);
 }
 
 // Get all courses owned by this user
@@ -53,125 +53,86 @@ if (isset($_POST['save_exam'])) {
     if (!empty($_POST['courses'])) {
         foreach ($_POST['courses'] as $courseID) {
 
-            if ($mode === 'new' || $mode === 'reuse') {
-
-                /* INSERT NEW ASSESSMENT */
-                $assessmentInsert = "INSERT INTO assessments
-                (courseID, assessmentTitle, type, deadline, createdAt, deadlineEnabled)
+            $assessments = "INSERT INTO assessments
+                (courseID, assessmentTitle, type, deadline, createdAt, deadlineEnabled) 
                 VALUES 
                 ('$courseID', '$title', '$testType', " .
-                    ($testDeadline ? "'" . mysqli_real_escape_string($conn, $testDeadline) . "'" : "NULL") . ",
+                ($testDeadline ? "'" . mysqli_real_escape_string($conn, $testDeadline) . "'" : "NULL") . ", 
                 '$createdAt', '$deadlineEnabled')";
-                executeQuery($assessmentInsert);
 
-                $assessmentID = mysqli_insert_id($conn);
+            executeQuery($assessments);
 
-                /* Insert TODOS */
-                $studentsQuery = "SELECT userID FROM enrollments WHERE courseID = '$courseID'";
-                $studentsResult = executeQuery($studentsQuery);
-                while ($student = mysqli_fetch_assoc($studentsResult)) {
-                    $uid = $student['userID'];
-                    $todoInsert = "INSERT INTO todo (userID, assessmentID, status)
-                       VALUES ('$uid', '$assessmentID', 'Pending')";
-                    executeQuery($todoInsert);
-                }
+            // Kunin ang bagong assessmentID
+            $assessmentID = mysqli_insert_id($conn);
 
-                /* INSERT NEW TEST */
-                $testInsert = "INSERT INTO tests 
-                (assessmentID, generalGuidance, testTimeLimit)
-                VALUES 
-                ('$assessmentID', '$generalGuidance', " .
-                    ($testTimeLimitSeconds !== null ? "'$testTimeLimitSeconds'" : "NULL") . ")";
-                executeQuery($testInsert);
+            // Insert todo for each enrolled student
+            $studentsQuery = "SELECT userID FROM enrollments WHERE courseID = '$courseID'";
+            $studentsResult = executeQuery($studentsQuery);
 
-                $testID = mysqli_insert_id($conn);
-
-            } elseif ($mode === 'edit') {
-
-                /* UPDATE EXISTING ASSESSMENT*/
-                $updateAssessment = "UPDATE assessments SET 
-                assessmentTitle='$title',
-                deadline=" .
-                    ($testDeadline ? "'" . mysqli_real_escape_string($conn, $testDeadline) . "'" : "NULL") . "
-                WHERE assessmentID='$testID'";
-                executeQuery($updateAssessment);
-
-                /* UPDATE EXISTING TEST*/
-                $updateTest = "UPDATE tests SET
-                generalGuidance='$generalGuidance',
-                testTimeLimit=" .
-                    ($testTimeLimitSeconds !== null ? "'$testTimeLimitSeconds'" : "NULL") . "
-                WHERE assessmentID='$testID'";
-                executeQuery($updateTest);
-
-                // Get existing testID
-                $getTest = executeQuery("SELECT testID FROM tests WHERE assessmentID='$testID' LIMIT 1");
-                $row = mysqli_fetch_assoc($getTest);
-                $testID = $row['testID'];
-
-                // Delete only if the mode is edit + user provided new questions
-                if ($mode === 'edit' && !empty($_POST['questions'])) {
-                    executeQuery("DELETE FROM testQuestionChoices WHERE testQuestionID IN 
-                     (SELECT testQuestionID FROM testQuestions WHERE testID='$testID')");
-                    executeQuery("DELETE FROM testQuestions WHERE testID='$testID'");
-                }
+            while ($student = mysqli_fetch_assoc($studentsResult)) {
+                $studentUserID = $student['userID'];
+                $todoQuery = "INSERT INTO todo (userID, assessmentID, status) 
+                  VALUES ('$studentUserID', '$assessmentID', 'Pending')";
+                executeQuery($todoQuery);
             }
 
-            /* INSERT NEW QUESTIONS + CHOICES (BOTH FOR NEW/REUSE AND EDIT)*/
+            $testQuery = "INSERT INTO tests 
+            (assessmentID, generalGuidance, testTimeLimit) 
+            VALUES 
+            ('$assessmentID', '$generalGuidance', " . ($testTimeLimitSeconds !== null ? "'$testTimeLimitSeconds'" : "NULL") . ")";
+
+            executeQuery($testQuery);
+
+            // Kunin ang bagong testID
+            $testID = mysqli_insert_id($conn);
+
             if (!empty($_POST['questions'])) {
-
                 foreach ($_POST['questions'] as $qIndex => $question) {
-
                     $testQuestion = $question['testQuestion'] ?? '';
                     $questionType = $question['questionType'] ?? '';
-                    $testPoints = $question['testQuestionPoints'] ?? 1;
-
+                    $testQuestionPoints = $question['testQuestionPoints'] ?? 1;
                     $correctAnswer = !empty($question['correctAnswer'])
-                        ? (is_array($question['correctAnswer'])
-                            ? implode(',', $question['correctAnswer'])
-                            : $question['correctAnswer'])
+                        ? (is_array($question['correctAnswer']) ? implode(',', $question['correctAnswer']) : $question['correctAnswer'])
                         : '';
 
-                    /* IMAGE UPLOAD */
                     $testQuestionImage = null;
-                    if (
-                        isset($_FILES['fileUpload']['name'][$qIndex]) &&
-                        $_FILES['fileUpload']['error'][$qIndex] === UPLOAD_ERR_OK
-                    ) {
+                    if (isset($_FILES['fileUpload']['name'][$qIndex]) && $_FILES['fileUpload']['error'][$qIndex] === UPLOAD_ERR_OK) {
+                        $fileName = $_FILES['fileUpload']['name'][$qIndex];
+                        $tmpName = $_FILES['fileUpload']['tmp_name'][$qIndex];
 
-                        $file = $_FILES['fileUpload'];
-                        $tmp = $file['tmp_name'][$qIndex];
-                        $name = $file['name'][$qIndex];
+                        $uploadFolder = __DIR__ . "/../shared/assets/prof-uploads/";
 
-                        $uploadDir = __DIR__ . "/../shared/assets/prof-uploads/";
-                        if (!is_dir($uploadDir))
-                            mkdir($uploadDir, 0777, true);
+                        if (!is_dir($uploadFolder)) {
+                            mkdir($uploadFolder, 0777, true);
+                        }
 
-                        $newName = time() . "_" . $name;
-                        $dest = $uploadDir . $newName;
+                        $newFileName = time() . "_" . basename($fileName);
+                        $destination = $uploadFolder . $newFileName;
 
-                        if (move_uploaded_file($tmp, $dest)) {
-                            $testQuestionImage = $newName;
+                        if (move_uploaded_file($tmpName, $destination)) {
+                            $testQuestionImage = $newFileName;
                         }
                     }
 
-                    /* INSERT QUESTION*/
-                    $insertQ = "INSERT INTO testQuestions
-                    (testID, testQuestion, questionType, testQuestionPoints, correctAnswer, testQuestionImage)
-                    VALUES
-                    ('$testID', '$testQuestion', '$questionType', '$testPoints', '$correctAnswer', " .
+                    $testQuestionQuery = "INSERT INTO testQuestions 
+                        (testID, testQuestion, questionType, testQuestionPoints, correctAnswer, testQuestionImage)
+                        VALUES 
+                        ('$testID', '$testQuestion', '$questionType', '$testQuestionPoints', '$correctAnswer', " .
                         ($testQuestionImage ? "'$testQuestionImage'" : "NULL") . ")";
-                    executeQuery($insertQ);
+                    executeQuery($testQuestionQuery);
 
+                    // Kunin bagong testQuestionID
                     $testQuestionID = mysqli_insert_id($conn);
 
-                    /*INSERT MULTIPLE CHOICE OPTIONS*/
                     if ($questionType === "Multiple Choice" && !empty($question['choices'])) {
                         foreach ($question['choices'] as $choiceText) {
                             $choiceText = mysqli_real_escape_string($conn, $choiceText);
-                            $insertChoice = "INSERT INTO testQuestionChoices (testQuestionID, choiceText)
-                                 VALUES ('$testQuestionID', '$choiceText')";
-                            executeQuery($insertChoice);
+
+                            $choiceQuery = "INSERT INTO testQuestionChoices 
+                                (testQuestionID, choiceText) 
+                                VALUES 
+                                ('$testQuestionID', '$choiceText')";
+                            executeQuery($choiceQuery);
                         }
                     }
                 }
@@ -275,7 +236,7 @@ if (isset($_POST['save_exam'])) {
 
                         $timeLimitDisplay = 'No time limit';
                         if (!empty($testTimeLimit)) {
-                            $timeLimitDisplay = $testTimeLimitMinutes . ' minute' . ((int) $testTimeLimit === 1 ? '' : 's');
+                            $timeLimitDisplay = $testTimeLimit . ' minute' . ((int) $testTimeLimit === 1 ? '' : 's');
                         }
 
                         $guidanceHtml = nl2br(htmlspecialchars($generalGuidanceRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
@@ -360,63 +321,98 @@ $testQuery = "
 
 $tests = executeQuery($testQuery);
 
-// Only keep mainData population
-$mainData = [
-    'assessmentTitle' => '',
-    'generalGuidance' => '',
-    'testTimeLimit' => null,
-    'deadline' => null,
-    'deadlineEnabled' => 0,
-    'testType' => 'Test',
-    'questions' => []
-];
+// Storing reused data
+$reusedData = null;
 
-// If editing or reusing, populate mainData from database
-if (isset($_GET['edit']) || isset($_GET['reuse'])) {
-    $reuseID = intval($_GET['edit'] ?? $_GET['reuse']);
+// If the instructor chose to reuse, it'll check the button if it was set
+if (isset($_GET['reuse']) || isset($_GET['edit'])) {
+    $reuseID = isset($_GET['reuse']) ? intval($_GET['reuse']) : intval($_GET['edit']);
 
-    // Fetch main test info
-    $testInfoQuery = "SELECT a.assessmentTitle, t.generalGuidance, t.testTimeLimit,
-                      a.deadline, a.deadlineEnabled, a.type AS testType, t.testID
-                      FROM assessments a
-                      JOIN tests t ON a.assessmentID = t.assessmentID
-                      WHERE a.assessmentID = '$reuseID' AND a.type='Test'";
-    $infoResult = executeQuery($testInfoQuery);
-    if ($infoResult && $row = $infoResult->fetch_assoc()) {
-        $mainData['assessmentTitle'] = $row['assessmentTitle'];
-        $mainData['generalGuidance'] = $row['generalGuidance'];
-        $mainData['testTimeLimit'] = $row['testTimeLimit'];
-        $mainData['deadline'] = $row['deadline'];
-        $mainData['deadlineEnabled'] = $row['deadlineEnabled'];
-        $mainData['testType'] = $row['testType'];
-        $testID = $row['testID'];
-    }
+    // Getting the data of the selected test to reuse or edit
+    $reuseQuery = "
+        SELECT 
+            a.assessmentTitle,
+            a.deadline,
+            a.deadlineEnabled,
+            a.type AS testType,
+            t.testID,
+            t.generalGuidance,
+            t.testTimeLimit,
+            tq.testQuestionID,
+            tq.testQuestion,
+            tq.questionType,
+            tq.testQuestionPoints,
+            tq.correctAnswer,
+            tq.testQuestionImage,
+            tqc.choiceID,
+            tqc.choiceText
+        FROM assessments a
+        JOIN tests t ON a.assessmentID = t.assessmentID
+        LEFT JOIN testQuestions tq ON t.testID = tq.testID
+        LEFT JOIN testQuestionChoices tqc ON tq.testQuestionID = tqc.testQuestionID
+        JOIN courses crs ON a.courseID = crs.courseID
+        JOIN users u ON crs.userID = u.userID
+        WHERE a.assessmentID = '$reuseID'
+          AND a.type = 'Test'
+          AND u.userID = '$userID'
+        ORDER BY tq.testQuestionID, tqc.choiceID
+    ";
 
-    // Fetch questions and choices
-    $questionsQuery = "SELECT * FROM testquestions WHERE testID = '$testID' ORDER BY testQuestionID ASC";
-    $questionsResult = executeQuery($questionsQuery);
-
-    if ($questionsResult && $questionsResult->num_rows > 0) {
-        while ($row = $questionsResult->fetch_assoc()) {
-            $qID = $row['testQuestionID'];
-            $row['choices'] = [];
-
-            if ($row['questionType'] === 'Multiple Choice') {
-                $choicesQuery = "SELECT * FROM testquestionchoices WHERE testQuestionID = '$qID'";
-                $choicesResult = executeQuery($choicesQuery);
-                if ($choicesResult) {
-                    while ($choice = $choicesResult->fetch_assoc()) {
-                        $row['choices'][] = $choice;
-                    }
-                }
-            }
-
-            $mainData['questions'][] = $row;
+    $reuseResult = executeQuery($reuseQuery);
+    if ($reuseResult && $reuseResult->num_rows > 0) {
+        $reusedData = [];
+        while ($row = $reuseResult->fetch_assoc()) {
+            $reusedData[] = $row;
         }
+    } else {
+        // Invalid or unauthorized reuse/edit attempt
+        header("Location: create-test.php");
+        exit();
     }
 }
 
+if (!empty($reusedData)) {
+    // Populate main test fields
+    $mainData = [
+        'assessmentTitle' => $reusedData[0]['assessmentTitle'],
+        'generalGuidance' => $reusedData[0]['generalGuidance'],
+        'testTimeLimit' => $reusedData[0]['testTimeLimit'],
+        'deadline' => $reusedData[0]['deadline'],
+        'deadlineEnabled' => $reusedData[0]['deadlineEnabled'],
+        'testType' => $reusedData[0]['testType']
+    ];
 
+    // Collect test questions and their choices
+    $testQuestions = [];
+    foreach ($reusedData as $row) {
+        $qID = $row['testQuestionID'];
+        if (empty($qID))
+            continue;
+
+        if (!isset($testQuestions[$qID])) {
+            $testQuestions[$qID] = [
+                'testQuestionID' => $row['testQuestionID'],
+                'testQuestion' => $row['testQuestion'],
+                'questionType' => $row['questionType'],
+                'testQuestionPoints' => $row['testQuestionPoints'],
+                'correctAnswer' => $row['correctAnswer'],
+                'testQuestionImage' => $row['testQuestionImage'],
+                'choices' => []
+            ];
+        }
+
+        // Add choices if present
+        if (!empty($row['choiceID']) && !empty($row['choiceText'])) {
+            $testQuestions[$qID]['choices'][] = [
+                'choiceID' => $row['choiceID'],
+                'choiceText' => $row['choiceText']
+            ];
+        }
+    }
+
+    // Re-index test questions for easier frontend use
+    $testQuestions = array_values($testQuestions);
+}
 
 ?>
 
@@ -428,7 +424,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
         <?php
-        echo isset($_GET['reuse']) ? 'Recreate Test' : (isset($_GET['edit']) ? 'Edit Test' : 'Create Test');
+        echo isset($_GET['reuse']) ? 'Recreate Test' : (isset($_GET['edit']) ? 'Edit Test' : 'Post Test');
         ?> ✦ Webstar
     </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -484,6 +480,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
         }
     </style>
 
+
 </head>
 
 <body>
@@ -502,12 +499,6 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
             <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-md-4 overflow-y-auto position-relative">
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
-
-                    <!-- Alert Container Toasts -->
-                <div id="toastContainer"
-                    class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1  d-flex flex-column align-items-center"
-                    style="z-index:1100; pointer-events:none;">
-                </div>
 
                     <!-- Navbar (mobile) -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
@@ -536,7 +527,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                         } else {
                                             echo 'Create Test';
                                         }
-                                        ?>
+                                        ?></span>
                                     </div>
 
                                     <!-- Assign Existing Task Button -->
@@ -569,9 +560,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                             <input type="text"
                                                 class="form-control textbox mb-2 px-3 py-2 text-reg text-16"
                                                 id="lessonInfo" name="taskTitle" aria-describedby="lessonInfo"
-                                                placeholder="Test Title"
-                                                value="<?php echo isset($mainData) ? htmlspecialchars($mainData['assessmentTitle']) : ''; ?>"
-                                                required>
+                                                placeholder="Test Title" required>
                                         </div>
                                     </div>
 
@@ -588,7 +577,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                         <button class="ql-underline"></button>
                                                         <button class="ql-list" value="bullet"></button>
                                                         <span id="word-counter"
-                                                            class="ms-auto text-muted text-med text-16 me-2">0/200</span>
+                                                            class="ms-auto text-muted text-med text-16 me-2">0/120</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -607,7 +596,6 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                 <div class="input-group">
                                                     <input type="datetime-local" name="deadline"
                                                         class="form-control textbox text-reg text-16 me-0 me-md-2"
-                                                        value="<?php echo isset($mainData['deadline']) ? date('Y-m-d\TH:i', strtotime($mainData['deadline'])) : ''; ?>"
                                                         required>
                                                 </div>
                                             </div>
@@ -619,18 +607,13 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                 </label>
                                                 <input type="number" name="testTimeLimit"
                                                     class="form-control textbox text-reg text-16"
-                                                    placeholder="No time limit if left blank" min="1" value="<?php
-                                                    if (isset($mainData['testTimeLimit'])) {
-                                                        echo htmlspecialchars(intval($mainData['testTimeLimit']) / 60);
-                                                    }
-                                                    ?>" />
+                                                    placeholder="No time limit if left blank" min="1" />
                                             </div>
                                         </div>
                                         <!-- wala pa to -->
                                         <div class="form-check mt-2 col d-flex align-items-center">
                                             <input class="form-check-input" type="checkbox" id="stopSubmissions"
-                                                name="stopSubmissions" style="border: 1px solid var(--black);" <?php if (!empty($mainData['deadlineEnabled']) && $mainData['deadlineEnabled'] == 1)
-                                                    echo 'checked'; ?> />
+                                                name="stopSubmissions" style="border: 1px solid var(--black);" />
                                             <label class="form-check-label text-reg text-14 ms-2"
                                                 style="margin-top: 4.5px;" for="stopSubmissions">
                                                 Stop accepting submissions after the deadline.
@@ -652,7 +635,6 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                             </label>
                                         </div>
                                     </div>
-
                                     <!-- Templates -->
                                     <template id="identificationTemplate">
                                         <div class="row position-relative">
@@ -700,7 +682,6 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                     </div>
 
                                                     <div class="row position-relative p-3">
-
                                                         <!-- Points Column -->
                                                         <div class="col-auto flex-shrink-0 mb-2">
                                                             <div class="text-reg mb-1">Points</div>
@@ -710,23 +691,20 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                                 style="width: 70px; outline: none; box-shadow: none; border: 1px solid var(--black);">
                                                         </div>
 
-                                                        <!-- Answer Column -->
-                                                        <div class="col mb-2">
-                                                            <div class="text-reg mb-1">Correct Answer</div>
+                                                        <!-- Correct Answers Column -->
+                                                        <div
+                                                            class="answers-container d-flex align-items-center flex-nowrap">
                                                             <div
-                                                                class="answers-container d-flex align-items-center flex-nowrap">
-                                                                <div
-                                                                    class="answer-wrapper me-2 d-inline-flex align-items-center">
-                                                                    <input type="text" placeholder="Answer"
-                                                                        class="border rounded p-2 text-reg"
-                                                                        style="width: 220px;"
-                                                                        name="questions[0][correctAnswer]">
-                                                                </div>
+                                                                class="answer-wrapper me-2 d-inline-flex align-items-center">
+                                                                <input type="text" placeholder="Answer"
+                                                                    class="border rounded p-2 text-reg"
+                                                                    style="width: 120px;"
+                                                                    name="questions[0][correctAnswer]" 
+                                                                >
                                                             </div>
                                                         </div>
 
                                                     </div>
-
 
                                                 </div>
                                             </div>
@@ -835,52 +813,38 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                         <!-- Dynamic Border Bottom based on the number of courses hehe -->
                                         <!-- Add to Course -->
                                         <div
-                                            class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center flex-nowrap justify-content-center justify-content-md-start <?php echo isset($_GET['edit']) ? 'invisible' : ''; ?>">
-                                            <span class="me-2 text-med text-16 pe-3">Add to Course</span>
+                                            class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center flex-nowrap justify-content-center justify-content-md-start">
+                                            <span class="me-2 text-med text-16 pe-3">Add to
+                                                Course</span>
                                             <div class="dropdown">
                                                 <button
                                                     class="btn dropdown-toggle dropdown-shape text-med text-16 me-md-5"
-                                                    type="button" style=" width: auto!important;"
-                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                    type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                                    style=" width: auto!important;">
                                                     <span class="me-2">Select Course</span>
                                                 </button>
                                                 <ul class="dropdown-menu p-2 mt-2"
                                                     style="min-width: 200px; border: 1px solid var(--black);">
                                                     <?php
                                                     if ($courses && $courses->num_rows > 0) {
-                                                        $assignedCourseIDs = [];
-                                                        if (isset($_GET['edit'])) {
-                                                            $editID = intval($_GET['edit']);
-                                                            $assignedQuery = "SELECT courseID FROM assessments WHERE assessmentID = '$editID'";
-                                                            $assignedResult = executeQuery($assignedQuery);
-                                                            if ($assignedResult && $assignedResult->num_rows > 0) {
-                                                                while ($row = $assignedResult->fetch_assoc()) {
-                                                                    $assignedCourseIDs[] = $row['courseID'];
-                                                                }
-                                                            }
-                                                        }
-
-                                                        while ($course = $courses->fetch_assoc()) {
-                                                            $checked = in_array($course['courseID'], $assignedCourseIDs) ? 'checked' : '';
-                                                            ?>
+                                                        while ($course = $courses->fetch_assoc()) { ?>
                                                             <li>
                                                                 <div class="form-check">
                                                                     <input class="form-check-input course-checkbox"
                                                                         type="checkbox" name="courses[]"
                                                                         style="border: 1px solid var(--black);"
-                                                                        value="<?= $course['courseID'] ?>"
-                                                                        id="course<?= $course['courseID'] ?>" <?= $checked ?>>
+                                                                        value="<?php echo $course['courseID']; ?>"
+                                                                        id="course<?php echo $course['courseID']; ?>">
                                                                     <label class="form-check-label text-reg"
-                                                                        for="course<?= $course['courseID'] ?>">
-                                                                        <?= $course['courseCode'] ?>
+                                                                        for="course<?php echo $course['courseID']; ?>">
+                                                                        <?php echo $course['courseCode']; ?>
                                                                     </label>
                                                                 </div>
                                                             </li>
-                                                            <?php
-                                                        }
+                                                        <?php }
                                                     } else { ?>
-                                                        <li><span class="dropdown-item-text text-muted">No courses
-                                                                found</span></li>
+                                                        <li><span class="dropdown-item-text text-muted">No
+                                                                courses found</span></li>
                                                     <?php } ?>
                                                 </ul>
                                             </div>
@@ -910,7 +874,11 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                         </div>
                     </div>
                 </div>
-                
+                <!-- Alert Container Toasts -->
+                <div id="toastContainer"
+                    class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1  d-flex flex-column align-items-center"
+                    style="z-index:1100; pointer-events:none;">
+                </div>
             </div>
         </div>
     </div>
@@ -985,10 +953,6 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
             }
         });
 
-        <?php if (isset($reusedData)) { ?>
-            quill.root.innerHTML = <?php echo json_encode($mainData['generalGuidance']); ?>;
-        <?php } ?>
-
         const maxWords = 200;
         const counter = document.getElementById("word-counter");
 
@@ -1000,7 +964,6 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                 let limited = text.split(/\s+/).slice(0, maxWords).join(" ");
                 quill.setText(limited + " ");
                 quill.setSelection(quill.getLength());
-                quill.setSelection(quill.getLength());
             }
 
             counter.textContent = `${Math.min(words, maxWords)}/${maxWords}`;
@@ -1009,33 +972,39 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
         const form = document.querySelector('#guidedanceForm');
 
         form.addEventListener("submit", function (e) {
-            // --- Quill ---
-            const guidelinesInput = document.getElementById("generalGuidance");
-            const plainText = quill.getText().trim();
-            guidelinesInput.value = quill.root.innerHTML.trim();
+            // --- Quill Validation & Save ---
+            const text = quill.getText().trim();
+            const html = quill.root.innerHTML.trim();
 
-            if (plainText === "") {
+            const guidelinesInput = document.getElementById('generalGuidance'); // <-- correct element ID
+
+            // Check if empty
+            if (text.length === 0 || text === "") {
                 e.preventDefault();
+                showAlert("Please provide general guidance");
                 quill.root.focus();
-                showAlert('Please fill out the general guidelines.');
-                return; // stop submission
+                return;
             }
+
+            // Save full HTML to hidden input
+            guidelinesInput.value = html;
 
             let valid = true;
             let message = "";
 
-            // --- Multiple Choice Validation ---
+            // Multiple Choice Validation
             document.querySelectorAll(".multiple-choice-item").forEach(mc => {
                 if (!mc.offsetParent) return;
                 const radios = mc.querySelectorAll("input[type='radio']");
-                const oneChecked = Array.from(radios).some(r => r.checked);
+                let oneChecked = Array.from(radios).some(r => r.checked);
+
                 const innerCard = mc.querySelector(".textbox, .card, .form-control");
                 if (!oneChecked) {
                     valid = false;
                     if (!message) message = "Choose the correct answers for all multiple choice questions.";
                     if (innerCard) innerCard.style.border = "2px solid red";
-                } else if (innerCard) {
-                    innerCard.style.border = "";
+                } else {
+                    if (innerCard) innerCard.style.border = "";
                 }
 
                 // Remove empty choices
@@ -1044,7 +1013,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                 });
             });
 
-            // --- Identification Validation ---
+            // Identification Validation
             document.querySelectorAll(".textbox").forEach(idBox => {
                 if (!idBox.offsetParent) return;
                 const type = idBox.querySelector("input[type='hidden'][name*='questionType']")?.value.toLowerCase();
@@ -1053,7 +1022,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                     const hasAnswer = answers.some(a => a.value.trim() !== "");
                     if (!hasAnswer) {
                         valid = false;
-                        if (!message) message = "Provide one correct answer for all identification questions.";
+                        if (!message) message = "Provide at least one correct answer for all identification questions.";
                         idBox.style.border = "2px solid red";
                     } else {
                         idBox.style.border = "";
@@ -1061,12 +1030,13 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                 }
             });
 
-            // --- Deadline Validation ---
+            // Deadline Validation
             const deadlineInput = document.querySelector('input[name="deadline"]');
             if (deadlineInput) {
                 const deadlineValue = new Date(deadlineInput.value);
                 const now = new Date();
                 now.setSeconds(0, 0);
+
                 if (!deadlineInput.value || deadlineValue < now) {
                     valid = false;
                     if (!message) message = "Please set the deadline to a future date or time within today.";
@@ -1076,7 +1046,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                 }
             }
 
-            // --- Course Selection Validation ---
+            // Selected Courses Validation
             const checkedCourses = document.querySelectorAll('.course-checkbox:checked');
             if (checkedCourses.length === 0) {
                 valid = false;
@@ -1085,7 +1055,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
 
             if (!valid) {
                 e.preventDefault();
-                showAlert(message); // show toast
+                showAlert(message);
             }
         });
 
@@ -1094,7 +1064,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
             const container = document.getElementById("toastContainer");
 
             const alert = document.createElement("div");
-            alert.className = "alert alert-danger fade show mb-2 text-center d-flex align-items-center justify-content-center shadow-lg px-3 py-2 text-med text-12";
+            alert.className = "alert alert-danger fade show mb-2 text-center d-flex align-items-center justify-content-center shadow-lg px-3 py-2 text-reg text-14";
             alert.innerHTML = `
             <i class="bi bi-x-circle-fill me-2 fs-6"></i>
             <span>${message}</span>
@@ -1144,7 +1114,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
             renumberQuestions();
         });
 
-
+        // Add answer (delegated)
         // document.addEventListener("click", function (e) {
         //     if (e.target.closest(".add-answer-btn")) {
         //         const button = e.target.closest(".add-answer-btn");
@@ -1245,7 +1215,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
 
                 const input = document.createElement("input");
                 input.type = "text";
-                input.classList.add("choice-input", "text-reg", "me-4", "text-truncate", "text-14");
+                input.classList.add("choice-input", "text-reg", "me-4", "text-truncate");
                 input.name = `questions[${questionIndex}][choices][]`;
                 input.placeholder = "Choice";
                 input.style.border = "none";
@@ -1336,7 +1306,6 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
 
             img.src = "../shared/assets/img/placeholder/placeholder.png";
             fileInput.value = "";
-            container.style.display = "none";
             container.style.display = "none";
         });
 
