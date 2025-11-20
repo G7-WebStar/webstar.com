@@ -640,7 +640,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
             $conn->query("INSERT INTO selectedlevels (submissionID, levelID) VALUES ($submissionID, $levelID)");
         }
 
-        echo "<script>alert('Grades saved successfully!'); window.location='" . $_SERVER['REQUEST_URI'] . "';</script>";
+        // Set session for toast
+        $_SESSION['success'] = "Grade submitted successfully!";
+
+        // Redirect to same page to trigger toast and prevent form resubmission
+        header("Location: " . $_SERVER['REQUEST_URI']);
         exit;
     }
 
@@ -673,6 +677,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
 <body>
     <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center align-items-md-start p-0 p-md-3"
         style="background-color: var(--black); overflow-y:auto;">
+        <!-- Toast Container -->
+        <div id="toastContainer"
+             class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+            style="z-index:1100; pointer-events:none;">
+           <?php if (isset($_SESSION['success'])): ?>
+               <div class="alert alert-success mb-2 shadow-lg text-med text-12
+                           d-flex align-items-center justify-content-center gap-2 px-3 py-2" role="alert"
+                    style="border-radius:8px; display:flex; align-items:center; gap:8px; padding:0.5rem 0.75rem; text-align:center; background-color:#d1e7dd; color:#0f5132;">
+                   <i class="bi bi-check-circle-fill fs-6" style="color: var(--black);"></i>
+                   <span style="color: var(--black);"><?= $_SESSION['success']; ?></span>
+               </div>
+               <?php unset($_SESSION['success']); ?>
+           <?php endif; ?>
+        </div>
 
         <div class="row w-100">
             <!-- Sidebar -->
@@ -868,9 +886,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                                             <input type="hidden" name="score" id="scoreInput">
                                             <input type="hidden" id="selectedBadgeIDs" name="selectedBadgeIDs" value="">
 
-                                            <div class="d-flex align-items-center justify-content-center mb-5">
+                                            <div class="d-flex align-items-center justify-content-center mb-2">
                                                 <div class="text-reg"><i>Grade</i></div>
                                             </div>
+                                            <div style="max-height: 450px; overflow-y: auto; padding-right: 10px;">
 
                                             <?php while ($criterion = $criteriaQuery->fetch_assoc()): ?>
                                                 <?php
@@ -954,7 +973,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                                             <!-- Buttons always below the card -->
                                             <div class="text-center mt-4">
                                                 <div
-                                                    class="d-flex justify-content-center align-items-center gap-3 mb-2">
+                                                    class="d-flex justify-content-center align-items-center gap-3 mb-2 stack-below-large">
                                                     <button type="button" id="prevBtn"
                                                         class="btn px-4 py-2 rounded-pill text-15 fw-semibold"
                                                         data-current-index="<?php echo $currentIndex; ?>"
@@ -980,6 +999,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                                                     <?php echo $leftToReview; ?> submissions left to review
                                                 </p>
 
+                                            </div>
                                             </div>
                                         </form>
                                     </div>
@@ -1538,6 +1558,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
         });
 
 
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const alertEl = document.querySelector('.alert.alert-success');
+            if (alertEl) {
+                setTimeout(() => {
+                    alertEl.style.transition = "opacity 0.5s ease-out";
+                    alertEl.style.opacity = 0;
+                    setTimeout(() => alertEl.remove(), 500);
+                }, 3000); // auto hide after 3s
+            }
+        });
     </script>
 </body>
 
