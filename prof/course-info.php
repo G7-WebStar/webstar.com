@@ -168,7 +168,7 @@ if (isset($_GET['courseID'])) {
     // Status filter
     $todoWhereStatus = "";
     $deadlineCondition = "";
-    
+
     if ($statusFilter === 'Pending') {
         $todoWhereStatus = "AND (todo.status IS NULL OR todo.status = 'Pending')";
         $deadlineCondition = "AND NOW() < assessments.deadline";
@@ -372,8 +372,33 @@ $user = mysqli_fetch_assoc($result);
         rel="stylesheet" />
     <style>
         .my-student-item:hover {
-            background-color: var(--highlight50);
+            background-color: var(--primaryColor);
             cursor: pointer;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 2px 0 #2c2c2c !important;
+            border: 1px solid var(--black);
+        }
+
+        .modal-body .confirm-text {
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            display: block;
+            margin: 0;
+            line-height: 1.35;
+        }
+
+        .modal-body .confirm-text .text-sbold {
+            display: inline;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        @media screen and (max-width: 767px) {
+            .text-sm-14 {
+                font-size: 14px !important;
+            }
         }
     </style>
 
