@@ -328,161 +328,187 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                 </div>
             </div>
         </div>
-    </div>
-    </div>
-    </div>
-    </div>
+        <!-- Toast Container -->
+        <div id="toastContainer"
+            class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center text-med text-14"
+            style="z-index:1100; pointer-events:none;">
+        </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        function createDoughnutChart(canvasId, submitted, pending, returned, missing) {
-            const ctx = document.getElementById(canvasId).getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    datasets: [{
-                        data: [submitted, pending, returned, missing],
-                        backgroundColor: ['#3DA8FF', '#C7C7C7', '#d9ffe4ff', '#ffd9d9ff'],
-                        borderWidth: 0,
-                    }]
-                },
-                options: {
-                    cutout: '75%',
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            enabled: false
+        <script>
+            //Function to show toast with icon
+            function showToast(message, type = 'success') {
+                const alert = document.createElement('div');
+                alert.className = `alert mb-2 shadow-lg d-flex align-items-center gap-2 px-3 py-2 
+                       ${type === 'success' ? 'alert-success' : 'alert-danger'}`;
+                alert.style.opacity = "0";
+                alert.style.transition = "opacity 0.3s ease";
+                alert.style.pointerEvents = "none";
+
+                alert.innerHTML = `
+                <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
+                <span>${message}</span>
+            `;
+
+                document.getElementById('toastContainer').appendChild(alert);
+
+                //Fade in
+                setTimeout(() => alert.style.opacity = "1", 10);
+
+                //Fade out & remove after 3s
+                setTimeout(() => {
+                    alert.style.opacity = "0";
+                    setTimeout(() => alert.remove(), 300);
+                }, 3000);
+            }
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            function createDoughnutChart(canvasId, submitted, pending, returned, missing) {
+                const ctx = document.getElementById(canvasId).getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        datasets: [{
+                            data: [submitted, pending, returned, missing],
+                            backgroundColor: ['#3DA8FF', '#C7C7C7', '#d9ffe4ff', '#ffd9d9ff'],
+                            borderWidth: 0,
+                        }]
+                    },
+                    options: {
+                        cutout: '75%',
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: false
+                            }
                         }
                     }
-                }
-            });
-        }
-
-        function showDoughnut() {
-            document.addEventListener("DOMContentLoaded", function() {
-                const chartsIDs = <?php echo json_encode($chartsIDs); ?>;
-                const submitted = <?php echo json_encode($submitted); ?>;
-                const pending = <?php echo json_encode($pending); ?>;
-                const returned = <?php echo json_encode($returned); ?>;
-                const missing = <?php echo json_encode($missing); ?>;
-                const isArchived = <?php echo json_encode($isArchived); ?>
-
-                chartsIDs.forEach(function(id, index) {
-                    if (isArchived[index] == 0) {
-                        createDoughnutChart(id, submitted[index], pending[index], returned[index], missing[index])
-                    } else {
-                        const archiveLabel = document.getElementById('chart-container' + (index + 1));
-                        archiveLabel.innerHTML = `<span class="badge rounded-pill text-bg-secondary text-reg">Archived</span>`;
-                        console.log('chart-container' + (index + 1));
-                    }
                 });
-            });
-        }
-
-
-        function archive(element, ID) {
-            const archiveLabel = document.getElementById('chart-container' + element.id);
-            const archiveDropdown = document.getElementById(element.id);
-
-            if (archiveDropdown.textContent == 'Mark as Archived') {
-                archiveDropdown.innerHTML = `<i class="fas fa-archive me-2"></i>Unarchive`;
-            } else if (archiveDropdown.textContent == 'Unarchive') {
-                archiveDropdown.innerHTML = `<i class="fas fa-archive me-2"></i>Mark as Archived`;
             }
 
-            fetchArchiveQuery(ID);
-            showDoughnut();
-        }
+            function showDoughnut() {
+                document.addEventListener("DOMContentLoaded", function() {
+                    const chartsIDs = <?php echo json_encode($chartsIDs); ?>;
+                    const submitted = <?php echo json_encode($submitted); ?>;
+                    const pending = <?php echo json_encode($pending); ?>;
+                    const returned = <?php echo json_encode($returned); ?>;
+                    const missing = <?php echo json_encode($missing); ?>;
+                    const isArchived = <?php echo json_encode($isArchived); ?>
 
-        function fetchArchiveQuery(assessmentID) {
-            fetch('../shared/assets/processes/archive-assessment.php?assessmentID=' + assessmentID)
-                .then(response => {
-                    if (!response.ok) {
-                        console.log("There was a problem with your request :(");
-                    } else {
-                        console.log("Successful!");
-                        window.location.reload();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error archiving assessment:', error);
-                    alert('Failed to archive. Please try again.');
-                });
-        }
-
-        showDoughnut();
-    </script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Get dropdown containers and all cards
-            const dropdownContainers = document.querySelectorAll('.dropdown-container');
-            const cards = document.querySelectorAll('.assessment-card');
-
-            // Current selected values
-            let currentCourse = 'All';
-            let currentStatus = '0'; // 0 = Active, 1 = Archived
-            let currentSort = 'Desc'; // Default descending by $cardIndex
-
-            // Filter and sort cards
-            function filterCards() {
-                cards.forEach(card => {
-                    const cardCourse = card.dataset.course || '';
-                    const cardStatus = card.dataset.status || '';
-
-                    const matchCourse = (currentCourse === 'All') || (cardCourse === currentCourse);
-                    const matchStatus = (currentStatus === '0') || (cardStatus === currentStatus);
-
-                    card.style.display = (matchCourse && matchStatus) ? '' : 'none';
-                });
-
-                // Sorting by data-sort (cardIndex)
-                const container = cards[0].parentNode;
-                const sortedCards = Array.from(cards).sort((a, b) => {
-                    const aIndex = parseInt(a.dataset.sort || 0, 10);
-                    const bIndex = parseInt(b.dataset.sort || 0, 10);
-                    return (currentSort === 'Asc') ? aIndex - bIndex : bIndex - aIndex;
-                });
-
-                sortedCards.forEach(c => container.appendChild(c));
-            }
-
-            // Handle dropdown clicks
-            dropdownContainers.forEach(container => {
-                const labelSpan = container.querySelector('.dropdown-toggle span');
-                const dropdownLabel = container.querySelector('.dropdown-label').textContent.trim();
-
-                container.querySelectorAll('.dropdown-item').forEach(item => {
-                    item.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const value = this.dataset.value || this.textContent.trim();
-
-                        // Update dropdown label text
-                        labelSpan.textContent = this.textContent.trim();
-
-                        // Update current filter/sort values
-                        if (dropdownLabel === 'Course') {
-                            currentCourse = value;
-                        } else if (dropdownLabel === 'Status') {
-                            currentStatus = value;
-                        } else if (dropdownLabel === 'Sort By') {
-                            currentSort = value; // 'Asc' or 'Desc'
+                    chartsIDs.forEach(function(id, index) {
+                        if (isArchived[index] == 0) {
+                            createDoughnutChart(id, submitted[index], pending[index], returned[index], missing[index])
+                        } else {
+                            const archiveLabel = document.getElementById('chart-container' + (index + 1));
+                            archiveLabel.innerHTML = `<span class="badge rounded-pill text-bg-secondary text-reg">Archived</span>`;
                         }
-
-                        // Apply filtering and sorting
-                        filterCards();
                     });
                 });
-            });
+            }
 
-            // Initialize filter and sort on page load
-            filterCards();
-        });
-    </script>
+
+            function archive(element, ID) {
+                const archiveLabel = document.getElementById('chart-container' + element.id);
+                const archiveDropdown = document.getElementById(element.id);
+
+                if (archiveDropdown.textContent == 'Mark as Archived') {
+                    archiveDropdown.innerHTML = `<i class="fas fa-archive me-2"></i>Unarchive`;
+                } else if (archiveDropdown.textContent == 'Unarchive') {
+                    archiveDropdown.innerHTML = `<i class="fas fa-archive me-2"></i>Mark as Archived`;
+                }
+
+                fetchArchiveQuery(ID);
+                showDoughnut();
+            }
+
+            function fetchArchiveQuery(assessmentID) {
+                fetch('../shared/assets/processes/archive-assessment.php?assessmentID=' + assessmentID)
+                    .then(response => {
+                        if (!response.ok) {
+                            showToast("There was a problem with your request :(", "danger");
+                        } else {
+                            showToast("Successful!", "success");
+                            window.location.reload();
+                        }
+                    })
+                    .catch(error => {
+                        showToast('Failed to archive. Please try again.', 'danger');
+                    });
+            }
+
+            showDoughnut();
+        </script>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                //Get dropdown containers and all cards
+                const dropdownContainers = document.querySelectorAll('.dropdown-container');
+                const cards = document.querySelectorAll('.assessment-card');
+
+                //Current selected values
+                let currentCourse = 'All';
+                let currentStatus = '0';
+                let currentSort = 'Desc';
+
+                //Filter and sort cards
+                function filterCards() {
+                    cards.forEach(card => {
+                        const cardCourse = card.dataset.course || '';
+                        const cardStatus = card.dataset.status || '';
+
+                        const matchCourse = (currentCourse === 'All') || (cardCourse === currentCourse);
+                        const matchStatus = (currentStatus === '0') || (cardStatus === currentStatus);
+
+                        card.style.display = (matchCourse && matchStatus) ? '' : 'none';
+                    });
+
+                    //Sorting by data-sort (cardIndex)
+                    const container = cards[0].parentNode;
+                    const sortedCards = Array.from(cards).sort((a, b) => {
+                        const aIndex = parseInt(a.dataset.sort || 0, 10);
+                        const bIndex = parseInt(b.dataset.sort || 0, 10);
+                        return (currentSort === 'Asc') ? aIndex - bIndex : bIndex - aIndex;
+                    });
+
+                    sortedCards.forEach(c => container.appendChild(c));
+                }
+
+                //Handle dropdown clicks
+                dropdownContainers.forEach(container => {
+                    const labelSpan = container.querySelector('.dropdown-toggle span');
+                    const dropdownLabel = container.querySelector('.dropdown-label').textContent.trim();
+
+                    container.querySelectorAll('.dropdown-item').forEach(item => {
+                        item.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            const value = this.dataset.value || this.textContent.trim();
+
+                            //Update dropdown label text
+                            labelSpan.textContent = this.textContent.trim();
+
+                            //Update current filter/sort values
+                            if (dropdownLabel === 'Course') {
+                                currentCourse = value;
+                            } else if (dropdownLabel === 'Status') {
+                                currentStatus = value;
+                            } else if (dropdownLabel === 'Sort By') {
+                                currentSort = value; // 'Asc' or 'Desc'
+                            }
+
+                            //Apply filtering and sorting
+                            filterCards();
+                        });
+                    });
+                });
+
+                //Initialize filter and sort on page load
+                filterCards();
+            });
+        </script>
 </body>
 
 </html>

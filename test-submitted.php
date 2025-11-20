@@ -131,16 +131,6 @@ $assessmentID = (mysqli_num_rows($assessmentIDResult) > 0) ? $assessmentIDRow['a
 //Checks if multiplier is already used
 $checkMultiplierUseQuery = "SELECT * FROM webstars WHERE userID = '$userID' AND assessmentID = '$assessmentID' AND sourceType = 'XP Multiplier Usage'";
 $checkMultiplierUseResult = executeQuery($checkMultiplierUseQuery);
-
-echo "<script>console.log(" . $baseXP . ");</script>";
-echo "<script>console.log(" . $baseWebstars . ");</script>";
-echo "<script>console.log(" . $correctBonusXP . ");</script>";
-echo "<script>console.log(" . $correctBonusWebstars . ");</script>";
-echo "<script>console.log(" . $timeFactor . ");</script>";
-echo "<script>console.log(" . $finalXP . ");</script>";
-echo "<script>console.log(" . $finalWebstars . ");</script>";
-echo "<script>console.log(" . $multipliedXP . ");</script>";
-echo "<script>console.log(" . $bonusXP . ");</script>";
 ?>
 
 <!doctype html>
@@ -374,8 +364,40 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
             </div>
         </div>
     </div>
+    <!-- Toast Container -->
+    <div id="toastContainer"
+        class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center text-med text-14"
+        style="z-index:1100; pointer-events:none;">
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <script>
+        // Function to show toast with icon
+        function showToast(message, type = 'success') {
+            const alert = document.createElement('div');
+            alert.className = `alert mb-2 shadow-lg d-flex align-items-center gap-2 px-3 py-2 
+                       ${type === 'success' ? 'alert-success' : 'alert-danger'}`;
+            alert.style.opacity = "0";
+            alert.style.transition = "opacity 0.3s ease";
+            alert.style.pointerEvents = "none";
+
+            alert.innerHTML = `
+                <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
+                <span>${message}</span>
+            `;
+
+            document.getElementById('toastContainer').appendChild(alert);
+
+            // Fade in
+            setTimeout(() => alert.style.opacity = "1", 10);
+
+            // Fade out & remove after 3s
+            setTimeout(() => {
+                alert.style.opacity = "0";
+                setTimeout(() => alert.remove(), 300);
+            }, 3000);
+        }
+    </script>
     <script>
         // Trigger confetti when the page loads
         window.onload = function() {
@@ -407,7 +429,7 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
                 }
             })();
         };
-        
+
         let timerHtml = document.getElementById('timer');
         let seconds = <?php echo $timeStartRow['remainingTime']; ?>;
         //Format time
@@ -468,10 +490,14 @@ echo "<script>console.log(" . $bonusXP . ");</script>";
                 const result = await response.json();
 
                 if (result.success) {
-                    alert(result.message);
-                    window.location.reload();
+                    await showToast(result.message, 'success');
+                    document.getElementById('multiplierBtn').disabled = true;
+                    document.getElementById('useBtn').disabled = true;
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3300);
                 } else {
-                    alert('Failed to apply multiplier: ' + result.error);
+                    showToast('Failed to apply multiplier: ' + result.error, 'danger');
                 }
             } catch (error) {
                 console.error('Error applying XP multiplier:', error);

@@ -408,7 +408,6 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                     if (unanswered.userAnswer == null || unanswered.userAnswer == '') {
                         unanswered.userAnswer = "No Answer";
                     }
-                    console.log(choiceText);
                 });
                 submitQuiz();
             }
@@ -646,11 +645,9 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             localStorage.setItem("choiceText<?php echo $testID; ?>", JSON.stringify(choiceText));
             localStorage.setItem("selectedAnswers<?php echo $testID; ?>", JSON.stringify(selectedAnswers));
 
-            console.log(choiceText);
         }
 
         function identificationType() {
-            console.log(choiceText[currentQuestionIndex]);
             const inputField = document.getElementById('input' + currentQuestionIndex);
             const identificationAnswer = {
                 userAnswer: inputField.value.trim(),
@@ -696,7 +693,6 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             }
         }
 
-        console.log(choiceText);
     </script>
 </body>
 
