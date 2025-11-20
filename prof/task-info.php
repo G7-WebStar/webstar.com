@@ -52,18 +52,26 @@ $linksArray = [];
 
 while ($file = mysqli_fetch_assoc($filesResult)) {
     if (!empty($file['fileAttachment'])) {
+        // fileAttachment has the actual uploaded file(s)
         $attachments = array_map('trim', explode(',', $file['fileAttachment']));
-        foreach ($attachments as $att) {
-            $fileName = basename($att);
-            $filePath = "../shared/assets/files/" . $fileName;
+
+        // fileTitle stores the display name(s) for the files
+        $titles = !empty($file['fileTitle']) ? array_map('trim', explode(',', $file['fileTitle'])) : [];
+
+        foreach ($attachments as $index => $att) {
+            $filePath = "../shared/assets/files/" . basename($att);
+
+            // Determine display name: use fileTitle if exists, otherwise fallback to filename
+            $displayName = $titles[$index] ?? basename($att);
 
             // Calculate size in MB
             $fileSize = file_exists($filePath) ? filesize($filePath) : 0;
             $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
+
             $fileLinks[] = [
-                'name' => $fileName,
-                'path' => $filePath,
-                'ext' => strtolower(pathinfo($fileName, PATHINFO_EXTENSION)),
+                'name' => $displayName,   // display name from DB
+                'path' => $filePath,      // actual file path
+                'ext' => strtolower(pathinfo($filePath, PATHINFO_EXTENSION)),
                 'size' => $fileSizeMB
             ];
         }
@@ -170,8 +178,10 @@ if (!empty($rubricID)) {
                             <!-- DESKTOP VIEW -->
                             <div class="row desktop-header d-none d-md-flex">
                                 <div class="col-auto me-2">
-                                    <button onclick="history.back()" class="btn p-0" style="background:none; border:none;">
-                                        <span class="material-symbols-outlined" style="color: var(--black); font-size: 22px;">
+                                    <button onclick="history.back()" class="btn p-0"
+                                        style="background:none; border:none;">
+                                        <span class="material-symbols-outlined"
+                                            style="color: var(--black); font-size: 22px;">
                                             arrow_back
                                         </span>
                                     </button>
@@ -201,8 +211,10 @@ if (!empty($rubricID)) {
                             <div class="d-flex d-md-none mobile-assignment">
                                 <div class="mobile-top">
                                     <div class="arrow">
-                                        <button onclick="history.back()" class="btn p-0" style="background:none; border:none;">
-                                            <span class="material-symbols-outlined" style="color: var(--black); font-size: 22px;">
+                                        <button onclick="history.back()" class="btn p-0"
+                                            style="background:none; border:none;">
+                                            <span class="material-symbols-outlined"
+                                                style="color: var(--black); font-size: 22px;">
                                                 arrow_back
                                             </span>
                                         </button>
@@ -253,24 +265,26 @@ if (!empty($rubricID)) {
                                                     <!-- FILES -->
                                                     <?php foreach ($fileLinks as $f):
                                                         $fileNameOnly = pathinfo($f['name'], PATHINFO_FILENAME);
-                                                    ?>
+                                                        ?>
                                                         <div onclick="openViewerModal('<?php echo $f['name']; ?>', '<?php echo $f['path']; ?>')"
                                                             style="cursor:pointer;">
                                                             <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
                                                                 style="width:400px; max-width:100%; min-width:310px;">
                                                                 <span class="px-3 py-3 material-symbols-outlined">draft</span>
-                                                                <div class="ms-2">
-                                                                    <div class="text-sbold text-16 mt-1">
+                                                                <div class="ms-2 flex-grow-1">
+                                                                    <!-- Truncated title -->
+                                                                    <div class="text-sbold text-16 mt-1 text-truncate"
+                                                                        style="max-width:320px;">
                                                                         <?php echo $fileNameOnly; ?>
                                                                     </div>
                                                                     <div class="due text-reg text-14 mb-1">
-                                                                        <?php echo strtoupper($f['ext']); ?> · <?php echo $f['size']; ?>
+                                                                        <?php echo strtoupper($f['ext']); ?> ·
+                                                                        <?php echo $f['size']; ?>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     <?php endforeach; ?>
-
                                                     <!-- LINKS -->
                                                     <?php foreach ($linksArray as $linkItem): ?>
                                                         <div onclick="openLinkViewerModal('<?php echo htmlspecialchars($linkItem['title']); ?>', '<?php echo htmlspecialchars($linkItem['url']); ?>')"
@@ -278,12 +292,14 @@ if (!empty($rubricID)) {
                                                             <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
                                                                 style="width:400px; max-width:100%; min-width:310px;">
                                                                 <span class="px-3 py-3 material-symbols-outlined">public</span>
-                                                                <div class="ms-2">
-                                                                    <div class="text-sbold text-16 mt-1">
+                                                                <div class="ms-2 flex-grow-1">
+                                                                    <!-- Truncated link title -->
+                                                                    <div class="text-sbold text-16 mt-1 text-truncate"
+                                                                        style="max-width:320px;">
                                                                         <?php echo htmlspecialchars($linkItem['title']); ?>
                                                                     </div>
-                                                                    <div class="text-reg text-12 mt-0"
-                                                                        style="color: var(--black);">
+                                                                    <div class="text-reg text-12 mt-0 text-truncate"
+                                                                        style="color: var(--black); max-width:320px;">
                                                                         <?php echo htmlspecialchars($linkItem['url']); ?>
                                                                     </div>
                                                                 </div>
@@ -347,7 +363,8 @@ if (!empty($rubricID)) {
             <div class="modal-content" style="border-radius:12px; overflow:hidden;">
                 <div class="modal-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-2">
-                        <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;" id="viewerModalLabel">File Viewer</h5>
+                        <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;"
+                            id="viewerModalLabel">File Viewer</h5>
                         <a id="modalDownloadBtn" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
                             style="background-color: var(--primaryColor); border: 1px solid var(--black);" download>
                             <span class="" style="display:flex;align-items:center;gap:4px;">
@@ -371,7 +388,8 @@ if (!empty($rubricID)) {
             <div class="modal-content" style="border-radius:12px; overflow:hidden;">
                 <div class="modal-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-2">
-                        <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;" id="linkViewerModalLabel">Link Viewer</h5>
+                        <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;"
+                            id="linkViewerModalLabel">Link Viewer</h5>
                         <a id="modalOpenInNewTab" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
                             style="background-color: var(--primaryColor); border: 1px solid var(--black);"
                             target="_blank">
@@ -422,7 +440,7 @@ if (!empty($rubricID)) {
                                 <div class="col-12 col-md-10">
                                     <?php foreach ($levelsByCriterion[$criterion['criterionID']] as $levelIndex => $level):
                                         $collapseID = strtolower(preg_replace('/\s+/', '', $level['levelTitle'])) . $criterionIndex;
-                                    ?>
+                                        ?>
                                         <div class="mb-2">
                                             <div class="w-100 d-flex align-items-center justify-content-center flex-column text-med text-14"
                                                 style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black);">
