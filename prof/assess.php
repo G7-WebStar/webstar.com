@@ -31,9 +31,9 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                 WHERE assessmentID = '$assessmentID' AND status = 'Submitted'";
         $countSubmittedResult = executeQuery($countSubmittedQuery);
 
-        $countGradedQuery = "SELECT COUNT(*) AS graded FROM todo 
-                                WHERE assessmentID = '$assessmentID' AND status = 'Graded'";
-        $countGradedResult = executeQuery($countGradedQuery);
+        $countReturnedQuery = "SELECT COUNT(*) AS returned FROM todo 
+                                WHERE assessmentID = '$assessmentID' AND status = 'Returned'";
+        $countReturnedResult = executeQuery($countReturnedQuery);
 
         $countMissingQuery = "SELECT COUNT(*) AS missing FROM todo 
                                 WHERE assessmentID = '$assessmentID' AND status = 'Missing'";
@@ -43,7 +43,7 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
         FROM submissions 
         INNER JOIN todo 
             ON todo.userID = submissions.userID
-        WHERE todo.status != 'Graded' AND todo.assessmentID = '$assessmentID' AND submissions.assessmentID = '$assessmentID'
+        WHERE todo.status != 'Returned' AND todo.assessmentID = '$assessmentID' AND submissions.assessmentID = '$assessmentID'
         ORDER BY todo.updatedAt ASC
         LIMIT 1";
         $getSubmissionIDResult = executeQuery($getSubmissionIDQuery);
@@ -58,11 +58,11 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
             $submittedTodoCount = $countRowSubmitted['submittedTodo'];
         }
 
-        $gradedTodoCount = 0;
+        $returnedTodoCount = 0;
 
-        if (mysqli_num_rows($countGradedResult) > 0) {
-            $countRowGraded = mysqli_fetch_assoc($countGradedResult);
-            $gradedTodoCount = $countRowGraded['graded'];
+        if (mysqli_num_rows($countReturnedResult) > 0) {
+            $countRowReturned = mysqli_fetch_assoc($countReturnedResult);
+            $returnedTodoCount = $countRowReturned['returned'];
         }
 
         $missingTodoCount = 0;
@@ -93,7 +93,7 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
             $rubricID = null;
         }
 
-        $rowAssessment['graded'] = $gradedTodoCount;
+        $rowAssessment['returned'] = $returnedTodoCount;
         $rowAssessment['submittedTodo'] = $submittedTodoCount;
         $rowAssessment['pending'] = $pendingTodoCount;
         $rowAssessment['missing'] = $missingTodoCount;
@@ -239,7 +239,7 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                         $deadline = $assessment['assessmentDeadline'];
                                         $submittedCount = $assessment['submittedTodo'];
                                         $pendingCount = $assessment['pending'];
-                                        $gradedCount = $assessment['graded'];
+                                        $returnedCount = $assessment['returned'];
                                         $missingCount = $assessment['missing'];
                                         $cardSubmissionID = $assessment['submissionID'];
                                         $archiveStatus = $assessment['isArchived'];
@@ -248,7 +248,7 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                         $chartsIDs[] = "chart$i";
                                         $submitted[] = $submittedCount;
                                         $pending[] = $pendingCount;
-                                        $graded[] = $gradedCount;
+                                        $returned[] = $returnedCount;
                                         $missing[] = $missingCount;
                                         $isArchived[] = $archiveStatus;
                                 ?>
@@ -272,7 +272,7 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                                     <div class="submission-stats">
                                                         <div class="text-reg text-14 mb-1"><span class="stat-value"><?php echo $submittedCount; ?></span> submitted</div>
                                                         <div class="text-reg text-14 mb-1"><span class="stat-value"><?php echo $pendingCount; ?></span> pending submission</div>
-                                                        <div class="text-reg text-14 mb-1"><span class="stat-value"><?php echo $gradedCount; ?></span> graded</div>
+                                                        <div class="text-reg text-14 mb-1"><span class="stat-value"><?php echo $returnedCount; ?></span> returned</div>
                                                         <div class="text-reg text-14">Due <?php echo $deadline; ?></div>
                                                     </div>
 
@@ -323,9 +323,13 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                                 </div>
                                             </div>
                                         </div>
-                                <?php
+                                    <?php
                                         $i++;
                                     }
+                                } else {
+                                    ?>
+                                    <div class="text-sbold text-center mt-5 text-25">No assessments found.</div>
+                                <?php
                                 }
                                 ?>
                             </div>
@@ -343,13 +347,13 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        function createDoughnutChart(canvasId, submitted, pending, graded, missing) {
+        function createDoughnutChart(canvasId, submitted, pending, returned, missing) {
             const ctx = document.getElementById(canvasId).getContext('2d');
             new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     datasets: [{
-                        data: [submitted, pending, graded, missing],
+                        data: [submitted, pending, returned, missing],
                         backgroundColor: ['#3DA8FF', '#C7C7C7', '#d9ffe4ff', '#ffd9d9ff'],
                         borderWidth: 0,
                     }]
@@ -373,13 +377,13 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                 const chartsIDs = <?php echo json_encode($chartsIDs); ?>;
                 const submitted = <?php echo json_encode($submitted); ?>;
                 const pending = <?php echo json_encode($pending); ?>;
-                const graded = <?php echo json_encode($graded); ?>;
+                const returned = <?php echo json_encode($returned); ?>;
                 const missing = <?php echo json_encode($missing); ?>;
                 const isArchived = <?php echo json_encode($isArchived); ?>
 
                 chartsIDs.forEach(function(id, index) {
                     if (isArchived[index] == 0) {
-                        createDoughnutChart(id, submitted[index], pending[index], graded[index], missing[index])
+                        createDoughnutChart(id, submitted[index], pending[index], returned[index], missing[index])
                     } else {
                         const archiveLabel = document.getElementById('chart-container' + (index + 1));
                         archiveLabel.innerHTML = `<span class="badge rounded-pill text-bg-secondary text-reg">Archived</span>`;

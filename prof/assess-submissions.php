@@ -39,10 +39,10 @@ $countSubmittedQuery = "SELECT COUNT(*) AS submittedTodo FROM todo
 $countSubmittedResult = executeQuery($countSubmittedQuery);
 $submitted = mysqli_fetch_assoc($countSubmittedResult);
 
-$countGradedQuery = "SELECT COUNT(*) AS graded FROM todo 
-                     WHERE assessmentID = '$assessmentID' AND status = 'Graded'";
-$countGradedResult = executeQuery($countGradedQuery);
-$graded = mysqli_fetch_assoc($countGradedResult);
+$countReturnedQuery = "SELECT COUNT(*) AS returned FROM todo 
+                     WHERE assessmentID = '$assessmentID' AND status = 'Returned'";
+$countReturnedResult = executeQuery($countReturnedQuery);
+$returned = mysqli_fetch_assoc($countReturnedResult);
 
 $countMissingQuery = "SELECT COUNT(*) AS missing FROM todo 
                      WHERE assessmentID = '$assessmentID' AND status = 'Missing'";
@@ -83,7 +83,7 @@ $getSubmissionIDQuery = "SELECT submissions.submissionID
         FROM submissions 
         INNER JOIN todo 
             ON todo.userID = submissions.userID
-        WHERE todo.status != 'Graded' AND todo.assessmentID = '$assessmentID' AND submissions.assessmentID = '$assessmentID'
+        WHERE todo.status != 'Returned' AND todo.assessmentID = '$assessmentID' AND submissions.assessmentID = '$assessmentID'
         ORDER BY todo.updatedAt ASC
         LIMIT 1";
 $getSubmissionIDResult = executeQuery($getSubmissionIDQuery);
@@ -237,16 +237,11 @@ $profilePic = !empty($test['profilePicture'])
                                                         <ul class="dropdown-menu" id="filter">
                                                             <li data-value="Newest"><a class="dropdown-item text-reg">Newest</a></li>
                                                             <li data-value="Oldest"><a class="dropdown-item text-reg">Oldest</a></li>
-                                                            <li data-value="Graded"><a class="dropdown-item text-reg">Graded</a>
+                                                            <li data-value="Returned"><a class="dropdown-item text-reg">Returned</a>
                                                             <li data-value="<?php echo ucfirst($statusText); ?>"><a class="dropdown-item text-reg"><?php echo ucfirst($statusText); ?></a>
                                                             <li data-value="Submitted"><a class="dropdown-item text-reg">Submitted</a>
                                                             </li>
                                                         </ul>
-                                                        <button class="btn btn-action btn-return-all" onclick="returnAll();">
-                                                            <img src="../shared/assets/img/assess/assignment.png"
-                                                                alt="Assess Icon"
-                                                                style="width: 18px; height: 18px; margin-right: 5px; object-fit: contain;">Return All
-                                                        </button>
                                                     </div>
 
                                                     <!-- Submissions List -->
@@ -303,8 +298,8 @@ $profilePic = !empty($test['profilePicture'])
                                                             <div class="text-reg text-14 mb-1"><span
                                                                     class="stat-value"><?php echo $pending['pending']; ?></span> <?php echo $statusText; ?></div>
                                                             <div class="text-reg text-14 mb-1"><span
-                                                                    class="stat-value"><?php echo $graded['graded']; ?></span>
-                                                                graded</div>
+                                                                    class="stat-value"><?php echo $returned['returned']; ?></span>
+                                                                returned</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -336,13 +331,13 @@ $profilePic = !empty($test['profilePicture'])
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
-            function createDoughnutChart(canvasId, submitted, pending, graded, missing) {
+            function createDoughnutChart(canvasId, submitted, pending, returned, missing) {
                 const ctx = document.getElementById(canvasId).getContext('2d');
                 new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         datasets: [{
-                            data: [submitted, pending, graded, missing],
+                            data: [submitted, pending, returned, missing],
                             backgroundColor: ['#3DA8FF', '#C7C7C7', '#d9ffe4ff', '#ffd9d9ff'],
                             borderWidth: 0,
                         }]
@@ -361,31 +356,10 @@ $profilePic = !empty($test['profilePicture'])
                 });
             }
 
-            createDoughnutChart('taskChart', <?php echo $submitted['submittedTodo']; ?>, <?php echo $pending['pending']; ?>, <?php echo $graded['graded']; ?>, <?php echo $missing['missing']; ?>);
+            createDoughnutChart('taskChart', <?php echo $submitted['submittedTodo']; ?>, <?php echo $pending['pending']; ?>, <?php echo $returned['returned']; ?>, <?php echo $missing['missing']; ?>);
 
             const studentIDs = <?php echo json_encode($studentIDs); ?>;
             console.log(studentIDs);
-
-            function returnAll() {
-                fetch('../shared/assets/processes/return-all.php?assessmentID=' + <?php echo $assessmentID; ?>, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            studentID: studentIDs
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert("Successfully Returned All");
-                        window.location.reload();
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        window.location.reload();
-                    });
-            }
 
             let selected = {};
 
@@ -414,7 +388,7 @@ $profilePic = !empty($test['profilePicture'])
                             data.results.forEach(function(result) {
                                 document.getElementById('submission-container').innerHTML +=
                                     `
-                                <a class="text-decoration-none" href="` + ((result.status != 'Graded') ? `<?php echo ($rubricID == null) ? 'grading-sheet.php?submissionID=' . $submissionID : 'grading-sheet-rubrics.php?submissionID=' ?>` + result.submissionID : '#') + `">
+                                <a class="text-decoration-none" href="` + ((result.status != 'Returned') ? `<?php echo ($rubricID == null) ? 'grading-sheet.php?submissionID=' . $submissionID : 'grading-sheet-rubrics.php?submissionID=' ?>` + result.submissionID : '#') + `">
                                     <div class="submission-item d-flex align-items-center py-3 border-bottom">
                                         <div class="d-flex align-items-center">
                                             <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">

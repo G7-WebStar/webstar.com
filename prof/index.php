@@ -90,7 +90,7 @@ if ($activeAssessmentsTabResult && mysqli_num_rows($activeAssessmentsTabResult) 
         }
 
         $countSubmittedQuery = "SELECT COUNT(*) AS submittedTodo FROM todo 
-                                WHERE assessmentID = '$assessmentID' AND (status = 'Graded' OR status = 'Submitted')";
+                                WHERE assessmentID = '$assessmentID' AND (status = 'Returned' OR status = 'Submitted')";
         $countSubmittedResult = executeQuery($countSubmittedQuery);
 
         $submittedTodoCount = 0;
