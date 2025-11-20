@@ -162,20 +162,6 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                     <div
                                         class="d-flex flex-wrap flex-lg-nowrap justify-content-center justify-content-lg-start gap-3">
 
-                                        <!-- Type dropdown -->
-                                        <div class="d-flex align-items-center flex-nowrap dropdown-container">
-                                            <span class="dropdown-label me-2">Type</span>
-                                            <button class="btn dropdown-toggle dropdown-custom" type="button"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                <span>All</span>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item text-reg" href="#">All</a></li>
-                                                <li><a class="dropdown-item text-reg" href="#">Oldest</a></li>
-                                                <li><a class="dropdown-item text-reg" href="#">Unread first</a></li>
-                                            </ul>
-                                        </div>
-
                                         <!-- Course dropdown -->
                                         <div class="d-flex align-items-center flex-nowrap dropdown-container">
                                             <span class="dropdown-label me-2">Course</span>
@@ -184,9 +170,10 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                                 <span>All</span>
                                             </button>
                                             <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item text-reg" href="#">All</a></li>
-                                                <li><a class="dropdown-item text-reg" href="#">COMP-006</a></li>
-                                                <li><a class="dropdown-item text-reg" href="#">Other courses</a>
+                                                <li><a class="dropdown-item text-reg">All</a></li>
+                                                <li><a class="dropdown-item text-reg">COMP-006</a></li>
+                                                <li><a class="dropdown-item text-reg">GEED-007</a></li>
+                                                <li><a class="dropdown-item text-reg">Other courses</a>
                                                 </li>
                                             </ul>
                                         </div>
@@ -199,9 +186,8 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                                 <span>Newest</span>
                                             </button>
                                             <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item text-reg" href="#">Newest</a></li>
-                                                <li><a class="dropdown-item text-reg" href="#">COMP-006</a></li>
-                                                <li><a class="dropdown-item text-reg" href="#">Other courses</a>
+                                                <li><a class="dropdown-item text-reg" data-value="Desc">Newest</a></li>
+                                                <li><a class="dropdown-item text-reg" data-value="Asc">Oldest</a></li>
                                                 </li>
                                             </ul>
                                         </div>
@@ -211,12 +197,11 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                             <span class="dropdown-label me-2">Status</span>
                                             <button class="btn dropdown-toggle dropdown-custom" type="button"
                                                 data-bs-toggle="dropdown" aria-expanded="false">
-                                                <span>Assigned</span>
+                                                <span>Active</span>
                                             </button>
                                             <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item text-reg" href="#">Assigned</a></li>
-                                                <li><a class="dropdown-item text-reg" href="#">COMP-006</a></li>
-                                                <li><a class="dropdown-item text-reg" href="#">Other courses</a>
+                                                <li><a class="dropdown-item text-reg" data-value="0">Active</a></li>
+                                                <li><a class="dropdown-item text-reg" data-value="1">Archived</a></li>
                                                 </li>
                                             </ul>
                                         </div>
@@ -230,7 +215,9 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                 if (mysqli_num_rows($assessmentsResult) > 0) {
                                     mysqli_data_seek($assessmentsResult, 0);
                                     $i = 1;
+                                    $cardIndex = 0;
                                     foreach ($assessments as $assessment) {
+                                        $cardIndex++;
                                         $ID = $assessment['assessmentID'];
                                         $type = $assessment['type'];
                                         $assessmentTitle = $assessment['assessmentTitle'];
@@ -252,7 +239,10 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                         $missing[] = $missingCount;
                                         $isArchived[] = $archiveStatus;
                                 ?>
-                                        <div class="assessment-card mb-3">
+                                        <div class="assessment-card mb-3"
+                                            data-course="<?php echo $courseCode; ?>"
+                                            data-sort="<?php echo $cardIndex; ?>"
+                                            data-status="<?php echo $archiveStatus; ?>">
                                             <div class="card-content">
                                                 <!-- Top Row: Left Info and Submission Stats -->
                                                 <div class="top-row overflow-hidden">
@@ -427,6 +417,72 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
         showDoughnut();
     </script>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Get dropdown containers and all cards
+            const dropdownContainers = document.querySelectorAll('.dropdown-container');
+            const cards = document.querySelectorAll('.assessment-card');
+
+            // Current selected values
+            let currentCourse = 'All';
+            let currentStatus = '0'; // 0 = Active, 1 = Archived
+            let currentSort = 'Desc'; // Default descending by $cardIndex
+
+            // Filter and sort cards
+            function filterCards() {
+                cards.forEach(card => {
+                    const cardCourse = card.dataset.course || '';
+                    const cardStatus = card.dataset.status || '';
+
+                    const matchCourse = (currentCourse === 'All') || (cardCourse === currentCourse);
+                    const matchStatus = (currentStatus === '0') || (cardStatus === currentStatus);
+
+                    card.style.display = (matchCourse && matchStatus) ? '' : 'none';
+                });
+
+                // Sorting by data-sort (cardIndex)
+                const container = cards[0].parentNode;
+                const sortedCards = Array.from(cards).sort((a, b) => {
+                    const aIndex = parseInt(a.dataset.sort || 0, 10);
+                    const bIndex = parseInt(b.dataset.sort || 0, 10);
+                    return (currentSort === 'Asc') ? aIndex - bIndex : bIndex - aIndex;
+                });
+
+                sortedCards.forEach(c => container.appendChild(c));
+            }
+
+            // Handle dropdown clicks
+            dropdownContainers.forEach(container => {
+                const labelSpan = container.querySelector('.dropdown-toggle span');
+                const dropdownLabel = container.querySelector('.dropdown-label').textContent.trim();
+
+                container.querySelectorAll('.dropdown-item').forEach(item => {
+                    item.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const value = this.dataset.value || this.textContent.trim();
+
+                        // Update dropdown label text
+                        labelSpan.textContent = this.textContent.trim();
+
+                        // Update current filter/sort values
+                        if (dropdownLabel === 'Course') {
+                            currentCourse = value;
+                        } else if (dropdownLabel === 'Status') {
+                            currentStatus = value;
+                        } else if (dropdownLabel === 'Sort By') {
+                            currentSort = value; // 'Asc' or 'Desc'
+                        }
+
+                        // Apply filtering and sorting
+                        filterCards();
+                    });
+                });
+            });
+
+            // Initialize filter and sort on page load
+            filterCards();
+        });
+    </script>
 </body>
 
 </html>
