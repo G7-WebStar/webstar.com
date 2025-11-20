@@ -301,7 +301,7 @@ $announcementResult = executeQuery($announcementQuery);
                         <!-- Header -->
                         <div class="modal-header d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center gap-2">
-                                <h5 class="modal-title text-sbold text-16 mb-0" id="viewerModalLabel">File Viewer</h5>
+                                <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;" id="viewerModalLabel">File Viewer</h5>
 
                                 <a id="modalDownloadBtn" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
                                     style="background-color: var(--primaryColor); border: 1px solid var(--black);" download>
@@ -334,7 +334,7 @@ $announcementResult = executeQuery($announcementQuery);
                         <!-- Header -->
                         <div class="modal-header d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center gap-2">
-                                <h5 class="modal-title text-sbold text-16 mb-0" id="linkViewerModalLabel">Link Viewer</h5>
+                                <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;" id="linkViewerModalLabel">Link Viewer</h5>
 
                                 <a id="modalOpenInNewTab" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
                                     style="background-color: var(--primaryColor); border: 1px solid var(--black);"

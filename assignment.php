@@ -1518,7 +1518,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
             <div class="modal-content" style="border-radius:12px; overflow:hidden;">
                 <div class="modal-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-2">
-                        <h5 class="modal-title text-sbold text-16 mb-0" id="viewerModalLabel">File Viewer</h5>
+                        <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;" id="viewerModalLabel">File Viewer</h5>
                         <a id="modalDownloadBtn" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
                             style="background-color: var(--primaryColor); border: 1px solid var(--black);" download>
                             <span class="" style="display:flex;align-items:center;gap:4px;">
@@ -1543,7 +1543,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
             <div class="modal-content" style="border-radius:12px; overflow:hidden;">
                 <div class="modal-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-2">
-                        <h5 class="modal-title text-sbold text-16 mb-0" id="linkViewerModalLabel">Link Viewer</h5>
+                        <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;" id="linkViewerModalLabel">Link Viewer</h5>
                         <a id="modalOpenInNewTab" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
                             style="background-color: var(--primaryColor); border: 1px solid var(--black);"
                             target="_blank">
@@ -2113,8 +2113,8 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                 viewer.innerHTML = `<iframe src="${filePath}" width="100%" height="100%" style="border:none; border-radius:10px;"></iframe>`;
             } else {
                 viewer.innerHTML = `<div class="text-white text-center mt-5">
-                    <p>This file type cannot be previewed.</p>
-                    <a href="${filePath}" download class="btn btn-warning">Download File</a>
+                    <p class="text-sbold text-16" style="color: var(--pureWhite);">This file type cannot be previewed.</p>
+                    <a href="${filePath}" download class="btn text-sbold text-16" style="background-color: var(--primaryColor); color: var(--black); border: none;"> Download File </a>
                 </div>`;
             }
             new bootstrap.Modal(document.getElementById("viewerModal")).show();
