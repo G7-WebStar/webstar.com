@@ -93,6 +93,10 @@ $checkRubricQuery = "SELECT rubricID FROM assignments WHERE assessmentID = '$ass
 $checkRubricResult = executeQuery($checkRubricQuery);
 $rubricIDRow = (mysqli_num_rows($checkRubricResult) > 0) ? mysqli_fetch_assoc($checkRubricResult) : null;
 $rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
+
+$profilePic = !empty($test['profilePicture'])
+    ? '../shared/assets/pfp-uploads/' . $test['profilePicture']
+    : '../shared/assets/pfp-uploads/defaultProfile.png';
 ?>
 
 <!doctype html>
@@ -258,7 +262,7 @@ $rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
                                                                     <div class="submission-item d-flex align-items-center py-3 border-bottom">
                                                                         <div class="d-flex align-items-center">
                                                                             <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
-                                                                                <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                                                                                <img src="<?php echo $profilePic ?>" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
                                                                             </div>
                                                                             <span class="text-sbold text-16"><?php echo $studentsTodoRow['lastName'] . ", " . $studentsTodoRow['firstName'] . " " . $studentsTodoRow['middleName']; ?></span>
                                                                         </div>

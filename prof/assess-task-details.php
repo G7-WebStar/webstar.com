@@ -352,15 +352,17 @@ if (!empty($rubricID)) {
                                                             <?php
                                                             if (mysqli_num_rows($profInfoResult) > 0) {
                                                                 while ($prof = mysqli_fetch_assoc($profInfoResult)) {
-
-
+                                                                    $profilePic = !empty($test['profilePicture'])
+                                                                        ? '../shared/assets/pfp-uploads/' . $test['profilePicture']
+                                                                        : '../shared/assets/pfp-uploads/defaultProfile.png';
                                                             ?>
                                                                     <div class="text-sbold text-14 pb-3">Prepared by</div>
                                                                     <div class="d-flex align-items-center pb-5">
                                                                         <div class="rounded-circle me-2"
                                                                             style="width: 50px; height: 50px; background-color: var(--highlight75);">
-                                                                            <img src="../shared/assets/img/assess/prof.png" alt="professor"
-                                                                                class="rounded-circle" style="width:50px;height:50px;">
+                                                                            <img src="<?php echo $profilePic ?>" alt="Profile"
+                                                                                alt="professor" class="rounded-circle"
+                                                                                style="width:50px;height:50px;">
                                                                         </div>
                                                                         <div>
                                                                             <div class="text-sbold text-14">Prof. <?php echo $prof['firstName'] . " " . $prof['middleName'] . " " . $prof['lastName']; ?></div>
