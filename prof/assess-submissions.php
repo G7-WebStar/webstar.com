@@ -57,9 +57,10 @@ INNER JOIN assessments
 	ON todo.assessmentID = assessments.assessmentID
 INNER JOIN courses
 	ON assessments.courseID = courses.courseID
-INNER JOIN submissions
+LEFT JOIN submissions
     ON todo.userID = submissions.userID
-WHERE courses.userID = '$userID' AND todo.assessmentID = '$assessmentID' AND submissions.assessmentID = '$assessmentID'
+    AND submissions.assessmentID = '$assessmentID'
+WHERE courses.userID = '$userID' AND todo.assessmentID = '$assessmentID'
 ORDER BY todo.updatedAt DESC";
 $studentTodoStatusResult = executeQuery($studentTodoStatusQuery);
 
@@ -93,6 +94,10 @@ $checkRubricQuery = "SELECT rubricID FROM assignments WHERE assessmentID = '$ass
 $checkRubricResult = executeQuery($checkRubricQuery);
 $rubricIDRow = (mysqli_num_rows($checkRubricResult) > 0) ? mysqli_fetch_assoc($checkRubricResult) : null;
 $rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
+
+$profilePic = !empty($test['profilePicture'])
+    ? '../shared/assets/pfp-uploads/' . $test['profilePicture']
+    : '../shared/assets/pfp-uploads/defaultProfile.png';
 ?>
 
 <!doctype html>
@@ -254,11 +259,11 @@ $rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
                                                                 <?php
                                                                 $gradingLink = ($rubricID == null) ? 'grading-sheet.php?submissionID=' : 'grading-sheet-rubrics.php?submissionID=';
                                                                 ?>
-                                                                <a class="text-decoration-none" href="<?php echo ($studentsTodoRow['status'] != 'Graded') ? $gradingLink . $studentsTodoRow['submissionID'] : '#'; ?>">
+                                                                <a class="text-decoration-none" href="<?php echo ($studentsTodoRow['status'] == 'Submitted') ? $gradingLink . $studentsTodoRow['submissionID'] : '#'; ?>">
                                                                     <div class="submission-item d-flex align-items-center py-3 border-bottom">
                                                                         <div class="d-flex align-items-center">
                                                                             <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
-                                                                                <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                                                                                <img src="<?php echo $profilePic ?>" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
                                                                             </div>
                                                                             <span class="text-sbold text-16"><?php echo $studentsTodoRow['lastName'] . ", " . $studentsTodoRow['firstName'] . " " . $studentsTodoRow['middleName']; ?></span>
                                                                         </div>
@@ -415,7 +420,7 @@ $rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
                                             <div class="avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
                                                 <img src="../shared/assets/img/assess/prof.png" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
                                             </div>
-                                            <span class="text-sbold text-16">` + result.lastname + `, ` + result.firstName + ` ` + result.middleName + `</span>
+                                            <span class="text-sbold text-16">` + result.lastName + `, ` + result.firstName + ` ` + result.middleName + `</span>
                                         </div>
                                         <div class="flex-grow-1 d-flex justify-content-center">
                                             <span class="badge badge-` + result.status.toLowerCase() + `">` + result.status + `</span>

@@ -654,7 +654,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                 </label>
                                                 <input type="number" name="testTimeLimit"
                                                     class="form-control textbox text-reg text-16"
-                                                    placeholder="No time limit if left blank" min="1" value="<?php
+                                                    placeholder="No time limit if left blank" min="1" required value="<?php
                                                     if (isset($mainData['testTimeLimit'])) {
                                                         echo htmlspecialchars(intval($mainData['testTimeLimit']) / 60);
                                                     }

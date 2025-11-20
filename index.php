@@ -431,7 +431,8 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                         class="d-flex flex-grow-1 flex-wrap justify-content-between p-2 w-100">
                                                                         <!-- For small screen of main content -->
                                                                         <div class="px-3 py-0">
-                                                                            <div class="text-sbold text-16">
+                                                                            <div class="text-sbold text-16 text-truncate" style="width:90px;"
+                                                                                title="<?php echo $activities['assessmentTitle']; ?>">
                                                                                 <?php echo $activities['assessmentTitle']; ?>
                                                                             </div>
                                                                             <div class="text-reg text-12">

@@ -339,7 +339,7 @@ $ungradedCount = mysqli_fetch_assoc($ungradedResult)['ungradedCount'] ?? 0;
                                                                 <?php
                                                                 $profilePic = !empty($test['profilePicture'])
                                                                     ? '../shared/assets/pfp-uploads/' . $test['profilePicture']
-                                                                    : '../shared/assets/img/default-profile.png';
+                                                                    : '../shared/assets/pfp-uploads/defaultProfile.png';
                                                                 $score = $test['score'];
                                                                 $status = $test['status'];
 
