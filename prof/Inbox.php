@@ -20,6 +20,7 @@ WHERE courses.userID = '$userID'
 ORDER BY inboxprof.inboxProfID DESC
 ";
 $selectInboxResult = executeQuery($selectInboxQuery);
+$inboxCount = mysqli_num_rows($selectInboxResult);
 
 ?>
 <!doctype html>
@@ -124,9 +125,9 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                     </div>
 
                                     <!-- Message Content -->
-                                    <div class="message-container mt-4 mt-lg-4 pb-4">
-                                        <?php
-                                        if (mysqli_num_rows($selectInboxResult) > 0) {
+                                    <?php if ($inboxCount > 0): ?>
+                                        <div class="message-container mt-4 mt-lg-4 pb-4">
+                                            <?php
                                             while ($inbox = mysqli_fetch_assoc($selectInboxResult)) {
                                                 $timestamp = strtotime($inbox['inboxCreatedAt']);
                                                 $displayDate = $timestamp ? date("F j, Y g:ia", $timestamp) : '';
@@ -175,18 +176,21 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                                 </div>
                                                 <?php
                                             }
-                                        } else {
                                             ?>
-                                            <!-- Empty State -->
-                                            <div
-                                                class="d-flex flex-column justify-content-center align-items-center inbox-empty-state">
+                                            <div id="js-empty-state"
+                                                class="d-none d-flex flex-column justify-content-center align-items-center inbox-empty-state inbox-filter-empty">
                                                 <img src="../shared/assets/img/empty/inbox.png" width="100" class="mb-1">
                                                 <div class="text-center text-14 text-reg mt-1">Your inbox is empty!</div>
                                             </div>
-                                            <?php
-                                        }
-                                        ?>
-                                    </div>
+                                        </div>
+                                    <?php else: ?>
+                                        <div
+                                            class="d-flex flex-column justify-content-center align-items-center inbox-empty-state"
+                                            style="min-height: 60vh;">
+                                            <img src="../shared/assets/img/empty/inbox.png" width="100" class="mb-1">
+                                            <div class="text-center text-14 text-reg mt-1">Your inbox is empty!</div>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -211,27 +215,37 @@ $selectInboxResult = executeQuery($selectInboxQuery);
             const courseDropdown = document.querySelector('.custom-dropdown[data-dropdown="course"]');
             const messageCards = messageContainer ? Array.from(messageContainer.querySelectorAll('.inbox-card')) : [];
 
-            if (!messageContainer || messageCards.length === 0) {
+            if (!messageContainer) {
+                return;
+            }
+
+            const baseEmptyState = messageContainer.querySelector('.inbox-empty-state:not(.inbox-filter-empty)');
+            const hasCards = messageCards.length > 0;
+            if (baseEmptyState) {
+                baseEmptyState.style.display = hasCards ? 'none' : 'flex';
+            }
+
+            if (!hasCards) {
                 return;
             }
 
             let currentSortDirection = 'desc';
             let currentCourseFilter = 'All';
 
-            let filterEmptyState = messageContainer.querySelector('.inbox-filter-empty');
+            let filterEmptyState = document.getElementById('js-empty-state');
             if (!filterEmptyState) {
                 filterEmptyState = document.createElement('div');
-                filterEmptyState.className = 'd-flex flex-column justify-content-center align-items-center inbox-empty-state inbox-filter-empty';
-                filterEmptyState.style.display = 'none';
+                filterEmptyState.id = 'js-empty-state';
+                filterEmptyState.className = 'd-none d-flex flex-column justify-content-center align-items-center inbox-empty-state inbox-filter-empty';
                 filterEmptyState.innerHTML = `
                     <img src="../shared/assets/img/empty/inbox.png" width="100" class="mb-1" alt="Empty inbox">
-                    <div class="text-center text-14 text-reg mt-1">No messages match your filters.</div>
+                    <div class="text-center text-14 text-reg mt-1">Your inbox is empty!</div>
                 `;
                 messageContainer.appendChild(filterEmptyState);
             }
 
             const applyFilters = () => {
-                const cards = Array.from(messageContainer.querySelectorAll('.inbox-card'));
+                const cards = messageCards;
 
                 cards.sort((a, b) => {
                     const aTime = parseInt(a.dataset.timestamp || '0', 10);
@@ -242,14 +256,50 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                 let visibleCount = 0;
                 cards.forEach(card => {
                     const matchesCourse = currentCourseFilter === 'All' || card.dataset.course === currentCourseFilter;
-                    card.style.display = matchesCourse ? '' : 'none';
                     if (matchesCourse) {
+                        card.style.display = '';
                         visibleCount++;
+                    } else {
+                        card.style.display = 'none';
                     }
                 });
 
-                messageContainer.appendChild(filterEmptyState);
-                filterEmptyState.style.display = visibleCount === 0 ? 'flex' : 'none';
+                // Always hide base empty state when we have cards (even if filtered out)
+                if (baseEmptyState) {
+                    baseEmptyState.style.display = 'none';
+                }
+
+                // Show filter empty state when no cards are visible
+                const shouldShowEmpty = visibleCount === 0;
+                
+                // Ensure filter empty state exists
+                if (!filterEmptyState.parentNode) {
+                    messageContainer.appendChild(filterEmptyState);
+                }
+                
+                // Toggle visibility using Bootstrap classes
+                if (shouldShowEmpty) {
+                    filterEmptyState.classList.remove('d-none');
+                    filterEmptyState.classList.add('d-flex');
+                } else {
+                    filterEmptyState.classList.add('d-none');
+                    filterEmptyState.classList.remove('d-flex');
+                }
+
+                // Adjust container layout based on whether we're showing empty state
+                if (shouldShowEmpty) {
+                    messageContainer.style.minHeight = '60vh';
+                    messageContainer.style.display = 'flex';
+                    messageContainer.style.alignItems = 'center';
+                    messageContainer.style.justifyContent = 'center';
+                    messageContainer.style.flexDirection = 'column';
+                } else {
+                    messageContainer.style.minHeight = 'auto';
+                    messageContainer.style.display = '';
+                    messageContainer.style.alignItems = '';
+                    messageContainer.style.justifyContent = '';
+                    messageContainer.style.flexDirection = '';
+                }
             };
 
             if (sortDropdown) {
