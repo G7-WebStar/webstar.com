@@ -265,3 +265,18 @@ body {
     font-style: normal !important;
     color: #9b9b9b;
 }
+
+/* Stack vertically on screens below 1640px */
+@media (max-width: 1640px) {
+    .stack-below-large {
+        display: flex;          /* ensure flex is applied */
+        flex-direction: column; /* stack vertically */
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;           /* spacing between buttons */
+    }
+
+    .stack-below-large button {
+        width: 100%; /* optional: full width buttons */
+    }
+}

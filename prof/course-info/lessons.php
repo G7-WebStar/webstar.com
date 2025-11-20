@@ -145,7 +145,7 @@ mysqli_data_seek($lessonResult, 0);
                                             aria-expanded="false">
                                             <i class="bi bi-three-dots-vertical"></i>
                                         </button>
-                                        <ul class="dropdown-menu dropdown-menu-end"
+                                        <ul class="dropdown-menu dropdown-menu-end dropdown-delete"
                                             aria-labelledby="lessonDropdown<?php echo $lessonID; ?>">
                                             <li><a class="dropdown-item text-reg text-14"
                                                     href="add-lesson.php?edit=<?php echo $lessonID; ?>">Edit</a></li>
@@ -221,7 +221,7 @@ mysqli_data_seek($lessonResult, 0);
         cursor: pointer;
     }
 
-    .dropdown-menu {
+    .dropdown-delete {
     position: fixed !important;
     inset: auto !important;
     z-index: 5000 !important;
