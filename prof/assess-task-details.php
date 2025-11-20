@@ -413,10 +413,10 @@ if (!empty($rubricID)) {
                                                             <div class="text-reg text-14 mb-1"><span
                                                                     class="stat-value"><?php echo $submitted['submittedTodo']; ?></span> submitted</div>
                                                             <div class="text-reg text-14 mb-1"><span
-                                                                    class="stat-value"><?php echo $pending['pending']; ?></span> <?php echo $statusText ?></div>
+                                                                    class="stat-value"><?php echo (mysqli_num_rows($getAssessmentStatusResult) > 0) ? $pending['pending'] : $missing['missing']; ?></span> <?php echo $statusText ?></div>
                                                             <div class="text-reg text-14 mb-1"><span
-                                                                    class="stat-value"><?php echo $returned['Returned']; ?></span>
-                                                                Returned</div>
+                                                                    class="stat-value"><?php echo $returned['returned']; ?></span>
+                                                                returned</div>
                                                         </div>
                                                     </div>
                                                 </div>
