@@ -540,7 +540,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                             echo '
                                                                 <div class="text-center my-2">
                                                                     <img src="../shared/assets/img/empty/leaderboard.png" width="100" class="mb-1">
-                                                                    <div class="text-med text-14 mt-2">This user has no badges yet.</div>
+                                                                    <div class="text-med text-14 mt-2">This student has no badges yet.</div>
                                                                 </div>';
                                                         }
                                                         ?>
@@ -611,11 +611,21 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                         <?php
                                                     }
                                                 } else
-                                                    echo '
-                                                        <div class="text-center mb-2">
-                                                            <img src="../shared/assets/img/empty/folder2.png" width="100" class="mb-1">
-                                                            <div class="text-med text-14 mt-2">This user is not enrolled <br>in any courses yet.</div>
-                                                        </div>';
+                                                   if (empty($courses)) {
+                                                        if ($user['role'] === 'student') {
+                                                            echo '
+                                                            <div class="text-center mb-2">
+                                                                <img src="../shared/assets/img/empty/folder2.png" width="100" class="mb-1">
+                                                                <div class="text-med text-14 mt-2">This student is not enrolled <br>in any courses yet.</div>
+                                                            </div>';
+                                                        } elseif ($user['role'] === 'professor') {
+                                                            echo '
+                                                            <div class="text-center mb-2">
+                                                                <img src="../shared/assets/img/empty/folder2.png" width="100" class="mb-1">
+                                                                <div class="text-med text-14 mt-2">This intructor has not created <br>any courses yet.</div>
+                                                            </div>';
+                                                        }
+                                                    }
                                                 ?>
 
                                             </div>

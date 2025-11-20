@@ -244,7 +244,7 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                                                     $dataAction = "course-info.php?courseID=" . $courseID;
                                                 }
                                                 ?>
-                                                <div class="card mb-1 me-3 w-100 mt-2 <?php echo $cardClass; ?>"
+                                                <div class="card mb-1 w-100 mt-2 <?php echo $cardClass; ?>"
                                                     data-timestamp="<?php echo $timestamp ?: 0; ?>"
                                                     data-course="<?php echo $courseCode; ?>"
                                                     data-type="<?php echo $notificationType; ?>"
