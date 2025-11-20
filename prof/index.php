@@ -28,7 +28,26 @@ if ($result && mysqli_num_rows($result) > 0) {
             $studentCount = $countRow['studentCount'];
         }
 
+        $courseScheduleQuery = "SELECT GROUP_CONCAT(
+            CONCAT(
+                courseSchedule.day, ' ', 
+                DATE_FORMAT(courseSchedule.startTime, '%h:%i %p'), '-', 
+                DATE_FORMAT(courseSchedule.endTime, '%h:%i %p')
+            ) 
+            ORDER BY FIELD(courseSchedule.day, 'Mon','Tue','Wed','Thu','Fri','Sat','Sun'), courseSchedule.startTime
+            SEPARATOR '\n'
+        ) AS schedule FROM courseschedule WHERE courseID = '$courseID'";
+        $courseScheduleResult = executeQuery($courseScheduleQuery);
+
+        $courseSchedule;
+
+        if (mysqli_num_rows($courseScheduleResult) > 0) {
+            $scheduleRow = mysqli_fetch_assoc($courseScheduleResult);
+            $courseSchedule = $scheduleRow['schedule'];
+        }
+
         $row['studentCount'] = $studentCount;
+        $row['schedule'] = $courseSchedule;
         $courses[] = $row;
     }
 }
@@ -46,7 +65,7 @@ DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline
 FROM assessments
 INNER JOIN courses
 	ON assessments.courseID = courses.courseID
-WHERE assessments.deadline >= CURRENT_DATE
+WHERE assessments.deadline >= CURRENT_DATE AND isArchived = '0'
 ";
 $activeAssessmentsTabResult = executeQuery($activeAssessmentsTabQuery);
 if ($activeAssessmentsTabResult && mysqli_num_rows($activeAssessmentsTabResult) > 0) {
@@ -376,12 +395,11 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                                                     class="text-reg text-14 ms-2"><?php echo $course['studentCount']; ?>
                                                                                     Students</span>
                                                                             </div>
-                                                                            <div class="d-flex align-items-start mb-2 mt-4">
+                                                                            <div class="d-flex align-items-center mb-2 mt-4">
                                                                                 <img src="../shared/assets/img/profIndex/calendar.png"
-                                                                                    alt="calendar" width="26" height="26"
-                                                                                    class="mt-2">
+                                                                                    alt="calendar" width="26" height="26">
                                                                                 <div class="calendar-schedule ms-2">
-                                                                                    <div class="text-reg">
+                                                                                    <div class="text-reg text-14">
                                                                                         <?php echo nl2br(($course['schedule'] ?: 'Schedule TBA')); ?>
                                                                                     </div>
                                                                                 </div>
@@ -538,14 +556,16 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                 });
             }
 
-            document.addEventListener("DOMContentLoaded", function() {
-                const chartsIDs = <?php echo json_encode($chartsIDs); ?>;
-                const submitted = <?php echo json_encode($submittedChart); ?>;
-                const student = <?php echo json_encode($studentChart); ?>;
-                chartsIDs.forEach((id, index) => {
-                    createDoughnutChart(id, submitted[index], student[index]);
+            <?php if ($totalAssessments > 0) { ?>
+                document.addEventListener("DOMContentLoaded", function() {
+                    const chartsIDs = <?php echo json_encode($chartsIDs); ?>;
+                    const submitted = <?php echo json_encode($submittedChart); ?>;
+                    const student = <?php echo json_encode($studentChart); ?>;
+                    chartsIDs.forEach((id, index) => {
+                        createDoughnutChart(id, submitted[index], student[index]);
+                    });
                 });
-            });
+            <?php } ?>
         </script>
 
 </body>
