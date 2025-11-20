@@ -11,7 +11,7 @@ if (!isset($_GET['testID'])) {
 $testID = intval($_GET['testID']);
 
 $testInfoQuery = "
-    SELECT *
+    SELECT *, assessments.createdAt AS assessmentCreatedAt
     FROM tests
     LEFT JOIN assessments ON tests.assessmentID = assessments.assessmentID
     LEFT JOIN courses ON assessments.courseID = courses.courseID
@@ -41,7 +41,7 @@ $currentDate = date("Y-m-d H:i:s");
 $isCompleted = (strtotime($currentDate) > strtotime($deadline));
 $examStatus = $isCompleted ? "Completed" : "Active";
 $examDuration = $test['testTimelimit'];
-$displayTime = !empty($test['updatedAt']) ? $test['updatedAt'] : $test['createdAt'];
+$displayTime = $test['assessmentCreatedAt'];
 $formattedTime = !empty($displayTime) ? date("F j, Y g:i A", strtotime($displayTime)) : "";
 
 // Total exam items
@@ -113,11 +113,11 @@ $assessmentID = $test['assessmentID'];
                             <!-- DESKTOP VIEW -->
                             <div class="row desktop-header d-none d-sm-flex">
                                 <div class="col-auto me-2">
-                                    <a href="assess.php" class="text-decoration-none">
+                                    <button onclick="history.back()" class="btn p-0" style="background:none; border:none;">
                                         <span class="material-symbols-outlined" style="color: var(--black); font-size: 22px;">
                                             arrow_back
                                         </span>
-                                    </a>
+                                    </button>
                                 </div>
                                 <div class="col">
                                     <span class="text-sbold text-25"><?php echo $testTitle; ?></span>
@@ -141,11 +141,11 @@ $assessmentID = $test['assessmentID'];
                             <div class="d-block d-sm-none mobile-assignment">
                                 <div class="mobile-top">
                                     <div class="arrow">
-                                        <a href="assess.php" class="text-decoration-none">
+                                        <button onclick="history.back()" class="btn p-0" style="background:none; border:none;">
                                             <span class="material-symbols-outlined" style="color: var(--black); font-size: 22px;">
                                                 arrow_back
                                             </span>
-                                        </a>
+                                        </button>
                                     </div>
                                     <div class="col">
                                         <span class="text-sbold text-25"><?php echo $testTitle; ?></span>
