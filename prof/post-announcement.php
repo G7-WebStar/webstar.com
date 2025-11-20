@@ -149,22 +149,30 @@ if (isset($_POST['save_announcement'])) {
         // --- Handle uploaded files ---
         if ($uploadedFiles) {
             $uploadDir = __DIR__ . "/../shared/assets/files/";
-            if (!is_dir($uploadDir))
+            if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0777, true);
+            }
 
             foreach ($_FILES['materials']['name'] as $key => $fileName) {
                 $tmpName = $_FILES['materials']['tmp_name'][$key];
                 $fileError = $_FILES['materials']['error'][$key];
 
                 if ($fileError === UPLOAD_ERR_OK) {
-                    $safeName = str_replace([" ", ","], "_", basename($fileName));
-                    $targetPath = $uploadDir . $safeName;
+                    $originalName = basename($fileName); // Keep original filename
+                    $safeOriginalName = str_replace([" ", ","], "_", $originalName);
+
+                    // Add date & time to create a unique fileTitle
+                    $dateTimePrefix = date('Ymd_His'); // e.g., 20251120_153045
+                    $fileTitle = $dateTimePrefix . '_' . $safeOriginalName;
+
+                    $targetPath = $uploadDir . $fileTitle;
 
                     if (move_uploaded_file($tmpName, $targetPath)) {
+                        // Insert both original and timestamped names into DB
                         $insertFile = "INSERT INTO files 
-                            (courseID, userID, announcementID, fileAttachment, fileLink) 
-                            VALUES 
-                            ('$selectedCourseID', '$userID', '$announcementID', '$safeName', '')";
+                    (courseID, userID, announcementID, fileAttachment, fileTitle, fileLink) 
+                    VALUES 
+                    ('$selectedCourseID', '$userID', '$announcementID', '$originalName', '$fileTitle', '')";
                         executeQuery($insertFile);
                     }
                 }
@@ -974,37 +982,36 @@ if (!empty($reusedData)) {
                         const linkValue = linkInput.value.trim();
                         if (!linkValue) return;
 
-
                         // Validation
                         let valid = true;
                         let errorMessages = [];
-                        
+
                         // Check total attachments limit
                         const totalAttachments = container.querySelectorAll('.col-12').length;
                         if (totalAttachments >= 10) {
                             valid = false;
-                            errorMessages.push("Please select at least one course before submitting.");
+                            errorMessages.push("You can only add up to 10 files or links total.");
                         }
 
                         if (!valid) {
-                            e.preventDefault();
-
-                            const container = document.getElementById("toastContainer");
-                            container.innerHTML = "";
+                            const toastContainer = document.getElementById("toastContainer");
+                            toastContainer.innerHTML = "";
 
                             errorMessages.forEach(msg => {
                                 const alert = document.createElement("div");
                                 alert.className = "alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 alert-danger";
                                 alert.role = "alert";
                                 alert.innerHTML = `
-                        <i class="bi bi-x-circle-fill fs-6"></i>
-                        <span>${msg}</span>
-                        `;
-                                container.appendChild(alert);
+                                    <i class="bi bi-x-circle-fill fs-6"></i>
+                                    <span>${msg}</span>
+                                `;
+                                toastContainer.appendChild(alert);
                                 setTimeout(() => alert.remove(), 3000);
                             });
 
+                            return;
                         }
+
                         // Get domain and favicon
                         function truncate(text, maxLength = 30) {
                             if (!text) return '';
@@ -1074,19 +1081,55 @@ if (!empty($reusedData)) {
 
             // File input change
             fileInput.addEventListener('change', function (event) {
-                // Merge new selections with existing files
+                const maxFileSizeMB = 10; // max size per file
+                const maxAttachments = 10; // max total files/links
+                const toastContainer = document.getElementById("toastContainer");
+
                 let dt = new DataTransfer();
                 Array.from(allFiles).forEach(f => dt.items.add(f));
-                Array.from(event.target.files).forEach(f => dt.items.add(f));
-                fileInput.files = dt.files;
-                allFiles = Array.from(fileInput.files); // update allFiles list
 
-                // Remove only file previews, keep links
+                let errorMessages = [];
+                let validFiles = [];
+
+                // Validate new files
+                Array.from(event.target.files).forEach(f => {
+                    const fileSizeMB = f.size / (1024 * 1024);
+                    if (fileSizeMB > maxFileSizeMB) {
+                        errorMessages.push(`File "${f.name}" exceeds 10 MB and was not added.`);
+                    } else {
+                        validFiles.push(f);
+                    }
+                });
+
+                // Check total attachments limit (existing + valid new files + existing links)
+                const totalExisting = container.querySelectorAll('.col-12').length;
+                if (totalExisting + validFiles.length > maxAttachments) {
+                    errorMessages.push("You can only add up to 10 files or links total.");
+                    // Trim validFiles to fit the limit
+                    validFiles = validFiles.slice(0, maxAttachments - totalExisting);
+                }
+
+                if (errorMessages.length > 0) {
+                    toastContainer.innerHTML = "";
+                    errorMessages.forEach(msg => {
+                        const alert = document.createElement("div");
+                        alert.className = "alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 alert-danger";
+                        alert.role = "alert";
+                        alert.innerHTML = `<i class="bi bi-x-circle-fill fs-6"></i><span>${msg}</span>`;
+                        toastContainer.appendChild(alert);
+                        setTimeout(() => alert.remove(), 5000);
+                    });
+                }
+
+                // Add only valid files
+                validFiles.forEach(f => dt.items.add(f));
+                fileInput.files = dt.files;
+                allFiles = Array.from(fileInput.files);
+
+                // 🔹 Remove only file previews, keep links
                 container.querySelectorAll('.file-preview').forEach(el => el.remove());
 
-                // Rebuild file previews
                 function truncate(text, maxLength = 50) {
-                    if (!text) return '';
                     return text.length > maxLength ? text.slice(0, maxLength - 1) + '…' : text;
                 }
 
@@ -1104,8 +1147,8 @@ if (!empty($reusedData)) {
                                         <span class="material-symbols-rounded">description</span>
                                     </div>
                                     <div>
-                                        <div class="text-sbold text-16" style="line-height: 1.5;">${truncatedName}</div>
-                                        <div class="text-reg text-12" style="line-height: 1.5;">${ext} · ${fileSizeMB} MB</div>
+                                        <div class="text-sbold text-16">${truncatedName}</div>
+                                        <div class="text-reg text-12">${ext} · ${fileSizeMB} MB</div>
                                     </div>
                                 </div>
                                 <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;" data-index="${index}">
@@ -1114,12 +1157,10 @@ if (!empty($reusedData)) {
                             </div>
                         </div>
                     </div>`;
-
                     container.insertAdjacentHTML('beforeend', fileHTML);
                 });
 
-
-                // Allow deletion of specific files
+                // Enable deletion
                 container.querySelectorAll('.delete-file').forEach((btn) => {
                     btn.addEventListener('click', function () {
                         const index = parseInt(this.dataset.index);
