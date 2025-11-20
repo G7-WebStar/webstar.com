@@ -2,38 +2,25 @@
 include('../shared/assets/database/connect.php');
 include("../shared/assets/processes/prof-session-process.php");
 
-$selectEnrolledQuery = "SELECT DISTINCT
-courses.courseCode
-FROM courses
-WHERE courses.userID = '$userID'
-ORDER BY courses.courseCode ASC
-";
+$selectEnrolledQuery = "SELECT DISTINCT courses.courseCode FROM courses WHERE courses.userID = '$userID' ORDER BY courses.courseCode ASC ";
 $selectEnrolledResult = executeQuery($selectEnrolledQuery);
 
-$selectInboxQuery = "SELECT 
-inbox.createdAt AS inboxCreatedAt,
-inbox.messageText,
-courses.courseCode,
-assessments.assessmentTitle AS assessmentTitle,
-userinfo.profilePicture AS profPFP
-FROM inbox
-INNER JOIN enrollments
-	ON inbox.enrollmentID = enrollments.enrollmentID
-INNER JOIN todo
-	ON enrollments.userID = todo.userID
-    AND enrollments.courseID = (SELECT courseID 
-                               FROM assessments 
-                               WHERE assessments.assessmentID = todo.assessmentID)
-INNER JOIN assessments
-	ON todo.assessmentID = assessments.assessmentID
+$selectInboxQuery = "
+SELECT
+    inboxprof.createdAt AS inboxCreatedAt,
+    inboxprof.messageText,
+    courses.courseCode,
+    userinfo.profilePicture AS profPFP
+FROM inboxprof
 INNER JOIN courses
-	ON assessments.courseID = courses.courseID
+    ON inboxprof.courseID = courses.courseID
 INNER JOIN userinfo
-	ON courses.userID = userinfo.userID
-WHERE enrollments.userID = '$userID' AND todo.status = 'Pending'
-ORDER BY inbox.inboxID DESC
+    ON courses.userID = userinfo.userID
+WHERE courses.userID = '$userID'
+ORDER BY inboxprof.inboxProfID DESC
 ";
 $selectInboxResult = executeQuery($selectInboxQuery);
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -91,47 +78,50 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                     </div>
 
                                     <!-- Dropdowns-->
-                                     
-                                <!-- Sort By -->
-                                <div class="col-auto mobile-dropdown">
-                                    <div class="d-flex align-items-center flex-nowrap mt-2">
-                                        <span class="dropdown-label me-2 text-reg">Sort by</span>
-                                        <div class="custom-dropdown" data-dropdown="sort">
-                                            <button class="dropdown-btn text-reg text-14" data-selected-sort="Newest">Newest</button>
-                                            <ul class="dropdown-list text-reg text-14">
-                                                <li data-value="Newest" data-sort="desc">Newest</li>
-                                                <li data-value="Oldest" data-sort="asc">Oldest</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <!-- Course -->
-                                <div class="col-auto mobile-dropdown">
-                                    <div class="d-flex align-items-center flex-nowrap mt-2">
-                                        <span class="dropdown-label me-2 text-reg">Courses</span>
-                                        <div class="custom-dropdown" data-dropdown="course">
-                                            <button class="dropdown-btn text-reg text-14" data-selected-course="All">All</button>
-                                            <ul class="dropdown-list text-reg text-14">
-                                                <li data-value="All" data-course="All">All</li>
-                                                <?php
-                                                if ($selectEnrolledResult && mysqli_num_rows($selectEnrolledResult) > 0) {
-                                                    mysqli_data_seek($selectEnrolledResult, 0);
-                                                    while ($course = mysqli_fetch_assoc($selectEnrolledResult)) {
-                                                        $courseCode = $course['courseCode'];
-                                                        ?>
-                                                        <li data-value="<?php echo $courseCode; ?>" data-course="<?php echo $courseCode; ?>">
-                                                            <?php echo $courseCode; ?>
-                                                        </li>
-                                                        <?php
-                                                    }
-                                                    mysqli_data_seek($selectEnrolledResult, 0);
-                                                }
-                                                ?>
-                                            </ul>
+                                    <!-- Sort By -->
+                                    <div class="col-auto mobile-dropdown">
+                                        <div class="d-flex align-items-center flex-nowrap mt-2">
+                                            <span class="dropdown-label me-2 text-reg">Sort by</span>
+                                            <div class="custom-dropdown" data-dropdown="sort">
+                                                <button class="dropdown-btn text-reg text-14"
+                                                    data-selected-sort="Newest">Newest</button>
+                                                <ul class="dropdown-list text-reg text-14">
+                                                    <li data-value="Newest" data-sort="desc">Newest</li>
+                                                    <li data-value="Oldest" data-sort="asc">Oldest</li>
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+
+                                    <!-- Course -->
+                                    <div class="col-auto mobile-dropdown">
+                                        <div class="d-flex align-items-center flex-nowrap mt-2">
+                                            <span class="dropdown-label me-2 text-reg">Courses</span>
+                                            <div class="custom-dropdown" data-dropdown="course">
+                                                <button class="dropdown-btn text-reg text-14"
+                                                    data-selected-course="All">All</button>
+                                                <ul class="dropdown-list text-reg text-14">
+                                                    <li data-value="All" data-course="All">All</li>
+                                                    <?php
+                                                    if ($selectEnrolledResult && mysqli_num_rows($selectEnrolledResult) > 0) {
+                                                        mysqli_data_seek($selectEnrolledResult, 0);
+                                                        while ($course = mysqli_fetch_assoc($selectEnrolledResult)) {
+                                                            $courseCode = $course['courseCode'];
+                                                            ?>
+                                                            <li data-value="<?php echo $courseCode; ?>"
+                                                                data-course="<?php echo $courseCode; ?>">
+                                                                <?php echo $courseCode; ?>
+                                                            </li>
+                                                            <?php
+                                                        }
+                                                        mysqli_data_seek($selectEnrolledResult, 0);
+                                                    }
+                                                    ?>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <!-- Message Content -->
                                     <div class="message-container mt-4 mt-lg-4 pb-4">
@@ -141,7 +131,7 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                                 $timestamp = strtotime($inbox['inboxCreatedAt']);
                                                 $displayDate = $timestamp ? date("F j, Y g:ia", $timestamp) : '';
                                                 $courseCode = $inbox['courseCode'];
-                                                $messageText = trim($inbox['messageText'] . ' ' . $inbox['assessmentTitle']);
+                                                $messageText = trim($inbox['messageText']);
                                                 ?>
                                                 <div class="card mb-1 me-3 w-100 mt-2 inbox-card"
                                                     data-timestamp="<?php echo $timestamp ?: 0; ?>"
@@ -188,7 +178,8 @@ $selectInboxResult = executeQuery($selectInboxQuery);
                                         } else {
                                             ?>
                                             <!-- Empty State -->
-                                            <div class="d-flex flex-column justify-content-center align-items-center inbox-empty-state">
+                                            <div
+                                                class="d-flex flex-column justify-content-center align-items-center inbox-empty-state">
                                                 <img src="../shared/assets/img/empty/inbox.png" width="100" class="mb-1">
                                                 <div class="text-center text-14 text-reg mt-1">Your inbox is empty!</div>
                                             </div>
@@ -213,7 +204,7 @@ $selectInboxResult = executeQuery($selectInboxQuery);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
-     <script>
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
             const messageContainer = document.querySelector('.message-container');
             const sortDropdown = document.querySelector('.custom-dropdown[data-dropdown="sort"]');
@@ -291,31 +282,31 @@ $selectInboxResult = executeQuery($selectInboxQuery);
         });
     </script>
 
-     <!-- Dropdown js -->
-     <script>
-                document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
-                    const btn = dropdown.querySelector('.dropdown-btn');
-                    const list = dropdown.querySelector('.dropdown-list');
+    <!-- Dropdown js -->
+    <script>
+        document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+            const btn = dropdown.querySelector('.dropdown-btn');
+            const list = dropdown.querySelector('.dropdown-list');
 
-                    btn.addEventListener('click', () => {
-                        list.style.display = list.style.display === 'block' ? 'none' : 'block';
-                    });
+            btn.addEventListener('click', () => {
+                list.style.display = list.style.display === 'block' ? 'none' : 'block';
+            });
 
-                    list.querySelectorAll('li').forEach(item => {
-                        item.addEventListener('click', () => {
-                            btn.textContent = item.dataset.value;
-                            list.style.display = 'none';
-                        });
-                    });
-
-                    // Close dropdown if clicked outside
-                    document.addEventListener('click', (e) => {
-                        if (!dropdown.contains(e.target)) {
-                            list.style.display = 'none';
-                        }
-                    });
+            list.querySelectorAll('li').forEach(item => {
+                item.addEventListener('click', () => {
+                    btn.textContent = item.dataset.value;
+                    list.style.display = 'none';
                 });
-            </script>
+            });
+
+            // Close dropdown if clicked outside
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target)) {
+                    list.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

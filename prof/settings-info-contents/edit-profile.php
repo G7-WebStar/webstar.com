@@ -6,9 +6,6 @@ $userQuery = "
         userinfo.middleName,
         userinfo.lastName,
         userinfo.studentID,
-        userinfo.gender,
-        userinfo.yearLevel,
-        userinfo.yearSection,
         userinfo.schoolEmail,
         userinfo.facebookLink,
         userinfo.linkedInLink,
@@ -32,9 +29,6 @@ if ($userResult && mysqli_num_rows($userResult) > 0) {
     $studentID = $userData['studentID'];
     $programID = $userData['programID'];
     $programName = $userData['programName'];
-    $gender = $userData['gender'];
-    $yearLevel = $userData['yearLevel'];
-    $yearSection = $userData['yearSection'];
     $schoolEmail = $userData['schoolEmail'];
     $fbLink = $userData['facebookLink'];
     $linkedInLink = $userData['linkedInLink'];
@@ -140,7 +134,7 @@ if (isset($_POST['deleteAccount'])) {
             <div class="d-block d-md-none mb-3 d-flex flex-column align-items-center text-center mb-5">
                 <div class="profile-pic mb-2">
                     <img id="profilePreviewMobile"
-                        src="<?php echo !empty($profilePicture) ? 'shared/assets/pfp-uploads/' . $profilePicture : 'https://via.placeholder.com/150'; ?>"
+                        src="<?php echo !empty($profilePicture) ? '../shared//assets/pfp-uploads/' . $profilePicture : 'https://via.placeholder.com/150'; ?>"
                         alt="Profile Picture" class="img-fluid">
                 </div>
 
@@ -175,7 +169,7 @@ if (isset($_POST['deleteAccount'])) {
                                 <input type="text" name="middleName" class="form-control" id="middleName"
                                     placeholder=" " pattern="[A-Za-z\s]+"
                                     oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')"
-                                    value="<?php echo $middleName ?? ''; ?>">
+                                    value="<?php echo $middleName ?? ''; ?>" >
                                 <label for="middleName" class="text-reg text-16">Middle Name</label>
                             </div>
                         </div>
@@ -203,7 +197,7 @@ if (isset($_POST['deleteAccount'])) {
                         </div>
                     </div>
 
-                    <div class="row mb-2 gx-2">
+                    <div class="row mb-2 gx-2 d-none">
                         <div class="col">
                             <!-- Student ID -->
                             <div class="form-floating">
@@ -242,7 +236,7 @@ if (isset($_POST['deleteAccount'])) {
                         </div>
                     </div>
                     <!-- Gender -->
-                    <div class="row gx-2 mb-2 align-dropdowns">
+                    <div class="row gx-2 mb-2 align-dropdowns d-none">
                         <div class="col-md-4 col-12 mb-3 mb-md-0">
                             <div class="form-floating">
                                 <select class="form-select" name="gender" id="gender">
@@ -335,14 +329,11 @@ if (isset($_POST['deleteAccount'])) {
                     </div>
                     <div class="row justify-content-center">
                         <div class="col-auto text-center">
-
                             <a class="btn rounded-5 text-med text-12 px-5"
-                                href="login-auth/forgot-password.php"
+                                href="../login-auth/forgot-password.php"
                                 style="background-color: var(--primaryColor); border: 1px solid var(--black);">
                                 Reset Password
                             </a>
-
-
                         </div>
 
                         <div class="col-auto text-center">
@@ -362,7 +353,7 @@ if (isset($_POST['deleteAccount'])) {
                     class="col-12 col-md-4 mt-4 pt-1 d-none d-md-flex flex-column align-items-center ps-md-3 px-3 mb-4 mx-auto">
                     <div class="profile-pic">
                         <img id="profilePreviewDesktop"
-                            src="<?php echo !empty($profilePicture) ? 'shared/assets/pfp-uploads/' . $profilePicture : 'https://via.placeholder.com/150'; ?>"
+                            src="<?php echo !empty($profilePicture) ? '../shared//assets/pfp-uploads/' . $profilePicture : 'https://via.placeholder.com/150'; ?>"
                             alt="Profile Picture">
                     </div>
                     <p class="text-med text-12 mt-2" style="color:var(--black); text-align:center; max-width:150px;">

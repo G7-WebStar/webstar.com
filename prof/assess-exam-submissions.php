@@ -49,13 +49,14 @@ $courseCodesQuery = "
 $courseCodesResult = executeQuery($courseCodesQuery);
 
 // Status filter
-$statusSQL = "";
 if ($statusFilter === "Submitted") {
-    $statusSQL = "AND (todo.status = 'Submitted' OR todo.status = 'Returned') AND scores.score IS NOT NULL";
+    $statusSQL = "AND (todo.status = 'Submitted' OR todo.status = 'Returned' OR scores.score IS NOT NULL)";
 } elseif ($statusFilter === "Pending") {
-    $statusSQL = "AND todo.status IS NULL AND scores.score IS NULL AND NOW() < assessments.deadline";
+    $statusSQL = "AND scores.score IS NULL AND (todo.status IS NULL OR todo.status = 'Pending') AND NOW() <= assessments.deadline";
 } elseif ($statusFilter === "Missing") {
-    $statusSQL = "AND todo.status IS NULL AND scores.score IS NULL AND NOW() > assessments.deadline";
+    $statusSQL = "AND scores.score IS NULL AND (todo.status IS NULL OR todo.status = 'Pending') AND NOW() > assessments.deadline";
+} else {
+    $statusSQL = ""; // 'All'
 }
 
 // Fetch student submissions
