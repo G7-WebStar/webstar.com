@@ -20,10 +20,17 @@ if (isset($_POST['nextBtn'])) {
         $htmlfileupload = $_FILES['fileUpload']['name'];
         $htmlfileuploadTMP = $_FILES['fileUpload']['tmp_name'];
         $htmlfolder = "shared/assets/pfp-uploads/";
-        move_uploaded_file($htmlfileuploadTMP, $htmlfolder . $htmlfileupload);
 
-        // wrap in quotes for SQL string
-        $profilePictureValue = "'$htmlfileupload'";
+        // append datetime to filename
+        $ext = pathinfo($htmlfileupload, PATHINFO_EXTENSION);
+        $nameOnly = pathinfo($htmlfileupload, PATHINFO_FILENAME);
+        $datetime = date("YmdHis");
+        $newFileName = $nameOnly . '_' . $datetime . '.' . $ext;
+
+        // move file with new name
+        move_uploaded_file($htmlfileuploadTMP, $htmlfolder . $newFileName);
+
+        $profilePictureValue = "'$newFileName'";
     } else {
         // use database default
         $profilePictureValue = "DEFAULT";

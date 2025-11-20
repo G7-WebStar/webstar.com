@@ -146,7 +146,12 @@ if (isset($_POST['save_exam'])) {
                         if (!is_dir($uploadDir))
                             mkdir($uploadDir, 0777, true);
 
-                        $newName = time() . "_" . $name;
+                        // with datetime to filename
+                        $ext = pathinfo($name, PATHINFO_EXTENSION);
+                        $nameOnly = pathinfo($name, PATHINFO_FILENAME);
+                        $datetime = date("YmdHis");
+                        $newName = $nameOnly . '_' . $datetime . '.' . $ext;
+
                         $dest = $uploadDir . $newName;
 
                         if (move_uploaded_file($tmp, $dest)) {
