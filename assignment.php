@@ -105,7 +105,6 @@ $assessmentQuery = "
     WHERE assignments.assignmentID = '$assignmentID'
     LIMIT 1
 ";
-
 $assessmentResult = executeQuery($assessmentQuery);
 $assessmentRow = mysqli_fetch_assoc($assessmentResult);
 $assessmentID = $assessmentRow['assessmentID'];
@@ -140,6 +139,23 @@ if ($submissionResult && mysqli_num_rows($submissionResult) > 0) {
     $scoreID = null;
 }
 
+function sanitizeFileName($fileName)
+{
+    $fileName = basename($fileName); // remove any path
+    // Replace spaces & non-alphanumeric characters (except dot, dash, underscore) with underscore
+    $fileName = preg_replace('/[^a-zA-Z0-9._-]/', '_', $fileName);
+    // Optional: replace multiple consecutive underscores with a single underscore
+    $fileName = preg_replace('/_+/', '_', $fileName);
+    return $fileName;
+}
+
+// Fetch title link for preview
+if (isset($_POST['action']) && $_POST['action'] === 'fetchLinkTitle' && isset($_POST['link'])) {
+    $link = trim($_POST['link']);
+
+    echo fetchLinkTitle($link);
+}
+
 // --- Handle multiple file uploads (Turn In) ---
 if (!empty($_FILES['fileAttachment']['name'][0])) {
     $targetDir = "shared/assets/files/";
@@ -162,41 +178,6 @@ if (!empty($_FILES['fileAttachment']['name'][0])) {
             VALUES ('$assessmentID', '$userID', NULL, NOW(), 1)
         ");
         $submissionID = mysqli_insert_id($conn);
-    }
-
-    // Update submission
-    executeQuery("
-        UPDATE submissions 
-        SET submittedAt = NOW(), isSubmitted = 1 
-        WHERE submissionID = '$submissionID'
-    ");
-
-    // Fetch updated submission date immediately
-    $updatedSubmission = executeQuery("
-        SELECT submittedAt 
-        FROM submissions 
-        WHERE submissionID = '$submissionID'
-        LIMIT 1
-    ");
-    if ($updatedSubmission && mysqli_num_rows($updatedSubmission) > 0) {
-        $row = mysqli_fetch_assoc($updatedSubmission);
-        $submissionDate = $row['submittedAt'];
-    }
-
-    $isSubmitted = 1;
-
-    foreach ($_FILES['fileAttachment']['name'] as $key => $fileName) {
-        $fileTmp = $_FILES['fileAttachment']['tmp_name'][$key];
-        $fileName = basename($fileName);
-        $targetFilePath = $targetDir . $fileName;
-
-        if (move_uploaded_file($fileTmp, $targetFilePath)) {
-            $insertFile = "
-                INSERT INTO files (courseID, userID, submissionID, fileAttachment)
-                VALUES ('$courseID', '$userID', '$submissionID', '$fileName')
-            ";
-            executeQuery($insertFile);
-        }
     }
 }
 
@@ -225,27 +206,6 @@ if (isset($_POST['links']) && !empty($_POST['links'])) {
             ");
 
         }
-
-        // Update submission
-        executeQuery("
-            UPDATE submissions 
-            SET submittedAt = NOW(), isSubmitted = 1 
-            WHERE submissionID = '$submissionID'
-        ");
-
-        // Fetch updated submission date immediately
-        $updatedSubmission = executeQuery("
-            SELECT submittedAt 
-            FROM submissions 
-            WHERE submissionID = '$submissionID'
-            LIMIT 1
-        ");
-        if ($updatedSubmission && mysqli_num_rows($updatedSubmission) > 0) {
-            $row = mysqli_fetch_assoc($updatedSubmission);
-            $submissionDate = $row['submittedAt'];
-        }
-
-        $isSubmitted = 1;
     }
 }
 
@@ -287,70 +247,166 @@ if ($submissionID) {
 }
 
 // --- Handle Unsubmit ---
-if (isset($_POST['unsubmit'])) {
-    if ($submissionID) {
-        executeQuery("
-            UPDATE submissions 
-            SET isSubmitted = 0 
-            WHERE submissionID = '$submissionID' AND userID = '$userID'
-        ");
-        $isSubmitted = 0;
-        $submissionDate = null;
-    }
+if (isset($_POST['unsubmit']) && $submissionID) {
+    executeQuery("
+        UPDATE submissions 
+        SET isSubmitted = 0 
+        WHERE submissionID = '$submissionID' AND userID = '$userID'
+    ");
+    $isSubmitted = 0;
+    $submissionDate = null;
 }
 
-// --- Handle deleted files on re-submit ---
-if (isset($_POST['deletedFiles']) && !empty($_POST['deletedFiles'])) {
-    $deletedFiles = json_decode($_POST['deletedFiles'], true);
-    if (is_array($deletedFiles)) {
+// --- Handle submission (files/links) ---
+if (
+    (isset($_FILES['fileAttachment']) && !empty($_FILES['fileAttachment']['name'][0])) ||
+    (isset($_POST['links']) && !empty($_POST['links']))
+) {
+
+    // Ensure submission exists
+    if (!$submissionID) {
+        executeQuery("
+            INSERT INTO submissions (assessmentID, userID, scoreID, submittedAt, isSubmitted)
+            VALUES ('$assessmentID', '$userID', NULL, NOW(), 1)
+        ");
+        $submissionID = mysqli_insert_id($conn);
+    } else {
+        executeQuery("
+            UPDATE submissions 
+            SET submittedAt = NOW(), isSubmitted = 1 
+            WHERE submissionID = '$submissionID'
+        ");
+    }
+
+    $isSubmitted = 1;
+
+    // --- Handle deleted files ---
+    if (isset($_POST['deletedFiles']) && !empty($_POST['deletedFiles'])) {
+        $deletedFiles = json_decode($_POST['deletedFiles'], true);
         foreach ($deletedFiles as $fileToDelete) {
             $fileToDelete = mysqli_real_escape_string($conn, $fileToDelete);
-
             executeQuery("
                 DELETE FROM files 
-                WHERE submissionID = '$submissionID' 
-                  AND userID = '$userID' 
-                  AND fileAttachment = '$fileToDelete'
+                WHERE submissionID='$submissionID' 
+                  AND userID='$userID' 
+                  AND fileAttachment='$fileToDelete'
             ");
+            $filePath = "shared/assets/files/" . $fileToDelete;
+        }
+    }
 
-            $filePath = "shared/assets/files/" . $fileToDelete; // instead of img/files
-            if (file_exists($filePath))
-                unlink($filePath);
+    // --- Handle submission even if no changes ---
+    if (isset($_POST['submit'])) { // your form must have name="submit"
+        if (!$submissionID) {
+            // First-time submission
+            executeQuery("
+            INSERT INTO submissions (assessmentID, userID, scoreID, submittedAt, isSubmitted)
+            VALUES ('$assessmentID', '$userID', NULL, NOW(), 1)
+        ");
+            $submissionID = mysqli_insert_id($conn);
+        } else {
+            // Resubmit even with no changes
+            executeQuery("
+            UPDATE submissions
+            SET submittedAt = NOW(), isSubmitted = 1
+            WHERE submissionID = '$submissionID' AND userID = '$userID'
+        ");
+        }
+        $isSubmitted = 1;
+    }
+
+    // --- Handle deleted links ---
+    if (isset($_POST['deletedLinks']) && !empty($_POST['deletedLinks'])) {
+        $deletedLinks = json_decode($_POST['deletedLinks'], true);
+        foreach ($deletedLinks as $linkToDelete) {
+            $linkToDelete = mysqli_real_escape_string($conn, $linkToDelete);
+            executeQuery("
+                DELETE FROM files 
+                WHERE submissionID='$submissionID' 
+                  AND userID='$userID' 
+                  AND fileLink='$linkToDelete'
+            ");
+        }
+    }
+
+    // --- Handle file uploads (with original name + timestamp storage) ---
+    if (!empty($_FILES['fileAttachment']['name'][0])) {
+        $targetDir = "shared/assets/files/";
+        if (!file_exists($targetDir)) {
+            mkdir($targetDir, 0777, true);
+        }
+
+        foreach ($_FILES['fileAttachment']['name'] as $key => $fileName) {
+            $fileTmp = $_FILES['fileAttachment']['tmp_name'][$key];
+            $originalName = sanitizeFileName($fileName);
+
+            // Generate unique filename (timestamp + original)
+            $timestamp = date('Ymd_His');
+            $fileTitle = $timestamp . "_" . $originalName;
+
+            $targetFilePath = $targetDir . $fileTitle;
+
+            // Prevent duplicate original name stored under same submission
+            $checkFile = executeQuery("
+            SELECT 1 FROM files
+            WHERE submissionID='$submissionID'
+              AND userID='$userID'
+              AND fileAttachment='$originalName'
+            LIMIT 1
+        ");
+
+            if (mysqli_num_rows($checkFile) == 0 && move_uploaded_file($fileTmp, $targetFilePath)) {
+                executeQuery("
+                INSERT INTO files (courseID, userID, submissionID, fileAttachment, fileTitle)
+                VALUES ('$courseID', '$userID', '$submissionID', '$originalName', '$fileTitle')
+            ");
+            }
+        }
+    }
+
+    // --- Handle link uploads ---
+    if (isset($_POST['links']) && !empty($_POST['links'])) {
+        $linksArray = json_decode($_POST['links'], true);
+        foreach ($linksArray as $linkData) {
+            $rawLink = mysqli_real_escape_string($conn, $linkData['link']);
+            $processedLink = processGoogleLink($rawLink);
+            $fileTitle = mysqli_real_escape_string($conn, fetchLinkTitle($rawLink));
+
+            // Avoid duplicates
+            $checkLink = executeQuery("
+                SELECT 1 FROM files 
+                WHERE submissionID='$submissionID' 
+                  AND userID='$userID' 
+                  AND fileLink='$processedLink'
+                LIMIT 1
+            ");
+            if (mysqli_num_rows($checkLink) == 0) {
+                executeQuery("
+                    INSERT INTO files (courseID, userID, submissionID, fileTitle, fileLink)
+                    VALUES ('$courseID', '$userID', '$submissionID', '$fileTitle', '$processedLink')
+                ");
+            }
         }
     }
 }
 
-// --- Fetch existing uploaded files (to show in sticky card) ---
-$files = [];
+// --- Fetch existing files & links for UI display ---
+$files = $links = [];
+
 if ($submissionID) {
-    $filesQuery = "
-        SELECT fileAttachment 
-        FROM files 
-        WHERE submissionID = '$submissionID'
-    ";
-    $filesResult = executeQuery($filesQuery);
-    while ($row = mysqli_fetch_assoc($filesResult)) {
+    $filesResult = executeQuery("
+        SELECT fileAttachment FROM files WHERE submissionID='$submissionID' AND fileAttachment IS NOT NULL
+    ");
+    while ($row = mysqli_fetch_assoc($filesResult))
         $files[] = $row['fileAttachment'];
-    }
-}
 
-// Fetch existing links for this submission
-$links = [];
-if ($submissionID) {
-    $linksQuery = "
-        SELECT fileLink, fileTitle
-        FROM files
-        WHERE submissionID = '$submissionID' AND fileLink IS NOT NULL
-    ";
-    $linksResult = executeQuery($linksQuery);
+    $linksResult = executeQuery("
+        SELECT fileLink, fileTitle FROM files WHERE submissionID='$submissionID' AND fileLink IS NOT NULL
+    ");
     while ($row = mysqli_fetch_assoc($linksResult)) {
-        $links[] = [
-            'link' => $row['fileLink'],
-            'title' => $row['fileTitle']
-        ];
+        $links[] = ['link' => $row['fileLink'], 'title' => $row['fileTitle']];
     }
 }
-
 
 // --- Update todo table status based on submission actions ---
 $todoCheckQuery = "
@@ -365,7 +421,7 @@ $todoStatus = $todoRow['status'] ?? 'Pending';
 
 // --- Update todo table status based on submission actions ---
 if ($isSubmitted) {
-    // Only update to "Submitted" if not yet graded
+    // Only update to "Submitted" if not yet Returned
     if (empty($scoreID)) {
         $newStatus = 'Submitted';
         if ($hasTodo) {
@@ -381,8 +437,8 @@ if ($isSubmitted) {
             ");
         }
     } else {
-        // If already graded, ensure todo shows "Graded"
-        $newStatus = 'Graded';
+        // If already Returned, ensure todo shows "Returned"
+        $newStatus = 'Returned';
         if ($hasTodo) {
             executeQuery("
                 UPDATE todo 
@@ -472,9 +528,9 @@ if (!empty($scoreID)) {
 }
 
 // --- Compute flags for timeline display ---
-$isGraded = ($todoStatus === 'Graded');
+$isReturned = ($todoStatus === 'Returned');
 if (!empty($gradedAt)) {
-    $isGraded = true;
+    $isReturned = true;
 }
 $isMissing = ($todoStatus === 'Missing');
 $isBeforeDeadline = ($isSubmitted && strtotime($submissionDate) <= strtotime($deadline));
@@ -867,7 +923,8 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                 <!-- DESKTOP VIEW -->
                                 <div class="row desktop-header d-none d-sm-flex">
                                     <div class="col-auto me-2">
-                                        <a href="todo.php" class="text-decoration-none">
+                                        <a href="javascript:void(0);" class="text-decoration-none"
+                                            onclick="history.back();">
                                             <i class="fa-solid fa-arrow-left text-reg text-16"
                                                 style="color: var(--black);"></i>
                                         </a>
@@ -894,10 +951,10 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                 <?php endif; ?>
                                             </div>
 
-                                            <!-- RIGHT: STATUS + SCORE -->
-                                            <div class="text-end">
-                                                <?php echo $status; ?>
-                                                <div class="text-sbold text-25">
+                                            <!-- RIGHT: SCORE -->
+                                            <div class="text-end mt-3">
+                                                <div
+                                                    class="text-sbold text-25 text-center justify-content-center align-items-center">
                                                     <?php echo $score !== null ? $score : '-'; ?>
                                                     <span class="text-muted">/<?php echo $totalPoints; ?></span>
                                                 </div>
@@ -914,7 +971,8 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                     <!-- Top row: back arrow + title -->
                                     <div class="mobile-top">
                                         <div class="arrow">
-                                            <a href="todo.php" class="text-decoration-none">
+                                            <a href="javascript:void(0);" class="text-decoration-none"
+                                                onclick="history.back();">
                                                 <i class="fa-solid fa-arrow-left text-reg text-16"
                                                     style="color: var(--black);"></i>
                                             </a>
@@ -939,9 +997,8 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                         <?php endif; ?>
                                     </div>
 
-                                    <!-- Status + Score below badges -->
+                                    <!-- Score below badges -->
                                     <div>
-                                        <div class="graded text-reg text-18"><?php echo $status; ?></div>
                                         <div class="score text-sbold text-25">
                                             <?php echo $score !== null ? $score : '-'; ?>
                                             <span class="text-muted">/<?php echo $totalPoints; ?></span>
@@ -1074,6 +1131,8 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                 </div>
 
                                                 <div class="existingUploads">
+                                                    <input type="hidden" name="deletedFiles" id="deletedFilesInput"
+                                                        value="[]">
 
                                                     <!-- Attachments -->
                                                     <?php foreach ($attachmentsArray as $file): ?>
@@ -1102,6 +1161,8 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                     <?php endforeach; ?>
 
                                                     <!-- Links -->
+                                                    <input type="hidden" name="deletedLinks" id="deletedLinksInput"
+                                                        value="[]">
                                                     <?php foreach ($linksArray as $link): ?>
                                                         <div class="cardFile text-sbold text-16 my-2 d-flex align-items-center justify-content-between"
                                                             data-type="link" data-link="<?= $link['link'] ?>">
@@ -1145,7 +1206,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                         </div>
                                                     </li>
 
-                                                    <?php if ($isSubmitted && !$isGraded && $isBeforeDeadline): ?>
+                                                    <?php if ($isSubmitted && !$isReturned && $isBeforeDeadline): ?>
                                                         <li class="timeline-item">
                                                             <div class="timeline-circle big"
                                                                 style="background-color: var(--primaryColor);"></div>
@@ -1158,7 +1219,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                             </div>
                                                         </li>
 
-                                                    <?php elseif ($isLate && !$isGraded): ?>
+                                                    <?php elseif ($isLate && !$isReturned): ?>
                                                         <li class="timeline-item">
                                                             <div class="timeline-circle big" style="background-color: red;">
                                                             </div>
@@ -1183,7 +1244,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                             </div>
                                                         </li>
 
-                                                    <?php elseif ($isGraded): ?>
+                                                    <?php elseif ($isReturned): ?>
                                                         <li class="timeline-item">
                                                             <div class="timeline-circle bg-dark"></div>
                                                             <div class="timeline-content">
@@ -1201,7 +1262,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                                 style="background-color: var(--primaryColor);"></div>
                                                             <div class="timeline-content">
                                                                 <div class="text-reg text-16">Your assignment has been
-                                                                    graded.</div>
+                                                                    Returned.</div>
                                                                 <div class="text-reg text-12">
                                                                     <?= date("M j, Y, g:iA", strtotime($statusUpdated)); ?>
                                                                 </div>
@@ -1250,7 +1311,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                         Turn In
                                                     </button>
 
-                                                <?php elseif ($isSubmitted == 1 && !$isGraded): ?>
+                                                <?php elseif ($isSubmitted == 1 && !$isReturned): ?>
                                                     <button type="button" id="unsubmitBtn"
                                                         class="btn btn-sm px-4 py-2 mb-4 rounded-pill text-reg text-md-14"
                                                         style="background-color: var(--primaryColor); margin-top: -25px;"
@@ -1267,7 +1328,8 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                     <div class="mt-3 d-flex justify-content-center w-100">
                                         <button type="button"
                                             class="btn text-reg text-12 rounded-4 d-flex justify-content-center align-items-center"
-                                            data-bs-toggle="modal" data-bs-target="#guidelinesModal">
+                                            style="background-color: var(--pureWhite);" data-bs-toggle="modal"
+                                            data-bs-target="#guidelinesModal">
                                             <span class="material-symbols-outlined me-1"
                                                 style="font-variation-settings:'FILL' 1;">info</span>
                                             View attachment guidelines
@@ -1486,8 +1548,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                             style="background-color: var(--primaryColor); border: 1px solid var(--black);"
                             target="_blank">
                             <span class="" style="display:flex;align-items:center;gap:4px;">
-                                <span class="material-symbols-outlined"
-                                    style="font-size:18px;">open_in_new</span>
+                                <span class="material-symbols-outlined" style="font-size:18px;">open_in_new</span>
                                 Open
                             </span>
                         </a>
@@ -1536,7 +1597,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
 
                                         // Check if this level is selected
                                         $isSelected = in_array($level['levelID'], $selectedLevels);
-                                        $bgColor = $isSelected ? 'var(--primaryColor)' : 'var(--pureWhite)';
+                                        $bgColor = $isSelected ? 'var(--primaryColor)' : 'transparent';
                                         $borderColor = $isSelected ? 'var(--black)' : 'var(--black)';
                                         ?>
                                         <div class="mb-2">
@@ -1560,7 +1621,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                 <div class="collapse w-100" id="<?= $collapseID; ?>"
                                                     data-bs-parent="#ratingAccordion<?= $criterionIndex; ?>">
                                                     <p class="mb-0 px-3 pb-2 text-reg text-14"
-                                                        style="text-align: justify; background-color: <?= $bgColor ?>; color: <?= $textColor ?>;">
+                                                        style="text-align: justify; background: transparent !important; color: <?= $textColor ?> !important; border: none !important; box-shadow: none !important;">
                                                         <?= $level['levelDescription']; ?>
                                                     </p>
                                                 </div>
@@ -1569,6 +1630,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                     <?php endforeach; ?>
                                 </div>
                             </div>
+
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -1594,6 +1656,14 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            function sanitizeFileName(fileName) {
+                // Replace spaces & non-alphanumeric characters (except dot, dash, underscore) with underscore
+                fileName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+                // Replace multiple consecutive underscores with a single underscore
+                fileName = fileName.replace(/_+/g, '_');
+                return fileName;
+            }
+
             // --- Toast for unsubmit with less than 50 webstars ---
             const userWebstars = <?= $userWebstars ?? 0 ?>;
             const requiredWebstars = 50;
@@ -1763,7 +1833,6 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                             .forEach(ic => ic.style.transform = 'rotate(0deg)');
                         icon.style.transform = 'rotate(180deg)';
                         icon.style.transition = 'transform 0.3s';
-                        container.parentElement.style.backgroundColor = 'var(--primaryColor)';
                     });
 
                     // Handle collapse
@@ -1814,58 +1883,79 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
 
                 const workList = document.querySelector('.uploadedFiles');
 
-                // --- Handle file selection ---
+                // --- Handle file selection (FIXED) ---
                 fileUpload.addEventListener('change', function () {
                     const newFiles = Array.from(this.files);
-                    newFiles.forEach(file => allSelectedFiles.items.add(file));
-                    this.value = '';
+                    this.value = ''; // Reset input to allow re-selecting the same file
+
+                    newFiles.forEach(file => {
+                        // Sanitize filename for display and submission
+                        const sanitizedName = sanitizeFileName(file.name);
+
+                        // Prevent duplicates
+                        if (![...allSelectedFiles.files].some(f => f.name === sanitizedName)) {
+                            const sanitizedFile = new File([file], sanitizedName, { type: file.type });
+                            allSelectedFiles.items.add(sanitizedFile);
+
+                            const cardHTML = `
+            <div class="cardFile text-sbold text-16 my-2 d-flex align-items-center justify-content-between"
+                data-size="${file.size}" data-type="file" data-name="${sanitizedName}">
+                <div class="d-flex align-items-center" style="flex: 1 1 0; min-width: 0;">
+                    <span class="material-symbols-outlined p-2 pe-2"
+                        style="font-variation-settings:'FILL' 1">draft</span>
+
+                    <span class="ms-2 text-truncate file-name"
+                        style="flex: 1 1 0; min-width: 0;">
+                        ${sanitizedName}
+                    </span>
+                </div>
+                <button type="button" class="border-0 bg-transparent mt-2 remove-btn">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>`;
+                            workList.insertAdjacentHTML('beforeend', cardHTML);
+                        }
+                    });
+
+                    fileUpload.files = allSelectedFiles.files; // 🔥 Sync input with updated list
+
+                    bindFileRemoveButtons();
 
                     myWorkContainer.style.display = 'block';
                     document.getElementById('myWorkLabel').style.display = 'block';
-
-                    newFiles.forEach(file => {
-                        const cardHTML = `
-                    <div class="cardFile text-sbold text-16 my-2 d-flex align-items-center justify-content-between"
-                        data-size="${file.size}" data-type="file">
-                        <div class="d-flex align-items-center">
-                            <span class="material-symbols-outlined p-2 pe-2" style="font-variation-settings:'FILL' 1">draft</span>
-                            <span class="ms-2">${file.name}</span>
-                        </div>
-                        <button type="button" class="border-0 bg-transparent mt-2 remove-btn">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    </div>
-                `;
-                        workList.insertAdjacentHTML('beforeend', cardHTML);
-                    });
-
-                    // Bind remove buttons
-                    workList.querySelectorAll('.remove-btn').forEach(btn => {
-                        if (!btn.dataset.bound) {
-                            btn.dataset.bound = 'true';
-                            btn.addEventListener('click', () => {
-                                const card = btn.closest('.cardFile');
-                                const fileName = card.querySelector('span.ms-2').textContent;
-
-                                for (let i = 0; i < allSelectedFiles.items.length; i++) {
-                                    if (allSelectedFiles.items[i].getAsFile().name === fileName) {
-                                        allSelectedFiles.items.remove(i);
-                                        break;
-                                    }
-                                }
-                                card.remove();
-
-                                const hasExisting = document.querySelector('.existingUploads .cardFile');
-                                const hasNew = document.querySelector('.uploadedFiles .cardFile');
-                                if (!hasExisting && !hasNew) myWorkContainer.style.display = 'none';
-                            });
-                        }
-                    });
 
                     if (<?= $isSubmitted ?> === 1) {
                         workList.querySelectorAll('button').forEach(btn => btn.style.display = 'none');
                     }
                 });
+
+
+                // --- Remove file handler (NEW FUNCTION) ---
+                function bindFileRemoveButtons() {
+                    workList.querySelectorAll('.remove-btn').forEach(btn => {
+                        if (btn.dataset.bound) return;
+                        btn.dataset.bound = 'true';
+
+                        btn.addEventListener('click', () => {
+                            const card = btn.closest('.cardFile');
+                            const fileName = card.dataset.name;
+
+                            for (let i = 0; i < allSelectedFiles.items.length; i++) {
+                                if (allSelectedFiles.items[i].getAsFile().name === fileName) {
+                                    allSelectedFiles.items.remove(i);
+                                    break;
+                                }
+                            }
+
+                            card.remove();
+                            fileUpload.files = allSelectedFiles.files; // 🔥 Sync again
+
+                            const hasExisting = document.querySelector('.existingUploads .cardFile');
+                            const hasNew = document.querySelector('.uploadedFiles .cardFile');
+                            if (!hasExisting && !hasNew) myWorkContainer.style.display = 'none';
+                        });
+                    });
+                }
 
                 // --- Handle Add Link ---
                 const addLinkBtn = document.getElementById('addLinkBtn');
@@ -1876,23 +1966,17 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                     const linkValue = linkInput.value.trim();
                     if (!linkValue) return;
 
-                    let linkTitle;
-                    try {
-                        const url = new URL(linkValue);
-                        linkTitle = url.hostname.replace('www.', '');
-                    } catch {
-                        linkTitle = linkValue;
-                    }
-
-                    myWorkContainer.style.display = 'block';
-                    document.getElementById('myWorkLabel').style.display = 'block';
-
+                    let linkTitle = linkValue;
                     const cardHTML = `
                         <div class="cardFile text-sbold text-16 my-2 px-1 d-flex align-items-center justify-content-between"
-                            data-link="${linkValue}" data-type="link">
-                            <div class="d-flex align-items-center">
+                            data-link="${linkValue}" data-type="link" style="flex: 1 1 0; min-width: 0;">
+                            <div class="d-flex align-items-center" style="flex: 1 1 0; min-width: 0;">
                                 <span class="material-symbols-outlined">link</span>
-                                <a href="${linkValue}" target="_blank" class="ms-2 text-decoration-none text-dark">${linkTitle}</a>
+                                <a href="${linkValue}" target="_blank" 
+                                class="ms-2 text-decoration-none text-dark"
+                                style="flex-shrink: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${linkTitle}
+                                </a>
                             </div>
                             <button type="button" class="border-0 bg-transparent mt-2 remove-btn">
                                 <span class="material-symbols-outlined">close</span>
@@ -1926,6 +2010,24 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                             });
                         }
                     });
+
+                    const cardLink = workList.querySelector(`.cardFile[data-link="${linkValue}"] a`);
+
+                    // Fetch real title via AJAX to the same PHP file
+                    const formData = new FormData();
+                    formData.append('action', 'fetchLinkTitle');
+                    formData.append('link', linkValue);
+
+                    fetch('', { // empty string means current PHP file
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(res => res.text())
+                        .then(title => {
+                            if (title) cardLink.textContent = title;
+                            updateLinksInput();
+                        })
+                        .catch(err => console.error(err));
 
                     updateLinksInput();
                     linkInput.value = '';

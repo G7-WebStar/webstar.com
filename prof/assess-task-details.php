@@ -101,6 +101,45 @@ $checkRubricQuery = "SELECT rubricID FROM assignments WHERE assessmentID = '$ass
 $checkRubricResult = executeQuery($checkRubricQuery);
 $rubricIDRow = (mysqli_num_rows($checkRubricResult) > 0) ? mysqli_fetch_assoc($checkRubricResult) : null;
 $rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
+
+// Rubric Info
+$rubricID = isset($assignmentRow['rubricID']) ? $assignmentRow['rubricID'] : null;
+$rubricTitle = '';
+$rubricPoints = 0;
+$criteriaList = [];
+$levelsByCriterion = [];
+
+if (!empty($rubricID)) {
+    // Get rubric title and total points
+    $rubricQuery = "SELECT rubricTitle, totalPoints FROM rubric WHERE rubricID = $rubricID LIMIT 1";
+    $rubricResult = executeQuery($rubricQuery);
+    $rubricRow = mysqli_fetch_assoc($rubricResult);
+
+    if ($rubricRow) {
+        $rubricTitle = $rubricRow['rubricTitle'];
+        $rubricPoints = $rubricRow['totalPoints'];
+    }
+
+    // Get criteria for this rubric
+    $criteriaQuery = "SELECT criterionID, criteriaTitle FROM criteria WHERE rubricID = $rubricID ORDER BY criterionID ASC";
+    $criteriaResult = executeQuery($criteriaQuery);
+    while ($criterion = mysqli_fetch_assoc($criteriaResult)) {
+        $criteriaList[] = $criterion;
+
+        // Get levels for this criterion
+        $criterionID = $criterion['criterionID'];
+        $levelsQuery = "SELECT levelID, levelTitle, levelDescription, points 
+                        FROM level 
+                        WHERE criterionID = $criterionID 
+                        ORDER BY points DESC";
+        $levelsResult = executeQuery($levelsQuery);
+        $levelsByCriterion[$criterionID] = [];
+        while ($level = mysqli_fetch_assoc($levelsResult)) {
+            $levelsByCriterion[$criterionID][] = $level;
+        }
+    }
+}
+
 ?>
 
 <!doctype html>
@@ -122,7 +161,8 @@ $rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet" />
 
 </head>
 
@@ -153,10 +193,9 @@ $rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
                             <!-- DESKTOP VIEW -->
                             <div class="row desktop-header d-none d-sm-flex">
                                 <div class="col-auto me-2">
-                                    <a href="assess.php" class="text-decoration-none">
-                                        <i class="fa-solid fa-arrow-left text-reg text-16"
-                                            style="color: var(--black);"></i>
-                                    </a>
+                                    <button onclick="history.back()" class="btn p-0" style="background:none; border:none;">
+                                        <i class="fa-solid fa-arrow-left text-reg text-16" style="color: var(--black);"></i>
+                                    </button>
                                 </div>
                                 <?php
                                 if (mysqli_num_rows($selectAssessmentResult) > 0) {
@@ -172,28 +211,28 @@ $rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
                                 } ?>
                             </div>
 
-
                             <!-- MOBILE VIEW -->
                             <div class="d-block d-sm-none mobile-assignment">
                                 <div class="mobile-top">
                                     <div class="arrow">
-                                        <a href="assess.php" class="text-decoration-none">
-                                            <i class="fa-solid fa-arrow-left text-reg text-16"
-                                                style="color: var(--black);"></i>
-                                        </a>
+                                        <div class="arrow">
+                                            <button onclick="history.back()" class="btn p-0" style="background:none; border:none;">
+                                                <i class="fa-solid fa-arrow-left text-reg text-16" style="color: var(--black);"></i>
+                                            </button>
+                                        </div>
+                                        <?php
+                                        if (mysqli_num_rows($selectAssessmentResult) > 0) {
+                                            mysqli_data_seek($selectAssessmentResult, 0);
+                                            while ($assessmentRow = mysqli_fetch_assoc($selectAssessmentResult)) {
+                                        ?>
+                                                <div class="col">
+                                                    <span class="text-sbold text-25"><?php echo $assessmentRow['assessmentTitle']; ?></span>
+                                                    <div class="text-reg text-18">Due <?php echo $assessmentRow['assessmentDeadline']; ?></div>
+                                                </div>
+                                        <?php
+                                            }
+                                        } ?>
                                     </div>
-                                    <?php
-                                    if (mysqli_num_rows($selectAssessmentResult) > 0) {
-                                        mysqli_data_seek($selectAssessmentResult, 0);
-                                        while ($assessmentRow = mysqli_fetch_assoc($selectAssessmentResult)) {
-                                    ?>
-                                            <div class="col">
-                                                <span class="text-sbold text-25"><?php echo $assessmentRow['assessmentTitle']; ?></span>
-                                                <div class="text-reg text-18">Due <?php echo $assessmentRow['assessmentDeadline']; ?></div>
-                                            </div>
-                                    <?php
-                                        }
-                                    } ?>
                                 </div>
                             </div>
                         </div>
@@ -231,73 +270,99 @@ $rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
                                                     <div class="tab-content" id="myTabContent">
                                                         <!-- Task Details Tab - Active -->
                                                         <div class="tab-pane fade show active" id="announcements" role="tabpanel" aria-labelledby="announcements-tab">
-                                                            <div class="text-sbold text-14 mt-5">Task Instructions</div>
-                                                            <p class="mb-5 mt-2 text-med text-14">
-                                                                <?php echo $assignmentRow['assignmentDescription']; ?>
-                                                            </p>
+                                                            <?php if (!empty($assignmentRow['assignmentDescription'])): ?>
+                                                                <div class="text-sbold text-14 mt-5">Task Instructions</div>
+                                                                <p class="mb-4 mt-3 text-med text-14">
+                                                                    <?php echo $assignmentRow['assignmentDescription']; ?>
+                                                                </p>
+                                                                <hr>
+                                                            <?php endif; ?>
 
-                                                            <hr>
+                                                            <?php if (!empty($attachmentsArray) || !empty($linksArray)): ?>
+                                                                <div class="text-sbold text-14 mt-3">Task Materials</div>
+                                                                <?php foreach ($attachmentsArray as $file):
+                                                                    $filePath = "shared/assets/files/" . $file;
+                                                                    $fileExt = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
+                                                                    $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
+                                                                    $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
 
-                                                            <div class="text-sbold text-14 mt-3">Task Materials</div>
-                                                            <?php foreach ($attachmentsArray as $file):
-                                                                $filePath = "shared/assets/files/" . $file;
-                                                                $fileExt = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
-                                                                $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
-                                                                $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
+                                                                    // Remove extension from display name
+                                                                    $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
+                                                                ?>
+                                                                    <a href="<?php echo $filePath; ?>"
+                                                                        <?php if (!preg_match('/^https?:\/\//', $filePath)) : ?>
+                                                                        download="<?php echo htmlspecialchars($file); ?>"
+                                                                        <?php endif; ?>
+                                                                        style="text-decoration:none; color:inherit;">
 
-                                                                // Remove extension from display name
-                                                                $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
-                                                            ?>
-                                                                <a href="<?php echo $filePath; ?>"
-                                                                    <?php if (!preg_match('/^https?:\/\//', $filePath)) : ?>
-                                                                    download="<?php echo htmlspecialchars($file); ?>"
-                                                                    <?php endif; ?>
-                                                                    style="text-decoration:none; color:inherit;">
+                                                                        <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
+                                                                            style="width:400px; max-width:100%; min-width:310px;">
+                                                                            <span class="px-3 py-3 material-symbols-outlined">draft</span>
+                                                                            <div class="ms-2">
+                                                                                <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
+                                                                                <div class="due text-reg text-14 mb-1">
+                                                                                    <?php echo $fileExt ?> · <?php echo $fileSizeMB ?>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </a>
+                                                                <?php endforeach; ?>
 
+                                                                <?php foreach ($linksArray as $link): ?>
                                                                     <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
                                                                         style="width:400px; max-width:100%; min-width:310px;">
-                                                                        <span class="px-3 py-3 material-symbols-outlined">draft</span>
+                                                                        <span class="px-3 py-3 material-symbols-outlined">public</span>
                                                                         <div class="ms-2">
+                                                                            <!-- temoparary lang ang filename here -->
                                                                             <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
-                                                                            <div class="due text-reg text-14 mb-1">
-                                                                                <?php echo $fileExt ?> · <?php echo $fileSizeMB ?>
+                                                                            <div class="text-reg link text-12 mt-0">
+                                                                                <a href="<?php echo $link ?>" target="_blank" rel="noopener noreferrer"
+                                                                                    style="text-decoration: none; color: var(--black);">
+                                                                                    <?php echo $link ?>
+                                                                                </a>
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                </a>
-                                                            <?php endforeach; ?>
+                                                                <?php endforeach; ?>
+                                                                <hr>
+                                                            <?php endif; ?>
 
-
-                                                            <?php foreach ($linksArray as $link): ?>
+                                                            <?php if (!empty($rubricID) && !empty($rubricTitle)): ?>
+                                                                <div class="text-sbold text-14 mt-4">Rubric</div>
                                                                 <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
-                                                                    style="width:400px; max-width:100%; min-width:310px;">
-                                                                    <span class="px-3 py-3 material-symbols-outlined">public</span>
+                                                                    style="max-width:100%; min-width:310px; cursor:pointer;"
+                                                                    data-bs-toggle="modal" data-bs-target="#rubricModal">
+
+                                                                    <span class="material-symbols-outlined ps-3 pe-2 py-3"
+                                                                        style="font-variation-settings:'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;">
+                                                                        rate_review
+                                                                    </span>
+
                                                                     <div class="ms-2">
-                                                                        <!-- temoparary lang ang filename here -->
-                                                                        <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
-                                                                        <div class="text-reg link text-12 mt-0">
-                                                                            <a href="<?php echo $link ?>" target="_blank" rel="noopener noreferrer"
-                                                                                style="text-decoration: none; color: var(--black);">
-                                                                                <?php echo $link ?>
-                                                                            </a>
+                                                                        <div class="text-sbold text-16 mt-1"><?php echo $rubricTitle; ?>
+                                                                        </div>
+                                                                        <div class="due text-reg text-14 mb-1">
+                                                                            <?php echo $rubricPoints; ?> points
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            <?php endforeach; ?>
+                                                                <hr>
+                                                            <?php endif; ?>
 
-                                                            <hr>
                                                             <?php
                                                             if (mysqli_num_rows($profInfoResult) > 0) {
                                                                 while ($prof = mysqli_fetch_assoc($profInfoResult)) {
-
-
+                                                                    $profilePic = !empty($test['profilePicture'])
+                                                                        ? '../shared/assets/pfp-uploads/' . $test['profilePicture']
+                                                                        : '../shared/assets/pfp-uploads/defaultProfile.png';
                                                             ?>
                                                                     <div class="text-sbold text-14 pb-3">Prepared by</div>
                                                                     <div class="d-flex align-items-center pb-5">
                                                                         <div class="rounded-circle me-2"
                                                                             style="width: 50px; height: 50px; background-color: var(--highlight75);">
-                                                                            <img src="../shared/assets/img/assess/prof.png" alt="professor"
-                                                                                class="rounded-circle" style="width:50px;height:50px;">
+                                                                            <img src="<?php echo $profilePic ?>" alt="Profile"
+                                                                                alt="professor" class="rounded-circle"
+                                                                                style="width:50px;height:50px;">
                                                                         </div>
                                                                         <div>
                                                                             <div class="text-sbold text-14">Prof. <?php echo $prof['firstName'] . " " . $prof['middleName'] . " " . $prof['lastName']; ?></div>
@@ -375,42 +440,117 @@ $rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
                                 </div>
                             </div>
                         </div>
-                    </div> <!-- Close content-scroll-container -->
+                        <!-- Close content-scroll-container -->
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        function createDoughnutChart(canvasId, submitted, pending, graded, missing) {
-            const ctx = document.getElementById(canvasId).getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    datasets: [{
-                        data: [submitted, pending, graded, missing],
-                        backgroundColor: ['#3DA8FF', '#C7C7C7', '#d9ffe4ff', '#ffd9d9ff'],
-                        borderWidth: 0,
-                    }]
-                },
-                options: {
-                    cutout: '75%',
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            enabled: false
+        <div class="modal fade" id="rubricModal" tabindex="-1" aria-labelledby="rubricModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered py-4">
+                <div class="modal-content rounded-4" style="max-height:450px; overflow:hidden;">
+
+                    <!-- HEADER -->
+                    <div class="modal-header border-bottom">
+                        <div class="modal-title text-sbold text-20 ms-3" id="rubricModalLabel">
+                            <?php echo $rubricTitle; ?>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <!-- BODY -->
+                    <div class="modal-body" style="overflow-y:auto; scrollbar-width:thin;">
+                        <div class="container text-center px-5">
+                            <?php foreach ($criteriaList as $criterionIndex => $criterion): ?>
+                                <!-- Section Title -->
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        <div class="text-sbold text-15" style="color: var(--black);">
+                                            <?php echo $criterion['criteriaTitle']; ?>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Accordion for levels -->
+                                <div id="ratingAccordion<?php echo $criterionIndex; ?>" class="row justify-content-center">
+                                    <div class="col-12 col-md-10">
+                                        <?php foreach ($levelsByCriterion[$criterion['criterionID']] as $levelIndex => $level):
+                                            $collapseID = strtolower(preg_replace('/\s+/', '', $level['levelTitle'])) . $criterionIndex;
+                                        ?>
+                                            <div class="mb-2">
+                                                <div class="w-100 d-flex align-items-center justify-content-center flex-column text-med text-14"
+                                                    style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black);">
+
+                                                    <div class="d-flex justify-content-between align-items-center w-100 px-3 py-2">
+                                                        <span class="flex-grow-1 text-center ps-3">
+                                                            <?php echo $level['levelTitle']; ?> · <?php echo $level['points']; ?>
+                                                            pts
+                                                        </span>
+
+                                                        <!-- only the icon is clickable -->
+                                                        <span class="material-symbols-rounded collapse-toggle"
+                                                            data-bs-toggle="collapse" data-bs-target="#<?php echo $collapseID; ?>"
+                                                            aria-expanded="false" aria-controls="<?php echo $collapseID; ?>"
+                                                            style="cursor:pointer;">
+                                                            expand_more
+                                                        </span>
+                                                    </div>
+
+                                                    <div class="collapse w-100 mt-2" id="<?php echo $collapseID; ?>"
+                                                        data-bs-parent="#ratingAccordion<?php echo $criterionIndex; ?>">
+                                                        <p class="mb-0 px-3 pb-2 text-reg text-14">
+                                                            <?php echo $level['levelDescription']; ?>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <!-- FOOTER -->
+                    <div class="modal-footer">
+                        <div class="container">
+                            <div class="row justify-content-end py-2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            function createDoughnutChart(canvasId, submitted, pending, graded, missing) {
+                const ctx = document.getElementById(canvasId).getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        datasets: [{
+                            data: [submitted, pending, graded, missing],
+                            backgroundColor: ['#3DA8FF', '#C7C7C7', '#d9ffe4ff', '#ffd9d9ff'],
+                            borderWidth: 0,
+                        }]
+                    },
+                    options: {
+                        cutout: '75%',
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: false
+                            }
                         }
                     }
-                }
-            });
-        }
+                });
+            }
 
-        createDoughnutChart('taskChart', <?php echo $submitted['submittedTodo']; ?>, <?php echo $pending['pending']; ?>, <?php echo $graded['graded']; ?>, <?php echo $missing['missing']; ?>);
-    </script>
+            createDoughnutChart('taskChart', <?php echo $submitted['submittedTodo']; ?>, <?php echo $pending['pending']; ?>, <?php echo $graded['graded']; ?>, <?php echo $missing['missing']; ?>);
+        </script>
 </body>
 
 </html>

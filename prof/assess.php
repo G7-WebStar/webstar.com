@@ -89,6 +89,8 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
         if (mysqli_num_rows($checkRubricResult) > 0) {
             $rubricRow = mysqli_fetch_assoc($checkRubricResult);
             $rubricID = $rubricRow['rubricID'];
+        } else {
+            $rubricID = null;
         }
 
         $rowAssessment['graded'] = $gradedTodoCount;

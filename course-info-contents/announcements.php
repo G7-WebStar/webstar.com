@@ -1,4 +1,28 @@
 <?php
+function getRelativeTime($datetime, $fullDateFallback = true)
+{
+    $now = new DateTime("now", new DateTimeZone('Asia/Manila'));
+    $past = new DateTime($datetime, new DateTimeZone('Asia/Manila'));
+    $diff = $now->getTimestamp() - $past->getTimestamp();
+
+    if ($diff < 0) {
+        $diff = 0;
+    }
+
+    if ($diff < 3600) { // less than 1 hour → minutes
+        $minutes = max(1, floor($diff / 60));
+        return $minutes . 'm ago';
+    } elseif ($diff < 86400) { // less than 1 day → hours
+        $hours = floor($diff / 3600);
+        return $hours . 'h ago';
+    } elseif ($diff < 604800) { // less than 1 week → days
+        $days = floor($diff / 86400);
+        return $days . 'd ago';
+    } else { // older → show full date
+        return $fullDateFallback ? date("F j, Y", strtotime($datetime)) : floor($diff / 604800) . 'w ago';
+    }
+}
+
 // HANDLE POST FIRST
 if (isset($_POST['announcementID'])) {
     $announcementID = $_POST['announcementID'];
@@ -83,7 +107,7 @@ $announcementResult = executeQuery($announcementQuery);
                 ? $row['profilePicture']
                 : "shared/assets/img/courseInfo/prof.png";
             $fullName = $row['firstName'] . " " . $row['lastName'];
-            $announcementDate = date("F j, Y g:iA", strtotime($row['announcementDate'] . " " . $row['announcementTime']));
+            $announcementDate = getRelativeTime($row['announcementDate'] . " " . $row['announcementTime']);
             $announcementContent = $row['announcementContent'];
             $announcementID = $row['announcementID'];
             $totalNoted = $row['totalNoted'];
@@ -127,7 +151,7 @@ $announcementResult = executeQuery($announcementQuery);
                     </div>
 
                     <!-- Desktop -->
-                    <p class="d-none d-md-block mb-0 mt-3 text-reg text-14" style="color: var(--black); line-height: 140%; white-space: pre-line;">
+                    <p class="d-none d-md-block mb-0 text-reg text-14" style="color: var(--black); line-height: 140%; white-space: pre-line;">
                         <?php echo nl2br($announcementContent); ?>
                     </p>
 

@@ -75,14 +75,16 @@ $averagePercent = ($totalPoints > 0) ? round(($averageScore / $totalPoints) * 10
 // Passing rate percentage
 $passingPercent = ($scoreCount > 0) ? round(($passedCount / $scoreCount) * 100) : 0;
 // Compute average time spent
-$averageTimeSpent = ($timeCount > 0) ? round($totalTimeSpent / $timeCount) : 0;
+$averageTimeSpent = ($timeCount > 0) ? round(($totalTimeSpent / $timeCount) / 60) : 0;
 
 $testTitle = $test['assessmentTitle'];
 $deadline = $test['deadline'];
 $currentDate = date("Y-m-d H:i:s");
 $isCompleted = (strtotime($currentDate) > strtotime($deadline));
 $examStatus = $isCompleted ? "Completed" : "Active";
-$examDuration = $test['testTimelimit'];
+$examDuration = (isset($test['testTimelimit']) && $test['testTimelimit'] > 0)
+    ? round($test['testTimelimit'] / 60)
+    : 0;
 $courseID = $test['courseID'];
 $assessmentID = $test['assessmentID'];
 
@@ -276,13 +278,13 @@ if ($pendingCount < 0) $pendingCount = 0;
                                                             <div class="analytics-metric text-center">
                                                                 <div class="mb-2">
                                                                     <span class="material-symbols-rounded alarm-icon"
-                                                                        style="vertical-align: middle;color: var(--black);">
+                                                                        style="vertical-align: middle;">
                                                                         alarm
                                                                     </span>
                                                                     <span class="analytics-score-value"
-                                                                        style=" margin-left: 8px;"><?php echo $averageTimeSpent; ?> mins</span>
+                                                                        style=" margin-left: 8px;"><?php echo $averageTimeSpent . ' ' . ($averageTimeSpent == 1 ? 'min' : 'mins'); ?></span>
                                                                 </div>
-                                                                <div class="analytics-score-label" >average time spent
+                                                                <div class="analytics-score-label">average time spent
                                                                 </div>
                                                                 <div class="analytics-score-desc mt-3">
                                                                     typical completion time</div>
@@ -302,7 +304,7 @@ if ($pendingCount < 0) $pendingCount = 0;
                                                     <div class="exam-stat-label mb-5">Total Exam Items</div>
                                                     <div class="exam-stat-value mb-2"><?php echo $totalPoints; ?></div>
                                                     <div class="exam-stat-label mb-5">Total Exam Points</div>
-                                                    <div class="exam-stat-value mb-2"><?php echo $examDuration; ?>mins</div>
+                                                    <div class="exam-stat-value mb-2"><?php echo $examDuration . ' ' . ($examDuration == 1 ? 'min' : 'mins'); ?></div>
                                                     <div class="exam-stat-label">Exam Duration</div>
                                                 </div>
 
@@ -437,10 +439,14 @@ if ($pendingCount < 0) $pendingCount = 0;
                                                         <span class="metric-badge badge-blue">
                                                             <?php echo $correctPercent; ?>% answered correctly
                                                         </span>
-                                                        <span class="metric-badge badge-green" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#modalCorrect<?php echo $qID; ?>">
+                                                        <span class="metric-badge badge-green"
+                                                            style="cursor: <?php echo $correct > 0 ? 'pointer' : 'default'; ?>;"
+                                                            <?php echo $correct > 0 ? 'data-bs-toggle="modal" data-bs-target="#modalCorrect' . $qID . '"' : ''; ?>>
                                                             <?php echo $correct; ?> students got it right
                                                         </span>
-                                                        <span class="metric-badge badge-red" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#modalWrong<?php echo $qID; ?>">
+                                                        <span class="metric-badge badge-red"
+                                                            style="cursor: <?php echo $wrong > 0 ? 'pointer' : 'default'; ?>;"
+                                                            <?php echo $wrong > 0 ? 'data-bs-toggle="modal" data-bs-target="#modalWrong' . $qID . '"' : ''; ?>>
                                                             <?php echo $wrong; ?> students got it wrong
                                                         </span>
                                                     </div>

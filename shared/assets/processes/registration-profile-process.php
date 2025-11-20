@@ -9,18 +9,32 @@ if (isset($_POST['nextBtn'])) {
     $firstName = $_POST['firstName'];
     $middleName = $_POST['middleName'];
     $lastName = $_POST['lastName'];
-    $userName = strtolower ($_POST['userName']);
+    $userName = strtolower($_POST['userName']);
     $studentID = strtoupper($_POST['studentID']);
     $programID = $_POST['program'];
     $gender = $_POST['gender'];
     $yearLevel = $_POST['yearLevel'];
     $yearSection = $_POST['yearSection'];
 
-    $htmlfileupload = $_FILES['fileUpload']['name'];
-    $htmlfileuploadTMP = $_FILES['fileUpload']['tmp_name'];
+    if (!empty($_FILES['fileUpload']['name'])) {
+        $htmlfileupload = $_FILES['fileUpload']['name'];
+        $htmlfileuploadTMP = $_FILES['fileUpload']['tmp_name'];
+        $htmlfolder = "shared/assets/pfp-uploads/";
 
-    $htmlfolder = "shared/assets/pfp-uploads/";
-    move_uploaded_file($htmlfileuploadTMP, $htmlfolder . $htmlfileupload);
+        // append datetime to filename
+        $ext = pathinfo($htmlfileupload, PATHINFO_EXTENSION);
+        $nameOnly = pathinfo($htmlfileupload, PATHINFO_FILENAME);
+        $datetime = date("YmdHis");
+        $newFileName = $nameOnly . '_' . $datetime . '.' . $ext;
+
+        // move file with new name
+        move_uploaded_file($htmlfileuploadTMP, $htmlfolder . $newFileName);
+
+        $profilePictureValue = "'$newFileName'";
+    } else {
+        // use database default
+        $profilePictureValue = "DEFAULT";
+    }
 
     if (!isset($_SESSION['userID'])) {
         header("Location: registration.php");
@@ -33,7 +47,7 @@ if (isset($_POST['nextBtn'])) {
     $nextQuery = "INSERT INTO userinfo 
         (userID, firstName, middleName, lastName, studentID, programID, gender, yearLevel, yearSection, profilePicture, createdAt) 
         VALUES 
-        ('$userID', '$firstName', '$middleName', '$lastName', '$studentID', '$programID', '$gender', '$yearLevel', '$yearSection', '$htmlfileupload', NOW())";
+        ('$userID', '$firstName', '$middleName', '$lastName', '$studentID', '$programID', '$gender', '$yearLevel', '$yearSection', $profilePictureValue, NOW())";
     $nextResult = executeQuery($nextQuery);
 
     if ($nextResult) {
@@ -47,4 +61,3 @@ if (isset($_POST['nextBtn'])) {
     header("Location: registration-profile.php");
     exit();
 }
-?>

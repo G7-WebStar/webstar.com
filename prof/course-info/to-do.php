@@ -84,7 +84,7 @@ if (isset($_POST['deleteAssessmentBtn']) && isset($_POST['deleteAssessmentID']) 
 
             // Always redirect to todo tab when deleting from todo page
             // Set activeTab in session so course-info.php picks it up
-            $_SESSION['activeTab'] = 'todo';
+            $_SESSION['activeTab'] = 'quests';
             $redirectCourseID = $_POST['courseID'] ?? $_GET['courseID'] ?? '';
             echo '<script>window.location.href = "course-info.php?courseID=' . urlencode($redirectCourseID) . '";</script>';
             exit();
@@ -122,7 +122,7 @@ $showDropdowns = $assessmentCount > 0
         <div class="d-flex align-items-center flex-nowrap me-4">
             <span class="dropdown-label me-2 text-reg text-14">Sort by</span>
             <form method="POST">
-                <input type="hidden" name="activeTab" value="todo">
+                <input type="hidden" name="activeTab" value="quests">
                 <select class="select-modern text-reg text-14" name="sortTodo" onchange="this.form.submit()">
                     <option value="Newest" <?php echo ($sortTodo == 'Newest') ? 'selected' : ''; ?>>Newest</option>
                     <option value="Oldest" <?php echo ($sortTodo == 'Oldest') ? 'selected' : ''; ?>>Oldest</option>
@@ -133,7 +133,7 @@ $showDropdowns = $assessmentCount > 0
         <div class="d-flex align-items-center flex-nowrap">
             <span class="dropdown-label me-2 text-reg text-14">Status</span>
             <form method="POST">
-                <input type="hidden" name="activeTab" value="todo">
+                <input type="hidden" name="activeTab" value="quests">
                 <select class="select-modern text-reg text-14" name="statusFilter" onchange="this.form.submit()">
                     <option value="Pending" <?php echo ($statusFilter == 'Pending') ? 'selected' : ''; ?>>Pending</option>
                     <option value="Missing" <?php echo ($statusFilter == 'Missing') ? 'selected' : ''; ?>>Missing</option>
@@ -245,9 +245,8 @@ $showDropdowns = $assessmentCount > 0
 
                                 <form method="POST" class="m-0">
                                     <input type="hidden" name="deleteAssessmentID" value="<?php echo $todoID; ?>">
-                                    <input type="hidden" name="deleteAssessmentType"
-                                        value="<?php echo htmlspecialchars($todo['type']); ?>">
-                                    <input type="hidden" name="activeTab" value="todo">
+                                    <input type="hidden" name="deleteAssessmentType" value="<?php echo htmlspecialchars($todo['type']); ?>">
+                                    <input type="hidden" name="activeTab" value="quests">
                                     <?php if (isset($courseID)): ?>
                                         <input type="hidden" name="courseID" value="<?php echo $courseID; ?>">
                                     <?php endif; ?>

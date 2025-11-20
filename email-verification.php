@@ -5,7 +5,8 @@ session_start();
 
 $errorMessages = [
     "invalidCode" => "Invalid code. Please try again.",
-    "verificationCodeExpired" => "Your verification code has expired. Please resend a new one."
+    "verificationCodeExpired" => "Your verification code has expired. Please resend a new one.",
+    "emailNoCredential" => "No email credentials found in the database!"
 ];
 
 if (isset($_SESSION['alert'])) {
@@ -70,28 +71,36 @@ if (isset($_POST['resend'])) {
 
     $mail = new PHPMailer(true);
 
-    try {
-        $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = 'learn.webstar@gmail.com';
-        $mail->Password   = 'mtls vctd rhai cdem';
-        $mail->SMTPSecure = 'tls';
-        $mail->Port       = 587;
-        $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
-        $headerPath = __DIR__ . '/shared/assets/img/email/email-header.png';
-        if (file_exists($headerPath)) {
-            $mail->AddEmbeddedImage($headerPath, 'emailHeader');
-        }
-        $footerPath = __DIR__ . '/shared/assets/img/email/email-footer.png';
-        if (file_exists($footerPath)) {
-            $mail->AddEmbeddedImage($footerPath, 'emailFooter');
-        }
-        $mail->addAddress($email);
+    $credentialQuery = "SELECT email, password FROM emailcredentials WHERE credentialID = 1";
+    $credentialResult = executeQuery($credentialQuery);
 
-        $mail->isHTML(true);
-        $mail->Subject = "Your Webstar LMS Verification Code";
-        $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+    if ($credentialRow = mysqli_fetch_assoc($credentialResult)) {
+        $smtpEmail = $credentialRow['email'];
+        $smtpPassword = $credentialRow['password'];
+
+        try {
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = $smtpEmail;
+            $mail->Password   = $smtpPassword;
+            $mail->SMTPSecure = 'tls';
+            $mail->Port       = 587;
+            $mail->setFrom($smtpEmail, 'Webstar');
+
+            $headerPath = __DIR__ . '/shared/assets/img/email/email-header.png';
+            if (file_exists($headerPath)) {
+                $mail->AddEmbeddedImage($headerPath, 'emailHeader');
+            }
+            $footerPath = __DIR__ . '/shared/assets/img/email/email-footer.png';
+            if (file_exists($footerPath)) {
+                $mail->AddEmbeddedImage($footerPath, 'emailFooter');
+            }
+            $mail->addAddress($email);
+
+            $mail->isHTML(true);
+            $mail->Subject = "Your Webstar LMS Verification Code";
+            $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
                     <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
                         <tr>
                             <td align="center">
@@ -143,13 +152,16 @@ if (isset($_POST['resend'])) {
                         </tr>
                     </table>
                 </div>';
-        $mail->send();
+            $mail->send();
 
-        $_SESSION['success'] = 'A new verification code has been sent to your email.';
-        header("Location: email-verification.php");
-        exit;
-    } catch (Exception $e) {
-        echo "Email failed. Error: {$mail->ErrorInfo}";
+            $_SESSION['success'] = 'A new verification code has been sent to your email.';
+            header("Location: email-verification.php");
+            exit;
+        } catch (Exception $e) {
+            echo "Email failed. Error: {$mail->ErrorInfo}";
+        }
+    } else {
+        $error = "emailNoCredential";
     }
 }
 

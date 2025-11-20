@@ -8,6 +8,15 @@ include('../shared/assets/database/connect.php');
 date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
 
+$toastMessage = '';
+$toastType = '';
+
+if (isset($_SESSION['toast'])) {
+    $toastMessage = $_SESSION['toast']['message'];
+    $toastType = $_SESSION['toast']['type'];
+    unset($_SESSION['toast']);
+}
+
 // --- Google Link Processor ---
 function processGoogleLink($link)
 {
@@ -150,14 +159,21 @@ if (isset($_POST['save_lesson'])) {
                     $fileError = $_FILES['materials']['error'][$key];
 
                     if ($fileError === UPLOAD_ERR_OK) {
-                        $safeName = str_replace([" ", ","], "_", basename($fileName));
-                        $targetPath = $uploadDir . $safeName;
+                        $originalName = basename($fileName); // Keep original name
+                        $safeOriginalName = str_replace([" ", ","], "_", $originalName);
+
+                        // Add date & time to generate unique fileTitle
+                        $dateTimePrefix = date('Ymd_His'); // e.g., 20251120_153045
+                        $fileTitle = $dateTimePrefix . '_' . $safeOriginalName;
+
+                        $targetPath = $uploadDir . $fileTitle;
 
                         if (move_uploaded_file($tmpName, $targetPath)) {
+                            // Insert both original and stored title into the database
                             $insertFile = "INSERT INTO files 
-                                (courseID, userID, lessonID, fileAttachment, fileLink) 
-                                VALUES 
-                                ('$selectedCourseID', '$userID', '$lessonID', '$safeName', '')";
+                            (courseID, userID, lessonID, fileAttachment, fileTitle, fileLink) 
+                            VALUES 
+                            ('$selectedCourseID', '$userID', '$lessonID', '$originalName', '$fileTitle', '')";
                             executeQuery($insertFile);
                         }
                     }
@@ -554,6 +570,11 @@ if (!empty($reusedData)) {
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
 
+                    <div id="toastContainer"
+                        class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+                        style="z-index: 1100;">
+                    </div>
+
                     <!-- Navbar (mobile) -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
@@ -914,13 +935,36 @@ if (!empty($reusedData)) {
                 hiddenInput.setCustomValidity('');
             }
 
+            // Validation
+            let valid = true;
+            let errorMessages = [];
+
             // Validate at least one course selected (only in NEW mode)
             let checkboxes = form.querySelectorAll(".course-checkbox");
             let checked = Array.from(checkboxes).some(cb => cb.checked);
             if (!checked && !window.location.search.includes("edit")) {
+                valid = false;
+                errorMessages.push("Please select at least one course before submitting.");
+            }
+
+            if (!valid) {
                 e.preventDefault();
-                alert("Please select at least one course before submitting.");
-                return false;
+
+                const container = document.getElementById("toastContainer");
+                container.innerHTML = "";
+
+                errorMessages.forEach(msg => {
+                    const alert = document.createElement("div");
+                    alert.className = "alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 alert-danger";
+                    alert.role = "alert";
+                    alert.innerHTML = `
+                        <i class="bi bi-x-circle-fill fs-6"></i>
+                        <span>${msg}</span>
+                        `;
+                    container.appendChild(alert);
+                    setTimeout(() => alert.remove(), 3000);
+                });
+
             }
 
             // Sync Quill content to hidden input
@@ -931,7 +975,6 @@ if (!empty($reusedData)) {
             html = html.replace(/(<br>)+$/g, '');
             hiddenInput.value = html.trim();
         });
-
 
         // File & Link preview logic with total limit of 10
         document.addEventListener('DOMContentLoaded', function () {
@@ -955,10 +998,33 @@ if (!empty($reusedData)) {
                         const linkValue = linkInput.value.trim();
                         if (!linkValue) return;
 
+                        // Validation
+                        let valid = true;
+                        let errorMessages = [];
+
                         // Check total attachments limit
                         const totalAttachments = container.querySelectorAll('.col-12').length;
                         if (totalAttachments >= 10) {
-                            alert("You can only add up to 10 files or links total.");
+                            valid = false;
+                            errorMessages.push("You can only add up to 10 files or links total.");
+                        }
+
+                        if (!valid) {
+                            const toastContainer = document.getElementById("toastContainer");
+                            toastContainer.innerHTML = "";
+
+                            errorMessages.forEach(msg => {
+                                const alert = document.createElement("div");
+                                alert.className = "alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 alert-danger";
+                                alert.role = "alert";
+                                alert.innerHTML = `
+                                    <i class="bi bi-x-circle-fill fs-6"></i>
+                                    <span>${msg}</span>
+                                `;
+                                toastContainer.appendChild(alert);
+                                setTimeout(() => alert.remove(), 3000);
+                            });
+
                             return;
                         }
 
@@ -1013,6 +1079,7 @@ if (!empty($reusedData)) {
                                 if (titleEl) titleEl.textContent = truncate(linkValue.split('/').pop() || "Link", 50);
                             });
 
+
                         // Delete handler
                         container.querySelectorAll('.delete-file').forEach((btn) => {
                             btn.addEventListener('click', function () {
@@ -1030,19 +1097,55 @@ if (!empty($reusedData)) {
 
             // File input change
             fileInput.addEventListener('change', function (event) {
-                // Merge new selections with existing files
+                const maxFileSizeMB = 10; // max size per file
+                const maxAttachments = 10; // max total files/links
+                const toastContainer = document.getElementById("toastContainer");
+
                 let dt = new DataTransfer();
                 Array.from(allFiles).forEach(f => dt.items.add(f));
-                Array.from(event.target.files).forEach(f => dt.items.add(f));
+
+                let errorMessages = [];
+                let validFiles = [];
+
+                // Validate new files
+                Array.from(event.target.files).forEach(f => {
+                    const fileSizeMB = f.size / (1024 * 1024);
+                    if (fileSizeMB > maxFileSizeMB) {
+                        errorMessages.push(`File "${f.name}" exceeds 10 MB and was not added.`);
+                    } else {
+                        validFiles.push(f);
+                    }
+                });
+
+                // Check total attachments limit (existing + valid new files + existing links)
+                const totalExisting = container.querySelectorAll('.col-12').length;
+                if (totalExisting + validFiles.length > maxAttachments) {
+                    errorMessages.push("You can only add up to 10 files or links total.");
+                    // Trim validFiles to fit the limit
+                    validFiles = validFiles.slice(0, maxAttachments - totalExisting);
+                }
+
+                if (errorMessages.length > 0) {
+                    toastContainer.innerHTML = "";
+                    errorMessages.forEach(msg => {
+                        const alert = document.createElement("div");
+                        alert.className = "alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 alert-danger";
+                        alert.role = "alert";
+                        alert.innerHTML = `<i class="bi bi-x-circle-fill fs-6"></i><span>${msg}</span>`;
+                        toastContainer.appendChild(alert);
+                        setTimeout(() => alert.remove(), 5000);
+                    });
+                }
+
+                // Add only valid files
+                validFiles.forEach(f => dt.items.add(f));
                 fileInput.files = dt.files;
-                allFiles = Array.from(fileInput.files); // update allFiles list
+                allFiles = Array.from(fileInput.files);
 
                 // 🔹 Remove only file previews, keep links
                 container.querySelectorAll('.file-preview').forEach(el => el.remove());
 
-                // Rebuild file previews
                 function truncate(text, maxLength = 50) {
-                    if (!text) return '';
                     return text.length > maxLength ? text.slice(0, maxLength - 1) + '…' : text;
                 }
 
@@ -1060,8 +1163,8 @@ if (!empty($reusedData)) {
                                         <span class="material-symbols-rounded">description</span>
                                     </div>
                                     <div>
-                                        <div class="text-sbold text-16" style="line-height: 1.5;">${truncatedName}</div>
-                                        <div class="text-reg text-12" style="line-height: 1.5;">${ext} · ${fileSizeMB} MB</div>
+                                        <div class="text-sbold text-16">${truncatedName}</div>
+                                        <div class="text-reg text-12">${ext} · ${fileSizeMB} MB</div>
                                     </div>
                                 </div>
                                 <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;" data-index="${index}">
@@ -1070,11 +1173,10 @@ if (!empty($reusedData)) {
                             </div>
                         </div>
                     </div>`;
-
                     container.insertAdjacentHTML('beforeend', fileHTML);
                 });
 
-                // Allow deletion of specific files
+                // Enable deletion
                 container.querySelectorAll('.delete-file').forEach((btn) => {
                     btn.addEventListener('click', function () {
                         const index = parseInt(this.dataset.index);

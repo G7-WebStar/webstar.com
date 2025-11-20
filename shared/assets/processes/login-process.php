@@ -25,6 +25,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
         $stmt->fetch();
 
         if ($password === $dbPassword || password_verify($password, $dbPassword)) {
+            // visits per day
+            $logVisit = $conn->prepare("INSERT INTO visits (dateVisited) VALUES (NOW())");
+            $logVisit->execute();
+            $logVisit->close();
+
             // Store session using email from DB
             $_SESSION['email'] = $emailFromDB;
             $_SESSION['userID'] = $userID;
@@ -42,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
                 $stmtNew->fetch();
                 $stmtNew->close();
 
-                if ($status === "created") {
+                if (strtolower($status) === "created") {
                     header("Location: login-auth/temporary-credentials.php");
                 } else {
                     header("Location: prof/index.php");
@@ -63,4 +68,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     $stmt->close();
     $conn->close();
 }
-?>

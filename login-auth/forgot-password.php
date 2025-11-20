@@ -11,7 +11,8 @@ require '../shared/assets/phpmailer/src/SMTP.php';
 
 $errorMessages = [
     "emailNotFound" => "The email you entered is not registered in our system.",
-    "emailSendFail" => "Error sending email. Please try again later."
+    "emailSendFail" => "Error sending email. Please try again later.",
+    "emailNoCredential" => "No email credentials found in the database!"
 ];
 
 if (isset($_SESSION['alert'])) {
@@ -32,31 +33,39 @@ if (isset($_POST['send'])) { // Send Code button
         $verificationCodeExpiry = date('Y-m-d H:i:s', time() + (5 * 60));
         $_SESSION['verificationCodeExpiry'] = $verificationCodeExpiry;
 
-        $_SESSION['email'] = $email; // save email for next step
+        $_SESSION['email'] = $email;
 
-        // --- Send via PHPMailer ---
         $mail = new PHPMailer(true);
-        try {
-            $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com';
-            $mail->SMTPAuth = true;
-            $mail->Username = 'learn.webstar@gmail.com';
-            $mail->Password = 'mtls vctd rhai cdem';
-            $mail->SMTPSecure = 'tls';
-            $mail->Port = 587;
-            $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
-            $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
-            if (file_exists($headerPath)) {
-                $mail->AddEmbeddedImage($headerPath, 'emailHeader');
-            }
-            $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
-            if (file_exists($footerPath)) {
-                $mail->AddEmbeddedImage($footerPath, 'emailFooter');
-            }
-            $mail->addAddress($email);
-            $mail->isHTML(true);
-            $mail->Subject = "Reset Password";
-            $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+
+
+        $credentialQuery = "SELECT email, password FROM emailcredentials WHERE credentialID = 1";
+        $credentialResult = executeQuery($credentialQuery);
+
+        if ($credentialRow = mysqli_fetch_assoc($credentialResult)) {
+            $smtpEmail = $credentialRow['email'];
+            $smtpPassword = $credentialRow['password'];
+
+            try {
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';
+                $mail->SMTPAuth = true;
+                $mail->Username   = $smtpEmail;
+                $mail->Password   = $smtpPassword;
+                $mail->SMTPSecure = 'tls';
+                $mail->Port = 587;
+                $mail->setFrom($smtpEmail, 'Webstar');
+                $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
+                if (file_exists($headerPath)) {
+                    $mail->AddEmbeddedImage($headerPath, 'emailHeader');
+                }
+                $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
+                if (file_exists($footerPath)) {
+                    $mail->AddEmbeddedImage($footerPath, 'emailFooter');
+                }
+                $mail->addAddress($email);
+                $mail->isHTML(true);
+                $mail->Subject = "Reset Password";
+                $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
                     <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
                         <tr>
                             <td align="center">
@@ -108,17 +117,20 @@ if (isset($_POST['send'])) { // Send Code button
                         </tr>
                     </table>
                 </div>';
-            $mail->send();
+                $mail->send();
 
-            $_SESSION['success'] = 'A verification code has been sent to your email.';
+                $_SESSION['success'] = 'A verification code has been sent to your email.';
 
-            header("Location: check-your-email.php");
-            exit;
-        } catch (Exception $e) {
-            $error = "emailSendFail"; // trigger alert box in HTML
+                header("Location: check-your-email.php");
+                exit;
+            } catch (Exception $e) {
+                $error = "emailSendFail"; // trigger alert box in HTML
+            }
+        } else {
+            $error = "emailNotFound"; // trigger alert box in HTML
         }
     } else {
-        $error = "emailNotFound"; // trigger alert box in HTML
+        $error = "emailNoCredential";
     }
 }
 ?>

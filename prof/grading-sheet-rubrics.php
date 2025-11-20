@@ -21,7 +21,7 @@ $submissionID = isset($_GET['submissionID']) ? intval($_GET['submissionID']) : 0
 $getInfo = $conn->prepare("
     SELECT s.userID
     FROM submissions s
-    WHERE s.submissionID = ?
+    WHERE s.submissionID = ? AND s.isSubmitted = 1
     LIMIT 1
 ");
 $getInfo->bind_param("i", $submissionID);
@@ -31,7 +31,9 @@ $result = $getInfo->get_result();
 if ($row = $result->fetch_assoc()) {
     $userID = intval($row['userID']);
 } else {
-    die("<p class='text-danger'>No student found for this submission.</p>");
+    header("Location: 404.html");
+    exit();
+
 }
 
 // ✅ Fetch student, program, course, and assessment details
@@ -144,7 +146,7 @@ $subQuery = $conn->prepare("
     SELECT s.submissionID
     FROM submissions s
     LEFT JOIN scores sc ON s.submissionID = sc.submissionID
-    WHERE s.assessmentID = ? AND sc.scoreID IS NULL
+    WHERE s.assessmentID = ? AND sc.scoreID IS NULL AND s.isSubmitted = 1
     ORDER BY s.submittedAt ASC
 ");
 $subQuery->bind_param("i", $details['assessmentID']);
@@ -199,7 +201,7 @@ $submissionIDs = [];
 $subQuery = $conn->prepare("
     SELECT s.submissionID
     FROM submissions s
-    WHERE s.assessmentID = ?
+    WHERE s.assessmentID = ? AND s.isSubmitted = 1
     ORDER BY s.submittedAt ASC
 ");
 $subQuery->bind_param("i", $details['assessmentID']);
@@ -944,8 +946,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                                                     <!-- FEEDBACK INPUT (replacing modal button) -->
                                                     <textarea name="feedback" id="feedbackInput" rows="3"
                                                         class="form-control text-reg text-15 rounded-3 p-3 mt-3"
-                                                        style="resize: none; background-color: #fff; border: 1px solid var(--black) !important;"
-                                                        placeholder="Write feedback here"><?= htmlspecialchars($existingFeedback ?? '') ?></textarea>
+                                                        style="resize: none; background-color: var(--pureWhite); border: 1px solid var(--black) !important;"
+                                                        placeholder="Write feedback that helps your student level up their learning journey!"><?= htmlspecialchars($existingFeedback ?? '') ?></textarea>
                                                 </div>
                                             </div>
                                             <!-- Buttons always below the card -->
@@ -955,20 +957,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                                                     <button type="button" id="prevBtn"
                                                         class="btn px-4 py-2 rounded-pill text-15 fw-semibold"
                                                         data-current-index="<?php echo $currentIndex; ?>"
-                                                        style="background-color: #fff; border: 1px solid var(--black); color: var(--black);">
+                                                        style="background-color: var(--pureWhite); border: 1px solid var(--black); color: var(--black);">
                                                         Previous
                                                     </button>
 
                                                     <button type="submit" name="submitGrade" id="submitRubricBtn"
                                                         class="btn px-4 py-2 rounded-pill text-15 fw-semibold"
-                                                        style="background-color: #FEE9A8; border: 1px solid var(--black); color: var(--black);">
+                                                        style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);">
                                                         Submit
                                                     </button>
 
                                                     <button type="button" id="nextBtn"
                                                         class="btn px-4 py-2 rounded-pill text-15 fw-semibold"
                                                         data-current-index="<?php echo $currentIndex; ?>"
-                                                        style="background-color: #fff; border: 1px solid var(--black); color: var(--black);">
+                                                        style="background-color: var(--pureWhite); border: 1px solid var(--black); color: var(--black);">
                                                         Next
                                                     </button>
                                                 </div>
@@ -1018,13 +1020,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                                         <div class="badge-option rounded-4 d-flex align-items-center" style="cursor: pointer;">
                                             <img src="../shared/assets/img/badge/<?php echo htmlspecialchars($badge['badgeIcon']); ?>"
                                                 alt="<?php echo htmlspecialchars($badge['badgeName']); ?> Icon"
-                                                style="width: 55px; height: 55px;" class="mx-1 ms-2">
+                                                style="width: 33px; height: 38px;" class="mx-1 ms-2">
                                             <div>
                                                 <div style="line-height: 1.1;">
-                                                    <div class="text-bold text-14">
+                                                    <div class="text-bold text-14 ms-1">
                                                         <?php echo htmlspecialchars($badge['badgeName']); ?>
                                                     </div>
-                                                    <div class="text-med text-12 text-muted">
+                                                    <div class="text-med text-12 text-muted ms-1">
                                                         <?php echo htmlspecialchars($badge['badgeDescription']); ?>
                                                     </div>
                                                 </div>
