@@ -115,31 +115,6 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                 margin-bottom: calc(1.5rem + 80px) !important;
             }
         }
-
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--dirtyWhite);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--primaryColor);
-            /* Your accent color */
-            border-radius: 10px;
-            border: 2px solid var(--dirtyWhite);
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #ff7b82;
-        }
-
-        * {
-            scrollbar-width: thin;
-            scrollbar-color: var(--primaryColor) var(--dirtyWhite);
-        }
     </style>
 </head>
 
@@ -581,11 +556,11 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                     const modalImg = document.getElementById('modal-img');
 
                     if (modalImg && modalImgContainer) {
-                        modalImg.src = questions[currentQuestionIndex].img;
+                        modalImg.src = "shared/assets/prof-uploads/" + questions[currentQuestionIndex].img;
                     }
 
 
-                    img.src = questions[currentQuestionIndex].img;
+                    img.src = "shared/assets/prof-uploads/" + questions[currentQuestionIndex].img;
 
                 }
             } else {
