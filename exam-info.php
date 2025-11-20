@@ -115,6 +115,10 @@ $assessmentCreationDate = $assessmentCreationDateRow['creationDate']
     <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
 
     <style>
+        .interactable:hover {
+            cursor: pointer;
+        }
+
         @media screen and (max-width: 767px) {
             .mobile-view {
                 margin-bottom: calc(1.5rem + 80px) !important;
@@ -144,7 +148,7 @@ $assessmentCreationDate = $assessmentCreationDateRow['creationDate']
                                 <!-- DESKTOP VIEW -->
                                 <div class="row desktop-header d-none d-sm-flex">
                                     <div class="col-auto me-2">
-                                        <a href="#" class="text-decoration-none">
+                                        <a onclick="history.back()" class="text-decoration-none interactable">
                                             <i class="fa-solid fa-arrow-left text-reg text-16"
                                                 style="color: var(--black);"></i>
                                         </a>
@@ -158,33 +162,46 @@ $assessmentCreationDate = $assessmentCreationDateRow['creationDate']
                                                 <div class="text-sbold text-25"><?php echo $testTitle['assessmentTitle']; ?></div>
                                                 <span class="text-reg text-18">Due <?php echo $testTitle['assessmentDeadline']; ?></span>
                                             </div>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
-                                    <div class="col-auto text-end">
-                                        Score <div class="text-sbold text-25">
-                                            <?php echo $score; ?><span class="text-muted">/<?php echo $totalItems; ?></span>
-                                        </div>
-                                    </div>
+                                            <?php
+                                            if ($status != 'Pending') {
+                                            ?>
+                                                <div class="col-auto text-end">
+                                                    Score <div class="text-sbold text-25">
+                                                        <?php echo $score; ?><span class="text-muted">/<?php echo $totalItems; ?></span>
+                                                    </div>
+                                                </div>
+                                            <?php
+                                            }
+                                            ?>
                                 </div>
 
                                 <!-- MOBILE VIEW -->
                                 <div class="d-block d-sm-none mobile-assignment">
                                     <div class="mobile-top">
                                         <div class="arrow">
-                                            <a href="#" class="text-decoration-none">
+                                            <a onclick="history.back()" class="text-decoration-none">
                                                 <i class="fa-solid fa-arrow-left text-reg text-16"
                                                     style="color: var(--black);"></i>
                                             </a>
                                         </div>
-                                        <div class="title text-sbold text-25">Quiz #1</div>
+                                        <div class="title text-sbold text-25"><?php echo $testTitle['assessmentTitle']; ?></div>
                                     </div>
-                                    <div class="graded text-reg text-18 mt-4">Score</div>
-                                    <div class="score text-sbold text-25">
-                                        <?php echo $score; ?>/<span class="text-muted"><?php echo $totalItems; ?></span>
-                                    </div>
+                                    <?php
+                                            if ($status != 'Pending') {
+                                    ?>
+                                        <div class="graded text-reg text-18 mt-4">Score</div>
+                                        <div class="score text-sbold text-25">
+                                            <?php echo $score; ?>/<span class="text-muted"><?php echo $totalItems; ?></span>
+                                        </div>
+                                    <?php
+                                            }
+                                    ?>
+
                                 </div>
+                        <?php
+                                        }
+                                    }
+                        ?>
                             </div>
                         </div>
 

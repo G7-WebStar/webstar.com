@@ -17,6 +17,11 @@ $selectTestQuery = "SELECT assessmentTitle, generalGuidance FROM tests
                     WHERE testID = $testID AND courses.userID = $userID";
 $selectTestResult = executeQuery($selectTestQuery);
 
+if (mysqli_num_rows($selectTestResult) <= 0) {
+    echo "Test does not exists.";
+    exit();
+}
+
 $selectQuestionsQuery = "SELECT 
 testquestions.*
 FROM tests 
@@ -55,6 +60,10 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
             cursor: pointer;
         }
 
+        .back-btn {
+            cursor: pointer;
+        }
+
         .interactable:hover {
             transition: 0.3s ease-in-out;
             background-color: var(--highlight75) !important;
@@ -72,31 +81,6 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
 
         .btn-mobile {
             margin-bottom: calc(1.5rem + 80px) !important;
-        }
-
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--dirtyWhite);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--primaryColor);
-            /* Your accent color */
-            border-radius: 10px;
-            border: 2px solid var(--dirtyWhite);
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #ff7b82;
-        }
-
-        * {
-            scrollbar-width: thin;
-            scrollbar-color: var(--primaryColor) var(--dirtyWhite);
         }
     </style>
 </head>
@@ -131,7 +115,7 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
                                         style="color: var(--black);"></i>
                                     <div class="quiz-nav col-12 d-flex flex-column flex-md-row align-items-center justify-content-between my-2 px-3 px-md-5 py-2 py-md-3">
                                         <div class="d-flex flex-row align-items-center mb-0">
-                                            <a href="todo.php" class="text-decoration-none"><i class="d-none d-md-block announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 me-3"
+                                            <a onclick="history.back()" class="text-decoration-none back-btn"><i class="d-none d-md-block announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 me-3"
                                                     style="color: var(--black);"></i></a>
                                             <?php
                                             if (mysqli_num_rows($selectTestResult) > 0) {
@@ -165,8 +149,8 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
                                             </div>
                                         </div>
 
-                                        <div class="row my-0 mx-auto justify-content-center align-content-center" id="img-container">
-                                            <img src="" id="img-question">
+                                        <div class="row my-0 mx-auto justify-content-center align-content-center" id="question-image">
+
                                         </div>
                                         <div class="col-12 col-md-8 h5 text-reg mx-auto my-0 px-3 px-md-0 text-center text-md-start fs-sm-6 d-flex justify-content-center flex-column" id="choices">
                                         </div>
@@ -198,7 +182,20 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
             </div>
         </div>
     </div>
+    <!-- Modal for each image -->
+    <div class="modal fade" id="imageModal0" tabindex="-1" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content bg-black border-0 d-flex justify-content-center align-items-center position-relative" style="width: 100vw; height: 100vh; border-radius: 0;">
 
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-4" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <div id="modal-img-container" class="modal-img-wrapper p-0 m-0 w-100 h-100 d-flex justify-content-center align-items-center">
+                    <img id="modal-img" class="modal-zoomable" src="" alt="Full - image" style="max-width: 100%; max-height: 100%; object-fit: contain; cursor: zoom-in; transition: transform 0.12s; transform-origin: 50% 50%; transform: translate(0px, 0px) scale(1);">
+                </div>
+            </div>
+
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         //Fetch Questions and Choices from DB
@@ -254,6 +251,7 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
         const questionContainer = document.getElementById('question-container');
         const choices = document.getElementById('choices');
         const imgContainer = document.getElementById('img-container');
+        const modalImgContainer = document.getElementById('modal-img-container');
         const questionNumber = document.getElementById('question-number');
 
         let currentQuestionIndex = 0;
@@ -317,7 +315,7 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
 
             } else {
                 //Displays an input text field if the question is of identification type
-                choices.innerHTML = `<input disabled type="text" placeholder="Answer" class="rounded-3 p-3 text-center border border-black" id="input` + currentQuestionIndex + `">`;
+                choices.innerHTML = `<input disabled type="text" class="rounded-3 p-3 text-center border border-black" id="input` + currentQuestionIndex + `">`;
                 let textValue = document.getElementById('input' + currentQuestionIndex)
                 correctIdentification = document.createElement('div');
                 correctIdentification.id = "identificationCorrection" + questionNo;
@@ -327,14 +325,32 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
             }
 
             //Displays the image if it exists
-            const img = document.getElementById('img-question');
-            imgContainer.style.maxWidth = "30%";
-            img.src = questions[currentQuestionIndex].img;
-            img.style.maxWidth = "auto";
-            img.style.height = "auto";
-            img.style.objectFit = "cover";
-            imgContainer.appendChild(img);
-            img.classList.add('rounded-5', 'my-2');
+            if (questions[currentQuestionIndex].img != '') {
+                document.getElementById('question-image').innerHTML =
+                    `<div class="row g-4 justify-content-center">
+                    <div class="col-12">
+                        <div id="img-container" class="pdf-preview-box text-center" data-bs-toggle="modal" data-bs-target="#imageModal0" style="cursor: zoom-in; overflow: hidden; border-radius: 10px; width: auto; height: 180px; position: relative; border: 1px solid var(--black);">
+                            <img id="img-question" src="" alt="image" style="width: 100%; height: 100%; object-fit: cover; object-position: center center; transition: transform 0.3s; transform: scale(1);">
+                        </div>
+                    </div>
+                </div>`;
+
+                imgDiv = document.getElementById('question-image');
+                if (imgDiv && imgDiv.innerHTML != '') {
+                    const img = document.getElementById('img-question');
+                    const modalImg = document.getElementById('modal-img');
+
+                    if (modalImg && modalImgContainer) {
+                        modalImg.src = "../shared/assets/prof-uploads/" + questions[currentQuestionIndex].img;
+                    }
+
+
+                    img.src = "../shared/assets/prof-uploads/" + questions[currentQuestionIndex].img;
+
+                }
+            } else {
+                document.getElementById('question-image').innerHTML = ``;
+            }
 
 
         }

@@ -237,12 +237,6 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                             } else if ($noResult) { ?>
                                 <div class="text-reg h1 text-center mt-5">No Result.</div>
                             <?php
-                            } else {
-                            ?>
-                                <script>
-                                    window.location.href = "course-join.php";
-                                </script>
-                            <?php
                             }
                             ?>
                         </div>

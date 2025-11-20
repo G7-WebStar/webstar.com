@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $userAnswer = $answer['userAnswer'];
         $userID = $userID; // from session
-        $isCorrect = (($userAnswer == $correctAnswer) || ($userAnswer == strtolower($correctAnswer))) ? 1 : 0;
+        $isCorrect = (($userAnswer == $correctAnswer) || (strtolower($userAnswer) == strtolower($correctAnswer))) ? 1 : 0;
 
         $insertQuery = "INSERT INTO testresponses (testID, testQuestionID, userID, userAnswer, isCorrect)
                         VALUES ('$testID', '$testQuestionID', '$userID', '$userAnswer', '$isCorrect')";
@@ -47,6 +47,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $scoreRow = mysqli_fetch_assoc($scoreResult);
     $score = $scoreRow['correct'];
 
+    $insertScoreQuery = "INSERT INTO scores (userID, testID, score) VALUES ('$userID','$testID','$score')";
+    $insertScoreResult = executeQuery($insertScoreQuery);
+
     $assessmentIDQuery = "SELECT assessmentID FROM tests WHERE testID = '$testID'";
     $assessmentIDResult = executeQuery($assessmentIDQuery);
     $assessmentIDRow = mysqli_fetch_assoc($assessmentIDResult);
@@ -73,11 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $totalPointsResult = executeQuery($totalPointsQuery);
     $totalPointsRow = mysqli_fetch_assoc($totalPointsResult);
     $totalPoints = $totalPointsRow['totalPoints'];
-
-    $scoreQuery = "SELECT COUNT(isCorrect) AS correct FROM testresponses WHERE isCorrect = '1' AND userID = '$userID' AND testID = '$testID'";
-    $scoreResult = executeQuery($scoreQuery);
-    $scoreRow = mysqli_fetch_assoc($scoreResult);
-    $score = $scoreRow['correct'];
 
     $timeFactorQuery = "SELECT tests.testTimeLimit, todo.timeSpent FROM tests INNER JOIN todo ON tests.assessmentID = todo.assessmentID WHERE tests.testID = '$testID'";
     $timeFactorResult = executeQuery($timeFactorQuery);

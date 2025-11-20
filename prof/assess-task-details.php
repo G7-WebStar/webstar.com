@@ -67,10 +67,10 @@ $countSubmittedQuery = "SELECT COUNT(*) AS submittedTodo FROM todo
 $countSubmittedResult = executeQuery($countSubmittedQuery);
 $submitted = mysqli_fetch_assoc($countSubmittedResult);
 
-$countGradedQuery = "SELECT COUNT(*) AS graded FROM todo 
-                     WHERE assessmentID = '$assessmentID' AND status = 'Graded'";
-$countGradedResult = executeQuery($countGradedQuery);
-$graded = mysqli_fetch_assoc($countGradedResult);
+$countReturnedQuery = "SELECT COUNT(*) AS returned FROM todo 
+                     WHERE assessmentID = '$assessmentID' AND status = 'Returned'";
+$countReturnedResult = executeQuery($countReturnedQuery);
+$returned = mysqli_fetch_assoc($countReturnedResult);
 
 $countMissingQuery = "SELECT COUNT(*) AS missing FROM todo 
                      WHERE assessmentID = '$assessmentID' AND status = 'Missing'";
@@ -90,7 +90,7 @@ $getSubmissionIDQuery = "SELECT submissions.submissionID
         FROM submissions 
         INNER JOIN todo 
             ON todo.userID = submissions.userID
-        WHERE todo.status != 'Graded' AND todo.assessmentID = '$assessmentID' AND submissions.assessmentID = '$assessmentID'
+        WHERE todo.status != 'Returned' AND todo.assessmentID = '$assessmentID' AND submissions.assessmentID = '$assessmentID'
         ORDER BY todo.updatedAt ASC
         LIMIT 1";
 $getSubmissionIDResult = executeQuery($getSubmissionIDQuery);
@@ -413,10 +413,10 @@ if (!empty($rubricID)) {
                                                             <div class="text-reg text-14 mb-1"><span
                                                                     class="stat-value"><?php echo $submitted['submittedTodo']; ?></span> submitted</div>
                                                             <div class="text-reg text-14 mb-1"><span
-                                                                    class="stat-value"><?php echo $pending['pending']; ?></span> <?php echo $statusText ?></div>
+                                                                    class="stat-value"><?php echo (mysqli_num_rows($getAssessmentStatusResult) > 0) ? $pending['pending'] : $missing['missing']; ?></span> <?php echo $statusText ?></div>
                                                             <div class="text-reg text-14 mb-1"><span
-                                                                    class="stat-value"><?php echo $graded['graded']; ?></span>
-                                                                graded</div>
+                                                                    class="stat-value"><?php echo $returned['returned']; ?></span>
+                                                                returned</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -524,13 +524,13 @@ if (!empty($rubricID)) {
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
-            function createDoughnutChart(canvasId, submitted, pending, graded, missing) {
+            function createDoughnutChart(canvasId, submitted, pending, returned, missing) {
                 const ctx = document.getElementById(canvasId).getContext('2d');
                 new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         datasets: [{
-                            data: [submitted, pending, graded, missing],
+                            data: [submitted, pending, returned, missing],
                             backgroundColor: ['#3DA8FF', '#C7C7C7', '#d9ffe4ff', '#ffd9d9ff'],
                             borderWidth: 0,
                         }]
@@ -549,7 +549,7 @@ if (!empty($rubricID)) {
                 });
             }
 
-            createDoughnutChart('taskChart', <?php echo $submitted['submittedTodo']; ?>, <?php echo $pending['pending']; ?>, <?php echo $graded['graded']; ?>, <?php echo $missing['missing']; ?>);
+            createDoughnutChart('taskChart', <?php echo $submitted['submittedTodo']; ?>, <?php echo $pending['pending']; ?>, <?php echo $returned['returned']; ?>, <?php echo $missing['missing']; ?>);
         </script>
 </body>
 

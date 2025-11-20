@@ -327,7 +327,6 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             let totalQuestion = questions.length;
             let choiceNo = 1;
 
-            console.log(isCorrectArray);
             choiceIDs = [];
             questionContainer.innerHTML = currentQuestion.
             question;
@@ -428,7 +427,6 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
         }
 
         showQuestion();
-        console.log(questions);
     </script>
 </body>
 

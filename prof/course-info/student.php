@@ -10,10 +10,13 @@ $query = "
         userinfo.lastName,
         userinfo.profilePicture,
         users.role,
-        enrollments.enrollmentID
+        enrollments.enrollmentID,
+        courses.courseTitle,
+        courses.courseCode
     FROM enrollments
     INNER JOIN users ON enrollments.userID = users.userID
     INNER JOIN userinfo ON users.userID = userinfo.userID
+    INNER JOIN courses ON enrollments.courseID = courses.courseID
     WHERE users.role = 'student' AND enrollments.courseID = '$courseID'
     ORDER BY userinfo.lastName ASC
 ";
@@ -43,9 +46,11 @@ $count = mysqli_num_rows($result);
 
     <!-- Student List -->
     <div class="row p-0" id="mystudentlist">
-        <?php if ($count > 0): ?>
+        <?php if ($count > 0):
+            $i = 1;
+        ?>
             <?php while ($row = mysqli_fetch_assoc($result)): ?>
-                <div onclick="window.location='profile.php?user=<?php echo htmlspecialchars($row['userName']) ?>'" class="my-student-item align-items-center text-decoration-none p-2 mb-4 rounded-4"
+                <div onclick="window.location='profile.php?user=<?php echo htmlspecialchars($row['userName']) ?>'" class="my-student-item align-items-center text-decoration-none px-2 py-0 mb-4 rounded-4"
                     style="padding: 14px 18px; transition: background 0.2s; display:flex">
                     <div class="rounded-circle me-3 flex-shrink-0" style="width: 40px; height: 40px; background-color: #5ba9ff;
                background-image: url('../shared/assets/pfp-uploads/<?= htmlspecialchars($row['profilePicture']) ?>');
@@ -58,18 +63,18 @@ $count = mysqli_num_rows($result);
                             </span>
                             <small class="text-reg my-student-username">@<?= htmlspecialchars($row['userName']) ?></small>
                         </div>
-                        <div class="dropdown position-relative d-flex justify-content-end align-items-center" onclick="event.stopPropagation();">
-                            <button class="btn btn-sm" type="button" style="background-color:transparent!important; border:0px;transform: none !important; box-shadow: none !important" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="dropdown position-relative d-flex justify-content-end align-items-center z-3" onclick="event.stopPropagation();">
+                            <button class="btn btn-sm" id="dot<?php echo $i; ?>" type="button" style="background-color:transparent!important; border:0px;transform: none !important; box-shadow: none !important" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-three-dots-vertical"></i>
                             </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" onclick="event.stopPropagation();">
+                            <ul class="dropdown-menu me-5" aria-labelledby="dropdownMenuButton" onclick="event.stopPropagation();">
                                 <li>
                                     <button type="button" name="markArchived" class="dropdown-item text-reg text-14" onclick="event.stopPropagation(); window.location='report.php?enrollmentID=<?= $row['enrollmentID'] ?>'">
                                         View Report
                                     </button>
                                 </li>
                                 <li>
-                                    <button type="button" name="markArchived" class="dropdown-item text-reg text-14 text-danger" onclick="kickoutStudent(<?= $row['enrollmentID'] ?>);">
+                                    <button type="button" name="markArchived" class="dropdown-item text-reg text-14 text-danger" data-bs-toggle="modal" data-bs-target="#kick<?php echo $i; ?>">
                                         Kick Out
                                     </button>
                                 </li>
@@ -77,6 +82,59 @@ $count = mysqli_num_rows($result);
                         </div>
                     </div>
                 </div>
+                <!-- Kick Student Modal -->
+                <div class="modal fade" id="kick<?php echo $i; ?>" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered py-4" style="max-width: 700px;  height: 25px;">
+                        <div class="modal-content">
+
+                            <!-- HEADER -->
+                            <div class="modal-header border-bottom">
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+
+
+                            <div class="modal-body">
+                                <div class="container">
+                                    <div class="row justify-content-center">
+                                        <div class="col-12 d-flex justify-content-center flex-column text-center text-30">
+                                            <p class="text-bold">Kick Out Student</p>
+                                        </div>
+                                        <div class="row">
+                                            <div class="mx-auto col-8 text-center mb-2">
+                                                <div class="mx-auto rounded-circle" style="width: 100px; height: 100px; background-color: #5ba9ff;
+                                                            background-image: url('../shared/assets/pfp-uploads/<?= htmlspecialchars($row['profilePicture']) ?>');
+                                                            background-size: cover; background-position: center;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-12 mb-3">
+                                                <p class="confirm-text text-16 text-sm-14 text-center text-reg">
+                                                    Are you sure you want to kick
+                                                    <span class="text-sbold"><?= htmlspecialchars($row['firstName'] . ' ' . $row['lastName']) ?></span>
+                                                    from
+                                                    <br>
+                                                    <span class="text-sbold"><?= htmlspecialchars($row['courseTitle'] . " | " . $row['courseCode']) ?></span>?
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- FOOTER -->
+                            <div class="modal-footer justify-content-center">
+                                <button id="kickBtn<?php echo $i; ?>" class="gradient-bg my-auto text-sbold btn d-flex align-items-center justify-content-center border border-danger rounded-5 px-lg-4 py-lg-2"
+                                    data-bs-toggle="modal" data-bs-target="#kick<?php echo $i; ?>" onclick="kickoutStudent(<?= $row['enrollmentID'] ?>, 'dot<?php echo $i; ?>');">
+                                    <span class="m-0 fs-sm-6 text-16 text-sm-12 text-danger">Kick Student</span>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <?php $i++; ?>
             <?php endwhile; ?>
         <?php else: ?>
             <p class="text-muted ps-3">No results found.</p>
@@ -87,7 +145,38 @@ $count = mysqli_num_rows($result);
         </p>
     </div>
 </div>
+<!-- Toast Container -->
+<div id="toastContainer"
+    class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center text-med text-14"
+    style="z-index:1100; pointer-events:none;">
+</div>
+<script>
+    //Function to show toast with icon
+    function showToast(message, type = 'success') {
+        const alert = document.createElement('div');
+        alert.className = `alert mb-2 shadow-lg d-flex align-items-center gap-2 px-3 py-2 
+                       ${type === 'success' ? 'alert-success' : 'alert-danger'}`;
+        alert.style.opacity = "0";
+        alert.style.transition = "opacity 0.3s ease";
+        alert.style.pointerEvents = "none";
 
+        alert.innerHTML = `
+                <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
+                <span>${message}</span>
+            `;
+
+        document.getElementById('toastContainer').appendChild(alert);
+
+        //Fade in
+        setTimeout(() => alert.style.opacity = "1", 10);
+
+        //Fade out & remove after 3s
+        setTimeout(() => {
+            alert.style.opacity = "0";
+            setTimeout(() => alert.remove(), 300);
+        }, 3000);
+    }
+</script>
 <script>
     (() => {
         const searchInput = document.getElementById('mysearchinput');
@@ -112,17 +201,40 @@ $count = mysqli_num_rows($result);
         });
     })();
 
-    function kickoutStudent(enrollmentID) {
+    function kickoutStudent(enrollmentID, btnID) {
+        document.getElementById(btnID).disabled = true;
         fetch('../shared/assets/processes/kick-out-student.php?enrollmentID=' + enrollmentID + '&userID=<?php echo $userID ?>', {
                 method: 'POST',
             })
             .then(data => {
-                alert("Successfully kicked out student.");
-                window.location.reload();
+                showToast("Successfully kicked out student.", "success");
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3300);
             })
             .catch(error => {
-                console.error("There was a problem with your request.");
-                window.location.reload();
+                showToast("There was a problem with your request.", "danger");
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3300);
             });
     }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        //Get all dropdown elements
+        const dropdowns = document.querySelectorAll('.dropdown');
+
+        dropdowns.forEach(dropdown => {
+            dropdown.addEventListener('show.bs.dropdown', function() {
+                //Close all other dropdowns
+                dropdowns.forEach(d => {
+                    if (d !== dropdown) {
+                        const bsDropdown = bootstrap.Dropdown.getInstance(d.querySelector('button'));
+                        if (bsDropdown) bsDropdown.hide();
+                    }
+                });
+            });
+        });
+    });
 </script>

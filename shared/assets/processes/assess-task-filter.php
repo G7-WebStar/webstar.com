@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $filters = $data['selected']['selected'];
 
-    if (in_array($filters, ['Pending', 'Graded', 'Submitted'])) {
+    if (in_array($filters, ['Pending', 'Returned', 'Submitted'])) {
         $filterQuery = "SELECT todo.userID, userinfo.firstName, userinfo.middleName, userinfo.lastName, todo.status, submissions.submissionID FROM todo
                         INNER JOIN userinfo
                         	ON todo.userID = userinfo.userID

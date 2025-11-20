@@ -58,7 +58,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                             todo.* FROM todo 
                             INNER JOIN tests 
                                 ON todo.assessmentID = tests.assessmentID 
-                            WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = 'Graded';";
+                            WHERE todo.userID = '$userID' AND tests.testID = '$testID' AND todo.status = 'Returned';";
         $checkStatusResult = executeQuery($checkStatusQuery);
 
         if (mysqli_num_rows($checkStatusResult) > 0) {
@@ -114,31 +114,6 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             .btn-mobile {
                 margin-bottom: calc(1.5rem + 80px) !important;
             }
-        }
-
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--dirtyWhite);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--primaryColor);
-            /* Your accent color */
-            border-radius: 10px;
-            border: 2px solid var(--dirtyWhite);
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #ff7b82;
-        }
-
-        * {
-            scrollbar-width: thin;
-            scrollbar-color: var(--primaryColor) var(--dirtyWhite);
         }
     </style>
 </head>
@@ -430,10 +405,9 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                 clearInterval(interval);
                 showToast("Time's up! Your quiz is being submitted.", "danger");
                 choiceText.forEach(unanswered => {
-                    if (unanswered.userAnswer == null) {
+                    if (unanswered.userAnswer == null || unanswered.userAnswer == '') {
                         unanswered.userAnswer = "No Answer";
                     }
-                    console.log(choiceText);
                 });
                 submitQuiz();
             }
@@ -581,11 +555,11 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                     const modalImg = document.getElementById('modal-img');
 
                     if (modalImg && modalImgContainer) {
-                        modalImg.src = questions[currentQuestionIndex].img;
+                        modalImg.src = "shared/assets/prof-uploads/" + questions[currentQuestionIndex].img;
                     }
 
 
-                    img.src = questions[currentQuestionIndex].img;
+                    img.src = "shared/assets/prof-uploads/" + questions[currentQuestionIndex].img;
 
                 }
             } else {
@@ -671,14 +645,9 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             localStorage.setItem("choiceText<?php echo $testID; ?>", JSON.stringify(choiceText));
             localStorage.setItem("selectedAnswers<?php echo $testID; ?>", JSON.stringify(selectedAnswers));
 
-            //console.log(selectedAnswers[currentQuestionIndex]);
-            console.log(choiceText);
-            console.log(currentQuestionIndex);
         }
 
         function identificationType() {
-            console.log("Identification Type");
-            console.log(choiceText[currentQuestionIndex]);
             const inputField = document.getElementById('input' + currentQuestionIndex);
             const identificationAnswer = {
                 userAnswer: inputField.value.trim(),
@@ -689,7 +658,7 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
         }
 
         function submitQuiz() {
-            if (questions[currentQuestionIndex].type == "Identification") {
+            if (questions[currentQuestionIndex].type == "Identification" && seconds > 0) {
                 identificationType();
             }
 
@@ -711,7 +680,6 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
                     })
                     .then(response => response.json())
                     .then(data => {
-                        console.log(data);
                         showToast("Quiz submitted successfully!", "success");
                     })
                     .catch(error => {
@@ -723,10 +691,8 @@ if (mysqli_num_rows($validateTestIDResult) <= 0) {
             } else {
                 showToast("Please answer all items before submitting.", "danger");
             }
-            console.log(timeSpent);
         }
 
-        console.log(choiceText);
     </script>
 </body>
 
