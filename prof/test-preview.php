@@ -17,6 +17,11 @@ $selectTestQuery = "SELECT assessmentTitle, generalGuidance FROM tests
                     WHERE testID = $testID AND courses.userID = $userID";
 $selectTestResult = executeQuery($selectTestQuery);
 
+if (mysqli_num_rows($selectTestResult) <= 0) {
+    echo "Test does not exists.";
+    exit();
+}
+
 $selectQuestionsQuery = "SELECT 
 testquestions.*
 FROM tests 
@@ -55,6 +60,10 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
             cursor: pointer;
         }
 
+        .back-btn {
+            cursor: pointer;
+        }
+
         .interactable:hover {
             transition: 0.3s ease-in-out;
             background-color: var(--highlight75) !important;
@@ -72,31 +81,6 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
 
         .btn-mobile {
             margin-bottom: calc(1.5rem + 80px) !important;
-        }
-
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--dirtyWhite);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--primaryColor);
-            /* Your accent color */
-            border-radius: 10px;
-            border: 2px solid var(--dirtyWhite);
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #ff7b82;
-        }
-
-        * {
-            scrollbar-width: thin;
-            scrollbar-color: var(--primaryColor) var(--dirtyWhite);
         }
     </style>
 </head>
@@ -131,7 +115,7 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
                                         style="color: var(--black);"></i>
                                     <div class="quiz-nav col-12 d-flex flex-column flex-md-row align-items-center justify-content-between my-2 px-3 px-md-5 py-2 py-md-3">
                                         <div class="d-flex flex-row align-items-center mb-0">
-                                            <a href="todo.php" class="text-decoration-none"><i class="d-none d-md-block announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 me-3"
+                                            <a onclick="history.back()" class="text-decoration-none back-btn"><i class="d-none d-md-block announcement-arrow fa-lg fa-solid fa-arrow-left text-reg text-12 me-3"
                                                     style="color: var(--black);"></i></a>
                                             <?php
                                             if (mysqli_num_rows($selectTestResult) > 0) {
