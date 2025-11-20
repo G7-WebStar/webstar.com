@@ -103,52 +103,52 @@ $displayAssessments = $filter === 'All' ? $assessments : [$filter];
 ?>
 
 <!-- Controls -->
-<div class="container-fluid records-controls mb-3">
-    <div class="row align-items-center justify-content-start flex-wrap">
-        <!-- Search -->
-        <div class="col-auto d-flex search-container mb-2 mb-lg-0" style="flex: 0 0 250px;">
-            <input type="text" placeholder="Search classmates" class="form-control py-1 text-reg text-lg-12 text-12">
-            <button type="button" class="btn-outline-secondary ms-1">
-                <i class="bi bi-search me-2"></i>
-            </button>
-        </div>
-
-        <!-- Dropdowns -->
-        <div class="col-auto d-flex dropdowns-wrapper mb-2 mb-lg-0">
-            <!-- Order -->
-            <div class="d-flex align-items-center mt-1">
-                <span class="dropdown-label me-1 text-reg text-14">Order by</span>
-                <form method="POST" style="display: inline-block; margin: 0;">
-                    <input type="hidden" name="activeTab" value="records">
-                    <input type="hidden" name="filterRecords" value="<?php echo htmlspecialchars($filter); ?>">
-                    <select class="select-modern text-reg text-14" name="orderByRecords" onchange="this.form.submit()">
-                        <option value="Ascending" <?php if ($order === 'Ascending') echo 'selected'; ?>>Ascending</option>
-                        <option value="Descending" <?php if ($order === 'Descending') echo 'selected'; ?>>Descending</option>
-                    </select>
-                </form>
+<?php if (!empty($students)): ?>
+    <div class="container-fluid records-controls mb-3">
+        <div class="row align-items-center justify-content-start flex-wrap">
+            <!-- Search -->
+            <div class="col-auto d-flex search-container mb-2 mb-lg-0" style="flex: 0 0 210px;">
+                <input type="text" placeholder="Search classmates" class="form-control py-1 text-reg text-lg-12 text-12">
+                <button type="button" class="btn-outline-secondary ms-1">
+                    <span class="material-symbols-outlined me-2 py-3">search</span>
+                </button>
             </div>
 
-            <!-- Filter -->
-            <div class="d-flex align-items-center mt-1 ms-3">
-                <span class="dropdown-label me-1 text-reg text-14">Filter by</span>
-                <form method="POST" style="display: inline-block; margin: 0;">
-                    <input type="hidden" name="activeTab" value="records">
-                    <input type="hidden" name="orderByRecords" value="<?php echo htmlspecialchars($order); ?>">
-                    <select class="select-modern text-reg text-14" name="filterRecords" onchange="this.form.submit()">
-                        <?php foreach ($assessmentsList as $assessmentTitle): ?>
-                            <option value="<?php echo htmlspecialchars($assessmentTitle); ?>" <?php if ($filter === $assessmentTitle) echo 'selected'; ?>>
-                                <?php echo htmlspecialchars($assessmentTitle); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </form>
+            <!-- Dropdowns -->
+            <div class="col-auto d-flex dropdowns-wrapper mb-2 mb-lg-0">
+                <!-- Order -->
+                <div class="d-flex align-items-center mt-1">
+                    <span class="dropdown-label me-1 text-reg text-14">Order by</span>
+                    <form method="POST" style="display: inline-block; margin: 0;">
+                        <input type="hidden" name="activeTab" value="records">
+                        <input type="hidden" name="filterRecords" value="<?php echo htmlspecialchars($filter); ?>">
+                        <select class="select-modern text-reg text-14" name="orderByRecords" onchange="this.form.submit()">
+                            <option value="Ascending" <?php if ($order === 'Ascending') echo 'selected'; ?>>Ascending</option>
+                            <option value="Descending" <?php if ($order === 'Descending') echo 'selected'; ?>>Descending</option>
+                        </select>
+                    </form>
+                </div>
+
+                <!-- Filter -->
+                <div class="d-flex align-items-center mt-1 ms-3">
+                    <span class="dropdown-label me-1 text-reg text-14">Filter by</span>
+                    <form method="POST" style="display: inline-block; margin: 0;">
+                        <input type="hidden" name="activeTab" value="records">
+                        <input type="hidden" name="orderByRecords" value="<?php echo htmlspecialchars($order); ?>">
+                        <select class="select-modern text-reg text-14" name="filterRecords" onchange="this.form.submit()">
+                            <?php foreach ($assessmentsList as $assessmentTitle): ?>
+                                <option value="<?php echo htmlspecialchars($assessmentTitle); ?>" <?php if ($filter === $assessmentTitle) echo 'selected'; ?>>
+                                    <?php echo htmlspecialchars($assessmentTitle); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Table or Empty State -->
-<?php if (!empty($students)): ?>
+    <!-- Table or Empty State -->
     <div class="records p-3">
         <div class="row">
             <div class="col-12">

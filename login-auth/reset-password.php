@@ -22,6 +22,7 @@ $errorMessages = [
     "mismatch" => "Passwords do not match. Please try again.",
     "emptyFields" => "Please fill in both password fields.",
     "updateFail" => "Something went wrong while updating your password. Please try again.",
+    "emailNoCredential" => "No email credentials found in the database!"
 ];
 
 // For alert handling
@@ -59,29 +60,36 @@ if (isset($_POST['reset'])) { // Reset password button
 
         $result = executeQuery($update);
 
-        if ($result) {
-            $mail = new PHPMailer(true);
-            try {
-                $mail->isSMTP();
-                $mail->Host = 'smtp.gmail.com';
-                $mail->SMTPAuth = true;
-                $mail->Username = 'learn.webstar@gmail.com';
-                $mail->Password = 'mtls vctd rhai cdem';
-                $mail->SMTPSecure = 'tls';
-                $mail->Port = 587;
-                $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
-                $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
-                if (file_exists($headerPath)) {
-                    $mail->AddEmbeddedImage($headerPath, 'emailHeader');
-                }
-                $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
-                if (file_exists($footerPath)) {
-                    $mail->AddEmbeddedImage($footerPath, 'emailFooter');
-                }
-                $mail->addAddress($email);
-                $mail->isHTML(true);
-                $mail->Subject = "Password Reset Successful";
-                $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+        $credentialQuery = "SELECT email, password FROM emailcredentials WHERE credentialID = 1";
+        $credentialResult = executeQuery($credentialQuery);
+
+        if ($credentialRow = mysqli_fetch_assoc($credentialResult)) {
+            $smtpEmail = $credentialRow['email'];
+            $smtpPassword = $credentialRow['password'];
+
+            if ($result) {
+                $mail = new PHPMailer(true);
+                try {
+                    $mail->isSMTP();
+                    $mail->Host = 'smtp.gmail.com';
+                    $mail->SMTPAuth = true;
+                    $mail->Username = $smtpEmail;
+                    $mail->Password = $smtpPassword;
+                    $mail->SMTPSecure = 'tls';
+                    $mail->Port = 587;
+                    $mail->setFrom($smtpEmail, 'Webstar');
+                    $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
+                    if (file_exists($headerPath)) {
+                        $mail->AddEmbeddedImage($headerPath, 'emailHeader');
+                    }
+                    $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
+                    if (file_exists($footerPath)) {
+                        $mail->AddEmbeddedImage($footerPath, 'emailFooter');
+                    }
+                    $mail->addAddress($email);
+                    $mail->isHTML(true);
+                    $mail->Subject = "Password Reset Successful";
+                    $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
                     <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
                         <tr>
                             <td align="center">
@@ -129,16 +137,19 @@ if (isset($_POST['reset'])) { // Reset password button
                         </tr>
                     </table>
                 </div>';
-                $mail->send();
-            } catch (Exception $e) {
-                // skip email error
+                    $mail->send();
+                } catch (Exception $e) {
+                    // skip email error
+                }
+                header("Location: reset-password-updated.php");
+                exit();
+            } else {
+                $_SESSION['alert'] = "updateFail";
+                header("Location: reset-password.php");
+                exit();
             }
-            header("Location: reset-password-updated.php");
-            exit();
         } else {
-            $_SESSION['alert'] = "updateFail";
-            header("Location: reset-password.php");
-            exit();
+            $error = "emailNoCredential";
         }
     }
 }

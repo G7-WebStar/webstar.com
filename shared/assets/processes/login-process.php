@@ -47,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
                 $stmtNew->fetch();
                 $stmtNew->close();
 
-                if ($status === "created") {
+                if (strtolower($status) === "created") {
                     header("Location: login-auth/temporary-credentials.php");
                 } else {
                     header("Location: prof/index.php");
@@ -68,4 +68,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     $stmt->close();
     $conn->close();
 }
-?>

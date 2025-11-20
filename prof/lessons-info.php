@@ -166,13 +166,11 @@ $linkCount = count($linksArray);
                                 <!-- DESKTOP VIEW -->
                                 <div class="row desktop-header d-none d-sm-flex">
                                     <div class="col-auto me-2">
-                                        <a href="course-info.php?courseID=<?= $courseID ?>"
-                                            class="text-decoration-none">
-                                            <span class="material-symbols-outlined"
-                                                style="color: var(--black); font-size: 22px;">
+                                        <button type="button" class="btn p-0" onclick="history.back()" style="background:none; border:none;">
+                                            <span class="material-symbols-rounded" style="color: var(--black); font-size: 22px;">
                                                 arrow_back
                                             </span>
-                                        </a>
+                                        </button>
                                     </div>
                                     <div class="col">
                                         <span class="text-sbold text-25"><?php echo $lessonTitle; ?></span>
@@ -187,13 +185,11 @@ $linkCount = count($linksArray);
                                 <div class="d-block d-sm-none mobile-assignment">
                                     <div class="mobile-top">
                                         <div class="arrow">
-                                            <a href="course-info.php?courseID=<?php echo $courseID ?>"
-                                                class="text-decoration-none">
-                                                <span class="material-symbols-outlined"
-                                                    style="color: var(--black); font-size: 22px;">
+                                            <button type="button" class="btn p-0" onclick="history.back()" style="background:none; border:none;">
+                                                <span class="material-symbols-rounded" style="color: var(--black); font-size: 22px;">
                                                     arrow_back
                                                 </span>
-                                            </a>
+                                            </button>
                                         </div>
                                         <div class="title text-sbold text-25"><?php echo $lessonTitle; ?></div>
                                     </div>

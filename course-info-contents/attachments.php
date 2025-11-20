@@ -12,7 +12,7 @@ switch ($sortAttachment) {
 }
 
 
-$fileQuery = "SELECT * FROM files WHERE courseID = '$courseID' ORDER BY $attachmentOrderBy";
+$fileQuery = "SELECT * FROM files WHERE courseID = '$courseID' AND submissionID IS NULL ORDER BY $attachmentOrderBy";
 $fileResult = executeQuery($fileQuery);
 
 // Check if there is at least one file with a non-empty title

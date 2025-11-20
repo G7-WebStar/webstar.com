@@ -35,7 +35,9 @@ $deadline     = $test['deadline'] ?? date("Y-m-d H:i:s");
 $currentDate  = date("Y-m-d H:i:s");
 $isCompleted  = (strtotime($currentDate) > strtotime($deadline));
 $examStatus   = $isCompleted ? "Completed" : "Active";
-$examDuration = $test['testTimelimit'] ?? 0;
+$examDuration = (isset($test['testTimelimit']) && $test['testTimelimit'] > 0)
+    ? round($test['testTimelimit'] / 60)
+    : 0;
 $courseID     = $test['courseID'] ?? 0;
 
 // Fetch distinct course codes for dropdown
@@ -152,6 +154,18 @@ $submittedCount = mysqli_fetch_assoc($submittedResult)['submittedCount'] ?? 0;
 
 $pendingCount = $totalStudents - $submittedCount;
 if ($pendingCount < 0) $pendingCount = 0;
+
+// Count ungraded submissions for button logic
+$ungradedQuery = "
+    SELECT COUNT(*) AS ungradedCount
+    FROM todo
+    LEFT JOIN scores ON todo.userID = scores.userID AND scores.testID = $testID
+    WHERE todo.assessmentID = $assessmentID
+    AND (todo.status = 'Submitted' OR todo.status = 'Pending')
+    AND scores.score IS NULL
+";
+$ungradedResult = executeQuery($ungradedQuery);
+$ungradedCount = mysqli_fetch_assoc($ungradedResult)['ungradedCount'] ?? 0;
 ?>
 
 <!doctype html>
@@ -289,18 +303,34 @@ if ($pendingCount < 0) $pendingCount = 0;
                                                             </div>
                                                         </form>
 
+                                                        <?php
+                                                        // Determine if the Return All button should be disabled
+                                                        $buttonDisabled = false;
+
+                                                        if ($currentDate < $deadline && $ungradedCount > 0) {
+                                                            $buttonDisabled = true;
+                                                        } elseif ($currentDate < $deadline && $ungradedCount == 0) {
+                                                            $buttonDisabled = false;
+                                                        } elseif ($currentDate >= $deadline && $ungradedCount > 0) {
+                                                            $buttonDisabled = true;
+                                                        } else {
+                                                            $buttonDisabled = false;
+                                                        }
+                                                        ?>
+
                                                         <!-- Return All -->
                                                         <form method="POST" class="ms-auto flex-shrink-0">
                                                             <input type="hidden" name="assessmentID" value="<?php echo $assessmentID; ?>">
                                                             <button type="submit" name="returnAll"
                                                                 class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 d-inline-flex align-items-center btn-return-all"
                                                                 style="background-color: var(--primaryColor); border: 1px solid var(--black); margin-right: auto; height: 27px; pointer-events:auto;"
-                                                                <?php echo ($currentDate < $deadline) ? 'disabled title="Return All available after deadline"' : ''; ?>>
+                                                                <?php echo $buttonDisabled ? 'disabled title="Return All available after deadline or successful test completion"' : ''; ?>>
                                                                 <span class="material-symbols-outlined">assignment_return</span>
                                                                 Return All
                                                             </button>
                                                         </form>
                                                     </div>
+
 
                                                     <!-- Submissions List -->
                                                     <div class="submissions-list mt-4">
@@ -343,8 +373,12 @@ if ($pendingCount < 0) $pendingCount = 0;
                                                                     </div>
                                                                     <div class="ms-auto d-flex align-items-center submission-right">
                                                                         <?php
-                                                                        // Check if timeSpent exists for this student
-                                                                        $timeSpentDisplay = (!isset($test['timeSpent']) || $test['timeSpent'] == 0) ? '-' : $test['timeSpent'] . ' mins';
+                                                                        // Convert seconds to minutes
+                                                                        $timeSpentMinutes = (!isset($test['timeSpent']) || $test['timeSpent'] == 0)
+                                                                            ? 0
+                                                                            : ceil($test['timeSpent'] / 60);
+
+                                                                        $timeSpentDisplay = ($timeSpentMinutes == 0) ? '-' : $timeSpentMinutes . ' mins';
                                                                         ?>
                                                                         <span class="badge-time"><?php echo $timeSpentDisplay; ?></span>
                                                                     </div>
@@ -393,7 +427,7 @@ if ($pendingCount < 0) $pendingCount = 0;
                                                     <div class="exam-stat-value mb-2"><?php echo $totalPoints; ?></div>
                                                     <div class="exam-stat-label mb-5">Total Exam Points</div>
 
-                                                    <div class="exam-stat-value mb-2"><?php echo $examDuration; ?>mins</div>
+                                                    <div class="exam-stat-value mb-2"><?php echo $examDuration . ' ' . ($examDuration == 1 ? 'min' : 'mins'); ?></div>
                                                     <div class="exam-stat-label">Exam Duration</div>
                                                 </div>
 
