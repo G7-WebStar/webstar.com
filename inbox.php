@@ -306,7 +306,7 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
 
                                     <!-- Load More Button -->
                                     <?php if ($inboxCount >= 20) { ?>
-                                        <div class="d-flex justify-content-center mt-4 mb-3">
+                                        <div class="d-flex justify-content-center mt-4 mb-3" id="loadMoreContainer" style="display: none !important;">
                                             <button type="button" id="loadMoreBtn"
                                                 class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 my-1 d-flex align-items-center gap-2"
                                                 style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);"
@@ -420,6 +420,8 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
 
         <!-- Dropdown js -->
         <script>
+            const INITIAL_LOADED_LIMIT = 20;
+            let currentLoadedLimit = INITIAL_LOADED_LIMIT;
             document.addEventListener('DOMContentLoaded', () => {
                 const messageContainer = document.querySelector('.message-container');
                 const sortDropdown = document.querySelector('.custom-dropdown[data-dropdown="sort"]');
@@ -443,6 +445,9 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                         return;
                     }
 
+                    const isAllFilter = (currentCourseFilter === 'All' || currentCourseFilter === '') &&
+                        (currentTypeFilter === 'All' || currentTypeFilter === '');
+
                     // Sort cards
                     cards.sort((a, b) => {
                         const aTime = parseInt(a.dataset.timestamp || '0', 10);
@@ -451,9 +456,7 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                     }).forEach(card => messageContainer.appendChild(card));
 
                     let visibleCount = 0;
-                    // Filter cards
                     cards.forEach(card => {
-                        // Trim and normalize course codes for comparison
                         const cardCourse = (card.dataset.course || '').trim();
                         const filterCourse = (currentCourseFilter || '').trim();
                         const cardType = (card.dataset.type || '').trim();
@@ -462,9 +465,22 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                         const matchesCourse = currentCourseFilter === 'All' || cardCourse === filterCourse;
                         const matchesType = currentTypeFilter === 'All' || cardType === filterType;
                         const shouldShow = matchesCourse && matchesType;
-                        card.style.display = shouldShow ? '' : 'none';
+
                         if (shouldShow) {
+                            if (isAllFilter) {
+                                const cardIndex = parseInt(card.dataset.cardIndex || '0', 10);
+                                if (cardIndex > currentLoadedLimit) {
+                                    card.classList.add('d-none');
+                                } else {
+                                    card.classList.remove('d-none');
+                                }
+                            } else {
+                                card.classList.remove('d-none');
+                            }
+                            card.style.display = '';
                             visibleCount++;
+                        } else {
+                            card.style.display = 'none';
                         }
                     });
 
@@ -484,6 +500,21 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                             messageContainer.style.alignItems = '';
                             messageContainer.style.justifyContent = '';
                             messageContainer.style.flexDirection = '';
+                        }
+                    }
+
+                    // Update Load More button visibility based on filtered results
+                    // Hide button immediately if no visible cards
+                    const loadMoreContainer = document.getElementById('loadMoreContainer');
+                    if (loadMoreContainer) {
+                        if (!isAllFilter || visibleCount === 0) {
+                            loadMoreContainer.style.setProperty('display', 'none', 'important');
+                        } else {
+                            setTimeout(function() {
+                                if (typeof updateLoadMoreButton === 'function') {
+                                    updateLoadMoreButton();
+                                }
+                            }, 0);
                         }
                     }
                 };
@@ -549,7 +580,6 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
             });
         </script>
 
-        
         <script>
             document.addEventListener("DOMContentLoaded", () => {
                 document.querySelectorAll(".inbox-card").forEach(card => {
@@ -570,6 +600,9 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
 
         <!-- Load More Button Functionality -->
         <script>
+            // Make updateLoadMoreButton accessible globally
+            let updateLoadMoreButton = null;
+
             document.addEventListener('DOMContentLoaded', function() {
                 // Get the Load More button
                 const loadMoreBtn = document.getElementById('loadMoreBtn');
@@ -586,29 +619,67 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                 }
 
                 // Function to update button state (enable/disable based on hidden cards)
-                function updateLoadMoreButton() {
-                    // Get all cards and separate visible from hidden
-                    const allCards = Array.from(messageContainer.querySelectorAll('.inbox-card'));
-                    const hiddenCards = allCards.filter(card => card.classList.contains('d-none'));
+                updateLoadMoreButton = function() {
+                    const loadMoreContainer = document.getElementById('loadMoreContainer');
+                    if (!loadMoreContainer) return;
 
-                    // If no hidden cards, disable button
-                    if (hiddenCards.length === 0) {
+                    // Get current filter values from dropdown button text
+                    const courseBtn = document.querySelector('.custom-dropdown[data-dropdown="course"] .dropdown-btn');
+                    const typeBtn = document.querySelector('.custom-dropdown[data-dropdown="type"] .dropdown-btn');
+                    const currentCourseFilter = courseBtn ? courseBtn.textContent.trim() : 'All';
+                    const currentTypeFilter = typeBtn ? typeBtn.textContent.trim() : 'All';
+
+                    // Get all cards and check their visibility
+                    const allCards = Array.from(messageContainer.querySelectorAll('.inbox-card'));
+                    
+                    // Cards that are currently visible (not hidden by d-none AND not hidden by filter)
+                    const visibleCards = allCards.filter(card => {
+                        const hasDNone = card.classList.contains('d-none');
+                        const isDisplayNone = card.style.display === 'none';
+                        return !hasDNone && !isDisplayNone;
+                    });
+                    
+                    // Hide button immediately if no visible cards (filters result in no matches)
+                    if (visibleCards.length === 0) {
+                        loadMoreContainer.style.setProperty('display', 'none', 'important');
+                        return;
+                    }
+                    
+                    const isAllFilter = (currentCourseFilter === 'All' || currentCourseFilter === '') &&
+                        (currentTypeFilter === 'All' || currentTypeFilter === '');
+
+                    // If not on the "All" filter, show all cards and hide the button
+                    if (!isAllFilter) {
+                        allCards.forEach(card => card.classList.remove('d-none'));
+                        loadMoreContainer.style.setProperty('display', 'none', 'important');
+                        return;
+                    }
+
+                    // Cards that are hidden by initial load (d-none) - these are the ones we can load
+                    const hiddenByLoad = allCards.filter(card => card.classList.contains('d-none'));
+
+                    // Since filters are "All", matching hidden cards are just hiddenByLoad
+                    const matchingHiddenCards = hiddenByLoad;
+
+                    const textSpan = loadMoreBtn.querySelector('span:last-child');
+
+                    if (matchingHiddenCards.length === 0) {
+                        loadMoreContainer.style.setProperty('display', 'flex', 'important');
                         loadMoreBtn.disabled = true;
                         loadMoreBtn.style.opacity = '0.5';
                         loadMoreBtn.style.cursor = 'not-allowed';
-                        const textSpan = loadMoreBtn.querySelector('span:last-child');
                         if (textSpan) {
                             textSpan.textContent = 'All loaded';
                         }
-                    } else {
-                        // If there are hidden cards, enable button
-                        loadMoreBtn.disabled = false;
-                        loadMoreBtn.style.opacity = '1';
-                        loadMoreBtn.style.cursor = 'pointer';
-                        const textSpan = loadMoreBtn.querySelector('span:last-child');
-                        if (textSpan) {
-                            textSpan.textContent = 'Load More';
-                        }
+                        return;
+                    }
+
+                    loadMoreContainer.style.setProperty('display', 'flex', 'important');
+                    loadMoreBtn.disabled = false;
+                    loadMoreBtn.style.opacity = '1';
+                    loadMoreBtn.style.cursor = 'pointer';
+                    if (textSpan) {
+                        textSpan.textContent = 'Load More';
                     }
                 }
 
@@ -620,29 +691,69 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                     // Get how many cards to load (10)
                     const loadCount = parseInt(this.getAttribute('data-load-count') || '10', 10);
 
-                    // Get all hidden cards
-                    const allCards = Array.from(messageContainer.querySelectorAll('.inbox-card'));
-                    const hiddenCards = allCards.filter(card => card.classList.contains('d-none'));
+                    // Get current filter values
+                    const courseBtn = document.querySelector('.custom-dropdown[data-dropdown="course"] .dropdown-btn');
+                    const typeBtn = document.querySelector('.custom-dropdown[data-dropdown="type"] .dropdown-btn');
+                    const currentCourseFilter = courseBtn ? courseBtn.textContent.trim() : 'All';
+                    const currentTypeFilter = typeBtn ? typeBtn.textContent.trim() : 'All';
 
-                    // If no hidden cards, update button and exit
-                    if (hiddenCards.length === 0) {
-                        updateLoadMoreButton();
+                    // Get all hidden cards (hidden by d-none, not by filter display:none)
+                    const allCards = Array.from(messageContainer.querySelectorAll('.inbox-card'));
+                    const hiddenCards = allCards.filter(card => {
+                        const hasDNone = card.classList.contains('d-none');
+                        const isDisplayNone = card.style.display === 'none';
+                        return hasDNone && !isDisplayNone;
+                    });
+
+                    const isAllFilter = (currentCourseFilter === 'All' || currentCourseFilter === '') &&
+                        (currentTypeFilter === 'All' || currentTypeFilter === '');
+
+                    // If not on "All" filter, do nothing (button hidden)
+                    if (!isAllFilter) {
                         return;
                     }
 
-                    // Show next 10 hidden cards
-                    let shown = 0;
-                    for (let i = 0; i < hiddenCards.length && shown < loadCount; i++) {
-                        hiddenCards[i].classList.remove('d-none');
-                        shown++;
+                    // Filter hidden cards to only those that match current filter (All filter = all hidden cards)
+                    const matchingHiddenCards = hiddenCards;
+
+                    // If no matching hidden cards, show disabled "All loaded"
+                    if (matchingHiddenCards.length === 0) {
+                        const loadMoreContainer = document.getElementById('loadMoreContainer');
+                        if (loadMoreContainer) {
+                            loadMoreContainer.style.setProperty('display', 'flex', 'important');
+                        }
+                        loadMoreBtn.disabled = true;
+                        loadMoreBtn.style.opacity = '0.5';
+                        loadMoreBtn.style.cursor = 'not-allowed';
+                        const textSpan = loadMoreBtn.querySelector('span:last-child');
+                        if (textSpan) textSpan.textContent = 'All loaded';
+                        return;
                     }
 
-                    // Update button state after showing cards
-                    updateLoadMoreButton();
+                    // Show next 10 matching hidden cards
+                    let shown = 0;
+                    for (let i = 0; i < matchingHiddenCards.length && shown < loadCount; i++) {
+                        matchingHiddenCards[i].classList.remove('d-none');
+                        shown++;
+                    }
+                    currentLoadedLimit += shown;
+
+                    // Re-apply filters to newly shown cards to ensure they display correctly
+                    if (typeof applyFilters === 'function') {
+                        applyFilters();
+                    } else {
+                        // Update button state after showing cards
+                        updateLoadMoreButton();
+                    }
                 });
 
-                // Check button state on page load
+                // Check button state on page load and after filters are applied
                 updateLoadMoreButton();
+                
+                // Also check after a short delay to ensure DOM is ready
+                setTimeout(function() {
+                    updateLoadMoreButton();
+                }, 200);
             });
         </script>
 </body>

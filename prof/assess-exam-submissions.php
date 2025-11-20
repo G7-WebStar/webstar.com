@@ -291,7 +291,7 @@ $ungradedCount = mysqli_fetch_assoc($ungradedResult)['ungradedCount'] ?? 0;
                                                         <form method="GET" class="d-flex align-items-center flex-nowrap me-3">
                                                             <input type="hidden" name="assessmentID" value="<?php echo $assessmentID; ?>">
                                                             <input type="hidden" name="status" id="statusInput" value="<?php echo $statusFilter; ?>">
-                                                            <span class="dropdown-label me-2">Status</span>
+                                                            <span class="dropdown-label text-reg me-2">Status</span>
                                                             <div class="custom-dropdown">
                                                                 <button type="button" class="dropdown-btn text-reg text-14"><?php echo $statusFilter; ?></button>
                                                                 <ul class="dropdown-list text-reg text-14">
