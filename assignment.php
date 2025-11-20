@@ -510,11 +510,11 @@ if ($isSubmitted) {
 
 
 // --- Fetch grading information (if exists) ---
-$ReturnedAt = null;
+$gradedAt = null;
 $statusUpdated = null;
 if (!empty($scoreID)) {
     $scoreQuery = "
-        SELECT ReturnedAt 
+        SELECT gradedAt 
         FROM scores 
         WHERE scoreID = '$scoreID' 
         LIMIT 1
@@ -522,14 +522,14 @@ if (!empty($scoreID)) {
     $scoreResult = executeQuery($scoreQuery);
     if ($scoreResult && mysqli_num_rows($scoreResult) > 0) {
         $scoreRow = mysqli_fetch_assoc($scoreResult);
-        $ReturnedAt = $scoreRow['ReturnedAt'];
-        $statusUpdated = $ReturnedAt;
+        $gradedAt = $scoreRow['gradedAt'];
+        $statusUpdated = $gradedAt;
     }
 }
 
 // --- Compute flags for timeline display ---
 $isReturned = ($todoStatus === 'Returned');
-if (!empty($ReturnedAt)) {
+if (!empty($gradedAt)) {
     $isReturned = true;
 }
 $isMissing = ($todoStatus === 'Missing');
