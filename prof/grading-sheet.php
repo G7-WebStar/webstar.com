@@ -17,7 +17,7 @@ if (!class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
 // ✅ Get submissionID
 $submissionID = isset($_GET['submissionID']) ? intval($_GET['submissionID']) : 0;
 
-// Automatically fetch userID from the submissions table
+// Automatically fetch student userID from the submissions table
 $getInfo = $conn->prepare("
     SELECT s.userID
     FROM submissions s
@@ -29,7 +29,7 @@ $getInfo->execute();
 $result = $getInfo->get_result();
 
 if ($row = $result->fetch_assoc()) {
-    $userID = intval($row['userID']);
+    $studentUserID = intval($row['userID']);
 } else {
     header("Location: 404.html");
     exit();
@@ -66,6 +66,9 @@ if ($detailsResult && $detailsResult->num_rows > 0) {
     $details = $detailsResult->fetch_assoc(); // Only fetch once
     // Create formatted student info
     $studentDisplay = $details['studentName'] . ' · ' . $details['programInitial'] . ' ' . $details['yearLevel'] . '-' . $details['yearSection'];
+    if (empty($studentUserID) && isset($details['userID'])) {
+        $studentUserID = intval($details['userID']);
+    }
 } else {
     $details = [
         'userID' => 0,
@@ -81,6 +84,7 @@ if ($detailsResult && $detailsResult->num_rows > 0) {
         'submittedAt' => 'N/A'
     ];
     $studentDisplay = $details['studentName'] . ' · ' . $details['programInitial'] . ' ' . $details['yearLevel'] . '-' . $details['yearSection'];
+    $studentUserID = 0;
 }
 
 // Get assignment points for this assessment
@@ -157,10 +161,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
     $score = isset($_POST['score']) ? floatval($_POST['score']) : 0;
     $feedback = trim($_POST['feedback'] ?? '');
 
-    if ($userID > 0 && $submissionID > 0) {
+    if ($studentUserID > 0 && $submissionID > 0) {
         // Check if a record already exists for this user and submission
         $check = $conn->prepare("SELECT scoreID FROM scores WHERE userID = ? AND submissionID = ?");
-        $check->bind_param("ii", $userID, $submissionID);
+        $check->bind_param("ii", $studentUserID, $submissionID);
         $check->execute();
         $checkResult = $check->get_result();
 
@@ -178,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
             // ✅ Insert new record if none exists
             $insert = $conn->prepare("INSERT INTO scores (userID, submissionID, score, feedback, gradedAt) 
                 VALUES (?, ?, ?, ?, NOW())");
-            $insert->bind_param("iids", $userID, $submissionID, $score, $feedback);
+            $insert->bind_param("iids", $studentUserID, $submissionID, $score, $feedback);
             $insert->execute();
 
             // Get the newly inserted scoreID
@@ -199,7 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
             WHERE e.userID = ? AND e.courseID = ?
             LIMIT 1
         ");
-        $enrollmentQuery->bind_param("ii", $userID, $details['courseID']);
+        $enrollmentQuery->bind_param("ii", $studentUserID, $details['courseID']);
         $enrollmentQuery->execute();
         $enrollmentResult = $enrollmentQuery->get_result();
         
@@ -222,22 +226,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
             ";
             executeQuery($insertNotificationQuery);
             
-            // Get student email and check if they have courseUpdateEnabled
+            // Get student email and check if they have questDeadlineEnabled
             $selectEmailQuery = "
-                SELECT u.email, COALESCE(s.courseUpdateEnabled, 0) as courseUpdateEnabled
+                SELECT u.email, COALESCE(s.questDeadlineEnabled, 0) as questDeadlineEnabled
                 FROM users u
                 LEFT JOIN settings s ON u.userID = s.userID
                 WHERE u.userID = ?
             ";
             $emailStmt = $conn->prepare($selectEmailQuery);
-            $emailStmt->bind_param("i", $userID);
+            $emailStmt->bind_param("i", $studentUserID);
             $emailStmt->execute();
             $emailResult = $emailStmt->get_result();
             
             if ($emailResult && $emailResult->num_rows > 0) {
                 $studentData = $emailResult->fetch_assoc();
                 
-                if ($studentData['courseUpdateEnabled'] == 1 && !empty($studentData['email'])) {
+                if ($studentData['questDeadlineEnabled'] == 1 && !empty($studentData['email'])) {
                     try {
                         $mail = new PHPMailer(true);
                         $mail->isSMTP();
@@ -266,7 +270,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                         $assessmentTitleEsc = htmlspecialchars($details['assessmentTitle'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
                         $courseCodeEsc = htmlspecialchars($details['courseCode'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
                         $courseTitleEsc = htmlspecialchars($details['courseTitle'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                        $scoreDisplay = number_format($score, 2);
+                        $scoreDisplay = number_format($score, 0);
+                        $maxScoreDisplay = number_format((float) $assignmentPoints, 0);
                         $feedbackHtml = !empty($feedback) ? nl2br(htmlspecialchars($feedback, ENT_QUOTES | ENT_HTML5, 'UTF-8')) : '<em>No feedback provided.</em>';
                         
                         $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
@@ -288,7 +293,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                                                     <div style="background-color:#f9f9f9; padding:15px; border-radius:5px; margin:20px 0;">
                                                         <p style="font-size:14px; color:#666; margin:5px 0;"><strong>Course:</strong> ' . $courseCodeEsc . ' - ' . $courseTitleEsc . '</p>
                                                         <p style="font-size:14px; color:#666; margin:5px 0;"><strong>Assessment:</strong> ' . $assessmentTitleEsc . '</p>
-                                                        <p style="font-size:18px; color:#2C2C2C; margin:10px 0;"><strong>Score: ' . $scoreDisplay . '/100</strong></p>
+                                                        <p style="font-size:18px; color:#2C2C2C; margin:10px 0;"><strong>Score: ' . $scoreDisplay . '/' . $maxScoreDisplay . '</strong></p>
                                                     </div>
                                                     <p style="font-size:15px; color:#333; margin-top: 25px;">
                                                         <strong>Feedback:</strong>
@@ -340,7 +345,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
 
     if (!empty($_POST['selectedBadgeIDs'])) {
         $badgeIDs = explode(',', $_POST['selectedBadgeIDs']); // Split multiple IDs
-        $userID = intval($details['userID']);
+        $studentUserID = intval($details['userID']);
         $courseID = intval($details['courseID']);
         $assignmentID = intval($details['assessmentID']);
         $earnedAt = date('Y-m-d H:i:s');
@@ -356,7 +361,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
             FROM studentbadges 
             WHERE userID = ? AND badgeID = ? AND assignmentID = ?
         ");
-            $check->bind_param("iii", $userID, $badgeID, $assignmentID);
+            $check->bind_param("iii", $studentUserID, $badgeID, $assignmentID);
             $check->execute();
             $checkResult = $check->get_result();
 
@@ -365,7 +370,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                 INSERT INTO studentbadges (userID, badgeID, courseID, assignmentID, earnedAt) 
                 VALUES (?, ?, ?, ?, ?)
             ");
-                $insert->bind_param("iiiis", $userID, $badgeID, $courseID, $assignmentID, $earnedAt);
+                $insert->bind_param("iiiis", $studentUserID, $badgeID, $courseID, $assignmentID, $earnedAt);
                 $insert->execute();
                 $insert->close();
             }
@@ -543,7 +548,7 @@ $prevSubmissionID = $submissionIDs[$prevIndex];
                                 <div
                                     class="row desktop-header d-none d-sm-flex align-items-center justify-content-between">
                                     <div class="col-auto d-flex align-items-center gap-3">
-                                        <a href="todo.php?userID=<?php echo htmlspecialchars($userID); ?>"
+                                        <a href="todo.php?userID=<?php echo htmlspecialchars($studentUserID); ?>"
                                             class="text-decoration-none">
                                             <i class="fa-solid fa-arrow-left text-20" style="color: var(--black);"></i>
                                         </a>
@@ -578,7 +583,7 @@ $prevSubmissionID = $submissionIDs[$prevIndex];
                                 <div class="d-block d-sm-none mobile-assignment mt-3">
                                     <div class="mobile-top d-flex align-items-center gap-3">
                                         <div class="arrow">
-                                            <a href="todo.php?userID=<?php echo htmlspecialchars($userID); ?>"
+                                            <a href="todo.php?userID=<?php echo htmlspecialchars($studentUserID); ?>"
                                                 class="text-decoration-none">
                                                 <i class="fa-solid fa-arrow-left text-reg text-16"
                                                     style="color: var(--black);"></i>

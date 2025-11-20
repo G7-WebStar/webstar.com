@@ -222,13 +222,12 @@ mysqli_data_seek($lessonResult, 0);
     }
 
     .dropdown-menu {
-        position: absolute !important;
-        top: 100%;
-        left: auto;
-        right: 0;
-        z-index: 2000;
-        min-width: 8rem;
-    }
+    position: fixed !important;
+    inset: auto !important;
+    z-index: 5000 !important;
+    transform: none !important;
+}
+
 </style>
 
 <script>
@@ -265,6 +264,17 @@ mysqli_data_seek($lessonResult, 0);
             });
         });
     });
+
+    document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(btn => {
+    btn.addEventListener('show.bs.dropdown', function () {
+        const menu = this.parentElement.querySelector('.dropdown-menu');
+        const rect = this.getBoundingClientRect();
+
+        menu.style.position = "fixed";
+        menu.style.top = rect.bottom + "px";
+        menu.style.left = (rect.right - menu.offsetWidth) + "px";
+    });
+});
 
 
 

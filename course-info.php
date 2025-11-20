@@ -631,8 +631,8 @@ $user = mysqli_fetch_assoc($result);
                                                         </li>
 
                                                         <li class="nav-item">
-                                                            <a class="nav-link text-14 <?php echo ($activeTab == 'quests') ? 'active' : ''; ?>"
-                                                                data-bs-toggle="tab" href="#quests">Quests</a>
+                                                            <a class="nav-link text-14 <?php echo ($activeTab == 'todo') ? 'active' : ''; ?>"
+                                                                data-bs-toggle="tab" href="#todo">Quests</a>
                                                         </li>
 
                                                         <li class="nav-item">
@@ -688,8 +688,8 @@ $user = mysqli_fetch_assoc($result);
                                             </div>
 
                                             <!-- Quests -->
-                                            <div class="tab-pane fade <?php echo ($activeTab == 'quests') ? 'show active' : ''; ?>"
-                                                id="quests" role="tabpanel">
+                                            <div class="tab-pane fade <?php echo ($activeTab == 'todo') ? 'show active' : ''; ?>"
+                                                id="todo" role="tabpanel">
                                                 <?php include 'course-info-contents/to-do.php'; ?>
                                             </div>
 
