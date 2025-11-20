@@ -85,7 +85,6 @@ if (isset($_POST['save_exam'])) {
                 executeQuery($testInsert);
 
                 $testID = mysqli_insert_id($conn);
-
             } elseif ($mode === 'edit') {
 
                 /* UPDATE EXISTING ASSESSMENT*/
@@ -331,7 +330,6 @@ if (isset($_POST['save_exam'])) {
 
                         $mail->send();
                     }
-
                 } catch (Exception $e) {
                     $errorMsg = isset($mail) && is_object($mail) ? $mail->ErrorInfo : $e->getMessage();
                     error_log("PHPMailer failed for Course ID $courseID: " . $errorMsg);
@@ -504,10 +502,10 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                     style="background-color: transparent;">
 
                     <!-- Alert Container Toasts -->
-                <div id="toastContainer"
-                    class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1  d-flex flex-column align-items-center"
-                    style="z-index:1100; pointer-events:none;">
-                </div>
+                    <div id="toastContainer"
+                        class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1  d-flex flex-column align-items-center"
+                        style="z-index:1100; pointer-events:none;">
+                    </div>
 
                     <!-- Navbar (mobile) -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
@@ -529,14 +527,14 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                     <!-- Page Title -->
                                     <div class="col text-center text-md-start">
                                         <span class="text-sbold text-20"><?php
-                                        if (isset($_GET['edit'])) {
-                                            echo 'Edit Test';
-                                        } elseif (isset($_GET['reuse'])) {
-                                            echo 'Recreate Test';
-                                        } else {
-                                            echo 'Create Test';
-                                        }
-                                        ?>
+                                                                            if (isset($_GET['edit'])) {
+                                                                                echo 'Edit Test';
+                                                                            } elseif (isset($_GET['reuse'])) {
+                                                                                echo 'Recreate Test';
+                                                                            } else {
+                                                                                echo 'Create Test';
+                                                                            }
+                                                                            ?>
                                     </div>
 
                                     <!-- Assign Existing Task Button -->
@@ -608,7 +606,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                     <input type="datetime-local" name="deadline"
                                                         class="form-control textbox text-reg text-16 me-0 me-md-2"
                                                         value="<?php echo isset($mainData['deadline']) ? date('Y-m-d\TH:i', strtotime($mainData['deadline'])) : ''; ?>"
-                                                        required>
+                                                        min="<?php echo date('Y-m-d\T00:00', strtotime('+1 day')); ?>" required>
                                                 </div>
                                             </div>
 
@@ -619,18 +617,18 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                 </label>
                                                 <input type="number" name="testTimeLimit"
                                                     class="form-control textbox text-reg text-16"
-                                                    placeholder="No time limit if left blank" min="1" value="<?php
-                                                    if (isset($mainData['testTimeLimit'])) {
-                                                        echo htmlspecialchars(intval($mainData['testTimeLimit']) / 60);
-                                                    }
-                                                    ?>" />
+                                                    placeholder="No time limit if left blank" min="1" required value="<?php
+                                                                                                                        if (isset($mainData['testTimeLimit'])) {
+                                                                                                                            echo htmlspecialchars(intval($mainData['testTimeLimit']) / 60);
+                                                                                                                        }
+                                                                                                                        ?>" />
                                             </div>
                                         </div>
                                         <!-- wala pa to -->
                                         <div class="form-check mt-2 col d-flex align-items-center">
                                             <input class="form-check-input" type="checkbox" id="stopSubmissions"
                                                 name="stopSubmissions" style="border: 1px solid var(--black);" <?php if (!empty($mainData['deadlineEnabled']) && $mainData['deadlineEnabled'] == 1)
-                                                    echo 'checked'; ?> />
+                                                                                                                    echo 'checked'; ?> />
                                             <label class="form-check-label text-reg text-14 ms-2"
                                                 style="margin-top: 4.5px;" for="stopSubmissions">
                                                 Stop accepting submissions after the deadline.
@@ -862,7 +860,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
 
                                                         while ($course = $courses->fetch_assoc()) {
                                                             $checked = in_array($course['courseID'], $assignedCourseIDs) ? 'checked' : '';
-                                                            ?>
+                                                    ?>
                                                             <li>
                                                                 <div class="form-check">
                                                                     <input class="form-check-input course-checkbox"
@@ -876,7 +874,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                                     </label>
                                                                 </div>
                                                             </li>
-                                                            <?php
+                                                        <?php
                                                         }
                                                     } else { ?>
                                                         <li><span class="dropdown-item-text text-muted">No courses
@@ -910,7 +908,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                         </div>
                     </div>
                 </div>
-                
+
             </div>
         </div>
     </div>
@@ -992,7 +990,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
         const maxWords = 200;
         const counter = document.getElementById("word-counter");
 
-        quill.on('text-change', function () {
+        quill.on('text-change', function() {
             let text = quill.getText().trim();
             let words = text.length > 0 ? text.split(/\s+/).length : 0;
 
@@ -1008,7 +1006,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
 
         const form = document.querySelector('#guidedanceForm');
 
-        form.addEventListener("submit", function (e) {
+        form.addEventListener("submit", function(e) {
             // --- Quill ---
             const guidelinesInput = document.getElementById("generalGuidance");
             const plainText = quill.getText().trim();
@@ -1061,19 +1059,12 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                 }
             });
 
-            // --- Deadline Validation ---
-            const deadlineInput = document.querySelector('input[name="deadline"]');
-            if (deadlineInput) {
-                const deadlineValue = new Date(deadlineInput.value);
-                const now = new Date();
-                now.setSeconds(0, 0);
-                if (!deadlineInput.value || deadlineValue < now) {
-                    valid = false;
-                    if (!message) message = "Please set the deadline to a future date or time within today.";
-                    deadlineInput.style.border = "2px solid red";
-                } else {
-                    deadlineInput.style.border = "";
-                }
+            // --- No Questions Validation ---
+            const questionsExist = document.querySelectorAll("#allQuestionsContainer .textbox, #allQuestionsContainer .multiple-choice-item");
+            if (questionsExist.length === 0) {
+                e.preventDefault();
+                showAlert("Please add at least one question before submitting.");
+                return; // stop submission
             }
 
             // --- Course Selection Validation ---
@@ -1183,7 +1174,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
 
 
         // Single Delete Handler for All Blocks
-        document.addEventListener("click", function (e) {
+        document.addEventListener("click", function(e) {
             const delBtn = e.target.closest(".delete-template");
             if (!delBtn) return;
 
@@ -1226,7 +1217,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
         });
 
         // Add Multiple Choice Choices
-        document.getElementById("allQuestionsContainer").addEventListener("click", function (e) {
+        document.getElementById("allQuestionsContainer").addEventListener("click", function(e) {
             if (e.target.closest(".add-radio-btn")) {
                 const button = e.target.closest(".add-radio-btn");
                 const container = button.closest(".multiple-choice-item").querySelector(".radio-choices-container");
@@ -1280,7 +1271,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
         });
 
         // Toggle Image Container
-        document.addEventListener("click", function (e) {
+        document.addEventListener("click", function(e) {
             if (e.target.closest(".image-icon")) {
                 const card = e.target.closest(".textbox");
                 const imageContainer = card.querySelector(".image-container");
@@ -1323,7 +1314,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
 
         }
 
-        document.addEventListener("click", function (e) {
+        document.addEventListener("click", function(e) {
             const delImgBtn = e.target.closest(".delete-image");
             if (!delImgBtn) return;
 
@@ -1369,7 +1360,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
             });
         }
 
-        mainContainer.addEventListener('input', function (e) {
+        mainContainer.addEventListener('input', function(e) {
             if (e.target.type === "number") updateTotalPoints();
         });
 
