@@ -235,209 +235,210 @@ if (!empty($rubricID)) {
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Scrollable Content Container -->
-                            <div class="content-scroll-container">
-                                <div class="container-fluid py-3">
-                                    <div class="row">
-                                        <!-- Left Content -->
-                                        <div class="col-12 col-lg-8">
-                                            <div class="p-0 px-lg-5">
-                                                <div class="tab-carousel-wrapper d-block"
-                                                    style="--tabs-right-extend: 60px;">
-                                                    <div class="tab-scroll">
-                                                        <ul class="nav nav-tabs custom-nav-tabs mb-3 flex-nowrap" id="myTab"
-                                                            role="tablist">
-                                                            <li class="nav-item">
-                                                                <a class="nav-link active" id="announcements-tab"
-                                                                    data-bs-toggle="tab" href="#announcements"
-                                                                    role="tab">Task Details</a>
-                                                            </li>
-                                                            <li class="nav-item">
-                                                                <a class="nav-link" id="lessons-tab" href="assess-submissions.php?assessmentID=<?php echo $assessmentID; ?>" role="tab">Submissions</a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
+                        <!-- Scrollable Content Container -->
+                        <div class="content-scroll-container">
+                            <div class="container-fluid py-3">
+                                <div class="row">
+                                    <!-- Left Content -->
+                                    <div class="col-12 col-lg-8">
+                                        <div class="p-0 px-lg-5">
+                                            <div class="tab-carousel-wrapper d-block"
+                                                style="--tabs-right-extend: 60px;">
+                                                <div class="tab-scroll">
+                                                    <ul class="nav nav-tabs custom-nav-tabs mb-3 flex-nowrap" id="myTab"
+                                                        role="tablist">
+                                                        <li class="nav-item">
+                                                            <a class="nav-link active" id="announcements-tab"
+                                                                data-bs-toggle="tab" href="#announcements"
+                                                                role="tab">Task Details</a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a class="nav-link" id="lessons-tab" href="assess-submissions.php?assessmentID=<?php echo $assessmentID; ?>" role="tab">Submissions</a>
+                                                        </li>
+                                                    </ul>
                                                 </div>
+                                            </div>
 
-                                                <!-- Tab Content -->
-                                                <?php
-                                                if (mysqli_num_rows($selectAssignmentResult) > 0) {
-                                                    mysqli_data_seek($selectAssignmentResult, 0);
-                                                    while ($assignmentRow = mysqli_fetch_assoc($selectAssignmentResult)) {
-                                                ?>
-                                                        <div class="tab-content" id="myTabContent">
-                                                            <!-- Task Details Tab - Active -->
-                                                            <div class="tab-pane fade show active" id="announcements" role="tabpanel" aria-labelledby="announcements-tab">
-                                                                <?php if (!empty($assignmentRow['assignmentDescription'])): ?>
-                                                                    <div class="text-sbold text-14 mt-5">Task Instructions</div>
-                                                                    <p class="mb-4 mt-3 text-med text-14">
-                                                                        <?php echo $assignmentRow['assignmentDescription']; ?>
-                                                                    </p>
-                                                                    <hr>
-                                                                <?php endif; ?>
+                                            <!-- Tab Content -->
+                                            <?php
+                                            if (mysqli_num_rows($selectAssignmentResult) > 0) {
+                                                mysqli_data_seek($selectAssignmentResult, 0);
+                                                while ($assignmentRow = mysqli_fetch_assoc($selectAssignmentResult)) {
+                                            ?>
+                                                    <div class="tab-content" id="myTabContent">
+                                                        <!-- Task Details Tab - Active -->
+                                                        <div class="tab-pane fade show active" id="announcements" role="tabpanel" aria-labelledby="announcements-tab">
+                                                            <?php if (!empty($assignmentRow['assignmentDescription'])): ?>
+                                                                <div class="text-sbold text-14 mt-5">Task Instructions</div>
+                                                                <p class="mb-4 mt-3 text-med text-14">
+                                                                    <?php echo $assignmentRow['assignmentDescription']; ?>
+                                                                </p>
+                                                                <hr>
+                                                            <?php endif; ?>
 
-                                                                <?php if (!empty($attachmentsArray) || !empty($linksArray)): ?>
-                                                                    <div class="text-sbold text-14 mt-3">Task Materials</div>
-                                                                    <?php foreach ($attachmentsArray as $file):
-                                                                        $filePath = "shared/assets/files/" . $file;
-                                                                        $fileExt = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
-                                                                        $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
-                                                                        $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
+                                                            <?php if (!empty($attachmentsArray) || !empty($linksArray)): ?>
+                                                                <div class="text-sbold text-14 mt-3">Task Materials</div>
+                                                                <?php foreach ($attachmentsArray as $file):
+                                                                    $filePath = "shared/assets/files/" . $file;
+                                                                    $fileExt = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
+                                                                    $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
+                                                                    $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
 
-                                                                        // Remove extension from display name
-                                                                        $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
-                                                                    ?>
-                                                                        <a href="<?php echo $filePath; ?>"
-                                                                            <?php if (!preg_match('/^https?:\/\//', $filePath)) : ?>
-                                                                            download="<?php echo htmlspecialchars($file); ?>"
-                                                                            <?php endif; ?>
-                                                                            style="text-decoration:none; color:inherit;">
+                                                                    // Remove extension from display name
+                                                                    $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
+                                                                ?>
+                                                                    <a href="<?php echo $filePath; ?>"
+                                                                        <?php if (!preg_match('/^https?:\/\//', $filePath)) : ?>
+                                                                        download="<?php echo htmlspecialchars($file); ?>"
+                                                                        <?php endif; ?>
+                                                                        style="text-decoration:none; color:inherit;">
 
-                                                                            <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
-                                                                                style="width:400px; max-width:100%; min-width:310px;">
-                                                                                <span class="px-3 py-3 material-symbols-outlined">draft</span>
-                                                                                <div class="ms-2">
-                                                                                    <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
-                                                                                    <div class="due text-reg text-14 mb-1">
-                                                                                        <?php echo $fileExt ?> · <?php echo $fileSizeMB ?>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </a>
-                                                                    <?php endforeach; ?>
-
-                                                                    <?php foreach ($linksArray as $link): ?>
                                                                         <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
                                                                             style="width:400px; max-width:100%; min-width:310px;">
-                                                                            <span class="px-3 py-3 material-symbols-outlined">public</span>
+                                                                            <span class="px-3 py-3 material-symbols-outlined">draft</span>
                                                                             <div class="ms-2">
-                                                                                <!-- temoparary lang ang filename here -->
                                                                                 <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
-                                                                                <div class="text-reg link text-12 mt-0">
-                                                                                    <a href="<?php echo $link ?>" target="_blank" rel="noopener noreferrer"
-                                                                                        style="text-decoration: none; color: var(--black);">
-                                                                                        <?php echo $link ?>
-                                                                                    </a>
+                                                                                <div class="due text-reg text-14 mb-1">
+                                                                                    <?php echo $fileExt ?> · <?php echo $fileSizeMB ?>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                    <?php endforeach; ?>
-                                                                    <hr>
-                                                                <?php endif; ?>
+                                                                    </a>
+                                                                <?php endforeach; ?>
 
-                                                                <?php if (!empty($rubricID) && !empty($rubricTitle)): ?>
-                                                                    <div class="text-sbold text-14 mt-4">Rubric</div>
+                                                                <?php foreach ($linksArray as $link): ?>
                                                                     <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
-                                                                        style="max-width:100%; min-width:310px; cursor:pointer;"
-                                                                        data-bs-toggle="modal" data-bs-target="#rubricModal">
-
-                                                                        <span class="material-symbols-outlined ps-3 pe-2 py-3"
-                                                                            style="font-variation-settings:'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;">
-                                                                            rate_review
-                                                                        </span>
-
+                                                                        style="width:400px; max-width:100%; min-width:310px;">
+                                                                        <span class="px-3 py-3 material-symbols-outlined">public</span>
                                                                         <div class="ms-2">
-                                                                            <div class="text-sbold text-16 mt-1"><?php echo $rubricTitle; ?>
-                                                                            </div>
-                                                                            <div class="due text-reg text-14 mb-1">
-                                                                                <?php echo $rubricPoints; ?> points
+                                                                            <!-- temoparary lang ang filename here -->
+                                                                            <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
+                                                                            <div class="text-reg link text-12 mt-0">
+                                                                                <a href="<?php echo $link ?>" target="_blank" rel="noopener noreferrer"
+                                                                                    style="text-decoration: none; color: var(--black);">
+                                                                                    <?php echo $link ?>
+                                                                                </a>
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    <hr>
-                                                                <?php endif; ?>
+                                                                <?php endforeach; ?>
+                                                                <hr>
+                                                            <?php endif; ?>
 
-                                                                <?php
-                                                                if (mysqli_num_rows($profInfoResult) > 0) {
-                                                                    while ($prof = mysqli_fetch_assoc($profInfoResult)) {
+                                                            <?php if (!empty($rubricID) && !empty($rubricTitle)): ?>
+                                                                <div class="text-sbold text-14 mt-4">Rubric</div>
+                                                                <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
+                                                                    style="max-width:100%; min-width:310px; cursor:pointer;"
+                                                                    data-bs-toggle="modal" data-bs-target="#rubricModal">
 
+                                                                    <span class="material-symbols-outlined ps-3 pe-2 py-3"
+                                                                        style="font-variation-settings:'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;">
+                                                                        rate_review
+                                                                    </span>
 
-                                                                ?>
-                                                                        <div class="text-sbold text-14 pb-3">Prepared by</div>
-                                                                        <div class="d-flex align-items-center pb-5">
-                                                                            <div class="rounded-circle me-2"
-                                                                                style="width: 50px; height: 50px; background-color: var(--highlight75);">
-                                                                                <img src="../shared/assets/img/assess/prof.png" alt="professor"
-                                                                                    class="rounded-circle" style="width:50px;height:50px;">
-                                                                            </div>
-                                                                            <div>
-                                                                                <div class="text-sbold text-14">Prof. <?php echo $prof['firstName'] . " " . $prof['middleName'] . " " . $prof['lastName']; ?></div>
-                                                                        <?php
-                                                                    }
-                                                                }
-                                                                        ?>
-                                                                        <?php
-                                                                        if (mysqli_num_rows($selectAssessmentResult) > 0) {
-                                                                            mysqli_data_seek($selectAssessmentResult, 0);
-                                                                            while ($createdAt = mysqli_fetch_assoc($selectAssessmentResult)) {
-                                                                        ?>
-                                                                                <div class="text-med text-12"><?php echo $createdAt['creationDate']; ?></div>
-                                                                        <?php
-                                                                            }
-                                                                        }
-                                                                        ?>
-                                                                            </div>
+                                                                    <div class="ms-2">
+                                                                        <div class="text-sbold text-16 mt-1"><?php echo $rubricTitle; ?>
                                                                         </div>
-                                                            </div>
+                                                                        <div class="due text-reg text-14 mb-1">
+                                                                            <?php echo $rubricPoints; ?> points
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <hr>
+                                                            <?php endif; ?>
 
-                                                            <!-- Submissions Tab - Disabled -->
-                                                            <div class="tab-pane fade" id="lessons" role="tabpanel" aria-labelledby="lessons-tab">
-                                                                <!-- Empty content - tab is disabled -->
-                                                            </div>
+                                                            <?php
+                                                            if (mysqli_num_rows($profInfoResult) > 0) {
+                                                                while ($prof = mysqli_fetch_assoc($profInfoResult)) {
+
+
+                                                            ?>
+                                                                    <div class="text-sbold text-14 pb-3">Prepared by</div>
+                                                                    <div class="d-flex align-items-center pb-5">
+                                                                        <div class="rounded-circle me-2"
+                                                                            style="width: 50px; height: 50px; background-color: var(--highlight75);">
+                                                                            <img src="../shared/assets/img/assess/prof.png" alt="professor"
+                                                                                class="rounded-circle" style="width:50px;height:50px;">
+                                                                        </div>
+                                                                        <div>
+                                                                            <div class="text-sbold text-14">Prof. <?php echo $prof['firstName'] . " " . $prof['middleName'] . " " . $prof['lastName']; ?></div>
+                                                                    <?php
+                                                                }
+                                                            }
+                                                                    ?>
+                                                                    <?php
+                                                                    if (mysqli_num_rows($selectAssessmentResult) > 0) {
+                                                                        mysqli_data_seek($selectAssessmentResult, 0);
+                                                                        while ($createdAt = mysqli_fetch_assoc($selectAssessmentResult)) {
+                                                                    ?>
+                                                                            <div class="text-med text-12"><?php echo $createdAt['creationDate']; ?></div>
+                                                                    <?php
+                                                                        }
+                                                                    }
+                                                                    ?>
+                                                                        </div>
+                                                                    </div>
                                                         </div>
-                                                <?php
-                                                    }
+
+                                                        <!-- Submissions Tab - Disabled -->
+                                                        <div class="tab-pane fade" id="lessons" role="tabpanel" aria-labelledby="lessons-tab">
+                                                            <!-- Empty content - tab is disabled -->
+                                                        </div>
+                                                    </div>
+                                            <?php
                                                 }
-                                                ?>
-                                            </div>
+                                            }
+                                            ?>
                                         </div>
+                                    </div>
 
 
-                                        <div class="col-12 col-lg-4">
-                                            <div class="cardSticky position-sticky" style="top: 20px;">
-                                                <div class="p-2">
-                                                    <div class="row align-items-center justify-content-center mb-3">
-                                                        <div class="col-auto">
-                                                            <div class="chart-container"
-                                                                style="width: 100px; height: 100px;">
-                                                                <canvas id="taskChart" width="100" height="100"></canvas>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-auto">
-                                                            <!-- Submission Stats -->
-                                                            <div class="submission-stats">
-                                                                <div class="text-reg text-14 mb-1"><span
-                                                                        class="stat-value"><?php echo $submitted['submittedTodo']; ?></span> submitted</div>
-                                                                <div class="text-reg text-14 mb-1"><span
-                                                                        class="stat-value"><?php echo $pending['pending']; ?></span> <?php echo $statusText ?></div>
-                                                                <div class="text-reg text-14 mb-1"><span
-                                                                        class="stat-value"><?php echo $graded['graded']; ?></span>
-                                                                    graded</div>
-                                                            </div>
+                                    <div class="col-12 col-lg-4">
+                                        <div class="cardSticky position-sticky" style="top: 20px;">
+                                            <div class="p-2">
+                                                <div class="row align-items-center justify-content-center mb-3">
+                                                    <div class="col-auto">
+                                                        <div class="chart-container"
+                                                            style="width: 100px; height: 100px;">
+                                                            <canvas id="taskChart" width="100" height="100"></canvas>
                                                         </div>
                                                     </div>
-
-                                                    <div class="d-flex justify-content-center pt-3">
-                                                        <?php if ($submissionID != null) { ?><a class="text-decoration-none" href="<?php echo ($rubricID == null) ? 'grading-sheet.php?submissionID=' . $submissionID : 'grading-sheet-rubrics.php?submissionID=' . $submissionID; ?>"><?php } ?>
-                                                            <?php if ($submissionID == null) { ?><div title="No submissions in this assessment yet"><?php } ?>
-                                                                <button class="btn btn-action" <?php echo ($submissionID == null) ? 'disabled' : '' ?>>
-                                                                    <img src="../shared/assets/img/assess/assess.png"
-                                                                        alt="Assess Icon"
-                                                                        style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
-                                                                    Sheet
-                                                                </button>
-                                                                <?php if ($submissionID == null) { ?>
-                                                                </div><?php } ?>
-                                                            <?php if ($submissionID != null) { ?></a><?php } ?>
+                                                    <div class="col-auto">
+                                                        <!-- Submission Stats -->
+                                                        <div class="submission-stats">
+                                                            <div class="text-reg text-14 mb-1"><span
+                                                                    class="stat-value"><?php echo $submitted['submittedTodo']; ?></span> submitted</div>
+                                                            <div class="text-reg text-14 mb-1"><span
+                                                                    class="stat-value"><?php echo $pending['pending']; ?></span> <?php echo $statusText ?></div>
+                                                            <div class="text-reg text-14 mb-1"><span
+                                                                    class="stat-value"><?php echo $graded['graded']; ?></span>
+                                                                graded</div>
+                                                        </div>
                                                     </div>
+                                                </div>
+
+                                                <div class="d-flex justify-content-center pt-3">
+                                                    <?php if ($submissionID != null) { ?><a class="text-decoration-none" href="<?php echo ($rubricID == null) ? 'grading-sheet.php?submissionID=' . $submissionID : 'grading-sheet-rubrics.php?submissionID=' . $submissionID; ?>"><?php } ?>
+                                                        <?php if ($submissionID == null) { ?><div title="No submissions in this assessment yet"><?php } ?>
+                                                            <button class="btn btn-action" <?php echo ($submissionID == null) ? 'disabled' : '' ?>>
+                                                                <img src="../shared/assets/img/assess/assess.png"
+                                                                    alt="Assess Icon"
+                                                                    style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
+                                                                Sheet
+                                                            </button>
+                                                            <?php if ($submissionID == null) { ?>
+                                                            </div><?php } ?>
+                                                        <?php if ($submissionID != null) { ?></a><?php } ?>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div> <!-- Close content-scroll-container -->
+                        </div>
+                        <!-- Close content-scroll-container -->
                     </div>
                 </div>
             </div>
