@@ -304,18 +304,14 @@ $ungradedCount = mysqli_fetch_assoc($ungradedResult)['ungradedCount'] ?? 0;
                                                         </form>
 
                                                         <?php
-                                                        // Determine if the Return All button should be disabled
-                                                        $buttonDisabled = false;
-
-                                                        if ($currentDate < $deadline && $ungradedCount > 0) {
-                                                            $buttonDisabled = true;
-                                                        } elseif ($currentDate < $deadline && $ungradedCount == 0) {
-                                                            $buttonDisabled = false;
-                                                        } elseif ($currentDate >= $deadline && $ungradedCount > 0) {
-                                                            $buttonDisabled = true;
+                                                        if ($currentDate < $deadline) {
+                                                            // Before deadline
+                                                            $buttonDisabled = ($ungradedCount > 0);
                                                         } else {
+                                                            // After deadline 
                                                             $buttonDisabled = false;
                                                         }
+
                                                         ?>
 
                                                         <!-- Return All -->
