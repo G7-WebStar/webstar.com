@@ -159,21 +159,24 @@ if (isset($_POST['save_lesson'])) {
                     $fileError = $_FILES['materials']['error'][$key];
 
                     if ($fileError === UPLOAD_ERR_OK) {
-                        $originalName = basename($fileName); // Keep original name
+
+                        // Correct: Use the uploaded filename
+                        $originalName = basename($fileName);
+
+                        // Sanitize for safe storage name
                         $safeOriginalName = str_replace([" ", ","], "_", $originalName);
 
-                        // Add date & time to generate unique fileTitle
-                        $dateTimePrefix = date('Ymd_His'); // e.g., 20251120_153045
-                        $fileTitle = $dateTimePrefix . '_' . $safeOriginalName;
+                        // Generate a unique stored filename
+                        $fileTitle = date('Ymd_His') . '_' . $safeOriginalName;
 
                         $targetPath = $uploadDir . $fileTitle;
 
                         if (move_uploaded_file($tmpName, $targetPath)) {
-                            // Insert both original and stored title into the database
                             $insertFile = "INSERT INTO files 
                             (courseID, userID, lessonID, fileAttachment, fileTitle, fileLink) 
                             VALUES 
-                            ('$selectedCourseID', '$userID', '$lessonID', '$originalName', '$fileTitle', '')";
+                            ('$selectedCourseID', '$userID', '$lessonID', '$fileTitle', '$originalName', '')";
+
                             executeQuery($insertFile);
                         }
                     }

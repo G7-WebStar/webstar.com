@@ -7,6 +7,15 @@ include('../shared/assets/database/connect.php');
 date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
 
+$toastMessage = '';
+$toastType = '';
+
+if (isset($_SESSION['toast'])) {
+    $toastMessage = $_SESSION['toast']['message'];
+    $toastType = $_SESSION['toast']['type'];
+    unset($_SESSION['toast']);
+}
+
 // --- Google Link Processor ---
 function processGoogleLink($link)
 {
@@ -160,25 +169,35 @@ if (isset($_POST['saveAssignment'])) {
         }
 
         // --- Handle uploaded files ---
-        if ($uploadedFiles) {
+        if (!empty($_FILES['materials']['name'][0])) {
             $uploadDir = __DIR__ . "/../shared/assets/files/";
-            if (!is_dir($uploadDir))
+            if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0777, true);
+            }
 
             foreach ($_FILES['materials']['name'] as $key => $fileName) {
                 $tmpName = $_FILES['materials']['tmp_name'][$key];
                 $fileError = $_FILES['materials']['error'][$key];
 
                 if ($fileError === UPLOAD_ERR_OK) {
-                    $safeName = str_replace(" ", "_", basename($fileName));
-                    $targetPath = $uploadDir . $safeName;
+
+                    // Original user filename (display)
+                    $fileTitle = str_replace([" ", ","], "_", basename($fileName));
+
+                    // Stored filename on server (unique)
+                    $fileAttachment = date('Ymd_His') . '_' . $fileTitle;
+
+                    // Corrected: single $
+                    $targetPath = $uploadDir . $fileAttachment;
 
                     if (move_uploaded_file($tmpName, $targetPath)) {
-                        $insertFile = "INSERT INTO files 
-                            (courseID, userID, assignmentID, fileAttachment, fileLink) 
-                            VALUES 
-                            ('$selectedCourseID', '$userID', '$assignmentID', '$safeName', '')";
-                        executeQuery($insertFile);
+
+                        executeQuery("
+                    INSERT INTO files 
+                    (courseID, userID, assignmentID, fileAttachment, fileTitle, fileLink) 
+                    VALUES 
+                    ('$selectedCourseID', '$userID', '$assignmentID', '$fileAttachment', '$fileTitle', '')
+                ");
                     }
                 }
             }
@@ -673,6 +692,11 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
 
+                    <div id="toastContainer"
+                        class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+                        style="z-index: 1100;">
+                    </div>
+
                     <!-- Navbar (mobile) -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
@@ -762,6 +786,10 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                     <div class="row g-3 m-0 p-0">
                                         <div class="row g-3 mt-4 m-0 p-0">
                                             <!-- Deadline -->
+                                            <?php
+                                            $currentDateTime = date('Y-m-d\TH:i'); // Now including time
+                                            ?>
+
                                             <div class="col-md-6 m-0 p-0 mb-3 mb-md-0">
                                                 <label class="form-label text-med text-16">
                                                     Deadline *
@@ -771,7 +799,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                         class="form-control textbox text-reg text-16 me-0 me-md-2"
                                                         name="deadline"
                                                         value="<?php echo isset($mainData['deadline']) ? date('Y-m-d\TH:i', strtotime($mainData['deadline'])) : ''; ?>"
-                                                        required>
+                                                        min="<?php echo $currentDateTime; ?>" required>
                                                 </div>
                                             </div>
 
@@ -782,9 +810,9 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                 </label>
                                                 <input type="number" id="rubricPointsInput"
                                                     class="form-control textbox text-reg text-16" name="points"
-                                                    placeholder="Ungraded if left blank"
-                                                    value="<?php echo isset($mainData['assignmentPoints']) ? htmlspecialchars($mainData['assignmentPoints']) : ''; ?>" />
-
+                                                    placeholder="Enter points earned"
+                                                    value="<?php echo isset($mainData['assignmentPoints']) ? htmlspecialchars($mainData['assignmentPoints']) : ''; ?>"
+                                                    min="1" required />
                                             </div>
                                         </div>
 
@@ -798,8 +826,6 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                 Stop accepting submissions after the deadline.
                                             </label>
                                         </div>
-
-
                                     </div>
 
                                     <!-- Learning Materials -->
@@ -1276,9 +1302,39 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
         const form = document.querySelector('#assignTaskForm'); // use your form ID
         form.addEventListener('submit', function (e) {
             const taskInput = document.querySelector('#task');
-
-            // Get plain text from Quill
             let text = quill.getText().trim();
+
+            // Validation
+            let valid = true;
+            let errorMessages = [];
+
+            // Validate at least one course selected (only in NEW mode)
+            let checkboxes = form.querySelectorAll(".course-checkbox");
+            let checked = Array.from(checkboxes).some(cb => cb.checked);
+            if (!checked && !window.location.search.includes("edit")) {
+                valid = false;
+                errorMessages.push("Please select at least one course before submitting.");
+            }
+
+            if (!valid) {
+                e.preventDefault();
+
+                const container = document.getElementById("toastContainer");
+                container.innerHTML = "";
+
+                errorMessages.forEach(msg => {
+                    const alert = document.createElement("div");
+                    alert.className = "alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 alert-danger";
+                    alert.role = "alert";
+                    alert.innerHTML = `
+                        <i class="bi bi-x-circle-fill fs-6"></i>
+                        <span>${msg}</span>
+                        `;
+                    container.appendChild(alert);
+                    setTimeout(() => alert.remove(), 3000);
+                });
+
+            }
 
             // Convert Quill HTML to plain text with bullets/line breaks
             let html = quill.root.innerHTML;
@@ -1297,16 +1353,6 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                 return false;
             } else {
                 taskInput.setCustomValidity('');
-            }
-        });
-
-        // Ensure at least one course is selected
-        document.querySelector("form").addEventListener("submit", function (e) {
-            let checkboxes = document.querySelectorAll(".course-checkbox");
-            let checked = Array.from(checkboxes).some(cb => cb.checked);
-            if (!checked) {
-                e.preventDefault();
-                alert("Please select at least one course before submitting.");
             }
         });
 
@@ -1332,14 +1378,42 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                         const linkValue = linkInput.value.trim();
                         if (!linkValue) return;
 
+                        // Validation
+                        let valid = true;
+                        let errorMessages = [];
+
                         // Check total attachments limit
                         const totalAttachments = container.querySelectorAll('.col-12').length;
                         if (totalAttachments >= 10) {
-                            alert("You can only add up to 10 files or links total.");
+                            valid = false;
+                            errorMessages.push("You can only add up to 10 files or links total.");
+                        }
+
+                        if (!valid) {
+                            const toastContainer = document.getElementById("toastContainer");
+                            toastContainer.innerHTML = "";
+
+                            errorMessages.forEach(msg => {
+                                const alert = document.createElement("div");
+                                alert.className = "alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 alert-danger";
+                                alert.role = "alert";
+                                alert.innerHTML = `
+                                    <i class="bi bi-x-circle-fill fs-6"></i>
+                                    <span>${msg}</span>
+                                `;
+                                toastContainer.appendChild(alert);
+                                setTimeout(() => alert.remove(), 3000);
+                            });
+
                             return;
                         }
 
                         // Get domain and favicon
+                        function truncate(text, maxLength = 30) {
+                            if (!text) return '';
+                            return text.length > maxLength ? text.slice(0, maxLength - 1) + '…' : text;
+                        }
+
                         const urlObj = new URL(linkValue);
                         const domain = urlObj.hostname;
                         const faviconURL = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
@@ -1348,33 +1422,29 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                         let displayTitle = "Loading...";
 
                         const previewHTML = `
-                    <div class="col-12 my-1" data-id="${uniqueID}">
-                        <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
-                            <div class="d-flex w-100 align-items-center justify-content-between">
-                                <div class="d-flex align-items-center flex-grow-1">
-                                    <div class="mx-3 d-flex align-items-center">
-                                        <img src="${faviconURL}" alt="${domain} Icon" 
-                                            onerror="this.onerror=null;this.src='../shared/assets/img/web.png';" 
-                                            style="width: 30px; height: 30px;">
-                                    </div>
-                                    <div>
-                                        <div id="title-${uniqueID}" class="text-sbold text-16" style="line-height: 1.5;">${displayTitle}</div>
-                                        <div class="text-reg text-12 text-break" style="line-height: 1.5;">
-                                            <a href="${linkValue}" target="_blank">${linkValue}</a>
+                        <div class="col-12 my-1" data-id="${uniqueID}">
+                            <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
+                                <div class="d-flex w-100 align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center flex-grow-1">
+                                        <div class="mx-3 d-flex align-items-center">
+                                            <img src="${faviconURL}" alt="${domain} Icon" 
+                                                onerror="this.onerror=null;this.src='../shared/assets/img/web.png';" 
+                                                style="width: 30px; height: 30px;">
+                                        </div>
+                                        <div>
+                                            <div id="title-${uniqueID}" class="text-sbold text-16" style="line-height: 1.5;">${displayTitle}</div>
+                                            <div class="text-reg text-12 text-break" style="line-height: 1.5;">
+                                                <a href="${linkValue}" target="_blank">${truncate(linkValue, 50)}</a>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">
-                                    <span
-                                    class="material-symbols-outlined">close</span>
+                                    <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <input type="hidden" name="links[]" value="${linkValue}" class="link-hidden">
-                    </div>
-                `;
-
-
+                            <input type="hidden" name="links[]" value="${linkValue}" class="link-hidden">
+                        </div>`;
                         container.insertAdjacentHTML('beforeend', previewHTML);
 
                         // Fetch page title
@@ -1382,11 +1452,13 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                             .then(res => res.json())
                             .then(data => {
                                 const titleEl = document.getElementById(`title-${uniqueID}`);
-                                if (titleEl) titleEl.textContent = data.title || linkValue;
-                            }).catch(() => {
+                                if (titleEl) titleEl.textContent = truncate(data.title || linkValue, 50);
+                            })
+                            .catch(() => {
                                 const titleEl = document.getElementById(`title-${uniqueID}`);
-                                if (titleEl) titleEl.textContent = linkValue.split('/').pop() || "Link";
+                                if (titleEl) titleEl.textContent = truncate(linkValue.split('/').pop() || "Link", 50);
                             });
+
 
                         // Delete handler
                         container.querySelectorAll('.delete-file').forEach((btn) => {
@@ -1405,46 +1477,86 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
 
             // File input change
             fileInput.addEventListener('change', function (event) {
-                // Merge new selections with existing files
+                const maxFileSizeMB = 10; // max size per file
+                const maxAttachments = 10; // max total files/links
+                const toastContainer = document.getElementById("toastContainer");
+
                 let dt = new DataTransfer();
                 Array.from(allFiles).forEach(f => dt.items.add(f));
-                Array.from(event.target.files).forEach(f => dt.items.add(f));
-                fileInput.files = dt.files;
-                allFiles = Array.from(fileInput.files); // update allFiles list
 
-                // Remove only file previews, keep links
+                let errorMessages = [];
+                let validFiles = [];
+
+                // Validate new files
+                Array.from(event.target.files).forEach(f => {
+                    const fileSizeMB = f.size / (1024 * 1024);
+                    if (fileSizeMB > maxFileSizeMB) {
+                        errorMessages.push(`File "${f.name}" exceeds 10 MB and was not added.`);
+                    } else {
+                        validFiles.push(f);
+                    }
+                });
+
+                // Check total attachments limit (existing + valid new files + existing links)
+                const totalExisting = container.querySelectorAll('.col-12').length;
+                if (totalExisting + validFiles.length > maxAttachments) {
+                    errorMessages.push("You can only add up to 10 files or links total.");
+                    // Trim validFiles to fit the limit
+                    validFiles = validFiles.slice(0, maxAttachments - totalExisting);
+                }
+
+                if (errorMessages.length > 0) {
+                    toastContainer.innerHTML = "";
+                    errorMessages.forEach(msg => {
+                        const alert = document.createElement("div");
+                        alert.className = "alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 alert-danger";
+                        alert.role = "alert";
+                        alert.innerHTML = `<i class="bi bi-x-circle-fill fs-6"></i><span>${msg}</span>`;
+                        toastContainer.appendChild(alert);
+                        setTimeout(() => alert.remove(), 5000);
+                    });
+                }
+
+                // Add only valid files
+                validFiles.forEach(f => dt.items.add(f));
+                fileInput.files = dt.files;
+                allFiles = Array.from(fileInput.files);
+
+                // 🔹 Remove only file previews, keep links
                 container.querySelectorAll('.file-preview').forEach(el => el.remove());
 
-                // Rebuild file previews
+                function truncate(text, maxLength = 50) {
+                    return text.length > maxLength ? text.slice(0, maxLength - 1) + '…' : text;
+                }
+
                 allFiles.forEach((file, index) => {
                     const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
                     const ext = file.name.split('.').pop().toUpperCase();
+                    const truncatedName = truncate(file.name, 50);
+
                     const fileHTML = `
-                <div class="col-12 my-1 file-preview">
-                    <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
-                        <div class="d-flex w-100 align-items-center justify-content-between">
-                            <div class="d-flex align-items-center flex-grow-1">
-                                <div class="mx-3 d-flex align-items-center">
-                                    <span class="material-symbols-rounded">
-                                        description
-                                    </span>
+                    <div class="col-12 my-1 file-preview">
+                        <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
+                            <div class="d-flex w-100 align-items-center justify-content-between">
+                                <div class="d-flex align-items-center flex-grow-1">
+                                    <div class="mx-3 d-flex align-items-center">
+                                        <span class="material-symbols-rounded">description</span>
+                                    </div>
+                                    <div>
+                                        <div class="text-sbold text-16">${truncatedName}</div>
+                                        <div class="text-reg text-12">${ext} · ${fileSizeMB} MB</div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <div class="text-sbold text-16" style="line-height: 1.5;">${file.name}</div>
-                                    <div class="text-reg text-12 " style="line-height: 1.5;">${ext} · ${fileSizeMB} MB</div>
+                                <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;" data-index="${index}">
+                                    <span class="material-symbols-outlined">close</span>
                                 </div>
-                            </div>
-                            <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;" data-index="${index}">
-                                <span
-                                    class="material-symbols-outlined">close</span>
                             </div>
                         </div>
-                    </div>
-                </div>`;
+                    </div>`;
                     container.insertAdjacentHTML('beforeend', fileHTML);
                 });
 
-                // Allow deletion of specific files
+                // Enable deletion
                 container.querySelectorAll('.delete-file').forEach((btn) => {
                     btn.addEventListener('click', function () {
                         const index = parseInt(this.dataset.index);

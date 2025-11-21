@@ -158,21 +158,23 @@ if (isset($_POST['save_announcement'])) {
                 $fileError = $_FILES['materials']['error'][$key];
 
                 if ($fileError === UPLOAD_ERR_OK) {
-                    $originalName = basename($fileName); // Keep original filename
-                    $safeOriginalName = str_replace([" ", ","], "_", $originalName);
 
-                    // Add date & time to create a unique fileTitle
-                    $dateTimePrefix = date('Ymd_His'); // e.g., 20251120_153045
-                    $fileTitle = $dateTimePrefix . '_' . $safeOriginalName;
+                    // Correct: Use the actual filename
+                    $safeOriginalName = str_replace([" ", ","], "_", basename($fileName));
 
-                    $targetPath = $uploadDir . $fileTitle;
+                    // Generate a unique file name
+                    $fileAttachment = date('Ymd_His') . '_' . $safeOriginalName;
+
+                    $targetPath = $uploadDir . $fileAttachment;
 
                     if (move_uploaded_file($tmpName, $targetPath)) {
-                        // Insert both original and timestamped names into DB
+
+                        // Save file to database with the correctly renamed file name
                         $insertFile = "INSERT INTO files 
-                    (courseID, userID, announcementID, fileAttachment, fileTitle, fileLink) 
-                    VALUES 
-                    ('$selectedCourseID', '$userID', '$announcementID', '$originalName', '$fileTitle', '')";
+                        (courseID, userID, announcementID, fileAttachment, fileTitle, fileLink) 
+                        VALUES 
+                        ('$selectedCourseID', '$userID', '$announcementID', '$fileAttachment', '$safeOriginalName', '')";
+
                         executeQuery($insertFile);
                     }
                 }

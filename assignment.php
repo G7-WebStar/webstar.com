@@ -338,31 +338,39 @@ if (
 
         foreach ($_FILES['fileAttachment']['name'] as $key => $fileName) {
             $fileTmp = $_FILES['fileAttachment']['tmp_name'][$key];
-            $originalName = sanitizeFileName($fileName);
+            $fileError = $_FILES['fileAttachment']['error'][$key];
 
-            // Generate unique filename (timestamp + original)
-            $timestamp = date('Ymd_His');
-            $fileTitle = $timestamp . "_" . $originalName;
+            if ($fileError === UPLOAD_ERR_OK) {
 
-            $targetFilePath = $targetDir . $fileTitle;
+                // Correct: Use original filename from upload
+                $originalName = sanitizeFileName(basename($fileName));
 
-            // Prevent duplicate original name stored under same submission
-            $checkFile = executeQuery("
-            SELECT 1 FROM files
-            WHERE submissionID='$submissionID'
-              AND userID='$userID'
-              AND fileAttachment='$originalName'
-            LIMIT 1
-        ");
+                // Make safe for server-side storage → timestamped name
+                $fileTitle = date('Ymd_His') . "_" . $originalName;
 
-            if (mysqli_num_rows($checkFile) == 0 && move_uploaded_file($fileTmp, $targetFilePath)) {
-                executeQuery("
-                INSERT INTO files (courseID, userID, submissionID, fileAttachment, fileTitle)
-                VALUES ('$courseID', '$userID', '$submissionID', '$originalName', '$fileTitle')
+                $targetFilePath = $targetDir . $fileTitle;
+
+                // Check if this original filename is already submitted (avoid duplicates)
+                $checkFile = executeQuery("
+                SELECT 1 FROM files
+                WHERE submissionID='$submissionID'
+                AND userID='$userID'
+                AND fileTitle='$originalName'
+                LIMIT 1
             ");
+
+                if (mysqli_num_rows($checkFile) == 0 && move_uploaded_file($fileTmp, $targetFilePath)) {
+                    executeQuery("
+                    INSERT INTO files 
+                    (courseID, userID, submissionID, fileAttachment, fileTitle, fileLink)
+                    VALUES 
+                    ('$courseID', '$userID', '$submissionID', '$fileTitle', '$originalName', '')
+                ");
+                }
             }
         }
     }
+
 
     // --- Handle link uploads ---
     if (isset($_POST['links']) && !empty($_POST['links'])) {
@@ -395,10 +403,10 @@ $files = $links = [];
 
 if ($submissionID) {
     $filesResult = executeQuery("
-        SELECT fileAttachment FROM files WHERE submissionID='$submissionID' AND fileAttachment IS NOT NULL
+        SELECT fileTitle FROM files WHERE submissionID='$submissionID' AND fileTitle IS NOT NULL
     ");
     while ($row = mysqli_fetch_assoc($filesResult))
-        $files[] = $row['fileAttachment'];
+        $files[] = $row['fileTitle'];
 
     $linksResult = executeQuery("
         SELECT fileLink, fileTitle FROM files WHERE submissionID='$submissionID' AND fileLink IS NOT NULL
@@ -808,20 +816,27 @@ $taskFilesArray = [];
 $taskLinksArray = [];
 
 $taskFilesQuery = "
-    SELECT fileAttachment, fileLink, fileTitle 
+    SELECT fileAttachment, fileTitle, fileLink
     FROM files 
     WHERE assignmentID = $assignmentID
 ";
 $taskFilesResult = executeQuery($taskFilesQuery);
 
 while ($file = mysqli_fetch_assoc($taskFilesResult)) {
+
+    // If there is a file attached
     if (!empty($file['fileAttachment'])) {
-        $taskFilesArray[] = $file['fileAttachment'];
+        $taskFilesArray[] = [
+            'attachment' => $file['fileAttachment'],
+            'title' => $file['fileTitle']
+        ];
     }
+
+    // If there is a link stored
     if (!empty($file['fileLink'])) {
         $taskLinksArray[] = [
             'link' => $file['fileLink'],
-            'title' => $file['fileTitle'] ?? $file['fileLink']
+            'title' => $file['fileTitle']
         ];
     }
 }
@@ -832,15 +847,15 @@ $linksArray = [];
 
 if ($submissionID) {
     $filesQuery = "
-        SELECT fileAttachment, fileLink, fileTitle 
+        SELECT fileLink, fileTitle 
         FROM files 
         WHERE submissionID = $submissionID
     ";
     $filesResult = executeQuery($filesQuery);
 
     while ($file = mysqli_fetch_assoc($filesResult)) {
-        if (!empty($file['fileAttachment'])) {
-            $attachmentsArray[] = $file['fileAttachment'];
+        if (!empty($file['fileTitle'])) {
+            $attachmentsArray[] = $file['fileTitle'];
         }
         if (!empty($file['fileLink'])) {
             $linksArray[] = [
@@ -952,14 +967,15 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                             </div>
 
                                             <!-- RIGHT: SCORE -->
-                                            <div class="text-end mt-3">
-                                                <div
-                                                    class="text-sbold text-25 text-center justify-content-center align-items-center">
-                                                    <?php echo $score !== null ? $score : '-'; ?>
-                                                    <span class="text-muted">/<?php echo $totalPoints; ?></span>
+                                            <?php if ($score !== null): ?>
+                                                <div class="text-end mt-3">
+                                                    <div
+                                                        class="text-sbold text-25 text-center justify-content-center align-items-center">
+                                                        <?php echo $score; ?>
+                                                        <span class="text-muted">/<?php echo $totalPoints; ?></span>
+                                                    </div>
                                                 </div>
-                                            </div>
-
+                                            <?php endif; ?>
                                         </div>
 
                                     </div>
@@ -998,13 +1014,14 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                     </div>
 
                                     <!-- Score below badges -->
-                                    <div>
-                                        <div class="score text-sbold text-25">
-                                            <?php echo $score !== null ? $score : '-'; ?>
-                                            <span class="text-muted">/<?php echo $totalPoints; ?></span>
+                                    <?php if ($score !== null): ?>
+                                        <div>
+                                            <div class="score text-sbold text-25">
+                                                <?php echo $score; ?>
+                                                <span class="text-muted">/<?php echo $totalPoints; ?></span>
+                                            </div>
                                         </div>
-                                    </div>
-
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -1022,39 +1039,43 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                         <div class="text-sbold text-14 mt-4">Task Materials</div>
 
                                         <?php foreach ($taskFilesArray as $file):
-                                            $filePath = "shared/assets/files/" . $file;
-                                            $fileExt = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
+                                            $filePath = "shared/assets/files/" . $file['attachment']; // Correct key
+                                            $fileExt = strtoupper(pathinfo($file['attachment'], PATHINFO_EXTENSION));
                                             $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
                                             $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
-                                            $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
                                             ?>
-                                            <div class="rubricCard my-3 py-1 d-flex align-items-start justify-content-between"
+                                            <div class="rubricCard my-3 py-1 d-flex align-items-start justify-content-between cardFile"
+                                                data-type="file" data-file="<?php echo $file['attachment']; ?>"
+                                                data-title="<?php echo htmlspecialchars($file['title'], ENT_QUOTES); ?>"
                                                 style="max-width:100%; min-width:310px; cursor:pointer;"
-                                                onclick="openViewerModal('<?php echo $file ?>', '<?php echo $filePath ?>')">
+                                                onclick="openViewerModal('<?php echo $file['attachment'] ?>', '<?php echo $filePath ?>')">
+
                                                 <div class="d-flex align-items-start">
-                                                    <span class="material-symbols-outlined p-2 pe-2 mt-1 ms-1"
+                                                    <span class="material-symbols-rounded p-2 pe-2 mt-1 ms-1"
                                                         style="font-variation-settings:'FILL' 1;">draft</span>
+
                                                     <div class="ms-2">
-                                                        <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
+                                                        <!-- Title shows here -->
+                                                        <div class="text-sbold text-16 mt-1"><?php echo $file['title']; ?></div>
                                                         <div class="due text-reg text-14 mb-1"><?php echo $fileExt ?> ·
-                                                            <?php echo $fileSizeMB ?>
-                                                        </div>
+                                                            <?php echo $fileSizeMB ?></div>
                                                     </div>
                                                 </div>
-                                                <a href="<?php echo $filePath ?>" download="<?php echo $file ?>"
+
+                                                <a href="<?php echo $filePath ?>" download="<?php echo $file['attachment'] ?>"
                                                     class="text-dark d-flex align-items-center" style="text-decoration: none;">
-                                                    <span class="material-symbols-outlined p-2 pe-2 mt-1 me-3"
+                                                    <span class="material-symbols-rounded p-2 pe-2 mt-1 me-3"
                                                         style="font-variation-settings:'FILL' 1;">download_2</span>
                                                 </a>
+
                                             </div>
                                         <?php endforeach; ?>
-
 
                                         <?php foreach ($taskLinksArray as $item): ?>
                                             <div class="rubricCard my-3 py-1 w-lg-25 d-flex align-items-start"
                                                 style="max-width:100%; min-width:310px; cursor:pointer;"
                                                 onclick="openLinkViewerModal('<?php echo addslashes($item['title']) ?>', '<?php echo $item['link'] ?>')">
-                                                <span class="material-symbols-outlined p-2 pe-2 mt-1"
+                                                <span class="material-symbols-rounded p-2 pe-2 mt-1"
                                                     style="font-variation-settings:'FILL' 1;">link</span>
                                                 <div class="ms-2" style="flex: 1 1 0; min-width: 0;">
                                                     <div class="text-sbold text-16 mt-1"><?php echo $item['title'] ?></div>
@@ -1075,7 +1096,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                             style="max-width:100%; min-width:310px; cursor:pointer;" data-bs-toggle="modal"
                                             data-bs-target="#rubricModal">
 
-                                            <span class="material-symbols-outlined ps-3 pe-2 py-3"
+                                            <span class="material-symbols-rounded ps-3 pe-2 py-3"
                                                 style="font-variation-settings:'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;">
                                                 rate_review
                                             </span>
@@ -1140,7 +1161,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                             data-type="file">
                                                             <div class="d-flex align-items-center"
                                                                 style="flex: 1 1 0; min-width: 0;">
-                                                                <span class="material-symbols-outlined p-2 pe-2"
+                                                                <span class="material-symbols-rounded p-2 pe-2"
                                                                     style="font-variation-settings:'FILL' 1;">draft</span>
                                                                 <a href="shared/assets/files/<?= rawurlencode($file) ?>"
                                                                     target="_blank"
@@ -1154,7 +1175,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                                     class="border-0 bg-transparent mt-2 remove-existing-file"
                                                                     data-filename="<?= addslashes($file) ?>"
                                                                     aria-label="Remove">
-                                                                    <span class="material-symbols-outlined">close</span>
+                                                                    <span class="material-symbols-rounded">close</span>
                                                                 </button>
                                                             <?php endif; ?>
                                                         </div>
@@ -1168,7 +1189,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                             data-type="link" data-link="<?= $link['link'] ?>">
                                                             <div class="d-flex align-items-center"
                                                                 style="flex: 1 1 0; min-width: 0;">
-                                                                <span class="material-symbols-outlined p-2 pe-2"
+                                                                <span class="material-symbols-rounded p-2 pe-2"
                                                                     style="font-variation-settings:'FILL' 1;">link</span>
                                                                 <a href="<?= $link['link'] ?>" target="_blank"
                                                                     class="ms-2 text-decoration-none text-dark"
@@ -1180,7 +1201,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                                 <button type="button"
                                                                     class="border-0 bg-transparent mt-2 remove-existing-file"
                                                                     data-link="<?= $link['link'] ?>" aria-label="Remove">
-                                                                    <span class="material-symbols-outlined">close</span>
+                                                                    <span class="material-symbols-rounded">close</span>
                                                                 </button>
                                                             <?php endif; ?>
                                                         </div>
@@ -1284,7 +1305,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                             style="border: 1px solid var(--black);"
                                                             onclick="document.getElementById('fileUpload').click();">
                                                             <div class="d-flex align-items-center gap-1">
-                                                                <span class="material-symbols-outlined"
+                                                                <span class="material-symbols-rounded"
                                                                     style="font-size:20px">upload</span>
                                                                 <span>File</span>
                                                             </div>
@@ -1330,7 +1351,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                             class="btn text-reg text-12 rounded-4 d-flex justify-content-center align-items-center"
                                             style="background-color: var(--pureWhite);" data-bs-toggle="modal"
                                             data-bs-target="#guidelinesModal">
-                                            <span class="material-symbols-outlined me-1"
+                                            <span class="material-symbols-rounded me-1"
                                                 style="font-variation-settings:'FILL' 1;">info</span>
                                             View attachment guidelines
                                         </button>
@@ -1523,7 +1544,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                         <a id="modalDownloadBtn" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
                             style="background-color: var(--primaryColor); border: 1px solid var(--black);" download>
                             <span class="" style="display:flex;align-items:center;gap:4px;">
-                                <span class="material-symbols-outlined"
+                                <span class="material-symbols-rounded"
                                     style="font-variation-settings:'FILL' 1; font-size:18px;">download_2</span>
                                 Download
                             </span>
@@ -1550,7 +1571,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                             style="background-color: var(--primaryColor); border: 1px solid var(--black);"
                             target="_blank">
                             <span class="" style="display:flex;align-items:center;gap:4px;">
-                                <span class="material-symbols-outlined" style="font-size:18px;">open_in_new</span>
+                                <span class="material-symbols-rounded" style="font-size:18px;">open_in_new</span>
                                 Open
                             </span>
                         </a>
@@ -1900,26 +1921,26 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                             allSelectedFiles.items.add(sanitizedFile);
 
                             const cardHTML = `
-            <div class="cardFile text-sbold text-16 my-2 d-flex align-items-center justify-content-between"
-                data-size="${file.size}" data-type="file" data-name="${sanitizedName}">
-                <div class="d-flex align-items-center" style="flex: 1 1 0; min-width: 0;">
-                    <span class="material-symbols-outlined p-2 pe-2"
-                        style="font-variation-settings:'FILL' 1">draft</span>
+                            <div class="cardFile text-sbold text-16 my-2 d-flex align-items-center justify-content-between"
+                                data-size="${file.size}" data-type="file" data-name="${sanitizedName}">
+                                <div class="d-flex align-items-center" style="flex: 1 1 0; min-width: 0;">
+                                    <span class="material-symbols-rounded p-2 pe-2"
+                                        style="font-variation-settings:'FILL' 1">draft</span>
 
-                    <span class="ms-2 text-truncate file-name"
-                        style="flex: 1 1 0; min-width: 0;">
-                        ${sanitizedName}
-                    </span>
-                </div>
-                <button type="button" class="border-0 bg-transparent mt-2 remove-btn">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
-            </div>`;
+                                    <span class="ms-2 text-truncate file-name"
+                                        style="flex: 1 1 0; min-width: 0;">
+                                        ${sanitizedName}
+                                    </span>
+                                </div>
+                                <button type="button" class="border-0 bg-transparent mt-2 remove-btn">
+                                    <span class="material-symbols-rounded">close</span>
+                                </button>
+                            </div>`;
                             workList.insertAdjacentHTML('beforeend', cardHTML);
                         }
                     });
 
-                    fileUpload.files = allSelectedFiles.files; // 🔥 Sync input with updated list
+                    fileUpload.files = allSelectedFiles.files;
 
                     bindFileRemoveButtons();
 
@@ -1973,7 +1994,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                         <div class="cardFile text-sbold text-16 my-2 px-1 d-flex align-items-center justify-content-between"
                             data-link="${linkValue}" data-type="link" style="flex: 1 1 0; min-width: 0;">
                             <div class="d-flex align-items-center" style="flex: 1 1 0; min-width: 0;">
-                                <span class="material-symbols-outlined">link</span>
+                                <span class="material-symbols-rounded">link</span>
                                 <a href="${linkValue}" target="_blank" 
                                 class="ms-2 text-decoration-none text-dark"
                                 style="flex-shrink: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -1981,7 +2002,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                 </a>
                             </div>
                             <button type="button" class="border-0 bg-transparent mt-2 remove-btn">
-                                <span class="material-symbols-outlined">close</span>
+                                <span class="material-symbols-rounded">close</span>
                             </button>
                         </div>
                     `;
