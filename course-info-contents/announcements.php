@@ -28,11 +28,11 @@ if (isset($_POST['announcementID'])) {
     $announcementID = $_POST['announcementID'];
 
     if (isset($_POST['noted'])) {
-        $insertQuery = "INSERT IGNORE INTO announcementNotes (announcementID, userID, notedAt)
+        $insertQuery = "INSERT IGNORE INTO announcementnotes (announcementID, userID, notedAt)
                         VALUES ('$announcementID', '$userID', NOW())";
         executeQuery($insertQuery);
     } else {
-        $deleteQuery = "DELETE FROM announcementNotes 
+        $deleteQuery = "DELETE FROM announcementnotes 
                         WHERE announcementID='$announcementID' AND userID='$userID'";
         executeQuery($deleteQuery);
     }
@@ -72,7 +72,7 @@ $announcementQuery = "
         MAX(CASE WHEN n.userID = '$userID' THEN 1 ELSE 0 END) AS isUserNoted 
     FROM announcements a
     INNER JOIN userinfo u ON a.userID = u.userID
-    LEFT JOIN announcementNotes n ON a.announcementID = n.announcementID 
+    LEFT JOIN announcementnotes n ON a.announcementID = n.announcementID 
     WHERE a.courseID = '$courseID'
     GROUP BY a.announcementID
     ORDER BY $orderBy

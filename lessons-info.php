@@ -11,7 +11,7 @@ $lessonID = intval($_GET['lessonID']);
 
 $lessonInfoQuery = "
     SELECT * FROM users
-    LEFT JOIN userInfo ON users.userID = userInfo.userID
+    LEFT JOIN userinfo ON users.userID = userinfo.userID
     LEFT JOIN courses ON users.userID = courses.userID
     LEFT JOIN lessons ON courses.courseID = lessons.courseID
     WHERE lessons.lessonID = $lessonID

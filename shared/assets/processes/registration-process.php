@@ -29,9 +29,12 @@ if (isset($_POST['signUpBtn'])) {
     $password = $_POST['password'];
     $confirmPassword = $_POST['confirmPassword'];
 
-    $checkEmailSql = "SELECT * FROM users WHERE email = '$email'";
-    $checkEmailResult = executeQuery($checkEmailSql);
-    // Check if password mismatch
+    // sql injection
+    $stmt = $conn->prepare("SELECT userID FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $checkEmailResult = $stmt->get_result();
+
     if (mysqli_num_rows($checkEmailResult) > 0) {
         $_SESSION['alert'] = 'emailExists';
     } elseif (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{8,}$/', $password)) {

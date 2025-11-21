@@ -7,7 +7,7 @@ include("../shared/assets/processes/prof-session-process.php");
 $assignmentID = intval($_GET['assignmentID']);
 
 $userQuery = "SELECT * FROM users 
-              LEFT JOIN userinfo ON users.userID = userInfo.userID 
+              LEFT JOIN userinfo ON users.userID = userinfo.userID 
               WHERE users.userID = $userID";
 $userResult = executeQuery($userQuery);
 
@@ -16,6 +16,7 @@ $assignmentQuery = "SELECT
                     assessments.assessmentTitle,
                     assessments.deadline,
                     assignments.assignmentDescription,
+                    assessments.createdAt AS assessmentCreatedAt,
                     assignments.assignmentPoints,
                     assignments.rubricID,
                     userinfo.firstName,
@@ -24,7 +25,7 @@ $assignmentQuery = "SELECT
                 FROM courses 
                 INNER JOIN assessments ON courses.courseID = assessments.courseID 
                 INNER JOIN assignments ON assessments.assessmentID = assignments.assessmentID
-                INNER JOIN userinfo ON courses.userID = userInfo.userID 
+                INNER JOIN userinfo ON courses.userID = userinfo.userID 
                 WHERE assignments.assignmentID = $assignmentID";
 
 $assignmentResult = executeQuery($assignmentQuery);
@@ -42,6 +43,7 @@ $profilePic = !empty($assignmentRow['profilePicture'])
 $deadline = $assignmentRow['deadline'];
 $score = $assignmentRow['score'] ?? null;
 $totalPoints = $assignmentRow['assignmentPoints'] ?? 0;
+$displayTime = $assignmentRow['assessmentCreatedAt'];
 $formattedTime = !empty($displayTime) ? date("F j, Y g:i A", strtotime($displayTime)) : "";
 
 $filesQuery = "SELECT * FROM files WHERE assignmentID = '$assignmentID'";
