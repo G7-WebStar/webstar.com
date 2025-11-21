@@ -33,7 +33,7 @@
 }
 
 .add-course-btn:hover {
-    background-color: #fcd86f;
+    background-color: var(--primaryColor)!important;
 }
 
 /* Dynamic Text */

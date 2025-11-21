@@ -810,7 +810,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                 </label>
                                                 <input type="number" id="rubricPointsInput"
                                                     class="form-control textbox text-reg text-16" name="points"
-                                                    placeholder="Enter points earned"
+                                                    placeholder="Enter points to be earned"
                                                     value="<?php echo isset($mainData['assignmentPoints']) ? htmlspecialchars($mainData['assignmentPoints']) : ''; ?>"
                                                     min="1" required />
                                             </div>

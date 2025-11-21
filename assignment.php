@@ -959,7 +959,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                         <div style="display: flex; align-items: center; gap: 12px;">
 
                                             <!-- LEFT: BADGES -->
-                                            <div class="me-2">
+                                            <div class="me-2" style="font-family: var(--text-med)!important;">
                                                 <?php if (!empty($badges)): ?>
                                                     <?php foreach ($badges as $b): ?>
                                                         <img src="shared/assets/img/badge/<?php echo $b['badgeIcon']; ?>"
