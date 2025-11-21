@@ -135,8 +135,6 @@ if (isset($_POST['saveChanges'])) {
 
         $result = executeQuery($updateInfoQuery);
 
-        $result = executeQuery($updateInfoQuery);
-
         if ($result) {
             $profileUpdated = true;
             $toastMessage = 'Profile updated successfully!';

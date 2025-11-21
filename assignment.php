@@ -847,15 +847,18 @@ $linksArray = [];
 
 if ($submissionID) {
     $filesQuery = "
-        SELECT fileLink, fileTitle 
+        SELECT fileAttachment, fileLink, fileTitle 
         FROM files 
         WHERE submissionID = $submissionID
     ";
     $filesResult = executeQuery($filesQuery);
 
     while ($file = mysqli_fetch_assoc($filesResult)) {
-        if (!empty($file['fileTitle'])) {
-            $attachmentsArray[] = $file['fileTitle'];
+        if (!empty($file['fileAttachment'])) {
+            $attachmentsArray[] = [
+                'attachment' => $file['fileAttachment'],
+                'title' => $file['fileTitle'] ?? $file['fileAttachment']
+            ];
         }
         if (!empty($file['fileLink'])) {
             $linksArray[] = [
@@ -865,6 +868,7 @@ if ($submissionID) {
         }
     }
 }
+
 // --- Fetch Badges for this assignment and student ---
 $badges = [];
 
@@ -1058,7 +1062,8 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                         <!-- Title shows here -->
                                                         <div class="text-sbold text-16 mt-1"><?php echo $file['title']; ?></div>
                                                         <div class="due text-reg text-14 mb-1"><?php echo $fileExt ?> ·
-                                                            <?php echo $fileSizeMB ?></div>
+                                                            <?php echo $fileSizeMB ?>
+                                                        </div>
                                                     </div>
                                                 </div>
 
@@ -1163,17 +1168,17 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                                 style="flex: 1 1 0; min-width: 0;">
                                                                 <span class="material-symbols-rounded p-2 pe-2"
                                                                     style="font-variation-settings:'FILL' 1;">draft</span>
-                                                                <a href="shared/assets/files/<?= rawurlencode($file) ?>"
+                                                                <a href="shared/assets/files/<?= rawurlencode($file['attachment']) ?>"
                                                                     target="_blank"
                                                                     class="ms-2 text-decoration-none text-dark"
                                                                     style="flex-shrink: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                                                    <?= $file ?>
+                                                                    <?= htmlspecialchars($file['title'], ENT_QUOTES) ?>
                                                                 </a>
                                                             </div>
                                                             <?php if ($isSubmitted == 0): ?>
                                                                 <button type="button"
                                                                     class="border-0 bg-transparent mt-2 remove-existing-file"
-                                                                    data-filename="<?= addslashes($file) ?>"
+                                                                    data-filename="<?= addslashes($file['attachment']) ?>"
                                                                     aria-label="Remove">
                                                                     <span class="material-symbols-rounded">close</span>
                                                                 </button>

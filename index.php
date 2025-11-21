@@ -90,7 +90,7 @@ $selectAnnouncementsQuery = "SELECT
         ON users.userID = profInfo.userID
     WHERE enrollments.userID = '$userID'
     AND announcements.announcementID NOT IN (
-        SELECT announcementID FROM announcementNotes WHERE userID = '$userID'
+        SELECT announcementID FROM announcementnotes WHERE userID = '$userID'
     );
     ";
 $selectAnnouncementsResult = executeQuery($selectAnnouncementsQuery);
@@ -118,7 +118,8 @@ $selectAssessmentQuery = "SELECT
         ON assessments.assessmentID = tests.assessmentID
     WHERE todo.userID = '$userID' AND todo.status = 'Pending'
     AND (assessments.deadline IS NULL OR assessments.deadline >= CURDATE())
-    GROUP BY assessments.assessmentID DESC
+    GROUP BY assessments.assessmentID
+    ORDER BY assessments.assessmentID DESC
     LIMIT 3;
 ";
 $selectAssessmentResult = executeQuery($selectAssessmentQuery);
@@ -161,6 +162,14 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
         rel="stylesheet" />
 
+
+    <style>
+        @media screen and (max-width: 767px) {
+            .mobile-view {
+                margin-bottom: 80px !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -183,7 +192,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                     <!-- Navbar for mobile -->
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-1 overflow-y-auto  row-padding-top">
+                    <div class="container-fluid py-1 overflow-y-auto  row-padding-top mobile-view">
                         <div class="row">
                             <!-- PUT CONTENT HERE -->
                             <?php
@@ -507,17 +516,46 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                         <?php
                                                         if (mysqli_num_rows($selectLeaderboardResult) > 0) {
                                                             while ($leaderboards = mysqli_fetch_assoc($selectLeaderboardResult)) {
+                                                                $courseID = $leaderboards['courseID'];
+                                                                $checkPlacementQuery = "SELECT 
+                                                                                        enrollments.userID, 
+                                                                                        enrollments.courseID, 
+                                                                                        leaderboard.xpPoints,
+                                                                                        userinfo.firstName,
+                                                                                        userinfo.middleName,
+                                                                                        userinfo.lastName FROM enrollments
+                                                                                        INNER JOIN leaderboard
+                                                                                            ON enrollments.enrollmentID = leaderboard.enrollmentID
+                                                                                        INNER JOIN userinfo
+                                                                                            ON enrollments.userID = userinfo.userID
+                                                                                        WHERE enrollments.courseID = '$courseID'
+                                                                                        ORDER BY leaderboard.xpPoints DESC";
+                                                                $checkPlacementResult = executeQuery($checkPlacementQuery);
+                                                                $i = 1;
+                                                                $rank = null;
+                                                                if (mysqli_num_rows($checkPlacementResult) > 0) {
+                                                                    while ($row = mysqli_fetch_assoc($checkPlacementResult)) {
+                                                                        if ($row['userID'] == $userID) {
+                                                                            $rank = $i;   // found your position
+                                                                            break;
+                                                                        }
+                                                                        $i++;
+                                                                    }
+                                                                }
                                                         ?>
                                                                 <div class="card custom-leaderboard-card">
                                                                     <div class="card-body p-4">
                                                                         <div style="display: inline-flex; align-items: center;">
-                                                                            <span class="rank-number text-bold text-18">11</span>
-                                                                            <span
-                                                                                class="text-reg text-12 badge rounded-pill ms-2 learderboard-badge"
-                                                                                style="display: inline-flex; align-items: center; gap: 4px;">
-                                                                                <i class="fa-solid fa-caret-up"></i>
-                                                                                2
-                                                                            </span>
+                                                                            <span class="rank-number text-bold text-18"><?php echo $rank; ?></span>
+                                                                            <?php
+                                                                            if ($rank == 1) {
+                                                                                echo '<img src="shared/assets/img/badge/1st.png" alt="1st" class="img-fluid float-end d-flex flex-row d-xxs-none ms-auto" width="30px">';
+                                                                            } else if ($rank == 2) {
+                                                                                echo '<img src="shared/assets/img/badge/2nd.png" alt="2nd" class="img-fluid float-end d-flex flex-row d-xxs-none ms-auto" width="30px">';
+                                                                            } else if ($rank == 3) {
+                                                                                echo '<img src="shared/assets/img/badge/3rd.png" alt="3rd" class="img-fluid float-end d-flex flex-row d-xxs-none ms-auto" width="30px">';
+                                                                            }
+                                                                            ?>
                                                                         </div>
 
                                                                         <!-- NEW WRAPPER -->

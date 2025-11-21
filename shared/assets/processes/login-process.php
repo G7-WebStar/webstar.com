@@ -5,7 +5,7 @@ $login_error = false; // default
 $email_not_found = false;  // Email/username not found
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
-    $conn = new mysqli("localhost", "root", "", "webstart");
+    $conn = new mysqli("localhost", "root", "", "webstar");
 
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
         $stmt->bind_result($userID, $role, $dbPassword, $emailFromDB);
         $stmt->fetch();
 
-        if ($password === $dbPassword || password_verify($password, $dbPassword)) {
+        if (password_verify($password, $dbPassword)) {
             // visits per day
             $logVisit = $conn->prepare("INSERT INTO visits (dateVisited) VALUES (NOW())");
             $logVisit->execute();

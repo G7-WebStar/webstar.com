@@ -22,14 +22,6 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
             <?php
             if (mysqli_num_rows($selectTopOneResult) > 0) {
                 while ($topOne = mysqli_fetch_assoc($selectTopOneResult)) {
-                    $previousRank = ($topOne['previousRank'] == null) ? '1' : $topOne['currentRank'];
-                    $currentRank = '1';
-                    $leaderboardID = $topOne['leaderboardID'];
-                    if ($topOne['currentRank'] != $currentRank) {
-                        $updatePreviousRankQuery = "UPDATE leaderboard SET previousRank = '$previousRank', currentRank = '$currentRank'
-                                                WHERE leaderboardID = '$leaderboardID'";
-                        $updatePreviousRankResult = executeQuery($updatePreviousRankQuery);
-                    }
             ?>
                     <div class="col-12 col-xl-4 mt-3 px-0 mx-auto mx-md-0 d-flex d-md-block justify-content-center justify-content-md-auto px-1 leaderboard-item">
                         <div class="card rounded-4 col-6 col-md-12">
@@ -45,22 +37,7 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                                                 <div class="float-end text-xl-36 text-xs-28 text-40">1</div>
                                             </div>
                                         </div>
-                                        <div class="badge rounded-pill text-dark text-reg float-end d-flex flex-row d-xxs-none"
-                                            style="background-color: <?php
-                                                                        $getPreviousRankQuery = "SELECT previousRank FROM leaderboard WHERE leaderboardID = '$leaderboardID'";
-                                                                        $getPreviousRankResult = executeQuery($getPreviousRankQuery);
-                                                                        $getPreviousRankRow = (mysqli_num_rows($getPreviousRankResult) > 0) ?  mysqli_fetch_assoc($getPreviousRankResult) : null;
-                                                                        $getPreviousRank = ($getPreviousRankRow == null) ? null : $getPreviousRankRow['previousRank'];
-
-                                                                        echo ($getPreviousRank > 1) ? '#C8ECC1' : '#e2e2e2ff'; ?>;">
-                                            <i class="<?php if ($getPreviousRank > 1) {
-                                                            echo 'bi bi-caret-up-fill';
-                                                        } else if ($getPreviousRank == 1) {
-                                                            echo '';
-                                                        } ?>"></i>
-                                            <?php echo ($getPreviousRank > 1) ? ($getPreviousRank - 1) : '-';
-                                            ?>
-                                        </div>
+                                        <img src="shared/assets/img/badge/1st.png" alt="1st" class="img-fluid float-end d-flex flex-row d-xxs-none" width="50px">
                                     </div>
                                     <div class="col-12 mt-3 text-xl-12 text-lg-16 text-xs-12 text-wrap">
                                         <?php echo $topOne['firstName'] . " " . $topOne['middleName'] . " " . $topOne['lastName']; ?>
@@ -70,7 +47,7 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                                     </div>
                                 </div>
                             </div>
-                            <p id="leaderboard-no-results" class="text-muted text-center mt-3" style="display:none;">
+                            <p id="leaderboard-no-results" class="text-muted text-center mt-3" style="display: none;">
                                 No matches found.
                             </p>
 
@@ -84,17 +61,9 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
             if (mysqli_num_rows($selectTopTwoToThreeResult) > 0) {
                 $i = 2;
                 while ($topTwoToThree = mysqli_fetch_assoc($selectTopTwoToThreeResult)) {
-                    $previousRank = ($topTwoToThree['previousRank'] == null) ? $i : $topTwoToThree['currentRank'];
-                    $currentRank = $i;
-                    $leaderboardID = $topTwoToThree['leaderboardID'];
-                    if ($topTwoToThree['currentRank'] != $currentRank) {
-                        $updatePreviousRankQuery = "UPDATE leaderboard SET previousRank = '$previousRank', currentRank = '$currentRank'
-                                                WHERE leaderboardID = '$leaderboardID'";
-                        $updatePreviousRankResult = executeQuery($updatePreviousRankQuery);
-                    }
             ?>
-                    <div class="col-6 col-md-12 col-xl-4 mt-3 px-0 px-1 leaderboard-item">
-                        <div class="card rounded-4">
+                    <div class="col-6 col-md-12 col-xl-4 mt-3 px-0 px-1 leaderboard-item d-flex">
+                        <div class="card rounded-4 flex-grow-1">
                             <div class="card-body border border-black rounded-4">
                                 <div class="row">
                                     <div class="col-6 d-flex align-items-center">
@@ -107,36 +76,7 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                                                 <div class="float-end text-xl-36 text-xs-28 text-40"><?php echo $i; ?></div>
                                             </div>
                                         </div>
-                                        <div class="badge rounded-pill text-dark text-reg float-end d-flex flex-row d-xxs-none"
-                                            style="background-color: <?php
-                                                                        $getPreviousRankQuery = "SELECT previousRank FROM leaderboard WHERE leaderboardID = '$leaderboardID'";
-                                                                        $getPreviousRankResult = executeQuery($getPreviousRankQuery);
-                                                                        $getPreviousRankRow = (mysqli_num_rows($getPreviousRankResult) > 0) ?  mysqli_fetch_assoc($getPreviousRankResult) : null;
-                                                                        $getPreviousRank = ($getPreviousRankRow == null) ? null : $getPreviousRankRow['previousRank'];
-
-                                                                        if ($getPreviousRank > $i) {
-                                                                            echo '#C8ECC1';
-                                                                        } else if ($getPreviousRank == $i) {
-                                                                            echo '#e2e2e2ff';
-                                                                        } else if ($getPreviousRank < $i) {
-                                                                            echo '#ecc1c1ff';
-                                                                        } ?>;">
-                                            <i class="<?php if ($getPreviousRank > $i) {
-                                                            echo 'bi bi-caret-up-fill';
-                                                        } else if ($getPreviousRank == $i) {
-                                                            echo '';
-                                                        } else if ($getPreviousRank < $i) {
-                                                            echo 'bi bi-caret-down-fill';
-                                                        } ?>"></i>
-                                            <?php if ($getPreviousRank > $i) {
-                                                echo $getPreviousRank - $i;
-                                            } else if ($getPreviousRank == $i) {
-                                                echo '-';
-                                            } else if ($getPreviousRank < $i) {
-                                                echo $i - $getPreviousRank;
-                                            }
-                                            ?>
-                                        </div>
+                                        <img src="shared/assets/img/badge/<?php echo ($i < 3) ? '2nd.png' : '3rd.png' ?>" alt="1st" class="img-fluid float-end d-flex flex-row d-xxs-none" width="50px">
                                     </div>
                                     <div class="col-12 mt-3 text-xl-12 text-lg-16 text-xs-12 text-wrap">
                                         <?php echo $topTwoToThree['firstName'] . " " . $topTwoToThree['middleName'] . " " . $topTwoToThree['lastName']; ?>
@@ -161,14 +101,6 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
             if (mysqli_num_rows($selectTopFourToTenResult) > 0) {
                 $i = 4;
                 while ($topFourToTen = mysqli_fetch_assoc($selectTopFourToTenResult)) {
-                    $previousRank = ($topFourToTen['previousRank'] == null) ? $i : $topFourToTen['currentRank'];
-                    $currentRank = $i;
-                    $leaderboardID = $topFourToTen['leaderboardID'];
-                    if ($topFourToTen['currentRank'] != $currentRank) {
-                        $updatePreviousRankQuery = "UPDATE leaderboard SET previousRank = '$previousRank', currentRank = '$currentRank'
-                                                WHERE leaderboardID = '$leaderboardID'";
-                        $updatePreviousRankResult = executeQuery($updatePreviousRankQuery);
-                    }
             ?>
                     <div class="container-fluid">
                         <div class="row px-1">
@@ -180,34 +112,8 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                                         </span>
                                         <span
                                             class="badge rounded-pill text-dark text-reg float-end d-flex flex-row d-xs-none d-md-none d-lg-flex"
-                                            style="background-color: <?php
-                                                                        $getPreviousRankQuery = "SELECT previousRank FROM leaderboard WHERE leaderboardID = '$leaderboardID'";
-                                                                        $getPreviousRankResult = executeQuery($getPreviousRankQuery);
-                                                                        $getPreviousRankRow = (mysqli_num_rows($getPreviousRankResult) > 0) ?  mysqli_fetch_assoc($getPreviousRankResult) : null;
-                                                                        $getPreviousRank = ($getPreviousRankRow == null) ? null : $getPreviousRankRow['previousRank'];
-
-                                                                        if ($getPreviousRank > $i) {
-                                                                            echo '#C8ECC1';
-                                                                        } else if ($getPreviousRank == $i) {
-                                                                            echo '#e2e2e2ff';
-                                                                        } else if ($getPreviousRank < $i) {
-                                                                            echo '#ecc1c1ff';
-                                                                        } ?>;">
-                                            <i class="<?php if ($getPreviousRank > $i) {
-                                                            echo 'bi bi-caret-up-fill';
-                                                        } else if ($getPreviousRank == $i) {
-                                                            echo '';
-                                                        } else if ($getPreviousRank < $i) {
-                                                            echo 'bi bi-caret-down-fill';
-                                                        } ?>"></i>
-                                            <?php if ($getPreviousRank > $i) {
-                                                echo $getPreviousRank - $i;
-                                            } else if ($getPreviousRank == $i) {
-                                                echo '-';
-                                            } else if ($getPreviousRank < $i) {
-                                                echo $i - $getPreviousRank;
-                                            }
-                                            ?>
+                                            style="background-color: '#ecc1c1ff';">
+                                            <i class=""></i>
                                         </span>
                                     </div>
                                     <div class="col-9 d-flex align-items-center justify-content-between">
