@@ -2,7 +2,7 @@
 // $dbhost = "localhost";
 // $dbuser = "root";
 // $dbpass = "";
-// $db = "webstar";
+// $db = "webstart";
 
 $dbhost = "localhost";
 $dbuser = "u977784600_webstar";
