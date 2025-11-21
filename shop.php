@@ -23,10 +23,10 @@ SELECT m.myItemID, m.dateAcquired,
        e.emblemID, e.emblemName AS emblemTitle, e.emblemPath AS emblemImg,
        c.coverImageID, c.title AS coverTitle, c.imagePath AS coverImg,
        t.colorThemeID, t.themeName AS colorTitle, t.hexCode
-FROM myItems m
+FROM myitems m
 LEFT JOIN emblem e ON m.emblemID = e.emblemID
-LEFT JOIN coverImage c ON m.coverImageID = c.coverImageID
-LEFT JOIN colorTheme t ON m.colorThemeID = t.colorThemeID
+LEFT JOIN coverimage c ON m.coverImageID = c.coverImageID
+LEFT JOIN colortheme t ON m.colorThemeID = t.colorThemeID
 WHERE m.userID = $userID
 ORDER BY m.dateAcquired DESC
 ";
@@ -43,8 +43,8 @@ if ($result && $result->num_rows > 0) {
 $coverImages = [];
 $coverQuery = "SELECT c.coverImageID, c.title, c.imagePath, c.description, c.price,
        CASE WHEN m.coverImageID IS NOT NULL THEN 1 ELSE 0 END AS isBought
-FROM coverImage c
-LEFT JOIN myItems m
+FROM coverimage c
+LEFT JOIN myitems m
     ON c.coverImageID = m.coverImageID AND m.userID = $userID
 ORDER BY isBought ASC, c.price DESC";
 $result = $conn->query($coverQuery);
@@ -61,7 +61,7 @@ $emblemQuery = "
 SELECT e.emblemID, e.emblemName, e.emblemPath, e.description, e.price,
        CASE WHEN m.emblemID IS NOT NULL THEN 1 ELSE 0 END AS isBought
 FROM emblem e
-LEFT JOIN myItems m
+LEFT JOIN myitems m
     ON e.emblemID = m.emblemID AND m.userID = $userID
 ORDER BY isBought ASC, e.price DESC
 ";
@@ -77,8 +77,8 @@ if ($result && $result->num_rows > 0) {
 $colorThemes = [];
 $colorQuery = "SELECT t.colorThemeID, t.themeName, t.hexCode, t.description, t.price,
        CASE WHEN m.colorThemeID IS NOT NULL THEN 1 ELSE 0 END AS isBought
-FROM colorTheme t
-LEFT JOIN myItems m
+FROM colortheme t
+LEFT JOIN myitems m
     ON t.colorThemeID = m.colorThemeID AND m.userID = $userID
 ORDER BY isBought ASC, t.price DESC";
 
@@ -91,7 +91,7 @@ if ($result && $result->num_rows > 0) {
 
 // Get Owned Cover Images
 $boughtCovers = [];
-$coverQuery = "SELECT coverImageID FROM myItems WHERE userID = $userID AND coverImageID IS NOT NULL";
+$coverQuery = "SELECT coverImageID FROM myitems WHERE userID = $userID AND coverImageID IS NOT NULL";
 $result = $conn->query($coverQuery);
 
 while ($row = $result->fetch_assoc()) {
@@ -100,7 +100,7 @@ while ($row = $result->fetch_assoc()) {
 
 // Get Owned Color Themes
 $boughtColors = [];
-$colorQuery = "SELECT colorThemeID FROM myItems WHERE userID = $userID AND colorThemeID IS NOT NULL";
+$colorQuery = "SELECT colorThemeID FROM myitems WHERE userID = $userID AND colorThemeID IS NOT NULL";
 $result = $conn->query($colorQuery);
 while ($row = $result->fetch_assoc()) {
     $boughtColors[] = $row['colorThemeID'];
@@ -108,7 +108,7 @@ while ($row = $result->fetch_assoc()) {
 
 // Get Owned Emblems
 $boughtEmblems = [];
-$emblemQuery = "SELECT emblemID FROM myItems WHERE userID = $userID AND emblemID IS NOT NULL";
+$emblemQuery = "SELECT emblemID FROM myitems WHERE userID = $userID AND emblemID IS NOT NULL";
 $result = $conn->query($emblemQuery);
 while ($row = $result->fetch_assoc()) {
     $boughtEmblems[] = $row['emblemID'];
@@ -130,7 +130,7 @@ if (isset($_POST['buyItem'])) {
     if ($coverImageID) {
         $itemType = 'cover';
         $itemID = $coverImageID;
-        $priceQuery = $conn->query("SELECT price FROM coverImage WHERE coverImageID = $coverImageID");
+        $priceQuery = $conn->query("SELECT price FROM coverimage WHERE coverImageID = $coverImageID");
     } elseif ($emblemID) {
         $itemType = 'emblem';
         $itemID = $emblemID;
@@ -138,7 +138,7 @@ if (isset($_POST['buyItem'])) {
     } elseif ($colorThemeID) {
         $itemType = 'color';
         $itemID = $colorThemeID;
-        $priceQuery = $conn->query("SELECT price FROM colorTheme WHERE colorThemeID = $colorThemeID");
+        $priceQuery = $conn->query("SELECT price FROM colortheme WHERE colorThemeID = $colorThemeID");
     }
 
     $priceData = $priceQuery->fetch_assoc();
