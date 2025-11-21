@@ -315,7 +315,6 @@ $selectQuestionsResult = executeQuery($selectQuestionsQuery);
 
             } else {
                 //Displays an input text field if the question is of identification type
-                choices.innerHTML = `<input disabled type="text" class="rounded-3 p-3 text-center border border-black" id="input` + currentQuestionIndex + `">`;
                 let textValue = document.getElementById('input' + currentQuestionIndex)
                 correctIdentification = document.createElement('div');
                 correctIdentification.id = "identificationCorrection" + questionNo;

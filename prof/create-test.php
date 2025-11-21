@@ -160,7 +160,7 @@ if (isset($_POST['save_exam'])) {
                     }
 
                     /* INSERT QUESTION*/
-                    $insertQ = "INSERT INTO testQuestions
+                    $insertQ = "INSERT INTO testquestions
                     (testID, testQuestion, questionType, testQuestionPoints, correctAnswer, testQuestionImage)
                     VALUES
                     ('$testID', '$testQuestion', '$questionType', '$testPoints', '$correctAnswer', " .
@@ -173,7 +173,7 @@ if (isset($_POST['save_exam'])) {
                     if ($questionType === "Multiple Choice" && !empty($question['choices'])) {
                         foreach ($question['choices'] as $choiceText) {
                             $choiceText = mysqli_real_escape_string($conn, $choiceText);
-                            $insertChoice = "INSERT INTO testQuestionChoices (testQuestionID, choiceText)
+                            $insertChoice = "INSERT INTO testquestionchoices (testQuestionID, choiceText)
                                  VALUES ('$testQuestionID', '$choiceText')";
                             executeQuery($insertChoice);
                         }
