@@ -40,7 +40,9 @@ $deadline = $test['deadline'];
 $currentDate = date("Y-m-d H:i:s");
 $isCompleted = (strtotime($currentDate) > strtotime($deadline));
 $examStatus = $isCompleted ? "Completed" : "Active";
-$examDuration = $test['testTimelimit'];
+$examDuration = (isset($test['testTimelimit']) && $test['testTimelimit'] > 0)
+    ? round($test['testTimelimit'] / 60)
+    : 0;
 $displayTime = $test['assessmentCreatedAt'];
 $formattedTime = !empty($displayTime) ? date("F j, Y g:i A", strtotime($displayTime)) : "";
 
