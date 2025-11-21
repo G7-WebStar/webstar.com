@@ -54,7 +54,7 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
     }
 }
 
-$profInfoQuery = "SELECT * FROM userInfo WHERE userID = '$userID'";
+$profInfoQuery = "SELECT * FROM userinfo WHERE userID = '$userID'";
 $profInfoResult = executeQuery($profInfoQuery);
 
 $countPendingQuery = "SELECT COUNT(*) AS pending FROM todo 

@@ -90,7 +90,7 @@ $selectAnnouncementsQuery = "SELECT
         ON users.userID = profInfo.userID
     WHERE enrollments.userID = '$userID'
     AND announcements.announcementID NOT IN (
-        SELECT announcementID FROM announcementNotes WHERE userID = '$userID'
+        SELECT announcementID FROM announcementnotes WHERE userID = '$userID'
     );
     ";
 $selectAnnouncementsResult = executeQuery($selectAnnouncementsQuery);
@@ -118,7 +118,8 @@ $selectAssessmentQuery = "SELECT
         ON assessments.assessmentID = tests.assessmentID
     WHERE todo.userID = '$userID' AND todo.status = 'Pending'
     AND (assessments.deadline IS NULL OR assessments.deadline >= CURDATE())
-    GROUP BY assessments.assessmentID DESC
+    GROUP BY assessments.assessmentID
+    ORDER BY assessments.assessmentID DESC
     LIMIT 3;
 ";
 $selectAssessmentResult = executeQuery($selectAssessmentQuery);

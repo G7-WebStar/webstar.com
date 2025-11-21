@@ -39,8 +39,8 @@ INNER JOIN userinfo AS profInfo
     ON courses.userID = profInfo.userID
 INNER JOIN enrollments
     ON courses.courseID = enrollments.courseID
-LEFT JOIN courseSchedule
-    ON courses.courseID = courseSchedule.courseID
+LEFT JOIN courseschedule
+    ON courses.courseID = courseschedule.courseID
 WHERE enrollments.userID = '$userID' AND isActive = '$isActive'
 GROUP BY courses.courseID
 ";

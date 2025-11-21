@@ -7,20 +7,20 @@ $enrolled = false;
 if (isset($_POST['access_code'])) {
     $code = $_POST['access_code'];
 
-    $checkCourseQuery = "SELECT * FROM courses WHERE code = '$code';";
+    $checkCourseQuery = "SELECT * FROM courses WHERE code = '$code'";
     $checkCourseResult = executeQuery($checkCourseQuery);
 
     if (mysqli_num_rows($checkCourseResult) > 0) {
         $availableCourses = mysqli_fetch_assoc($checkCourseResult);
         $courseID = $availableCourses['courseID'];
 
-        $checkEnrollmentQuery = "SELECT * FROM enrollments WHERE userID = '$userID' AND courseID = '$courseID';";
+        $checkEnrollmentQuery = "SELECT * FROM enrollments WHERE userID = '$userID' AND courseID = '$courseID'";
         $checkEnrollmentResult = executeQuery($checkEnrollmentQuery);
 
         if (mysqli_num_rows($checkEnrollmentResult) > 0) {
             $enrolled = true;
         } else {
-            $selectUserQuery = "SELECT yearSection FROM userinfo WHERE userID = '$userID';";
+            $selectUserQuery = "SELECT yearSection FROM userinfo WHERE userID = '$userID'";
             $selectUserResult = executeQuery($selectUserQuery);
 
             if (mysqli_num_rows($selectUserResult) > 0) {

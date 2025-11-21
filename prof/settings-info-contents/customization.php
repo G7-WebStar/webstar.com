@@ -14,7 +14,7 @@ if ($emblemsResult && $emblemsResult->num_rows > 0) {
 }
 
 // Cover Images
-$coversQuery = "SELECT coverImageID, title AS coverTitle, imagePath AS coverImg FROM coverImage ORDER BY title ASC";
+$coversQuery = "SELECT coverImageID, title AS coverTitle, imagePath AS coverImg FROM coverimage ORDER BY title ASC";
 $coversResult = $conn->query($coversQuery);
 if ($coversResult && $coversResult->num_rows > 0) {
     while ($row = $coversResult->fetch_assoc()) {
@@ -23,7 +23,7 @@ if ($coversResult && $coversResult->num_rows > 0) {
 }
 
 // Color Themes
-$themesQuery = "SELECT colorThemeID, themeName AS colorTitle, hexCode FROM colorTheme ORDER BY themeName ASC";
+$themesQuery = "SELECT colorThemeID, themeName AS colorTitle, hexCode FROM colortheme ORDER BY themeName ASC";
 $themesResult = $conn->query($themesQuery);
 if ($themesResult && $themesResult->num_rows > 0) {
     while ($row = $themesResult->fetch_assoc()) {

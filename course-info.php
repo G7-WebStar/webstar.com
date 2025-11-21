@@ -20,8 +20,7 @@ if (isset($_GET['courseID'])) {
     	ON courses.userID = profInfo.userID
     INNER JOIN enrollments
     	ON courses.courseID = enrollments.courseID
-    WHERE enrollments.userID = '$userID' AND enrollments.courseID = '$courseID';
-;
+    WHERE enrollments.userID = '$userID' AND enrollments.courseID = '$courseID'
 ";
     $selectCourseResult = executeQuery($selectCourseQuery);
 
