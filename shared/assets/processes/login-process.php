@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
         $stmt->bind_result($userID, $role, $dbPassword, $emailFromDB);
         $stmt->fetch();
 
-        if ($password === $dbPassword || password_verify($password, $dbPassword)) {
+        if (password_verify($password, $dbPassword)) {
             // visits per day
             $logVisit = $conn->prepare("INSERT INTO visits (dateVisited) VALUES (NOW())");
             $logVisit->execute();

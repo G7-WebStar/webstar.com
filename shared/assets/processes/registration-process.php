@@ -28,6 +28,7 @@ if (isset($_POST['signUpBtn'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
     $confirmPassword = $_POST['confirmPassword'];
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     // sql injection
     $stmt = $conn->prepare("SELECT userID FROM users WHERE email = ?");
@@ -129,7 +130,7 @@ if (isset($_POST['signUpBtn'])) {
         }
 
         $_SESSION['email'] = $email;
-        $_SESSION['password'] = $password;
+        $_SESSION['password'] = $hashedPassword;
 
         header("Location: email-verification.php");
     }
