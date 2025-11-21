@@ -124,9 +124,9 @@ if (isset($_POST['save_exam'])) {
 
                 // Delete only if the mode is edit + user provided new questions
                 if ($mode === 'edit' && !empty($_POST['questions'])) {
-                    executeQuery("DELETE FROM testQuestionChoices WHERE testQuestionID IN 
-                     (SELECT testQuestionID FROM testQuestions WHERE testID='$testID')");
-                    executeQuery("DELETE FROM testQuestions WHERE testID='$testID'");
+                    executeQuery("DELETE FROM testquestionchoices WHERE testQuestionID IN 
+                     (SELECT testQuestionID FROM testquestions WHERE testID='$testID')");
+                    executeQuery("DELETE FROM testquestions WHERE testID='$testID'");
                 }
             }
 
@@ -172,7 +172,7 @@ if (isset($_POST['save_exam'])) {
 
 
                     /* INSERT QUESTION*/
-                    $insertQ = "INSERT INTO testQuestions
+                    $insertQ = "INSERT INTO testquestions
                     (testID, testQuestion, questionType, testQuestionPoints, correctAnswer, testQuestionImage)
                     VALUES
                     ('$testID', '$testQuestion', '$questionType', '$testPoints', '$correctAnswer', " .

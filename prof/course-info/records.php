@@ -15,10 +15,10 @@ if ($assessmentResult && mysqli_num_rows($assessmentResult) > 0) {
 
 $recordQuery = "
 SELECT 
-    userInfo.userInfoID,
-    userInfo.firstName,
-    userInfo.middleName,
-    userInfo.lastName,
+    userinfo.userinfoID,
+    userinfo.firstName,
+    userinfo.middleName,
+    userinfo.lastName,
     assessments.assessmentID,
     assessments.assessmentTitle,
     assessments.type AS assessmentType,
@@ -26,15 +26,15 @@ SELECT
     CASE 
         WHEN assessments.type = 'task' THEN COALESCE(assignments.assignmentPoints, 0)
         WHEN assessments.type = 'test' THEN (
-            SELECT COALESCE(SUM(testQuestions.testQuestionPoints), 0)
-            FROM testQuestions
-            WHERE testQuestions.testID = tests.testID
+            SELECT COALESCE(SUM(testquestions.testQuestionPoints), 0)
+            FROM testquestions
+            WHERE testquestions.testID = tests.testID
         )
         ELSE 0
     END AS totalPoints
 FROM enrollments
 JOIN users ON enrollments.userID = users.userID
-JOIN userInfo ON users.userID = userInfo.userID
+JOIN userinfo ON users.userID = userinfo.userID
 JOIN assessments ON assessments.courseID = enrollments.courseID
 LEFT JOIN assignments ON assessments.assessmentID = assignments.assessmentID
 LEFT JOIN tests ON assessments.assessmentID = tests.assessmentID
@@ -54,7 +54,7 @@ WHERE enrollments.courseID = '$courseID'
 ";
 
 if ($filter === 'All') {
-    $recordQuery .= " ORDER BY userInfo.lastName $orderDirection";
+    $recordQuery .= " ORDER BY userinfo.lastName $orderDirection";
 } else {
     $safeFilter = mysqli_real_escape_string($conn, $filter);
     if ($order === 'Ascending') {
@@ -63,14 +63,14 @@ if ($filter === 'All') {
         (assessments.assessmentTitle != '$safeFilter') ASC,
         (scores.score IS NULL) ASC,
         CAST(scores.score AS UNSIGNED) ASC,
-        userInfo.lastName ASC
+        userinfo.lastName ASC
     ";
     } else {
         $recordQuery .= "
     ORDER BY
         (assessments.assessmentTitle != '$safeFilter') ASC,
         CAST(scores.score AS UNSIGNED) DESC,
-        userInfo.lastName ASC
+        userinfo.lastName ASC
     ";
     }
 }

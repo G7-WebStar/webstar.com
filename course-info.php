@@ -142,9 +142,7 @@ if (isset($_GET['courseID'])) {
     userinfo.middleName,
     userinfo.lastName,
     enrollments.userID,
-    leaderboard.xpPoints AS totalPoints,
-    leaderboard.previousRank,
-    leaderboard.currentRank
+    leaderboard.xpPoints AS totalPoints
     FROM leaderboard
     INNER JOIN enrollments
         ON leaderboard.enrollmentID = enrollments.enrollmentID
