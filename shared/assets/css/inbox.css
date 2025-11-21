@@ -119,7 +119,7 @@
 
 /* Load More Button Hover */
 button.btn[style*="var(--primaryColor)"]:hover {
-    background-color: #fcd86f !important;
+    background-color: var(--primaryColor)!important;
     border: 1px solid var(--black) !important;
     color: var(--black) !important;
     transition: all 0.3s ease;

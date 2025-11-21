@@ -61,65 +61,75 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
             <?php include '../shared/components/prof-sidebar-for-mobile.php'; ?>
             <?php include '../shared/components/prof-sidebar-for-desktop.php'; ?>
 
-            <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-md-4 overflow-y-auto">
+            <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-md-4">
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 row-padding-top">
+                    <div class="container-fluid py-3 row-padding-top  h-100  overflow-y-auto">
                         <div class="row">
                             <div class="col-12">
 
                                 <!-- Header Section -->
-                                <div class="row align-items-center mb-3 text-center text-lg-start">
-                                    <!-- Title -->
-                                    <div class="col-12 col-lg-auto mb-3 mb-lg-0">
+                                <div class="row align-items-center mb-3 text-center text-md-start">
+                                    <div class="col-12 col-md-auto text-center text-md-start position-relative">
                                         <h1 class="text-sbold text-25 mb-0 mt-2" style="color: var(--black);">My Inbox
                                         </h1>
+                                        <!-- Filter Icon (mobile only) -->
+                                        <span id="filterToggle"
+                                            class="position-absolute end-0 top-50 translate-middle-y d-md-none px-2"
+                                            role="button" tabindex="0" aria-label="Show filters"
+                                            style="cursor: pointer; user-select: none; ">
+                                            <span class="material-symbols-rounded"
+                                                style="font-size: 30px; color: var(--black);">
+                                                tune
+                                            </span>
+                                        </span>
                                     </div>
 
                                     <!-- Dropdowns-->
-
-                                    <!-- Sort By -->
-                                    <div class="col-auto mobile-dropdown">
-                                        <div class="d-flex align-items-center flex-nowrap mt-2">
-                                            <span class="dropdown-label me-2 text-reg">Sort by</span>
-                                            <div class="custom-dropdown" data-dropdown="sort">
-                                                <button class="dropdown-btn text-reg text-14"
-                                                    data-selected-sort="Newest">Newest</button>
-                                                <ul class="dropdown-list text-reg text-14">
-                                                    <li data-value="Newest" data-sort="desc">Newest</li>
-                                                    <li data-value="Oldest" data-sort="asc">Oldest</li>
-                                                </ul>
+                                    <div class="col-12 col-md-auto d-flex flex-wrap justify-content-center justify-content-md-start gap-3 mt-2 mt-md-0 d-none d-md-flex"
+                                        style="row-gap: 0!important;" id="mobileFilters">
+                                        <!-- Sort By -->
+                                        <div class="col-auto mobile-dropdown">
+                                            <div class="d-flex align-items-center flex-nowrap mt-2">
+                                                <span class="dropdown-label me-2 text-reg">Sort by</span>
+                                                <div class="custom-dropdown" data-dropdown="sort">
+                                                    <button class="dropdown-btn text-reg text-14"
+                                                        data-selected-sort="Newest">Newest</button>
+                                                    <ul class="dropdown-list text-reg text-14">
+                                                        <li data-value="Newest" data-sort="desc">Newest</li>
+                                                        <li data-value="Oldest" data-sort="asc">Oldest</li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <!-- Course -->
-                                    <div class="col-auto mobile-dropdown">
-                                        <div class="d-flex align-items-center flex-nowrap mt-2">
-                                            <span class="dropdown-label me-2 text-reg">Courses</span>
-                                            <div class="custom-dropdown" data-dropdown="course">
-                                                <button class="dropdown-btn text-reg text-14"
-                                                    data-selected-course="All">All</button>
-                                                <ul class="dropdown-list text-reg text-14">
-                                                    <li data-value="All" data-course="All">All</li>
-                                                    <?php
-                                                    if ($selectEnrolledResult && mysqli_num_rows($selectEnrolledResult) > 0) {
-                                                        mysqli_data_seek($selectEnrolledResult, 0);
-                                                        while ($course = mysqli_fetch_assoc($selectEnrolledResult)) {
-                                                            $courseCode = $course['courseCode'];
-                                                            ?>
-                                                            <li data-value="<?php echo $courseCode; ?>"
-                                                                data-course="<?php echo $courseCode; ?>">
-                                                                <?php echo $courseCode; ?>
-                                                            </li>
-                                                            <?php
+                                        <!-- Course -->
+                                        <div class="col-auto mobile-dropdown">
+                                            <div class="d-flex align-items-center flex-nowrap mt-2">
+                                                <span class="dropdown-label me-2 text-reg">Courses</span>
+                                                <div class="custom-dropdown" data-dropdown="course">
+                                                    <button class="dropdown-btn text-reg text-14"
+                                                        data-selected-course="All">All</button>
+                                                    <ul class="dropdown-list text-reg text-14">
+                                                        <li data-value="All" data-course="All">All</li>
+                                                        <?php
+                                                        if ($selectEnrolledResult && mysqli_num_rows($selectEnrolledResult) > 0) {
+                                                            mysqli_data_seek($selectEnrolledResult, 0);
+                                                            while ($course = mysqli_fetch_assoc($selectEnrolledResult)) {
+                                                                $courseCode = $course['courseCode'];
+                                                                ?>
+                                                                <li data-value="<?php echo $courseCode; ?>"
+                                                                    data-course="<?php echo $courseCode; ?>">
+                                                                    <?php echo $courseCode; ?>
+                                                                </li>
+                                                                <?php
+                                                            }
+                                                            mysqli_data_seek($selectEnrolledResult, 0);
                                                         }
-                                                        mysqli_data_seek($selectEnrolledResult, 0);
-                                                    }
-                                                    ?>
-                                                </ul>
+                                                        ?>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -134,7 +144,7 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                                                 $courseCode = $inbox['courseCode'];
                                                 $messageText = trim($inbox['messageText']);
                                                 ?>
-                                                <div class="card mb-1 me-3 w-100 mt-2 inbox-card"
+                                                <div class="card mb-1 w-100 mt-2 inbox-card"
                                                     data-timestamp="<?php echo $timestamp ?: 0; ?>"
                                                     data-course="<?php echo $courseCode; ?>"
                                                     style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1;">
@@ -184,8 +194,7 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                                             </div>
                                         </div>
                                     <?php else: ?>
-                                        <div
-                                            class="d-flex flex-column justify-content-center align-items-center inbox-empty-state"
+                                        <div class="d-flex flex-column justify-content-center align-items-center inbox-empty-state"
                                             style="min-height: 60vh;">
                                             <img src="../shared/assets/img/empty/inbox.png" width="100" class="mb-1">
                                             <div class="text-center text-14 text-reg mt-1">Your inbox is empty!</div>
@@ -207,6 +216,37 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Toggle JS -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const filterToggle = document.getElementById("filterToggle");
+            const mobileFilters = document.getElementById("mobileFilters");
+            const icon = filterToggle.querySelector(".material-symbols-rounded");
+
+            const storageKey = "filtersVisible_" + "<?php echo $activePage; ?>";
+
+            if (localStorage.getItem(storageKey) === "true") {
+                mobileFilters.classList.remove("d-none");
+                filterToggle.classList.add("active");
+                icon.textContent = "close";
+            }
+
+            filterToggle.addEventListener("click", () => {
+                const isVisible = !mobileFilters.classList.contains("d-none");
+
+                // Toggle panel
+                mobileFilters.classList.toggle("d-none");
+
+                // Toggle icon
+                filterToggle.classList.toggle("active");
+                icon.textContent = filterToggle.classList.contains("active") ? "close" : "tune";
+
+                // Save state
+                localStorage.setItem(storageKey, !isVisible);
+            });
+        });
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -271,12 +311,12 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
 
                 // Show filter empty state when no cards are visible
                 const shouldShowEmpty = visibleCount === 0;
-                
+
                 // Ensure filter empty state exists
                 if (!filterEmptyState.parentNode) {
                     messageContainer.appendChild(filterEmptyState);
                 }
-                
+
                 // Toggle visibility using Bootstrap classes
                 if (shouldShowEmpty) {
                     filterEmptyState.classList.remove('d-none');

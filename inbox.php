@@ -51,7 +51,10 @@ ORDER BY inbox.inboxID DESC
 ";
 $selectInboxResult = executeQuery($selectInboxQuery);
 $inboxCount = mysqli_num_rows($selectInboxResult);
+
+
 ?>
+
 <!doctype html>
 <html lang="en">
 
@@ -70,7 +73,8 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
 
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_downward_alt" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_downward_alt" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
 
@@ -83,12 +87,12 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
             <?php include 'shared/components/sidebar-for-mobile.php'; ?>
             <?php include 'shared/components/sidebar-for-desktop.php'; ?>
 
-            <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-md-4 overflow-y-auto">
+            <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-md-4 ">
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 row-padding-top">
+                    <div class="container-fluid py-3 row-padding-top h-100  overflow-y-auto">
                         <div class="row">
                             <div class="col-12">
                                 <!-- Header Section -->
@@ -168,9 +172,9 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                                                     <ul class="dropdown-list text-reg text-14">
                                                         <li data-value="All" data-type="All">All</li>
                                                         <li data-value="Course Update" data-type="Course Update">Course
-                                                            Update</li>
+                                                            Updates</li>
                                                         <li data-value="Submissions Update"
-                                                            data-type="Submissions Update">Submissions Update</li>
+                                                            data-type="Submissions Update">Submissions Updates</li>
                                                         <li data-value="Badge Updates" data-type="Badge Updates">Badge
                                                             Updates</li>
                                                         <li data-value="Leaderboard Updates"
@@ -185,7 +189,7 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                                     </div>
 
                                     <!-- Message Content -->
-                                    <div class="message-container mt-3 pb-4" <?php echo ($inboxCount == 0) ? 'style="min-height: 60vh; display: flex; align-items: center; justify-content: center; flex-direction: column;"' : 'style="min-height: auto;"'; ?>>
+                                    <div class="message-container mt-3 pb-4 " <?php echo ($inboxCount == 0) ? 'style="min-height: 60vh; display: flex; align-items: center; justify-content: center; flex-direction: column;"' : 'style="min-height: auto;"'; ?>>
                                         <?php
                                         if ($inboxCount > 0) {
                                             $cardIndex = 0;
@@ -204,6 +208,25 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                                                 $assignmentID = $inbox['assignmentID'] ?? null;
                                                 $testID = $inbox['testID'] ?? null;
                                                 $lessonID = $inbox['lessonID'] ?? null;
+
+                                                $badgeData = null; // default
+                                        
+                                                if ($notificationType === 'Badge Updates') {
+                                                    // Extract badge name from message
+                                                    if (preg_match('/badge:\s*(.+)$/i', $messageText, $matches)) {
+                                                        $badgeName = trim($matches[1]);
+
+                                                        // Fetch badge info from badges table
+                                                        $badgeQuery = "SELECT badgeName, badgeIcon, badgeDescription, badgeXP, badgeWebstars 
+                                                        FROM badges 
+                                                        WHERE badgeName = '$badgeName' LIMIT 1";
+                                                        $badgeResult = executeQuery($badgeQuery);
+                                                        if ($badgeResult && mysqli_num_rows($badgeResult) > 0) {
+                                                            $badgeData = mysqli_fetch_assoc($badgeResult);
+                                                        }
+                                                    }
+                                                }
+
 
                                                 // Determine page redirect based on message patterns
                                                 $dataAction = '';
@@ -250,6 +273,11 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                                                     data-type="<?php echo $notificationType; ?>"
                                                     data-action="<?php echo $dataAction; ?>"
                                                     data-card-index="<?php echo $cardIndex; ?>"
+                                                    data-badge-name="<?php echo $badgeData['badgeName'] ?? ''; ?>"
+                                                    data-badge-icon="<?php echo $badgeData['badgeIcon'] ?? ''; ?>"
+                                                    data-badge-xp="<?php echo $badgeData['badgeXP'] ?? ''; ?>"
+                                                    data-badge-webstars="<?php echo $badgeData['badgeWebstars'] ?? ''; ?>"
+                                                    data-badge-description="<?php echo $badgeData['badgeDescription'] ?? ''; ?>"
                                                     style="max-width: 1101px; border: 1px solid var(--black); border-radius: 15px; background-color: var(--pureWhite); opacity: 1; cursor:pointer;">
 
                                                     <div class="card-body py-2 px-4 px-md-3">
@@ -306,12 +334,12 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
 
                                     <!-- Load More Button -->
                                     <?php if ($inboxCount >= 20) { ?>
-                                        <div class="d-flex justify-content-center mt-4 mb-3" id="loadMoreContainer" style="display: none !important;">
+                                        <div class="d-flex justify-content-center mt-4 mb-3" id="loadMoreContainer"
+                                            style="display: none !important;">
                                             <button type="button" id="loadMoreBtn"
                                                 class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 my-1 d-flex align-items-center gap-2"
                                                 style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);"
-                                                data-total-cards="<?php echo $inboxCount; ?>"
-                                                data-current-visible="20"
+                                                data-total-cards="<?php echo $inboxCount; ?>" data-current-visible="20"
                                                 data-load-count="10">
                                                 <span class="material-symbols-outlined">arrow_downward_alt</span>
                                                 <span>Load More</span>
@@ -325,7 +353,7 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                 </div>
             </div>
         </div>
-
+        <!-- Badge Modal -->
         <div class="modal fade" id="feedbackModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered py-4" style="max-width: 700px;  height: 25px;">
                 <div class="modal-content">
@@ -343,14 +371,15 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                             <div class="container">
                                 <div class="row justify-content-center">
                                     <div class="col-12 d-flex justify-content-center flex-column text-center">
-                                        <img class="img-fluid object-fit-contain mx-auto mb-3" width="200px"
-                                            src="shared/assets/img/badge/perfect_scorer.png" alt="image">
-                                        <p class="text-sbold mb-0">You’ve unlocked a new badge:</p>
-                                        <p class="text-bold">Ahead of the Curve</p>
+                                        <img id="badgeIcon" class="img-fluid object-fit-contain mx-auto mb-3"
+                                            width="100px" src="shared/assets/img/badge/perfect_scorer.png" alt="image">
+                                        <p class="text-sbold mb-0">You’ve earned a new badge:</p>
+                                        <p id="badgeTitle" class="text-bold">Ahead of the Curve</p>
                                     </div>
                                     <div class="row">
                                         <div class="mx-auto col-8 text-center">
-                                            <p class="text-reg text-14">You’re leading the pack! This badge is awarded
+                                            <p id="badgeDescription" class="text-reg text-14">You’re leading the pack!
+                                                This badge is awarded
                                                 for staying on top of lessons and completing tasks before the deadlines.
                                                 Keep blazing the trail!</p>
                                         </div>
@@ -359,35 +388,68 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                                         <div class="mx-auto col-8 text-center">
                                             <img class="img-fluid object-fit-contain mx-auto" width="20px"
                                                 src="shared/assets/img/xp.png" alt="XP">
-                                            <span class="text-sbold">+150 XPs</span>
+                                            <span id="badgeXP" class="text-sbold">+150 XPs</span>
                                         </div>
                                         <div class="mx-auto col-8 text-center">
                                             <img class="img-fluid object-fit-contain mx-auto" width="20px"
                                                 src="shared/assets/img/webstar.png" alt="XP">
-                                            <span class="text-sbold">+50 Webstars</span>
+                                            <span id="badgeWebstars" class="text-sbold">+50 Webstars</span>
                                         </div>
                                         <div class="mx-auto col-8 text-center my-3">
-                                            <span class="text-reg text-12 badge rounded-pill course-badge"
-                                                style="width: 99px; height: 19px; border-radius: 50px; padding: 4px 10px;">
-                                                COMP-006
-                                            </span>
+                                            
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- FOOTER -->
-                        <div class="modal-footer border-top">
-
-                        </div>
                     </form>
                 </div>
             </div>
         </div>
+        <!-- Welcome Modal -->
+        <div class="modal fade" id="welcomeModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered py-4" style="max-width: 500px;">
+                <div class="modal-content">
+                    <div class="modal-header border-bottom">
+                        <h5 class="modal-title text-sbold">Welcome!</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-start">
+                        <p class="text-reg text-14 mb-3">
+                            Welcome to <span class="text-sbold">Webstar</span>! ✦ <br> <br>We’re thrilled to have you on board.
+                            Thank you so much for taking the time to participate in the testing of this site. Your
+                            feedback
+                            and activity will help us improve the platform and create a better experience for all
+                            learners and instructors of PUP-STC.
+                        </p>
+                        <p class="text-reg text-14 mb-3">
+                            As a token of our appreciation, you have been awarded <span class="text-sbold">1000
+                                Webstars</span>!
+                            You can use them to unlock shop items, increase your XPs, and explore all the exciting
+                            features
+                            Webstar has to offer.
+                        </p>
+                        <p class="text-reg text-14 mb-3">
+                            Remember, the more you engage with courses, lessons, and tasks, the more rewards you’ll
+                            earn.
+                            Keep exploring, completing tasks, and enjoying the journey ahead!
+                        </p>
+                        <p class="text-reg text-14 mb-3">
+                            Sincerely,<br>
+                            Alyssa, Ayisha, Kimberly, Shane, James, & Neil <br>
+                            <strong>
+                                The Webstar Team ♡
+                            </strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
-
+        <!-- Toggle JS -->
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 const filterToggle = document.getElementById("filterToggle");
@@ -510,7 +572,7 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                         if (!isAllFilter || visibleCount === 0) {
                             loadMoreContainer.style.setProperty('display', 'none', 'important');
                         } else {
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 if (typeof updateLoadMoreButton === 'function') {
                                     updateLoadMoreButton();
                                 }
@@ -580,30 +642,12 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
             });
         </script>
 
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                document.querySelectorAll(".inbox-card").forEach(card => {
-                    card.addEventListener("click", (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const url = card.dataset.action;
-                        console.log("Card clicked, data-action:", url);
-                        if (url && url !== "") {
-                            window.location.href = url;
-                        } else {
-                            console.warn("No URL found in data-action attribute");
-                        }
-                    });
-                });
-            });
-        </script>
-
         <!-- Load More Button Functionality -->
         <script>
             // Make updateLoadMoreButton accessible globally
             let updateLoadMoreButton = null;
 
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 // Get the Load More button
                 const loadMoreBtn = document.getElementById('loadMoreBtn');
                 if (!loadMoreBtn) {
@@ -619,7 +663,7 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                 }
 
                 // Function to update button state (enable/disable based on hidden cards)
-                updateLoadMoreButton = function() {
+                updateLoadMoreButton = function () {
                     const loadMoreContainer = document.getElementById('loadMoreContainer');
                     if (!loadMoreContainer) return;
 
@@ -631,20 +675,20 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
 
                     // Get all cards and check their visibility
                     const allCards = Array.from(messageContainer.querySelectorAll('.inbox-card'));
-                    
+
                     // Cards that are currently visible (not hidden by d-none AND not hidden by filter)
                     const visibleCards = allCards.filter(card => {
                         const hasDNone = card.classList.contains('d-none');
                         const isDisplayNone = card.style.display === 'none';
                         return !hasDNone && !isDisplayNone;
                     });
-                    
+
                     // Hide button immediately if no visible cards (filters result in no matches)
                     if (visibleCards.length === 0) {
                         loadMoreContainer.style.setProperty('display', 'none', 'important');
                         return;
                     }
-                    
+
                     const isAllFilter = (currentCourseFilter === 'All' || currentCourseFilter === '') &&
                         (currentTypeFilter === 'All' || currentTypeFilter === '');
 
@@ -684,10 +728,10 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                 }
 
                 // When button is clicked, show 10 more cards
-                loadMoreBtn.addEventListener('click', function(e) {
+                loadMoreBtn.addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    
+
                     // Get how many cards to load (10)
                     const loadCount = parseInt(this.getAttribute('data-load-count') || '10', 10);
 
@@ -749,13 +793,56 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
 
                 // Check button state on page load and after filters are applied
                 updateLoadMoreButton();
-                
+
                 // Also check after a short delay to ensure DOM is ready
-                setTimeout(function() {
+                setTimeout(function () {
                     updateLoadMoreButton();
                 }, 200);
             });
         </script>
+
+        <!-- Badge and Welcome Message Modal JS -->
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const feedbackModal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+                const welcomeModal = new bootstrap.Modal(document.getElementById('welcomeModal'));
+
+                document.querySelectorAll(".inbox-card").forEach(card => {
+                    card.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const notifType = card.dataset.type || '';
+
+                        if (notifType === "Badge Updates") {
+                            const badgeName = card.dataset.badgeName || 'Unknown Badge';
+                            const badgeIcon = card.dataset.badgeIcon || 'default.png';
+                            const badgeXP = card.dataset.badgeXp || '0';
+                            const badgeWebstars = card.dataset.badgeWebstars || '0';
+                            const badgeDescription = card.dataset.badgeDescription || '';
+
+                            document.getElementById('badgeIcon').src = 'shared/assets/img/badge/' + badgeIcon;
+                            document.getElementById('badgeTitle').textContent = badgeName;
+                            document.getElementById('badgeXP').textContent = `+${badgeXP} XPs`;
+                            document.getElementById('badgeWebstars').textContent = `+${badgeWebstars} Webstars`;
+                            document.getElementById('badgeDescription').textContent = 'You’re leading the pack! ' + badgeDescription + ' Keep blazing the trail!';
+
+                            feedbackModal.show();
+
+                        } else if (notifType === "Welcome") {
+                            welcomeModal.show();
+
+                        } else {
+                            const url = card.dataset.action;
+                            if (url) window.location.href = url;
+                        }
+                    });
+                });
+            });
+
+        </script>
+
+
 </body>
 
 </html>

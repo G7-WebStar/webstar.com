@@ -262,14 +262,14 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                                     </p>
                                     <div class="d-flex justify-content-center mb-3">
                                         <input type="text" name="access_code"
-                                            class="input-style form-control rounded-4 border-blue"
+                                            class="input-style form-control rounded-3 border-blue"
                                             id="accessCodeInput" placeholder="0 0 0 0 0 0" required
                                             inputmode="text" pattern="^[A-Z0-9]{6}$" maxlength="6"
                                             oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0,6);">
                                     </div>
                                 </div>
 
-                                <div id="alertContainer" style="display: none;" class="mb-3">
+                                <div id="alertContainer" style="display: none;" class="mb-3 px-3">
                                     <div class="alert alert-danger d-flex align-items-center mb-0" role="alert" id="alertStyle">
                                         <i class="bi bi-exclamation-triangle-fill me-2" id="exclamation"></i>
                                         <div class="text-reg text-14" id="alertMessage"></div>

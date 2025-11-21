@@ -78,6 +78,11 @@
   color: var(--black);
 }
 
+.tooltip-inner {
+  font-family: 'Regular', sans-serif!important;
+  letter-spacing: -0.03em!important;
+}
+
 .text-med {
   font-family: 'Medium', sans-serif;
   letter-spacing: -0.03em;
@@ -276,7 +281,8 @@ a.btn:hover {
 /* Medium screens (md: ≥768px) */
 @media (min-width: 768px) and (max-width: 1159px) {
   .create-prof-row {
-    width: 85%; /* Adjust as desired */
+    width: 85%;
+    /* Adjust as desired */
   }
 }
 
@@ -295,13 +301,16 @@ a.btn:hover {
 }
 
 .row-padding-top {
-  margin-top: 0px !important; /* Default for md and up */
+  margin-top: 0px !important;
+  /* Default for md and up */
 }
 
 @media (max-width: 767.98px) {
   .row-padding-top {
-    margin-top: 60px !important; /* Mobile only */
-    margin-bottom: 0px !important; /* Mobile only */
+    margin-top: 60px !important;
+    /* Mobile only */
+    margin-bottom: 0px !important;
+    /* Mobile only */
   }
 }
 
@@ -314,5 +323,6 @@ a.btn:hover {
 .dropdown-menu .dropdown-item:active,
 .dropdown-menu .dropdown-item:focus,
 .dropdown-menu .dropdown-item.show {
-  color: var(--black) !important; /* or your preferred text color */
+  color: var(--black) !important;
+  /* or your preferred text color */
 }
