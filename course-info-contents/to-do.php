@@ -16,7 +16,6 @@ $showDropdowns = $assessmentCount > 0
                 <select class="select-modern text-reg text-14" name="sortTodo" onchange="this.form.submit()">
                     <option value="Newest" <?php echo ($sortTodo == 'Newest') ? 'selected' : ''; ?>>Newest</option>
                     <option value="Oldest" <?php echo ($sortTodo == 'Oldest') ? 'selected' : ''; ?>>Oldest</option>
-                    <option value="Missing" <?php echo ($sortTodo == 'Missing') ? 'selected' : ''; ?>>Missing</option>
                 </select>
             </form>
         </div>
