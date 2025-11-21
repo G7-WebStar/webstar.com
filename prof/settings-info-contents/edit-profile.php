@@ -1,7 +1,7 @@
 <?php
 $userQuery = "
     SELECT 
-        users.username,
+        users.userName,
         userinfo.firstName,
         userinfo.middleName,
         userinfo.lastName,
@@ -25,7 +25,7 @@ if ($userResult && mysqli_num_rows($userResult) > 0) {
     $firstName = $userData['firstName'];
     $middleName = $userData['middleName'];
     $lastName = $userData['lastName'];
-    $userName = $userData['username'];
+    $userName = $userData['userName'];
     $studentID = $userData['studentID'];
     $programID = $userData['programID'];
     $programName = $userData['programName'];
@@ -134,7 +134,7 @@ if (isset($_POST['deleteAccount'])) {
             <div class="d-block d-md-none mb-3 d-flex flex-column align-items-center text-center mb-5">
                 <div class="profile-pic mb-2">
                     <img id="profilePreviewMobile"
-                        src="<?php echo !empty($profilePicture) ? '../shared//assets/pfp-uploads/' . $profilePicture : 'https://via.placeholder.com/150'; ?>"
+                        src="<?php echo !empty($profilePicture) ? '../shared/assets/pfp-uploads/' . $profilePicture : 'https://via.placeholder.com/150'; ?>"
                         alt="Profile Picture" class="img-fluid">
                 </div>
 
@@ -353,7 +353,7 @@ if (isset($_POST['deleteAccount'])) {
                     class="col-12 col-md-4 mt-4 pt-1 d-none d-md-flex flex-column align-items-center ps-md-3 px-3 mb-4 mx-auto">
                     <div class="profile-pic">
                         <img id="profilePreviewDesktop"
-                            src="<?php echo !empty($profilePicture) ? '../shared//assets/pfp-uploads/' . $profilePicture : 'https://via.placeholder.com/150'; ?>"
+                            src="<?php echo !empty($profilePicture) ? '../shared/assets/pfp-uploads/' . $profilePicture : 'https://via.placeholder.com/150'; ?>"
                             alt="Profile Picture">
                     </div>
                     <p class="text-med text-12 mt-2" style="color:var(--black); text-align:center; max-width:150px;">

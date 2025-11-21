@@ -1,13 +1,11 @@
 <?php $activePage = 'profIndex'; ?>
 <?php
+
 include('../shared/assets/database/connect.php');
 include("../shared/assets/processes/prof-session-process.php");
 
 $profInfoQuery = "SELECT firstName FROM userinfo
-INNER JOIN courses
-	ON userinfo.userID = courses.userID
-WHERE courses.userID = $userID
-GROUP BY courses.userID;";
+WHERE userID = $userID";
 $profInfoResult = executeQuery($profInfoQuery);
 
 $courses = [];
@@ -30,11 +28,11 @@ if ($result && mysqli_num_rows($result) > 0) {
 
         $courseScheduleQuery = "SELECT GROUP_CONCAT(
             CONCAT(
-                courseSchedule.day, ' ', 
-                DATE_FORMAT(courseSchedule.startTime, '%h:%i %p'), '-', 
-                DATE_FORMAT(courseSchedule.endTime, '%h:%i %p')
+                courseschedule.day, ' ', 
+                DATE_FORMAT(courseschedule.startTime, '%h:%i %p'), '-', 
+                DATE_FORMAT(courseschedule.endTime, '%h:%i %p')
             ) 
-            ORDER BY FIELD(courseSchedule.day, 'Mon','Tue','Wed','Thu','Fri','Sat','Sun'), courseSchedule.startTime
+            ORDER BY FIELD(courseschedule.day, 'Mon','Tue','Wed','Thu','Fri','Sat','Sun'), courseschedule.startTime
             SEPARATOR '\n'
         ) AS schedule FROM courseschedule WHERE courseID = '$courseID'";
         $courseScheduleResult = executeQuery($courseScheduleQuery);
@@ -65,7 +63,7 @@ DATE_FORMAT(assessments.deadline, '%b %e') AS assessmentDeadline
 FROM assessments
 INNER JOIN courses
 	ON assessments.courseID = courses.courseID
-WHERE assessments.deadline >= CURRENT_DATE AND isArchived = '0'
+WHERE assessments.deadline >= CURRENT_DATE AND isArchived = '0' AND courses.userID = '$userID'
 ";
 $activeAssessmentsTabResult = executeQuery($activeAssessmentsTabQuery);
 if ($activeAssessmentsTabResult && mysqli_num_rows($activeAssessmentsTabResult) > 0) {
