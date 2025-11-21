@@ -31,16 +31,16 @@ $course = "
         courses.courseImage,
         GROUP_CONCAT(
             CONCAT(
-                courseSchedule.day, ' ', 
-                DATE_FORMAT(courseSchedule.startTime, '%h:%i %p'), '-', 
-                DATE_FORMAT(courseSchedule.endTime, '%h:%i %p')
+                courseschedule.day, ' ', 
+                DATE_FORMAT(courseschedule.startTime, '%h:%i %p'), '-', 
+                DATE_FORMAT(courseschedule.endTime, '%h:%i %p')
             ) 
-            ORDER BY FIELD(courseSchedule.day, 'Mon','Tue','Wed','Thu','Fri','Sat','Sun'), courseSchedule.startTime
+            ORDER BY FIELD(courseschedule.day, 'Mon','Tue','Wed','Thu','Fri','Sat','Sun'), courseschedule.startTime
             SEPARATOR '\n'
-        ) AS courseSchedule
+        ) AS courseschedule
     FROM userinfo
     INNER JOIN courses ON userinfo.userID = courses.userID
-    LEFT JOIN courseSchedule ON courses.courseID = courseSchedule.courseID
+    LEFT JOIN courseschedule ON courses.courseID = courseschedule.courseID
     WHERE courses.userID = '$userID'
       AND courses.isActive = '$isActive'
 ";
@@ -102,7 +102,7 @@ $courses = executeQuery($course);
                         <!-- Schedule Text -->
                         <div class="col p-0 ms-2">
                             <p class="card-text text-reg text-12 mb-0">
-                                <?php echo isset($row['courseSchedule']) ? nl2br($row['courseSchedule']) : 'No schedule yet'; ?>
+                                <?php echo isset($row['courseschedule']) ? nl2br($row['courseschedule']) : 'No schedule yet'; ?>
                             </p>
                         </div>
                     </div>

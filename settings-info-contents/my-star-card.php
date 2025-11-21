@@ -39,7 +39,7 @@ $starCardQuery = "
     JOIN userinfo ON users.userID = userinfo.userID
     JOIN program ON userinfo.programID = program.programID
     LEFT JOIN profile ON users.userID = profile.userID
-    LEFT JOIN studentBadges AS sb ON users.userID = sb.userID
+    LEFT JOIN studentbadges AS sb ON users.userID = sb.userID
     LEFT JOIN badges AS b ON sb.badgeID = b.badgeID
     WHERE users.userID = '$userID'
 ";
@@ -58,8 +58,8 @@ $myItemsQuery = "
         t.hexCode AS colorHex
     FROM profile prof
     LEFT JOIN emblem e ON prof.emblemID = e.emblemID
-    LEFT JOIN coverImage c ON prof.coverImageID = c.coverImageID
-    LEFT JOIN colorTheme t ON prof.colorThemeID = t.colorThemeID
+    LEFT JOIN coverimage c ON prof.coverImageID = c.coverImageID
+    LEFT JOIN colortheme t ON prof.colorThemeID = t.colorThemeID
     WHERE prof.userID = '$userID'
 ";
 $myItemsResult = mysqli_query($conn, $myItemsQuery);

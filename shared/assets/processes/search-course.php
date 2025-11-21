@@ -14,20 +14,20 @@ SELECT
     profInfo.profilePicture AS profPFP,
     GROUP_CONCAT(
         CONCAT(
-            courseSchedule.day, ' ', 
-            DATE_FORMAT(courseSchedule.startTime, '%h:%i %p'), '-', 
-            DATE_FORMAT(courseSchedule.endTime, '%h:%i %p')
+            courseschedule.day, ' ', 
+            DATE_FORMAT(courseschedule.startTime, '%h:%i %p'), '-', 
+            DATE_FORMAT(courseschedule.endTime, '%h:%i %p')
         ) 
-        ORDER BY FIELD(courseSchedule.day, 'Mon','Tue','Wed','Thu','Fri','Sat','Sun'), courseSchedule.startTime
+        ORDER BY FIELD(courseschedule.day, 'Mon','Tue','Wed','Thu','Fri','Sat','Sun'), courseschedule.startTime
         SEPARATOR '\n'
-    ) AS courseSchedule
+    ) AS courseschedule
 FROM courses
 INNER JOIN userinfo AS profInfo
     ON courses.userID = profInfo.userID
 INNER JOIN enrollments
     ON courses.courseID = enrollments.courseID
-LEFT JOIN courseSchedule
-    ON courses.courseID = courseSchedule.courseID
+LEFT JOIN courseschedule
+    ON courses.courseID = courseschedule.courseID
 WHERE enrollments.userID = '$userID'
 ";
 
@@ -88,7 +88,7 @@ if (!$noResult) {
                         </div>
                         <div class="col p-0 ms-2">
                             <p class="card-text text-reg text-12 mb-0">
-                                <?php echo isset($courses['courseSchedule']) ? nl2br($courses['courseSchedule']) : 'No schedule yet'; ?>
+                                <?php echo isset($courses['courseschedule']) ? nl2br($courses['courseschedule']) : 'No schedule yet'; ?>
                             </p>
                         </div>
                     </div>
