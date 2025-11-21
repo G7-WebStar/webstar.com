@@ -67,7 +67,7 @@ $course = "
         ) AS courseSchedule
     FROM userinfo
     INNER JOIN courses ON userinfo.userID = courses.userID
-    LEFT JOIN courseSchedule ON courses.courseID = courseSchedule.courseID
+    LEFT JOIN courseschedule ON courses.courseID = courseschedule.courseID
     WHERE courses.userID = '$userID'
       AND courses.isActive = '$isActive'
 ";

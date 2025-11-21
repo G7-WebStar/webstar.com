@@ -90,13 +90,13 @@ $getProfIDResult = executeQuery($getProfIDQuery);
 $profUserIDRow = mysqli_fetch_assoc($getProfIDResult);
 $profUserID = $profUserIDRow['userID'];
 
-$profInfoQuery = "SELECT * FROM userInfo WHERE userID = '$profUserID'";
+$profInfoQuery = "SELECT * FROM userinfo WHERE userID = '$profUserID'";
 $profInfoResult = executeQuery($profInfoQuery);
 
 $assessmentCreationDateQuery = "SELECT DATE_FORMAT(createdAt, '%b %e, %Y %l:%i %p') AS creationDate FROM assessments WHERE assessmentID = '$assessmentID'";
 $assessmentCreationDateResult = executeQuery($assessmentCreationDateQuery);
 $assessmentCreationDateRow = mysqli_fetch_assoc($assessmentCreationDateResult);
-$assessmentCreationDate = $assessmentCreationDateRow['creationDate']
+$assessmentCreationDate = $assessmentCreationDateRow['creationDate'];
 ?>
 
 <!doctype html>
