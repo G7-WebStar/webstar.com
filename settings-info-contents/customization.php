@@ -7,10 +7,10 @@ SELECT m.myItemID, m.dateAcquired,
        e.emblemID, e.emblemName AS emblemTitle, e.emblemPath AS emblemImg,
        c.coverImageID, c.title AS coverTitle, c.imagePath AS coverImg,
        t.colorThemeID, t.themeName AS colorTitle, t.hexCode
-FROM myItems m
+FROM myitems m
 LEFT JOIN emblem e ON m.emblemID = e.emblemID
-LEFT JOIN coverImage c ON m.coverImageID = c.coverImageID
-LEFT JOIN colorTheme t ON m.colorThemeID = t.colorThemeID
+LEFT JOIN coverimage c ON m.coverImageID = c.coverImageID
+LEFT JOIN colortheme t ON m.colorThemeID = t.colorThemeID
 WHERE m.userID = $userID
 ORDER BY m.dateAcquired DESC
 ";

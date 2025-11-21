@@ -156,7 +156,7 @@ if (isset($_POST['buyItem'])) {
             $conn->query("UPDATE profile SET webstars = webstars - $price WHERE userID = $userID");
 
             // Insert into myItems 
-            $conn->query("INSERT INTO myItems (userID, coverImageID, emblemID, colorThemeID, dateAcquired) 
+            $conn->query("INSERT INTO myitems (userID, coverImageID, emblemID, colorThemeID, dateAcquired) 
                           VALUES (
                               $userID,
                               " . ($coverImageID ?: "NULL") . ",
