@@ -25,7 +25,7 @@ $showDropdowns = $assessmentCount > 0
             <form method="POST">
                 <input type="hidden" name="activeTab" value="todo">
                 <select class="select-modern text-reg text-14" name="statusFilter" onchange="this.form.submit()">
-                    <option value="Pending" <?php echo ($statusFilter == 'Pending') ? 'selected' : ''; ?>>Assigned</option>
+                    <option value="Pending" <?php echo ($statusFilter == 'Pending') ? 'selected' : ''; ?>>Pending</option>
                     <option value="Missing" <?php echo ($statusFilter == 'Missing') ? 'selected' : ''; ?>>Missing</option>
                     <option value="Done" <?php echo ($statusFilter == 'Done') ? 'selected' : ''; ?>>Done</option>
                 </select>
