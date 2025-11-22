@@ -61,11 +61,26 @@ function fetchLinkTitle($link)
     $title = '';
 
     // Process Google links
-    $link = processGoogleLink($link);
+    $processedLink = processGoogleLink($link);
+
+    // Always use original link for fetching title
+    $titleFetchUrl = $link;
 
     // Ensure the link has a scheme
-    if (!preg_match('/^https?:\/\//', $link)) {
-        $link = 'http://' . $link;
+    if (!preg_match('/^https?:\/\//', $titleFetchUrl)) {
+        $titleFetchUrl = 'http://' . $titleFetchUrl;
+    }
+
+    // --- YouTube Title Detection ---
+    if (preg_match('/(youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $titleFetchUrl, $ytMatch)) {
+        $oembedUrl = "https://www.youtube.com/oembed?url=" . urlencode($titleFetchUrl) . "&format=json";
+        $json = @file_get_contents($oembedUrl);
+        if ($json !== false) {
+            $data = json_decode($json, true);
+            if (isset($data['title'])) {
+                return $data['title']; // 🟢 Return YouTube Title Immediately
+            }
+        }
     }
 
     // Set context for user-agent
@@ -77,10 +92,21 @@ function fetchLinkTitle($link)
     ];
     $context = stream_context_create($options);
 
+    // --- General HTML Title Fetch ---
     try {
-        $html = @file_get_contents($link, false, $context);
-        if ($html && preg_match("/<title>(.*?)<\/title>/is", $html, $matches)) {
-            $title = trim($matches[1]);
+        $html = @file_get_contents($titleFetchUrl, false, $context);
+
+        if ($html) {
+
+            // Try OG title first
+            if (preg_match('/<meta property="og:title" content="([^"]+)"/i', $html, $matches)) {
+                $title = trim($matches[1]);
+            }
+
+            // Try <title> tag
+            elseif (preg_match("/<title>(.*?)<\/title>/is", $html, $matches)) {
+                $title = trim($matches[1]);
+            }
         }
     } catch (Exception $e) {
         $title = '';
@@ -88,7 +114,7 @@ function fetchLinkTitle($link)
 
     // Fallback to domain if title is empty
     if (empty($title)) {
-        $parsedUrl = parse_url($link);
+        $parsedUrl = parse_url($titleFetchUrl);
         $title = isset($parsedUrl['host']) ? ucfirst(str_replace('www.', '', $parsedUrl['host'])) : 'Link';
     }
 
