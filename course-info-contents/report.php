@@ -217,21 +217,21 @@ ORDER BY submissions.submittedAt DESC
 
 ?>
 <div class="row mt-3">
-    <div class="mx-1 mb-3">
+    <div class="mb-3">
         <div class="col-12 card p-2 d-flex flex-column flex-sm-row align-items-center justify-content-between"
             style="
-        border: 1px solid var(--black); border-radius: 20px; background: linear-gradient(180deg, #FDDF94 0%, #FFFFFF 100%);">
+        border: 1px solid var(--black); border-radius: 10px; background: linear-gradient(180deg, #FDDF94 0%, #FFFFFF 100%);">
             <!-- Left Side: Profile + Info -->
             <div class="d-flex flex-column flex-sm-row align-items-center text-center text-sm-start ">
                 <div class="card d-flex justify-content-center align-items-center"
-                    style="width:83px; height:85px; border-radius:15px; overflow:hidden; border:1px solid var(--black); background-color:var(--black); margin:12px;">
+                    style="width:83px; height:85px; border-radius:10px; overflow:hidden; border:1px solid var(--black); background-color:var(--black); margin:12px;">
                     <img src="<?php
                     if (!empty($student['profilePicture'])) {
                         echo 'shared/assets/pfp-uploads/' . $student['profilePicture'];
                     } else {
                         echo 'shared/assets/img/default-profile.png';
                     }
-                    ?>" alt="Profile" style="object-fit:cover; border-radius:15px; width:100%; height:100%;">
+                    ?>" alt="Profile" style="object-fit:cover; border-radius:0px; width:100%; height:100%;">
                 </div>
 
                 <div>
@@ -289,7 +289,7 @@ ORDER BY submissions.submittedAt DESC
     </div>
 
     <!-- Stats -->
-    <div class="row ms-2 justify-content-center align-items-center mt-3 text-center">
+    <div class="row m-0 justify-content-center align-items-center mt-3 text-center">
         <div class="col-12 col-sm-6 mb-3 mb-sm-0 d-flex flex-column align-items-center">
             <div class="percent d-flex justify-content-center align-items-center text-sbold text-20">
                 <span class="material-symbols-outlined" style="margin-right:6px; font-size:23px;">
@@ -314,39 +314,43 @@ ORDER BY submissions.submittedAt DESC
     </div>
 
     <!-- Record Table -->
-    <div class="row mt-2">
-        <div class="col-12">
-            <div class="text-med text-20 my-3">Record</div>
+    <div class="row mt-4 mt-md-2 w-100 m-0">
+        <div class="col-12 p-0 d-flex align-items-center align-items-md-start w-100">
+            <div class="w-100 text-med text-14 text-center text-md-start my-3">Record</div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-12">
+    <div class="row m-0">
+        <div class="col-12 p-0">
             <div class="card d-none d-md-block"
-                style="border: 1px solid var(--black); border-radius: 10px; overflow: hidden; width: 620px;">
+                style="border: 1px solid var(--black); border-radius: 10px; overflow: hidden; width: 100%;">
                 <div class="table-responsive d-none d-md-block">
-                    <table class="table mb-0" style="width: 618px;">
+                    <table class="table mb-0  px-3" style="width: 100%">
                         <thead>
                             <tr class="text-med text-12">
                                 <th
                                     style="background-color: var(--primaryColor); border-right:1px solid var(--black); border-bottom:1px solid var(--black); width:25%;">
                                     <span class="material-symbols-outlined"
-                                        style="font-size:13px; vertical-align:middle; margin-right:4px;">calendar_today</span>Date
+                                        style="font-size:13px; vertical-align:middle; margin-right:4px; color: var(--black);">calendar_today</span>
+                                    <span class="text-reg">Date</span>
                                 </th>
                                 <th
                                     style="background-color: var(--primaryColor); border-right:1px solid var(--black); border-bottom:1px solid var(--black); width:25%;">
                                     <span class="material-symbols-outlined"
-                                        style="font-size:13px; vertical-align:middle; margin-right:4px;">notes</span>Title
+                                        style="font-size:13px; vertical-align:middle; margin-right:4px; color: var(--black);">notes</span>
+                                    <span class="text-reg">Title</span>
                                 </th>
                                 <th
                                     style="background-color: var(--primaryColor); border-right:1px solid var(--black); border-bottom:1px solid var(--black); width:25%;">
                                     <span class="material-symbols-outlined"
-                                        style="font-size:13px; vertical-align:middle; margin-right:4px;">list</span>Type
+                                        style="font-size:13px; vertical-align:middle; margin-right:4px; color: var(--black);">list</span>
+                                    <span class="text-reg">Type</span>
                                 </th>
                                 <th
                                     style="background-color: var(--primaryColor); border-bottom:1px solid var(--black); width:25%;">
                                     <span class="material-symbols-outlined"
-                                        style="font-size:13px; vertical-align:middle; margin-right:4px;">task_alt</span>Grade
+                                        style="font-size:13px; vertical-align:middle; margin-right:4px; color: var(--black);">task_alt</span>
+                                    <span class="text-reg">Grade</span>
                                 </th>
                             </tr>
                         </thead>
@@ -374,7 +378,7 @@ ORDER BY submissions.submittedAt DESC
                                     $allRecords[] = [
                                         'date' => $test['testDate'],
                                         'title' => $test['assessmentTitle'],
-                                        'link' => "test-result.php?testID={$test['testID']}",
+                                        'link' => "exam-info.php?testID={$test['testID']}",
                                         'type' => $test['type'],
                                         'score' => $test['score'],
                                         'total' => $test['totalPoints']
@@ -390,23 +394,24 @@ ORDER BY submissions.submittedAt DESC
                                     ?>
                                     <tr class="text-med text-12">
                                         <td
-                                            style="border-right:1px solid var(--black); <?php echo $isLast ? '' : 'border-bottom:1px solid var(--black);'; ?>">
+                                            style="border-right:1px solid var(--black);color: var(--black)!important; <?php echo $isLast ? '' : 'border-bottom:1px solid var(--black);'; ?>">
                                             <?php echo date('F d, Y', strtotime($row['date'])); ?>
                                         </td>
                                         <td
-                                            style="border-right:1px solid var(--black); <?php echo $isLast ? '' : 'border-bottom:1px solid var(--black);'; ?>">
+                                            style="border-right:1px solid var(--black);color: var(--black)!important; <?php echo $isLast ? '' : 'border-bottom:1px solid var(--black);'; ?>">
                                             <a href="<?php echo $row['link']; ?>"
                                                 style="text-decoration:none; color:var(--black); font-weight:500;">
                                                 <?php echo $row['title']; ?>
                                             </a>
                                         </td>
                                         <td
-                                            style="border-right:1px solid var(--black); text-align:center; <?php echo $isLast ? '' : 'border-bottom:1px solid var(--black);'; ?>">
+                                            style="border-right:1px solid var(--black); color: var(--black)!important;text-align:center; <?php echo $isLast ? '' : 'border-bottom:1px solid var(--black);'; ?>">
                                             <span class="course-badge rounded-pill px-3 text-reg text-12">
                                                 <?php echo ucfirst($row['type']); ?>
                                             </span>
                                         </td>
-                                        <td style="<?php echo $isLast ? '' : 'border-bottom:1px solid var(--black);'; ?>">
+                                        <td
+                                            style="color: var(--black)!important;<?php echo $isLast ? '' : 'border-bottom:1px solid var(--black);'; ?>">
                                             <?php echo $row['score']; ?>/<?php echo $row['total']; ?>
                                         </td>
                                     </tr>
@@ -417,7 +422,7 @@ ORDER BY submissions.submittedAt DESC
                             if (!$hasRecords):
                                 ?>
                                 <tr>
-                                    <td colspan="4" class="text-center text-reg text-12">No records found.</td>
+                                    <td colspan="4" class="text-center text-muted text-med text-14">No records found.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -428,8 +433,8 @@ ORDER BY submissions.submittedAt DESC
     </div>
 
     <!-- Mobile Cards -->
-    <div class="row">
-        <div class="col d-block d-md-none">
+    <div class="row m-0">
+        <div class="col d-block d-md-none p-0">
 
             <?php
             $hasRecords = false;
@@ -439,63 +444,61 @@ ORDER BY submissions.submittedAt DESC
 
                 foreach ($allRecords as $record):
                     ?>
-                    <div class="card p-3 ms-2 mb-2" style="border: 1px solid var(--black); border-radius: 15px; width: 290px;">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <a href="<?php echo $record['link']; ?>"
-                                style="text-decoration:none; color:var(--black); font-weight:500;">
-                                <?php echo $record['title']; ?>
-                            </a>
-                            <span class="text-sbold text-16">
-                                <?php echo $record['score']; ?>/<?php echo $record['total']; ?>
-                            </span>
-                        </div>
-                        <div class="justify-content-start align-items-start">
-                            <div class="text-reg text-14 mb-2">
-                                <?php echo date('F d, Y', strtotime($record['date'])); ?>
+                    <a href="<?php echo $record['link']; ?>" style="text-decoration:none; color:var(--black);">
+                        <div class="card p-3 mb-2 w-100"
+                            style="border: 1px solid var(--black); border-radius: 10px; width: 290px;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-sbold"><?php echo $record['title']; ?></span>
+                                <span class="text-sbold text-16">
+                                    <?php echo $record['score']; ?>/<?php echo $record['total']; ?>
+                                </span>
                             </div>
-                            <div class="course-badge rounded-pill px-3 text-reg text-12" style="width: 60px;">
-                                <?php echo ucfirst($record['type']); ?>
+                            <div class="justify-content-start align-items-start">
+                                <div class="text-reg text-14 mb-2">
+                                    <?php echo date('F d, Y', strtotime($record['date'])); ?>
+                                </div>
+                                <div class="course-badge rounded-pill px-3 text-reg text-12" style="width: 60px;">
+                                    <?php echo ucfirst($record['type']); ?>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                     <?php
                 endforeach;
             endif;
 
             if (!$hasRecords):
                 ?>
-                <div class="text-center text-muted">No submission or test records found.</div>
+                <div class="text-center text-muted text-med text-14">No submission or test records found.</div>
             <?php endif; ?>
         </div>
     </div>
 
     <!-- Badges -->
-    <div class="row">
-        <div class="col">
-            <div class="text-med text-20 my-3">
-                Badges
-            </div>
+    <div class="row mt-4 mt-md-2 w-100 m-0">
+        <div class="col-12 p-0 d-flex align-items-center align-items-md-start w-100">
+            <div class="w-100 text-med text-14 text-center text-md-start my-3">Badges</div>
         </div>
     </div>
 
-    <div class="row mx-1">
+    <div class="row m-0">
         <?php if (!empty($studentCourseBadges)): ?>
             <?php foreach ($studentCourseBadges as $b): ?>
-                <div class="col-12 mb-2">
-                    <div class="card py-2 py-sm-0" style="border: 1px solid var(--black); border-radius: 15px; width: 100%;">
+                <div class="col-12 mb-2 p-0">
+                    <div class="card py-2 py-sm-0" style="border: 1px solid var(--black); border-radius: 10px; width: 100%;">
                         <div class="col-12 d-flex flex-row align-items-center justify-content-between flex-nowrap px-3 py-1">
 
                             <!-- Left Side: Badge icon + details -->
-                            <div class="d-flex flex-row align-items-center flex-nowrap" style="min-width: 0;">
+                            <div class="d-flex flex-row align-items-center flex-nowrap py-1" style="min-width: 0;">
                                 <div class="d-flex justify-content-center align-items-center flex-shrink-0">
                                     <img src="shared/assets/img/badge/<?php echo $b['badgeIcon']; ?>"
                                         style="width:60px; height:62px; object-fit:contain;" data-bs-toggle="tooltip"
                                         data-bs-placement="top" title="<?php echo $b['badgeName']; ?>">
                                 </div>
 
-                                <div class="ms-2 flex-grow-1"
+                                <div class="ms-3 me-4 flex-grow-1"
                                     style="min-width:0; word-break: break-word; white-space: normal; text-align: justify;">
-                                    <div class="text-bold text-16"><?php echo $b['badgeName']; ?></div>
+                                    <div class="text-sbold text-16"><?php echo $b['badgeName']; ?></div>
 
                                     <?php if (!empty($b['badgeDescription'])): ?>
                                         <div class="text-med text-12"><?php echo $b['badgeDescription']; ?></div>
@@ -506,7 +509,7 @@ ORDER BY submissions.submittedAt DESC
                             <!-- Right Side: Count -->
                             <?php if (!empty($b['badgeCount']) && $b['badgeCount'] > 1): ?>
                                 <div class="text-end flex-shrink-0" style="line-height: 1.2; margin-left: 5px;">
-                                    <div class="text-bold text-22 justify-content-end">
+                                    <div class="text-sbold text-22 justify-content-end">
                                         x<?php echo $b['badgeCount']; ?></div>
                                 </div>
                             <?php endif; ?>
@@ -516,7 +519,7 @@ ORDER BY submissions.submittedAt DESC
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
-            <div class="col-12 text-center text-muted">No badges earned yet.</div>
+            <div class="col-12 text-center text-muted text-med text-14">No badges earned yet.</div>
         <?php endif; ?>
     </div>
 

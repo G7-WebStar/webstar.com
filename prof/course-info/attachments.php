@@ -28,18 +28,19 @@ mysqli_data_seek($fileResult, 0);
 
 <?php if ($hasFiles): ?>
 
-<div class="d-flex align-items-center flex-nowrap mb-1">
-    <div class="d-flex align-items-center flex-nowrap">
-        <span class="dropdown-label me-2 text-reg text-14">Sort by</span>
-        <form method="POST">
-            <input type="hidden" name="activeTab" value="attachments">
-            <select class="select-modern text-reg text-14" name="sortAttachment" onchange="this.form.submit()">
-                <option value="Newest" <?php echo ($sortAttachment == 'Newest') ? 'selected' : ''; ?>>Newest</option>
-                <option value="Oldest" <?php echo ($sortAttachment == 'Oldest') ? 'selected' : ''; ?>>Oldest</option>
-            </select>
-        </form>
+    <!-- Sort By Dropdown (Shown only when there are attachments) -->
+    <div class="d-flex align-items-center flex-nowrap mb-2">
+        <div class="d-flex align-items-center flex-nowrap">
+            <span class="dropdown-label me-2 text-reg text-14">Sort by</span>
+            <form method="POST">
+                <input type="hidden" name="activeTab" value="attachments">
+                <select class="select-modern text-reg text-14" name="sortAttachment" onchange="this.form.submit()">
+                    <option value="Newest" <?php echo ($sortAttachment == 'Newest') ? 'selected' : ''; ?>>Newest</option>
+                    <option value="Oldest" <?php echo ($sortAttachment == 'Oldest') ? 'selected' : ''; ?>>Oldest</option>
+                </select>
+            </form>
+        </div>
     </div>
-</div>
 
 <div class="d-flex flex-column flex-nowrap overflow-x-hidden">
     <?php while ($file = mysqli_fetch_assoc($fileResult)): ?>
@@ -54,33 +55,39 @@ mysqli_data_seek($fileResult, 0);
         }
         ?>
 
-        <div class="row mb-0 mt-2">
-            <div class="col">
-                <div class="todo-card d-flex align-items-stretch p-2">
-                    <div class="d-flex w-100 align-items-center justify-content-between">
+            <div class="row mb-0 mt-2">
+                <div class="col">
+                    <div class="todo-card d-flex align-items-stretch px-2 py-3">
+                        <div class="d-flex w-100 align-items-center justify-content-between">
 
-                        <!-- Clickable area opens modal -->
-                        <div class="d-flex align-items-center flex-grow-1" style="cursor:pointer;"
-                            onclick="openTodoViewer('<?php echo addslashes($fileName); ?>', '<?php echo addslashes($filePath); ?>')">
+                            <!-- Attachment Info (click opens modal) -->
+                            <div class="d-flex align-items-center flex-grow-1" style="cursor:pointer;"
+                                onclick="openTodoViewer('<?php echo addslashes($fileName); ?>', '<?php echo addslashes($filePath); ?>')">
+                                <div class="mx-4 d-flex align-items-center">
+                                    <span class="material-symbols-rounded" style="line-height: 1;">
+                                        draft
+                                    </span>
+                                </div>
+                                <div class="file-info">
+                                    <div class="text-sbold text-16 text-truncate" style="line-height: 1;"
+                                        title="<?php echo htmlspecialchars($fileName); ?>">
+                                        <?php echo htmlspecialchars($fileName); ?>
+                                    </div>
+                                    <div class="text-reg text-12 mt-1" style="line-height: 1;">
+                                        Uploaded <?= getRelativeTime($file['uploadedAt'], true) ?>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Download Icon (click downloads file) -->
                             <div class="mx-4 d-flex align-items-center">
-                                <span class="material-symbols-outlined" style="line-height:1;">draft</span>
+                                <a href="<?php echo $filePath; ?>" download="<?php echo htmlspecialchars($fileName); ?>"
+                                    style="color:inherit;" class="mt-2">
+                                    <span class="material-symbols-rounded" style="cursor:pointer;">
+                                        download_2
+                                    </span>
+                                </a>
                             </div>
-                            <div class="file-info">
-                                <div class="text-sbold text-16 py-1 text-truncate" title="<?php echo htmlspecialchars($fileName); ?>">
-                                    <?php echo htmlspecialchars($fileName); ?>
-                                </div>
-                                <div class="text-reg text-12">
-                                    Uploaded <?php echo date("F d, Y", strtotime($file['uploadedAt'])); ?>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Download Icon -->
-                        <div class="mx-4 d-flex align-items-center">
-                            <a href="<?php echo $filePath; ?>" download="<?php echo htmlspecialchars($fileName); ?>" style="color:inherit;">
-                                <span class="material-symbols-outlined" style="cursor:pointer;">download_2</span>
-                            </a>
-                        </div>
 
                     </div>
                 </div>

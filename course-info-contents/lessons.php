@@ -86,7 +86,7 @@ mysqli_data_seek($lessonResult, 0);
                                 <!-- Left side: File icon and Text -->
                                 <div class="d-flex align-items-center flex-grow-1">
                                     <div class="mx-4 d-flex align-items-center">
-                                        <span class="material-symbols-outlined" style="line-height: 1;">
+                                        <span class="material-symbols-rounded" style="line-height: 1;">
                                             menu_book
                                         </span>
                                     </div>

@@ -167,8 +167,10 @@ $courses = executeQuery($course);
                                             <input type="text" placeholder="Search" name="search"
                                                 value="<?php echo htmlspecialchars($search); ?>"
                                                 class="form-control py-1 text-reg text-14" id="searchInput">
-                                            <button type="submit" class="btn-outline-secondary">
-                                                <i class="bi bi-search me-2"></i>
+                                            <button type="submit" class="btn-outline-secondary d-flex align-items-center">
+                                                <span class="material-symbols-rounded me-1" style="font-size:20px">
+                                                    search
+                                                </span>
                                             </button>
                                         </form>
                                     </div>
@@ -285,7 +287,8 @@ $courses = executeQuery($course);
                                     </div>
                                 <?php } ?>
                             <?php } else { ?>
-                                <div class="d-flex flex-column justify-content-center align-items-center" style="min-height: 60vh;">
+                                <div class="d-flex flex-column justify-content-center align-items-center"
+                                    style="min-height: 60vh;">
                                     <img src="../shared/assets/img/empty/folder2.png" width="100" class="mb-1">
                                     <div class="text-center text-14 text-reg mt-1">No courses found.</div>
                                 </div>
