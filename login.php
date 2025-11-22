@@ -6,6 +6,8 @@ header("Pragma: no-cache");
 
 include("shared/assets/database/connect.php");
 include("shared/assets/processes/login-process.php");
+session_unset();
+session_destroy();
 
 if (isset($_SESSION['userID'])) {
     if ($_SESSION['role'] == 'student') {
