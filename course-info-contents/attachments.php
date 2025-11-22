@@ -15,10 +15,10 @@ switch ($sortAttachment) {
 $fileQuery = "SELECT * FROM files WHERE courseID = '$courseID' AND submissionID IS NULL ORDER BY $attachmentOrderBy";
 $fileResult = executeQuery($fileQuery);
 
-// Check if there is at least one file with a non-empty title
+// Check if there is at least one file with non-empty title and attachment
 $hasFiles = false;
 while ($file = mysqli_fetch_assoc($fileResult)) {
-    if (!empty($file['fileAttachment'])) {
+    if (!empty($file['fileTitle']) && !empty($file['fileAttachment'])) {
         $hasFiles = true;
         break;
     }
@@ -47,14 +47,15 @@ mysqli_data_seek($fileResult, 0);
     <!-- Attachments List -->
     <div class="d-flex flex-column flex-nowrap overflow-x-hidden">
         <?php while ($file = mysqli_fetch_assoc($fileResult)): ?>
-            <?php if (empty($file['fileAttachment']))
-                continue; ?>
+            <?php if (empty($file['fileAttachment'])) continue; ?>
 
             <?php
-            $fileName = $file['fileAttachment'];
-            $filePath = $file['fileLink'];
+            $fileName = $file['fileTitle'];        // Display only
+            $filePath = $file['fileAttachment'];   // Actual file path
+
+            // If it's a local file
             if (!preg_match('/^https?:\/\//', $filePath)) {
-                $filePath = "shared/assets/files/" . $fileName; // local path
+                $filePath = "shared/assets/files/" . $filePath;
             }
             ?>
 
@@ -63,32 +64,27 @@ mysqli_data_seek($fileResult, 0);
                     <div class="todo-card d-flex align-items-stretch p-2">
                         <div class="d-flex w-100 align-items-center justify-content-between">
 
-                            <!-- Attachment Info (click opens modal) -->
+                            <!-- Clickable area opens modal -->
                             <div class="d-flex align-items-center flex-grow-1" style="cursor:pointer;"
                                 onclick="openTodoViewer('<?php echo addslashes($fileName); ?>', '<?php echo addslashes($filePath); ?>')">
                                 <div class="mx-4 d-flex align-items-center">
-                                    <span class="material-symbols-outlined" style="line-height: 1;">
-                                        draft
-                                    </span>
+                                    <span class="material-symbols-outlined">draft</span>
                                 </div>
                                 <div class="file-info">
-                                    <div class="text-sbold text-16 py-1 text-truncate" style="line-height: 1;"
-                                        title="<?php echo htmlspecialchars($fileName); ?>">
+                                    <div class="text-sbold text-16 py-1 text-truncate"
+                                         title="<?php echo htmlspecialchars($fileName); ?>">
                                         <?php echo htmlspecialchars($fileName); ?>
                                     </div>
-                                    <div class="text-reg text-12" style="line-height: 1;">
+                                    <div class="text-reg text-12">
                                         Uploaded <?php echo date("F d, Y", strtotime($file['uploadedAt'])); ?>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Download Icon (click downloads file) -->
+                            <!-- Download icon -->
                             <div class="mx-4 d-flex align-items-center">
-                                <a href="<?php echo $filePath; ?>" download="<?php echo htmlspecialchars($fileName); ?>"
-                                    style="color:inherit;">
-                                    <span class="material-symbols-outlined" style="cursor:pointer;">
-                                        download_2
-                                    </span>
+                                <a href="<?php echo $filePath; ?>" download="<?php echo htmlspecialchars($fileName); ?>" style="color:inherit;">
+                                    <span class="material-symbols-outlined" style="cursor:pointer;">download_2</span>
                                 </a>
                             </div>
 
@@ -96,6 +92,7 @@ mysqli_data_seek($fileResult, 0);
                     </div>
                 </div>
             </div>
+
         <?php endwhile; ?>
     </div>
 
@@ -190,5 +187,4 @@ mysqli_data_seek($fileResult, 0);
 
         new bootstrap.Modal(document.getElementById("todoViewerModal")).show();
     }
-</script>
 </script>

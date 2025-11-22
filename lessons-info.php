@@ -33,32 +33,36 @@ $profPic = !empty($lesson['profilePicture']) ? $lesson['profilePicture'] : "shar
 $displayTime = !empty($lesson['updatedAt']) ? $lesson['updatedAt'] : $lesson['createdAt'];
 $formattedTime = !empty($displayTime) ? date("F j, Y g:i A", strtotime($displayTime)) : "";
 
-$filesQuery = "SELECT * FROM files WHERE lessonID = '$lessonID'";
+$filesQuery = "SELECT * FROM files WHERE lessonID = $lessonID";
 $filesResult = executeQuery($filesQuery);
 
-// $filesQuery = "SELECT * FROM files WHERE lessonID = '$lessonID'";
-// $filesResult = executeQuery($filesQuery);
-
-$fileLinks = [];   // for viewer modal
-$linksArray = [];  // for link list display
+$fileLinks = [];
+$linksArray = [];
 
 while ($file = mysqli_fetch_assoc($filesResult)) {
 
     // ---------- FILE ATTACHMENTS ----------
     if (!empty($file['fileAttachment'])) {
 
+        // Split fileAttachment and fileTitle by comma
         $attachments = array_map('trim', explode(',', $file['fileAttachment']));
+        $titles = !empty($file['fileTitle']) ? array_map('trim', explode(',', $file['fileTitle'])) : [];
 
-        foreach ($attachments as $att) {
+        foreach ($attachments as $index => $att) {
 
+            // Use actual file name in server folder
             $fileName = basename($att);
-            $filePath = "shared/assets/files/" . $fileName;
+            $filePath = "shared/assets/files/" . $fileName; // <-- make sure path is correct relative to this PHP file
+
+            // Display title from DB, fallback to filename
+            $displayTitle = $titles[$index] ?? $fileName;
 
             $fileLinks[] = [
-                'name' => $fileName,
+                'attachment' => $fileName,   // actual file on server
                 'path' => $filePath,
+                'title' => $displayTitle,    // what will be displayed
                 'ext' => strtolower(pathinfo($fileName, PATHINFO_EXTENSION)),
-                'title' => $file['fileTitle']
+                'size' => file_exists($filePath) ? round(filesize($filePath) / 1048576, 2) . " MB" : "Unknown size"
             ];
         }
     }
@@ -66,15 +70,15 @@ while ($file = mysqli_fetch_assoc($filesResult)) {
     // ---------- LINK ATTACHMENTS ----------
     if (!empty($file['fileLink'])) {
         $links = array_map('trim', explode(',', $file['fileLink']));
-
         foreach ($links as $l) {
             $linksArray[] = [
-                'title' => $file['fileTitle'],
+                'title' => $file['fileTitle'] ?? $l,
                 'url' => $l
             ];
         }
     }
 }
+
 
 $fileCount = count($fileLinks);
 $linkCount = count($linksArray);
@@ -144,7 +148,8 @@ $linkCount = count($linksArray);
                                         <span class="text-sbold text-25"><?php echo $lessonTitle; ?></span>
                                         <div class="text-reg text-18"><?php echo $fileCount ?>
                                             <?php echo $fileCount == 1 ? "file" : "files" ?> · <?php echo $linkCount ?>
-                                            <?php echo $linkCount == 1 ? "link" : "links" ?></div>
+                                            <?php echo $linkCount == 1 ? "link" : "links" ?>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -164,7 +169,8 @@ $linkCount = count($linksArray);
                                     </div>
                                     <div class="due text-reg text-18"><?php echo $fileCount ?>
                                         <?php echo $fileCount == 1 ? "file" : "files" ?> · <?php echo $linkCount ?>
-                                        <?php echo $linkCount == 1 ? "link" : "links" ?></div>
+                                        <?php echo $linkCount == 1 ? "link" : "links" ?>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -180,17 +186,17 @@ $linkCount = count($linksArray);
                                     <div class="text-sbold text-14 mt-4">Learning Materials</div>
                                     <?php foreach ($fileLinks as $f): ?>
                                         <?php
-                                        $file = $f['name'];
                                         $filePath = $f['path'];
-
                                         $fileExt = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
                                         $fileSize = file_exists($filePath) ? filesize($filePath) : 0;
                                         $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
 
-                                        $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
+                                        $displayTitle = $f['title'];  // from DB
+                                        $fileExt = strtoupper($f['ext']);
+                                        $fileSizeMB = $f['size'];
                                         ?>
 
-                                        <div onclick="openViewerModal('<?php echo $file; ?>', '<?php echo $filePath; ?>')"
+                                        <div onclick="openViewerModal('<?php echo $f['title']; ?>', '<?php echo $f['path']; ?>')"
                                             style="cursor:pointer; text-decoration:none; color:inherit;">
 
                                             <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
@@ -200,8 +206,8 @@ $linkCount = count($linksArray);
 
                                                 <div class="ms-2">
                                                     <div class="text-sbold text-16 mt-1 text-truncate" style="width:225px;"
-                                                        title="<?php echo $fileNameOnly; ?>">
-                                                        <?php echo $fileNameOnly ?>
+                                                        title="<?php echo htmlspecialchars($displayTitle); ?>">
+                                                        <?php echo htmlspecialchars($displayTitle); ?>
                                                     </div>
                                                     <div class="due text-reg text-14 mb-1">
                                                         <?php echo $fileExt ?> · <?php echo $fileSizeMB ?>
@@ -229,7 +235,8 @@ $linkCount = count($linksArray);
                                                         <?php echo htmlspecialchars($linkItem['title']); ?>
                                                     </div>
 
-                                                    <div class="text-reg text-12 mt-0 text-truncate" style="color: var(--black); width: 230px;"
+                                                    <div class="text-reg text-12 mt-0 text-truncate"
+                                                        style="color: var(--black); width: 230px;"
                                                         title="<?php echo htmlspecialchars($linkItem['url']); ?>">
                                                         <?php echo htmlspecialchars($linkItem['url']); ?>
                                                     </div>
@@ -270,7 +277,8 @@ $linkCount = count($linksArray);
                 <!-- Header -->
                 <div class="modal-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-2">
-                        <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;" id="viewerModalLabel">File Viewer</h5>
+                        <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;"
+                            id="viewerModalLabel">File Viewer</h5>
 
                         <a id="modalDownloadBtn" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
                             style="background-color: var(--primaryColor); border: 1px solid var(--black);" download>
@@ -303,7 +311,8 @@ $linkCount = count($linksArray);
                 <!-- Header -->
                 <div class="modal-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-2">
-                        <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;" id="linkViewerModalLabel">Link Viewer</h5>
+                        <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;"
+                            id="linkViewerModalLabel">Link Viewer</h5>
 
                         <a id="modalOpenInNewTab" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
                             style="background-color: var(--primaryColor); border: 1px solid var(--black);"
