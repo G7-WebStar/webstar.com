@@ -743,7 +743,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                                     <div class="rounded-circle flex-shrink-0 me-2 overflow-hidden d-flex justify-content-center align-items-center"
                                                                         style="width: 40px; height: 40px; border: 1px solid var(--black); box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.8);">
                                                                         <img src="shared/assets/pfp-uploads/<?= htmlspecialchars($user['profilePicture']) ?>"
-                                                                            style="width: auto; height: 100%; object-fit: cover;"
+                                                                            style="width: 100%; height: 100%; object-fit: cover;"
                                                                             alt="Profile Picture">
                                                                     </div>
 

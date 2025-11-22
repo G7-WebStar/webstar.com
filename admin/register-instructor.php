@@ -30,7 +30,7 @@ if (isset($_POST['registerBtn'])) {
     if (mysqli_num_rows($usernameCheckResult) > 0) {
         $usernameError = "Username has already been taken.";
     }
-
+    
     // If no errors, insert user
     if ($usernameError == "") {
 
