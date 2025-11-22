@@ -8,6 +8,10 @@ include('../shared/assets/database/connect.php');
 date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
 
+$errorMessages = [
+    "emailNoCredential" => "No email credentials found in the database!"
+];
+
 if (!class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
     require '../shared/assets/phpmailer/src/Exception.php';
     require '../shared/assets/phpmailer/src/PHPMailer.php';
@@ -234,59 +238,67 @@ if (isset($_POST['save_exam'])) {
                 ";
                 $emailsResult = executeQuery($selectEmailsQuery);
 
-                try {
-                    $mail = new PHPMailer(true);
-                    $mail->isSMTP();
-                    $mail->Host = 'smtp.gmail.com';
-                    $mail->SMTPAuth = true;
-                    $mail->Username = 'learn.webstar@gmail.com';
-                    $mail->Password = 'mtls vctd rhai cdem';
-                    $mail->SMTPSecure = 'tls';
-                    $mail->Port = 587;
-                    $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
-                    $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
-                    if (file_exists($headerPath)) {
-                        $mail->AddEmbeddedImage($headerPath, 'emailHeader');
-                    }
-                    $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
-                    if (file_exists($footerPath)) {
-                        $mail->AddEmbeddedImage($footerPath, 'emailFooter');
-                    }
+                $credentialQuery = "SELECT email, password FROM emailcredentials WHERE credentialID = 1";
+                $credentialResult = executeQuery($credentialQuery);
+                $credentialRow = $credentialResult ? mysqli_fetch_assoc($credentialResult) : null;
 
-                    $mail->isHTML(true);
-                    $mail->CharSet = 'UTF-8';
-                    $mail->Encoding = 'base64';
-                    $mail->Subject = "[NEW TEST] " . $titleRaw . " for Course " . $courseCode;
+                if ($credentialRow) {
+                    $smtpEmail = $credentialRow['email'];
+                    $smtpPassword = $credentialRow['password'];
 
-                    $recipientsFound = false;
-                    while ($student = mysqli_fetch_assoc($emailsResult)) {
-                        if ($student['questDeadlineEnabled'] == 1 && !empty($student['email'])) {
-                            $mail->addAddress($student['email']);
-                            $recipientsFound = true;
+                    try {
+                        $mail = new PHPMailer(true);
+                        $mail->isSMTP();
+                        $mail->Host = 'smtp.gmail.com';
+                        $mail->SMTPAuth = true;
+                        $mail->Username = $smtpEmail;
+                        $mail->Password = $smtpPassword;
+                        $mail->SMTPSecure = 'tls';
+                        $mail->Port = 587;
+                        $mail->setFrom($smtpEmail, 'Webstar');
+                        $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
+                        if (file_exists($headerPath)) {
+                            $mail->AddEmbeddedImage($headerPath, 'emailHeader');
                         }
-                    }
+                        $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
+                        if (file_exists($footerPath)) {
+                            $mail->AddEmbeddedImage($footerPath, 'emailFooter');
+                        }
 
-                    if ($recipientsFound) {
-                        $deadlineDisplay = 'Not set';
-                        if (!empty($testDeadline)) {
-                            try {
-                                $deadlineDate = new DateTime($testDeadline);
-                                $deadlineDisplay = $deadlineDate->format('F j, Y \a\t g:i A');
-                            } catch (Exception $e) {
-                                $deadlineDisplay = $testDeadline;
+                        $mail->isHTML(true);
+                        $mail->CharSet = 'UTF-8';
+                        $mail->Encoding = 'base64';
+                        $mail->Subject = "[NEW TEST] " . $titleRaw . " for Course " . $courseCode;
+
+                        $recipientsFound = false;
+                        while ($student = mysqli_fetch_assoc($emailsResult)) {
+                            if ($student['questDeadlineEnabled'] == 1 && !empty($student['email'])) {
+                                $mail->addAddress($student['email']);
+                                $recipientsFound = true;
                             }
                         }
 
-                        $timeLimitDisplay = 'No time limit';
-                        if (!empty($testTimeLimit)) {
-                            $timeLimitDisplay = $testTimeLimitMinutes . ' minute' . ((int) $testTimeLimit === 1 ? '' : 's');
-                        }
+                        if ($recipientsFound) {
+                            $deadlineDisplay = 'Not set';
+                            if (!empty($testDeadline)) {
+                                try {
+                                    $deadlineDate = new DateTime($testDeadline);
+                                    $deadlineDisplay = $deadlineDate->format('F j, Y \a\t g:i A');
+                                } catch (Exception $e) {
+                                    $deadlineDisplay = $testDeadline;
+                                }
+                            }
 
-                        $guidanceHtml = nl2br(htmlspecialchars($generalGuidanceRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-                        $emailTitleEsc = htmlspecialchars($titleRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                        $courseCodeEsc = htmlspecialchars($courseCode, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                            $timeLimitDisplay = 'No time limit';
+                            if (!empty($testTimeLimit)) {
+                                $timeLimitDisplay = $testTimeLimitMinutes . ' minute' . ((int) $testTimeLimit === 1 ? '' : 's');
+                            }
 
-                        $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+                            $guidanceHtml = nl2br(htmlspecialchars($generalGuidanceRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                            $emailTitleEsc = htmlspecialchars($titleRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                            $courseCodeEsc = htmlspecialchars($courseCode, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+                            $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
                             <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
                                 <tr>
                                     <td align="center">
@@ -333,11 +345,12 @@ if (isset($_POST['save_exam'])) {
                             </table>
                         </div>';
 
-                        $mail->send();
+                            $mail->send();
+                        }
+                    } catch (Exception $e) {
+                        $errorMsg = isset($mail) && is_object($mail) ? $mail->ErrorInfo : $e->getMessage();
+                        error_log("PHPMailer failed for Course ID $courseID: " . $errorMsg);
                     }
-                } catch (Exception $e) {
-                    $errorMsg = isset($mail) && is_object($mail) ? $mail->ErrorInfo : $e->getMessage();
-                    error_log("PHPMailer failed for Course ID $courseID: " . $errorMsg);
                 }
             }
         }

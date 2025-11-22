@@ -48,29 +48,27 @@ $profIsInboxPage = isset($activePage) && $activePage === 'inbox';
 $profUserId = prof_sidebar_resolve_user_id();
 $profInboxCount = 0;
 
-// Get enrollmentIDs for the professor's courses
-$enrollmentIds = [];
+// Get courseIDs for the professor's courses
+$courseIds = [];
 if ($profUserId !== null) {
-    $enrollmentQuery = "SELECT DISTINCT e.enrollmentID FROM enrollments e 
-		INNER JOIN courses c ON e.courseID = c.courseID 
-		WHERE c.userID = $profUserId";
-    $enrollmentResult = executeQuery($enrollmentQuery);
-    if ($enrollmentResult) {
-        while ($row = mysqli_fetch_assoc($enrollmentResult)) {
-            $enrollmentIds[] = $row['enrollmentID'];
+    $courseQuery = "SELECT courseID FROM courses WHERE userID = $profUserId";
+    $courseResult = executeQuery($courseQuery);
+    if ($courseResult) {
+        while ($row = mysqli_fetch_assoc($courseResult)) {
+            $courseIds[] = (int) $row['courseID'];
         }
     }
 }
 
-if (!empty($enrollmentIds)) {
-    $enrollmentIdsStr = implode(',', $enrollmentIds);
+if (!empty($courseIds)) {
+    $courseIdsStr = implode(',', $courseIds);
     if ($profIsInboxPage)
-        executeQuery("UPDATE inbox SET isRead = 1 WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
-    $profInboxCount = prof_sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
+        executeQuery("UPDATE inboxProf SET isRead = 1 WHERE courseID IN ($courseIdsStr) AND isRead = 0");
+    $profInboxCount = prof_sidebar_fetch_count("SELECT COUNT(*) AS c FROM inboxProf WHERE courseID IN ($courseIdsStr) AND isRead = 0");
 } else {
     if ($profIsInboxPage)
-        executeQuery("UPDATE inbox SET isRead = 1 WHERE isRead = 0");
-    $profInboxCount = prof_sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE isRead = 0");
+        executeQuery("UPDATE inboxProf SET isRead = 1 WHERE isRead = 0");
+    $profInboxCount = prof_sidebar_fetch_count("SELECT COUNT(*) AS c FROM inboxProf WHERE isRead = 0");
 }
 
 $_SESSION['profInboxCount'] = $profInboxCount;
