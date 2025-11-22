@@ -2,6 +2,31 @@
 include('../shared/assets/database/connect.php');
 include("../shared/assets/processes/prof-session-process.php");
 
+
+function getRelativeTime($datetime, $fullDateFallback = true)
+{
+    $now = new DateTime("now", new DateTimeZone('Asia/Manila'));
+    $past = new DateTime($datetime, new DateTimeZone('Asia/Manila'));
+    $diff = $now->getTimestamp() - $past->getTimestamp();
+
+    if ($diff < 0) {
+        $diff = 0;
+    }
+
+    if ($diff < 3600) { // less than 1 hour → minutes
+        $minutes = max(1, floor($diff / 60));
+        return $minutes . 'm ago';
+    } elseif ($diff < 86400) { // less than 1 day → hours
+        $hours = floor($diff / 3600);
+        return $hours . 'h ago';
+    } elseif ($diff < 604800) { // less than 1 week → days
+        $days = floor($diff / 86400);
+        return $days . 'd ago';
+    } else { // older → show full date
+        return $fullDateFallback ? date("F j, Y", strtotime($datetime)) : floor($diff / 604800) . 'w ago';
+    }
+}
+
 $selectEnrolledQuery = "SELECT DISTINCT courses.courseCode FROM courses WHERE courses.userID = '$userID' ORDER BY courses.courseCode ASC ";
 $selectEnrolledResult = executeQuery($selectEnrolledQuery);
 
@@ -140,7 +165,7 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                                             <?php
                                             while ($inbox = mysqli_fetch_assoc($selectInboxResult)) {
                                                 $timestamp = strtotime($inbox['inboxCreatedAt']);
-                                                $displayDate = $timestamp ? date("F j, Y g:ia", $timestamp) : '';
+                                                $displayDate = $inbox['inboxCreatedAt'] ? getRelativeTime($inbox['inboxCreatedAt']) : '';
                                                 $courseCode = $inbox['courseCode'];
                                                 $messageText = trim($inbox['messageText']);
                                                 ?>
