@@ -812,7 +812,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                         class="form-control textbox text-reg text-16 me-0 me-md-2"
                                                         name="deadline"
                                                         value="<?php echo isset($mainData['deadline']) ? date('Y-m-d\TH:i', strtotime($mainData['deadline'])) : ''; ?>"
-                                                        min="<?php echo $currentDateTime; ?>" required>
+                                                        min="<?php echo date('Y-m-d\T00:00', strtotime('+1 day')); ?>" required>
                                                 </div>
                                             </div>
 

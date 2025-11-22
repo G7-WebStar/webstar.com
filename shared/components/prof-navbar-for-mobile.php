@@ -65,12 +65,12 @@ if ($userId !== null) {
 if (!empty($courseIds)) {
     $courseIdsStr = implode(',', $courseIds);
     if ($isInboxPage)
-        executeQuery("UPDATE inboxProf SET isRead = 1 WHERE courseID IN ($courseIdsStr) AND isRead = 0");
-    $unreadInboxCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM inboxProf WHERE courseID IN ($courseIdsStr) AND isRead = 0");
+        executeQuery("UPDATE inboxprof SET isRead = 1 WHERE courseID IN ($courseIdsStr) AND isRead = 0");
+    $unreadInboxCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM inboxprof WHERE courseID IN ($courseIdsStr) AND isRead = 0");
 } else {
     if ($isInboxPage)
-        executeQuery("UPDATE inboxProf SET isRead = 1 WHERE isRead = 0");
-    $unreadInboxCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM inboxProf WHERE isRead = 0");
+        executeQuery("UPDATE inboxprof SET isRead = 1 WHERE isRead = 0");
+    $unreadInboxCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM inboxprof WHERE isRead = 0");
 }
 
 // Share to session for view fallback

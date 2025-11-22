@@ -30,7 +30,7 @@ mysqli_data_seek($fileResult, 0);
 
 <?php if ($hasLinks): ?>
     <!-- Sort By Dropdown (Shown only when there are files) -->
-    <div class="d-flex align-items-center flex-nowrap mb-1" id="header">
+    <div class="d-flex align-items-center flex-nowrap mb-2" id="header">
         <div class="d-flex align-items-center flex-nowrap">
             <span class="dropdown-label me-2 text-reg text-12">Sort by</span>
             <form method="POST">
@@ -57,22 +57,22 @@ mysqli_data_seek($fileResult, 0);
                     <a href="<?php echo htmlspecialchars($fileLink); ?>"
                         target="_blank" rel="noopener noreferrer"
                         style="text-decoration: none; color: inherit; display: block;">
-                        <div class="todo-card d-flex align-items-stretch p-2">
+                        <div class="todo-card d-flex align-items-stretch px-2 py-3">
                             <div class="d-flex w-100 align-items-center">
 
                                 <!-- File Info -->
                                 <div class="d-flex align-items-center flex-grow-1">
                                     <div class="mx-4 d-flex align-items-center">
-                                        <span class="material-symbols-outlined" style="line-height: 1;">
+                                        <span class="material-symbols-rounded" style="line-height: 1;">
                                             public
                                         </span>
                                     </div>
                                     <div class="file-info">
-                                        <div class="text-sbold text-16 py-1 text-truncate" style="line-height: 1;"
+                                        <div class="text-sbold text-16 text-truncate" style="line-height: 1.2;"
                                             title="<?php echo htmlspecialchars($fileTitle); ?>">
                                             <?php echo htmlspecialchars($fileTitle); ?>
                                         </div>
-                                        <div class="text-reg text-12 text-truncate" style="line-height: 1;"
+                                        <div class="text-reg text-12 mt-1 text-truncate" style="line-height: 1.2;"
                                             title="<?php echo htmlspecialchars($fileLink); ?>">
                                             <?php echo htmlspecialchars($fileLink); ?>
                                         </div>

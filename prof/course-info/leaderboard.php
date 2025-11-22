@@ -9,23 +9,26 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
 <?php if ($hasLeaderboardResults): ?>
     <div class="container-fluid">
         <div class="row align-items-center justify-content-start flex-column flex-md-row">
-            <div class="col-8 col-sm-6 col-md-12 col-lg-6 d-flex search-container mb-2 mb-lg-0">
-                <input type="text" id="leaderboardSearch" placeholder="Search classmates" class="form-control py-1 text-reg text-lg-12 text-14">
-                <button type="button" class="btn-outline-secondary">
-                    <i class="bi bi-search me-2"></i>
+            <div class="col-12 col-sm-6 col-md-12 col-lg-6 d-flex search-container mb-2 mb-lg-0">
+                <input type="text" id="leaderboardSearch" placeholder="Search classmates" class="form-control text-reg"
+                style="font-size:13px!important; padding:6px 14px">
+                <button type="button" class="btn-outline-secondary d-flex align-items-center">
+                      <span class="material-symbols-rounded me-3" style="font-size:20px">
+                        search
+                    </span>
                 </button>
             </div>
         </div>
     </div>
-    <div class="customCard text-sbold p-3">
+    <div class="customCard text-sbold pt-1 pb-3 px-3 mx-1">
         <div class="row" id="topThree">
             <?php
             if (mysqli_num_rows($selectTopOneResult) > 0) {
                 while ($topOne = mysqli_fetch_assoc($selectTopOneResult)) {
             ?>
                     <div class="col-12 col-xl-4 mt-3 px-0 mx-auto mx-md-0 d-flex d-md-block justify-content-center justify-content-md-auto px-1 leaderboard-item">
-                        <div class="card rounded-4 col-6 col-md-12">
-                            <div class="card-body border border-black rounded-4">
+                        <div class="card rounded-4 col-6 col-md-12 border-0 h-100" >
+                            <div class="card-body rounded-4 border-none h-100"style="border:1px solid var(--black)">
                                 <div class="row">
                                     <div class="col-6 d-flex align-items-center">
                                         <img src="../shared/assets/pfp-uploads/<?php echo $topOne['profilePicture']; ?>" alt="" width="90"
@@ -63,8 +66,8 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                 while ($topTwoToThree = mysqli_fetch_assoc($selectTopTwoToThreeResult)) {
             ?>
                     <div class="col-6 col-md-12 col-xl-4 mt-3 px-0 px-1 leaderboard-item d-flex">
-                        <div class="card rounded-4 flex-grow-1">
-                            <div class="card-body border border-black rounded-4">
+                        <div class="card rounded-4 flex-grow-1 border-0">
+                            <div class="card-body border-none rounded-4" style="border:1px solid var(--black)">
                                 <div class="row">
                                     <div class="col-6 d-flex align-items-center">
                                         <img src="../shared/assets/pfp-uploads/<?php echo $topTwoToThree['profilePicture']; ?>" alt="" width="90"

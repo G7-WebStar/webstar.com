@@ -326,3 +326,7 @@ a.btn:hover {
   color: var(--black) !important;
   /* or your preferred text color */
 }
+
+.material-symbols-rounded{
+  color: #2C2C2C!important;
+}

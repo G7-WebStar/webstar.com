@@ -132,10 +132,10 @@ $linkCount = count($linksArray);
                                 <!-- DESKTOP VIEW -->
                                 <div class="row desktop-header d-none d-sm-flex">
                                     <div class="col-auto me-2">
-                                        <a href="course-info.php?courseID=<?= $courseID ?>"
+                                        <a onclick="window.history.back()"
                                             class="text-decoration-none">
                                             <span class="material-symbols-outlined"
-                                                style="color: var(--black); font-size: 22px;">
+                                                style="color: var(--black); font-size: 22px; cursor:pointer">
                                                 arrow_back
                                             </span>
                                         </a>

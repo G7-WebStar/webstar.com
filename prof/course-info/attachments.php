@@ -31,7 +31,7 @@ mysqli_data_seek($fileResult, 0);
 <?php if ($hasFiles): ?>
 
     <!-- Sort By Dropdown (Shown only when there are attachments) -->
-    <div class="d-flex align-items-center flex-nowrap mb-1">
+    <div class="d-flex align-items-center flex-nowrap mb-2">
         <div class="d-flex align-items-center flex-nowrap">
             <span class="dropdown-label me-2 text-reg text-14">Sort by</span>
             <form method="POST">
@@ -60,24 +60,24 @@ mysqli_data_seek($fileResult, 0);
 
             <div class="row mb-0 mt-2">
                 <div class="col">
-                    <div class="todo-card d-flex align-items-stretch p-2">
+                    <div class="todo-card d-flex align-items-stretch px-2 py-3">
                         <div class="d-flex w-100 align-items-center justify-content-between">
 
                             <!-- Attachment Info (click opens modal) -->
                             <div class="d-flex align-items-center flex-grow-1" style="cursor:pointer;"
                                 onclick="openTodoViewer('<?php echo addslashes($fileName); ?>', '<?php echo addslashes($filePath); ?>')">
                                 <div class="mx-4 d-flex align-items-center">
-                                    <span class="material-symbols-outlined" style="line-height: 1;">
+                                    <span class="material-symbols-rounded" style="line-height: 1;">
                                         draft
                                     </span>
                                 </div>
                                 <div class="file-info">
-                                    <div class="text-sbold text-16 py-1 text-truncate" style="line-height: 1;"
+                                    <div class="text-sbold text-16 text-truncate" style="line-height: 1;"
                                         title="<?php echo htmlspecialchars($fileName); ?>">
                                         <?php echo htmlspecialchars($fileName); ?>
                                     </div>
-                                    <div class="text-reg text-12" style="line-height: 1;">
-                                        Uploaded <?php echo date("F d, Y", strtotime($file['uploadedAt'])); ?>
+                                    <div class="text-reg text-12 mt-1" style="line-height: 1;">
+                                        Uploaded <?= getRelativeTime($file['uploadedAt'], true) ?>
                                     </div>
                                 </div>
                             </div>
@@ -85,8 +85,8 @@ mysqli_data_seek($fileResult, 0);
                             <!-- Download Icon (click downloads file) -->
                             <div class="mx-4 d-flex align-items-center">
                                 <a href="<?php echo $filePath; ?>" download="<?php echo htmlspecialchars($fileName); ?>"
-                                    style="color:inherit;">
-                                    <span class="material-symbols-outlined" style="cursor:pointer;">
+                                    style="color:inherit;" class="mt-2">
+                                    <span class="material-symbols-rounded" style="cursor:pointer;">
                                         download_2
                                     </span>
                                 </a>
