@@ -97,6 +97,10 @@ $assessmentCreationDateQuery = "SELECT DATE_FORMAT(createdAt, '%b %e, %Y %l:%i %
 $assessmentCreationDateResult = executeQuery($assessmentCreationDateQuery);
 $assessmentCreationDateRow = mysqli_fetch_assoc($assessmentCreationDateResult);
 $assessmentCreationDate = $assessmentCreationDateRow['creationDate'];
+
+$profilePic = !empty($assignmentRow['profilePicture'])
+    ? 'shared/assets/pfp-uploads/' . $assignmentRow['profilePicture']
+    : 'shared/assets/pfp-uploads/defaultProfile.png';
 ?>
 
 <!doctype html>
@@ -219,7 +223,7 @@ $assessmentCreationDate = $assessmentCreationDateRow['creationDate'];
                                     ?>
                                             <div class="d-flex align-items-center pb-5">
                                                 <div class="rounded-circle me-2" style="width: 50px; height: 50px; background-color: var(--highlight75);">
-                                                    <img src="shared/assets/pfp-uploads/prof.png"
+                                                    <img src="<?php echo $profilePic ?>"
                                                         alt="Prof Picture" class="rounded-circle" style="width:50px;height:50px;">
                                                 </div>
                                                 <div>

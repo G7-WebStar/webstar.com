@@ -157,7 +157,7 @@ include("shared/assets/processes/registration-profile-process.php");
                         <!-- Right: Profile Picture -->
                         <div class="col-md-auto d-flex flex-column align-items-center ps-md-3 px-3">
                             <div class="profile-pic">
-                                <img id="profilePreview" src="https://via.placeholder.com/150" alt="Profile Picture">
+                                <img id="profilePreview">
                             </div>
 
                             <div style="width: 100%; display: flex; justify-content: center;">

@@ -17,6 +17,10 @@ if (isset($_SESSION['toast'])) {
     unset($_SESSION['toast']);
 }
 
+$errorMessages = [
+    "emailNoCredential" => "No email credentials found in the database!"
+];
+
 // --- Google Link Processor ---
 function processGoogleLink($link)
 {
@@ -274,16 +278,24 @@ if (isset($_POST['save_lesson'])) {
                 ";
                 $emailsResult = executeQuery($selectEmailsQuery);
 
-                try {
-                    $mail = new PHPMailer(true);
-                    $mail->isSMTP();
-                    $mail->Host = 'smtp.gmail.com';
-                    $mail->SMTPAuth = true;
-                    $mail->Username = 'learn.webstar@gmail.com';
-                    $mail->Password = 'mtls vctd rhai cdem';
-                    $mail->SMTPSecure = 'tls';
-                    $mail->Port = 587;
-                    $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
+                $credentialQuery = "SELECT email, password FROM emailcredentials WHERE credentialID = 1";
+                $credentialResult = executeQuery($credentialQuery);
+                $credentialRow = $credentialResult ? mysqli_fetch_assoc($credentialResult) : null;
+
+                if ($credentialRow) {
+                    $smtpEmail = $credentialRow['email'];
+                    $smtpPassword = $credentialRow['password'];
+
+                    try {
+                        $mail = new PHPMailer(true);
+                        $mail->isSMTP();
+                        $mail->Host = 'smtp.gmail.com';
+                        $mail->SMTPAuth = true;
+                        $mail->Username = $smtpEmail;
+                        $mail->Password = $smtpPassword;
+                        $mail->SMTPSecure = 'tls';
+                        $mail->Port = 587;
+                        $mail->setFrom($smtpEmail, 'Webstar');
                     $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
                     if (file_exists($headerPath)) {
                         $mail->AddEmbeddedImage($headerPath, 'emailHeader');
@@ -357,9 +369,10 @@ if (isset($_POST['save_lesson'])) {
                         $mail->send();
                     }
 
-                } catch (Exception $e) {
-                    $errorMsg = isset($mail) && is_object($mail) ? $mail->ErrorInfo : $e->getMessage();
-                    error_log("PHPMailer failed for Course ID $selectedCourseID: " . $errorMsg);
+                    } catch (Exception $e) {
+                        $errorMsg = isset($mail) && is_object($mail) ? $mail->ErrorInfo : $e->getMessage();
+                        error_log("PHPMailer failed for Course ID $selectedCourseID: " . $errorMsg);
+                    }
                 }
             }
 

@@ -49,28 +49,28 @@ $isInboxPage = isset($activePage) && $activePage === 'inbox';
 $userId = sidebar_resolve_user_id();
 $unreadInboxCount = 0;
 
-// Get enrollmentIDs for the user
-$enrollmentIds = [];
+// Get courseIDs for the professor's courses
+$courseIds = [];
 if ($userId !== null) {
-    $enrollmentQuery = "SELECT enrollmentID FROM enrollments WHERE userID = $userId";
-    $enrollmentResult = executeQuery($enrollmentQuery);
-    if ($enrollmentResult) {
-        while ($row = mysqli_fetch_assoc($enrollmentResult)) {
-            $enrollmentIds[] = $row['enrollmentID'];
+    $courseQuery = "SELECT courseID FROM courses WHERE userID = $userId";
+    $courseResult = executeQuery($courseQuery);
+    if ($courseResult) {
+        while ($row = mysqli_fetch_assoc($courseResult)) {
+            $courseIds[] = (int) $row['courseID'];
         }
     }
 }
 
-// Inbox: clear and count using enrollmentID only
-if (!empty($enrollmentIds)) {
-    $enrollmentIdsStr = implode(',', $enrollmentIds);
+// Inbox: clear and count using courseID only
+if (!empty($courseIds)) {
+    $courseIdsStr = implode(',', $courseIds);
     if ($isInboxPage)
-        executeQuery("UPDATE inbox SET isRead = 1 WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
-    $unreadInboxCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
+        executeQuery("UPDATE inboxProf SET isRead = 1 WHERE courseID IN ($courseIdsStr) AND isRead = 0");
+    $unreadInboxCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM inboxProf WHERE courseID IN ($courseIdsStr) AND isRead = 0");
 } else {
     if ($isInboxPage)
-        executeQuery("UPDATE inbox SET isRead = 1 WHERE isRead = 0");
-    $unreadInboxCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE isRead = 0");
+        executeQuery("UPDATE inboxProf SET isRead = 1 WHERE isRead = 0");
+    $unreadInboxCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM inboxProf WHERE isRead = 0");
 }
 
 // Share to session for view fallback

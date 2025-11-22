@@ -3,8 +3,7 @@ $assessmentCount = mysqli_num_rows($selectAssessmentResult);
 
 // Determine if dropdowns should be visible
 $showDropdowns = $assessmentCount > 0
-    || (!empty($statusFilter) && $statusFilter != 'Pending')
-    || (!empty($sortTodo) && $sortTodo == 'Missing');
+    || (!empty($statusFilter) && $statusFilter != 'Pending');
 ?>
 <?php if ($showDropdowns): ?>
     <div class="d-flex align-items-center flex-nowrap mb-2" id="header">
@@ -16,7 +15,6 @@ $showDropdowns = $assessmentCount > 0
                 <select class="select-modern text-reg text-14" name="sortTodo" onchange="this.form.submit()">
                     <option value="Newest" <?php echo ($sortTodo == 'Newest') ? 'selected' : ''; ?>>Newest</option>
                     <option value="Oldest" <?php echo ($sortTodo == 'Oldest') ? 'selected' : ''; ?>>Oldest</option>
-                    <option value="Missing" <?php echo ($sortTodo == 'Missing') ? 'selected' : ''; ?>>Missing</option>
                 </select>
             </form>
         </div>
@@ -26,7 +24,7 @@ $showDropdowns = $assessmentCount > 0
             <form method="POST">
                 <input type="hidden" name="activeTab" value="todo">
                 <select class="select-modern text-reg text-14" name="statusFilter" onchange="this.form.submit()">
-                    <option value="Pending" <?php echo ($statusFilter == 'Pending') ? 'selected' : ''; ?>>Assigned</option>
+                    <option value="Pending" <?php echo ($statusFilter == 'Pending') ? 'selected' : ''; ?>>Pending</option>
                     <option value="Missing" <?php echo ($statusFilter == 'Missing') ? 'selected' : ''; ?>>Missing</option>
                     <option value="Done" <?php echo ($statusFilter == 'Done') ? 'selected' : ''; ?>>Done</option>
                 </select>

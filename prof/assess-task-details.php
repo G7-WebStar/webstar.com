@@ -294,7 +294,7 @@ if (!empty($rubricID)) {
                                                                             style="width:400px; max-width:100%; min-width:310px;">
                                                                            <span class="px-3 py-3 material-symbols-outlined">draft</span>
                                                                            <div class="ms-2">
-                                                                               <div class="text-sbold text-16 mt-1"><?php echo $fileNameOnly ?></div>
+                                                                               <div class="text-sbold text-16 mt-1 text-truncate" style="max-width:320px;"><?php echo $fileNameOnly ?></div>
                                                                                <div class="due text-reg text-14 mb-1">
                                                                                    <?php echo $fileExt ?> · <?php echo $fileSizeMB ?>
                                                                                </div>
@@ -314,9 +314,9 @@ if (!empty($rubricID)) {
                                                                             style="width:400px; max-width:100%; min-width:310px;">
                                                                            <span class="px-3 py-3 material-symbols-outlined">public</span>
                                                                            <div class="ms-2">
-                                                                               <div class="text-sbold text-16 mt-1"><?php echo $linkTitle ?></div>
-                                                                                <div class="text-reg link text-12 mt-0"
-                                                                                     style="color: var(--black);"><?php echo $linkTitle ?></div>
+                                                                               <div class="text-sbold text-16 mt-1 text-truncate" style="max-width:320px;"><?php echo $linkTitle ?></div>
+                                                                                <div class="text-reg link text-12 mt-0 text-truncate"
+                                                                                     style="color: var(--black); max-width: 320px;"><?php echo $linkTitle ?></div>
                                                                             </div>
                                                                         </div>
                                                                    </div>
@@ -336,7 +336,7 @@ if (!empty($rubricID)) {
                                                                     </span>
 
                                                                     <div class="ms-2">
-                                                                        <div class="text-sbold text-16 mt-1"><?php echo $rubricTitle; ?>
+                                                                        <div class="text-sbold text-16 mt-1 text-truncate" style="max-width:320px;"><?php echo $rubricTitle; ?>
                                                                         </div>
                                                                         <div class="due text-reg text-14 mb-1">
                                                                             <?php echo $rubricPoints; ?> points
