@@ -128,6 +128,23 @@ $getCoursesResult = executeQuery($getCoursesQuery);
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
 
+
+    <style>
+        @media screen and (max-width: 767px) {
+            .img-small {
+                width: 150px !important;
+            }
+
+            .mobile-view {
+                margin-top: 80px !important;
+                margin-bottom: 80px !important;
+            }
+
+            .text-sm-20 {
+                font-size: 20px !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -151,7 +168,7 @@ $getCoursesResult = executeQuery($getCoursesQuery);
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
                     <div class="container-fluid py-1 overflow-y-auto">
-                        <div class="row">
+                        <div class="row justify-content-center mobile-view">
                             <!-- Header Section -->
                             <div class="row align-items-center mb-3 text-center text-lg-start">
                                 <!-- Title -->
@@ -330,7 +347,10 @@ $getCoursesResult = executeQuery($getCoursesQuery);
                                     }
                                 } else {
                                     ?>
-                                    <div class="text-sbold text-center mt-5 text-25">No assessments found.</div>
+                                    <div class="text-sbold text-center mt-5 text-25 d-flex flex-column align-items-center text-sm-20">
+                                        <img src="../shared/assets/img/empty/todo.png" alt="No Assessments" class="mx-auto mt-5 img-fluid img-small" width="250px">
+                                        Nothing to assess here.
+                                    </div>
                                 <?php
                                 }
                                 ?>
@@ -487,6 +507,24 @@ $getCoursesResult = executeQuery($getCoursesQuery);
                     });
 
                     sortedCards.forEach(c => container.appendChild(c));
+
+                    // Remove previous empty-state if it exists
+                    const existingEmpty = container.querySelector(".empty-assessments");
+                    if (existingEmpty) existingEmpty.remove();
+
+                    // Append empty-state ONLY if no visible cards
+                    const visibleCards = sortedCards.filter(c => c.style.display !== 'none');
+                    if (visibleCards.length === 0) {
+                        let empty = document.createElement('div');
+                        empty.className = "empty-assessments text-sbold text-center mt-5 text-25 d-flex flex-column align-items-center text-sm-20";
+                        empty.innerHTML = `
+                                              <img src="../shared/assets/img/empty/todo.png" alt="No Assessments" class="mx-auto mt-5 img-fluid img-small" width="250px">
+                                              Nothing to assess here.
+                                          `;
+                        container.appendChild(empty);
+                    }
+
+
                 }
 
                 //Handle dropdown clicks
