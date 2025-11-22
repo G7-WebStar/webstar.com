@@ -61,7 +61,7 @@ if ($userId !== null) {
     }
 }
 
-// Inbox: clear and count using courseID onlyyyy
+// Inbox: clear and count using courseID only
 if (!empty($courseIds)) {
     $courseIdsStr = implode(',', $courseIds);
     if ($isInboxPage)
@@ -75,7 +75,6 @@ if (!empty($courseIds)) {
 
 // Share to session for view fallback
 $_SESSION['InboxCount'] = $unreadInboxCount;
-//what
 ?>
 
 <!-- Styles -->
@@ -120,7 +119,7 @@ $_SESSION['InboxCount'] = $unreadInboxCount;
                     <a class="dropdown-item d-flex align-items-center" href="add-lesson.php">
                         <span class="material-symbols-rounded me-2"
                             style="color:#2c2c2c;font-size:16px">notes</span>
-                        Test
+                        Lesson
                     </a>
                 </li>
                 <li>
