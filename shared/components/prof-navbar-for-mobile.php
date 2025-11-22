@@ -120,7 +120,7 @@ $_SESSION['InboxCount'] = $unreadInboxCount;
                     <a class="dropdown-item d-flex align-items-center" href="add-lesson.php">
                         <span class="material-symbols-rounded me-2"
                             style="color:#2c2c2c;font-size:16px">notes</span>
-                        Lesson
+                        Test
                     </a>
                 </li>
                 <li>
