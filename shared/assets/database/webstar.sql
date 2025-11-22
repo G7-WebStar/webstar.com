@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Nov 20, 2025 at 04:38 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: 127.0.0.1:3306
+-- Generation Time: Nov 22, 2025 at 04:06 AM
+-- Server version: 11.8.3-MariaDB-log
+-- PHP Version: 7.2.34
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `webstart`
+-- Database: `u977784600_webstar`
 --
 
 -- --------------------------------------------------------
@@ -89,7 +89,8 @@ CREATE TABLE `announcements` (
 INSERT INTO `announcements` (`announcementID`, `courseID`, `userID`, `announcementTitle`, `announcementContent`, `announcementDate`, `announcementTime`, `isRequired`) VALUES
 (2, 34, 1, '', 'PAPA MO', '2025-11-17', '14:11:00', 0),
 (3, 34, 1, '', 'Github', '2025-11-17', '14:17:42', 0),
-(4, 34, 1, '', 'SHEETS', '2025-11-17', '14:21:35', 0);
+(4, 34, 1, '', 'SHEETS', '2025-11-17', '14:21:35', 0),
+(5, 34, 1, '', 'aa', '2025-11-20', '23:41:03', 0);
 
 -- --------------------------------------------------------
 
@@ -113,7 +114,16 @@ CREATE TABLE `assessments` (
 --
 
 INSERT INTO `assessments` (`assessmentID`, `courseID`, `assessmentTitle`, `type`, `deadline`, `deadlineEnabled`, `createdAt`, `isArchived`) VALUES
-(1, 34, 'aa', 'Task', '2025-11-19 21:27:00', 0, '2025-11-20 21:27:24', 0);
+(1, 34, 'aa', 'Task', '2025-11-19 21:27:00', 0, '2025-11-20 21:27:24', 0),
+(2, 34, 'aa', 'Task', '2025-11-19 23:41:00', 0, '2025-11-20 23:41:22', 0),
+(3, 34, 'a', 'Test', '2025-11-22 23:41:00', 0, '2025-11-20 23:41:55', 0),
+(4, 34, 'ahh', 'Task', '2025-11-21 23:59:00', 0, '2025-11-20 23:59:32', 0),
+(5, 34, 'ahh', 'Test', '2025-11-22 23:59:00', 0, '2025-11-20 23:59:58', 0),
+(6, 35, 'STS Activity', 'Task', '2025-11-22 18:35:00', 0, '2025-11-21 10:36:23', 0),
+(8, 35, 'Activity # 2', 'Task', '2025-11-22 18:42:00', 0, '2025-11-21 10:42:06', 0),
+(9, 35, 'Test ni Kim ', 'Test', '2025-11-29 18:42:00', 0, '2025-11-21 18:43:48', 0),
+(10, 35, 'Test ni Kim', 'Test', '2025-11-23 18:45:00', 0, '2025-11-21 18:45:43', 0),
+(11, 35, 'Test again', 'Test', '2025-11-23 18:48:00', 0, '2025-11-21 18:49:43', 1);
 
 -- --------------------------------------------------------
 
@@ -134,7 +144,11 @@ CREATE TABLE `assignments` (
 --
 
 INSERT INTO `assignments` (`assignmentID`, `assessmentID`, `assignmentDescription`, `assignmentPoints`, `rubricID`) VALUES
-(1, 1, 'aa', 0, 0);
+(1, 1, 'aa', 0, 0),
+(2, 2, 'aa', 1, 0),
+(3, 4, 'ag', 1, 0),
+(4, 6, 'Kindly answer and pass on time.', 100, 10),
+(6, 8, 'Kindly answer asap', 50, NULL);
 
 -- --------------------------------------------------------
 
@@ -147,35 +161,37 @@ CREATE TABLE `badges` (
   `badgeName` varchar(100) NOT NULL,
   `badgeDescription` varchar(255) DEFAULT NULL,
   `badgeIcon` varchar(255) DEFAULT NULL,
-  `badgeCategory` varchar(50) DEFAULT NULL
+  `badgeCategory` varchar(50) DEFAULT NULL,
+  `badgeXP` int(11) NOT NULL DEFAULT 0,
+  `badgeWebstars` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `badges`
 --
 
-INSERT INTO `badges` (`badgeID`, `badgeName`, `badgeDescription`, `badgeIcon`, `badgeCategory`) VALUES
-(1, 'Perfect Scorer', 'Awarded to learners who achieved a flawless, 100% score on any test or task — true mastery!', 'perfect_scorer.png', 'Achievement'),
-(2, 'Top Scorer', 'Granted to the learner who outperformed everyone with the highest score in a test or activity.', 'top_scorer.png', 'Achievement'),
-(3, 'Early Finisher', 'Given to those who beat the clock by submitting their task or test at least one day ahead of the deadline.', 'early_finisher.png', 'Achievement'),
-(4, 'First Finisher', 'Presented to the fastest learner who submitted their task or test before anyone else.', 'first_finisher.png', 'Achievement'),
-(5, 'High Achiever', 'Earned by learners who consistently score 90% or higher on any test or task — excellence at its best!', 'high_achiever.png', 'Achievement'),
-(6, 'Quick Thinker', 'Awarded to learners who completed a quiz or exam with impressive speed and accuracy.', 'quick_thinker.png', 'Achievement'),
-(7, 'Leaderboard Legend', 'Crowned to the ultimate top performer who reigned #1 on the leaderboard for the week or course.', 'leaderboard_legend.png', 'Leaderboard'),
-(8, 'Top 3 Titan', 'Bestowed upon learners who claimed a spot in the Top 3 leaderboard — the elite ranks!', 'top_3_titan.png', 'Leaderboard'),
-(9, 'Top 10 Challenger', 'Given to determined learners who earned a place in the Top 10 leaderboard.', 'top_10_challenger.png', 'Leaderboard'),
-(10, 'Elite Performer', 'Celebrating learners who maintained a Top 3 ranking across multiple modules or courses — unstoppable!', 'elite_performer.png', 'Leaderboard'),
-(11, 'Star Performer', 'Awarded to learners who delivered an exceptional performance in a task, activity, or project — a true standout!', 'star_performer.png', 'Recognition'),
-(12, 'Most Improved', 'Given to learners who have shown remarkable growth and steady progress throughout their learning journey.', 'most_improved.png', 'Recognition'),
-(13, 'Exemplary Effort', 'Recognizes learners who consistently demonstrate hard work, perseverance, and dedication — effort that truly shines!', 'exemplary_effort.png', 'Recognition'),
-(14, 'Creative Thinker', 'Granted to learners who showcase originality and creativity in solving problems or completing their work.', 'creative_thinker.png', 'Recognition'),
-(15, 'Insightful Thinker', 'For learners whose answers, reflections, or analyses show impressive depth and understanding.', 'insightful_thinker.png', 'Recognition'),
-(16, 'Well-Documented Work', 'Awarded for submissions that are exceptionally clear, organized, and well-presented — a mark of professionalism!', 'well_documented_work.png', 'Recognition'),
-(17, 'Pixel Perfectionist', 'Awarded to learners who craft layouts with flawless alignment, clean visuals, and pixel-perfect precision.', 'pixel_perfectionist.png', 'Development'),
-(18, 'Function Wizard', 'Bestowed upon learners who write efficient, elegant, and well-structured JavaScript or PHP functions — pure coding magic!', 'function_wizard.png', 'Development'),
-(19, 'Component Crafter', 'Given to learners who build reusable, modular, and well-organized components that make development shine.', 'component_crafter.png', 'Development'),
-(20, 'CSS Sorcerer', 'Recognizes mastery in CSS — for creating stunning, responsive, and creative designs that captivate users.', 'css_sorcerer.png', 'Development'),
-(21, 'UI Enchanter', 'Celebrates learners who bring interfaces to life with smooth interactions, seamless animations, and user-friendly flow.', 'ui_enchanter.png', 'Development');
+INSERT INTO `badges` (`badgeID`, `badgeName`, `badgeDescription`, `badgeIcon`, `badgeCategory`, `badgeXP`, `badgeWebstars`) VALUES
+(1, 'Perfect Scorer', 'Awarded to learners who achieved a flawless, 100% score on any test or task — true mastery!', 'perfect_scorer.png', 'Achievement', 500, 200),
+(2, 'Top Scorer', 'Granted to the learner who outperformed everyone with the highest score in a test or activity.', 'top_scorer.png', 'Achievement', 500, 200),
+(3, 'Early Finisher', 'Given to those who beat the clock by submitting their task or test at least one day ahead of the deadline.', 'early_finisher.png', 'Achievement', 500, 200),
+(4, 'First Finisher', 'Presented to the fastest learner who submitted their task or test before anyone else.', 'first_finisher.png', 'Achievement', 500, 200),
+(5, 'High Achiever', 'Earned by learners who consistently score 90% or higher on any test or task — excellence at its best!', 'high_achiever.png', 'Achievement', 500, 200),
+(6, 'Quick Thinker', 'Awarded to learners who completed a quiz or exam with impressive speed and accuracy.', 'quick_thinker.png', 'Achievement', 500, 200),
+(7, 'Leaderboard Legend', 'Crowned to the ultimate top performer who reigned #1 on the leaderboard for the week or course.', 'leaderboard_legend.png', 'Leaderboard', 500, 300),
+(8, 'Silver Star', 'Bestowed upon learners who claimed the Top 2 spot on this week\'s leaderboard!', 'silver_star.png', 'Leaderboard', 300, 200),
+(9, 'Bronze Achiever', 'Awarded to learners who achieved a place in the Top 3 of this week\'s leaderboard!\n', 'bronze_achiever.png', 'Leaderboard', 250, 150),
+(10, 'Elite Performer', 'Given to determined learners who earned a place in the Top 10 leaderboard.', 'elite_performer.png', 'Leaderboard', 200, 100),
+(11, 'Star Performer', 'Awarded to learners who delivered an exceptional performance in a task, activity, or project — a true standout!', 'star_performer.png', 'Recognition', 300, 200),
+(12, 'Most Improved', 'Given to learners who have shown remarkable growth and steady progress throughout their learning journey.', 'most_improved.png', 'Recognition', 300, 200),
+(13, 'Exemplary Effort', 'Recognizes learners who consistently demonstrate hard work, perseverance, and dedication — effort that truly shines!', 'exemplary_effort.png', 'Recognition', 300, 200),
+(14, 'Creative Thinker', 'Granted to learners who showcase originality and creativity in solving problems or completing their work.', 'creative_thinker.png', 'Recognition', 300, 200),
+(15, 'Insightful Thinker', 'For learners whose answers, reflections, or analyses show impressive depth and understanding.', 'insightful_thinker.png', 'Recognition', 300, 200),
+(16, 'Well-Documented Work', 'Awarded for submissions that are exceptionally clear, organized, and well-presented — a mark of professionalism!', 'well_documented_work.png', 'Recognition', 300, 200),
+(17, 'Pixel Perfectionist', 'Awarded to learners who craft layouts with flawless alignment, clean visuals, and pixel-perfect precision.', 'pixel_perfectionist.png', 'Development', 300, 200),
+(18, 'Function Wizard', 'Bestowed upon learners who write efficient, elegant, and well-structured JavaScript or PHP functions — pure coding magic!', 'function_wizard.png', 'Development', 300, 200),
+(19, 'Component Crafter', 'Given to learners who build reusable, modular, and well-organized components that make development shine.', 'component_crafter.png', 'Development', 300, 200),
+(20, 'CSS Sorcerer', 'Recognizes mastery in CSS — for creating stunning, responsive, and creative designs that captivate users.', 'css_sorcerer.png', 'Development', 300, 200),
+(21, 'UI Enchanter', 'Celebrates learners who bring interfaces to life with smooth interactions, seamless animations, and user-friendly flow.', 'ui_enchanter.png', 'Development', 300, 200);
 
 -- --------------------------------------------------------
 
@@ -247,7 +263,8 @@ INSERT INTO `courses` (`courseID`, `userID`, `courseCode`, `courseTitle`, `cours
 (2, 1, 'GEED-007', 'Web Development 2', 'webdev.jpg', 1, '789ABC', 'BSIT 4-1'),
 (3, 1, 'MM-102', 'Multimedia', 'AdobeStock_359419956.jpeg', 1, '1Z8AQ8', 'BSIT 4-1'),
 (33, 1, 'GEED-039', 'Capstone 2', 'default.png', 1, 'EKACOG', 'BSIT 2-1'),
-(34, 1, 'GEED-102', 'Principles of Accounting', 'AdobeStock_1428263864.jpeg', 1, '05TMQM', 'BSIT 4-1');
+(34, 1, 'GEED-102', 'Principles of Accounting', 'AdobeStock_1428263864.jpeg', 1, '05TMQM', 'BSIT 4-1'),
+(35, 29, 'STS-369', 'Science Technology Society', 'cover photo2.jpg', 1, '3GZN2O', '4-1');
 
 -- --------------------------------------------------------
 
@@ -274,7 +291,8 @@ INSERT INTO `courseschedule` (`courseScheduleID`, `courseID`, `day`, `startTime`
 (57, 3, 'Monday', '18:08:00', '20:07:00', '2025-11-18 13:09:10'),
 (59, 1, 'Monday', '01:18:00', '01:19:00', '2025-11-18 13:10:04'),
 (60, 33, 'Monday', '21:47:00', '21:47:00', '2025-11-18 17:45:35'),
-(61, 34, 'Tuesday', '16:00:00', '18:00:00', '2025-11-18 17:46:09');
+(61, 34, 'Tuesday', '16:00:00', '18:00:00', '2025-11-18 17:46:09'),
+(62, 35, 'Wednesday', '09:00:00', '12:00:00', '2025-11-21 09:57:55');
 
 -- --------------------------------------------------------
 
@@ -475,7 +493,35 @@ INSERT INTO `enrollments` (`enrollmentID`, `userID`, `courseID`, `yearSection`) 
 (12, 12, 1, 2023),
 (13, 2, 3, 1),
 (14, 2, 34, 1),
-(15, 2, 33, 1);
+(15, 2, 33, 1),
+(24, 27, 1, 2),
+(25, 27, 35, 2),
+(26, 2, 35, 1);
+
+--
+-- Triggers `enrollments`
+--
+DELIMITER $$
+CREATE TRIGGER `insert_welcome_message` AFTER INSERT ON `enrollments` FOR EACH ROW BEGIN
+    -- Check if this is the first enrollment for the user
+    IF (SELECT COUNT(*) FROM enrollments WHERE userID = NEW.userID) = 1 THEN
+        INSERT INTO inbox (
+            enrollmentID,
+            messageText,
+            notifType,
+            createdAt,
+            isRead
+        ) VALUES (
+            NEW.enrollmentID,
+            'Welcome to Webstar! ✦',
+            'Welcome',
+            NOW(),
+            0
+        );
+    END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -497,7 +543,8 @@ CREATE TABLE `feedback` (
 
 INSERT INTO `feedback` (`feedbackID`, `senderID`, `receiverID`, `message`, `created_at`) VALUES
 (3, 2, 18, 'heyyyy', '2025-11-17 17:44:05'),
-(4, 1, 18, 'hi', '2025-11-20 22:48:53');
+(4, 1, 18, 'hi', '2025-11-20 22:48:53'),
+(5, 29, 18, 'hellooooo', '2025-11-21 09:31:25');
 
 -- --------------------------------------------------------
 
@@ -532,7 +579,15 @@ INSERT INTO `files` (`fileID`, `courseID`, `userID`, `announcementID`, `lessonID
 (6, 34, 1, NULL, 2, NULL, NULL, '', '[ Folk Dance Performance ] Tinikling', 'https://youtu.be/-powVSwYn0w', '2025-11-17 14:37:18'),
 (7, 34, 2, NULL, NULL, NULL, 8, '0c5dc8b9-b04b-4622-8730-0223ae22f9a5.jpg', '', '', '2025-11-17 17:18:17'),
 (9, 34, 2, NULL, NULL, NULL, 8, 'star-card-highres (41).png', '', '', '2025-11-17 17:24:44'),
-(10, 34, 1, NULL, NULL, 4, NULL, 'webstar_(8).sql', '', '', '2025-11-17 18:14:25');
+(10, 34, 1, NULL, NULL, 4, NULL, 'webstar_(8).sql', '', '', '2025-11-17 18:14:25'),
+(20, 35, 29, NULL, NULL, 4, NULL, '20251121_183623_STS_LESSON_3_na_madami.pdf', 'STS_LESSON_3_na_madami.pdf', '', '2025-11-21 10:36:23'),
+(21, 35, 29, NULL, NULL, 4, NULL, '', 'Webstar - Final Weeks - Google Drive', 'https://docs.google.com/spreadsheets/d/1zZneXyH61wTgs5ViQQ2IyHRC6wYjZIJ0NF8JspMBrOA/preview', '2025-11-21 10:36:23'),
+(22, 35, 27, NULL, NULL, NULL, 9, '20251121_103700_istockphoto-1427555254-612x612.jpg', 'istockphoto-1427555254-612x612.jpg', '', '2025-11-21 10:37:00'),
+(24, 35, 27, NULL, NULL, NULL, 10, '20251121_103912_istockphoto-1427555254-612x612.jpg', 'istockphoto-1427555254-612x612.jpg', '', '2025-11-21 10:39:12'),
+(25, 35, 29, NULL, NULL, 6, NULL, '20251121_184206_Webstar-Chapters-1-3-as-of-Sept-2025.pdf', 'Webstar-Chapters-1-3-as-of-Sept-2025.pdf', '', '2025-11-21 10:42:06'),
+(26, 35, 29, NULL, NULL, 6, NULL, '', 'Webstar - Final Weeks - Google Drive', 'https://docs.google.com/spreadsheets/d/1zZneXyH61wTgs5ViQQ2IyHRC6wYjZIJ0NF8JspMBrOA/preview', '2025-11-21 10:42:06'),
+(27, 35, 27, NULL, NULL, NULL, 11, '20251121_104225_istockphoto-1427555254-612x612.jpg', 'istockphoto-1427555254-612x612.jpg', '', '2025-11-21 10:42:25'),
+(28, 35, 2, NULL, NULL, NULL, 14, '20251121_110034_SAM6.pdf', 'SAM6.pdf', '', '2025-11-21 11:00:34');
 
 -- --------------------------------------------------------
 
@@ -572,7 +627,48 @@ INSERT INTO `inbox` (`inboxID`, `enrollmentID`, `messageText`, `notifType`, `cre
 (20, 14, '\"TEST W PICTURE\" was returned by your instructor. You can now view the results.', 'Submissions Update', '2025-11-17 15:49:07', 1),
 (21, 14, 'A new task has been assigned: hahaha', 'Course Update', '2025-11-17 16:02:04', 1),
 (22, 14, 'A new task has been assigned: Activity #', 'Course Update', '2025-11-17 18:14:25', 1),
-(23, 14, 'A new task has been assigned: aa', 'Course Update', '2025-11-20 21:27:24', 1);
+(23, 14, 'A new task has been assigned: aa', 'Course Update', '2025-11-20 21:27:24', 1),
+(24, 14, 'A new announcement has been posted : \"aa...\"', 'Course Update', '2025-11-20 23:41:03', 1),
+(25, 14, 'A new task has been assigned: aa', 'Course Update', '2025-11-20 23:41:22', 1),
+(26, 14, 'A new test has been posted: a', 'Course Update', '2025-11-20 23:41:56', 1),
+(27, 14, 'A new task has been assigned: ahh', 'Course Update', '2025-11-20 23:59:32', 1),
+(28, 14, 'A new test has been posted: ahh', 'Course Update', '2025-11-20 23:59:58', 1),
+(29, 14, 'Congratulations! You earned a new badge: Perfect Scorer', 'Badge Updates', '2025-11-21 09:00:23', 1),
+(30, 1, 'Congratulations! You earned a new badge: Perfect Scorer', 'Badge Updates', '2025-11-21 09:01:23', 1),
+(31, 1, 'Congratulations! You earned a new badge: Top Scorer', 'Badge Updates', '2025-11-21 09:04:06', 1),
+(32, 2, 'Congratulations! You earned a new badge: Top Scorer', 'Badge Updates', '2025-11-21 09:07:11', 1),
+(33, 2, 'Congratulations! You earned a new badge: Top Scorer', 'Badge Updates', '2025-11-21 09:07:55', 1),
+(75, 19, 'Welcome to Webstar! ✦', 'Welcome', '2025-11-21 11:44:19', 1),
+(76, 1, 'Welcome to Webstar! ✦', 'Welcome', '2025-11-21 11:44:44', 1),
+(77, 2, 'Congratulations! You\'ve earned a new badge: Top Scorer', 'Badge Updates', '2025-11-21 11:54:05', 1),
+(78, 2, 'Congratulations! You\'ve earned a new badge: Insightful Thinker', 'Badge Updates', '2025-11-21 11:55:00', 1),
+(79, 2, 'Congratulations! You\'ve earned a new badge: Quick Thinker', 'Badge Updates', '2025-11-21 12:08:49', 1),
+(80, 2, 'Congratulations! You\'ve earned a new badge: Leaderboard Legend', 'Badge Updates', '2025-11-21 12:08:56', 1),
+(81, 2, 'Congratulations! You\'ve earned a new badge: UI Enchanter', 'Badge Updates', '2025-11-21 12:09:06', 1),
+(82, 24, 'Welcome to Webstar! ✦', 'Welcome', '2025-11-21 07:47:13', 1),
+(83, 25, 'A new announcement has been posted : \"Hello Good evening! This is...\"', 'Course Update', '2025-11-21 10:22:31', 1),
+(84, 25, 'A new announcement has been posted : \"hello this is with link...\"', 'Course Update', '2025-11-21 10:27:02', 1),
+(85, 25, 'A new announcement has been posted : \"Announcejfdhoej sheets...\"', 'Course Update', '2025-11-21 10:30:52', 1),
+(86, 25, 'A new lesson has been added: Social & Professional MIDTERM', 'Course Update', '2025-11-21 10:32:55', 1),
+(87, 25, 'A new lesson has been added: Social & Professional MIDTERM', 'Course Update', '2025-11-21 10:33:57', 1),
+(88, 25, 'A new task has been assigned: STS Activity', 'Course Update', '2025-11-21 10:36:23', 1),
+(89, 25, 'A new task has been assigned: STS Activity', 'Course Update', '2025-11-21 10:38:56', 1),
+(90, 25, 'A new task has been assigned: Activity # 2', 'Course Update', '2025-11-21 10:42:06', 1),
+(91, 25, 'A new test has been posted: Test ni Kim', 'Course Update', '2025-11-21 10:45:43', 1),
+(92, 26, 'A new test has been posted: Test ni Kim', 'Course Update', '2025-11-21 10:45:43', 0),
+(94, 25, 'A new test has been posted: Test again', 'Course Update', '2025-11-21 10:49:43', 1),
+(95, 26, 'A new test has been posted: Test again', 'Course Update', '2025-11-21 10:49:43', 0),
+(97, 25, '\"Test again\" was returned by your instructor. You can now view the results.', 'Submissions Update', '2025-11-21 10:55:05', 1),
+(98, 25, '\"Test again\" was returned by your instructor. You can now view the results.', 'Submissions Update', '2025-11-21 10:57:01', 1),
+(99, 25, '\"Test again\" was returned by your instructor. You can now view the results.', 'Submissions Update', '2025-11-21 10:57:05', 1),
+(100, 26, 'Your submission for \"Activity # 2\" has been graded.', 'Submissions Update', '2025-11-21 11:09:42', 0),
+(101, 26, 'Congratulations! You\'ve earned a new badge: Creative Thinker', 'Badge Updates', '2025-11-21 11:09:44', 0),
+(102, 26, 'Congratulations! You\'ve earned a new badge: Exemplary Effort', 'Badge Updates', '2025-11-21 11:09:44', 0),
+(103, 26, 'Congratulations! You\'ve earned a new badge: Most Improved', 'Badge Updates', '2025-11-21 11:09:44', 0),
+(104, 25, 'Your submission for \"Activity # 2\" has been graded.', 'Submissions Update', '2025-11-21 11:10:10', 1),
+(105, 25, 'Congratulations! You\'ve earned a new badge: Star Performer', 'Badge Updates', '2025-11-21 11:10:12', 1),
+(106, 25, 'Congratulations! You\'ve earned a new badge: Creative Thinker', 'Badge Updates', '2025-11-21 11:10:12', 1),
+(107, 25, 'Congratulations! You\'ve earned a new badge: Insightful Thinker', 'Badge Updates', '2025-11-21 11:10:12', 1);
 
 -- --------------------------------------------------------
 
@@ -594,7 +690,7 @@ CREATE TABLE `inboxprof` (
 
 INSERT INTO `inboxprof` (`inboxProfID`, `courseID`, `messageText`, `createdAt`, `isRead`) VALUES
 (1, 1, 'Test #1 is completed.', '2025-11-20 21:10:50', 0),
-(2, 2, 'Hello!', '2025-11-20 21:43:31', 0);
+(2, 1, 'Hello!', '2025-11-20 21:43:31', 0);
 
 -- --------------------------------------------------------
 
@@ -608,32 +704,36 @@ CREATE TABLE `leaderboard` (
   `timeRange` varchar(10) NOT NULL,
   `periodStart` date NOT NULL,
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp(),
-  `xpPoints` int(11) NOT NULL,
-  `previousRank` int(11) NOT NULL,
-  `currentRank` int(11) NOT NULL
+  `xpPoints` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `leaderboard`
 --
 
-INSERT INTO `leaderboard` (`leaderboardID`, `enrollmentID`, `timeRange`, `periodStart`, `updatedAt`, `xpPoints`, `previousRank`, `currentRank`) VALUES
-(1, 1, 'Weekly', '2025-08-25', '2025-08-30 12:00:00', 240, 0, 1),
-(2, 2, 'Weekly', '2025-08-25', '2025-08-30 12:00:00', 0, 0, 1),
-(3, 1, 'Weekly', '2025-09-28', '2025-09-28 16:50:22', 240, 0, 0),
-(4, 3, 'Weekly', '2025-09-28', '2025-09-28 16:58:09', 0, 0, 2),
-(5, 4, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0, 0, 3),
-(6, 5, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0, 0, 4),
-(7, 6, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0, 0, 5),
-(8, 7, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0, 0, 6),
-(9, 8, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0, 0, 7),
-(10, 9, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0, 0, 8),
-(11, 10, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0, 0, 9),
-(12, 11, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0, 0, 10),
-(13, 12, 'Monthly', '2025-09-01', '2025-09-28 21:34:51', 0, 0, 11),
-(15, 14, '', '0000-00-00', '2025-11-17 14:08:20', 290, 0, 1),
-(16, 15, '', '0000-00-00', '2025-11-17 16:06:41', 0, 0, 1),
-(17, 14, '', '0000-00-00', '2025-11-17 17:18:33', 1044, 0, 0);
+INSERT INTO `leaderboard` (`leaderboardID`, `enrollmentID`, `timeRange`, `periodStart`, `updatedAt`, `xpPoints`) VALUES
+(2, 2, 'Weekly', '2025-08-25', '2025-11-21 12:09:06', 3100),
+(3, 1, 'Weekly', '2025-09-28', '2025-11-21 09:04:06', 1740),
+(4, 3, 'Weekly', '2025-09-28', '2025-09-28 16:58:09', 0),
+(5, 4, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
+(6, 5, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
+(7, 6, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
+(8, 7, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
+(9, 8, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
+(10, 9, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
+(11, 10, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
+(12, 11, 'Weekly', '2025-09-01', '2025-09-28 21:03:44', 0),
+(13, 12, 'Monthly', '2025-09-01', '2025-09-28 21:34:51', 0),
+(15, 14, '', '0000-00-00', '2025-11-17 14:08:20', 290),
+(16, 15, '', '0000-00-00', '2025-11-17 16:06:41', 0),
+(17, 14, '', '0000-00-00', '2025-11-17 17:18:33', 1044),
+(18, 25, '', '0000-00-00', '2025-11-21 09:58:35', 230),
+(19, 24, '', '0000-00-00', '2025-11-21 09:58:35', 0),
+(20, 25, '', '0000-00-00', '2025-11-21 10:37:00', 230),
+(21, 25, '', '0000-00-00', '2025-11-21 10:39:12', 230),
+(22, 25, '', '0000-00-00', '2025-11-21 11:10:12', 1130),
+(23, 26, '', '0000-00-00', '2025-11-21 10:43:57', 0),
+(24, 26, '', '0000-00-00', '2025-11-21 11:09:44', 2032);
 
 -- --------------------------------------------------------
 
@@ -898,7 +998,7 @@ CREATE TABLE `profile` (
   `emblemID` int(11) NOT NULL DEFAULT 1,
   `coverImageID` int(11) NOT NULL DEFAULT 1,
   `colorThemeID` int(11) NOT NULL DEFAULT 1,
-  `starCard` int(11) NOT NULL
+  `starCard` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -906,8 +1006,11 @@ CREATE TABLE `profile` (
 --
 
 INSERT INTO `profile` (`profileID`, `userID`, `bio`, `webstars`, `emblemID`, `coverImageID`, `colorThemeID`, `starCard`) VALUES
-(1, 2, 'Welcome to my Webstar profile!', 2132, 7, 17, 9, 2),
-(2, 1, 'Welcome to my Webstar profile!!', 700, 7, 15, 11, 2);
+(1, 2, 'Welcome to my Webstar profile!', 4945, 7, 17, 9, 2),
+(2, 1, 'Welcome to my Webstar profile!!', 700, 7, 15, 11, 2),
+(5, 27, 'Welcome to my Webstar profile!', 1912, 1, 1, 1, 1),
+(6, 28, 'Welcome to my Webstar profile', 1000, 7, 1, 1, 0),
+(7, 29, 'Welcome to my Webstar profile!', 1000, 7, 24, 21, 0);
 
 -- --------------------------------------------------------
 
@@ -956,20 +1059,23 @@ CREATE TABLE `report` (
 --
 
 INSERT INTO `report` (`reportID`, `enrollmentID`, `totalXP`, `allTimeRank`, `generatedAt`) VALUES
-(1, 1, 480, 1, '2025-11-20 22:33:28'),
-(2, 3, 0, 6, '2025-11-20 22:33:29'),
-(3, 8, 0, 11, '2025-11-20 22:33:29'),
-(4, 6, 0, 9, '2025-11-20 22:33:29'),
-(5, 11, 0, 4, '2025-11-20 22:33:28'),
-(6, 10, 0, 3, '2025-11-20 22:33:28'),
-(7, 5, 0, 8, '2025-11-20 22:33:29'),
-(8, 7, 0, 10, '2025-11-20 22:33:29'),
-(9, 9, 0, 2, '2025-11-20 22:33:28'),
-(10, 4, 0, 7, '2025-11-20 22:33:29'),
-(11, 12, 0, 5, '2025-11-20 22:33:28'),
-(12, 2, 0, 1, '2025-11-17 18:25:49'),
-(13, 14, 1334, 1, '2025-11-20 22:07:12'),
-(14, 15, 0, 1, '2025-11-17 16:06:49');
+(1, 1, 1740, 1, '2025-11-21 21:30:25'),
+(2, 3, 0, 4, '2025-11-21 21:30:25'),
+(3, 8, 0, 9, '2025-11-21 21:30:25'),
+(4, 6, 0, 7, '2025-11-21 21:30:25'),
+(5, 11, 0, 12, '2025-11-21 21:30:25'),
+(6, 10, 0, 11, '2025-11-21 21:30:25'),
+(7, 5, 0, 6, '2025-11-21 21:30:25'),
+(8, 7, 0, 8, '2025-11-21 21:30:25'),
+(9, 9, 0, 10, '2025-11-21 21:30:25'),
+(10, 4, 0, 5, '2025-11-21 21:30:25'),
+(11, 12, 0, 2, '2025-11-21 21:30:25'),
+(12, 2, 1000, 1, '2025-11-21 10:39:50'),
+(13, 14, 1334, 1, '2025-11-21 10:57:50'),
+(14, 15, 0, 1, '2025-11-17 16:06:49'),
+(15, 25, 1820, 2, '2025-11-21 21:30:21'),
+(16, 24, 0, 3, '2025-11-21 21:30:25'),
+(17, 26, 2032, 1, '2025-11-21 21:30:21');
 
 -- --------------------------------------------------------
 
@@ -1022,8 +1128,11 @@ CREATE TABLE `scores` (
 --
 
 INSERT INTO `scores` (`scoreID`, `userID`, `submissionID`, `testID`, `score`, `feedback`, `gradedAt`) VALUES
-(1, 2, NULL, 5, 5, NULL, '2025-11-17 15:47:17'),
-(2, 1, 8, NULL, 65, 'Nice try', '2025-11-17 17:31:55');
+(1, 2, 13, 5, 5, NULL, '2025-11-17 15:47:17'),
+(3, 27, 13, 3, 0, NULL, '2025-11-21 10:46:18'),
+(4, 27, 13, 5, 0, NULL, '2025-11-21 10:51:09'),
+(5, 2, 14, NULL, 50, 'Great Job!', '2025-11-21 11:09:42'),
+(6, 27, 11, NULL, 50, 'Good job!', '2025-11-21 11:10:10');
 
 -- --------------------------------------------------------
 
@@ -1078,7 +1187,8 @@ INSERT INTO `settings` (`settingsID`, `userID`, `courseUpdateEnabled`, `questDea
 (10, 10, 0, 0, 0),
 (11, 11, 0, 0, 0),
 (12, 12, 0, 0, 0),
-(18, 1, 0, 0, 0);
+(18, 1, 0, 0, 0),
+(19, 27, 0, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -1102,7 +1212,119 @@ CREATE TABLE `studentbadges` (
 INSERT INTO `studentbadges` (`studentBadgeID`, `userID`, `badgeID`, `courseID`, `assignmentID`, `earnedAt`) VALUES
 (1, 2, 1, 1, 0, '2025-10-28 20:16:06'),
 (2, 2, 2, 1, 0, '2025-10-28 20:16:06'),
-(3, 2, 2, 1, 0, '2025-10-28 20:16:06');
+(3, 2, 2, 1, 0, '2025-10-28 20:16:06'),
+(18, 2, 1, 1, 1, '2025-11-21 09:00:23'),
+(19, 2, 1, 1, 1, '2025-11-21 09:01:23'),
+(20, 2, 2, 2, 1, '2025-11-21 09:04:06'),
+(21, 2, 2, 2, 1, '2025-11-21 09:07:11'),
+(22, 2, 2, 2, 1, '2025-11-21 09:07:55'),
+(23, 2, 15, 2, 1, '2025-11-21 09:07:55'),
+(24, 2, 15, 2, 1, '2025-11-21 09:07:55'),
+(25, 2, 6, 2, 1, '2025-11-21 09:07:55'),
+(26, 2, 7, 2, 1, '2025-11-21 09:07:55'),
+(27, 2, 21, 2, 1, '2025-11-21 09:07:55'),
+(28, 2, 14, 35, 8, '2025-11-21 19:09:44'),
+(29, 2, 13, 35, 8, '2025-11-21 19:09:44'),
+(30, 2, 12, 35, 8, '2025-11-21 19:09:44'),
+(31, 27, 11, 35, 8, '2025-11-21 19:10:12'),
+(32, 27, 14, 35, 8, '2025-11-21 19:10:12'),
+(33, 27, 15, 35, 8, '2025-11-21 19:10:12');
+
+--
+-- Triggers `studentbadges`
+--
+DELIMITER $$
+CREATE TRIGGER `student_badge_updates` AFTER INSERT ON `studentbadges` FOR EACH ROW BEGIN
+    DECLARE v_userID INT;
+    DECLARE v_badgeXP INT;
+    DECLARE v_badgeWebstars INT;
+    DECLARE v_badgeName VARCHAR(255);
+    DECLARE v_enrollmentID INT;
+    DECLARE v_leaderboardID INT;
+
+    -- Get badge info
+    SELECT badgeXP, badgeWebstars, badgeName
+    INTO v_badgeXP, v_badgeWebstars, v_badgeName
+    FROM badges
+    WHERE badgeID = NEW.badgeID;
+
+    SET v_userID = NEW.userID;
+
+    -- Update webstars in profile
+    UPDATE profile
+    SET webstars = webstars + v_badgeWebstars
+    WHERE userID = v_userID;
+
+    -- Insert into webstars table
+    INSERT INTO webstars (
+        userID,
+        assessmentID,
+        sourceType,
+        pointsChanged,
+        dateEarned
+    ) VALUES (
+        v_userID,
+        NEW.assignmentID,
+        'Badge',
+        v_badgeWebstars,
+        NOW()
+    );
+
+    
+    -- Get enrollmentID for this user and course
+SELECT enrollmentID INTO v_enrollmentID
+FROM enrollments
+WHERE userID = v_userID
+  AND courseID = NEW.courseID
+LIMIT 1;
+
+
+    IF v_enrollmentID IS NOT NULL THEN
+        -- Update leaderboard XP
+        SELECT leaderboardID INTO v_leaderboardID
+        FROM leaderboard
+        WHERE enrollmentID = v_enrollmentID
+        ORDER BY updatedAt DESC
+        LIMIT 1;
+
+        IF v_leaderboardID IS NOT NULL THEN
+            UPDATE leaderboard
+            SET xpPoints = xpPoints + v_badgeXP,
+                updatedAt = NOW()
+            WHERE leaderboardID = v_leaderboardID;
+        END IF;
+
+        -- Notify user in inbox
+        INSERT INTO inbox (
+            enrollmentID,
+            messageText,
+            notifType,
+            createdAt,
+            isRead
+        ) VALUES (
+            v_enrollmentID,
+            CONCAT('Congratulations! You''ve earned a new badge: ', v_badgeName),
+            'Badge Updates',
+            NOW(),
+            0
+        );
+    END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `studentlevels`
+--
+
+CREATE TABLE `studentlevels` (
+  `studentLevelID` int(11) NOT NULL,
+  `leaderboardID` int(11) NOT NULL,
+  `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -1131,7 +1353,11 @@ INSERT INTO `submissions` (`submissionID`, `userID`, `assessmentID`, `scoreID`, 
 (5, 2, 2, 0, '2025-11-17 15:25:26', 0, 0),
 (6, 2, 4, 0, '2025-11-17 15:36:13', 0, 0),
 (7, 2, 5, 0, '2025-11-17 15:42:31', 0, 0),
-(8, 2, 7, 2, '2025-11-17 17:24:43', 1, 1);
+(9, 27, 6, NULL, '2025-11-21 10:37:00', 1, 1),
+(11, 27, 8, 6, '2025-11-21 11:02:02', 1, 1),
+(12, 27, 9, 3, '2025-11-21 10:46:18', 0, 0),
+(13, 27, 11, 4, '2025-11-21 10:51:09', 0, 0),
+(14, 2, 8, 5, '2025-11-21 11:00:34', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -1229,7 +1455,9 @@ CREATE TABLE `testquestionchoices` (
 INSERT INTO `testquestionchoices` (`choiceID`, `testQuestionID`, `choiceText`) VALUES
 (1, 4, 'Mabaho'),
 (2, 4, 'Mabango'),
-(3, 4, 'DI ko alam, amuyin mo');
+(3, 4, 'DI ko alam, amuyin mo'),
+(4, 6, '1'),
+(5, 7, 'a');
 
 -- --------------------------------------------------------
 
@@ -1255,7 +1483,11 @@ INSERT INTO `testquestions` (`testQuestionID`, `testID`, `testQuestion`, `questi
 (1, 1, 'Anong pangalan ng aso ni marimar?', 'Identification', '1763363827_logo-removebg-preview.png', 'Pulgoso', 2),
 (3, 3, 'Anong pangalan ng aso ni marimar?', 'Identification', NULL, 'Pulgoso', 12),
 (4, 4, 'Anong amoy ng utot ni dom?', 'Multiple Choice', NULL, 'DI ko alam, amuyin mo', 2),
-(5, 5, 'Crush mo ba ako?', 'Identification', '1763365103_profile2.jpg', 'oo', 1);
+(5, 5, 'Crush mo ba ako?', 'Identification', '1763365103_profile2.jpg', 'oo', 1),
+(6, 1, 'a', 'Multiple Choice', NULL, '1', 1),
+(7, 2, 'a', 'Multiple Choice', NULL, 'a', 1),
+(8, 4, 'Anong pangalan ng aso ni marimar?', 'Identification', NULL, 'Pulgoso', 2),
+(9, 5, 'Anong ulam ito?', 'Identification', 'chicken curry_20251121184943.png', 'adobo', 10);
 
 -- --------------------------------------------------------
 
@@ -1278,7 +1510,10 @@ CREATE TABLE `testresponses` (
 
 INSERT INTO `testresponses` (`testResponseID`, `testID`, `testQuestionID`, `userID`, `userAnswer`, `isCorrect`) VALUES
 (2, 4, 4, 2, 'Mabaho', 0),
-(3, 5, 5, 2, 'oO', 0);
+(3, 5, 5, 2, 'oO', 0),
+(4, 3, 3, 27, 'Polgoso', 0),
+(5, 5, 5, 27, 'yes', 0),
+(6, 5, 9, 27, 'ewan ko', 0);
 
 -- --------------------------------------------------------
 
@@ -1292,6 +1527,17 @@ CREATE TABLE `tests` (
   `generalGuidance` varchar(500) NOT NULL,
   `testTimelimit` int(5) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tests`
+--
+
+INSERT INTO `tests` (`testID`, `assessmentID`, `generalGuidance`, `testTimelimit`) VALUES
+(1, 3, '<p>a</p>', 60),
+(2, 5, '<p>aa</p>', 660),
+(3, 9, '<p>Kindly read and answer carefully!</p>', 300),
+(4, 10, '<p>Kindly answer!</p>', 120),
+(5, 11, '<p>Please see the image carefully!</p>', 120);
 
 -- --------------------------------------------------------
 
@@ -1315,13 +1561,23 @@ CREATE TABLE `todo` (
 --
 
 INSERT INTO `todo` (`todoID`, `userID`, `assessmentID`, `status`, `updatedAt`, `isRead`, `timeSpent`, `timeStart`) VALUES
-(1, 2, 1, 'Missing', '2025-11-20 22:23:27', 1, NULL, NULL),
+(1, 2, 1, 'Missing', '2025-11-21 10:40:12', 1, NULL, NULL),
 (13, 2, 3, 'Pending', '2025-11-17 15:22:53', 1, NULL, NULL),
-(14, 2, 4, 'Submitted', '2025-11-17 15:36:13', 1, 60, '2025-11-17 15:35:13'),
+(14, 2, 4, 'Pending', '2025-11-21 09:34:34', 1, 60, '2025-11-17 15:35:13'),
 (15, 2, 5, 'Returned', '2025-11-17 15:42:31', 1, 120, '2025-11-17 15:38:34'),
-(16, 2, 7, 'Graded', '2025-11-17 17:40:23', 1, NULL, NULL),
-(17, 2, 8, 'Pending', '2025-11-17 18:20:10', 1, NULL, NULL),
-(19, 2, 1, 'Missing', '2025-11-20 22:23:27', 1, NULL, NULL);
+(17, 2, 8, 'Returned', '2025-11-21 11:10:55', 1, NULL, NULL),
+(19, 2, 1, 'Missing', '2025-11-21 10:40:12', 1, NULL, NULL),
+(20, 2, 2, 'Pending', '2025-11-20 23:41:22', 1, NULL, NULL),
+(21, 2, 3, 'Pending', '2025-11-20 23:41:55', 1, NULL, NULL),
+(22, 2, 4, 'Pending', '2025-11-21 09:34:34', 1, NULL, NULL),
+(23, 2, 5, 'Pending', '2025-11-20 23:59:58', 1, NULL, NULL),
+(24, 27, 6, 'Submitted', '2025-11-21 10:37:00', 1, NULL, NULL),
+(26, 27, 8, 'Submitted', '2025-11-21 11:02:02', 1, NULL, NULL),
+(27, 27, 9, 'Submitted', '2025-11-21 10:46:18', 1, 22, '2025-11-21 10:45:55'),
+(28, 27, 10, 'Pending', '2025-11-21 10:45:43', 1, NULL, NULL),
+(29, 2, 10, 'Pending', '2025-11-21 10:45:43', 0, NULL, NULL),
+(30, 27, 11, 'Returned', '2025-11-21 10:51:09', 1, 69, '2025-11-21 10:49:59'),
+(31, 2, 11, 'Pending', '2025-11-21 10:49:43', 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1334,13 +1590,13 @@ CREATE TABLE `userinfo` (
   `userID` int(11) NOT NULL,
   `profilePicture` varchar(100) NOT NULL DEFAULT 'defaultProfile.png',
   `firstName` varchar(50) NOT NULL,
-  `middleName` varchar(50) NOT NULL,
+  `middleName` varchar(50) DEFAULT NULL,
   `lastName` varchar(50) NOT NULL,
   `studentID` varchar(50) DEFAULT NULL,
-  `programID` varchar(50) NOT NULL,
-  `gender` varchar(50) NOT NULL,
-  `yearLevel` varchar(20) NOT NULL,
-  `yearSection` int(11) NOT NULL,
+  `programID` varchar(50) DEFAULT '1',
+  `gender` varchar(50) DEFAULT 'Other',
+  `yearLevel` varchar(20) DEFAULT '1',
+  `yearSection` int(11) DEFAULT 1,
   `schoolEmail` varchar(50) DEFAULT NULL,
   `facebookLink` text DEFAULT NULL,
   `linkedInLink` text DEFAULT NULL,
@@ -1372,7 +1628,10 @@ INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `
 (16, 21, 'defaultProfile.png', 'Marielle Alyssa', '', 'Cato', NULL, '6', '', '4', 1, 'marielle@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1),
 (17, 22, 'defaultProfile.png', 'Neil Jeferson', '', 'Vergara', NULL, '6', '', '4', 1, 'neil@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1),
 (18, 23, 'defaultProfile.png', 'Shane Rhyder', '', 'Silverio', NULL, '6', '', '4', 1, 'shane@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 11),
-(19, 24, 'defaultProfile.png', 'Kimberly Joan', '', 'Palla', NULL, '6', '', '4', 1, 'kimberly@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1);
+(19, 24, 'defaultProfile.png', 'Kimberly Joan', '', 'Palla', NULL, '6', '', '4', 1, 'kimberly@example.com', NULL, NULL, NULL, '2025-11-03 17:57:48', 1),
+(20, 27, 'defaultProfile.png', 'Mam', 'mo', 'blue', '123456', '4', 'Male', '4', 2, 'cj29070@gmail.com', '', '', '', '2025-11-21 07:46:55', 0),
+(22, 28, 'defaultProfile.png', 'Neil', NULL, 'Vergara', NULL, '1', 'Other', '1', 1, NULL, NULL, NULL, NULL, '2025-11-21 09:18:07', 1),
+(23, 29, 'defaultProfile.png', 'Ayisha', 'Dayan', 'Estoque', NULL, '1', 'Other', '1', 1, NULL, NULL, NULL, NULL, '2025-11-21 09:21:40', 1);
 
 -- --------------------------------------------------------
 
@@ -1382,7 +1641,7 @@ INSERT INTO `userinfo` (`userInfoID`, `userID`, `profilePicture`, `firstName`, `
 
 CREATE TABLE `users` (
   `userID` int(11) NOT NULL,
-  `password` varchar(50) NOT NULL,
+  `password` varchar(1024) NOT NULL,
   `email` varchar(50) NOT NULL,
   `role` varchar(12) NOT NULL DEFAULT 'student',
   `userName` varchar(50) NOT NULL,
@@ -1395,7 +1654,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`, `status`) VALUES
 (1, 'Password123', 'john.doe@gmail.com', 'professor', 'jay', 'Active'),
-(2, 'Hello@world', 'jane.smith@gmail.com', 'student', 'janesmith', 'Active'),
+(2, '$2y$10$igZvllxtYFNUGtxi1SHxxOkPxmT/n4sxwPBFkmZaXshs3KMIl5KKS', 'jane.smith@gmail.com', 'student', 'janesmith', 'Active'),
 (3, 'HelloWorld', 'john.doe2@gmail.com', 'student', 'JohnDoee', 'Active'),
 (4, 'password123', 'michael.lee@gmail.com', 'student', 'michael_lee', 'Active'),
 (5, 'securePass!1', 'sophia.garcia@gmail.com', 'student', 'sophia_garcia', 'Active'),
@@ -1406,13 +1665,16 @@ INSERT INTO `users` (`userID`, `password`, `email`, `role`, `userName`, `status`
 (10, 'myPass!77', 'liam.torres@gmail.com', 'student', 'liam_torres', 'Active'),
 (11, 'safeKey555', 'emma.davis@gmail.com', 'student', 'emma_davis', 'Active'),
 (12, 'newPass!11', 'chloe.nguyen@gmail.com', 'student', 'chloe_nguyen', 'Active'),
-(18, 'adminpassword', 'admin@example.com', 'admin', 'Administrator', 'active'),
+(18, '$2y$10$igZvllxtYFNUGtxi1SHxxOkPxmT/n4sxwPBFkmZaXshs3KMIl5KKS', 'admin@example.com', 'admin', 'Administrator', 'active'),
 (19, 'devpassword1', 'christian@example.com', 'developer', 'christianjamss', 'active'),
 (20, 'devpassword2', 'ayisha@example.com', 'developer', 'ayishaestoque', 'active'),
 (21, 'devpassword3', 'marielle@example.com', 'developer', 'mariellecato', 'active'),
 (22, 'devpassword4', 'neil@example.com', 'developer', 'neilvergara', 'active'),
 (23, 'devpassword5', 'shane@example.com', 'developer', 'shanesilverio', 'active'),
-(24, 'devpassword6', 'kimberly@example.com', 'developer', 'kimberlypalla', 'active');
+(24, 'devpassword6', 'kimberly@example.com', 'developer', 'kimberlypalla', 'active'),
+(27, '$2y$10$igZvllxtYFNUGtxi1SHxxOkPxmT/n4sxwPBFkmZaXshs3KMIl5KKS', 'cj29070@gmail.com', 'student', 'mamamooo', 'Active'),
+(28, '$2y$10$igZvllxtYFNUGtxi1SHxxOkPxmT/n4sxwPBFkmZaXshs3KMIl5KKS', 'webstarr.archive@gmail.com', 'professor', 'nyel_123', 'active'),
+(29, '$2y$10$igZvllxtYFNUGtxi1SHxxOkPxmT/n4sxwPBFkmZaXshs3KMIl5KKS', 'webstar.archive@gmail.com', 'professor', 'ayi_123', 'active');
 
 --
 -- Triggers `users`
@@ -1468,7 +1730,29 @@ INSERT INTO `visits` (`visitID`, `dateVisited`) VALUES
 (12, '2025-11-20 22:55:30'),
 (13, '2025-11-20 23:03:12'),
 (14, '2025-11-20 23:17:47'),
-(15, '2025-11-20 23:23:49');
+(15, '2025-11-20 23:23:49'),
+(16, '2025-11-20 23:40:54'),
+(17, '2025-11-21 08:59:25'),
+(18, '2025-11-21 12:10:44'),
+(19, '2025-11-21 12:12:09'),
+(20, '2025-11-21 12:12:16'),
+(21, '2025-11-21 12:13:50'),
+(22, '2025-11-21 12:17:53'),
+(23, '2025-11-21 07:48:58'),
+(24, '2025-11-21 07:51:40'),
+(25, '2025-11-21 07:55:37'),
+(26, '2025-11-21 07:57:08'),
+(27, '2025-11-21 08:17:25'),
+(28, '2025-11-21 08:19:42'),
+(29, '2025-11-21 09:11:47'),
+(30, '2025-11-21 09:21:03'),
+(31, '2025-11-21 09:24:06'),
+(32, '2025-11-21 09:27:11'),
+(33, '2025-11-21 09:42:29'),
+(34, '2025-11-21 10:02:17'),
+(35, '2025-11-21 10:25:46'),
+(36, '2025-11-21 10:43:43'),
+(37, '2025-11-21 21:23:13');
 
 -- --------------------------------------------------------
 
@@ -1505,7 +1789,63 @@ INSERT INTO `webstars` (`webstarsID`, `userID`, `assessmentID`, `sourceType`, `p
 (37, 2, 4, 'XP Multiplier Usage', -1000, '2025-11-17 15:37:16'),
 (38, 2, 5, 'Tests', 1, '2025-11-17 15:42:31'),
 (39, 2, 7, 'Submission', 104, '2025-11-17 17:18:33'),
-(40, 2, 7, 'Unsubmit', -50, '2025-11-17 17:21:17');
+(40, 2, 7, 'Unsubmit', -50, '2025-11-17 17:21:17'),
+(41, 2, 1, 'Badge', 200, '2025-11-21 09:00:23'),
+(42, 2, 1, 'Badge', 200, '2025-11-21 09:01:23'),
+(43, 2, 1, 'Badge', 200, '2025-11-21 09:04:06'),
+(44, 2, 1, 'Badge', 200, '2025-11-21 09:07:11'),
+(45, 2, 1, 'Badge', 200, '2025-11-21 09:07:55'),
+(46, 2, 1, 'Badge', 200, '2025-11-21 11:54:05'),
+(47, 2, 1, 'Badge', 200, '2025-11-21 11:55:00'),
+(48, 2, 1, 'Badge', 200, '2025-11-21 12:08:49'),
+(49, 2, 1, 'Badge', 300, '2025-11-21 12:08:56'),
+(50, 2, 1, 'Badge', 200, '2025-11-21 12:09:06'),
+(51, 27, 6, 'Submission', 113, '2025-11-21 10:37:00'),
+(52, 27, 7, 'Submission', 113, '2025-11-21 10:39:12'),
+(53, 27, 8, 'Submission', 113, '2025-11-21 10:42:25'),
+(54, 27, 8, 'Unsubmit', -50, '2025-11-21 10:42:47'),
+(55, 27, 9, 'Tests', 12, '2025-11-21 10:46:18'),
+(56, 27, 11, 'Tests', 11, '2025-11-21 10:51:09'),
+(57, 2, 8, 'Submission', 113, '2025-11-21 11:00:34'),
+(58, 2, 8, 'Badge', 200, '2025-11-21 11:09:44'),
+(59, 2, 8, 'Badge', 200, '2025-11-21 11:09:44'),
+(60, 2, 8, 'Badge', 200, '2025-11-21 11:09:44'),
+(61, 27, 8, 'Badge', 200, '2025-11-21 11:10:12'),
+(62, 27, 8, 'Badge', 200, '2025-11-21 11:10:12'),
+(63, 27, 8, 'Badge', 200, '2025-11-21 11:10:12');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `xplevel`
+--
+
+CREATE TABLE `xplevel` (
+  `levelID` int(11) NOT NULL,
+  `tierName` varchar(50) NOT NULL,
+  `xpThreshold` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `xplevel`
+--
+
+INSERT INTO `xplevel` (`levelID`, `tierName`, `xpThreshold`) VALUES
+(1, 'Novice', 0),
+(2, 'Apprentice', 100),
+(3, 'Initiate', 250),
+(4, 'Learner', 500),
+(5, 'Skilled', 800),
+(6, 'Adept', 1200),
+(7, 'Proficient', 1700),
+(8, 'Specialist', 2300),
+(9, 'Expert', 3000),
+(10, 'Master', 4000),
+(11, 'Grandmaster', 5500),
+(12, 'Legend', 7500),
+(13, 'Mythic', 10000),
+(14, 'Ascendant', 14000),
+(15, 'Transcendent', 20000);
 
 --
 -- Indexes for dumped tables
@@ -1703,6 +2043,12 @@ ALTER TABLE `studentbadges`
   ADD KEY `courseID` (`courseID`);
 
 --
+-- Indexes for table `studentlevels`
+--
+ALTER TABLE `studentlevels`
+  ADD PRIMARY KEY (`studentLevelID`);
+
+--
 -- Indexes for table `submissions`
 --
 ALTER TABLE `submissions`
@@ -1769,6 +2115,12 @@ ALTER TABLE `webstars`
   ADD PRIMARY KEY (`webstarsID`);
 
 --
+-- Indexes for table `xplevel`
+--
+ALTER TABLE `xplevel`
+  ADD PRIMARY KEY (`levelID`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -1782,25 +2134,25 @@ ALTER TABLE `activities`
 -- AUTO_INCREMENT for table `announcementnotes`
 --
 ALTER TABLE `announcementnotes`
-  MODIFY `noteID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `noteID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `announcements`
 --
 ALTER TABLE `announcements`
-  MODIFY `announcementID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `announcementID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `assessments`
 --
 ALTER TABLE `assessments`
-  MODIFY `assessmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `assessmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `assignments`
 --
 ALTER TABLE `assignments`
-  MODIFY `assignmentID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `assignmentID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `badges`
@@ -1818,13 +2170,13 @@ ALTER TABLE `colortheme`
 -- AUTO_INCREMENT for table `courses`
 --
 ALTER TABLE `courses`
-  MODIFY `courseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `courseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `courseschedule`
 --
 ALTER TABLE `courseschedule`
-  MODIFY `courseScheduleID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+  MODIFY `courseScheduleID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT for table `coverimage`
@@ -1854,25 +2206,25 @@ ALTER TABLE `emblem`
 -- AUTO_INCREMENT for table `enrollments`
 --
 ALTER TABLE `enrollments`
-  MODIFY `enrollmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `enrollmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `feedback`
 --
 ALTER TABLE `feedback`
-  MODIFY `feedbackID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `feedbackID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `files`
 --
 ALTER TABLE `files`
-  MODIFY `fileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `fileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `inbox`
 --
 ALTER TABLE `inbox`
-  MODIFY `inboxID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `inboxID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=108;
 
 --
 -- AUTO_INCREMENT for table `inboxprof`
@@ -1884,13 +2236,13 @@ ALTER TABLE `inboxprof`
 -- AUTO_INCREMENT for table `leaderboard`
 --
 ALTER TABLE `leaderboard`
-  MODIFY `leaderboardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `leaderboardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `lessons`
 --
 ALTER TABLE `lessons`
-  MODIFY `lessonID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `lessonID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `level`
@@ -1908,7 +2260,7 @@ ALTER TABLE `myitems`
 -- AUTO_INCREMENT for table `profile`
 --
 ALTER TABLE `profile`
-  MODIFY `profileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `profileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `program`
@@ -1920,7 +2272,7 @@ ALTER TABLE `program`
 -- AUTO_INCREMENT for table `report`
 --
 ALTER TABLE `report`
-  MODIFY `reportID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `reportID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `rubric`
@@ -1932,7 +2284,7 @@ ALTER TABLE `rubric`
 -- AUTO_INCREMENT for table `scores`
 --
 ALTER TABLE `scores`
-  MODIFY `scoreID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `scoreID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `selectedlevels`
@@ -1944,19 +2296,25 @@ ALTER TABLE `selectedlevels`
 -- AUTO_INCREMENT for table `settings`
 --
 ALTER TABLE `settings`
-  MODIFY `settingsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `settingsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `studentbadges`
 --
 ALTER TABLE `studentbadges`
-  MODIFY `studentBadgeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `studentBadgeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+
+--
+-- AUTO_INCREMENT for table `studentlevels`
+--
+ALTER TABLE `studentlevels`
+  MODIFY `studentLevelID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `submissions`
 --
 ALTER TABLE `submissions`
-  MODIFY `submissionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `submissionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `supports`
@@ -1968,55 +2326,55 @@ ALTER TABLE `supports`
 -- AUTO_INCREMENT for table `testquestionchoices`
 --
 ALTER TABLE `testquestionchoices`
-  MODIFY `choiceID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `choiceID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `testquestions`
 --
 ALTER TABLE `testquestions`
-  MODIFY `testQuestionID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `testQuestionID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `testresponses`
 --
 ALTER TABLE `testresponses`
-  MODIFY `testResponseID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `testResponseID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `tests`
 --
 ALTER TABLE `tests`
-  MODIFY `testID` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `testID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `todo`
 --
 ALTER TABLE `todo`
-  MODIFY `todoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `todoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `userinfo`
 --
 ALTER TABLE `userinfo`
-  MODIFY `userInfoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `userInfoID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `visits`
 --
 ALTER TABLE `visits`
-  MODIFY `visitID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `visitID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `webstars`
 --
 ALTER TABLE `webstars`
-  MODIFY `webstarsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `webstarsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- Constraints for dumped tables
