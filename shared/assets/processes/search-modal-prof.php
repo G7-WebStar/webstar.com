@@ -62,7 +62,13 @@ if (mysqli_num_rows($result) > 0) {
     </a>';
     }
 } else {
-    echo '<div class="text-center text-muted p-3">No results found.</div>';
+    echo '
+        <div class="text-center d-flex flex-column align-items-center justify-content-center h-100">
+            <div>
+                <img src="../shared/assets/img/empty/search.png" width="80" class="mb-1">
+            </div>
+            <div class="text-med text-14 mt-2">No user found</div>
+        </div>';
 }
 
 ?>

@@ -32,7 +32,7 @@ mysqli_data_seek($lessonResult, 0);
 <?php if ($hasLessons): ?>
 
     <!-- Sort By Dropdown (only shown if there are lessons) -->
-    <div class="d-flex align-items-center flex-nowrap mb-1">
+    <div class="d-flex align-items-center flex-nowrap mb-2">
         <div class="d-flex align-items-center flex-nowrap">
             <span class="dropdown-label me-2 text-reg text-12">Sort by</span>
             <form method="POST">
@@ -76,11 +76,11 @@ mysqli_data_seek($lessonResult, 0);
             $fileCount = count($attachmentsArray);
             $linkCount = count($linksArray);
         ?>
-            <div class="row mb-0 mt-3">
+            <div class="row mb-0 mt-2">
                 <div class="col">
                     <a href="lessons-info.php?lessonID=<?php echo $lessonID; ?>"
                         style="text-decoration: none; color: inherit; display: block;">
-                        <div class="todo-card d-flex align-items-stretch p-2">
+                        <div class="todo-card d-flex align-items-stretch px-2 py-3">
                             <div class="d-flex w-100 align-items-center justify-content-between">
 
                                 <!-- Left side: File icon and Text -->
@@ -92,10 +92,10 @@ mysqli_data_seek($lessonResult, 0);
                                     </div>
 
                                     <div>
-                                        <div class="text-sbold text-16 py-1" style="line-height: 1;">
+                                        <div class="text-sbold text-16" style="line-height: 1;">
                                             <?php echo htmlspecialchars($lessonTitle); ?>
                                         </div>
-                                        <div class="text-reg text-12" style="line-height: 1;">
+                                        <div class="text-reg text-12 mt-1" style="line-height: 1;">
                                             <?php echo $fileCount . " file" . ($fileCount != 1 ? "s" : "") . " · " . $linkCount . " link" . ($linkCount != 1 ? "s" : ""); ?>
                                         </div>
                                     </div>

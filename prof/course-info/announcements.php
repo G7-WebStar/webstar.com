@@ -113,7 +113,7 @@ $announcementResult = executeQuery($announcementQuery);
     <?php if (mysqli_num_rows($announcementResult) > 0): ?>
 
         <!-- Sort By Dropdown -->
-        <div class="d-flex align-items-center flex-wrap mb-1" id="header">
+        <div class="d-flex align-items-center flex-wrap mb-2" id="header">
             <div class="d-flex align-items-center flex-wrap">
                 <span class="dropdown-label me-2 text-reg text-14">Sort by</span>
                 <form method="POST">

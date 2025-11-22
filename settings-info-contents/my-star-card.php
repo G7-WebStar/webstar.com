@@ -32,7 +32,7 @@ $starCardQuery = "
         ) AS totalEnrollments,
         (
             SELECT COUNT(*) 
-            FROM studentBadges AS sb 
+            FROM studentbadges AS sb 
             WHERE sb.userID = users.userID
         ) AS totalBadges
     FROM users
@@ -219,82 +219,86 @@ $starCard = mysqli_fetch_assoc($starCardResult);
             </div>
 
         </div>
+        <?php if ($starCard['starCard'] !== null && $starCard['starCard'] !== '0'): ?>
+            <div class="row">
+                <!-- My Star Card Content -->
 
-        <div class="row">
-            <!-- My Star Card Content -->
-            <div class="w-100 d-flex justify-content-center m-0 p-0 mb-1">
-                <div class="mt-3 rounded-4 p-0"
-                    style="border: 1px solid var(--black); width: 250px; aspect-ratio: 1 / 1 !important;">
-                    <div class="px-4 rounded-4 star-card"
-                        style="background: linear-gradient(to bottom,<?= htmlspecialchars($profile['colorHex']) ?>, #FFFFFF); max-width: 350px;">
-                        <div class="text-center text-12 text-sbold mb-4" style="margin-top: 30px;">
-                            <span class="me-1">My Week on </span>
-                            <img src="shared/assets/img/webstar-logo-black.png"
-                                style="width: 80px; height: 100%; object-fit: cover; margin-top:-5px"
-                                alt="Profile Picture">
-                        </div>
-
-                        <div class="d-flex justify-content-center text-decoration-none pb-2">
-                            <div class="rounded-circle flex-shrink-0 me-2 overflow-hidden d-flex justify-content-center align-items-center"
-                                style="width: 40px; height: 40px; border: 1px solid var(--black); box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.8);">
-                                <img src="shared/assets/pfp-uploads/<?= htmlspecialchars($user['profilePicture']) ?>"
-                                    style="width: auto; height: 100%; object-fit: cover;" alt="Profile Picture">
+                <div class="w-100 d-flex justify-content-center m-0 p-0 mb-1">
+                    <div class="mt-3 rounded-4 p-0"
+                        style="border: 1px solid var(--black); width: 250px; aspect-ratio: 1 / 1 !important;">
+                        <div class="px-4 rounded-4 star-card"
+                            style="background: linear-gradient(to bottom,<?= htmlspecialchars($profile['colorHex']) ?>, #FFFFFF); max-width: 350px;">
+                            <div class="text-center text-12 text-sbold mb-4" style="margin-top: 30px;">
+                                <span class="me-1">My Week on </span>
+                                <img src="shared/assets/img/webstar-logo-black.png"
+                                    style="width: 80px; height: 100%; object-fit: cover; margin-top:-5px"
+                                    alt="Profile Picture">
                             </div>
-                            <div class="d-flex flex-column justify-content-center text-12">
-                                <span
-                                    class="text-sbold"><?= htmlspecialchars($user['firstName'] . ' ' . $user['lastName']) ?></span>
-                                <small class="text-reg">@<?= htmlspecialchars($user['userName']) ?></small>
-                            </div>
-                        </div>
 
-                        <div class="d-flex flex-column justify-content-center text-14 mt-1">
-                            <span class="text-bold text-center"><?= htmlspecialchars($starCard['courseCode']) ?></span>
-                            <small
-                                class="text-reg text-center"><?= htmlspecialchars($starCard['courseTitle']) ?></small>
-                        </div>
-
-                        <div class="stats mt-3 mb-1">
-                            <div class="d-flex justify-content-between align-items-center text-center">
-                                <div class="flex-fill text-center mx-1 text-14">
-                                    <div class="text-bold">2</div>
-                                    <small class="text-med text-muted text-12">level</small>
+                            <div class="d-flex justify-content-center text-decoration-none pb-2">
+                                <div class="rounded-circle flex-shrink-0 me-2 overflow-hidden d-flex justify-content-center align-items-center"
+                                    style="width: 40px; height: 40px; border: 1px solid var(--black); box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.8);">
+                                    <img src="shared/assets/pfp-uploads/<?= htmlspecialchars($user['profilePicture']) ?>"
+                                        style="width: auto; height: 100%; object-fit: cover;" alt="Profile Picture">
                                 </div>
-                                <div class="flex-fill text-center mx-1 text-14">
-                                    <div class="text-bold">3</div>
-                                    <small class="text-med text-muted text-12"> rank</small>
-                                </div>
-                                <div class="flex-fill text-center mx-1 text-14">
-                                    <div class="text-bold">340</div>
-                                    <small class="text-med text-muted text-12">XPs</small>
+                                <div class="d-flex flex-column justify-content-center text-12">
+                                    <span
+                                        class="text-sbold"><?= htmlspecialchars($user['firstName'] . ' ' . $user['lastName']) ?></span>
+                                    <small class="text-reg">@<?= htmlspecialchars($user['userName']) ?></small>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="emblem">
-                            <div class="h-100 d-flex justify-content-center align-items-center py-2">
-                                <img src="shared/assets/img/shop/emblems/<?= htmlspecialchars($profile['emblemImg']) ?>"
-                                    class="img-fluid"
-                                    style="max-height: 250px; width: 100%; height: auto; object-fit: contain;">
+                            <div class="d-flex flex-column justify-content-center text-14 mt-1">
+                                <span class="text-bold text-center"><?= htmlspecialchars($starCard['courseCode']) ?></span>
+                                <small
+                                    class="text-reg text-center"><?= htmlspecialchars($starCard['courseTitle']) ?></small>
+                            </div>
+
+                            <div class="stats mt-3 mb-1">
+                                <div class="d-flex justify-content-between align-items-center text-center">
+                                    <div class="flex-fill text-center mx-1 text-14">
+                                        <div class="text-bold">2</div>
+                                        <small class="text-med text-muted text-12">level</small>
+                                    </div>
+                                    <div class="flex-fill text-center mx-1 text-14">
+                                        <div class="text-bold">3</div>
+                                        <small class="text-med text-muted text-12"> rank</small>
+                                    </div>
+                                    <div class="flex-fill text-center mx-1 text-14">
+                                        <div class="text-bold">340</div>
+                                        <small class="text-med text-muted text-12">XPs</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="emblem">
+                                <div class="h-100 d-flex justify-content-center align-items-center py-2">
+                                    <img src="shared/assets/img/shop/emblems/<?= htmlspecialchars($profile['emblemImg']) ?>"
+                                        class="img-fluid"
+                                        style="max-height: 250px; width: 100%; height: auto; object-fit: contain;">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="d-flex justify-content-center mt-3">
-            <button type="button" class="btn btn-sm px-3 rounded-pill text-med text-14"
-                style="background-color: <?= htmlspecialchars($profile['colorHex']) ?>; border: 1px solid var(--black);"
-                onclick="exportCardAsJPG()" title="Download your Star Card and share it with your friends!"
-                data-bs-toggle="tooltip" data-bs-placement="left">
-                <div style="display: flex; align-items: center; gap: 5px;">
-                    <i class="fa-solid fa-share"></i>
-                    <span>Share</span>
-                </div>
-            </button>
-        </div>
+            </div>
+
+            <div class="d-flex justify-content-center mt-3">
+                <button type="button" class="btn btn-sm px-3 rounded-pill text-med text-14"
+                    style="background-color: <?= htmlspecialchars($profile['colorHex']) ?>; border: 1px solid var(--black);"
+                    onclick="exportCardAsJPG()" title="Download your Star Card and share it with your friends!"
+                    data-bs-toggle="tooltip" data-bs-placement="left">
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <i class="fa-solid fa-share"></i>
+                        <span>Share</span>
+                    </div>
+                </button>
+            </div>
+        <?php endif; ?>
     </form>
 </div>
+
 
 <!-- Dropdown js -->
 

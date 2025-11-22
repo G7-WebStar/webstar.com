@@ -252,7 +252,7 @@ if (isset($_POST['feedback'])) {
                     <!-- Navbar for mobile -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto row-padding-top shop-container">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top shop-container h-100">
 
                         <!-- Sticky Header: Title + Tabs -->
                         <div class="settings-header-wrapper my-1">

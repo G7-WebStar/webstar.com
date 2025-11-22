@@ -117,7 +117,7 @@ $showDropdowns = $assessmentCount > 0
 <?php endif; ?>
 
 <?php if ($showDropdowns): ?>
-    <div class="d-flex align-items-center flex-nowrap mb-3" id="header">
+    <div class="d-flex align-items-center flex-nowrap mb-2" id="header">
         <!-- Sort by -->
         <div class="d-flex align-items-center flex-nowrap me-4">
             <span class="dropdown-label me-2 text-reg text-14">Sort by</span>
@@ -153,7 +153,7 @@ $showDropdowns = $assessmentCount > 0
             if (empty($todo['assessmentTitle']))
                 continue; // skip invalid assessments
             ?>
-            <div class="row mb-0 mt-3">
+            <div class="row mb-0 mt-2">
                 <div class="col-12 col-md-10">
                     <?php
                     $type = strtolower(trim($todo['type']));
@@ -179,7 +179,7 @@ $showDropdowns = $assessmentCount > 0
                     ?>
                     <div class="todo-card d-flex align-items-stretch" data-link="<?php echo htmlspecialchars($link); ?>">
                         <!-- Date -->
-                        <div class="date d-flex align-items-center justify-content-center text-sbold text-20">
+                        <div class="date py-3 d-flex align-items-center justify-content-center text-sbold text-20"style="text-transform:uppercase;background-color: var(--primaryColor)">
                             <?php echo $todo['assessmentDeadline']; ?>
                         </div>
 
@@ -190,7 +190,7 @@ $showDropdowns = $assessmentCount > 0
                                 <div class="text-sbold text-16"
                                     style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                     <?php echo htmlspecialchars($todo['assessmentTitle']); ?></div>
-                                <span class="course-badge rounded-pill px-3 text-reg text-12 mt-2 d-inline d-md-none">
+                                <span class="course-badge rounded-pill me-2 px-3 text-reg text-12 mt-2 d-inline d-md-none">
                                     <?php echo htmlspecialchars($todo['type']); ?>
                                 </span>
                             </div>
@@ -201,7 +201,7 @@ $showDropdowns = $assessmentCount > 0
                                 </span>
 
                                 <!-- DROPDOWN MENU -->
-                                <div class="dropdown" data-dropdown="true" style="position: relative;">
+                                <div class="dropdown " data-dropdown="true" style="position: relative;">
                                     <button class="btn btn-light btn-sm p-1 px-2 border-0 bg-transparent" type="button"
                                         id="dropdownMenuButton<?php echo $todoID; ?>" data-bs-toggle="dropdown"
                                         aria-expanded="false" style="line-height: 1;">
