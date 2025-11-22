@@ -24,6 +24,7 @@ if (isset($_POST['registerBtn'])) {
     $lastName = $_POST['lastName'];
     $username = strtolower($_POST['tempUsernameID']);
     $password = $_POST['tempPasswordID'];
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     // Check if username exists
     $usernameCheckResult = mysqli_query($conn, "SELECT * FROM users WHERE username='$username'");
@@ -35,7 +36,7 @@ if (isset($_POST['registerBtn'])) {
     if ($usernameError == "") {
 
         mysqli_query($conn, "INSERT INTO users (username, password, role, status) 
-                             VALUES ('$username', '$password', 'professor', 'Active')");
+                             VALUES ('$username', '$hashedPassword', 'professor', 'Active')");
 
         $userID = mysqli_insert_id($conn);
 

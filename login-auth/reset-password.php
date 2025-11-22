@@ -34,6 +34,7 @@ if (isset($_SESSION['alert'])) {
 if (isset($_POST['reset'])) { // Reset password button
     $email = $_SESSION['email'] ?? null;
     $newPassword = trim($_POST['password']);
+    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
     $confirm = trim($_POST['confirmPassword']);
 
     if (empty($newPassword) || empty($confirm)) {
@@ -53,9 +54,9 @@ if (isset($_POST['reset'])) { // Reset password button
         $_SESSION['role'] = $role;
 
         if ($role === 'professor') {
-            $update = "UPDATE users SET password = '$newPassword', status = 'active' WHERE email = '$email'";
+            $update = "UPDATE users SET password = '$hashedPassword', status = 'active' WHERE email = '$email'";
         } else {
-            $update = "UPDATE users SET password = '$newPassword' WHERE email = '$email'";
+            $update = "UPDATE users SET password = '$hashedPassword' WHERE email = '$email'";
         }
 
         $result = executeQuery($update);
