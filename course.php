@@ -235,7 +235,16 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                                 <?php
                                 }
                             } else if ($noResult) { ?>
-                                <div class="text-reg h1 text-center mt-5">No Result.</div>
+                                <div class="d-flex flex-column justify-content-center align-items-center" style="min-height: 60vh;">
+                                    <img src="shared/assets/img/empty/folder2.png" width="100" class="mb-1">
+                                    <div class="text-center text-14 text-reg mt-1">No Result.</div>
+                                </div>
+                            <?php
+                            } else { ?>
+                                <div class="d-flex flex-column justify-content-center align-items-center" style="min-height: 60vh;">
+                                    <img src="shared/assets/img/empty/folder2.png" width="100" class="mb-1">
+                                    <div class="text-center text-14 text-reg mt-1">No courses found.</div>
+                                </div>
                             <?php
                             }
                             ?>

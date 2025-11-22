@@ -37,7 +37,7 @@ include("shared/assets/processes/registration-process.php");
             </div>
 
             <!-- Registration Form -->
-            <div class="col-md-7 d-flex flex-column justify-content-center align-items-center p-4 h-100 registration-form-col" style="background: var(--dirtyWhite);">
+            <div class="col-md-7 d-flex flex-column justify-content-center align-items-center p-4 registration-form-col" style="background: var(--dirtyWhite);">
                 <div class="w-100" style="max-width: 400px;">
                     <div class="text-center mb-3 mt-4 pt-3 registration-title text-bold text-30" style="color: var(--black);">Create an account</div>
 
