@@ -722,10 +722,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                                 <div
                                     class="row desktop-header d-none d-sm-flex align-items-center justify-content-between">
                                     <div class="col-auto d-flex align-items-center gap-3">
-                                        <a href="todo.php?userID=<?php echo htmlspecialchars($studentUserID); ?>"
-                                            class="text-decoration-none">
-                                            <i class="fa-solid fa-arrow-left text-20" style="color: var(--black);"></i>
-                                        </a>
+                                        <button onclick="history.back()" class="p-0" style="background:none; border:none;">
+                                            <span class="material-symbols-outlined"
+                                                  style="color: var(--black); font-size: 22px;">
+                                                arrow_back
+                                            </span>
+                                        </button>
                                         <div class="d-flex align-items-center gap-3">
                                             <div class="rounded-circle"
                                                 style="width: 40px; height: 40px; background-color: var(--highlight75);">
