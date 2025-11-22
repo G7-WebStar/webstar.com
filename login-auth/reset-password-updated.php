@@ -43,7 +43,7 @@ session_start();
 
                 <!-- Lock Image -->
                 <div class="container text-center mt-4 mb-4">
-                    <img src="../shared/assets/img/resetPassword/lock.png" class="img-fluid bottom-image" alt="Success" style="max-width: 200px;">
+                    <img src="../shared/assets/img/resetPassword/Lock.png" class="img-fluid bottom-image" alt="Success" style="max-width: 200px;">
                 </div>
 
                 <!-- Back to Login Redirect -->

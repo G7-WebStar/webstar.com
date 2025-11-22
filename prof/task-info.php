@@ -39,7 +39,6 @@ $profName = $assignmentRow['firstName'] . ' ' . $assignmentRow['lastName'];
 $profilePic = !empty($assignmentRow['profilePicture'])
     ? '../shared/assets/pfp-uploads/' . $assignmentRow['profilePicture']
     : '../shared/assets/pfp-uploads/defaultProfile.png';
-
 $deadline = $assignmentRow['deadline'];
 $score = $assignmentRow['score'] ?? null;
 $totalPoints = $assignmentRow['assignmentPoints'] ?? 0;
@@ -323,7 +322,7 @@ if (!empty($rubricID)) {
                                                         </span>
 
                                                         <div class="ms-2">
-                                                            <div class="text-sbold text-16 mt-1"><?php echo $rubricTitle; ?>
+                                                            <div class="text-sbold text-16 mt-1 text-truncate" style="max-width:320px;"><?php echo $rubricTitle; ?>
                                                             </div>
                                                             <div class="due text-reg text-14 mb-1">
                                                                 <?php echo $rubricPoints; ?> points
