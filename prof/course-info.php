@@ -133,6 +133,14 @@ if (isset($_POST['deleteCourse'])) {
 
 if (isset($_GET['courseID'])) {
     $courseID = $_GET['courseID'];
+
+    $checkCourseOwnershipQuery = "SELECT * FROM courses WHERE userID = '$userID' AND courseID = '$courseID'";
+    $checkCourseOwnershipResult = executeQuery($checkCourseOwnershipQuery);
+
+    if (mysqli_num_rows($checkCourseOwnershipResult) <= 0) {
+        header("Location: 404.html");
+    }
+
     $selectCourseQuery = "SELECT 
     courses.*, 
    	profInfo.firstName AS profFirstName,
