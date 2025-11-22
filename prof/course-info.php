@@ -963,7 +963,7 @@ $user = mysqli_fetch_assoc($result);
                             style="background-color: var(--primaryColor); border: 1px solid var(--black);"
                             data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" name="deleteCourse" class="btn rounded-pill px-4"
-                            style="background-color: rgba(255, 80, 80, 1); border: 1px solid var(--black); color: var(--black);">
+                            style="background-color: rgba(248, 142, 142, 1); border: 1px solid var(--black); color: var(--black);">
                             Delete
                         </button>
                     </div>

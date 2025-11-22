@@ -184,7 +184,7 @@ mysqli_data_seek($lessonResult, 0);
                                 <form method="POST" class="m-0 delete-lesson-form" data-lesson-id="<?php echo $lessonID; ?>">
                                     <input type="hidden" name="deleteLessonID" value="<?php echo $lessonID; ?>">
                                     <button type="submit" name="deleteLessonBtn" class="btn rounded-pill px-4"
-                                        style="background-color: rgba(255, 80, 80, 1); border: 1px solid var(--black);"
+                                        style="background-color: rgba(248, 142, 142, 1); border: 1px solid var(--black);"
                                         data-lesson-id="<?php echo $lessonID; ?>">
                                         Delete
                                     </button>

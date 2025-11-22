@@ -367,7 +367,7 @@ $announcementResult = executeQuery($announcementQuery);
                             <form method="POST" class="m-0">
                                 <input type="hidden" value="<?php echo $announcementID; ?>" name="deleteAnnouncementID">
                                 <button type="submit" name="deleteAnnouncementBtn" class="btn rounded-pill px-4"
-                                    style="background-color: rgba(255, 80, 80, 1); border: 1px solid var(--black);">
+                                    style="background-color: rgba(248, 142, 142, 1); border: 1px solid var(--black);">
                                     Delete
                                 </button>
                             </form>
