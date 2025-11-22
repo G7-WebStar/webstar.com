@@ -75,6 +75,7 @@ if (!empty($courseIds)) {
 
 // Share to session for view fallback
 $_SESSION['InboxCount'] = $unreadInboxCount;
+
 ?>
 
 <!-- Styles -->
