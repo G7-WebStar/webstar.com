@@ -45,7 +45,7 @@ if (!$username && isset($_SESSION['userID'])) {
         WHERE users.userID = '$userID'
     ";
     $badgeQuery = "
-        SELECT b.badgeName, b.badgeIcon, COUNT(sb.badgeID) AS timesEarned
+        SELECT b.badgeName, b.badgeIcon, b.badgeDescription, COUNT(sb.badgeID) AS timesEarned
         FROM studentbadges AS sb
         JOIN badges AS b ON sb.badgeID = b.badgeID
         WHERE sb.userID = '$userID'
@@ -118,7 +118,7 @@ if (!$username && isset($_SESSION['userID'])) {
         WHERE users.userName = '$escaped'
     ";
     $badgeQuery = "
-    SELECT b.badgeName, b.badgeIcon, COUNT(sb.badgeID) AS timesEarned
+    SELECT b.badgeName, b.badgeIcon, b.badgeDescription, COUNT(sb.badgeID) AS timesEarned
     FROM studentbadges AS sb
     JOIN badges AS b ON sb.badgeID = b.badgeID
     JOIN users AS u ON sb.userID = u.userID
@@ -217,6 +217,45 @@ if (!$username && isset($_SESSION['userID'])) {
 // Execute the query
 $myItemsResult = mysqli_query($conn, $myItemsQuery);
 $profile = mysqli_fetch_assoc($myItemsResult);
+
+// For Star Card
+if (!$username && isset($_SESSION['userID'])) {
+    // Use userID from session
+    $starCardQuery = "
+    SELECT 
+        profile.starCard,
+        courses.courseCode,
+        courses.courseTitle
+    FROM profile
+    LEFT JOIN courses ON profile.starCard = courses.courseID
+    WHERE profile.userID = '$userID'
+    ";
+
+} elseif ($username) {
+    $escaped = mysqli_real_escape_string($conn, $username);
+    // Get userID by username first
+    $userRow = $conn->query("SELECT userID FROM users WHERE userName = '$escaped' LIMIT 1")->fetch_assoc();
+    if ($userRow) {
+        $userID = (int) $userRow['userID'];
+        $starCardQuery = "
+    SELECT 
+        profile.starCard,
+        courses.courseCode,
+        courses.courseTitle
+    FROM profile
+    LEFT JOIN courses ON profile.starCard = courses.courseID
+    WHERE profile.userID = '$userID'
+    ";
+
+    } else {
+        // Username not found
+        header("Location: 404.php");
+        exit;
+    }
+}
+
+$starCardResult = mysqli_query($conn, $starCardQuery);
+$starCard = mysqli_fetch_assoc($starCardResult);
 
 if (!$user) {
     // Redirect to 404 page if user is not found
@@ -531,7 +570,8 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                             while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                                 ?>
                                                                 <div class="w-100 badge-option rounded-3 d-flex align-items-center p-2 mt-2"
-                                                                    style="cursor: pointer; border: 1px solid var(--black);">
+                                                                    style="cursor: pointer; border: 1px solid var(--black);" title="<?php echo $row['badgeDescription']; ?>"
+                                                                    data-bs-toggle="tooltip" data-bs-placement="left"> 
                                                                     <img src="shared/assets/img/badge/<?php echo $row['badgeIcon']; ?>"
                                                                         alt="Badge" style="width: 55px; height: 55px;"
                                                                         class="mx-1 ms-1 me-2">
@@ -598,12 +638,6 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                                 <!-- Rank Info -->
                                                                 <div style="display: inline-flex; align-items: center;">
                                                                     <span class="rank-number text-bold text-18">11</span>
-                                                                    <span
-                                                                        class="text-reg text-12 badge rounded-pill ms-2 learderboard-badge"
-                                                                        style="display: inline-flex; align-items: center; gap: 4px;">
-                                                                        <i class="fa-solid fa-caret-up"></i>
-                                                                        2
-                                                                    </span>
                                                                 </div>
 
                                                                 <!-- Course Info -->
@@ -627,7 +661,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                     }
                                                 } else
 
-                                                   if (empty($courses)) {
+                                                    if (empty($courses)) {
                                                         if ($user['role'] === 'student') {
                                                             echo '
                                                             <div class="text-center mb-2">
@@ -671,95 +705,140 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                         <span class="text-sbold">My Star Card</span>
                                                     </div>
                                                     <?php if (isset($_SESSION['userID']) && $_SESSION['userID'] == $user['userID']): ?>
-                                                        <div>
-                                                            <button type="button"
-                                                                class="btn btn-sm px-3 rounded-pill text-med text-14"
-                                                                style="background-color: <?= htmlspecialchars($profile['colorHex']) ?>; border: 1px solid var(--black);"
-                                                                onclick="exportCardAsJPG()"
-                                                                title="Download your Star Card and share it with your friends!"
-                                                                data-bs-toggle="tooltip" data-bs-placement="left">
-                                                                <div style="display: flex; align-items: center; gap: 5px;">
-                                                                    <i class="fa-solid fa-share"></i>
-                                                                    <span>Share</span>
-                                                                </div>
-                                                            </button>
-
-                                                        </div>
+                                                        <?php if ($starCard['starCard'] !== null && $starCard['starCard'] !== '0'): ?>
+                                                            <div>
+                                                                <button type="button"
+                                                                    class="btn btn-sm px-3 rounded-pill text-med text-14"
+                                                                    style="background-color: <?= htmlspecialchars($profile['colorHex']) ?>; border: 1px solid var(--black);"
+                                                                    onclick="exportCardAsJPG()"
+                                                                    title="Download your Star Card and share it with your friends!"
+                                                                    data-bs-toggle="tooltip" data-bs-placement="left">
+                                                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                                                        <i class="fa-solid fa-share"></i>
+                                                                        <span>Share</span>
+                                                                    </div>
+                                                                </button>
+                                                            </div>
+                                                        <?php endif; ?>
                                                     <?php endif; ?>
                                                 </div>
                                                 <!-- My Star Card Content -->
-                                                <div class="w-100 d-flex justify-content-center m-0 p-0 mb-1">
-                                                    <div class="mt-3 rounded-4 p-0"
-                                                        style="border: 1px solid var(--black); width: 250px;  aspect-ratio: 1 / 1  !important;">
-                                                        <div class="px-4 rounded-4 star-card"
-                                                            style="background: linear-gradient(to bottom,<?= htmlspecialchars($profile['colorHex']) ?>, #FFFFFF); max-width: 350px; ">
-                                                            <div class="text-center text-12 text-sbold mb-4"
-                                                                style="margin-top: 30px;">
-                                                                <span class="me-1">My Week on </span>
-                                                                <img src="shared/assets/img/webstar-logo-black.png"
-                                                                    style="width: 80px; height: 100%; object-fit: cover; margin-top:-5px"
-                                                                    alt="Profile Picture">
-                                                            </div>
-
-                                                            <div
-                                                                class="d-flex justify-content-center text-decoration-none pb-2">
-                                                                <div class="rounded-circle flex-shrink-0 me-2 overflow-hidden d-flex justify-content-center align-items-center"
-                                                                    style="width: 40px; height: 40px; border: 1px solid var(--black); box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.8);">
-                                                                    <img src="shared/assets/pfp-uploads/<?= htmlspecialchars($user['profilePicture']) ?>"
-                                                                        style="width: auto; height: 100%; object-fit: cover;"
+                                                <?php if ($starCard['starCard'] !== null && $starCard['starCard'] !== '0'): ?>
+                                                    <!-- Star Card HTML -->
+                                                    <div class="w-100 d-flex justify-content-center m-0 p-0 mb-1">
+                                                        <div class="mt-3 rounded-4 p-0"
+                                                            style="border: 1px solid var(--black); width: 250px;  aspect-ratio: 1 / 1  !important;">
+                                                            <div class="px-4 rounded-4 star-card"
+                                                                style="background: linear-gradient(to bottom,<?= htmlspecialchars($profile['colorHex']) ?>, #FFFFFF); max-width: 350px; ">
+                                                                <div class="text-center text-12 text-sbold mb-4"
+                                                                    style="margin-top: 30px;">
+                                                                    <span class="me-1">My Week on </span>
+                                                                    <img src="shared/assets/img/webstar-logo-black.png"
+                                                                        style="width: 80px; height: 100%; object-fit: cover; margin-top:-5px"
                                                                         alt="Profile Picture">
                                                                 </div>
 
                                                                 <div
-                                                                    class="d-flex flex-column justify-content-center text-12">
-                                                                    <span class="text-sbold">
-                                                                        <?= htmlspecialchars($user['firstName'] . ' ' . $user['lastName']) ?>
-                                                                    </span>
-                                                                    <small class="text-reg">
-                                                                        @<?= htmlspecialchars($user['userName']) ?>
-                                                                    </small>
-                                                                </div>
-                                                            </div>
-                                                            <div
-                                                                class="d-flex flex-column justify-content-center text-14 mt-1">
-                                                                <span class="text-bold text-center">COMP-006</span>
-                                                                <small class="text-reg text-center">Web
-                                                                    Development</small>
-                                                            </div>
-                                                            <div class="stats mt-3 mb-1">
-                                                                <div
-                                                                    class="d-flex justify-content-between align-items-center text-center">
-                                                                    <div class="flex-fill text-center mx-1 text-14">
-                                                                        <div class="text-bold">2</div>
-                                                                        <small
-                                                                            class="text-med text-muted text-12">level</small>
+                                                                    class="d-flex justify-content-center text-decoration-none pb-2">
+                                                                    <div class="rounded-circle flex-shrink-0 me-2 overflow-hidden d-flex justify-content-center align-items-center"
+                                                                        style="width: 40px; height: 40px; border: 1px solid var(--black); box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.8);">
+                                                                        <img src="shared/assets/pfp-uploads/<?= htmlspecialchars($user['profilePicture']) ?>"
+                                                                            style="width: auto; height: 100%; object-fit: cover;"
+                                                                            alt="Profile Picture">
                                                                     </div>
 
-                                                                    <div class="flex-fill text-center mx-1 text-14">
-                                                                        <div class="text-bold">3</div>
-                                                                        <small class="text-med text-muted text-12">
-                                                                            rank</small>
-                                                                    </div>
-
-                                                                    <div class="flex-fill text-center mx-1 text-14">
-                                                                        <div class="text-bold">340</div>
-                                                                        <small
-                                                                            class="text-med text-muted text-12">XPs</small>
+                                                                    <div
+                                                                        class="d-flex flex-column justify-content-center text-12">
+                                                                        <span class="text-sbold">
+                                                                            <?= htmlspecialchars($user['firstName'] . ' ' . $user['lastName']) ?>
+                                                                        </span>
+                                                                        <small class="text-reg">
+                                                                            @<?= htmlspecialchars($user['userName']) ?>
+                                                                        </small>
                                                                     </div>
                                                                 </div>
-                                                            </div>
 
-                                                            <div class="emblem">
                                                                 <div
-                                                                    class="h-100 d-flex justify-content-center align-items-center py-2">
-                                                                    <img src="shared/assets/img/shop/emblems/<?= htmlspecialchars($profile['emblemImg']) ?>"
-                                                                        class="img-fluid"
-                                                                        style="max-height: 250px; width: 100%; height: auto; object-fit: contain;">
+                                                                    class="d-flex flex-column justify-content-center text-14 mt-1">
+                                                                    <span
+                                                                        class="text-bold text-center"><?= htmlspecialchars($starCard['courseCode']) ?></span>
+                                                                    <small
+                                                                        class="text-reg text-center"><?= htmlspecialchars($starCard['courseTitle']) ?></small>
+                                                                </div>
+
+                                                                <div class="stats mt-3 mb-1">
+                                                                    <div
+                                                                        class="d-flex justify-content-between align-items-center text-center">
+                                                                        <div class="flex-fill text-center mx-1 text-14">
+                                                                            <div class="text-bold">2</div>
+                                                                            <small
+                                                                                class="text-med text-muted text-12">level</small>
+                                                                        </div>
+
+                                                                        <div class="flex-fill text-center mx-1 text-14">
+                                                                            <div class="text-bold">3</div>
+                                                                            <small
+                                                                                class="text-med text-muted text-12">rank</small>
+                                                                        </div>
+
+                                                                        <div class="flex-fill text-center mx-1 text-14">
+                                                                            <div class="text-bold">340</div>
+                                                                            <small
+                                                                                class="text-med text-muted text-12">XPs</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="emblem">
+                                                                    <div
+                                                                        class="h-100 d-flex justify-content-center align-items-center py-2">
+                                                                        <img src="shared/assets/img/shop/emblems/<?= htmlspecialchars($profile['emblemImg']) ?>"
+                                                                            class="img-fluid"
+                                                                            style="max-height: 250px; width: 100%; height: auto; object-fit: contain;">
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                <?php else: ?>
+                                                    <!-- Empty State -->
+                                                    <div class="w-100 d-flex justify-content-center m-0 p-0 mb-1">
+                                                        <div class="mt-3 rounded-4 p-0"
+                                                            style="border: 1px solid var(--black); width: 250px;  aspect-ratio: 1 / 1  !important;">
+                                                            <div class="px-4 rounded-4 star-card text-center"
+                                                                style="background: linear-gradient(to bottom, #cccccc, #FFFFFF); max-width: 350px;">
+                                                                <div class="text-center text-12 text-sbold mb-4"
+                                                                    style="margin-top: 30px;">
+                                                                    <?php if (!isset($username) && empty($username)): ?>
+                                                                        <span class="me-1">Set up your Star Card in Settings and
+                                                                            choose which course’s Star Card to display on your
+                                                                            profile.</span>
+                                                                        <div>
+                                                                            <a href="settings.php"
+                                                                                style="text-decoration: none !important; color: inherit !important;"
+                                                                                onmouseover="this.style.textDecoration='none'; this.style.color='inherit';"
+                                                                                onmouseout="this.style.textDecoration='none'; this.style.color='inherit';">
+                                                                                <button type="button"
+                                                                                    class="btn btn-sm px-3 rounded-pill text-med text-14 mt-3"
+                                                                                    style="background-color: <?= htmlspecialchars($profile['colorHex']) ?>; border: 1px solid var(--black);">
+                                                                                    <div
+                                                                                        style="display: flex; align-items: center; gap: 5px;">
+                                                                                        <span>Set up</span>
+                                                                                    </div>
+                                                                                </button>
+                                                                            </a>
+                                                                        </div>
+                                                                    <?php else: ?>
+                                                                        <span class="me-1">This user has not set up <br>their Star Card yet.</span>
+                                                                    <?php endif; ?>
+
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                <?php endif; ?>
+
                                             </div>
                                         </div>
                                     </div>

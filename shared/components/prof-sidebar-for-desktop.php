@@ -260,8 +260,8 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
 
                         <!-- Sign Out -->
                         <li>
-                            <a class="dropdown-item d-flex align-items-center text-med text-14" href="#" onclick="logout();"
-                                style="color:var(--highlight);">
+                            <a class="dropdown-item d-flex align-items-center text-med text-14" href="#"
+                                onclick="logout();" style="color:var(--highlight);">
                                 <span class="material-symbols-rounded"
                                     style="font-size:18px; display: inline-flex; width: 1.5em; ">logout</span>
                                 Sign Out
@@ -296,7 +296,12 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
           border-radius: 16px; height: 350px; background-color: #fff; padding:10px;">
                     <div id="searchResults" class="scroll-content"
                         style="height: 100%; overflow-y: auto; border-radius: 12px;">
-                        <div class="text-center text-muted p-3">Type a name or username to search.</div>
+                        <div class="h-100 d-flex flex-column align-items-center justify-content-center">
+                            <div>
+                                <img src="../shared/assets/img/empty/search.png" width="80" class="mb-1">
+                            </div>
+                            <div class="text-center text-med text-14 p-3">Type a name or username to search</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -314,17 +319,25 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
         const query = searchInput.value.trim();
 
         if (query === '') {
-            searchResults.innerHTML = '<div class="text-center text-muted p-3">Type a name or username to search.</div>';
+            searchResults.innerHTML = `
+    <div class="h-100 d-flex flex-column align-items-center justify-content-center">
+        <div>
+            <img src="../shared/assets/img/empty/search.png" width="80" class="mb-1" alt="Search Icon">
+        </div>
+        <div class="text-center text-med text-14 p-3">Type a name or username to search</div>
+    </div>
+`;
+
             return;
         }
 
         fetch('../shared/assets/processes/search-modal-prof.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'searchTerm=' + encodeURIComponent(query)
-            })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'searchTerm=' + encodeURIComponent(query)
+        })
             .then(res => res.text())
             .then(html => searchResults.innerHTML = html)
             .catch(() => searchResults.innerHTML = '<div class="text-center text-muted p-3">Error loading results.</div>');

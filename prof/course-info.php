@@ -138,10 +138,21 @@ if (isset($_GET['courseID'])) {
    	profInfo.firstName AS profFirstName,
     profInfo.middleName AS profMiddleName,
     profInfo.lastName AS profLastName,
-    profInfo.profilePicture AS profPFP
+    profInfo.profilePicture AS profPFP,
+    GROUP_CONCAT(
+        CONCAT(
+            courseschedule.day, ' ', 
+            DATE_FORMAT(courseschedule.startTime, '%h:%i %p'), '-', 
+            DATE_FORMAT(courseschedule.endTime, '%h:%i %p')
+        ) 
+        ORDER BY FIELD(courseschedule.day, 'Mon','Tue','Wed','Thu','Fri','Sat','Sun'), courseschedule.startTime
+        SEPARATOR '\n'
+    ) AS courseschedule
     FROM courses
     INNER JOIN userinfo AS profInfo
     	ON courses.userID = profInfo.userID
+    LEFT JOIN courseschedule
+        ON courses.courseID = courseschedule.courseID
     WHERE courses.courseID = '$courseID' AND courses.userID = '$userID';
 ";
     $selectCourseResult = executeQuery($selectCourseQuery);
@@ -526,7 +537,7 @@ $user = mysqli_fetch_assoc($result);
                                                                 </span>
                                                                 <div class="d-flex flex-column justify-content-center">
                                                                     <span class="text-reg text-12">
-                                                                        <span class="me-1 text-med">Thursdays</span> 8AM - 10AM
+                                                                        <span><?php echo isset($courses['courseschedule']) ? nl2br($courses['courseschedule']) : 'No schedule yet'; ?></span>
                                                                     </span>
                                                                 </div>
                                                             </div>
@@ -715,7 +726,7 @@ $user = mysqli_fetch_assoc($result);
                                                         </span>
                                                         <div class="d-flex flex-column justify-content-center">
                                                             <span class="text-reg text-14">
-                                                                <span class="me-1 text-med">Thursdays</span> 8AM - 10AM
+                                                                <span><?php echo isset($courses['courseschedule']) ? nl2br($courses['courseschedule']) : 'No schedule yet'; ?></span>
                                                             </span>
                                                         </div>
                                                     </div>
@@ -812,7 +823,8 @@ $user = mysqli_fetch_assoc($result);
 
                                                         <li class="nav-item">
                                                             <a class="nav-link text-14 <?php echo ($activeTab == 'todo') ? 'active' : ''; ?>"
-                                                                data-bs-toggle="tab" data-bs-target="#todo" href="#todo">Quests</a>
+                                                                data-bs-toggle="tab" data-bs-target="#todo"
+                                                                href="#todo">Quests</a>
                                                         </li>
 
                                                         <li class="nav-item">

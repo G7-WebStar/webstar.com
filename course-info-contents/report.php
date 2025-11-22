@@ -3,18 +3,18 @@ if (isset($userID)) {
     $studentQuery = "
     SELECT 
         users.userName,
-        userInfo.firstName,
-        userInfo.middleName,
-        userInfo.lastName,
-        userInfo.studentID,
-        userInfo.yearLevel,
-        userInfo.yearSection,
-        userInfo.profilePicture,
+        userinfo.firstName,
+        userinfo.middleName,
+        userinfo.lastName,
+        userinfo.studentID,
+        userinfo.yearLevel,
+        userinfo.yearSection,
+        userinfo.profilePicture,
         program.programInitial,
         enrollments.enrollmentID
     FROM users
-    INNER JOIN userInfo ON users.userID = userInfo.userID
-    INNER JOIN program ON userInfo.programID = program.programID
+    INNER JOIN userinfo ON users.userID = userinfo.userID
+    INNER JOIN program ON userinfo.programID = program.programID
     INNER JOIN enrollments ON enrollments.userID = users.userID
     WHERE users.userID = '$userID' 
       AND enrollments.courseID = '$courseID'

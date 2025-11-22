@@ -323,7 +323,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                 <!-- Card 1 -->
                                                                 <div class="card mb-3"
                                                                     style="border-radius: 12px; border: 1px solid rgba(44, 44, 44, 1); padding: 15px;">
-                                                                    <div class="announcement-card d-flex align-items-start mb-3">
+                                                                    <div class="announcement-card d-flex align-items-start">
                                                                         <!-- Instructor Image -->
                                                                         <div class="flex-shrink-0 me-3">
                                                                             <img src="shared/assets/pfp-uploads/<?php echo $announcements['profilePicture']; ?>"
