@@ -28,7 +28,16 @@ if (isset($_POST['access_code'])) {
                 $yearSection = $selectedUser['yearSection'];
 
                 $enrollQuery = "INSERT INTO enrollments (`userID`, `courseID`, `yearSection`) VALUES ('$userID','$courseID','$yearSection')";
-                $enrollResult = executeQuery($enrollQuery);
+
+                if (mysqli_query($conn, $enrollQuery)) {
+                    $getEnrollmentIDQuery = "SELECT enrollmentID FROM enrollments WHERE userID = '$userID' AND courseID = '$courseID'";
+                    $getEnrollmentIDResult = executeQuery($getEnrollmentIDQuery);
+                    if (mysqli_num_rows($getEnrollmentIDResult) > 0) {
+                        $enrollentIDRow = mysqli_fetch_assoc($getEnrollmentIDResult);
+                        $enrollmentID = $enrollentIDRow['enrollmentID'];
+                        executeQuery("INSERT INTO leaderboard (enrollmentID, xpPoints) VALUES ('$enrollmentID', '0')");
+                    }
+                }
 
                 header("Location: index.php");
                 exit();
@@ -55,7 +64,7 @@ if (isset($_POST['access_code'])) {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
-    
+
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
