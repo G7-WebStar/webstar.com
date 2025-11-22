@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+date_default_timezone_set('Asia/Manila');
 $login_error = false; // default
 $email_not_found = false;  // Email/username not found
 
