@@ -8,6 +8,10 @@ include("../shared/assets/database/connect.php");
 date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
 
+$errorMessages = [
+    "emailNoCredential" => "No email credentials found in the database!"
+];
+
 if (!class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
     require '../shared/assets/phpmailer/src/Exception.php';
     require '../shared/assets/phpmailer/src/PHPMailer.php';
@@ -500,39 +504,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                 $studentData = $emailResult->fetch_assoc();
                 
                 if ($studentData['questDeadlineEnabled'] == 1 && !empty($studentData['email'])) {
-                    try {
-                        $mail = new PHPMailer(true);
-                        $mail->isSMTP();
-                        $mail->Host       = 'smtp.gmail.com';
-                        $mail->SMTPAuth   = true;
-                        $mail->Username   = 'learn.webstar@gmail.com';
-                        $mail->Password   = 'mtls vctd rhai cdem';
-                        $mail->SMTPSecure = 'tls';
-                        $mail->Port       = 587;
-                        $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
-                        $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
-                        if (file_exists($headerPath)) {
-                            $mail->AddEmbeddedImage($headerPath, 'emailHeader');
-                        }
-                        $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
-                        if (file_exists($footerPath)) {
-                            $mail->AddEmbeddedImage($footerPath, 'emailFooter');
-                        }
-                        
-                        $mail->isHTML(true);
-                        $mail->CharSet = 'UTF-8';
-                        $mail->Encoding = 'base64';
-                        $mail->Subject = "[GRADED] " . $details['assessmentTitle'] . " - " . $details['courseCode'];
-                        $mail->addAddress($studentData['email']);
-                        
-                        $assessmentTitleEsc = htmlspecialchars($details['assessmentTitle'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                        $courseCodeEsc = htmlspecialchars($details['courseCode'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                        $courseTitleEsc = htmlspecialchars($details['courseTitle'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                        $scoreDisplay = number_format($score, 0);
-                        $maxScoreDisplay = number_format((float) $totalPoints, 0);
-                        $feedbackHtml = !empty($feedback) ? nl2br(htmlspecialchars($feedback, ENT_QUOTES | ENT_HTML5, 'UTF-8')) : '<em>No feedback provided.</em>';
-                        
-                        $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+                    $credentialQuery = "SELECT email, password FROM emailcredentials WHERE credentialID = 1";
+                    $credentialResult = executeQuery($credentialQuery);
+                    $credentialRow = $credentialResult ? mysqli_fetch_assoc($credentialResult) : null;
+
+                    if ($credentialRow) {
+                        $smtpEmail = $credentialRow['email'];
+                        $smtpPassword = $credentialRow['password'];
+
+                        try {
+                            $mail = new PHPMailer(true);
+                            $mail->isSMTP();
+                            $mail->Host       = 'smtp.gmail.com';
+                            $mail->SMTPAuth   = true;
+                            $mail->Username   = $smtpEmail;
+                            $mail->Password   = $smtpPassword;
+                            $mail->SMTPSecure = 'tls';
+                            $mail->Port       = 587;
+                            $mail->setFrom($smtpEmail, 'Webstar');
+                            $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
+                            if (file_exists($headerPath)) {
+                                $mail->AddEmbeddedImage($headerPath, 'emailHeader');
+                            }
+                            $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
+                            if (file_exists($footerPath)) {
+                                $mail->AddEmbeddedImage($footerPath, 'emailFooter');
+                            }
+                            
+                            $mail->isHTML(true);
+                            $mail->CharSet = 'UTF-8';
+                            $mail->Encoding = 'base64';
+                            $mail->Subject = "[GRADED] " . $details['assessmentTitle'] . " - " . $details['courseCode'];
+                            $mail->addAddress($studentData['email']);
+                            
+                            $assessmentTitleEsc = htmlspecialchars($details['assessmentTitle'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                            $courseCodeEsc = htmlspecialchars($details['courseCode'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                            $courseTitleEsc = htmlspecialchars($details['courseTitle'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                            $scoreDisplay = number_format($score, 0);
+                            $maxScoreDisplay = number_format((float) $totalPoints, 0);
+                            $feedbackHtml = !empty($feedback) ? nl2br(htmlspecialchars($feedback, ENT_QUOTES | ENT_HTML5, 'UTF-8')) : '<em>No feedback provided.</em>';
+                            
+                            $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
                             <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
                                 <tr>
                                     <td align="center">
@@ -579,10 +591,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                             </table>
                         </div>';
                         
-                        $mail->send();
-                    } catch (Exception $e) {
-                        $errorMsg = isset($mail) && is_object($mail) ? $mail->ErrorInfo : $e->getMessage();
-                        error_log("PHPMailer failed for Submission ID $submissionID: " . $errorMsg);
+                            $mail->send();
+                        } catch (Exception $e) {
+                            $errorMsg = isset($mail) && is_object($mail) ? $mail->ErrorInfo : $e->getMessage();
+                            error_log("PHPMailer failed for Submission ID $submissionID: " . $errorMsg);
+                        }
                     }
                 }
             }
