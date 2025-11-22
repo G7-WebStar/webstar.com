@@ -142,8 +142,8 @@ $announcementResult = executeQuery($announcementQuery);
             $isChecked = ($row['isUserNoted']) ? 'checked' : '';
 
             $attachmentsArray = [];
+            $fileTitlesMap = []; // NEW
             $linksArray = [];
-
             $filesQuery = "SELECT * FROM files WHERE announcementID = '$announcementID'";
             $filesResult = executeQuery($filesQuery);
 
@@ -151,6 +151,11 @@ $announcementResult = executeQuery($announcementQuery);
                 if (!empty($file['fileAttachment'])) {
                     $attachments = array_map('trim', explode(',', $file['fileAttachment']));
                     $attachmentsArray = array_merge($attachmentsArray, $attachments);
+
+                    // Map each attachment to its title
+                    foreach ($attachments as $att) {
+                        $fileTitlesMap[$att] = !empty($file['fileTitle']) ? $file['fileTitle'] : $att;
+                    }
                 }
 
                 if (!empty($file['fileLink'])) {
@@ -287,9 +292,10 @@ $announcementResult = executeQuery($announcementQuery);
                                         <div class="cardFile d-flex align-items-start w-100 overflow-hidden" style="cursor:pointer;">
                                             <span class="px-4 py-3 material-symbols-outlined">draft</span>
                                             <div class="ms-2">
-                                                <div class="text-sbold text-16 mt-1 pe-4 file-name text-truncate" style="max-width:330px;"
-                                                    title="<?php echo $decodedAttachment; ?>">
-                                                    <?php echo $decodedAttachment; ?>
+                                                <div class="text-sbold text-16 mt-1 pe-4 file-name text-truncate"
+                                                    style="max-width:330px;"
+                                                    title="<?php echo htmlspecialchars($fileTitlesMap[$decodedAttachment]); ?>">
+                                                    <?php echo htmlspecialchars($fileTitlesMap[$decodedAttachment]); ?>
                                                 </div>
                                                 <div class="due text-reg text-14 mb-1">
                                                     <?php echo strtoupper($fileExtension); ?> file

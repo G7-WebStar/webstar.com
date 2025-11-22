@@ -115,8 +115,8 @@ $announcementResult = executeQuery($announcementQuery);
             $isChecked = ($row['isUserNoted']) ? 'checked' : '';
 
             $attachmentsArray = [];
+            $fileTitlesMap = []; // NEW
             $linksArray = [];
-
             $filesQuery = "SELECT * FROM files WHERE announcementID = '$announcementID'";
             $filesResult = executeQuery($filesQuery);
 
@@ -124,6 +124,11 @@ $announcementResult = executeQuery($announcementQuery);
                 if (!empty($file['fileAttachment'])) {
                     $attachments = array_map('trim', explode(',', $file['fileAttachment']));
                     $attachmentsArray = array_merge($attachmentsArray, $attachments);
+
+                    // Map each attachment to its title
+                    foreach ($attachments as $att) {
+                        $fileTitlesMap[$att] = !empty($file['fileTitle']) ? $file['fileTitle'] : $att;
+                    }
                 }
 
                 if (!empty($file['fileLink'])) {
@@ -133,7 +138,7 @@ $announcementResult = executeQuery($announcementQuery);
 
                 $fileTitle = !empty($file['fileTitle']) ? $file['fileTitle'] : '';
             }
-        ?>
+            ?>
 
             <!-- Announcement Card -->
             <div class="announcement-card d-flex align-items-start mb-1">
@@ -151,7 +156,8 @@ $announcementResult = executeQuery($announcementQuery);
                     </div>
 
                     <!-- Desktop -->
-                    <p class="d-none d-md-block mb-0 text-reg text-14" style="color: var(--black); line-height: 140%; white-space: pre-line;">
+                    <p class="d-none d-md-block mb-0 text-reg text-14"
+                        style="color: var(--black); line-height: 140%; white-space: pre-line;">
                         <?php echo nl2br($announcementContent); ?>
                     </p>
 
@@ -166,9 +172,7 @@ $announcementResult = executeQuery($announcementQuery);
                         <?php
                         $totalItems = count($attachmentsArray) + count($linksArray);
                         ?>
-                        <button type="button"
-                            class="btn btn-attachments mt-3 text-med text-12"
-                            data-bs-toggle="modal"
+                        <button type="button" class="btn btn-attachments mt-3 text-med text-12" data-bs-toggle="modal"
                             data-bs-target="#attachmentsModal<?php echo $announcementID; ?>">
                             View <?php echo $totalItems; ?> Attachment<?php echo $totalItems > 1 ? 's' : ''; ?>
                         </button>
@@ -239,9 +243,10 @@ $announcementResult = executeQuery($announcementQuery);
                                         <div class="cardFile d-flex align-items-start w-100 overflow-hidden" style="cursor:pointer;">
                                             <span class="px-4 py-3 material-symbols-outlined">draft</span>
                                             <div class="ms-2">
-                                                <div class="text-sbold text-16 mt-1 pe-4 file-name text-truncate" style="max-width:330px;"
-                                                    title="<?php echo $decodedAttachment; ?>">
-                                                    <?php echo $decodedAttachment; ?>
+                                                <div class="text-sbold text-16 mt-1 pe-4 file-name text-truncate"
+                                                    style="max-width:330px;"
+                                                    title="<?php echo htmlspecialchars($fileTitlesMap[$decodedAttachment]); ?>">
+                                                    <?php echo htmlspecialchars($fileTitlesMap[$decodedAttachment]); ?>
                                                 </div>
                                                 <div class="due text-reg text-14 mb-1">
                                                     <?php echo strtoupper($fileExtension); ?> file
@@ -257,7 +262,8 @@ $announcementResult = executeQuery($announcementQuery);
 
                             <!-- Links Section -->
                             <?php if (!empty($linksArray)): ?>
-                                <div class="text-sbold text-16 <?php echo !empty($attachmentsArray) ? 'mt-4' : 'mt-0'; ?> mb-2">Links</div>
+                                <div class="text-sbold text-16 <?php echo !empty($attachmentsArray) ? 'mt-4' : 'mt-0'; ?> mb-2">
+                                    Links</div>
                                 <?php foreach ($linksArray as $index => $link): ?>
                                     <a href="#" class="openLinkViewer text-decoration-none d-block mb-2"
                                         data-url="<?php echo htmlspecialchars($link); ?>" style="color: var(--black);">
@@ -294,14 +300,15 @@ $announcementResult = executeQuery($announcementQuery);
             </div>
 
             <!-- FILE VIEWER MODAL -->
-            <div class="modal fade" id="viewerModal" tabindex="-1"style="z-index:10000">
+            <div class="modal fade" id="viewerModal" tabindex="-1" style="z-index:10000">
                 <div class="modal-dialog modal-xl modal-dialog-centered">
                     <div class="modal-content" style="border-radius:12px; overflow:hidden;">
 
                         <!-- Header -->
                         <div class="modal-header d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center gap-2">
-                                <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;" id="viewerModalLabel">File Viewer</h5>
+                                <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;"
+                                    id="viewerModalLabel">File Viewer</h5>
 
                                 <a id="modalDownloadBtn" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
                                     style="background-color: var(--primaryColor); border: 1px solid var(--black);" download>
@@ -327,14 +334,15 @@ $announcementResult = executeQuery($announcementQuery);
 
 
             <!-- LINK VIEWER MODAL -->
-            <div class="modal fade" id="linkViewerModal" tabindex="-1"style="z-index:10000">
+            <div class="modal fade" id="linkViewerModal" tabindex="-1" style="z-index:10000">
                 <div class="modal-dialog modal-xl modal-dialog-centered">
                     <div class="modal-content" style="border-radius:12px; overflow:hidden;">
 
                         <!-- Header -->
                         <div class="modal-header d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center gap-2">
-                                <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;" id="linkViewerModalLabel">Link Viewer</h5>
+                                <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;"
+                                    id="linkViewerModalLabel">Link Viewer</h5>
 
                                 <a id="modalOpenInNewTab" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
                                     style="background-color: var(--primaryColor); border: 1px solid var(--black);"
@@ -381,7 +389,7 @@ $announcementResult = executeQuery($announcementQuery);
         $toastType = isset($_POST['noted'])
             ? 'alert-success'
             : 'alert-danger';
-    ?>
+        ?>
         <script>
             window.addEventListener('DOMContentLoaded', () => {
                 const container = document.getElementById("toastContainer");
@@ -413,7 +421,7 @@ $announcementResult = executeQuery($announcementQuery);
 <!-- Toast Script -->
 <script>
     document.querySelectorAll('input[name="noted"]').forEach(checkbox => {
-        checkbox.addEventListener('change', function(e) {
+        checkbox.addEventListener('change', function (e) {
             // e.preventDefault();
 
             const form = this.closest('form');
@@ -426,7 +434,7 @@ $announcementResult = executeQuery($announcementQuery);
             //     body: formData
             // });
 
-            checkbox.addEventListener('change', function() {
+            checkbox.addEventListener('change', function () {
                 this.closest('form').submit();
             });
 
@@ -459,7 +467,7 @@ $announcementResult = executeQuery($announcementQuery);
     document.addEventListener("DOMContentLoaded", () => {
         // FILE VIEWER 
         document.querySelectorAll(".openFileViewer").forEach(fileBtn => {
-            fileBtn.addEventListener("click", function(e) {
+            fileBtn.addEventListener("click", function (e) {
                 e.preventDefault();
 
                 const fileName = this.dataset.file;
@@ -499,7 +507,7 @@ $announcementResult = executeQuery($announcementQuery);
 
         // LINK VIEWER 
         document.querySelectorAll(".openLinkViewer").forEach(linkBtn => {
-            linkBtn.addEventListener("click", function(e) {
+            linkBtn.addEventListener("click", function (e) {
                 e.preventDefault();
 
                 const url = this.dataset.url;

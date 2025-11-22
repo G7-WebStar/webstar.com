@@ -3,6 +3,7 @@ $activePage = 'settings';
 
 include("shared/assets/database/connect.php");
 include("shared/assets/processes/session-process.php");
+date_default_timezone_set('Asia/Manila');
 
 $activeTab = 'edit-profile';
 if (isset($_POST['activeTab'])) {
@@ -80,20 +81,46 @@ if (isset($_POST['saveChanges'])) {
     $githubLink = $_POST['githubLink'] ?? '';
 
     // Handle profile picture upload
-    $uploadField = isset($_FILES['fileUpload']) ? 'fileUpload' : (isset($_FILES['fileUploadMobile']) ? 'fileUploadMobile' : null);
-    if ($uploadField && isset($_FILES[$uploadField]) && $_FILES[$uploadField]['error'] === UPLOAD_ERR_OK) {
-        $fileTmp = $_FILES[$uploadField]['tmp_name'];
-        $fileName = basename($_FILES[$uploadField]['name']);
-        $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $allowedExt = ['jpg', 'jpeg', 'png'];
-        if (in_array($fileExt, $allowedExt)) {
-            $newFileName = 'profile_' . $userID . '_' . time() . '.' . $fileExt;
+    $uploadField = null;
+    if (!empty($_FILES['fileUpload']['name'])) {
+        $uploadField = 'fileUpload';
+    } elseif (!empty($_FILES['fileUploadMobile']['name'])) {
+        $uploadField = 'fileUploadMobile';
+    }
+
+    if ($uploadField !== null) {
+
+        $file = $_FILES[$uploadField];
+
+        $fileTmp = $file['tmp_name'];
+        $fileName = $file['name'];
+        $fileSize = $file['size'];
+        $fileType = mime_content_type($fileTmp);
+
+        $allowedTypes = ['image/jpeg', 'image/png'];
+        $maxSize = 5 * 1024 * 1024; // 5MB
+
+        if (!in_array($fileType, $allowedTypes)) {
+            $toastMessage = "Invalid file type. Only JPG/PNG allowed.";
+            $toastType = "alert-danger";
+        } elseif ($fileSize > $maxSize) {
+            $toastMessage = "File too large. Max 5MB.";
+            $toastType = "alert-danger";
+        } else {
+            $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            $newFileName = "profile_{$userID}_" . time() . "." . $fileExt;
             $uploadDir = "shared/assets/pfp-uploads/";
+
             if (!is_dir($uploadDir))
                 mkdir($uploadDir, 0777, true);
+
             $uploadPath = $uploadDir . $newFileName;
+
             if (move_uploaded_file($fileTmp, $uploadPath)) {
                 $profilePicture = $newFileName;
+            } else {
+                $toastMessage = "Upload failed!";
+                $toastType = "alert-danger";
             }
         }
     }
@@ -142,6 +169,7 @@ if (isset($_POST['saveChanges'])) {
         }
     }
 }
+
 // --- Handle save action ---
 if (isset($_POST['save'])) {
     $courseUpdateEnabled = isset($_POST['courseUpdateEnabled']) ? 1 : 0;
@@ -163,10 +191,10 @@ if (isset($_POST['save'])) {
     // Keep the tab as preferences
     $activeTab = 'preferences';
 
-     if ($result) {
-            $toastMessage = 'Preferences updated successfully!';
-            $toastType = 'alert-success';
-        }
+    if ($result) {
+        $toastMessage = 'Preferences updated successfully!';
+        $toastType = 'alert-success';
+    }
 }
 
 // Handle feedback form submission
@@ -180,15 +208,15 @@ if (isset($_POST['feedback'])) {
 
         if ($adminData) {
             $receiverID = $adminData['userID'];
+            $createdAt = date('Y-m-d H:i:s');
 
-            // Insert feedback directly (simple version)
             executeQuery("
-                INSERT INTO feedback (senderID, receiverID, message)
-                VALUES ('$userID', '$receiverID', '$feedback')
+                INSERT INTO feedback (senderID, receiverID, message, createdAt)
+                VALUES ('$userID', '$receiverID', '$feedback', '$createdAt')
             ");
         }
 
-         if ($adminResult) {
+        if ($adminResult) {
             $toastMessage = 'Thanks for your feedback! We’ll review it carefully and use it to improve your experience.';
             $toastType = 'alert-success';
         }

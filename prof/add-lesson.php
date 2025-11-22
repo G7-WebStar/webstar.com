@@ -60,34 +60,47 @@ function fetchLinkTitle($url)
 {
     $url = trim($url);
 
-    // Ensure original link is used for title fetch (important for Google Drive)
+    // Ensure URL protocol
     if (!preg_match('/^https?:\/\//', $url)) {
         $url = 'https://' . $url;
     }
 
+    // Check if it's a YouTube link
+    if (preg_match('/(youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $url, $matches)) {
+        // Use oEmbed API to fetch the title
+        $apiUrl = "https://www.youtube.com/oembed?url=" . urlencode($url) . "&format=json";
+
+        $json = @file_get_contents($apiUrl);
+        if ($json !== false) {
+            $data = json_decode($json, true);
+            if (isset($data['title'])) {
+                return $data['title'];
+            }
+        }
+    }
+
+    // Normal HTML fetch if not YouTube
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0");
     curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-
     $html = curl_exec($ch);
     curl_close($ch);
 
     if ($html) {
-
-        // Try to get OG Title (works for most modern sites)
-        if (preg_match('/<meta property="og:title" content="([^"]+)"\/?>/i', $html, $matches)) {
+        // OG Title
+        if (preg_match('/<meta property="og:title" content="([^"]+)"/i', $html, $matches)) {
             return trim($matches[1]);
         }
 
-        // Try <title>
+        // Page <title>
         if (preg_match("/<title>(.*?)<\/title>/is", $html, $matches)) {
             return trim($matches[1]);
         }
     }
 
-    // If still no luck → fallback to domain
+    // Fallback: Domain name
     $parsedUrl = parse_url($url);
     return isset($parsedUrl['host']) ? ucfirst(str_replace('www.', '', $parsedUrl['host'])) : 'Link';
 }
