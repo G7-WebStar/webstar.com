@@ -61,7 +61,7 @@ if ($userId !== null) {
     }
 }
 
-// Inbox: clear and count using courseID only
+// Inbox: clear and count using courseID onlyyyy
 if (!empty($courseIds)) {
     $courseIdsStr = implode(',', $courseIds);
     if ($isInboxPage)
@@ -75,7 +75,7 @@ if (!empty($courseIds)) {
 
 // Share to session for view fallback
 $_SESSION['InboxCount'] = $unreadInboxCount;
-
+//what
 ?>
 
 <!-- Styles -->
