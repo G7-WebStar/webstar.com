@@ -33,20 +33,20 @@ if (!$username && isset($_SESSION['userID'])) {
             ) AS totalEnrollments,
             (
                 SELECT COUNT(*)
-                FROM studentBadges AS sb
+                FROM studentbadges AS sb
                 WHERE sb.userID = users.userID
             ) AS totalBadges
         FROM users
         JOIN userinfo ON users.userID = userinfo.userID
         JOIN program ON userinfo.programID = program.programID
         LEFT JOIN profile ON users.userID = profile.userID
-        LEFT JOIN studentBadges AS sb ON users.userID = sb.userID
+        LEFT JOIN studentbadges AS sb ON users.userID = sb.userID
         LEFT JOIN badges AS b ON sb.badgeID = b.badgeID
         WHERE users.userID = '$userID'
     ";
     $badgeQuery = "
         SELECT b.badgeName, b.badgeIcon, COUNT(sb.badgeID) AS timesEarned
-        FROM studentBadges AS sb
+        FROM studentbadges AS sb
         JOIN badges AS b ON sb.badgeID = b.badgeID
         WHERE sb.userID = '$userID'
         GROUP BY sb.badgeID
@@ -106,20 +106,20 @@ if (!$username && isset($_SESSION['userID'])) {
             ) AS totalEnrollments,
             (
                 SELECT COUNT(*)
-                FROM studentBadges AS sb
+                FROM studentbadges AS sb
                 WHERE sb.userID = users.userID
             ) AS totalBadges
         FROM users
         JOIN userinfo ON users.userID = userinfo.userID
         JOIN program ON userinfo.programID = program.programID
         LEFT JOIN profile ON users.userID = profile.userID
-        LEFT JOIN studentBadges AS sb ON users.userID = sb.userID
+        LEFT JOIN studentbadges AS sb ON users.userID = sb.userID
         LEFT JOIN badges AS b ON sb.badgeID = b.badgeID
         WHERE users.userName = '$escaped'
     ";
     $badgeQuery = "
     SELECT b.badgeName, b.badgeIcon, COUNT(sb.badgeID) AS timesEarned
-    FROM studentBadges AS sb
+    FROM studentbadges AS sb
     JOIN badges AS b ON sb.badgeID = b.badgeID
     JOIN users AS u ON sb.userID = u.userID
     WHERE u.userName = '$escaped'
@@ -181,8 +181,8 @@ if (!$username && isset($_SESSION['userID'])) {
         t.hexCode AS colorHex
     FROM profile prof
     LEFT JOIN emblem e ON prof.emblemID = e.emblemID
-    LEFT JOIN coverImage c ON prof.coverImageID = c.coverImageID
-    LEFT JOIN colorTheme t ON prof.colorThemeID = t.colorThemeID
+    LEFT JOIN coverimage c ON prof.coverimageID = c.coverimageID
+    LEFT JOIN colortheme t ON prof.colorthemeID = t.colorthemeID
         WHERE prof.userID = '$userID'
     ";
 } elseif ($username) {
@@ -203,8 +203,8 @@ if (!$username && isset($_SESSION['userID'])) {
         t.hexCode AS colorHex
     FROM profile prof
     LEFT JOIN emblem e ON prof.emblemID = e.emblemID
-    LEFT JOIN coverImage c ON prof.coverImageID = c.coverImageID
-    LEFT JOIN colorTheme t ON prof.colorThemeID = t.colorThemeID
+    LEFT JOIN coverimage c ON prof.coverimageID = c.coverimageID
+    LEFT JOIN colortheme t ON prof.colorthemeID = t.colorthemeID
             WHERE prof.userID = '$userID'
         ";
     } else {

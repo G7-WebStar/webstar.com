@@ -99,11 +99,11 @@ if (isset($_POST['access_code'])) {
                     <!-- Navbar for mobile -->
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-1 overflow-y-auto row-padding-top">
+                    <div class="container-fluid py-1 overflow-y-auto row-padding-top h-100 d-flex align-items-center justify-content-center">
                         <div class="row">
-                            <div class="col-12 d-flex justify-content-center align-items-center" style="min-height: 60vh;">
+                            <div class="col-12 d-flex justify-content-center align-items-center" style="min-height: 40vh;">
                                 <div class="text-center">
-                                    <img src="shared/assets/img/courseJoin/folder-dynamic-color.png" alt="Course Enrollment" class="course-join-image">
+                                    <img src="shared/assets/img/courseJoin/folder-dynamic-color.png" alt="Course Enrollment" class="course-join-image" style="width:200px; height:100%">
                                     <h1 class="course-join-headline">Enroll in your first course to begin</h1>
                                     <p class="course-join-subheadline">Enter the access code provided by your professor.</p>
 

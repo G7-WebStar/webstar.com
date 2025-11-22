@@ -148,7 +148,7 @@ if (isset($_POST['registerBtn'])) {
                                                         value="<?= isset($middleName) ? $middleName : '' ?>"
                                                         pattern="[A-Za-z\s]+"
                                                         oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')"
-                                                        required>
+                                                        >
                                                     <label for="middleName">Middle Name</label>
                                                 </div>
                                             </div>
