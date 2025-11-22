@@ -36,7 +36,7 @@ if (isset($_POST['registerBtn'])) {
     if ($usernameError == "") {
 
         mysqli_query($conn, "INSERT INTO users (username, password, role, status) 
-                             VALUES ('$username', '$password', 'professor', 'Created')");
+                             VALUES ('$username', '$hashedPassword', 'professor', 'Created')");
 
         $userID = mysqli_insert_id($conn);
 
