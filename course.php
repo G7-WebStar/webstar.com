@@ -148,7 +148,7 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                                     <div class="d-flex align-items-center flex-nowrap my-1">
                                         <span class="dropdown-label me-2 text-reg">Status</span>
                                         <div class="custom-dropdown">
-                                            <button class="dropdown-btn text-reg text-14">Active</button>
+                                            <button class="dropdown-btn text-reg text-14"><?php echo ucfirst($filter); ?></button>
                                             <ul class="dropdown-list text-reg text-14">
                                                 <li data-value="Active" onclick="window.location.href='?status=active'">
                                                     Active</li>

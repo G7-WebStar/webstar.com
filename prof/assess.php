@@ -102,6 +102,9 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
         $assessments[] = $rowAssessment;
     }
 }
+
+$getCoursesQuery = "SELECT courseCode FROM courses WHERE userID = '$userID'";
+$getCoursesResult = executeQuery($getCoursesQuery);
 ?>
 
 <!doctype html>
@@ -170,11 +173,20 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                                                 <span>All</span>
                                             </button>
                                             <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item text-reg">All</a></li>
-                                                <li><a class="dropdown-item text-reg">COMP-006</a></li>
-                                                <li><a class="dropdown-item text-reg">GEED-007</a></li>
-                                                <li><a class="dropdown-item text-reg">Other courses</a>
-                                                </li>
+                                                <li><a class="dropdown-item text-reg" data-value="All">All</a></li>
+                                                <?php
+                                                if (mysqli_num_rows($getCoursesResult) > 0) {
+                                                    while ($courseCodes = mysqli_fetch_assoc($getCoursesResult)) {
+                                                ?>
+                                                        <li><a class="dropdown-item text-reg" data-value="<?php echo $courseCodes['courseCode']; ?>">
+                                                                <?php echo $courseCodes['courseCode']; ?>
+                                                            </a></li>
+
+                                                <?php
+                                                    }
+                                                }
+                                                ?>
+
                                             </ul>
                                         </div>
 
@@ -461,7 +473,7 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                         const cardStatus = card.dataset.status || '';
 
                         const matchCourse = (currentCourse === 'All') || (cardCourse === currentCourse);
-                        const matchStatus = (currentStatus === '0') || (cardStatus === currentStatus);
+                        const matchStatus = (cardStatus === currentStatus);
 
                         card.style.display = (matchCourse && matchStatus) ? '' : 'none';
                     });
@@ -485,7 +497,7 @@ if ($assessmentsResult && mysqli_num_rows($assessmentsResult) > 0) {
                     container.querySelectorAll('.dropdown-item').forEach(item => {
                         item.addEventListener('click', function(e) {
                             e.preventDefault();
-                            const value = this.dataset.value || this.textContent.trim();
+                            const value = this.dataset.value;
 
                             //Update dropdown label text
                             labelSpan.textContent = this.textContent.trim();
