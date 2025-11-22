@@ -77,7 +77,7 @@
                         <hr class="dropdown-divider">
                     </li>
                     <li><a class="dropdown-item" style="font-family: var(--Bold); color:var(--highlight)"
-                            href="#" onclick="logout();"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign
+                            href="../login.php"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign
                             out</a></li>
                 </ul>
             </div>
