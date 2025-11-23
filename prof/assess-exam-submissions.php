@@ -15,6 +15,7 @@ $assessmentID = intval($_GET['assessmentID']);
 // Default filters
 $sortBy = $_GET['sortBy'] ?? 'All';
 $statusFilter = $_GET['status'] ?? 'All';
+$sortTodo = $sortTodo ?? null;
 
 $testInfoQuery = "
     SELECT *
@@ -307,13 +308,13 @@ $ungradedCount = mysqli_fetch_assoc($ungradedResult)['ungradedCount'] ?? 0;
                                                         <?php
                                                         if ($currentDate < $deadline) {
                                                             // Before deadline
-                                                            $buttonDisabled = ($ungradedCount > 0);
+                                                            $buttonDisabled = ($ungradedCount > 0 || $totalStudents == 0); // added totalStudents check
                                                         } else {
                                                             // After deadline 
-                                                            $buttonDisabled = false;
+                                                            $buttonDisabled = ($totalStudents == 0); // disable if no students even after deadline
                                                         }
-
                                                         ?>
+
 
                                                         <!-- Return All -->
                                                         <form method="POST" class="ms-auto flex-shrink-0">
