@@ -33,12 +33,12 @@ if (isset($_POST['deleteAssessmentBtn']) && isset($_POST['deleteAssessmentID']) 
             // If it's a test, delete test-related records first
             if ($testID) {
                 // 1. Delete testquestionchoices (needs testquestionID from testquestions)
-                $getTestQuestionsQuery = "SELECT testquestionID FROM testquestions WHERE testID = '$testID'";
+                $getTestQuestionsQuery = "SELECT testQuestionID FROM testquestions WHERE testID = '$testID'";
                 $getTestQuestionsResult = executeQuery($getTestQuestionsQuery);
                 if ($getTestQuestionsResult) {
                     while ($questionRow = mysqli_fetch_assoc($getTestQuestionsResult)) {
-                        $testquestionID = $questionRow['testquestionID'];
-                        executeQuery("DELETE FROM testquestionchoices WHERE testquestionID = '$testquestionID'");
+                        $testQuestionID = $questionRow['testQuestionID'];
+                        executeQuery("DELETE FROM testquestionchoices WHERE testQuestionID = '$testQuestionID'");
                     }
                 }
 
