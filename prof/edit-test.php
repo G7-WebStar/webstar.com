@@ -17,6 +17,10 @@ if (!class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
 $toastMessage = '';
 $toastType = '';
 
+$errorMessages = [
+    "emailNoCredential" => "No email credentials found in the database!"
+];
+
 if (isset($_SESSION['toast'])) {
     $toastMessage = $_SESSION['toast']['message'];
     $toastType = $_SESSION['toast']['type'];
@@ -246,39 +250,47 @@ if (isset($_POST['save_exam'])) {
                 ";
                 $emailsResult = executeQuery($selectEmailsQuery);
 
-                try {
-                    $mail = new PHPMailer(true);
-                    $mail->isSMTP();
-                    $mail->Host = 'smtp.gmail.com';
-                    $mail->SMTPAuth = true;
-                    $mail->Username = 'learn.webstar@gmail.com';
-                    $mail->Password = 'mtls vctd rhai cdem';
-                    $mail->SMTPSecure = 'tls';
-                    $mail->Port = 587;
-                    $mail->setFrom('learn.webstar@gmail.com', 'Webstar');
-                    $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
-                    if (file_exists($headerPath)) {
-                        $mail->AddEmbeddedImage($headerPath, 'emailHeader');
-                    }
-                    $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
-                    if (file_exists($footerPath)) {
-                        $mail->AddEmbeddedImage($footerPath, 'emailFooter');
-                    }
+                $credentialQuery = "SELECT email, password FROM emailcredentials WHERE credentialID = 1";
+                $credentialResult = executeQuery($credentialQuery);
+                $credentialRow = $credentialResult ? mysqli_fetch_assoc($credentialResult) : null;
 
-                    $mail->isHTML(true);
-                    $mail->CharSet = 'UTF-8';
-                    $mail->Encoding = 'base64';
-                    $mail->Subject = "[NEW TEST] " . $titleRaw . " for Course " . $courseCode;
+                if ($credentialRow) {
+                    $smtpEmail = $credentialRow['email'];
+                    $smtpPassword = $credentialRow['password'];
 
-                    $recipientsFound = false;
-                    while ($student = mysqli_fetch_assoc($emailsResult)) {
-                        if ($student['courseUpdateEnabled'] == 1 && !empty($student['email'])) {
-                            $mail->addAddress($student['email']);
-                            $recipientsFound = true;
+                    try {
+                        $mail = new PHPMailer(true);
+                        $mail->isSMTP();
+                        $mail->Host = 'smtp.gmail.com';
+                        $mail->SMTPAuth = true;
+                        $mail->Username = $smtpEmail;
+                        $mail->Password = $smtpPassword;
+                        $mail->SMTPSecure = 'tls';
+                        $mail->Port = 587;
+                        $mail->setFrom($smtpEmail, 'Webstar');
+                        $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
+                        if (file_exists($headerPath)) {
+                            $mail->AddEmbeddedImage($headerPath, 'emailHeader');
                         }
-                    }
+                        $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
+                        if (file_exists($footerPath)) {
+                            $mail->AddEmbeddedImage($footerPath, 'emailFooter');
+                        }
 
-                    if ($recipientsFound) {
+                        $mail->isHTML(true);
+                        $mail->CharSet = 'UTF-8';
+                        $mail->Encoding = 'base64';
+                        $mail->Subject = "[NEW TEST] " . $titleRaw . " for Course " . $courseCode;
+
+                        $recipientsFound = false;
+                        while ($student = mysqli_fetch_assoc($emailsResult)) {
+                            if ($student['courseUpdateEnabled'] == 1 && !empty($student['email'])) {
+                                $mail->addAddress($student['email']);
+                                $recipientsFound = true;
+                            }
+                        }
+
+                        if ($recipientsFound) {
                         $deadlineDisplay = 'Not set';
                         if (!empty($testDeadline)) {
                             try {
@@ -298,59 +310,60 @@ if (isset($_POST['save_exam'])) {
                         $emailTitleEsc = htmlspecialchars($titleRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
                         $courseCodeEsc = htmlspecialchars($courseCode, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-                        $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
-                            <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
-                                <tr>
-                                    <td align="center">
-                                        <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-                                            <tr>
-                                                <td align="center" style="padding: 0;">
-                                                    <img src="cid:emailHeader" alt="Webstar Header" style="width:600px; height:auto; display:block;">
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 30px;">
-                                                    <p style="font-size:15px; color:#333;">Hello Learner,</p>
-                                                    <p style="font-size:15px; color:#333;">
-                                                        A new test has been posted in your course <strong>' . $courseCodeEsc . '</strong>.
-                                                    </p>
-                                                    <h2 style="text-align:center; font-size:24px; color:#2C2C2C; margin:20px 0;">' . $emailTitleEsc . '</h2>
-                                                    <p style="font-size:15px; color:#333; margin-top: 25px;">
-                                                        <strong>General Guidelines:</strong>
-                                                    </p>
-                                                    <div style="font-size:15px; color:#333; margin-bottom: 20px; line-height: 22px;">
-                                                        ' . $guidanceHtml . '
-                                                    </div>
-                                                    <div style="background-color:#f9f9f9; padding:15px; border-radius:5px; margin:20px 0;">
-                                                        <p style="font-size:14px; color:#666; margin:5px 0;"><strong>Deadline:</strong> ' . htmlspecialchars($deadlineDisplay, ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</p>
-                                                        <p style="font-size:14px; color:#666; margin:5px 0;"><strong>Time Limit:</strong> ' . htmlspecialchars($timeLimitDisplay, ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</p>
-                                                    </div>
-                                                    <p style="font-size:15px; color:#333;">
-                                                        Please log in to your Webstar account to access and complete the test before the deadline.
-                                                    </p>
-                                                    <p style="margin-top:30px; color:#333;">
-                                                        Warm regards,<br>
-                                                        <strong>The Webstar Team</strong><br>
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td align="center" style="padding: 0;">
-                                                    <img src="cid:emailFooter" alt="Webstar Footer" style="width:600px; height:auto; display:block; border:0; outline:none; text-decoration:none;" />
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>';
+                            $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+                                <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
+                                    <tr>
+                                        <td align="center">
+                                            <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                                                <tr>
+                                                    <td align="center" style="padding: 0;">
+                                                        <img src="cid:emailHeader" alt="Webstar Header" style="width:600px; height:auto; display:block;">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 30px;">
+                                                        <p style="font-size:15px; color:#333;">Hello Learner,</p>
+                                                        <p style="font-size:15px; color:#333;">
+                                                            A new test has been posted in your course <strong>' . $courseCodeEsc . '</strong>.
+                                                        </p>
+                                                        <h2 style="text-align:center; font-size:24px; color:#2C2C2C; margin:20px 0;">' . $emailTitleEsc . '</h2>
+                                                        <p style="font-size:15px; color:#333; margin-top: 25px;">
+                                                            <strong>General Guidelines:</strong>
+                                                        </p>
+                                                        <div style="font-size:15px; color:#333; margin-bottom: 20px; line-height: 22px;">
+                                                            ' . $guidanceHtml . '
+                                                        </div>
+                                                        <div style="background-color:#f9f9f9; padding:15px; border-radius:5px; margin:20px 0;">
+                                                            <p style="font-size:14px; color:#666; margin:5px 0;"><strong>Deadline:</strong> ' . htmlspecialchars($deadlineDisplay, ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</p>
+                                                            <p style="font-size:14px; color:#666; margin:5px 0;"><strong>Time Limit:</strong> ' . htmlspecialchars($timeLimitDisplay, ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</p>
+                                                        </div>
+                                                        <p style="font-size:15px; color:#333;">
+                                                            Please log in to your Webstar account to access and complete the test before the deadline.
+                                                        </p>
+                                                        <p style="margin-top:30px; color:#333;">
+                                                            Warm regards,<br>
+                                                            <strong>The Webstar Team</strong><br>
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="center" style="padding: 0;">
+                                                        <img src="cid:emailFooter" alt="Webstar Footer" style="width:600px; height:auto; display:block; border:0; outline:none; text-decoration:none;" />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>';
 
-                        $mail->send();
+                            $mail->send();
+                        }
+
+                    } catch (Exception $e) {
+                        $errorMsg = isset($mail) && is_object($mail) ? $mail->ErrorInfo : $e->getMessage();
+                        error_log("PHPMailer failed for Course ID $courseID: " . $errorMsg);
                     }
-
-                } catch (Exception $e) {
-                    $errorMsg = isset($mail) && is_object($mail) ? $mail->ErrorInfo : $e->getMessage();
-                    error_log("PHPMailer failed for Course ID $courseID: " . $errorMsg);
                 }
             }
         }
