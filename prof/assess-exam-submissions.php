@@ -307,14 +307,14 @@ $ungradedCount = mysqli_fetch_assoc($ungradedResult)['ungradedCount'] ?? 0;
 
                                                         <?php
                                                         if ($currentDate < $deadline) {
-                                                            // Before deadline
-                                                            $buttonDisabled = ($ungradedCount > 0 || $totalStudents == 0); // added totalStudents check
+                                                            // BEFORE DEADLINE - disable if ungraded exists OR no students
+                                                            $buttonDisabled = ($ungradedCount > 0 || $totalStudents == 0);
                                                         } else {
-                                                            // After deadline 
-                                                            $buttonDisabled = ($totalStudents == 0); // disable if no students even after deadline
+                                                            // AFTER DEADLINE - enable as long as there is at least 1 student
+                                                            $buttonDisabled = ($totalStudents == 0);
                                                         }
-                                                        ?>
 
+                                                        ?>
 
                                                         <!-- Return All -->
                                                         <form method="POST" class="ms-auto flex-shrink-0">
