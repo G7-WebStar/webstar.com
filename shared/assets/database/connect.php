@@ -6,7 +6,7 @@
 
 $dbhost = "localhost";
 $dbuser = "u977784600_webstar";
-$dbpass = "Webstaru977784600_";
+$dbpass = "WebstarTeamu977784600_";
 $db = "u977784600_webstar";
 
 

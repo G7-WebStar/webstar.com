@@ -18,6 +18,28 @@ $testResult = executeQuery($testQuery);
 $testRow = mysqli_fetch_assoc($testResult);
 $testID = $testRow['testID'] ?? 0; // fallback to 0 if not found
 
+// Get test info directly from tests so it exists even if no students
+$testInfoQuery = "
+    SELECT 
+    tests.testID, 
+    assessments.assessmentTitle, 
+    assessments.deadline, 
+    assessments.courseID, 
+    tests.testTimelimit, 
+    assessments.assessmentID
+    FROM tests
+    INNER JOIN assessments ON tests.assessmentID = assessments.assessmentID
+    WHERE tests.testID = $testID
+    LIMIT 1
+";
+$testInfoResult = executeQuery($testInfoQuery);
+$test = mysqli_fetch_assoc($testInfoResult);
+
+if (!$test) {
+    echo "Test not found.";
+    exit;
+}
+
 // Total exam points
 $totalPointsQuery = "SELECT SUM(testQuestionPoints) AS totalPoints FROM testquestions WHERE testID = $testID";
 $totalPointsResult = executeQuery($totalPointsQuery);
@@ -39,11 +61,6 @@ $testAnalyticQuery = "
 ";
 
 $testAnalyticResult = executeQuery($testAnalyticQuery);
-
-if (!$test = mysqli_fetch_assoc($testAnalyticResult)) {
-    echo "Test not found.";
-    exit;
-}
 
 $totalScore = 0;
 $scoreCount = 0;
