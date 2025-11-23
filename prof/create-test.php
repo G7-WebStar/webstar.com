@@ -114,9 +114,9 @@ if (isset($_POST['save_exam'])) {
 
                 // Delete only if the mode is edit + user provided new questions
                 if ($mode === 'edit' && !empty($_POST['questions'])) {
-                    executeQuery("DELETE FROM testQuestionChoices WHERE testQuestionID IN 
-                     (SELECT testQuestionID FROM testQuestions WHERE testID='$testID')");
-                    executeQuery("DELETE FROM testQuestions WHERE testID='$testID'");
+                    executeQuery("DELETE FROM testquestionchoices WHERE testQuestionID IN 
+                     (SELECT testQuestionID FROM testquestions WHERE testID='$testID')");
+                    executeQuery("DELETE FROM testquestions WHERE testID='$testID'");
                 }
             }
 
