@@ -135,10 +135,11 @@ $displayAssessments = $filter === 'All' ? $assessments : [$filter];
                     <form method="POST" style="display: inline-block; margin: 0;">
                         <input type="hidden" name="activeTab" value="records">
                         <input type="hidden" name="orderByRecords" value="<?php echo htmlspecialchars($order); ?>">
-                        <select class="select-modern text-reg text-14" name="filterRecords" onchange="this.form.submit()">
+                        <select class="select-modern text-reg text-14" name="filterRecords" style="width:120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" onchange="this.form.submit()">
                             <?php foreach ($assessmentsList as $assessmentTitle): ?>
-                                <option value="<?php echo htmlspecialchars($assessmentTitle); ?>" <?php if ($filter === $assessmentTitle) echo 'selected'; ?>>
-                                    <?php echo htmlspecialchars($assessmentTitle); ?>
+                                <option value="<?php echo htmlspecialchars($assessmentTitle); ?>" title="<?php echo htmlspecialchars($assessmentTitle); ?>" 
+                                <?php if ($filter === $assessmentTitle) echo 'selected'; ?>>
+                                    <?php echo htmlspecialchars(strlen($assessmentTitle) > 20 ? substr($assessmentTitle, 0, 20) . '…' : $assessmentTitle); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>

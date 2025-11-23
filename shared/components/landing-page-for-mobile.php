@@ -17,21 +17,21 @@
 
     <!-- Nav Links -->
     <ul class="navbar-nav text-center w-100">
-      <li class="nav-item"><a href="#" class="nav-link text-dark fw-medium">About Us</a></li>
-      <li class="nav-item"><a href="#" class="nav-link text-dark fw-medium">Features</a></li>
-      <li class="nav-item"><a href="#" class="nav-link text-dark fw-medium">Our Team</a></li>
-      <li class="nav-item"><a href="#" class="nav-link text-dark fw-medium">Contact</a></li>
+      <li class="nav-item"><a href="#about" class="nav-link text-dark fw-medium">About Us</a></li>
+      <li class="nav-item"><a href="#fearures" class="nav-link text-dark fw-medium">Features</a></li>
+      <li class="nav-item"><a href="#team" class="nav-link text-dark fw-medium">Our Team</a></li>
+      <li class="nav-item"><a href="#contact" class="nav-link text-dark fw-medium">Contact</a></li>
     </ul>
 
     <!-- Buttons -->
     <div class="d-flex flex-column gap-2 w-75 mt-4">
-      <form>
-        <button type="button" class="button w-100 px-3 py-1 rounded-pill text-reg text-md-14">
+      <form action="login.php" method="get">
+        <button type="submit" class="btn button w-100 px-3 py-1 rounded-pill text-reg text-md-14">
           Sign in
         </button>
       </form>
-      <form>
-        <button type="button" class="button w-100 px-3 py-1 rounded-pill text-reg text-md-14"
+      <form action="registration.php" method="get">
+        <button type="submit" class="btn button w-100 px-3 py-1 rounded-pill text-reg text-md-14"
           style="background-color: var(--primaryColor);">
           Register
         </button>

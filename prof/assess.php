@@ -280,7 +280,7 @@ $getCoursesResult = executeQuery($getCoursesQuery);
                                                         <div class="mb-2 text-reg">
                                                             <span class="badge rounded-pill task-badge"><?php echo $type; ?></span>
                                                         </div>
-                                                        <div class="text-bold text-18 mb-2"><?php echo $assessmentTitle; ?></div>
+                                                        <div class="text-bold text-18 mb-2 text-truncate" title="<?php echo $assessmentTitle; ?>" style="width: 200px;"><?php echo $assessmentTitle; ?></div>
                                                         <div class="text-sbold text-14"><?php echo $courseCode; ?><br>
                                                             <div class="text-reg text-14"><?php echo $courseTitle; ?></div>
                                                         </div>
