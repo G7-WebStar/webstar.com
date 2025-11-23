@@ -73,6 +73,33 @@ if ($detailsResult && $detailsResult->num_rows > 0) {
     if (empty($studentUserID) && isset($details['userID'])) {
         $studentUserID = intval($details['userID']);
     }
+    // --- Check if logged-in user owns this assessment/course ---
+    $ownerCheck = $conn->prepare("
+    SELECT c.userID
+    FROM courses c
+    INNER JOIN assessments a ON c.courseID = a.courseID
+    WHERE a.assessmentID = ?
+    LIMIT 1
+");
+    $ownerCheck->bind_param("i", $details['assessmentID']);
+    $ownerCheck->execute();
+    $ownerResult = $ownerCheck->get_result();
+
+    if ($ownerResult && $ownerResult->num_rows > 0) {
+        $ownerRow = $ownerResult->fetch_assoc();
+        $courseOwnerID = intval($ownerRow['userID']);
+        if ($courseOwnerID !== intval($_SESSION['userID'])) {
+            // ❌ Not the owner → redirect to 404
+            header("Location: 404.php");
+            exit();
+        }
+    } else {
+        // ❌ Assessment/course not found → redirect to 404
+        header("Location: 404.php");
+        exit();
+    }
+    $ownerCheck->close();
+
 } else {
     $details = [
         'userID' => 0,
@@ -394,6 +421,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
     // ✅ Set session for toast notification
     $_SESSION['success'] = "Grade submitted successfully!";
 
+    // Fetch all ungraded submissions for this assessment
+    $subQuery = $conn->prepare("
+    SELECT s.submissionID
+    FROM submissions s
+    LEFT JOIN scores sc ON s.submissionID = sc.submissionID
+    WHERE s.assessmentID = ? AND sc.scoreID IS NULL AND s.isSubmitted = 1
+    ORDER BY s.submittedAt ASC
+");
+    $subQuery->bind_param("i", $details['assessmentID']);
+    $subQuery->execute();
+    $subResult = $subQuery->get_result();
+
+    $ungradedIDs = [];
+    while ($row = $subResult->fetch_assoc()) {
+        $ungradedIDs[] = intval($row['submissionID']);
+    }
+    $subQuery->close();
+
+    // If no submissionID given or invalid, redirect to first ungraded submission
+    if ($submissionID === 0 || !in_array($submissionID, $ungradedIDs)) {
+        if (!empty($ungradedIDs)) {
+            header("Location: ?submissionID={$ungradedIDs[0]}&assessmentID={$details['assessmentID']}");
+            exit();
+        } else {
+            header("Location: assess.php");
+            exit();
+        }
+    }
 
 }
 
