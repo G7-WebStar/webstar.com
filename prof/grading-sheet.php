@@ -515,6 +515,24 @@ $prevIndex = ($currentIndex - 1 + $totalUngraded) % $totalUngraded;
 
 $nextSubmissionID = $submissionIDs[$nextIndex];
 $prevSubmissionID = $submissionIDs[$prevIndex];
+
+// getting of student profile
+$profilePicturePath = "../shared/assets/pfp-uploads/defaultProfile.png"; // default fallback
+
+if ($studentUserID > 0) {
+    $stmt = $conn->prepare("SELECT profilePicture FROM userinfo WHERE userID = ? LIMIT 1");
+    $stmt->bind_param("i", $studentUserID);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($row = $result->fetch_assoc()) {
+        if (!empty($row['profilePicture'])) {
+            $profilePicturePath = "../shared/assets/pfp-uploads/" . $row['profilePicture'];
+        }
+    }
+
+    $stmt->close();
+}
 ?>
 
 
@@ -586,9 +604,12 @@ $prevSubmissionID = $submissionIDs[$prevIndex];
                                         </button>
 
                                         <div class="d-flex align-items-center gap-3">
-                                            <div class="rounded-circle"
-                                                style="width: 40px; height: 40px; background-color: var(--highlight75);">
+                                            <div class="rounded-circle overflow-hidden"
+                                                 style="width: 40px; height: 40px; background-color: var(--highlight75);">
+                                                <img src="<?php echo htmlspecialchars($profilePicturePath); ?>" 
+                                                     alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;">
                                             </div>
+
                                             <div>
                                                 <div class="text-sbold text-18" style="color: var(--black);">
                                                     <?php echo htmlspecialchars($studentDisplay); ?>
@@ -616,10 +637,8 @@ $prevSubmissionID = $submissionIDs[$prevIndex];
                                 <div class="d-block d-sm-none mobile-assignment mt-3">
                                     <div class="mobile-top d-flex align-items-center gap-3">
                                         <div class="arrow">
-                                            <a href="todo.php?userID=<?php echo htmlspecialchars($studentUserID); ?>"
-                                                class="text-decoration-none">
-                                                <i class="fa-solid fa-arrow-left text-reg text-16"
-                                                    style="color: var(--black);"></i>
+                                            <a href="javascript:history.back()" class="text-decoration-none">
+                                                <i class="fa-solid fa-arrow-left text-reg text-16" style="color: var(--black);"></i>
                                             </a>
                                         </div>
                                         <div class="title text-sbold text-18">

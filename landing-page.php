@@ -47,7 +47,7 @@
 
 
     <!-- About Section for Desktop -->
-    <section class="about-section d-none d-md-flex align-items-center justify-content-between px-5 py-5 mt-5">
+    <section id="about" class="about-section d-none d-md-flex align-items-center justify-content-between px-5 py-5 mt-5">
       <!-- Left Side Image -->
       <div class="about-img-left">
         <img src="shared/assets/img/time.png" alt="Time Icon" class="img-fluid mt-5" style="max-width: 350px;">
@@ -88,7 +88,7 @@
 
 
     <!-- About Section for Mobile -->
-    <section class="about-section-mobile d-block d-md-none text-center py-4 px-3 mt-5">
+    <section id="about" class="about-section-mobile d-block d-md-none text-center py-4 px-3 mt-5">
       <div class="text-sbold text-30">
         about
       </div>
@@ -122,7 +122,7 @@
     </section>
 
     <!-- Features Section -->
-    <section class="features-section">
+    <section id="features" class="features-section">
       <h2>our <span style="font-style:italic;">best</span> features</h2>
       <p class="subtitle">Discover how Webstar turns learning into an engaging, rewarding experience through features
         designed to motivate and inspire every learner.</p>
@@ -205,7 +205,7 @@
     </section>
 
     <!-- Team Section -->
-    <section class="team-section">
+    <section id="team" class="team-section">
       <h2>our <span style="font-style:italic;">best</span> team</h2>
       <p>Meet the passionate minds behind Webstar — information technology students united by one mission: to make
         learning engaging and rewarding for everyone.</p>
@@ -296,7 +296,7 @@
     </section>
 
     <!-- Contact Section -->
-    <section class="contact-section d-flex align-items-center justify-content-center py-5 px-5">
+    <section id="contact" class="contact-section d-flex align-items-center justify-content-center py-5 px-5">
       <div class="container">
         <div class="row align-items-center justify-content-center flex-column-reverse flex-md-row">
 
@@ -313,7 +313,7 @@
               <span>learn.webstar@gmail.com</span>
             </div>
             <form action="#">
-              <button type="submit" class="contact-btn px-3 py-1 flex-fill rounded-pill text-reg text-md-14 mt-4">
+              <button type="submit" class="btn contact-btn px-3 py-1 flex-fill rounded-pill text-reg text-md-14 mt-4">
                 Send us an email
               </button>
             </form>
