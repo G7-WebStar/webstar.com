@@ -498,7 +498,7 @@ ORDER BY submissions.submittedAt DESC
 
                                 <div class="ms-3 me-4 flex-grow-1"
                                     style="min-width:0; word-break: break-word; white-space: normal; text-align: justify;">
-                                    <div class="text-sbold text-16"><?php echo $b['badgeName']; ?></div>
+                                    <div class="text-sbold text-14"><?php echo $b['badgeName']; ?></div>
 
                                     <?php if (!empty($b['badgeDescription'])): ?>
                                         <div class="text-med text-12"><?php echo $b['badgeDescription']; ?></div>
