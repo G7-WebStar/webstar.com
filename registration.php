@@ -23,7 +23,7 @@ include("shared/assets/processes/registration-process.php");
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
-    
+
 </head>
 
 <body>
@@ -96,12 +96,15 @@ include("shared/assets/processes/registration-process.php");
     <script>
         function togglePassword(inputId, icon) {
             const input = document.getElementById(inputId);
+
             if (input.type === "password") {
+                // Show
                 input.type = "text";
-                icon.classList.replace("fa-eye", "fa-eye-slash");
-            } else {
-                input.type = "password";
                 icon.classList.replace("fa-eye-slash", "fa-eye");
+            } else {
+                // Hide
+                input.type = "password";
+                icon.classList.replace("fa-eye", "fa-eye-slash");
             }
         }
     </script>
