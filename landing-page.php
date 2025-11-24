@@ -223,9 +223,9 @@
 
           <div class="col-md-6 col-lg-4">
             <div class="team-card" style="border: 1px solid var(--black);">
-              <span class="role-badge">UI/UX Designer & Project Manager</span>
+              <span class="role-badge">UI/UX Designer, Project Manager & Developer</span>
               <div class="team-overlay"></div>
-              <img src="shared/assets/pfp-uploads/torillo.jpg" alt="Christian James D. Torrillo">
+              <img src="shared/assets/pfp-uploads/torrillo.jpg" alt="Christian James D. Torrillo">
               <div class="team-info text-start text-18">
                 <p class="text-bold">TORRILLO,</p>
                 <p>Christian James D.</p>
