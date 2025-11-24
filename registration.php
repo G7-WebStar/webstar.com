@@ -55,7 +55,7 @@ include("shared/assets/processes/registration-process.php");
                                 placeholder="Password"
                                 value="<?php echo isset($_POST['password']) ? htmlspecialchars($_POST['password']) : ''; ?>" required>
                             <label for="password">Password</label>
-                            <i class="fas fa-eye toggle-password" onclick="togglePassword('password', this)"
+                            <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('password', this)"
                                 style="font-size: 0.85rem; color:#6c757d; position:absolute; right:15px; top:50%; transform: translateY(-50%); cursor:pointer;"></i>
                         </div>
 
@@ -64,7 +64,7 @@ include("shared/assets/processes/registration-process.php");
                                 placeholder="Confirm password"
                                 value="<?php echo isset($_POST['confirmPassword']) ? htmlspecialchars($_POST['confirmPassword']) : ''; ?>" required>
                             <label for="confirm password">Confirm password</label>
-                            <i class="fas fa-eye toggle-password" onclick="togglePassword('confirmPassword', this)"
+                            <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('confirmPassword', this)"
                                 style="font-size: 0.85rem; color:#6c757d; position:absolute; right:15px; top:50%; transform: translateY(-50%); cursor:pointer;"></i>
                         </div>
 
