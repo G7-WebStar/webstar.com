@@ -373,7 +373,7 @@ if ($pendingCount < 0) $pendingCount = 0;
 
                                             <?php
                                             // Fetch all questions for this test
-                                            $questionsQuery = "SELECT * FROM testQuestions WHERE testID = $testID";
+                                            $questionsQuery = "SELECT * FROM testquestions WHERE testID = $testID";
                                             $questionsResult = executeQuery($questionsQuery);
                                             $questions = [];
 
@@ -392,7 +392,7 @@ if ($pendingCount < 0) $pendingCount = 0;
                                                 ];
                                                 // Fetch choices for Multiple Choice
                                                 if ($q['questionType'] == "Multiple Choice") {
-                                                    $choicesQuery = "SELECT * FROM testQuestionChoices WHERE testQuestionID = $qID";
+                                                    $choicesQuery = "SELECT * FROM testquestionchoices WHERE testQuestionID = $qID";
                                                     $choicesResult = executeQuery($choicesQuery);
                                                     while ($c = mysqli_fetch_assoc($choicesResult)) {
                                                         $questions[$qID]['choices'][$c['choiceText']] = 0;
@@ -404,21 +404,31 @@ if ($pendingCount < 0) $pendingCount = 0;
                                                 SELECT * 
                                                 FROM users 
                                                 LEFT JOIN userinfo ON users.userID = userinfo.userID 
-                                                LEFT JOIN testResponses ON users.userID = testResponses.userID AND testResponses.testID = $testID 
+                                                LEFT JOIN testresponses ON users.userID = testresponses.userID AND testresponses.testID = $testID 
                                                 LEFT JOIN scores ON users.userID = scores.userID AND scores.testID = $testID 
                                                 LEFT JOIN tests ON tests.testID = $testID
                                             ";
                                             $responsesResult = executeQuery($responsesQuery);
 
                                             while ($r = mysqli_fetch_assoc($responsesResult)) {
-                                                $qID = $r['testQuestionID'];
+
+                                                // Skip rows without a questionID (happens when no students yet)
+                                                if (!isset($r['testQuestionID']) || $r['testQuestionID'] === null) {
+                                                    continue;
+                                                }
+
+                                                $qID = intval($r['testQuestionID']);
+
+                                                // Skip if question not found
                                                 if (!isset($questions[$qID])) continue;
 
+                                                // Count total responses for this question
                                                 $questions[$qID]['totalResponses']++;
 
-                                                $fullName = trim($r['firstName'] . ' ' . $r['lastName']);
+                                                $fullName = trim(($r['firstName'] ?? '') . ' ' . ($r['lastName'] ?? ''));
 
-                                                if ($r['isCorrect'] == 1) {
+                                                // Correct or wrong classification
+                                                if (isset($r['isCorrect']) && $r['isCorrect'] == 1) {
                                                     $questions[$qID]['correctCount']++;
                                                     $questions[$qID]['studentsCorrect'][] = $fullName;
                                                 } else {
@@ -426,9 +436,10 @@ if ($pendingCount < 0) $pendingCount = 0;
                                                     $questions[$qID]['studentsWrong'][] = $fullName;
                                                 }
 
+                                                // Multiple choice answers
                                                 if ($questions[$qID]['questionType'] == "Multiple Choice") {
-                                                    $answer = trim($r['userAnswer']);
-                                                    if (isset($questions[$qID]['choices'][$answer])) {
+                                                    $answer = isset($r['userAnswer']) ? trim($r['userAnswer']) : '';
+                                                    if ($answer !== '' && isset($questions[$qID]['choices'][$answer])) {
                                                         $questions[$qID]['choices'][$answer]++;
                                                     }
                                                 }
