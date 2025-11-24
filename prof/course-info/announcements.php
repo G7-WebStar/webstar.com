@@ -287,6 +287,7 @@ $announcementResult = executeQuery($announcementQuery);
 
                                     <a href="#" class="openFileViewer text-decoration-none d-block mb-2"
                                         data-file="<?php echo $decodedAttachment; ?>" data-extension="<?php echo $fileExtension; ?>"
+                                        data-title="<?php echo htmlspecialchars($fileTitlesMap[$decodedAttachment]); ?>"
                                         style="color: var(--black);">
 
                                         <div class="cardFile d-flex align-items-start w-100 overflow-hidden" style="cursor:pointer;">
@@ -489,7 +490,8 @@ $announcementResult = executeQuery($announcementQuery);
                 const filePath = "../shared/assets/files/" + fileName;
 
                 // HEADER title
-                document.getElementById("viewerModalLabel").textContent = fileName;
+                const fileTitle = this.dataset.title || fileName;
+                document.getElementById("viewerModalLabel").textContent = fileTitle;
 
                 // Download button
                 const dl = document.getElementById("modalDownloadBtn");
