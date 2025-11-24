@@ -68,17 +68,17 @@ if (!empty($enrollmentIds)) {
     if ($isInboxPage) executeQuery("UPDATE inbox SET isRead = 1 WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
     $unreadInboxCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE enrollmentID IN ($enrollmentIdsStr) AND isRead = 0");
 } else {
-    if ($isInboxPage) executeQuery("UPDATE inbox SET isRead = 1 WHERE isRead = 0");
-    $unreadInboxCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM inbox WHERE isRead = 0");
+    // If student has no enrollments, no notification count should be shown and no database updates should occur
+    $unreadInboxCount = 0;
 }
 
-// To-do: clear and count
-if ($userId !== null) {
+// To-do: clear and count (only if student has enrollments)
+if ($userId !== null && !empty($enrollmentIds)) {
     if ($isTodoPage) executeQuery("UPDATE todo SET isRead = 1 WHERE userID = $userId AND isRead = 0");
     $newTodoCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM todo WHERE userID = $userId AND isRead = 0");
 } else {
-    if ($isTodoPage) executeQuery("UPDATE todo SET isRead = 1 WHERE isRead = 0");
-    $newTodoCount = sidebar_fetch_count("SELECT COUNT(*) AS c FROM todo WHERE isRead = 0");
+    // If student has no enrollments, no todo count should be shown and no database updates should occur
+    $newTodoCount = 0;
 }
 
 // Share to session for view fallback
