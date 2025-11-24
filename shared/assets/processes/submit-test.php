@@ -60,18 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $scoreIDRow = mysqli_fetch_assoc($scoreIDResult);
     $scoreID = $scoreIDRow['scoreID'];
 
-    $insertSubmissionQuery = "INSERT INTO submissions (userID, assessmentID, scoreID, isSubmitted) 
-                                                VALUES ('$userID','$assessmentID','$scoreID', 'Yes')";
-    $insertSubmissionResult = executeQuery($insertSubmissionQuery);
-
-    $submissionIDQuery = "SELECT submissionID FROM submissions WHERE scoreID = '$scoreID'";
-    $submissionIDResult = executeQuery($submissionIDQuery);
-    $submissionIDRow = mysqli_fetch_assoc($submissionIDResult);
-    $submissionID = $submissionIDRow['submissionID'];
-
-    $submissionIDInScoresQuery = "UPDATE scores SET submissionID = '$submissionID'";
-    $submissionIDInScoresResult = executeQuery($submissionIDInScoresQuery);
-
     $totalPointsQuery = "SELECT SUM(testQuestionPoints) AS totalPoints FROM testquestions WHERE testID = '$testID'";
     $totalPointsResult = executeQuery($totalPointsQuery);
     $totalPointsRow = mysqli_fetch_assoc($totalPointsResult);
