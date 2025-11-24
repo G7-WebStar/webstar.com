@@ -9,6 +9,19 @@ if ($testID == null) {
     exit();
 }
 
+// Check if the test belongs to the current user
+$accessCheckQuery = "SELECT tests.testID 
+                     FROM tests
+                     INNER JOIN assessments ON tests.assessmentID = assessments.assessmentID
+                     INNER JOIN todo ON assessments.assessmentID = todo.assessmentID
+                     WHERE tests.testID = '$testID' AND todo.userID = '$userID'";
+$accessCheckResult = executeQuery($accessCheckQuery);
+
+if (mysqli_num_rows($accessCheckResult) <= 0) {
+    header("Location: 404.html");
+    exit();
+}
+
 $testExistenceQuery = "SELECT tests.testID, tests.testTimeLimit FROM tests 
 INNER JOIN assessments 
     ON tests.assessmentID = assessments.assessmentID 
@@ -165,7 +178,7 @@ $profilePic = !empty($assignmentRow['profilePicture'])
                                     if (mysqli_num_rows($selectTestResult) > 0) {
                                         mysqli_data_seek($selectTestResult, 0);
                                         while ($testTitle = mysqli_fetch_assoc($selectTestResult)) {
-                                            ?>
+                                    ?>
                                             <div class="col">
                                                 <div class="text-sbold text-25"><?php echo $testTitle['assessmentTitle']; ?>
                                                 </div>
@@ -174,50 +187,50 @@ $profilePic = !empty($assignmentRow['profilePicture'])
                                             </div>
                                             <?php
                                             if ($status != 'Pending') {
-                                                ?>
+                                            ?>
                                                 <div class="col-auto text-end text-reg">
                                                     Score <div class="text-sbold text-25">
                                                         <?php echo $score; ?><span class="text-muted">/<?php echo $totalItems; ?>
                                                     </div>
                                                 </div>
 
-                                                <?php
-                                            }
-                                            ?>
-                                        </div>
-
-                                        <!-- MOBILE VIEW -->
-                                        <div class="d-block d-sm-none mobile-assignment">
-                                            <div class="mobile-top">
-                                                <div class="arrow">
-                                                    <a onclick="history.back()" class="text-decoration-none">
-                                                        <i class="fa-solid fa-arrow-left text-reg text-16"
-                                                            style="color: var(--black);"></i>
-                                                    </a>
-                                                </div>
-
-                                                <div class="title text-sbold text-25"
-                                                    style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; max-width: 220px;">
-                                                    <?php echo $testTitle['assessmentTitle']; ?>
-                                                </div>
-
-                                            </div>
                                             <?php
-                                            if ($status != 'Pending') {
-                                                ?>
-                                                <div class="graded text-reg text-18 mt-4">Score</div>
-                                                <div class="score text-sbold text-25">
-                                                    <?php echo $score; ?>/<span class="text-muted"><?php echo $totalItems; ?></span>
-                                                </div>
-                                                <?php
                                             }
                                             ?>
+                                </div>
 
+                                <!-- MOBILE VIEW -->
+                                <div class="d-block d-sm-none mobile-assignment">
+                                    <div class="mobile-top">
+                                        <div class="arrow">
+                                            <a onclick="history.back()" class="text-decoration-none">
+                                                <i class="fa-solid fa-arrow-left text-reg text-16"
+                                                    style="color: var(--black);"></i>
+                                            </a>
                                         </div>
-                                        <?php
+
+                                        <div class="title text-sbold text-25"
+                                            style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; max-width: 220px;">
+                                            <?php echo $testTitle['assessmentTitle']; ?>
+                                        </div>
+
+                                    </div>
+                                    <?php
+                                            if ($status != 'Pending') {
+                                    ?>
+                                        <div class="graded text-reg text-18 mt-4">Score</div>
+                                        <div class="score text-sbold text-25">
+                                            <?php echo $score; ?>/<span class="text-muted"><?php echo $totalItems; ?></span>
+                                        </div>
+                                    <?php
+                                            }
+                                    ?>
+
+                                </div>
+                        <?php
                                         }
                                     }
-                                    ?>
+                        ?>
                             </div>
                         </div>
 
@@ -234,7 +247,7 @@ $profilePic = !empty($assignmentRow['profilePicture'])
                                     <?php
                                     if (mysqli_num_rows($profInfoResult) > 0) {
                                         while ($prof = mysqli_fetch_assoc($profInfoResult)) {
-                                            ?>
+                                    ?>
                                             <div class="d-flex align-items-center pb-5">
                                                 <div class="rounded-circle me-2"
                                                     style="width: 50px; height: 50px; background-color: var(--highlight75);">
@@ -248,7 +261,7 @@ $profilePic = !empty($assignmentRow['profilePicture'])
                                                     <div class="text-med text-12"><?php echo $assessmentCreationDate; ?></div>
                                                 </div>
                                             </div>
-                                            <?php
+                                    <?php
                                         }
                                     }
                                     ?>

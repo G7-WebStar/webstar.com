@@ -42,10 +42,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                       WHERE todo.userID = '$userID' AND todo.status = 'Pending' AND assessments.type = 'Test' AND tests.testID = '$testID'";
     $updateTodoStatusResult = executeQuery($updateTodoStatusQuery);
 
-    $scoreQuery = "SELECT COUNT(isCorrect) AS correct FROM testresponses WHERE isCorrect = '1' AND userID = '$userID' AND testID = '$testID'";
+    $scoreQuery = "SELECT SUM(testquestions.testQuestionPoints) AS correctPoints
+                   FROM testresponses
+                   INNER JOIN testquestions
+                   ON testresponses.testQuestionID = testquestions.testQuestionID
+                   WHERE testresponses.isCorrect = 1 
+                   AND testresponses.userID = '$userID' 
+                   AND testresponses.testID = '$testID'";
     $scoreResult = executeQuery($scoreQuery);
     $scoreRow = mysqli_fetch_assoc($scoreResult);
-    $score = $scoreRow['correct'];
+    $score = $scoreRow['correctPoints'] ?? 0;
 
     $insertScoreQuery = "INSERT INTO scores (userID, testID, score) VALUES ('$userID','$testID','$score')";
     $insertScoreResult = executeQuery($insertScoreQuery);
