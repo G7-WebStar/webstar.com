@@ -54,7 +54,7 @@ if (isset($_POST['reset'])) { // Reset password button
         $_SESSION['role'] = $role;
 
         if ($role === 'professor') {
-            $update = "UPDATE users SET password = '$hashedPassword', status = 'active' WHERE email = '$email'";
+            $update = "UPDATE users SET password = '$hashedPassword', status = 'Active' WHERE email = '$email'";
         } else {
             $update = "UPDATE users SET password = '$hashedPassword' WHERE email = '$email'";
         }

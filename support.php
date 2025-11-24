@@ -42,7 +42,7 @@ $supportStudentResult = executeQuery($supportStudentQuery);
             <?php include 'shared/components/sidebar-for-mobile.php'; ?>
             <?php include 'shared/components/sidebar-for-desktop.php'; ?>
 
-            <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-md-4 overflow-y-auto">
+            <div class="col main-container m-0 mx-0 mx-md-2 p-md-4 overflow-y-auto">
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>

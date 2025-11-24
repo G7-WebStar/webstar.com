@@ -174,6 +174,8 @@ if (isset($_POST['save_exam'])) {
                         }
                     }
 
+                    $testQuestion = mysqli_real_escape_string($conn, $question['testQuestion']);
+                    $correctAnswer = mysqli_real_escape_string($conn, $question['correctAnswer']);
 
                     /* INSERT QUESTION*/
                     $insertQ = "INSERT INTO testquestions
@@ -663,11 +665,11 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                             <!-- Time limit -->
                                             <div class="col-md-6 m-0 p-0">
                                                 <label class="form-label text-med text-16">
-                                                    Time Limit (in minutes)
+                                                    Time Limit
                                                 </label>
                                                 <input type="number" name="testTimeLimit"
                                                     class="form-control textbox text-reg text-16"
-                                                    placeholder="No time limit if left blank" min="1" required value="<?php
+                                                    placeholder="in minutes" min="1" required value="<?php
                                                     if (isset($mainData['testTimeLimit'])) {
                                                         echo htmlspecialchars(intval($mainData['testTimeLimit']) / 60);
                                                     }

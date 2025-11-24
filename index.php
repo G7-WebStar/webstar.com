@@ -169,6 +169,29 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                 margin-bottom: 80px !important;
             }
         }
+
+        @media (max-width: 576px) {
+            .welcome-text-one {
+                font-size: 18px !important;
+                padding-top: 20px !important;
+            }
+
+            .welcome-text-two {
+                font-size: 14px !important;
+                padding-bottom: 20px !important;
+                padding: 0px 60px;
+            }
+        }
+
+        @media (max-width: 1270px) {
+
+            .left-side,
+            .right-side {
+                width: 100% !important;
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+            }
+        }
     </style>
 </head>
 
@@ -198,9 +221,9 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                             <?php
                             if (mysqli_num_rows($selectEnrolledResult) > 0) {
                                 while ($studentEnrolled = mysqli_fetch_assoc($selectEnrolledResult)) {
-                            ?>
+                                    ?>
                                     <!-- left side -->
-                                    <div class="col-12 col-sm-12 col-md-7">
+                                    <div class="col-12 col-sm-12 col-md-7 left-side">
                                         <div class="row align-items-center ps-0 ps-md-4">
                                             <!-- Image column -->
                                             <div class="col-auto d-none d-sm-block">
@@ -211,8 +234,10 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
 
                                             <!-- Text column -->
                                             <div class="col text-center text-sm-start">
-                                                <div class="text-sbold text-22"><?php echo $welcomeText; ?></div>
-                                                <div class="text-reg text-16">Pick up where you left off and keep building your
+                                                <div class="text-sbold text-22 welcome-text-one"><?php echo $welcomeText; ?>
+                                                </div>
+                                                <div class="text-reg text-16 welcome-text-two">Pick up where you left off and
+                                                    keep building your
                                                     skills.</div>
                                             </div>
                                         </div>
@@ -227,7 +252,8 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                     <div
                                                         class="p-4 pb-0 d-flex justify-content-between align-items-center mb-3">
                                                         <div class="d-flex align-items-center">
-                                                            <span class="material-symbols-rounded" style="color: var(--black); margin-right: 5px;">
+                                                            <span class="material-symbols-rounded"
+                                                                style="color: var(--black); margin-right: 5px;">
                                                                 folder
                                                             </span>
                                                             <span>Your Courses</span>
@@ -256,24 +282,29 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                 if (mysqli_num_rows($selectEnrolledResult) > 0) {
                                                                     mysqli_data_seek($selectEnrolledResult, 0);
                                                                     while ($enrolledSubjects = mysqli_fetch_assoc($selectEnrolledResult)) {
-                                                                ?>
+                                                                        ?>
                                                                         <!-- Card 1 -->
                                                                         <div class="card custom-course-card">
                                                                             <a href="course-info.php?courseID=<?php echo $enrolledSubjects['courseID']; ?>"
                                                                                 class="text-decoration-none text-black">
                                                                                 <img src="shared/assets/img/course-images/<?php echo $enrolledSubjects['courseImage']; ?>"
                                                                                     class="card-img-top" alt="...">
-                                                                                <div class="card-body border-top border-black px-3 py-2">
-                                                                                    <div class="text-sbold text-16 text-truncate" style="max-width: 200px;" title="<?php echo $enrolledSubjects['courseCode']; ?>">
+                                                                                <div
+                                                                                    class="card-body border-top border-black px-3 py-2">
+                                                                                    <div class="text-sbold text-16 text-truncate"
+                                                                                        style="max-width: 200px;"
+                                                                                        title="<?php echo $enrolledSubjects['courseCode']; ?>">
                                                                                         <?php echo $enrolledSubjects['courseCode']; ?>
                                                                                     </div>
-                                                                                    <p class="text-reg text-14 mb-0 text-truncate" style="max-width: 200px;" title="<?php echo $enrolledSubjects['courseTitle']; ?>">
+                                                                                    <p class="text-reg text-14 mb-0 text-truncate"
+                                                                                        style="max-width: 200px;"
+                                                                                        title="<?php echo $enrolledSubjects['courseTitle']; ?>">
                                                                                         <?php echo $enrolledSubjects['courseTitle']; ?>
                                                                                     </p>
                                                                                 </div>
                                                                             </a>
                                                                         </div>
-                                                                <?php
+                                                                        <?php
                                                                     }
                                                                 }
                                                                 ?>
@@ -302,7 +333,8 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                     <!-- Top Header  -->
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                                         <div class="d-flex align-items-center">
-                                                            <span class="material-symbols-rounded me-2" style="color: var(--black); margin-right: 5px;">
+                                                            <span class="material-symbols-rounded me-2"
+                                                                style="color: var(--black); margin-right: 5px;">
                                                                 campaign
                                                             </span>
                                                             <span>Recent Announcements</span>
@@ -319,7 +351,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                         <?php
                                                         if (mysqli_num_rows($selectAnnouncementsResult) > 0) {
                                                             while ($announcements = mysqli_fetch_assoc($selectAnnouncementsResult)) {
-                                                        ?>
+                                                                ?>
                                                                 <!-- Card 1 -->
                                                                 <div class="card mb-3"
                                                                     style="border-radius: 12px; border: 1px solid rgba(44, 44, 44, 1); padding: 15px;">
@@ -346,7 +378,8 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                                 </div>
                                                                                 <div class="date-row d-flex justify-content-between align-items-center mt-1"
                                                                                     style="position: relative;">
-                                                                                    <span style="font-weight: normal;"><?php echo getRelativeTime($announcements['announcementDate'] . ' ' . $announcements['announcementTime']); ?></span>
+                                                                                    <span
+                                                                                        style="font-weight: normal;"><?php echo getRelativeTime($announcements['announcementDate'] . ' ' . $announcements['announcementTime']); ?></span>
                                                                                 </div>
                                                                             </div>
 
@@ -362,16 +395,18 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                         </a>
                                                                     </div>
                                                                 </div>
-                                                            <?php
+                                                                <?php
                                                             }
                                                         } else {
                                                             ?>
                                                             <div class="col-12 text-center text-14">
-                                                                <img src="shared/assets/img/empty/announcements.png" alt="No Announcements" class="empty-state-img" style="width: 100px;">
+                                                                <img src="shared/assets/img/empty/announcements.png"
+                                                                    alt="No Announcements" class="empty-state-img"
+                                                                    style="width: 100px;">
                                                                 <p class="text-med mt-1 mb-0">Nothing new here.</p>
                                                                 <p class="text-reg mt-1">Announcements are all caught up.</p>
                                                             </div>
-                                                        <?php
+                                                            <?php
                                                         }
                                                         ?>
                                                     </div>
@@ -380,7 +415,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                         </div>
                                     </div>
                                     <!-- Right side -->
-                                    <div class="col-12 col-sm-12 col-md-5">
+                                    <div class="col-12 col-sm-12 col-md-5 right-side">
                                         <div class="row text-sbold text-18">
                                             <div class="col">
                                                 <div class="card p-4 mb-3 left-card">
@@ -404,9 +439,10 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                             if ($totalAssessmentsCount > 0) {
                                                                 $emptyAssessment = false;
                                                                 $totalAssessments = mysqli_fetch_assoc($selectAssessmentResult);
-                                                            ?>
-                                                                <span class="count-badge ms-2 text-sbold text-16"><?php echo $totalAssessments['totalAssessments']; ?></span>
-                                                            <?php
+                                                                ?>
+                                                                <span
+                                                                    class="count-badge ms-2 text-sbold text-16"><?php echo $totalAssessments['totalAssessments']; ?></span>
+                                                                <?php
                                                             } else {
                                                                 $emptyAssessment = true;
                                                             }
@@ -428,11 +464,11 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                 } elseif ($type === 'test') {
                                                                     $link = "test.php?testID=" . $activities['testID'];
                                                                 }
-                                                        ?>
-                                                                <div class="todo-card d-flex align-items-stretch mb-2">
+                                                                ?>
+                                                                <div class="todo-card d-flex align-items-stretch mb-2" style="max-width:100%!important">
                                                                     <!-- Date -->
-                                                                    <div
-                                                                        class="date d-flex align-items-center justify-content-center text-sbold text-20">
+                                                                    <div class="date d-flex align-items-center justify-content-center text-sbold text-20"
+                                                                        style="text-transform:uppercase; background-color: var(--primaryColor)">
                                                                         <?php echo $activities['assessmentDeadline']; ?>
                                                                     </div>
                                                                     <!-- Main content -->
@@ -440,7 +476,8 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                         class="d-flex flex-grow-1 flex-wrap justify-content-between p-2 w-100">
                                                                         <!-- For small screen of main content -->
                                                                         <div class="px-3 py-0">
-                                                                            <div class="text-sbold text-16 text-truncate" style="width:90px;"
+                                                                            <div class="text-sbold text-16 text-truncate"
+                                                                                style="width:90px;"
                                                                                 title="<?php echo $activities['assessmentTitle']; ?>">
                                                                                 <?php echo $activities['assessmentTitle']; ?>
                                                                             </div>
@@ -465,16 +502,17 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            <?php
+                                                                <?php
                                                             }
                                                         } else {
                                                             ?>
                                                             <div class="col-12 text-center text-14">
-                                                                <img src="shared/assets/img/empty/todo.png" alt="No Leaderboard" class="empty-state-img" style="width: 100px;">
+                                                                <img src="shared/assets/img/empty/todo.png" alt="No Leaderboard"
+                                                                    class="empty-state-img" style="width: 100px;">
                                                                 <p class="text-med mt-1 mb-0">You're on track.</p>
                                                                 <p class="text-reg mt-1">No new assessments ahead.</p>
                                                             </div>
-                                                        <?php
+                                                            <?php
                                                         }
                                                         ?>
 
@@ -503,7 +541,8 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                     <!-- Top Header -->
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                                         <div class="d-flex align-items-center">
-                                                            <span class="material-symbols-rounded" style="color: var(--black); margin-right: 10px;">
+                                                            <span class="material-symbols-rounded"
+                                                                style="color: var(--black); margin-right: 10px;">
                                                                 leaderboard
                                                             </span>
                                                             <span>Leaderboard Rank</span>
@@ -542,11 +581,12 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                         $i++;
                                                                     }
                                                                 }
-                                                        ?>
+                                                                ?>
                                                                 <div class="card custom-leaderboard-card">
                                                                     <div class="card-body p-4">
                                                                         <div style="display: inline-flex; align-items: center;">
-                                                                            <span class="rank-number text-bold text-18"><?php echo $rank; ?></span>
+                                                                            <span
+                                                                                class="rank-number text-bold text-18"><?php echo $rank; ?></span>
                                                                             <?php
                                                                             if ($rank == 1) {
                                                                                 echo '<img src="shared/assets/img/badge/1st.png" alt="1st" class="img-fluid float-end d-flex flex-row d-xxs-none ms-auto" width="30px">';
@@ -579,16 +619,18 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            <?php
+                                                                <?php
                                                             }
                                                         } else {
                                                             ?>
                                                             <div class="col-12 text-center text-14">
-                                                                <img src="shared/assets/img/empty/leaderboard.png" alt="No Leaderboard" class="empty-state-img" style="width: 100px;">
+                                                                <img src="shared/assets/img/empty/leaderboard.png"
+                                                                    alt="No Leaderboard" class="empty-state-img"
+                                                                    style="width: 100px;">
                                                                 <p class="text-med mt-1 mb-0">Leaderboard is empty.</p>
                                                                 <p class="text-reg mt-1">Start submitting tasks to earn scores.</p>
                                                             </div>
-                                                        <?php
+                                                            <?php
                                                         }
                                                         ?>
                                                     </div>
@@ -596,7 +638,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                             </div>
                                         </div>
                                     </div>
-                            <?php
+                                    <?php
                                 }
                             } else {
                                 echo "<script>window.location.href = 'course-join.php';</script>";

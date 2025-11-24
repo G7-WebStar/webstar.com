@@ -91,7 +91,7 @@ $linkCount = count($linksArray);
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | Lessons-info</title>
+    <title><?php echo $lessonTitle; ?> ✦ Webstar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="shared/assets/css/global-styles.css">
@@ -107,6 +107,14 @@ $linkCount = count($linksArray);
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
         rel="stylesheet" />
+
+    <style>
+        @media screen and (max-width: 767px) {
+            .mobile-view {
+                margin-bottom: 80px !important;
+            }
+        }
+    </style>
 
 </head>
 
@@ -129,15 +137,14 @@ $linkCount = count($linksArray);
                     <!-- Navbar for mobile -->
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top mobile-view">
                         <div class="row mb-3">
                             <div class="col-12 cardHeader p-3 mb-4">
 
                                 <!-- DESKTOP VIEW -->
-                                <div class="row desktop-header d-none d-sm-flex">
+                                <div class="row desktop-header d-none d-sm-flex d-flex align-items-center">
                                     <div class="col-auto me-2">
-                                        <a onclick="window.history.back()"
-                                            class="text-decoration-none">
+                                        <a onclick="window.history.back()" class="text-decoration-none">
                                             <span class="material-symbols-outlined"
                                                 style="color: var(--black); font-size: 22px; cursor:pointer">
                                                 arrow_back
@@ -165,7 +172,11 @@ $linkCount = count($linksArray);
                                                 </span>
                                             </a>
                                         </div>
-                                        <div class="title text-sbold text-25"><?php echo $lessonTitle; ?></div>
+                                        <div class="title text-sbold text-25"
+                                            style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; max-width: 220px;">
+                                            <?php echo $lessonTitle; ?>
+                                        </div>
+
                                     </div>
                                     <div class="due text-reg text-18"><?php echo $fileCount ?>
                                         <?php echo $fileCount == 1 ? "file" : "files" ?> · <?php echo $linkCount ?>

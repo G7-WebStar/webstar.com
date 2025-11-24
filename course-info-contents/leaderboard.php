@@ -42,7 +42,7 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                                             </div>
                                         </div>
                                         <img src="shared/assets/img/badge/1st.png" alt="1st"
-                                            class="img-fluid float-end d-flex flex-row d-xxs-none" width="50px">
+                                            class="img-fluid float-end d-flex flex-row d-xxs-none" width="50px" >
                                     </div>
                                     <div class="col-12 mt-3 text-xl-12 text-lg-16 text-xs-12 text-wrap">
                                         <?php echo $topOne['firstName'] . " " . $topOne['middleName'] . " " . $topOne['lastName']; ?>

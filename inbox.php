@@ -86,7 +86,7 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Webstar | My Inbox</title>
+    <title>My Inbox ✦ Webstar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="shared/assets/css/global-styles.css" />
@@ -442,26 +442,29 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                     </div>
                     <div class="modal-body text-start">
                         <p class="text-reg text-14 mb-3">
-                            Welcome to <span class="text-sbold">Webstar</span>! ✦ <br> <br>We’re thrilled to have you on board.
-                            Thank you so much for taking the time to participate in the testing of this site. Your
+                            welcome to <span class="text-sbold">Webstar</span>! ✦ <br> <br>we’re sooo thrilled to have you on board.
+                            thank u so much for taking the time to participate in the testing of the system we spent a year working on. your
                             feedback
                             and activity will help us improve the platform and create a better experience for all
                             learners and instructors of PUP-STC.
                         </p>
                         <p class="text-reg text-14 mb-3">
-                            As a token of our appreciation, you have been awarded <span class="text-sbold">1000
+                            as a token of our appreciation, you have been awarded <span class="text-sbold">1000
                                 Webstars</span>!
-                            You can use them to unlock shop items, increase your XPs, and explore all the exciting
+                            you can use them to unlock shop items, increase your XPs, and explore all the exciting
                             features
                             Webstar has to offer.
                         </p>
                         <p class="text-reg text-14 mb-3">
-                            Remember, the more you engage with courses, lessons, and tasks, the more rewards you’ll
+                            remember, the more you engage with courses, lessons, and tasks, the more rewards you’ll
                             earn.
-                            Keep exploring, completing tasks, and enjoying the journey ahead!
+                            keep exploring, completing tasks, and enjoying the journey ahead!
                         </p>
                         <p class="text-reg text-14 mb-3">
-                            Sincerely,<br>
+                            alsoo pls pls do not forget to answer our <a class="text-decoration-none" style="cursor: pointer" href="https://forms.gle/hvBwAtZ5FQhzCGfK7">questionnaire</a>! 
+                        </p>
+                        <p class="text-reg text-14 mb-3">
+                            sincerely,<br>
                             Alyssa, Ayisha, Kimberly, Shane, James, & Neil <br>
                             <strong>
                                 The Webstar Team ♡

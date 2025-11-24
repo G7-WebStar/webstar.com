@@ -80,8 +80,10 @@ if (isset($_POST['deleteAssessmentBtn']) && isset($_POST['deleteAssessmentID']) 
             mysqli_commit($conn);
 
             // Set success message in session
-            $_SESSION['success'] = 'Assessment deleted successfully!';
-
+            $_SESSION['toast'] = [
+                'type' => 'alert-success',
+                'message' => 'Assessment deleted successfully!'
+            ];
             // Always redirect to todo tab when deleting from todo page
             // Set activeTab in session so course-info.php picks it up
             $_SESSION['activeTab'] = 'todo';
@@ -99,9 +101,9 @@ if (isset($_POST['deleteAssessmentBtn']) && isset($_POST['deleteAssessmentID']) 
 $assessmentCount = mysqli_num_rows($selectAssessmentResult);
 
 // Determine if dropdowns should be visible
-$showDropdowns = $assessmentCount > 0
-    || (!empty($statusFilter) && $statusFilter != 'Pending')
-    || (!empty($sortTodo) && $sortTodo == 'Missing');
+// $showDropdowns = $assessmentCount > 0
+//     || (!empty($statusFilter) && $statusFilter != 'Pending')
+//     || (!empty($sortTodo) && $sortTodo == 'Missing');
 ?>
 <?php if (isset($_SESSION['success'])): ?>
     <div class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
@@ -116,7 +118,6 @@ $showDropdowns = $assessmentCount > 0
     <?php unset($_SESSION['success']); ?>
 <?php endif; ?>
 
-<?php if ($showDropdowns): ?>
     <div class="d-flex align-items-center flex-nowrap mb-2" id="header">
         <!-- Sort by -->
         <div class="d-flex align-items-center flex-nowrap me-4">
@@ -135,14 +136,12 @@ $showDropdowns = $assessmentCount > 0
             <form method="POST">
                 <input type="hidden" name="activeTab" value="todo">
                 <select class="select-modern text-reg text-14" name="statusFilter" onchange="this.form.submit()">
-                    <option value="Pending" <?php echo ($statusFilter == 'Pending') ? 'selected' : ''; ?>>Pending</option>
-                    <option value="Missing" <?php echo ($statusFilter == 'Missing') ? 'selected' : ''; ?>>Missing</option>
+                    <option value="Active" <?php echo ($statusFilter == 'Active') ? 'selected' : ''; ?>>Active</option>
                     <option value="Done" <?php echo ($statusFilter == 'Done') ? 'selected' : ''; ?>>Done</option>
                 </select>
             </form>
         </div>
     </div>
-<?php endif; ?>
 
 <?php if ($assessmentCount > 0): ?>
     <!-- To-Do List -->
@@ -158,7 +157,7 @@ $showDropdowns = $assessmentCount > 0
                     <?php
                     $type = strtolower(trim($todo['type']));
                     $link = "#";
-                    $editlink ="";
+                    $editlink = "";
                     $todoID = "";
 
                     if ($type === 'task') {
@@ -179,7 +178,8 @@ $showDropdowns = $assessmentCount > 0
                     ?>
                     <div class="todo-card d-flex align-items-stretch" data-link="<?php echo htmlspecialchars($link); ?>">
                         <!-- Date -->
-                        <div class="date py-3 d-flex align-items-center justify-content-center text-sbold text-20"style="text-transform:uppercase;background-color: var(--primaryColor)">
+                        <div class="date py-3 d-flex align-items-center justify-content-center text-sbold text-20"
+                            style="text-transform:uppercase;background-color: var(--primaryColor)">
                             <?php echo $todo['assessmentDeadline']; ?>
                         </div>
 
@@ -189,7 +189,8 @@ $showDropdowns = $assessmentCount > 0
                             <div class="px-3 py-0 flex-grow-1" style="min-width: 0; overflow: hidden;">
                                 <div class="text-sbold text-16"
                                     style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                    <?php echo htmlspecialchars($todo['assessmentTitle']); ?></div>
+                                    <?php echo htmlspecialchars($todo['assessmentTitle']); ?>
+                                </div>
                                 <span class="course-badge rounded-pill me-2 px-3 text-reg text-12 mt-2 d-inline d-md-none">
                                     <?php echo htmlspecialchars($todo['type']); ?>
                                 </span>
@@ -245,7 +246,8 @@ $showDropdowns = $assessmentCount > 0
 
                                 <form method="POST" class="m-0">
                                     <input type="hidden" name="deleteAssessmentID" value="<?php echo $todoID; ?>">
-                                    <input type="hidden" name="deleteAssessmentType" value="<?php echo htmlspecialchars($todo['type']); ?>">
+                                    <input type="hidden" name="deleteAssessmentType"
+                                        value="<?php echo htmlspecialchars($todo['type']); ?>">
                                     <input type="hidden" name="activeTab" value="todo">
                                     <?php if (isset($courseID)): ?>
                                         <input type="hidden" name="courseID" value="<?php echo $courseID; ?>">
@@ -264,27 +266,18 @@ $showDropdowns = $assessmentCount > 0
         <?php endwhile; ?>
     </div>
 
-<?php elseif (!empty($statusFilter) && $statusFilter != 'Pending' || $sortTodo == 'Missing'): ?>
+<?php elseif (empty($statusFilter) && $statusFilter != 'Active' ): ?>
     <div class="empty-state text-center">
-        <?php if ($statusFilter == 'Pending'): ?>
+        <?php if ($statusFilter == 'Active'): ?>
             <img src="../shared/assets/img/empty/todo.png" alt="No Pending Quests" class="empty-state-img">
             <div class="empty-state-text text-reg text-14 d-flex flex-column align-items-center">
-                <p class="text-med mt-1 mb-0">No quests have been assigned yet.</p>
-                <p class="text-reg mt-1">Your next adventure awaits!</p>
-            </div>
-
-        <?php elseif ($statusFilter == 'Missing' || $sortTodo == 'Missing'): ?>
-            <img src="../shared/assets/img/empty/quest.png" alt="No Missing Quests" class="empty-state-img">
-            <div class="empty-state-text text-reg text-14 d-flex flex-column align-items-center">
-                <p class="text-med mt-1 mb-0">No missing quests.</p>
-                <p class="text-reg mt-1">You’re right on track, adventurer!</p>
+               <p class="text-med mb-0">No assessments here.</p>
             </div>
 
         <?php elseif ($statusFilter == 'Done'): ?>
             <img src="../shared/assets/img/empty/folder.png" alt="No Done Quests" class="empty-state-img">
             <div class="empty-state-text text-reg text-14 d-flex flex-column align-items-center">
-                <p class="text-med mt-1 mb-0">You haven’t submitted any quests yet.</p>
-                <p class="text-reg mt-1">Complete one to earn XPs!</p>
+                <p class="text-med mb-0">No assessments here.</p>
             </div>
         <?php endif; ?>
     </div>
@@ -293,7 +286,7 @@ $showDropdowns = $assessmentCount > 0
     <div class="empty-state text-center">
         <img src="../shared/assets/img/empty/todo.png" alt="No Quests" class="empty-state-img">
         <div class="empty-state-text text-reg text-14 d-flex flex-column align-items-center">
-            <p class="text-med mb-0">No quests are available at the moment.</p>
+            <p class="text-med mb-0">No assessments here.</p>
         </div>
     </div>
 <?php endif; ?>

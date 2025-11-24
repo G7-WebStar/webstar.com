@@ -2,10 +2,10 @@
 $assessmentCount = mysqli_num_rows($selectAssessmentResult);
 
 // Determine if dropdowns should be visible
-$showDropdowns = $assessmentCount > 0
-    || (!empty($statusFilter) && $statusFilter != 'Pending');
+// $showDropdowns = $assessmentCount > 0
+//     || (!empty($statusFilter) && $statusFilter != 'Pending');
 ?>
-<?php if ($showDropdowns): ?>
+
     <div class="d-flex align-items-center flex-nowrap mb-2" id="header">
         <!-- Sort by -->
         <div class="d-flex align-items-center flex-nowrap me-4">
@@ -31,7 +31,7 @@ $showDropdowns = $assessmentCount > 0
             </form>
         </div>
     </div>
-<?php endif; ?>
+
 
 <?php if ($assessmentCount > 0): ?>
     <!-- To-Do List -->

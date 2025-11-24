@@ -101,6 +101,22 @@ $assessmentCreationDate = $assessmentCreationDateRow['creationDate'];
 $profilePic = !empty($assignmentRow['profilePicture'])
     ? 'shared/assets/pfp-uploads/' . $assignmentRow['profilePicture']
     : 'shared/assets/pfp-uploads/defaultProfile.png';
+
+
+$questionPtsQuery = "SELECT SUM(testQuestionPoints) AS totalQuestionPts FROM testquestions 
+INNER JOIN testresponses 
+    ON testquestions.testQuestionID = testresponses.testQuestionID
+WHERE testquestions.testID = '$testID' AND testresponses.isCorrect = '1'";
+$questionPtsResult = executeQuery($questionPtsQuery);
+$testResponseRow = (mysqli_num_rows($questionPtsResult) > 0) ? mysqli_fetch_assoc($questionPtsResult) : '0';
+$testResponse = ($testResponseRow == 0 || null) ? '0' : $testResponseRow['totalQuestionPts'];
+
+
+$questionTotalQuery = "SELECT SUM(testQuestionPoints) AS questionTotal FROM testquestions 
+WHERE testquestions.testID = '$testID'";
+$questionTotalResult = executeQuery($questionTotalQuery);
+$questionTotalRow = (mysqli_num_rows($questionTotalResult) > 0) ? mysqli_fetch_assoc($questionTotalResult) : null;
+$questionTotal = ($questionTotalRow == null) ? null : $questionTotalRow['questionTotal'];
 ?>
 
 <!doctype html>
@@ -109,10 +125,11 @@ $profilePic = !empty($assignmentRow['profilePicture'])
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | Exam Info</title>
+    <title>Exam Info ✦ Webstar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="shared/assets/css/global-styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="shared/assets/css/exam-info.css">
     <link rel="stylesheet" href="shared/assets/css/sidebar-and-container-styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
@@ -125,7 +142,7 @@ $profilePic = !empty($assignmentRow['profilePicture'])
 
         @media screen and (max-width: 767px) {
             .mobile-view {
-                margin-bottom: calc(1.5rem + 80px) !important;
+                margin-bottom: 80px !important;
             }
         }
     </style>
@@ -150,7 +167,7 @@ $profilePic = !empty($assignmentRow['profilePicture'])
                             <div class="col-12 cardHeader p-3 mb-4">
 
                                 <!-- DESKTOP VIEW -->
-                                <div class="row desktop-header d-none d-sm-flex">
+                                <div class="row desktop-header d-none d-sm-flex d-flex align-items-center">
                                     <div class="col-auto me-2">
                                         <a onclick="history.back()" class="text-decoration-none interactable">
                                             <i class="fa-solid fa-arrow-left text-reg text-16"
@@ -161,51 +178,60 @@ $profilePic = !empty($assignmentRow['profilePicture'])
                                     if (mysqli_num_rows($selectTestResult) > 0) {
                                         mysqli_data_seek($selectTestResult, 0);
                                         while ($testTitle = mysqli_fetch_assoc($selectTestResult)) {
-                                    ?>
+                                            ?>
                                             <div class="col">
-                                                <div class="text-sbold text-25"><?php echo $testTitle['assessmentTitle']; ?></div>
-                                                <span class="text-reg text-18">Due <?php echo $testTitle['assessmentDeadline']; ?></span>
+                                                <div class="text-sbold text-25"><?php echo $testTitle['assessmentTitle']; ?>
+                                                </div>
+                                                <span class="text-reg text-18">Due
+                                                    <?php echo $testTitle['assessmentDeadline']; ?></span>
                                             </div>
                                             <?php
                                             if ($status != 'Pending') {
-                                            ?>
-                                                <div class="col-auto text-end">
+                                                ?>
+                                                <div class="col-auto text-end text-reg">
                                                     Score <div class="text-sbold text-25">
-                                                        <?php echo $score; ?><span class="text-muted">/<?php echo $totalItems; ?></span>
+                                                        <?php echo $testResponse; ?><span
+                                                            class="text-muted">/<?php echo $questionTotal; ?></span>
                                                     </div>
                                                 </div>
-                                            <?php
+
+                                                <?php
                                             }
                                             ?>
-                                </div>
-
-                                <!-- MOBILE VIEW -->
-                                <div class="d-block d-sm-none mobile-assignment">
-                                    <div class="mobile-top">
-                                        <div class="arrow">
-                                            <a onclick="history.back()" class="text-decoration-none">
-                                                <i class="fa-solid fa-arrow-left text-reg text-16"
-                                                    style="color: var(--black);"></i>
-                                            </a>
                                         </div>
-                                        <div class="title text-sbold text-25"><?php echo $testTitle['assessmentTitle']; ?></div>
-                                    </div>
-                                    <?php
+
+                                        <!-- MOBILE VIEW -->
+                                        <div class="d-block d-sm-none mobile-assignment">
+                                            <div class="mobile-top">
+                                                <div class="arrow">
+                                                    <a onclick="history.back()" class="text-decoration-none">
+                                                        <i class="fa-solid fa-arrow-left text-reg text-16"
+                                                            style="color: var(--black);"></i>
+                                                    </a>
+                                                </div>
+
+                                                <div class="title text-sbold text-25"
+                                                    style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; max-width: 220px;">
+                                                    <?php echo $testTitle['assessmentTitle']; ?>
+                                                </div>
+
+                                            </div>
+                                            <?php
                                             if ($status != 'Pending') {
-                                    ?>
-                                        <div class="graded text-reg text-18 mt-4">Score</div>
-                                        <div class="score text-sbold text-25">
-                                            <?php echo $score; ?>/<span class="text-muted"><?php echo $totalItems; ?></span>
-                                        </div>
-                                    <?php
+                                                ?>
+                                                <div class="graded text-reg text-18 mt-4">Score</div>
+                                                <div class="score text-sbold text-25">
+                                                    <?php echo $score; ?>/<span class="text-muted"><?php echo $totalItems; ?></span>
+                                                </div>
+                                                <?php
                                             }
-                                    ?>
+                                            ?>
 
-                                </div>
-                        <?php
+                                        </div>
+                                        <?php
                                         }
                                     }
-                        ?>
+                                    ?>
                             </div>
                         </div>
 
@@ -214,24 +240,29 @@ $profilePic = !empty($assignmentRow['profilePicture'])
                             <div class="col-12 col-lg-8">
                                 <div class="p-0 px-lg-5">
                                     <div class="text-sbold text-14 mt-3">Exam General Guidelines</div>
-                                    <p class="mt-3 text-med text-14 "><?php echo $testGuidelines; ?></p>
+                                    <div class="mt-3 text-med text-14">
+                                        <?php echo nl2br($testGuidelines) ?></p>
+                                    </div>
                                     <hr>
                                     <div class="text-sbold text-14 pb-3">Prepared by</div>
                                     <?php
                                     if (mysqli_num_rows($profInfoResult) > 0) {
                                         while ($prof = mysqli_fetch_assoc($profInfoResult)) {
-                                    ?>
+                                            ?>
                                             <div class="d-flex align-items-center pb-5">
-                                                <div class="rounded-circle me-2" style="width: 50px; height: 50px; background-color: var(--highlight75);">
-                                                    <img src="<?php echo $profilePic ?>"
-                                                        alt="Prof Picture" class="rounded-circle" style="width:50px;height:50px;">
+                                                <div class="rounded-circle me-2"
+                                                    style="width: 50px; height: 50px; background-color: var(--highlight75);">
+                                                    <img src="<?php echo $profilePic ?>" alt="Prof Picture"
+                                                        class="rounded-circle" style="width:50px;height:50px;">
                                                 </div>
                                                 <div>
-                                                    <div class="text-sbold text-14">Prof. <?php echo $prof['firstName'] . " " . $prof['middleName'] . " " . $prof['lastName']; ?></div>
+                                                    <div class="text-sbold text-14">Prof.
+                                                        <?php echo $prof['firstName'] . " " . $prof['middleName'] . " " . $prof['lastName']; ?>
+                                                    </div>
                                                     <div class="text-med text-12"><?php echo $assessmentCreationDate; ?></div>
                                                 </div>
                                             </div>
-                                    <?php
+                                            <?php
                                         }
                                     }
                                     ?>
@@ -244,13 +275,17 @@ $profilePic = !empty($assignmentRow['profilePicture'])
                                     <div class="p-2">
                                         <div class="text-sbold text-16">Exam Details</div>
 
-                                        <div class="text-sbold text-16 text-center mt-4"><?php echo $totalItems; ?></div>
+                                        <div class="text-sbold text-16 text-center mt-4"><?php echo $totalItems; ?>
+                                        </div>
                                         <div class="text-reg text-14 text-center">Total Exam Items</div>
 
-                                        <div class="text-sbold text-16 text-center mt-4"><?php echo $totalPoints; ?></div>
+                                        <div class="text-sbold text-16 text-center mt-4"><?php echo $totalPoints; ?>
+                                        </div>
                                         <div class="text-reg text-14 text-center">Total Exam Points</div>
 
-                                        <div class="text-sbold text-16 text-center mt-4"><?php echo ($testTimeLimit / 60); ?> mins</div>
+                                        <div class="text-sbold text-16 text-center mt-4">
+                                            <?php echo ($testTimeLimit / 60); ?> mins
+                                        </div>
                                         <div class="text-reg text-14 text-center">Exam Duration</div>
 
                                         <div id="examStatusText" class="text-reg text-14 text-center mt-4">

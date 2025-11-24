@@ -22,6 +22,7 @@ if (isset($_GET['courseID'])) {
     profInfo.middleName AS profMiddleName,
     profInfo.lastName AS profLastName,
     profInfo.profilePicture AS profPFP,
+    users.userName,
     GROUP_CONCAT(
         CONCAT(
             courseschedule.day, ' ', 
@@ -36,6 +37,8 @@ if (isset($_GET['courseID'])) {
     	ON courses.userID = profInfo.userID
     INNER JOIN enrollments
     	ON courses.courseID = enrollments.courseID
+    INNER JOIN users
+        ON users.userID = profInfo.userID
     LEFT JOIN courseschedule
         ON courses.courseID = courseschedule.courseID
     WHERE enrollments.userID = '$userID' AND enrollments.courseID = '$courseID'
@@ -127,7 +130,7 @@ if (isset($_GET['courseID'])) {
     LEFT JOIN tests
         ON tests.assessmentID = todo.assessmentID
     WHERE todo.userID = '$userID' 
-    AND courses.courseID = '$courseID'AND todo.status = 'Pending'
+    AND courses.courseID = '$courseID'AND (NOW() < assessments.deadline AND todo.status = 'Pending')
     ORDER BY $todoOrderBy";
 
     $selectLimitAssessmentQuery = $selectAssessmentQueryForCourseCard;
@@ -203,6 +206,132 @@ if (!$result) {
 
 $user = mysqli_fetch_assoc($result);
 
+$rankQuery = "
+    SELECT ranking FROM (
+        SELECT 
+            enrollments.userID,
+            RANK() OVER (ORDER BY leaderboard.xpPoints DESC) AS ranking
+        FROM enrollments
+        INNER JOIN leaderboard 
+            ON enrollments.enrollmentID = leaderboard.enrollmentID
+        WHERE enrollments.courseID = '$courseID'
+    ) AS ranked
+    WHERE userID = '$userID'
+";
+
+$rankResult = executeQuery($rankQuery);
+
+$rank = null;
+
+if ($rankResult && mysqli_num_rows($rankResult) > 0) {
+    $rankRow = mysqli_fetch_assoc($rankResult);
+    $rank = $rankRow['ranking'];
+}
+
+$enrollmentQuery = "
+    SELECT enrollmentID 
+    FROM enrollments 
+    WHERE userID = '$userID' 
+      AND courseID = '$courseID'
+    LIMIT 1
+";
+$enrollmentResult = mysqli_query($conn, $enrollmentQuery);
+$enrollmentRow = mysqli_fetch_assoc($enrollmentResult);
+$enrollmentID = $enrollmentRow['enrollmentID'];
+
+$xpQuery = "
+    SELECT 
+        l.xpPoints,
+        x.xpLevelID,
+        x.tierName,
+        x.xpThreshold
+    FROM leaderboard l
+    JOIN xplevel x
+        ON l.xpLevelID = x.xpLevelID
+    WHERE l.enrollmentID = '$enrollmentID'
+    LIMIT 1
+";
+$xpResult = mysqli_query($conn, $xpQuery);
+$xp = mysqli_fetch_assoc($xpResult);
+
+$totalXP = $xp['xpPoints'];
+$currentLevel = $xp['xpLevelID'];
+$currentTier = $xp['tierName'];
+$currentThresh = $xp['xpThreshold'];
+
+$nextQuery = "
+    SELECT xpThreshold
+    FROM xplevel
+    WHERE xpLevelID = " . ($currentLevel + 1) . "
+    LIMIT 1
+";
+$nextResult = mysqli_query($conn, $nextQuery);
+
+if (mysqli_num_rows($nextResult) > 0) {
+    $nextThreshold = mysqli_fetch_assoc($nextResult)['xpThreshold'];
+} else {
+    $nextThreshold = $currentThresh;
+}
+
+$progress = ($totalXP / $nextThreshold) * 100;
+if ($progress > 100)
+    $progress = 100;
+
+if (isset($_POST['deleteCourse'])) {
+    $courseID = mysqli_real_escape_string($conn, $_POST['courseID']);
+    $userID = $_SESSION['userID'];
+
+    // Get enrollment ID
+    $enrollmentQuery = "
+        SELECT enrollmentID 
+        FROM enrollments 
+        WHERE userID = '$userID' 
+        AND courseID = '$courseID'
+        LIMIT 1
+    ";
+    $enrollmentResult = executeQuery($enrollmentQuery);
+    $enrollmentRow = mysqli_fetch_assoc($enrollmentResult);
+
+    if (!$enrollmentRow) {
+        exit();
+    }
+
+    $enrollmentID = $enrollmentRow['enrollmentID'];
+
+    // Delete student's todo for assessments in this course
+    $deleteTodoQuery = "
+        DELETE FROM todo
+        WHERE userID = '$userID'
+        AND assessmentID IN (
+            SELECT assessmentID FROM assessments WHERE courseID = '$courseID'
+        )
+    ";
+    executeQuery($deleteTodoQuery);
+
+    // Delete leaderboard entry
+    $deleteLeaderboardQuery = "
+        DELETE FROM leaderboard
+        WHERE enrollmentID = '$enrollmentID'
+    ";
+    executeQuery($deleteLeaderboardQuery);
+
+    // Delete enrollment
+    $deleteEnrollmentQuery = "
+        DELETE FROM enrollments 
+        WHERE enrollmentID = '$enrollmentID'
+        LIMIT 1
+    ";
+
+    if (executeQuery($deleteEnrollmentQuery)) {
+        $_SESSION['toast'] = [
+            'message' => 'You have been unenrolled from the course.',
+            'type' => 'alert-success'
+        ];
+
+        header("Location: course.php");
+        exit();
+    }
+}
 ?>
 
 <!doctype html>
@@ -211,7 +340,7 @@ $user = mysqli_fetch_assoc($result);
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | <?php echo $courseCode['courseCode']; ?></title>
+    <title><?php echo $courseCode['courseCode']; ?>✦ Webstar</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
@@ -239,6 +368,16 @@ $user = mysqli_fetch_assoc($result);
                 margin-bottom: 80px !important;
             }
         }
+
+        @media (max-width: 1270px) {
+
+            .left-side,
+            .right-side {
+                width: 100% !important;
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+            }
+        }
     </style>
 
 
@@ -264,7 +403,7 @@ $user = mysqli_fetch_assoc($result);
                             <div class="row mt-0">
 
                                 <!-- LEFT: Course Card -->
-                                <div class="col-md-4">
+                                <div class="col-md-4 left-side">
                                     <?php
                                     if (mysqli_num_rows($selectCourseResult) > 0) {
                                         while ($courses = mysqli_fetch_assoc($selectCourseResult)) {
@@ -285,11 +424,12 @@ $user = mysqli_fetch_assoc($result);
                                                         <div class="fa fa-arrow-left text-dark position-absolute start-0 top-50 translate-middle-y ms-4"
                                                             onclick="window.history.back()" style="cursor: pointer;"></div>
 
-                                                        <div class="text-center flex-grow-1">
+                                                        <div class="text-center flex-grow-1 px-5" style="min-width:0;">
                                                             <h5 class="text-bold mb-1" style="line-height:1;">
                                                                 <?php echo $courses['courseCode']; ?>
                                                             </h5>
-                                                            <p class="text-reg mb-0" style="line-height:1;">
+                                                            <p class="text-reg mb-0"
+                                                                style="line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;">
                                                                 <?php echo $courses['courseTitle']; ?>
                                                             </p>
                                                         </div>
@@ -311,21 +451,49 @@ $user = mysqli_fetch_assoc($result);
                                                                     style="width: 100%; height: 100%; object-fit: cover;">
                                                             </div>
 
+                                                            <!-- Three-dot menu -->
+                                                            <div class="dropdown position-absolute top-0 end-0 m-2">
+                                                                <button
+                                                                    class="btn p-1 rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center"
+                                                                    type="button" data-bs-toggle="dropdown"
+                                                                    aria-expanded="false" style="width: 32px; height: 32px;">
+                                                                    <i class="fa-solid fa-ellipsis-vertical text-dark"></i>
+                                                                </button>
+
+                                                                <ul class="dropdown-menu shadow-sm text-reg border">
+                                                                    <li>
+                                                                        <a class="dropdown-item"
+                                                                            href="create-course.php?edit=<?php echo $courses['courseID']; ?>">Edit</a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a class="dropdown-item text-danger "
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#deleteModal">Delete</a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+
                                                             <!-- Prof -->
-                                                            <div class="d-flex align-items-center text-decoration-none">
-                                                                <div class="rounded-circle me-2 flex-shrink-0" style="width: 25px; height: 25px; background-color: #5ba9ff;
+                                                            <a class="text-decoration-none" style="cursor:pointer"
+                                                                href="profile.php?user=<?php echo htmlspecialchars($courses['userName']) ?>">
+                                                                <div class="d-flex align-items-center text-decoration-none">
+                                                                    <div class="rounded-circle me-2 flex-shrink-0" style="width: 25px; height: 25px; background-color: #5ba9ff;
                                                     background: url('shared/assets/pfp-uploads/<?php echo $courses['profPFP']; ?>') no-repeat center center;
                                                     background-size: cover;">
+                                                                    </div>
+                                                                    <div class="d-flex flex-column justify-content-center">
+                                                                        <span class="text-sbold text-12"
+                                                                            style="line-height: 1.2">
+                                                                            <?php echo $courses['profFirstName'] . " " . $courses['profMiddleName'] . " " . $courses['profLastName']; ?>
+                                                                        </span>
+                                                                        <small class="text-reg text-12"
+                                                                            style="line-height: 1.2">
+                                                                            Instructor
+                                                                        </small>
+                                                                    </div>
                                                                 </div>
-                                                                <div class="d-flex flex-column justify-content-center">
-                                                                    <span class="text-sbold text-12" style="line-height: 1.2">
-                                                                        <?php echo $courses['profFirstName'] . " " . $courses['profMiddleName'] . " " . $courses['profLastName']; ?>
-                                                                    </span>
-                                                                    <small class="text-reg text-12" style="line-height: 1.2">
-                                                                        Instructor
-                                                                    </small>
-                                                                </div>
-                                                            </div>
+                                                            </a>
+
 
                                                             <!-- Sched -->
                                                             <div class="d-flex align-items-center text-decoration-none mt-3">
@@ -351,9 +519,8 @@ $user = mysqli_fetch_assoc($result);
                                                                             style="font-size:20px">
                                                                             leaderboard
                                                                         </span>
-                                                                        <span class="text-sbold">
-                                                                            RANK 1
-                                                                        </span>
+                                                                        <span class="text-sbold">RANK
+                                                                            <?php echo $rank; ?></span>
                                                                         <?php
                                                                         if (mysqli_num_rows($selectLeaderboardResult) > 0) {
                                                                             mysqli_data_seek($selectLeaderboardResult, 0);
@@ -384,19 +551,19 @@ $user = mysqli_fetch_assoc($result);
                                                                         style="background-color:white">
                                                                         <div class="d-flex justify-content-between py-1">
                                                                             <span class="text-sbold">
-                                                                                LV. 1 · Mentor
+                                                                                LV. <?php echo $currentLevel; ?> ·
+                                                                                <?php echo $currentTier; ?>
                                                                             </span>
                                                                             <span class="text-sbold">
-                                                                                3160 / 4000 XP
+                                                                                <?php echo $totalXP; ?> /
+                                                                                <?php echo $nextThreshold; ?> XP
                                                                             </span>
                                                                         </div>
 
-                                                                        <div class="progress mt-2 mb-2" role="progressbar"
-                                                                            aria-label="Basic example" aria-valuenow="0"
-                                                                            aria-valuemin="0" aria-valuemax="100"
+                                                                        <div class="progress mt-2 mb-2"
                                                                             style="height: 10px; border: 1px solid var(--black);">
                                                                             <div class="progress-bar"
-                                                                                style="width: 50%; background-color:var(--primaryColor); border-right: 1px solid var(--black);">
+                                                                                style="width: <?php echo $progress; ?>%; background-color:var(--primaryColor); border-right:1px solid var(--black);">
                                                                             </div>
                                                                         </div>
 
@@ -407,8 +574,10 @@ $user = mysqli_fetch_assoc($result);
                                                             <!-- Quests -->
                                                             <div class="row mb-3 mt-3">
                                                                 <div class="col">
-                                                                    <label class="text-med text-12">Quests</label>
-                                                                    <?php if (mysqli_num_rows($selectLimitAssessmentResult) > 0) {
+
+                                                                    <?php if (mysqli_num_rows($selectLimitAssessmentResult) > 0) { ?>
+                                                                        <label class="text-med text-12">Pending Quests</label>
+                                                                        <?php
                                                                         mysqli_data_seek($selectLimitAssessmentResult, 0);
                                                                         while ($activities = mysqli_fetch_assoc($selectLimitAssessmentResult)) {
                                                                             ?>
@@ -462,12 +631,28 @@ $user = mysqli_fetch_assoc($result);
                                                 <div class="course-card-desktop w-100 p-4"
                                                     style="outline: 1px solid var(--black); border-radius: 10px; ">
 
-                                                    <!-- Back Button -->
-                                                    <div class="mb-3">
-                                                        <a href="course.php" class="text-reg">
+                                                    <!-- Back Button + Three-dot menu -->
+                                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                                        <!-- Back Button (JavaScript back) -->
+                                                        <a onclick="history.back()" style="cursor:pointer;" class="text-reg">
                                                             <i class="fas fa-arrow-left"></i>
                                                         </a>
+
+                                                        <!-- Three-dot menu -->
+                                                        <div class="dropdown">
+                                                            <button class="btn p-0 btn-sm border-0 bg-transparent" type="button"
+                                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                            </button>
+                                                            <ul class="dropdown-menu border shadow-none text-reg ">
+
+                                                                <li><a class="dropdown-item text-danger" data-bs-toggle="modal"
+                                                                        data-bs-target="#deleteModal">Unenroll</a></li>
+                                                            </ul>
+                                                        </div>
+
                                                     </div>
+
 
                                                     <!-- Course Image -->
                                                     <div class="course-image w-100 mb-3"
@@ -484,20 +669,24 @@ $user = mysqli_fetch_assoc($result);
                                                     </p>
 
                                                     <!-- Prof -->
-                                                    <div class="d-flex align-items-center text-decoration-none">
-                                                        <div class="rounded-circle me-2 flex-shrink-0" style="width: 30px; height: 30px; background-color: #5ba9ff;
+                                                    <a class="text-decoration-none" style="cursor:pointer"
+                                                        href="profile.php?user=<?php echo htmlspecialchars($courses['userName']) ?>">
+                                                        <div class="d-flex align-items-center text-decoration-none">
+                                                            <div class="rounded-circle me-2 flex-shrink-0" style="width: 30px; height: 30px; background-color: #5ba9ff;
                                                     background: url('shared/assets/pfp-uploads/<?php echo $courses['profPFP']; ?>') no-repeat center center;
                                                     background-size: cover;">
+                                                            </div>
+                                                            <div class="d-flex flex-column justify-content-center">
+                                                                <span class="text-sbold text-14" style="line-height: 1.2">
+                                                                    <?php echo $courses['profFirstName'] . " " . $courses['profMiddleName'] . " " . $courses['profLastName']; ?>
+                                                                </span>
+                                                                <small class="text-reg text-12" style="line-height: 1.2">
+                                                                    Instructor
+                                                                </small>
+                                                            </div>
                                                         </div>
-                                                        <div class="d-flex flex-column justify-content-center">
-                                                            <span class="text-sbold text-14" style="line-height: 1.2">
-                                                                <?php echo $courses['profFirstName'] . " " . $courses['profMiddleName'] . " " . $courses['profLastName']; ?>
-                                                            </span>
-                                                            <small class="text-reg text-12" style="line-height: 1.2">
-                                                                Instructor
-                                                            </small>
-                                                        </div>
-                                                    </div>
+                                                    </a>
+
 
                                                     <!-- Sched -->
                                                     <div class="d-flex align-items-center text-decoration-none mt-3">
@@ -515,6 +704,7 @@ $user = mysqli_fetch_assoc($result);
 
                                                     <!-- Class Standing -->
                                                     <div class="row mb-3 mt-3">
+
                                                         <div class="col">
                                                             <label class="text-med text-14 mb-1">Class Standing</label>
                                                             <div class="class-standing text-14 d-flex justify-content-between align-items-center rounded-3 mt-2"
@@ -523,7 +713,7 @@ $user = mysqli_fetch_assoc($result);
                                                                     leaderboard
                                                                 </span>
                                                                 <span class="text-sbold">
-                                                                    RANK 1
+                                                                    RANK <?php echo $rank; ?>
                                                                 </span>
                                                                 <?php
                                                                 if (mysqli_num_rows($selectLeaderboardResult) > 0) {
@@ -552,12 +742,15 @@ $user = mysqli_fetch_assoc($result);
                                                             <label class="text-med text-14 mb-1">Level</label>
                                                             <div class="class-standing text-14 align-items-center rounded-3 p-3 mt-2"
                                                                 style="background-color:white">
+
                                                                 <div class="d-flex justify-content-between py-1">
                                                                     <span class="text-sbold">
-                                                                        LV. 1 · Mentor
+                                                                        LV. <?php echo $currentLevel; ?> ·
+                                                                        <?php echo $currentTier; ?>
                                                                     </span>
                                                                     <span class="text-sbold">
-                                                                        3160 / 4000 XP
+                                                                        <?php echo $totalXP; ?> / <?php echo $nextThreshold; ?>
+                                                                        XP
                                                                     </span>
                                                                 </div>
 
@@ -566,7 +759,7 @@ $user = mysqli_fetch_assoc($result);
                                                                     aria-valuemin="0" aria-valuemax="100"
                                                                     style="height: 10px; border: 1px solid var(--black);">
                                                                     <div class="progress-bar"
-                                                                        style="width: 50%; background-color:var(--primaryColor); border-right: 1px solid var(--black);">
+                                                                        style="width: <?php echo $progress; ?>%; background-color:var(--primaryColor); border-right: 1px solid var(--black);">
                                                                     </div>
                                                                 </div>
 
@@ -577,11 +770,14 @@ $user = mysqli_fetch_assoc($result);
                                                     <!-- Quests -->
                                                     <div class="row mb-3 mt-3">
                                                         <div class="col">
-                                                            <label class="text-med text-14 mb-1">Quests</label>
-                                                            <?php if (mysqli_num_rows($selectLimitAssessmentResult) > 0) {
+
+                                                            <?php if (mysqli_num_rows($selectLimitAssessmentResult) > 0) { ?>
+                                                                <label class="text-med text-14 mb-1">Pending Quests</label>
+                                                                <?php
                                                                 mysqli_data_seek($selectLimitAssessmentResult, 0);
                                                                 while ($activities = mysqli_fetch_assoc($selectLimitAssessmentResult)) {
                                                                     ?>
+
                                                                     <div
                                                                         class="todo-card-course-info d-flex align-items-stretch rounded-2 mt-2 w-100">
                                                                         <div class="date-section text-sbold text-14 px-1"
@@ -623,7 +819,7 @@ $user = mysqli_fetch_assoc($result);
                                     ?>
                                 </div>
                                 <!-- RIGHT: Tabs and Content -->
-                                <div class="col-md-8">
+                                <div class="col-md-8 right-side">
                                     <div class="tab-section">
                                         <div class="tab-carousel-wrapper">
                                             <div class="d-flex align-items-center position-relative"
@@ -752,6 +948,33 @@ $user = mysqli_fetch_assoc($result);
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    <!-- Unenroll Modal -->
+    <div class="modal" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form method="POST" action="">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="transform: scale(0.8); border:none !important; box-shadow:none !important;"></button>
+                    </div>
+                    <div class="modal-body d-flex flex-column justify-content-center align-items-center text-center">
+                        <span class="mt-4 text-bold text-22">This action cannot be undone.</span>
+                        <span class="mb-4 text-reg text-14">Are you sure you want to unenroll from this course?</span>
+                        <input type="hidden" name="courseID" value="<?php echo $courseID; ?>">
+                    </div>
+                    <div class="modal-footer text-sbold text-18">
+                        <button type="button" class="btn rounded-pill px-4"
+                            style="background-color: var(--primaryColor); border: 1px solid var(--black);"
+                            data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" name="deleteCourse" class="btn rounded-pill px-4"
+                            style="background-color: rgba(248, 142, 142, 1); border: 1px solid var(--black); color: var(--black);">
+                            Unenroll
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
