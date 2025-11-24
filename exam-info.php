@@ -103,20 +103,7 @@ $profilePic = !empty($assignmentRow['profilePicture'])
     : 'shared/assets/pfp-uploads/defaultProfile.png';
 
 
-$questionPtsQuery = "SELECT SUM(testQuestionPoints) AS totalQuestionPts FROM testquestions 
-INNER JOIN testresponses 
-    ON testquestions.testQuestionID = testresponses.testQuestionID
-WHERE testquestions.testID = '$testID' AND testresponses.isCorrect = '1'";
-$questionPtsResult = executeQuery($questionPtsQuery);
-$testResponseRow = (mysqli_num_rows($questionPtsResult) > 0) ? mysqli_fetch_assoc($questionPtsResult) : '0';
-$testResponse = ($testResponseRow == 0 || null) ? '0' : $testResponseRow['totalQuestionPts'];
 
-
-$questionTotalQuery = "SELECT SUM(testQuestionPoints) AS questionTotal FROM testquestions 
-WHERE testquestions.testID = '$testID'";
-$questionTotalResult = executeQuery($questionTotalQuery);
-$questionTotalRow = (mysqli_num_rows($questionTotalResult) > 0) ? mysqli_fetch_assoc($questionTotalResult) : null;
-$questionTotal = ($questionTotalRow == null) ? null : $questionTotalRow['questionTotal'];
 ?>
 
 <!doctype html>
