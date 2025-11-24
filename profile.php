@@ -441,6 +441,12 @@ function getRelativeTime($datetime, $fullDateFallback = true)
             text-align: center;
             border-radius: 25px;
         }
+
+         @media screen and (max-width: 767px) {
+            .mobile-view {
+                margin-bottom: 80px !important;
+            }
+        }
     </style>
 
 </head>
@@ -465,7 +471,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                     <!-- Navbar for mobile -->
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto row-padding-top" style="position: relative;">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top mobile-view" style="position: relative;">
                         <div class="row g-0 w-100">
 
                             <!-- Sticky Header -->
@@ -519,9 +525,12 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                             <div class="user-username text-med text-muted">
                                                                 @<?= htmlspecialchars($user['userName']) ?>
                                                             </div>
-                                                            <div class="user-username text-med text-muted">
-                                                                <?= htmlspecialchars($user['programInitial'] . ' ' . $user['yearLevel'] . '-' . $user['yearSection']) ?>
-                                                            </div>
+                                                            <?php if (strtolower($user['role']) === 'student'): ?>
+                                                                <div class="user-username text-med text-muted">
+                                                                    <?= htmlspecialchars($user['programInitial'] . ' ' . $user['yearLevel'] . '-' . $user['yearSection']) ?>
+                                                                </div>
+                                                            <?php endif; ?>
+
 
                                                             <!-- Bio -->
                                                             <div class="bio mt-3">

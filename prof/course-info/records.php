@@ -137,8 +137,8 @@ $displayAssessments = $filter === 'All' ? $assessments : [$filter];
                         <input type="hidden" name="orderByRecords" value="<?php echo htmlspecialchars($order); ?>">
                         <select class="select-modern text-reg text-14" name="filterRecords" style="width:120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" onchange="this.form.submit()">
                             <?php foreach ($assessmentsList as $assessmentTitle): ?>
-                                <option value="<?php echo htmlspecialchars($assessmentTitle); ?>" title="<?php echo htmlspecialchars($assessmentTitle); ?>" 
-                                <?php if ($filter === $assessmentTitle) echo 'selected'; ?>>
+                                <option value="<?php echo htmlspecialchars($assessmentTitle); ?>" title="<?php echo htmlspecialchars($assessmentTitle); ?>"
+                                    <?php if ($filter === $assessmentTitle) echo 'selected'; ?>>
                                     <?php echo htmlspecialchars(strlen($assessmentTitle) > 20 ? substr($assessmentTitle, 0, 20) . '…' : $assessmentTitle); ?>
                                 </option>
                             <?php endforeach; ?>
@@ -160,7 +160,9 @@ $displayAssessments = $filter === 'All' ? $assessments : [$filter];
                                 <tr class="text-med text-12">
                                     <th style="position: sticky; left: 0; z-index: 3; background-color: var(--primaryColor); border-right: 1px solid var(--black); border-bottom: 1px solid var(--black); width: 150px; font-weight: normal;">Name</th>
                                     <?php foreach ($displayAssessments as $assessmentTitle): ?>
-                                        <th style="background-color: var(--primaryColor); border-right:1px solid var(--black); border-bottom:1px solid var(--black); width:150px; font-weight: normal;">
+                                        <th style="background-color: var(--primaryColor); border-right:1px solid var(--black); border-bottom:1px solid var(--black); width:150px; font-weight: normal; 
+                                                overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+                                            title="<?php echo htmlspecialchars($assessmentTitle); ?>">
                                             <?php echo htmlspecialchars($assessmentTitle); ?>
                                         </th>
                                     <?php endforeach; ?>

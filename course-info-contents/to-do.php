@@ -6,31 +6,31 @@ $assessmentCount = mysqli_num_rows($selectAssessmentResult);
 //     || (!empty($statusFilter) && $statusFilter != 'Pending');
 ?>
 
-    <div class="d-flex align-items-center flex-nowrap mb-2" id="header">
-        <!-- Sort by -->
-        <div class="d-flex align-items-center flex-nowrap me-4">
-            <span class="dropdown-label me-2 text-reg text-14">Sort by</span>
-            <form method="POST">
-                <input type="hidden" name="activeTab" value="todo">
-                <select class="select-modern text-reg text-14" name="sortTodo" onchange="this.form.submit()">
-                    <option value="Newest" <?php echo ($sortTodo == 'Newest') ? 'selected' : ''; ?>>Newest</option>
-                    <option value="Oldest" <?php echo ($sortTodo == 'Oldest') ? 'selected' : ''; ?>>Oldest</option>
-                </select>
-            </form>
-        </div>
-        <!-- Status -->
-        <div class="d-flex align-items-center flex-nowrap">
-            <span class="dropdown-label me-2 text-reg text-14">Status</span>
-            <form method="POST">
-                <input type="hidden" name="activeTab" value="todo">
-                <select class="select-modern text-reg text-14" name="statusFilter" onchange="this.form.submit()">
-                    <option value="Pending" <?php echo ($statusFilter == 'Pending') ? 'selected' : ''; ?>>Pending</option>
-                    <option value="Missing" <?php echo ($statusFilter == 'Missing') ? 'selected' : ''; ?>>Missing</option>
-                    <option value="Done" <?php echo ($statusFilter == 'Done') ? 'selected' : ''; ?>>Done</option>
-                </select>
-            </form>
-        </div>
+<div class="d-flex align-items-center flex-nowrap mb-2" id="header">
+    <!-- Sort by -->
+    <div class="d-flex align-items-center flex-nowrap me-4">
+        <span class="dropdown-label me-2 text-reg text-14">Sort by</span>
+        <form method="POST">
+            <input type="hidden" name="activeTab" value="todo">
+            <select class="select-modern text-reg text-14" name="sortTodo" onchange="this.form.submit()">
+                <option value="Newest" <?php echo ($sortTodo == 'Newest') ? 'selected' : ''; ?>>Newest</option>
+                <option value="Oldest" <?php echo ($sortTodo == 'Oldest') ? 'selected' : ''; ?>>Oldest</option>
+            </select>
+        </form>
     </div>
+    <!-- Status -->
+    <div class="d-flex align-items-center flex-nowrap">
+        <span class="dropdown-label me-2 text-reg text-14">Status</span>
+        <form method="POST">
+            <input type="hidden" name="activeTab" value="todo">
+            <select class="select-modern text-reg text-14" name="statusFilter" onchange="this.form.submit()">
+                <option value="Pending" <?php echo ($statusFilter == 'Pending') ? 'selected' : ''; ?>>Pending</option>
+                <option value="Missing" <?php echo ($statusFilter == 'Missing') ? 'selected' : ''; ?>>Missing</option>
+                <option value="Done" <?php echo ($statusFilter == 'Done') ? 'selected' : ''; ?>>Done</option>
+            </select>
+        </form>
+    </div>
+</div>
 
 
 <?php if ($assessmentCount > 0): ?>
@@ -64,7 +64,11 @@ $assessmentCount = mysqli_num_rows($selectAssessmentResult);
                         <!-- Main content -->
                         <div class="d-flex flex-grow-1 flex-wrap justify-content-between align-items-center p-2 w-100">
                             <div class="px-3 py-0">
-                                <div class="text-sbold text-16"><?php echo htmlspecialchars($todo['assessmentTitle']); ?></div>
+                                <div class="text-sbold text-16"
+                                    style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px;">
+                                    <?php echo htmlspecialchars($todo['assessmentTitle']); ?>
+                                </div>
+
                                 <span class="course-badge rounded-pill px-3 text-reg text-12 mt-2 d-inline d-md-none">
                                     <?php echo htmlspecialchars($todo['type']); ?>
                                 </span>

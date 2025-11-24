@@ -5,6 +5,24 @@ include('shared/assets/database/connect.php');
 include("shared/assets/processes/session-process.php");
 
 $assignmentID = intval($_GET['assignmentID'] ?? 0);
+
+// Only allow user assigned to this assignment
+$accessCheckQuery = "
+    SELECT assignments.assignmentID
+    FROM assignments
+    INNER JOIN assessments ON assignments.assessmentID = assessments.assessmentID
+    INNER JOIN todo ON assessments.assessmentID = todo.assessmentID
+    WHERE assignments.assignmentID = '$assignmentID' 
+      AND todo.userID = '$userID'
+    LIMIT 1
+";
+$accessCheckResult = executeQuery($accessCheckQuery);
+
+if (mysqli_num_rows($accessCheckResult) === 0) {
+    header("Location: 404.html");
+    exit();
+}
+
 // SUBMISSIONS QUERY 
 
 // --- Google Link Processor ---
@@ -204,7 +222,6 @@ if (isset($_POST['links']) && !empty($_POST['links'])) {
                 INSERT INTO files (courseID, userID, submissionID, fileTitle, fileLink)
                 VALUES ('$courseID', '$userID', '$submissionID', '$fileTitle', '$processedLink')
             ");
-
         }
     }
 }
@@ -1060,7 +1077,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                             $fileExt = strtoupper(pathinfo($file['attachment'], PATHINFO_EXTENSION));
                                             $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
                                             $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
-                                            ?>
+                                        ?>
                                             <div class="rubricCard my-3 py-1 d-flex align-items-start justify-content-between cardFile"
                                                 data-type="file" data-file="<?php echo $file['attachment']; ?>"
                                                 data-title="<?php echo htmlspecialchars($file['title'], ENT_QUOTES); ?>"
@@ -1355,7 +1372,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                         class="btn btn-sm px-4 py-2 mb-4 rounded-pill text-reg text-md-14"
                                                         style="background-color: var(--primaryColor); margin-top: -25px;"
                                                         <?php if ($userWebstars >= 50): ?> data-bs-toggle="modal"
-                                                            data-bs-target="#unsubmitModal" <?php endif; ?>>
+                                                        data-bs-target="#unsubmitModal" <?php endif; ?>>
                                                         Unsubmit
                                                     </button>
                                                 <?php endif; ?>
@@ -1640,7 +1657,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                         $isSelected = in_array($level['levelID'], $selectedLevels);
                                         $bgColor = $isSelected ? 'var(--primaryColor)' : 'transparent';
                                         $borderColor = $isSelected ? 'var(--black)' : 'var(--black)';
-                                        ?>
+                                    ?>
                                         <div class="mb-2">
                                             <div class="w-100 d-flex flex-column text-med text-14"
                                                 style="background-color: <?= $bgColor ?>; color: <?= $textColor ?>; border-radius: 10px; border: 1px solid <?= $borderColor ?>; transition: 0.3s; overflow: hidden;">
@@ -1696,7 +1713,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             function sanitizeFileName(fileName) {
                 // Replace spaces & non-alphanumeric characters (except dot, dash, underscore) with underscore
                 fileName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
@@ -1711,7 +1728,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
             const unsubmitBtn = document.getElementById('unsubmitBtn');
 
             if (unsubmitBtn && userWebstars < requiredWebstars) {
-                unsubmitBtn.addEventListener('click', function (e) {
+                unsubmitBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopImmediatePropagation();
                     showToast(`You need at least ${requiredWebstars} Webstars to unsubmit.`);
@@ -1744,7 +1761,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
 
             // --- Success toast for downloads ---
             document.querySelectorAll('a[download]').forEach(downloadLink => {
-                downloadLink.addEventListener('click', function (e) {
+                downloadLink.addEventListener('click', function(e) {
                     const fileName = this.getAttribute('download');
                     showDownloadToast(`"${fileName}" downloaded successfully!`);
                 });
@@ -1801,7 +1818,9 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                     myConfetti({
                         particleCount: 200,
                         spread: 100,
-                        origin: { y: 0.6 }
+                        origin: {
+                            y: 0.6
+                        }
                     });
 
                     // Continuous confetti for 5 seconds
@@ -1818,14 +1837,20 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                             particleCount: 5,
                             angle: 60,
                             spread: 70,
-                            origin: { x: 0, y: 0.6 },
+                            origin: {
+                                x: 0,
+                                y: 0.6
+                            },
                             colors: colors
                         });
                         myConfetti({
                             particleCount: 5,
                             angle: 120,
                             spread: 70,
-                            origin: { x: 1, y: 0.6 },
+                            origin: {
+                                x: 1,
+                                y: 0.6
+                            },
                             colors: colors
                         });
 
@@ -1840,10 +1865,12 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                     }, duration + 500);
                 });
 
-                submittedModalEl.addEventListener('hidden.bs.modal', function () {
+                submittedModalEl.addEventListener('hidden.bs.modal', function() {
                     fetch('', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
                         body: 'updateModalShown=1&submissionID=' + submissionID
                     }).then(res => res.text()).then(console.log);
                 });
@@ -1899,7 +1926,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
 
                 const turnInModal = document.getElementById('turnInModal');
                 if (turnInModal) {
-                    turnInModal.addEventListener('show.bs.modal', function (e) {
+                    turnInModal.addEventListener('show.bs.modal', function(e) {
                         if (getTotalFileSize() > MAX_TOTAL_SIZE) {
                             e.preventDefault();
                             showToast('Total file size exceeds 25 MB. Please remove some files.', 'bg-danger');
@@ -1914,7 +1941,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                 }
 
                 if (turnInModal) {
-                    turnInModal.addEventListener('show.bs.modal', function (e) {
+                    turnInModal.addEventListener('show.bs.modal', function(e) {
                         if (!hasUploadedWork()) {
                             e.preventDefault();
                             showToast('Please upload a file or add a link before turning in.', 'bg-danger');
@@ -1925,7 +1952,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                 const workList = document.querySelector('.uploadedFiles');
 
                 // --- Handle file selection (FIXED) ---
-                fileUpload.addEventListener('change', function () {
+                fileUpload.addEventListener('change', function() {
                     const newFiles = Array.from(this.files);
                     this.value = ''; // Reset input to allow re-selecting the same file
 
@@ -1935,7 +1962,9 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
 
                         // Prevent duplicates
                         if (![...allSelectedFiles.files].some(f => f.name === sanitizedName)) {
-                            const sanitizedFile = new File([file], sanitizedName, { type: file.type });
+                            const sanitizedFile = new File([file], sanitizedName, {
+                                type: file.type
+                            });
                             allSelectedFiles.items.add(sanitizedFile);
 
                             const cardHTML = `
@@ -2003,7 +2032,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                 const linkInput = document.getElementById('linkInput');
                 const linksInput = document.getElementById('linksInput');
 
-                addLinkBtn.addEventListener('click', function () {
+                addLinkBtn.addEventListener('click', function() {
                     const linkValue = linkInput.value.trim();
                     if (!linkValue) return;
 
@@ -2060,9 +2089,9 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                     formData.append('link', linkValue);
 
                     fetch('', { // empty string means current PHP file
-                        method: 'POST',
-                        body: formData
-                    })
+                            method: 'POST',
+                            body: formData
+                        })
                         .then(res => res.text())
                         .then(title => {
                             if (title) cardLink.textContent = title;
@@ -2104,7 +2133,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
             const filesToDelete = [];
             const deletedFilesInput = document.getElementById('deletedFiles');
             document.querySelectorAll('.remove-existing-file').forEach(btn => {
-                btn.addEventListener('click', function () {
+                btn.addEventListener('click', function() {
                     const fileName = this.dataset.filename;
                     filesToDelete.push(fileName);
                     deletedFilesInput.value = JSON.stringify(filesToDelete);
@@ -2117,7 +2146,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
             });
             // --- Enable Bootstrap Tooltips (FOR BADGES) ---
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            tooltipTriggerList.map(function (tooltipTriggerEl) {
+            tooltipTriggerList.map(function(tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl)
             });
         });
@@ -2243,7 +2272,16 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
             });
         });
     </script>
+    <script>
+        // Get the modal element
+        const viewerModal = document.getElementById('viewerModal');
 
+        // Listen for when the modal is hidden
+        viewerModal.addEventListener('hidden.bs.modal', () => {
+            // Remove any remaining backdrops
+            document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+        });
+    </script>
 
 </body>
 

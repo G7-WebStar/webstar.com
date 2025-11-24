@@ -25,6 +25,18 @@ if (!$lesson = mysqli_fetch_assoc($lessonInfoResult)) {
 }
 
 $courseID = $lesson['courseID'];
+
+$checkEnrollmentQuery = "
+    SELECT * FROM enrollments 
+    WHERE userID = '$userID' AND courseID = '$courseID'
+";
+$checkEnrollmentResult = executeQuery($checkEnrollmentQuery);
+
+if (mysqli_num_rows($checkEnrollmentResult) == 0) {
+    header("Location: 404.html");
+    exit;
+}
+
 $lessonTitle = $lesson['lessonTitle'];
 $lessonDescription = $lesson['lessonDescription'];
 $profName = $lesson['firstName'] . " " . $lesson['lastName'];
@@ -193,7 +205,7 @@ $linkCount = count($linksArray);
                                     <div class="text-sbold text-14 mt-3">Lesson Objectives</div>
                                     <p class="mt-3 text-med text-14"><?php echo nl2br($lessonDescription) ?></p>
                                     <hr>
-                                    
+
                                     <?php if (!empty($fileLinks) || !empty($linksArray)): ?>
                                         <div class="text-sbold text-14 mt-4">Learning Materials</div>
                                         <?php foreach ($fileLinks as $f): ?>
