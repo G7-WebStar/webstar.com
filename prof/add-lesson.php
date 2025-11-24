@@ -181,7 +181,7 @@ if (isset($_POST['save_lesson'])) {
                         $originalName = basename($fileName);
 
                         // Sanitize for safe storage name
-                        $safeOriginalName = str_replace([" ", ","], "_", $originalName);
+                        $safeOriginalName = preg_replace("/[^a-zA-Z0-9_]/", "_", $originalName);
 
                         // Generate a unique stored filename
                         $fileTitle = date('Ymd_His') . '_' . $safeOriginalName;
@@ -192,7 +192,7 @@ if (isset($_POST['save_lesson'])) {
                             $insertFile = "INSERT INTO files 
                             (courseID, userID, lessonID, fileAttachment, fileTitle, fileLink) 
                             VALUES 
-                            ('$selectedCourseID', '$userID', '$lessonID', '$fileTitle', '$originalName', '')";
+                            ('$selectedCourseID', '$userID', '$lessonID', '$fileTitle', '$safeOriginalName', '')";
 
                             executeQuery($insertFile);
                         }
@@ -207,14 +207,22 @@ if (isset($_POST['save_lesson'])) {
                     foreach ($links as $link) {
                         $link = trim($link);
                         if ($link !== '') {
-                            // Process Google links and fetch title
+
                             $fileTitle = fetchLinkTitle($link);
-                            $processedLink = processGoogleLink($link);
+
+                            // Skip Google Drive conversion for YouTube links
+                            if (preg_match('/(youtube\.com|youtu\.be)/i', $link)) {
+                                $processedLink = $link;
+                            } else {
+                                $processedLink = processGoogleLink($link);
+                            }
 
                             $insertLink = "INSERT INTO files 
-                    (courseID, userID, lessonID, fileAttachment, fileTitle, fileLink) 
-                    VALUES 
-                    ('$selectedCourseID', '$userID', '$lessonID', '', '" . mysqli_real_escape_string($conn, $fileTitle) . "', '$processedLink')";
+                            (courseID, userID, lessonID, fileAttachment, fileTitle, fileLink) 
+                            VALUES 
+                            ('$selectedCourseID', '$userID', '$lessonID', '', '" .
+                                mysqli_real_escape_string($conn, $fileTitle) . "', '$processedLink')";
+
                             executeQuery($insertLink);
                         }
                     }
@@ -927,7 +935,9 @@ if (!empty($reusedData)) {
         });
 
         <?php if (isset($reusedData)) { ?>
-            quill.root.innerHTML = <?php echo json_encode($mainData['lessonDescription']); ?>;
+            quill.clipboard.dangerouslyPasteHTML(
+                <?= json_encode($mainData['lessonDescription']); ?>
+            );
         <?php } ?>
 
         // Word counter
@@ -1287,7 +1297,7 @@ if (!empty($reusedData)) {
                                         <span class="material-symbols-rounded">description</span>
                                     </div>
                                     <div>
-                                        <div class="text-sbold text-16" style="line-height: 1.5;"><?= htmlspecialchars($file['fileAttachment']) ?></div>
+                                        <div class="text-sbold text-16" style="line-height: 1.5;"><?= htmlspecialchars($file['fileTitle'] ?: basename($file['fileAttachment'])) ?></div>
                                         <div class="text-reg text-12" style="line-height: 1.5;">
     <?= $fileExt ?> · <?= $fileSizeMB ?>
 </div>
