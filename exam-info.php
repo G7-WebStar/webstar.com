@@ -190,8 +190,7 @@ $profilePic = !empty($assignmentRow['profilePicture'])
                                             ?>
                                                 <div class="col-auto text-end text-reg">
                                                     Score <div class="text-sbold text-25">
-                                                        <?php echo $testResponse; ?><span
-                                                            class="text-muted">/<?php echo $questionTotal; ?></span>
+                                                        <?php echo $score; ?><span class="text-muted">/<?php echo $totalItems; ?>
                                                     </div>
                                                 </div>
 
