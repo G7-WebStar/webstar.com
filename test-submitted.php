@@ -82,15 +82,21 @@ $totalPointsResult = executeQuery($totalPointsQuery);
 $totalPointsRow = mysqli_fetch_assoc($totalPointsResult);
 $totalPoints = $totalPointsRow['totalPoints'];
 
-$scoreQuery = "SELECT COUNT(isCorrect) AS correct FROM testresponses WHERE isCorrect = '1' AND userID = '$userID' AND testID = '$testID'";
+$scoreQuery = "SELECT SUM(testquestions.testQuestionPoints) AS correctPoints
+               FROM testresponses
+               INNER JOIN testquestions
+                 ON testresponses.testQuestionID = testquestions.testQuestionID
+               WHERE testresponses.isCorrect = 1 
+                 AND testresponses.userID = '$userID' 
+                 AND testresponses.testID = '$testID'";
 $scoreResult = executeQuery($scoreQuery);
 $scoreRow = mysqli_fetch_assoc($scoreResult);
-$score = $scoreRow['correct'];
+$score = $scoreRow['correctPoints'] ?? 0;
 
-$totalItemsQuery = "SELECT COUNT(*) AS totalItems FROM testquestions WHERE testID = '$testID'";
-$totalItemsResult = executeQuery($totalItemsQuery);
-$totalItemsRow = mysqli_fetch_assoc($totalItemsResult);
-$totalItems = $totalItemsRow['totalItems'];
+$totalPointsQuery = "SELECT SUM(testQuestionPoints) AS totalPoints FROM testquestions WHERE testID = '$testID'";
+$totalPointsResult = executeQuery($totalPointsQuery);
+$totalPointsRow = mysqli_fetch_assoc($totalPointsResult);
+$totalPoints = $totalPointsRow['totalPoints'];
 
 $timeFactorQuery = "SELECT tests.testTimeLimit, todo.timeSpent FROM tests INNER JOIN todo ON tests.assessmentID = todo.assessmentID WHERE tests.testID = '$testID'";
 $timeFactorResult = executeQuery($timeFactorQuery);
@@ -271,7 +277,7 @@ $checkMultiplierUseResult = executeQuery($checkMultiplierUseQuery);
                                         <div class="question-container">
                                             <div class="h2 text-sbold text-center fs-sm-6" id="question-container">
                                                 <img class="medal-img" src="shared/assets/img/medal.png" alt="medal">
-                                                <div class="text-bold">You scored <?php echo $score; ?>/<?php echo $totalItems; ?> !</div>
+                                                <div class="text-bold">You scored <?php echo $score; ?>/<?php echo $totalPoints; ?> !</div>
                                                 <div class="text-sbold mt-4 mt-md-5 text-18">Rewards</div>
                                                 <div class="row mt-2">
                                                     <div class="col-12">

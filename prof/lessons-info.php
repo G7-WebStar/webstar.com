@@ -25,6 +25,12 @@ if (!$lesson = mysqli_fetch_assoc($lessonInfoResult)) {
     exit;
 }
 
+// if does not the users lesson
+if ($lesson['userID'] != $userID) {
+    header("Location: ../404.html");
+    exit();
+}
+
 $courseID = $lesson['courseID'];
 $lessonTitle = $lesson['lessonTitle'];
 $lessonDescription = $lesson['lessonDescription'];
