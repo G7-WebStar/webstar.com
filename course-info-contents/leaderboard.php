@@ -33,7 +33,7 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                                 <div class="row">
                                     <div class="col-6 d-flex align-items-center">
                                         <img src="shared/assets/pfp-uploads/<?php echo $topOne['profilePicture']; ?>" alt=""
-                                            width="90" height="90" class="rounded-circle float-start leaderboard-img">
+                                            width="90" height="90" class="rounded-circle float-start leaderboard-img" style="object-fit:contain">
                                     </div>
                                     <div class="col-6">
                                         <div class="row">
@@ -42,7 +42,7 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                                             </div>
                                         </div>
                                         <img src="shared/assets/img/badge/1st.png" alt="1st"
-                                            class="img-fluid float-end d-flex flex-row d-xxs-none" width="50px">
+                                            class="img-fluid float-end d-flex flex-row d-xxs-none" width="50px" >
                                     </div>
                                     <div class="col-12 mt-3 text-xl-12 text-lg-16 text-xs-12 text-wrap">
                                         <?php echo $topOne['firstName'] . " " . $topOne['middleName'] . " " . $topOne['lastName']; ?>
@@ -73,7 +73,7 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                                 <div class="row">
                                     <div class="col-6 d-flex align-items-center">
                                         <img src="shared/assets/pfp-uploads/<?php echo $topTwoToThree['profilePicture']; ?>" alt=""
-                                            width="90" height="90" class="rounded-circle float-start leaderboard-img">
+                                            width="90" height="90" class="rounded-circle float-start leaderboard-img" style="object-fit:contain">
                                     </div>
                                     <div class="col-6">
                                         <div class="row">
@@ -125,7 +125,7 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                                     <div class="col-9 d-flex align-items-center justify-content-between">
                                         <div class="d-flex align-items-center gap-3">
                                             <img src="shared/assets/pfp-uploads/<?php echo $topFourToTen['profilePicture']; ?>"
-                                                alt="" width="40" height="40" class="rounded-circle me-2 d-xxs-none">
+                                                alt="" width="40" height="40" class="rounded-circle me-2 d-xxs-none" style="object-fit:contain">
                                             <span class="text-xl-12 text-wrap">
                                                 <?php echo $topFourToTen['firstName'] . " " . $topFourToTen['middleName'] . " " . $topFourToTen['lastName']; ?>
                                             </span>

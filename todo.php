@@ -18,11 +18,11 @@ $selectEnrolledResult = executeQuery($selectEnrolledQuery);
 // Build filter clauses
 $statusWhere = "";
 if ($statusFilter == 'Pending') {
-    $statusWhere = "AND todo.status = 'Pending'";
+    $statusWhere = "AND (todo.status = 'Pending' AND NOW() < assessments.deadline )";
 } elseif ($statusFilter == 'Missing') {
     $statusWhere = "AND todo.status = 'Missing'";
 } elseif ($statusFilter == 'Done') {
-    $statusWhere = "AND todo.status IN ('Graded', 'Submitted')";
+    $statusWhere = "AND todo.status IN ('Graded', 'Submitted', 'Returned')";
 } else {
     $statusWhere = "AND todo.status IN ('Pending', 'Missing', 'Submitted', 'Graded')";
 }
@@ -60,7 +60,7 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | My To-do</title>
+    <title>My Quests ✦ Webstar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
@@ -190,8 +190,10 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                 </div>
 
                                 <!-- Task container -->
-                                <div class="row mb-0 mt-2 mx-auto <?php echo (mysqli_num_rows($selectAssessmentResult) == 0) ? 'empty-todo-container' : ''; ?>">
-                                    <div class="col-12 col-md-10 mt-3 mx-auto mx-md-0 p-0 <?php echo (mysqli_num_rows($selectAssessmentResult) == 0) ? 'empty-todo-column' : ''; ?>">
+                                <div
+                                    class="row mb-0 mt-2 mx-auto <?php echo (mysqli_num_rows($selectAssessmentResult) == 0) ? 'empty-todo-container' : ''; ?>">
+                                    <div
+                                        class="col-12 col-md-10 mt-3 mx-auto mx-md-0 p-0 <?php echo (mysqli_num_rows($selectAssessmentResult) == 0) ? 'empty-todo-column' : ''; ?>">
                                         <?php
                                         if (mysqli_num_rows($selectAssessmentResult) > 0) {
                                             while ($todo = mysqli_fetch_assoc($selectAssessmentResult)) {
@@ -215,19 +217,20 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                                         </div>
 
                                                         <!-- Main content -->
-                                                        <div
-                                                            class="d-flex flex-grow-1 flex-wrap justify-content-between p-2 w-100">
+                                                        <div class="d-flex flex-grow-1 justify-content-between align-items-center p-2 w-100"
+                                                            style="min-width: 0;">
                                                             <!-- For small screen of main content -->
-                                                            <div class="px-3 py-0">
-                                                                <div class="text-sbold text-16 text-start assessment-title">
+                                                            <div class="px-3 py-0 flex-grow-1"
+                                                                style="min-width: 0; overflow: hidden;">
+                                                                <div class="text-sbold text-16 text-start"
+                                                                    style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                                                     <?php echo $todo['assessmentTitle']; ?>
                                                                 </div>
                                                                 <div class="text-reg text-12 text-start">
                                                                     <?php echo $todo['courseCode']; ?>
                                                                 </div>
                                                             </div>
-                                                            <div class="d-flex align-items-center justify-content-center"
-                                                                style="height:100%;">
+                                                            <div class="d-flex align-items-center justify-content-center">
                                                                 <span
                                                                     class="course-badge rounded-pill px-3 text-reg text-12 d-none d-lg-inline me-3">
                                                                     <?php echo $todo['type']; ?>
@@ -238,7 +241,6 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                                                         style="color:var(--black);"></i>
                                                                 </div>
                                                             </div>
-
                                                         </div>
                                                     </div>
                                                 </a>
@@ -248,7 +250,7 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                             $emptyImage = "shared/assets/img/empty/todo.png";
                                             $emptyText1 = "No quests have been assigned yet.";
                                             $emptyText2 = "Your next adventure awaits!";
-                                            
+
                                             if ($statusFilter == 'Missing') {
                                                 $emptyImage = "shared/assets/img/empty/quest.png";
                                                 $emptyText1 = "No missing quests.";
@@ -260,10 +262,14 @@ $selectAssessmentResult = executeQuery($selectAssessmentQuery);
                                             }
                                             ?>
                                             <!-- Empty State -->
-                                            <div class="d-flex flex-column justify-content-center align-items-center todo-empty-state">
-                                                <img src="<?php echo $emptyImage; ?>" width="100" alt="Empty state" class="mb-1">
-                                                <div class="text-center text-14 text-med mt-1"><?php echo $emptyText1; ?></div>
-                                                <div class="text-center text-14 text-reg mt-1"><?php echo $emptyText2; ?></div>
+                                            <div
+                                                class="d-flex flex-column justify-content-center align-items-center todo-empty-state">
+                                                <img src="<?php echo $emptyImage; ?>" width="100" alt="Empty state"
+                                                    class="mb-1">
+                                                <div class="text-center text-14 text-med mt-1"><?php echo $emptyText1; ?>
+                                                </div>
+                                                <div class="text-center text-14 text-reg mt-1"><?php echo $emptyText2; ?>
+                                                </div>
                                             </div>
                                             <?php
                                         }

@@ -2,6 +2,7 @@
 $activePage = 'course';
 include('shared/assets/database/connect.php');
 include("shared/assets/processes/session-process.php");
+
 if (isset($_POST['markUnarchived'])) {
     $courseID = $_POST['courseID'];
     $update = "UPDATE courses SET isActive = '1' WHERE courseID = '$courseID'";
@@ -13,6 +14,16 @@ if (isset($_POST['markArchived'])) {
     $update = "UPDATE courses SET isActive = '0' WHERE courseID = '$courseID'";
     executeQuery($update);
 }
+
+$toastMessage = '';
+$toastType = '';
+
+if (isset($_SESSION['toast'])) {
+    $toastMessage = $_SESSION['toast']['message'];
+    $toastType = $_SESSION['toast']['type'];
+    unset($_SESSION['toast']);
+}
+
 
 $filter = isset($_GET['status']) ? $_GET['status'] : 'active';
 $isActive = ($filter == 'archived') ? '0' : '1';
@@ -72,7 +83,7 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | My Courses</title>
+    <title>My Courses ✦ Webstar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
@@ -115,6 +126,11 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
             <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-0 p-md-4 overflow-y-auto">
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
+
+                    <!-- Toast container -->
+                    <div id="toastContainer"
+                        class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+                        style="z-index: 1100;"></div>
 
                     <!-- Navbar for mobile -->
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
@@ -463,6 +479,27 @@ if ((isset($_GET['search'])) && ($_GET['search'] !== '')) {
                     }
                 });
             </script>
+
+            <!-- Toast Handling -->
+            <?php if (!empty($toastMessage)): ?>
+                <script>
+                    window.addEventListener('DOMContentLoaded', () => {
+                        const container = document.getElementById("toastContainer");
+                        if (!container) return;
+
+                        const alert = document.createElement("div");
+                        alert.className = `alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 <?= $toastType ?>`;
+                        alert.role = "alert";
+                        alert.innerHTML = `
+            <i class="bi <?= ($toastType === 'alert-success') ? 'bi-check-circle-fill' : 'bi-x-circle-fill'; ?> fs-6"></i>
+            <span><?= addslashes($toastMessage) ?></span>
+        `;
+                        container.appendChild(alert);
+
+                        setTimeout(() => alert.remove(), 3000);
+                    });
+                </script>
+            <?php endif; ?>
 
 </body>
 

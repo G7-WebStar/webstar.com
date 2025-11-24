@@ -231,6 +231,64 @@ if (!$username && isset($_SESSION['userID'])) {
     WHERE profile.userID = '$userID'
     ";
 
+    $enrollmentQuery = "
+    SELECT e.enrollmentID
+    FROM enrollments e
+    JOIN profile p ON p.userID = e.userID
+    WHERE e.userID = '$userID'
+    AND e.courseID = p.starCard
+    LIMIT 1;
+";
+    $enrollmentResult = mysqli_query($conn, $enrollmentQuery);
+    $enrollmentRow = mysqli_fetch_assoc($enrollmentResult);
+    $enrollmentID = $enrollmentRow['enrollmentID'];
+
+    $xpQuery = "
+    SELECT 
+        l.xpPoints,
+        x.xpLevelID,
+        x.tierName,
+        x.xpThreshold
+    FROM leaderboard l
+    JOIN xplevel x
+        ON l.xpLevelID = x.xpLevelID
+    WHERE l.enrollmentID = '$enrollmentID'
+    LIMIT 1
+";
+    $xpResult = mysqli_query($conn, $xpQuery);
+    $xp = mysqli_fetch_assoc($xpResult);
+
+    $totalXP = $xp['xpPoints'];
+    $currentLevel = $xp['xpLevelID'];
+    $currentTier = $xp['tierName'];
+    $currentThresh = $xp['xpThreshold'];
+
+    $rankQuery = "
+    SELECT r.ranking
+    FROM (
+    SELECT 
+        e.userID,
+        RANK() OVER (ORDER BY l.xpPoints DESC) AS ranking
+    FROM enrollments e
+    INNER JOIN leaderboard l 
+        ON e.enrollmentID = l.enrollmentID
+    INNER JOIN profile p
+        ON p.userID = e.userID
+    WHERE e.courseID = p.starCard
+    ) AS r
+    WHERE r.userID = '$userID';
+";
+
+    $rankResult = executeQuery($rankQuery);
+
+    $rank = null;
+
+    if ($rankResult && mysqli_num_rows($rankResult) > 0) {
+        $rankRow = mysqli_fetch_assoc($rankResult);
+        $rank = $rankRow['ranking'];
+    }
+
+
 } elseif ($username) {
     $escaped = mysqli_real_escape_string($conn, $username);
     // Get userID by username first
@@ -247,6 +305,63 @@ if (!$username && isset($_SESSION['userID'])) {
     WHERE profile.userID = '$userID'
     ";
 
+        $enrollmentQuery = "
+    SELECT e.enrollmentID
+    FROM enrollments e
+    JOIN profile p ON p.userID = e.userID
+    WHERE e.userID = '$userID'
+    AND e.courseID = p.starCard
+    LIMIT 1;
+";
+        $enrollmentResult = mysqli_query($conn, $enrollmentQuery);
+        $enrollmentRow = mysqli_fetch_assoc($enrollmentResult);
+        $enrollmentID = $enrollmentRow['enrollmentID'];
+
+        $xpQuery = "
+    SELECT 
+        l.xpPoints,
+        x.xpLevelID,
+        x.tierName,
+        x.xpThreshold
+    FROM leaderboard l
+    JOIN xplevel x
+        ON l.xpLevelID = x.xpLevelID
+    WHERE l.enrollmentID = '$enrollmentID'
+    LIMIT 1
+";
+        $xpResult = mysqli_query($conn, $xpQuery);
+        $xp = mysqli_fetch_assoc($xpResult);
+
+        $totalXP = $xp['xpPoints'];
+        $currentLevel = $xp['xpLevelID'];
+        $currentTier = $xp['tierName'];
+        $currentThresh = $xp['xpThreshold'];
+
+        $rankQuery = "
+    SELECT r.ranking
+    FROM (
+    SELECT 
+        e.userID,
+        RANK() OVER (ORDER BY l.xpPoints DESC) AS ranking
+    FROM enrollments e
+    INNER JOIN leaderboard l 
+        ON e.enrollmentID = l.enrollmentID
+    INNER JOIN profile p
+        ON p.userID = e.userID
+    WHERE e.courseID = p.starCard
+    ) AS r
+    WHERE r.userID = '$userID';
+";
+
+        $rankResult = executeQuery($rankQuery);
+
+        $rank = null;
+
+        if ($rankResult && mysqli_num_rows($rankResult) > 0) {
+            $rankRow = mysqli_fetch_assoc($rankResult);
+            $rank = $rankRow['ranking'];
+        }
+
     } else {
         // Username not found
         header("Location: 404.php");
@@ -262,7 +377,6 @@ if (!$user) {
     header("Location: 404.php");
     exit;
 }
-
 function getRelativeTime($datetime, $fullDateFallback = true)
 {
     $now = new DateTime("now", new DateTimeZone('Asia/Manila'));
@@ -286,6 +400,8 @@ function getRelativeTime($datetime, $fullDateFallback = true)
         return $fullDateFallback ? date("F j, Y", strtotime($datetime)) : floor($diff / 604800) . 'w ago';
     }
 }
+
+
 
 ?>
 
@@ -570,8 +686,9 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                             while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                                 ?>
                                                                 <div class="w-100 badge-option rounded-3 d-flex align-items-center p-2 mt-2"
-                                                                    style="cursor: pointer; border: 1px solid var(--black);" title="<?php echo $row['badgeDescription']; ?>"
-                                                                    data-bs-toggle="tooltip" data-bs-placement="left"> 
+                                                                    style="cursor: pointer; border: 1px solid var(--black);"
+                                                                    title="<?php echo $row['badgeDescription']; ?>"
+                                                                    data-bs-toggle="tooltip" data-bs-placement="left">
                                                                     <img src="shared/assets/img/badge/<?php echo $row['badgeIcon']; ?>"
                                                                         alt="Badge" style="width: 55px; height: 55px;"
                                                                         class="mx-1 ms-1 me-2">
@@ -635,10 +752,6 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                         <div class="card rounded-3 mb-2"
                                                             style="border: 1px solid var(--black);">
                                                             <div class="card-body p-4">
-                                                                <!-- Rank Info -->
-                                                                <div style="display: inline-flex; align-items: center;">
-                                                                    <span class="rank-number text-bold text-18">11</span>
-                                                                </div>
 
                                                                 <!-- Course Info -->
                                                                 <div class="info-block">
@@ -651,7 +764,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
 
                                                                     <div class="xp-container">
                                                                         <div class="xp-block text-reg text-12 mb-0">
-                                                                            <?php echo $leaderboards['totalPoints']; ?> · LV 1
+                                                                            <?php echo $leaderboards['totalPoints']; ?> XPs
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -665,13 +778,13 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                         if ($user['role'] === 'student') {
                                                             echo '
                                                             <div class="text-center mb-2">
-                                                                <img src="../shared/assets/img/empty/folder2.png" width="100" class="mb-1">
+                                                                <img src="shared/assets/img/empty/folder2.png" width="100" class="mb-1">
                                                                 <div class="text-med text-14 mt-2">This student is not enrolled <br>in any courses yet.</div>
                                                             </div>';
                                                         } elseif ($user['role'] === 'professor') {
                                                             echo '
                                                             <div class="text-center mb-2">
-                                                                <img src="../shared/assets/img/empty/folder2.png" width="100" class="mb-1">
+                                                                <img src="shared/assets/img/empty/folder2.png" width="100" class="mb-1">
                                                                 <div class="text-med text-14 mt-2">This intructor has not created <br>any courses yet.</div>
                                                             </div>';
                                                         }
@@ -770,19 +883,20 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                                     <div
                                                                         class="d-flex justify-content-between align-items-center text-center">
                                                                         <div class="flex-fill text-center mx-1 text-14">
-                                                                            <div class="text-bold">2</div>
+                                                                            <div class="text-bold"><?php echo $currentLevel; ?>
+                                                                            </div>
                                                                             <small
                                                                                 class="text-med text-muted text-12">level</small>
                                                                         </div>
 
                                                                         <div class="flex-fill text-center mx-1 text-14">
-                                                                            <div class="text-bold">3</div>
+                                                                            <div class="text-bold"><?php echo $rank; ?></div>
                                                                             <small
                                                                                 class="text-med text-muted text-12">rank</small>
                                                                         </div>
 
                                                                         <div class="flex-fill text-center mx-1 text-14">
-                                                                            <div class="text-bold">340</div>
+                                                                            <div class="text-bold"><?php echo $totalXP; ?></div>
                                                                             <small
                                                                                 class="text-med text-muted text-12">XPs</small>
                                                                         </div>
@@ -829,7 +943,8 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                                             </a>
                                                                         </div>
                                                                     <?php else: ?>
-                                                                        <span class="me-1">This user has not set up <br>their Star Card yet.</span>
+                                                                        <span class="me-1">This user has not set up <br>their Star
+                                                                            Card yet.</span>
                                                                     <?php endif; ?>
 
                                                                 </div>

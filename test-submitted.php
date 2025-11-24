@@ -131,6 +131,21 @@ $assessmentID = (mysqli_num_rows($assessmentIDResult) > 0) ? $assessmentIDRow['a
 //Checks if multiplier is already used
 $checkMultiplierUseQuery = "SELECT * FROM webstars WHERE userID = '$userID' AND assessmentID = '$assessmentID' AND sourceType = 'XP Multiplier Usage'";
 $checkMultiplierUseResult = executeQuery($checkMultiplierUseQuery);
+
+$questionPtsQuery = "SELECT SUM(testQuestionPoints) AS totalQuestionPts FROM testquestions 
+INNER JOIN testresponses 
+    ON testquestions.testQuestionID = testresponses.testQuestionID
+WHERE testquestions.testID = '$testID' AND testresponses.isCorrect = '1'";
+$questionPtsResult = executeQuery($questionPtsQuery);
+$testResponseRow = (mysqli_num_rows($questionPtsResult) > 0) ? mysqli_fetch_assoc($questionPtsResult) : '0'; 
+$testResponse = ($testResponseRow == 0 || null) ? '0' : $testResponseRow['totalQuestionPts'];
+
+
+$questionTotalQuery = "SELECT SUM(testQuestionPoints) AS questionTotal FROM testquestions 
+WHERE testquestions.testID = '$testID'";
+$questionTotalResult = executeQuery($questionTotalQuery);
+$questionTotalRow = (mysqli_num_rows($questionTotalResult) > 0) ? mysqli_fetch_assoc($questionTotalResult) : null; 
+$questionTotal = ($questionTotalRow == null) ? null : $questionTotalRow['questionTotal'];
 ?>
 
 <!doctype html>
@@ -139,7 +154,7 @@ $checkMultiplierUseResult = executeQuery($checkMultiplierUseQuery);
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | <?php echo $pageTitle; ?></title>
+    <title><?php echo $pageTitle; ?> ✦ Webstar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
@@ -271,7 +286,7 @@ $checkMultiplierUseResult = executeQuery($checkMultiplierUseQuery);
                                         <div class="question-container">
                                             <div class="h2 text-sbold text-center fs-sm-6" id="question-container">
                                                 <img class="medal-img" src="shared/assets/img/medal.png" alt="medal">
-                                                <div class="text-bold">You scored <?php echo $score; ?>/<?php echo $totalItems; ?> !</div>
+<div class="text-bold">You scored <?php echo $testResponse; ?>/<?php echo $questionTotal; ?> !</div>
                                                 <div class="text-sbold mt-4 mt-md-5 text-18">Rewards</div>
                                                 <div class="row mt-2">
                                                     <div class="col-12">

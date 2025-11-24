@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Webstar | Where Education Meets Exploration</title>
+  <title>Webstar ✦ Where Education Meets Exploration</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="shared/assets/css/global-styles.css">
   <link rel="stylesheet" href="shared/assets/css/landing-page.css">
@@ -12,6 +12,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@1" />
   <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
+  <style>
+    @media (max-width: 576px) { 
+    .subtitle {
+        font-size: 14px !important;
+        padding: 0px 20px;
+    }
+}
+  </style>
 </head>
 
 <body>
@@ -37,8 +45,8 @@
 
     <!-- Mobile Hero (Only visible on mobile) -->
     <section class="mobile-hero">
-      <h1><span>where</span><br>education<br><span>meets</span><br>exploration</h1>
-      <p>Turn every lesson into a quest and every achievement into progress with Webstar!</p>
+      <div class="intro"><span style="font-size:60px!important; font-style: italic!important;">where</span><br>education<br><span style="font-size:60px!important;font-style: italic!important;">meets</span><br>exploration</div>
+      <p class="mt-5 text-med" style="font-size:15px!important">Turn every lesson into a quest and every achievement into progress with Webstar!</p>
       <div class="hero-images">
         <img src="shared/assets/img/folder1.png" alt="Folder Icon" class="folder-img">
         <img src="shared/assets/img/rocket.png" alt="Rocket Icon" class="rocket-img">
@@ -101,7 +109,7 @@
         <img src="shared/assets/img/time.png" class="img-fluid" alt="Time Icon" style="max-width: 150px;">
       </div>
 
-      <div class="text-reg text-18">
+      <div class="text-reg text-14">
         <div><strong>Webstar</strong> is an innovative <strong>Learning Management System</strong> designed to make
           education
           more engaging, interactive, and rewarding. It transforms traditional online learning into an immersive

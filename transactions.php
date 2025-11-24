@@ -92,7 +92,7 @@ $result = mysqli_query($conn, $query);
                                     <!-- Table -->
                                     <div class="message-container mt-3 pb-4">
                                         <div class="table-responsive"
-                                            style="border-radius:10px; border: 1px solid var(--black);">
+                                            style="border-radius:10px; border: 1px solid var(--black); width:100%">
                                             <table
                                                 class="table table-inner-borders text-center align-middle text-reg text-14 mb-0 webstars-table">
                                                 <thead>

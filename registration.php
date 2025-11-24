@@ -11,7 +11,7 @@ include("shared/assets/processes/registration-process.php");
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | Registration</title>
+    <title>Registration ✦ Webstar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
@@ -23,37 +23,51 @@ include("shared/assets/processes/registration-process.php");
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
-    
+
+    <style>
+        @media (min-width: 768px) {
+            .registration-form-col {
+                height: auto !important;
+            }
+        }
+    </style>
+
 </head>
 
 <body>
-    <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center" style="background: var(--black);">
+    <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center"
+        style="background: var(--black);">
         <div class="row w-100 h-100 registration-container">
             <!-- Logo -->
-            <div class="col-md-6 d-flex flex-column justify-content-center align-items-center p-0 registration-logo-col">
+            <div
+                class="col-md-6 d-flex flex-column justify-content-center align-items-center p-0 registration-logo-col">
                 <div class="w-100 d-flex justify-content-center align-items-center" style="height: 100%;">
-                    <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid logo" style="max-width: 270px;">
+                    <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid logo"
+                        style="max-width: 270px;">
                 </div>
             </div>
 
             <!-- Registration Form -->
-            <div class="col-md-7 d-flex flex-column justify-content-center align-items-center p-4 registration-form-col" style="background: var(--dirtyWhite);">
+            <div class="col-md-7 d-flex flex-column justify-content-center align-items-center p-4 registration-form-col h-100"
+                style="background: var(--dirtyWhite);">
                 <div class="w-100" style="max-width: 400px;">
-                    <div class="text-center mb-3 mt-4 pt-3 registration-title text-bold text-30" style="color: var(--black);">Create an account</div>
+                    <div class="text-center mb-3 mt-4 pt-3 registration-title text-bold text-30"
+                        style="color: var(--black);">Create an account</div>
 
                     <form method="POST" action="" class="text-reg mx-auto custom-form" style="max-width: 315px;">
                         <div class="form-floating mb-3">
-                            <input type="email" name="email" class="form-control"
-                                placeholder="Email" pattern=".+@gmail\.com"
-                                title="Only Gmail addresses allowed"
-                                value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
+                            <input type="email" name="email" class="form-control" placeholder="Email"
+                                pattern=".+@gmail\.com" title="Only Gmail addresses allowed"
+                                value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>"
+                                required>
                             <label for="email">Email</label>
                         </div>
 
                         <div class="password-wrapper mb-3 form-floating ">
                             <input type="password" name="password" id="password" class="form-control"
                                 placeholder="Password"
-                                value="<?php echo isset($_POST['password']) ? htmlspecialchars($_POST['password']) : ''; ?>" required>
+                                value="<?php echo isset($_POST['password']) ? htmlspecialchars($_POST['password']) : ''; ?>"
+                                required>
                             <label for="password">Password</label>
                             <i class="fas fa-eye toggle-password" onclick="togglePassword('password', this)"
                                 style="font-size: 0.85rem; color:#6c757d; position:absolute; right:15px; top:50%; transform: translateY(-50%); cursor:pointer;"></i>
@@ -62,7 +76,8 @@ include("shared/assets/processes/registration-process.php");
                         <div class="password-wrapper mb-3 form-floating">
                             <input type="password" name="confirmPassword" id="confirmPassword" class="form-control"
                                 placeholder="Confirm password"
-                                value="<?php echo isset($_POST['confirmPassword']) ? htmlspecialchars($_POST['confirmPassword']) : ''; ?>" required>
+                                value="<?php echo isset($_POST['confirmPassword']) ? htmlspecialchars($_POST['confirmPassword']) : ''; ?>"
+                                required>
                             <label for="confirm password">Confirm password</label>
                             <i class="fas fa-eye toggle-password" onclick="togglePassword('confirmPassword', this)"
                                 style="font-size: 0.85rem; color:#6c757d; position:absolute; right:15px; top:50%; transform: translateY(-50%); cursor:pointer;"></i>
@@ -76,7 +91,8 @@ include("shared/assets/processes/registration-process.php");
                             </div>
                         <?php } ?>
 
-                        <button type="submit" name="signUpBtn" class="d-block mx-auto btn btn-primary text-sbold mb-4 mt-3"
+                        <button type="submit" name="signUpBtn"
+                            class="d-block mx-auto btn btn-primary text-sbold mb-4 mt-3"
                             style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black); width: 100%; font-size: 18px; border-radius: 8px;">
                             Sign up
                         </button>

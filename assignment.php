@@ -895,7 +895,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webstar | Assignment</title>
+    <title><?php echo $assignmentTitle ?> ✦ Webstar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="shared/assets/css/global-styles.css">
@@ -912,6 +912,14 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
         rel="stylesheet" />
+
+    <style>
+        @media screen and (max-width: 767px) {
+            .mobile-view {
+                margin-bottom: 80px !important;
+            }
+        }
+    </style>
 
 </head>
 
@@ -935,12 +943,12 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                     <!-- Navbar for mobile -->
                     <?php include 'shared/components/navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top mobile-view">
                         <div class="row mb-3">
                             <div class="col-12 cardHeader p-3 mb-4">
 
                                 <!-- DESKTOP VIEW -->
-                                <div class="row desktop-header d-none d-sm-flex">
+                                <div class="row desktop-header d-none d-sm-flex d-flex align-items-center">
                                     <div class="col-auto me-2">
                                         <a href="javascript:void(0);" class="text-decoration-none"
                                             onclick="history.back();">
@@ -954,7 +962,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                             <?php echo date("M d, Y", strtotime($deadline)); ?>
                                         </div>
                                     </div>
-                                    <div class="col-auto text-end">
+                                    <div class="col-auto text-end d-flex align-items-center">
 
                                         <div style="display: flex; align-items: center; gap: 12px;">
 
@@ -972,7 +980,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
 
                                             <!-- RIGHT: SCORE -->
                                             <?php if ($score !== null): ?>
-                                                <div class="text-end mt-3">
+                                                <div class="text-end">
                                                     <div
                                                         class="text-sbold text-25 text-center justify-content-center align-items-center">
                                                         <?php echo $score; ?>
@@ -997,7 +1005,12 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                     style="color: var(--black);"></i>
                                             </a>
                                         </div>
-                                        <div class="title text-sbold text-25"><?php echo $assignmentTitle ?></div>
+
+                                        <div class="title text-sbold text-25"
+                                            style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; max-width: 220px;">
+                                            <?php echo $assignmentTitle ?>
+                                        </div>
+
                                     </div>
 
                                     <!-- Due date -->
@@ -1141,12 +1154,12 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                 </div>
                             </div>
 
-                            <div class="col-12 col-lg-4">
+                            <div class="col-12 col-lg-4 ">
                                 <!-- Sticky Container for Card + Button -->
                                 <div class="position-sticky" style="top: 20px;">
 
                                     <!-- Sticky Card -->
-                                    <div class="cardSticky" id="stickyCard">
+                                    <div class="cardSticky mt-3 mt-md-0" id="stickyCard">
                                         <div class="px-2 pt-2">
                                             <!-- My Work Section -->
                                             <div class="myWorkContainer mb-3"
@@ -1353,7 +1366,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                     <!-- View Attachment Guidelines Button -->
                                     <div class="mt-3 d-flex justify-content-center w-100">
                                         <button type="button"
-                                            class="btn text-reg text-12 rounded-4 d-flex justify-content-center align-items-center"
+                                            class="btn text-reg text-12 rounded-5 d-flex justify-content-center align-items-center"
                                             style="background-color: var(--pureWhite);" data-bs-toggle="modal"
                                             data-bs-target="#guidelinesModal">
                                             <span class="material-symbols-rounded me-1"

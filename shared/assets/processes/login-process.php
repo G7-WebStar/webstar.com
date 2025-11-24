@@ -6,8 +6,8 @@ $login_error = false; // default
 $email_not_found = false;  // Email/username not found
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
-    //$conn = new mysqli("localhost", "root", "", "webstart");
-   $conn = new mysqli("localhost", "u977784600_webstar", "Webstaru977784600_", "u977784600_webstar");
+    // $conn = new mysqli("localhost", "root", "", "webstart");
+    $conn = new mysqli("localhost", "u977784600_webstar", "WebstarTeamu977784600_", "u977784600_webstar");
 
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);

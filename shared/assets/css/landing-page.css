@@ -68,6 +68,13 @@ body {
     letter-spacing: -0.2rem;
 }
 
+.mobile-hero .intro{
+    font-size: 50px;
+    font-family: 'SemiBold', sans-serif;
+    line-height: 50px;
+    letter-spacing: -0.2rem;
+}
+
 .hero-section .intro span {
     font-style: italic;
     font-family: 'SemiBold', sans-serif;
@@ -338,11 +345,14 @@ footer {
     }
 }
 
+
+
 /* ===============================
    MOBILE HERO ONLY
    =============================== */
 .mobile-hero {
     display: none;
+    
 }
 
 @media (max-width: 768px) {

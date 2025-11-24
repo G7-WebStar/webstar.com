@@ -312,7 +312,7 @@ $getCoursesResult = executeQuery($getCoursesQuery);
                                                                     style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;"><?php echo ($type == 'Task') ? 'Task' : 'Test'; ?> Details
                                                             </button></a>
                                                         <?php if ($type == 'Task') { ?>
-                                                            <?php if ($cardSubmissionID != null) { ?><a href="<?php echo ($rubricIDs == null) ? 'grading-sheet.php?' : 'grading-sheet-rubrics.php?'; ?>submissionID=<?php echo $cardSubmissionID; ?>"><?php } ?>
+                                                            <?php if ($cardSubmissionID != null) { ?><a href="<?php echo ($rubricIDs === null || $rubricIDs === 0) ? 'grading-sheet.php?' : 'grading-sheet-rubrics.php?'; ?>submissionID=<?php echo $cardSubmissionID; ?>"><?php } ?>
                                                                 <?php if ($cardSubmissionID == null) { ?><div title="No submissions in this assessment yet"><?php } ?>
                                                                     <button class="btn btn-action" <?php echo ($cardSubmissionID == null) ? 'disabled' : '' ?>>
                                                                         <img src="../shared/assets/img/assess/assess.png"
