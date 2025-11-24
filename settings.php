@@ -211,7 +211,7 @@ if (isset($_POST['feedback'])) {
             $createdAt = date('Y-m-d H:i:s');
 
             executeQuery("
-                INSERT INTO feedback (senderID, receiverID, message, createdAt)
+                INSERT INTO feedback (senderID, receiverID, message, created_at)
                 VALUES ('$userID', '$receiverID', '$feedback', '$createdAt')
             ");
         }

@@ -518,9 +518,11 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                             <div class="user-username text-med text-muted">
                                                                 @<?= htmlspecialchars($user['userName']) ?>
                                                             </div>
-                                                            <div class="user-username text-med text-muted">
-                                                                <?= htmlspecialchars($user['programInitial'] . ' ' . $user['yearLevel'] . '-' . $user['yearSection']) ?>
-                                                            </div>
+                                                            <?php if (strtolower($user['role']) === 'student'): ?>
+                                                                <div class="user-username text-med text-muted">
+                                                                    <?= htmlspecialchars($user['programInitial'] . ' ' . $user['yearLevel'] . '-' . $user['yearSection']) ?>
+                                                                </div>
+                                                            <?php endif; ?>
 
                                                             <!-- Bio -->
                                                             <div class="bio mt-3">
