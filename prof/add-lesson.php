@@ -177,22 +177,30 @@ if (isset($_POST['save_lesson'])) {
 
                     if ($fileError === UPLOAD_ERR_OK) {
 
-                        // Correct: Use the uploaded filename
-                        $originalName = basename($fileName);
+                        // Get original filename and extension
+                        $originalName = pathinfo($fileName, PATHINFO_FILENAME);
+                        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
 
-                        // Sanitize for safe storage name
-                        $safeOriginalName = preg_replace("/[^a-zA-Z0-9_]/", "_", $originalName);
+                        // Replace symbols with underscores (keep letters, numbers, dash, and underscore)
+                        $safeOriginalName = preg_replace('/[^a-zA-Z0-9-_]/', '_', $originalName);
 
-                        // Generate a unique stored filename
-                        $fileTitle = date('Ymd_His') . '_' . $safeOriginalName;
+                        // Reattach the extension
+                        if ($extension) {
+                            $safeOriginalName .= '.' . $extension;
+                        }
 
-                        $targetPath = $uploadDir . $fileTitle;
+                        // Generate a unique file name
+                        $fileAttachment = date('Ymd_His') . '_' . $safeOriginalName;
+
+                        $targetPath = $uploadDir . $fileAttachment;
 
                         if (move_uploaded_file($tmpName, $targetPath)) {
+
+                            // Save file to database
                             $insertFile = "INSERT INTO files 
-                            (courseID, userID, lessonID, fileAttachment, fileTitle, fileLink) 
-                            VALUES 
-                            ('$selectedCourseID', '$userID', '$lessonID', '$fileTitle', '$safeOriginalName', '')";
+                                (courseID, userID, lessonID, fileAttachment, fileTitle, fileLink) 
+                                VALUES 
+                                ('$selectedCourseID', '$userID', '$lessonID', '$fileAttachment', '$safeOriginalName', '')";
 
                             executeQuery($insertFile);
                         }
