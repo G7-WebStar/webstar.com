@@ -176,8 +176,15 @@ if (isset($_POST['save_announcement'])) {
 
                 if ($fileError === UPLOAD_ERR_OK) {
 
-                    // Correct: Use the actual filename
-                    $safeOriginalName = str_replace([" ", ","], "_", basename($fileName));
+                    // Get original filename and extension
+                    $originalName = pathinfo($fileName, PATHINFO_FILENAME);
+                    $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+
+                    // Replace symbols with underscores (keep letters, numbers, dash, and underscore)
+                    $safeOriginalName = preg_replace('/[^a-zA-Z0-9-_]/', '_', $originalName);
+
+                    // Reattach the extension
+                    $safeOriginalName .= '.' . $extension;
 
                     // Generate a unique file name
                     $fileAttachment = date('Ymd_His') . '_' . $safeOriginalName;
@@ -186,7 +193,7 @@ if (isset($_POST['save_announcement'])) {
 
                     if (move_uploaded_file($tmpName, $targetPath)) {
 
-                        // Save file to database with the correctly renamed file name
+                        // Save file to database
                         $insertFile = "INSERT INTO files 
                         (courseID, userID, announcementID, fileAttachment, fileTitle, fileLink) 
                         VALUES 
@@ -206,12 +213,19 @@ if (isset($_POST['save_announcement'])) {
                     continue;
 
                 $fileTitle = fetchLinkTitle($link);
-                $processedLink = processGoogleLink($link);
+
+                // Check if YouTube
+                if (preg_match('/(youtube\.com|youtu\.be)/i', $link)) {
+                    $processedLink = $link; // Do NOT modify YouTube links
+                } else {
+                    $processedLink = processGoogleLink($link); // Only for Google Drive/Docs
+                }
 
                 $insertLink = "INSERT INTO files 
                 (courseID, userID, announcementID, fileAttachment, fileTitle, fileLink) 
                 VALUES 
-                ('$selectedCourseID', '$userID', '$announcementID', '', '" . mysqli_real_escape_string($conn, $fileTitle) . "', '$processedLink')";
+                ('$selectedCourseID', '$userID', '$announcementID', '', '" .
+                    mysqli_real_escape_string($conn, $fileTitle) . "', '$processedLink')";
                 executeQuery($insertLink);
             }
         }
@@ -910,7 +924,9 @@ if (!empty($reusedData)) {
         });
 
         <?php if (isset($reusedData)) { ?>
-            quill.root.innerHTML = <?php echo json_encode($mainData['announcementContent']); ?>;
+            quill.clipboard.dangerouslyPasteHTML(
+                <?= json_encode($mainData['announcementContent']); ?>
+            );
         <?php } ?>
 
         // Word counter
@@ -1270,7 +1286,7 @@ if (!empty($reusedData)) {
                                         <span class="material-symbols-rounded">description</span>
                                     </div>
                                     <div>
-                                        <div class="text-sbold text-16" style="line-height: 1.5;"><?= htmlspecialchars($file['fileAttachment']) ?></div>
+                                         <div class="text-sbold text-16" style="line-height: 1.5;"><?= htmlspecialchars($file['fileTitle'] ?: basename($file['fileAttachment'])) ?></div>
                                         <div class="text-reg text-12" style="line-height: 1.5;">
     <?= $fileExt ?> · <?= $fileSizeMB ?>
 </div>

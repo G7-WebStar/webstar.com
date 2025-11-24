@@ -33,7 +33,7 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                                 <div class="row">
                                     <div class="col-6 d-flex align-items-center">
                                         <img src="shared/assets/pfp-uploads/<?php echo $topOne['profilePicture']; ?>" alt=""
-                                            width="90" height="90" class="rounded-circle float-start leaderboard-img" style="object-fit:contain">
+                                            width="90" height="90" class="rounded-circle float-start leaderboard-img object-fit-cover">
                                     </div>
                                     <div class="col-6">
                                         <div class="row">
@@ -73,7 +73,7 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                                 <div class="row">
                                     <div class="col-6 d-flex align-items-center">
                                         <img src="shared/assets/pfp-uploads/<?php echo $topTwoToThree['profilePicture']; ?>" alt=""
-                                            width="90" height="90" class="rounded-circle float-start leaderboard-img" style="object-fit:contain">
+                                            width="90" height="90" class="rounded-circle float-start leaderboard-img object-fit-cover">
                                     </div>
                                     <div class="col-6">
                                         <div class="row">
@@ -125,7 +125,7 @@ $hasLeaderboardResults = mysqli_num_rows($selectTopOneResult) > 0
                                     <div class="col-9 d-flex align-items-center justify-content-between">
                                         <div class="d-flex align-items-center gap-3">
                                             <img src="shared/assets/pfp-uploads/<?php echo $topFourToTen['profilePicture']; ?>"
-                                                alt="" width="40" height="40" class="rounded-circle me-2 d-xxs-none" style="object-fit:contain">
+                                                alt="" width="40" height="40" class="rounded-circle me-2 d-xxs-none object-fit-cover">
                                             <span class="text-xl-12 text-wrap">
                                                 <?php echo $topFourToTen['firstName'] . " " . $topFourToTen['middleName'] . " " . $topFourToTen['lastName']; ?>
                                             </span>

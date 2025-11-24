@@ -225,7 +225,7 @@
             <div class="team-card" style="border: 1px solid var(--black);">
               <span class="role-badge">UI/UX Designer & Project Manager</span>
               <div class="team-overlay"></div>
-              <img src="shared/assets/pfp-uploads/prof.png" alt="Christian James D. Torrillo">
+              <img src="shared/assets/pfp-uploads/torillo.jpg" alt="Christian James D. Torrillo">
               <div class="team-info text-start text-18">
                 <p class="text-bold">TORRILLO,</p>
                 <p>Christian James D.</p>
@@ -238,7 +238,7 @@
             <div class="team-card" style="border: 1px solid var(--black);">
               <span class="role-badge">Full Stack Dev & Database Administrator</span>
               <div class="team-overlay"></div>
-              <img src="shared/assets/pfp-uploads/prof.png" alt="Shane Rhyder Silverio">
+              <img src="shared/assets/pfp-uploads/silverio.jpg" alt="Shane Rhyder Silverio">
               <div class="team-info text-start text-18">
                 <p class="text-bold">SILVERIO,</p>
                 <p>Shane Rhyder</p>
@@ -251,7 +251,7 @@
             <div class="team-card" style="border: 1px solid var(--black);">
               <span class="role-badge">Full Stack Dev</span>
               <div class="team-overlay"></div>
-              <img src="shared/assets/pfp-uploads/prof.png" alt="Marielle Alyssa L. Cato">
+              <img src="shared/assets/pfp-uploads/cato.jpg" alt="Marielle Alyssa L. Cato">
               <div class="team-info text-start text-18">
                 <p class="text-bold">CATO,</p>
                 <p>Marielle Alyssa L.</p>
@@ -264,7 +264,7 @@
             <div class="team-card" style="border: 1px solid var(--black);">
               <span class="role-badge">Full Stack Dev</span>
               <div class="team-overlay"></div>
-              <img src="shared/assets/pfp-uploads/prof.png" alt="Ayisha Sofhia D. Estoque">
+              <img src="shared/assets/pfp-uploads/estoque.jpg" alt="Ayisha Sofhia D. Estoque">
               <div class="team-info text-start text-18">
                 <p class="text-bold">ESTOQUE,</p>
                 <p>Ayisha Sofhia D.</p>
@@ -277,7 +277,7 @@
             <div class="team-card" style="border: 1px solid var(--black);">
               <span class="role-badge">Full Stack Dev</span>
               <div class="team-overlay"></div>
-              <img src="shared/assets/pfp-uploads/prof.png" alt="Kimberly Joan N. Palla">
+              <img src="shared/assets/pfp-uploads/palla.jpg" alt="Kimberly Joan N. Palla">
               <div class="team-info text-start text-18">
                 <p class="text-bold">PALLA,</p>
                 <p>Kimberly Joan N.</p>

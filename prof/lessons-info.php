@@ -217,59 +217,59 @@ $linkCount = count($linksArray);
                                     <p class="mt-3 text-med text-14"><?php echo nl2br($lessonDescription) ?></p>
                                     <hr>
 
-                                    <div class="text-sbold text-14 mt-4">Learning Materials</div>
-                                    <?php foreach ($fileLinks as $f):
-                                        $fileNameOnly = pathinfo($f['name'], PATHINFO_FILENAME);
+                                    <?php if (!empty($fileLinks) || !empty($linksArray)): ?>
+                                        <div class="text-sbold text-14 mt-4">Learning Materials</div>
+                                        <?php foreach ($fileLinks as $f):
+                                            $fileNameOnly = pathinfo($f['name'], PATHINFO_FILENAME);
                                         ?>
-                                        <div onclick="openViewerModal('<?php echo $f['name']; ?>', '<?php echo $f['path']; ?>')"
-                                            style="cursor:pointer;">
-                                            <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
-                                                style="width:400px; max-width:100%; min-width:310px;">
-                                                <span class="px-3 py-3 material-symbols-outlined">draft</span>
-                                                <div class="ms-2 flex-grow-1">
-                                                    <!-- Truncated title -->
-                                                    <div class="text-sbold text-16 mt-1 text-truncate"
-                                                        style="max-width:320px;">
-                                                        <?php echo $fileNameOnly; ?>
-                                                    </div>
-                                                    <div class="due text-reg text-14 mb-1">
-                                                        <?php echo strtoupper($f['ext']); ?> ·
-                                                        <?php echo $f['size']; ?>
+                                            <div onclick="openViewerModal('<?php echo $f['name']; ?>', '<?php echo $f['path']; ?>')"
+                                                style="cursor:pointer;">
+                                                <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
+                                                    style="width:400px; max-width:100%; min-width:310px;">
+                                                    <span class="px-3 py-3 material-symbols-outlined">draft</span>
+                                                    <div class="ms-2 flex-grow-1">
+                                                        <!-- Truncated title -->
+                                                        <div class="text-sbold text-16 mt-1 text-truncate"
+                                                            style="max-width:320px;">
+                                                            <?php echo $fileNameOnly; ?>
+                                                        </div>
+                                                        <div class="due text-reg text-14 mb-1">
+                                                            <?php echo strtoupper($f['ext']); ?> ·
+                                                            <?php echo $f['size']; ?>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    <?php endforeach; ?>
+                                        <?php endforeach; ?>
 
-                                    <?php foreach ($linksArray as $linkItem): ?>
-                                        <div onclick="openLinkViewerModal('<?php echo htmlspecialchars($linkItem['title']); ?>',
+                                        <?php foreach ($linksArray as $linkItem): ?>
+                                            <div onclick="openLinkViewerModal('<?php echo htmlspecialchars($linkItem['title']); ?>',
                                       '<?php echo htmlspecialchars($linkItem['url']); ?>')"
-                                            style="cursor:pointer; text-decoration:none; color:inherit;">
+                                                style="cursor:pointer; text-decoration:none; color:inherit;">
 
-                                            <div class="cardFile my-3 w-lg-25 d-flex align-items-start overflow-hidden"
-                                                style="width:400px; max-width:100%; min-width:310px;">
+                                                <div class="cardFile my-3 w-lg-25 d-flex align-items-start overflow-hidden"
+                                                    style="width:400px; max-width:100%; min-width:310px;">
 
-                                                <span class="px-3 py-3 material-symbols-outlined">public</span>
+                                                    <span class="px-3 py-3 material-symbols-outlined">public</span>
 
-                                                <div class="ms-2">
-                                                    <div class="text-sbold text-16 mt-1 text-truncate" style="width: 250px;"
-                                                        title="<?php echo htmlspecialchars($linkItem['title']); ?>">
-                                                        <?php echo htmlspecialchars($linkItem['title']); ?>
-                                                    </div>
+                                                    <div class="ms-2">
+                                                        <div class="text-sbold text-16 mt-1 text-truncate" style="width: 250px;"
+                                                            title="<?php echo htmlspecialchars($linkItem['title']); ?>">
+                                                            <?php echo htmlspecialchars($linkItem['title']); ?>
+                                                        </div>
 
-                                                    <div class="text-reg text-12 mt-0 text-truncate"
-                                                        style="color: var(--black); width: 230px;"
-                                                        title="<?php echo htmlspecialchars($linkItem['url']); ?>">
-                                                        <?php echo htmlspecialchars($linkItem['url']); ?>
+                                                        <div class="text-reg text-12 mt-0 text-truncate"
+                                                            style="color: var(--black); width: 230px;"
+                                                            title="<?php echo htmlspecialchars($linkItem['url']); ?>">
+                                                            <?php echo htmlspecialchars($linkItem['url']); ?>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    <?php endforeach; ?>
+                                        <?php endforeach; ?>
 
-
-
-                                    <hr>
+                                        <hr>
+                                    <?php endif; ?>
 
                                     <div class="text-sbold text-14 pb-3">Prepared by</div>
                                     <div class="d-flex align-items-center pb-5">

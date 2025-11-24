@@ -257,21 +257,6 @@ if (isset($_GET['courseID'])) {
     $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
 
     $whereTotalPlacementQuery = "WHERE enrollments.courseID = '$courseID'";
-    $dateFilter = $_POST['dateFilter'] ?? null;
-
-    if (!empty($dateFilter)) {
-        if ($dateFilter === 'Monthly') {
-            $whereTotalPlacementQuery .= " AND leaderboard.timeRange = '$dateFilter'";
-        } else if ($dateFilter === 'Weekly') {
-            $whereTotalPlacementQuery .= " AND leaderboard.timeRange = '$dateFilter'";
-        } else if ($dateFilter === 'Daily') {
-            $whereTotalPlacementQuery .= " AND leaderboard.timeRange = '$dateFilter'";
-        }
-        $navState = "active";
-    } else {
-        $navState = "";
-        $whereTotalPlacementQuery .= " AND leaderboard.timeRange = 'Weekly'";
-    }
 
     $countLimitQuery = "SELECT COUNT(*) AS limitCount FROM leaderboard";
     $countLimitResult = executeQuery($countLimitQuery);

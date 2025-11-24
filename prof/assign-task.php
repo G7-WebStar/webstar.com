@@ -211,23 +211,29 @@ if (isset($_POST['saveAssignment'])) {
 
                 if ($fileError === UPLOAD_ERR_OK) {
 
-                    // Original user filename (display)
-                    $fileTitle = str_replace([" ", ","], "_", basename($fileName));
+                    // Get original filename and extension
+                    $originalName = pathinfo($fileName, PATHINFO_FILENAME);
+                    $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+
+                    // Replace symbols and spaces with underscores (keep letters, numbers, dash, underscore)
+                    $safeName = preg_replace('/[^a-zA-Z0-9-_]/', '_', $originalName);
+
+                    // Reattach the extension
+                    $fileTitle = $safeName . '.' . $extension;
 
                     // Stored filename on server (unique)
                     $fileAttachment = date('Ymd_His') . '_' . $fileTitle;
 
-                    // Corrected: single $
                     $targetPath = $uploadDir . $fileAttachment;
 
                     if (move_uploaded_file($tmpName, $targetPath)) {
 
                         executeQuery("
-                    INSERT INTO files 
-                    (courseID, userID, assignmentID, fileAttachment, fileTitle, fileLink) 
-                    VALUES 
-                    ('$selectedCourseID', '$userID', '$assignmentID', '$fileAttachment', '$fileTitle', '')
-                ");
+                        INSERT INTO files 
+                        (courseID, userID, assignmentID, fileAttachment, fileTitle, fileLink) 
+                        VALUES 
+                        ('$selectedCourseID', '$userID', '$assignmentID', '$fileAttachment', '$fileTitle', '')
+                    ");
                     }
                 }
             }
@@ -240,13 +246,20 @@ if (isset($_POST['saveAssignment'])) {
                 if ($link === '')
                     continue;
 
-                $processedLink = processGoogleLink($link);
                 $fileTitle = fetchLinkTitle($link);
+
+                // Skip Google Drive conversion for YouTube links
+                if (preg_match('/(youtube\.com|youtu\.be)/i', $link)) {
+                    $processedLink = $link;
+                } else {
+                    $processedLink = processGoogleLink($link);
+                }
 
                 $insertLink = "INSERT INTO files 
                 (courseID, userID, assignmentID, fileAttachment, fileTitle, fileLink) 
                 VALUES 
-                ('$selectedCourseID', '$userID', '$assignmentID', '', '" . mysqli_real_escape_string($conn, $fileTitle) . "', '$processedLink')";
+                ('$selectedCourseID', '$userID', '$assignmentID', '', '" .
+                    mysqli_real_escape_string($conn, $fileTitle) . "', '$processedLink')";
                 executeQuery($insertLink);
             }
         }
@@ -351,45 +364,45 @@ if (isset($_POST['saveAssignment'])) {
                     $mail->SMTPSecure = 'tls';
                     $mail->Port = 587;
                     $mail->setFrom($smtpEmail, 'Webstar');
-                $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
-                if (file_exists($headerPath)) {
-                    $mail->AddEmbeddedImage($headerPath, 'emailHeader');
-                }
-                $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
-                if (file_exists($footerPath)) {
-                    $mail->AddEmbeddedImage($footerPath, 'emailFooter');
-                }
+                    $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
+                    if (file_exists($headerPath)) {
+                        $mail->AddEmbeddedImage($headerPath, 'emailHeader');
+                    }
+                    $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
+                    if (file_exists($footerPath)) {
+                        $mail->AddEmbeddedImage($footerPath, 'emailFooter');
+                    }
 
-                        $mail->isHTML(true);
-                        $mail->CharSet = 'UTF-8';
-                        $mail->Encoding = 'base64';
-                        $mail->Subject = "[NEW TASK] " . $titleRaw . " for Course " . $courseCode;
+                    $mail->isHTML(true);
+                    $mail->CharSet = 'UTF-8';
+                    $mail->Encoding = 'base64';
+                    $mail->Subject = "[NEW TASK] " . $titleRaw . " for Course " . $courseCode;
 
-                        $recipientsFound = false;
-                        while ($student = mysqli_fetch_assoc($emailsResult)) {
-                            if ($student['questDeadlineEnabled'] == 1 && !empty($student['email'])) {
-                                $mail->addAddress($student['email']);
-                                $recipientsFound = true;
+                    $recipientsFound = false;
+                    while ($student = mysqli_fetch_assoc($emailsResult)) {
+                        if ($student['questDeadlineEnabled'] == 1 && !empty($student['email'])) {
+                            $mail->addAddress($student['email']);
+                            $recipientsFound = true;
+                        }
+                    }
+
+                    if ($recipientsFound) {
+                        $deadlineDisplay = 'Not set';
+                        if (!empty($deadline)) {
+                            try {
+                                $deadlineDate = new DateTime($deadline);
+                                $deadlineDisplay = $deadlineDate->format('F j, Y \\a\\t g:i A');
+                            } catch (Exception $e) {
+                                $deadlineDisplay = $deadline;
                             }
                         }
 
-                        if ($recipientsFound) {
-                            $deadlineDisplay = 'Not set';
-                            if (!empty($deadline)) {
-                                try {
-                                    $deadlineDate = new DateTime($deadline);
-                                    $deadlineDisplay = $deadlineDate->format('F j, Y \\a\\t g:i A');
-                                } catch (Exception $e) {
-                                    $deadlineDisplay = $deadline;
-                                }
-                            }
+                        $pointsDisplay = ($points !== '' && $points !== null) ? $points : 'Ungraded';
+                        $descHtml = nl2br(htmlspecialchars($descRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                        $emailTitleEsc = htmlspecialchars($titleRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        $courseCodeEsc = htmlspecialchars($courseCode, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-                            $pointsDisplay = ($points !== '' && $points !== null) ? $points : 'Ungraded';
-                            $descHtml = nl2br(htmlspecialchars($descRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-                            $emailTitleEsc = htmlspecialchars($titleRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                            $courseCodeEsc = htmlspecialchars($courseCode, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-
-                            $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+                        $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
                             <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
                                 <tr>
                                     <td align="center">
@@ -436,8 +449,8 @@ if (isset($_POST['saveAssignment'])) {
                             </table>
                         </div>';
 
-                            $mail->send();
-                        }
+                        $mail->send();
+                    }
                 } catch (Exception $e) {
                     $errorMsg = isset($mail) && is_object($mail) ? $mail->ErrorInfo : $e->getMessage();
                     error_log("PHPMailer failed for Course ID $selectedCourseID: " . $errorMsg);
@@ -457,6 +470,7 @@ if (isset($_POST['saveAssignment'])) {
             'message' => 'Assignment edited successfully!'
         ];
     }
+    ;
     $_SESSION['activeTab'] = 'todo';
     header("Location: course-info.php?courseID=" . intval($_POST['courses'][0]));
     exit();
@@ -838,7 +852,8 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                                         class="form-control textbox text-reg text-16 me-0 me-md-2"
                                                         name="deadline"
                                                         value="<?php echo isset($mainData['deadline']) ? date('Y-m-d\TH:i', strtotime($mainData['deadline'])) : ''; ?>"
-                                                        min="<?php echo date('Y-m-d\T00:00', strtotime('+1 day')); ?>" required>
+                                                        min="<?php echo date('Y-m-d\T00:00', strtotime('+1 day')); ?>"
+                                                        required>
                                                 </div>
                                             </div>
 
@@ -1302,7 +1317,6 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
             </div>
         </div>
     </div>
-    </div>
 
     <!-- Quill JS -->
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
@@ -1317,9 +1331,10 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
         });
 
         <?php if (isset($reusedData)) { ?>
-            quill.root.innerHTML = <?php echo json_encode($mainData['assignmentDescription']); ?>;
+            quill.clipboard.dangerouslyPasteHTML(
+                <?= json_encode($mainData['assignmentDescription']); ?>
+            );
         <?php } ?>
-
 
         const maxWords = 120;
         const counter = document.getElementById("word-counter");
@@ -1693,7 +1708,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                         <span class="material-symbols-rounded">description</span>
                                     </div>
                                     <div>
-                                        <div class="text-sbold text-16" style="line-height: 1.5;"><?= htmlspecialchars($file['fileAttachment']) ?></div>
+                                        <div class="text-sbold text-16" style="line-height: 1.5;"><?= htmlspecialchars($file['fileTitle'] ?: basename($file['fileAttachment'])) ?></div>
                                         <div class="text-reg text-12" style="line-height: 1.5;">
     <?= $fileExt ?> · <?= $fileSizeMB ?>
 </div>
