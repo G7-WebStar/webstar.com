@@ -9,7 +9,7 @@
 
         <!-- Logo -->
         <a class="navbar-brand mx-auto ms-5" href="#">
-            <img src="shared/assets/img/webstar-logo-black.png" alt="Webstar" style="height: 35px;">
+            <img src="shared/assets/img/webstar-logo-black.png" alt="Webstar" style="height: 25px;">
         </a>
 
 

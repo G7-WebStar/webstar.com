@@ -23,6 +23,10 @@ $query = "
           i.firstName LIKE '%$escaped%' OR
           i.lastName LIKE '%$escaped%'
       )
+    AND u.userName IS NOT NULL 
+    AND u.userName <> ''
+    AND i.firstName IS NOT NULL
+    AND i.firstName <> ''
     LIMIT 20
 ";
 
