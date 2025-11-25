@@ -264,7 +264,7 @@ if (isset($_POST['save_lesson'])) {
                             e.enrollmentID,
                             '$escapedNotificationMessage',
                             '$escapedNotifType',
-                            NOW()
+                            CONVERT_TZ(NOW(), '+00:00', '+08:00')
                         FROM
                             enrollments e
                         WHERE
