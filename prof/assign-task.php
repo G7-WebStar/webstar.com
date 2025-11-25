@@ -537,19 +537,20 @@ if (isset($_POST['saveAssignment'])) {
             }
         }
     }
-    if ($insertAssignment) {
+    // --- Determine toast message based on mode ---
+    if ($mode === 'new' || $mode === 'reuse') {
         $_SESSION['toast'] = [
             'type' => 'alert-success',
             'message' => 'Assignment assigned successfully!'
         ];
-    }
-    if ($updateAssignment) {
+    } elseif ($mode === 'edit') {
         $_SESSION['toast'] = [
             'type' => 'alert-success',
             'message' => 'Assignment edited successfully!'
         ];
     }
-    ;
+
+    // --- Set active tab and redirect ---
     $_SESSION['activeTab'] = 'todo';
     header("Location: course-info.php?courseID=" . intval($_POST['courses'][0]));
     exit();
