@@ -126,7 +126,7 @@ if (isset($_POST['returnAll']) && isset($_POST['assessmentID'])) {
             enrollments.enrollmentID,
             CONCAT('\"', '$testTitleEscaped', '\" was returned by your instructor. You can now view the results.'),
             'Submissions Update',
-            NOW()
+            CONVERT_TZ(NOW(), '+00:00', '+08:00')
         FROM todo
         INNER JOIN enrollments ON todo.userID = enrollments.userID AND enrollments.courseID = $courseID
         WHERE todo.assessmentID = $assessmentID 

@@ -511,7 +511,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
             // Insert notification into inbox
             $insertNotificationQuery = "
                 INSERT INTO inbox (enrollmentID, messageText, notifType, createdAt)
-                VALUES ('$enrollmentID', '$escapedNotificationMessage', '$escapedNotifType', NOW())
+                VALUES ('$enrollmentID', '$escapedNotificationMessage', '$escapedNotifType', CONVERT_TZ(NOW(), '+00:00', '+08:00'))
             ";
             executeQuery($insertNotificationQuery);
             
