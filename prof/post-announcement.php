@@ -143,51 +143,45 @@ if (isset($_POST['save_announcement'])) {
     foreach ($_POST['courses'] ?? [] as $selectedCourseID) {
 
         if ($mode === 'new') {
-            // INSERT new announcement
+            // --- INSERT new announcement ---
             $insertAnnouncement = "INSERT INTO announcements 
-                (courseID, userID, announcementContent, announcementDate, announcementTime, isRequired) 
-                VALUES 
-                ('$selectedCourseID', '$userID', '$content', '$date', '$time', '$isRequired')";
+        (courseID, userID, announcementContent, announcementDate, announcementTime, isRequired) 
+        VALUES 
+        ('$selectedCourseID', '$userID', '$content', '$date', '$time', '$isRequired')";
             executeQuery($insertAnnouncement);
             $announcementID = mysqli_insert_id($conn);
 
-        } elseif ($mode === 'edit' || $mode === 'reuse') {
-            // UPDATE existing announcement
+        } elseif ($mode === 'edit') {
+            // --- UPDATE existing announcement ---
             $updateAnnouncement = "UPDATE announcements 
-                SET courseID='$selectedCourseID', announcementContent='$content', announcementDate='$date', announcementTime='$time', isRequired='$isRequired'
-                WHERE announcementID='$announcementID'";
+        SET announcementContent='$content', announcementDate='$date', announcementTime='$time', isRequired='$isRequired'
+        WHERE announcementID='$announcementID'";
             executeQuery($updateAnnouncement);
 
-            // --- REMOVE FILES ---
-            if (!empty($_POST['removeFiles'])) {
-                $removeFiles = $_POST['removeFiles'];
-                $removeFilesStr = implode("','", array_map(function ($file) use ($conn) {
-                    return mysqli_real_escape_string($conn, $file);
-                }, $removeFiles));
+        } elseif ($mode === 'reuse') {
+            // Store old announcement ID
+            $oldAnnouncementID = $announcementID;
 
-                $deleteQuery = "DELETE FROM files 
-                    WHERE announcementID='$announcementID' 
-                    AND fileAttachment IN ('$removeFilesStr')";
-                executeQuery($deleteQuery);
+            // --- CREATE new announcement based on old one ---
+            $insertAnnouncement = "INSERT INTO announcements 
+        (courseID, userID, announcementContent, announcementDate, announcementTime, isRequired)
+        SELECT '$selectedCourseID', userID, announcementContent, announcementDate, announcementTime, isRequired
+        FROM announcements
+        WHERE announcementID='$oldAnnouncementID'";
+            executeQuery($insertAnnouncement);
+            $announcementID = mysqli_insert_id($conn); // new announcement ID
 
-                foreach ($removeFiles as $file) {
-                    $filePath = __DIR__ . "/../shared/assets/files/" . $file;
-                    if (file_exists($filePath))
-                        unlink($filePath);
-                }
-            }
+            // --- COPY FILES from old announcement ---
+            $filesQuery = "SELECT * FROM files WHERE announcementID='$oldAnnouncementID'";
+            $filesResult = executeQuery($filesQuery);
+            while ($file = mysqli_fetch_assoc($filesResult)) {
+                $fileAttachment = $file['fileAttachment'] ?? null;
+                $fileLink = $file['fileLink'] ?? null;
+                $fileTitle = mysqli_real_escape_string($conn, $file['fileTitle'] ?? '');
 
-            // --- REMOVE LINKS ---
-            if (!empty($_POST['removeLinks'])) {
-                $removeLinks = $_POST['removeLinks'];
-                $removeLinksStr = implode("','", array_map(function ($link) use ($conn) {
-                    return mysqli_real_escape_string($conn, $link);
-                }, $removeLinks));
-
-                $deleteQuery = "DELETE FROM files 
-                    WHERE announcementID='$announcementID' 
-                    AND fileLink IN ('$removeLinksStr')";
-                executeQuery($deleteQuery);
+                $insertFile = "INSERT INTO files (announcementID, fileAttachment, fileLink, fileTitle)
+                       VALUES ('$announcementID', '$fileAttachment', '$fileLink', '$fileTitle')";
+                executeQuery($insertFile);
             }
         }
 
@@ -437,13 +431,13 @@ if (isset($_POST['save_announcement'])) {
     if ($mode === 'new' || $mode === 'reuse') {
         $_SESSION['toast'] = [
             'type' => 'alert-success',
-            'message' => 'Lesson added successfully!'
+            'message' => 'Annoucement added successfully!'
         ];
     }
     if ($mode === 'edit') {
         $_SESSION['toast'] = [
             'type' => 'alert-success',
-            'message' => 'Lesson edited successfully!'
+            'message' => 'Annoucement edited successfully!'
         ];
     }
     header("Location: course-info.php?courseID=" . intval($_POST['courses'][0]));

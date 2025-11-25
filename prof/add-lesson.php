@@ -146,17 +146,17 @@ if (isset($_POST['save_lesson'])) {
             if ($mode === 'new') {
                 // INSERT new lesson
                 $lessons = "INSERT INTO lessons 
-                    (courseID, lessonTitle, lessonDescription, createdAt) 
-                    VALUES 
-                    ('$selectedCourseID', '$title', '$content', '$createdAt')";
+        (courseID, lessonTitle, lessonDescription, createdAt) 
+        VALUES 
+        ('$selectedCourseID', '$title', '$content', '$createdAt')";
                 executeQuery($lessons);
                 $lessonID = mysqli_insert_id($conn);
 
-            } elseif ($mode === 'edit' || $mode === 'reuse') {
+            } elseif ($mode === 'edit') {
                 // UPDATE existing lesson
                 $updateLesson = "UPDATE lessons 
-                    SET courseID='$selectedCourseID', lessonTitle='$title', lessonDescription='$content', createdAt='$createdAt'
-                    WHERE lessonID='$lessonID'";
+        SET courseID='$selectedCourseID', lessonTitle='$title', lessonDescription='$content', createdAt='$createdAt'
+        WHERE lessonID='$lessonID'";
                 executeQuery($updateLesson);
 
                 // --- REMOVE FILES ---
@@ -167,8 +167,8 @@ if (isset($_POST['save_lesson'])) {
                     }, $removeFiles));
 
                     $deleteQuery = "DELETE FROM files 
-                        WHERE lessonID='$lessonID' 
-                        AND fileAttachment IN ('$removeFilesStr')";
+            WHERE lessonID='$lessonID' 
+            AND fileAttachment IN ('$removeFilesStr')";
                     executeQuery($deleteQuery);
 
                     foreach ($removeFiles as $file) {
@@ -186,11 +186,36 @@ if (isset($_POST['save_lesson'])) {
                     }, $removeLinks));
 
                     $deleteQuery = "DELETE FROM files 
-                        WHERE lessonID='$lessonID' 
-                        AND fileLink IN ('$removeLinksStr')";
+            WHERE lessonID='$lessonID' 
+            AND fileLink IN ('$removeLinksStr')";
                     executeQuery($deleteQuery);
                 }
+
+            } elseif ($mode === 'reuse') {
+                // --- CREATE new lesson for reuse ---
+                $insertLesson = "INSERT INTO lessons 
+        (courseID, lessonTitle, lessonDescription, createdAt)
+        VALUES 
+        ('$selectedCourseID', '$title', '$content', '$createdAt')";
+                executeQuery($insertLesson);
+                $lessonID = mysqli_insert_id($conn);
+
+                // --- COPY files and links from old lesson ---
+                $oldLessonQuery = "SELECT * FROM files WHERE lessonID='" . intval($_POST['lessonID']) . "'";
+                $oldLessonResult = executeQuery($oldLessonQuery);
+                while ($file = mysqli_fetch_assoc($oldLessonResult)) {
+                    $fileAttachment = $file['fileAttachment'] ?? null;
+                    $fileLink = $file['fileLink'] ?? null;
+                    $fileTitle = $file['fileTitle'] ?? null;
+
+                    $insertFile = "INSERT INTO files 
+            (lessonID, fileAttachment, fileLink, fileTitle)
+            VALUES 
+            ('$lessonID', '$fileAttachment', '$fileLink', '" . mysqli_real_escape_string($conn, $fileTitle) . "')";
+                    executeQuery($insertFile);
+                }
             }
+
 
             // --- Handle uploaded files ---
             if (!empty($_FILES['materials']['name'][0])) {
