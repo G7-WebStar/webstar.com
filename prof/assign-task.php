@@ -180,9 +180,15 @@ if (isset($_POST['saveAssignment'])) {
             $assignmentID = mysqli_insert_id($conn);
 
         } elseif ($mode === 'edit') {
+
+            // --- Get deadlineEnabled (checkbox) ---
+            $deadlineEnabled = isset($_POST['stopSubmissions']) ? 1 : 0;
+
             // --- UPDATE existing assessment ---
             $updateAssessment = "UPDATE assessments 
-                SET assessmentTitle='$title', deadline=" . ($deadline ? "'$deadline'" : "NULL") . " 
+                SET assessmentTitle='$title',
+                    deadline=" . ($deadline ? "'$deadline'" : "NULL") . ",
+                    deadlineEnabled='$deadlineEnabled'
                 WHERE assessmentID='$taskID'";
             executeQuery($updateAssessment);
 
@@ -201,17 +207,17 @@ if (isset($_POST['saveAssignment'])) {
         } elseif ($mode === 'reuse') {
             // --- CREATE NEW ASSESSMENT ---
             $insertAssessment = "INSERT INTO assessments
-                (courseID, assessmentTitle, type, deadline, deadlineEnabled, createdAt)
-                VALUES
-                ('$selectedCourseID', '$title', 'Task', " . ($deadline ? "'$deadline'" : "NULL") . ", '$deadlineEnabled', NOW())";
+        (courseID, assessmentTitle, type, deadline, deadlineEnabled, createdAt)
+        VALUES
+        ('$selectedCourseID', '$title', 'Task', " . ($deadline ? "'$deadline'" : "NULL") . ", '$deadlineEnabled', NOW())";
             executeQuery($insertAssessment);
             $assessmentID = mysqli_insert_id($conn);
 
             // --- CREATE NEW ASSIGNMENT LINKED TO NEW ASSESSMENT ---
             $insertAssignment = "INSERT INTO assignments
-                (assessmentID, assignmentDescription, assignmentPoints, rubricID)
-                VALUES
-                ('$assessmentID', '$desc', '$points', '$rubricID')";
+        (assessmentID, assignmentDescription, assignmentPoints, rubricID)
+        VALUES
+        ('$assessmentID', '$desc', '$points', '$rubricID')";
             executeQuery($insertAssignment);
             $assignmentID = mysqli_insert_id($conn);
 
@@ -226,11 +232,13 @@ if (isset($_POST['saveAssignment'])) {
             while ($file = mysqli_fetch_assoc($filesResult)) {
                 $fileAttachment = $file['fileAttachment'] ?? null;
                 $fileLink = $file['fileLink'] ?? null;
-                $fileTitle = $file['fileTitle'] ?? null;
+                $fileTitle = mysqli_real_escape_string($conn, $file['fileTitle'] ?? '');
 
-                $insertFile = "INSERT INTO files 
-                    (assignmentID, fileAttachment, fileLink, fileTitle)
-                    VALUES ('$assignmentID', '$fileAttachment', '$fileLink', '" . mysqli_real_escape_string($conn, $fileTitle) . "')";
+                // INSERT with correct courseID and userID
+                $insertFile = "INSERT INTO files
+            (assignmentID, fileAttachment, fileLink, fileTitle, courseID, userID)
+            VALUES
+            ('$assignmentID', '$fileAttachment', '$fileLink', '$fileTitle', '$selectedCourseID', '$userID')";
                 executeQuery($insertFile);
             }
 
@@ -240,7 +248,7 @@ if (isset($_POST['saveAssignment'])) {
             while ($student = mysqli_fetch_assoc($studentsResult)) {
                 $studentUserID = $student['userID'];
                 $todoQuery = "INSERT INTO todo (userID, assessmentID, status, isRead)
-                      VALUES ('$studentUserID', '$assessmentID', 'Pending', 0)";
+            VALUES ('$studentUserID', '$assessmentID', 'Pending', 0)";
                 executeQuery($todoQuery);
             }
         }
