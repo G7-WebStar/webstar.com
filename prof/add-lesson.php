@@ -146,76 +146,85 @@ if (isset($_POST['save_lesson'])) {
             if ($mode === 'new') {
                 // INSERT new lesson
                 $lessons = "INSERT INTO lessons 
-        (courseID, lessonTitle, lessonDescription, createdAt) 
-        VALUES 
-        ('$selectedCourseID', '$title', '$content', '$createdAt')";
+                (courseID, lessonTitle, lessonDescription, createdAt) 
+                VALUES 
+                ('$selectedCourseID', '$title', '$content', '$createdAt')";
                 executeQuery($lessons);
                 $lessonID = mysqli_insert_id($conn);
 
             } elseif ($mode === 'edit') {
-                // UPDATE existing lesson
+                // --- UPDATE existing lesson ---
                 $updateLesson = "UPDATE lessons 
-        SET courseID='$selectedCourseID', lessonTitle='$title', lessonDescription='$content', createdAt='$createdAt'
-        WHERE lessonID='$lessonID'";
+                SET courseID='$selectedCourseID', 
+                    lessonTitle='$title', 
+                    lessonDescription='$content', 
+                    createdAt='$createdAt'
+                WHERE lessonID='$lessonID'";
                 executeQuery($updateLesson);
 
-                // --- REMOVE FILES ---
-                if (!empty($_POST['removeFiles'])) {
-                    $removeFiles = $_POST['removeFiles'];
-                    $removeFilesStr = implode("','", array_map(function ($file) use ($conn) {
-                        return mysqli_real_escape_string($conn, $file);
-                    }, $removeFiles));
-
-                    $deleteQuery = "DELETE FROM files 
-            WHERE lessonID='$lessonID' 
-            AND fileAttachment IN ('$removeFilesStr')";
-                    executeQuery($deleteQuery);
-
-                    foreach ($removeFiles as $file) {
-                        $filePath = __DIR__ . "/../shared/assets/files/" . $file;
-                        if (file_exists($filePath))
-                            unlink($filePath);
-                    }
-                }
-
-                // --- REMOVE LINKS ---
-                if (!empty($_POST['removeLinks'])) {
-                    $removeLinks = $_POST['removeLinks'];
-                    $removeLinksStr = implode("','", array_map(function ($link) use ($conn) {
-                        return mysqli_real_escape_string($conn, $link);
-                    }, $removeLinks));
-
-                    $deleteQuery = "DELETE FROM files 
-            WHERE lessonID='$lessonID' 
-            AND fileLink IN ('$removeLinksStr')";
-                    executeQuery($deleteQuery);
-                }
-
             } elseif ($mode === 'reuse') {
-                // --- CREATE new lesson for reuse ---
+                // --- OLD lesson ID from form ---
+                $oldLessonID = intval($_POST['lessonID']);
+
+                // --- CREATE NEW LESSON WITH EDITED VALUES ---
                 $insertLesson = "INSERT INTO lessons 
-        (courseID, lessonTitle, lessonDescription, createdAt)
-        VALUES 
-        ('$selectedCourseID', '$title', '$content', '$createdAt')";
+                (courseID, lessonTitle, lessonDescription, createdAt)
+                VALUES 
+                ('$selectedCourseID', '$title', '$content', '$createdAt')";
                 executeQuery($insertLesson);
+
+                // --- NEW lesson ID ---
                 $lessonID = mysqli_insert_id($conn);
 
-                // --- COPY files and links from old lesson ---
-                $oldLessonQuery = "SELECT * FROM files WHERE lessonID='" . intval($_POST['lessonID']) . "'";
-                $oldLessonResult = executeQuery($oldLessonQuery);
-                while ($file = mysqli_fetch_assoc($oldLessonResult)) {
+                // --- COPY ALL FILES / LINKS FROM OLD LESSON ---
+                $filesQuery = "SELECT * FROM files WHERE lessonID='$oldLessonID'";
+                $filesResult = executeQuery($filesQuery);
+
+                while ($file = mysqli_fetch_assoc($filesResult)) {
                     $fileAttachment = $file['fileAttachment'] ?? null;
                     $fileLink = $file['fileLink'] ?? null;
-                    $fileTitle = $file['fileTitle'] ?? null;
+                    $fileTitle = mysqli_real_escape_string($conn, $file['fileTitle'] ?? '');
 
                     $insertFile = "INSERT INTO files 
-            (lessonID, fileAttachment, fileLink, fileTitle)
-            VALUES 
-            ('$lessonID', '$fileAttachment', '$fileLink', '" . mysqli_real_escape_string($conn, $fileTitle) . "')";
+                    (lessonID, fileAttachment, fileLink, fileTitle, courseID, userID)
+                    VALUES 
+                    ('$lessonID', '$fileAttachment', '$fileLink', '$fileTitle', '$selectedCourseID', '$userID')";
                     executeQuery($insertFile);
                 }
             }
 
+            // --- REMOVE FILES IF REQUESTED ---
+            if (!empty($_POST['removeFiles'])) {
+                $removeFiles = $_POST['removeFiles'];
+                $removeFilesStr = implode("','", array_map(function ($f) use ($conn) {
+                    return mysqli_real_escape_string($conn, $f);
+                }, $removeFiles));
+
+                $deleteQuery = "DELETE FROM files 
+                WHERE lessonID='$lessonID'
+                AND fileAttachment IN ('$removeFilesStr')";
+                executeQuery($deleteQuery);
+
+                // Delete physical files
+                foreach ($removeFiles as $file) {
+                    $path = __DIR__ . "/../shared/assets/files/" . $file;
+                    if (file_exists($path))
+                        unlink($path);
+                }
+            }
+
+            // --- REMOVE LINKS IF REQUESTED ---
+            if (!empty($_POST['removeLinks'])) {
+                $removeLinks = $_POST['removeLinks'];
+                $removeLinksStr = implode("','", array_map(function ($l) use ($conn) {
+                    return mysqli_real_escape_string($conn, $l);
+                }, $removeLinks));
+
+                $deleteQuery = "DELETE FROM files 
+                WHERE lessonID='$lessonID'
+                AND fileLink IN ('$removeLinksStr')";
+                executeQuery($deleteQuery);
+            }
 
             // --- Handle uploaded files ---
             if (!empty($_FILES['materials']['name'][0])) {
