@@ -117,6 +117,7 @@ $announcementResult = executeQuery($announcementQuery);
             $attachmentsArray = [];
             $fileTitlesMap = []; // NEW
             $linksArray = [];
+            $linkTitlesMap = []; // NEW array to store link titles
             $filesQuery = "SELECT * FROM files WHERE announcementID = '$announcementID'";
             $filesResult = executeQuery($filesQuery);
 
@@ -134,6 +135,11 @@ $announcementResult = executeQuery($announcementQuery);
                 if (!empty($file['fileLink'])) {
                     $links = array_map('trim', explode(',', $file['fileLink']));
                     $linksArray = array_merge($linksArray, $links);
+
+                    // Map each link to its title
+                    foreach ($links as $lnk) {
+                        $linkTitlesMap[$lnk] = !empty($file['fileTitle']) ? $file['fileTitle'] : $lnk;
+                    }
                 }
 
                 $fileTitle = !empty($file['fileTitle']) ? $file['fileTitle'] : '';
@@ -275,8 +281,8 @@ $announcementResult = executeQuery($announcementQuery);
 
                                                 <!-- FILE TITLE -->
                                                 <div class="text-sbold text-16 mt-1 pe-4 text-truncate" style="max-width:330px;"
-                                                    title="<?php echo htmlspecialchars($fileTitle); ?>">
-                                                    <?php echo htmlspecialchars($fileTitle); ?>
+                                                    title="<?php echo htmlspecialchars($linkTitlesMap[$link]); ?>">
+                                                    <?php echo htmlspecialchars($linkTitlesMap[$link]); ?>
                                                 </div>
 
                                                 <!-- ACTUAL LINK BELOW -->

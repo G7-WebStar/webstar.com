@@ -1,11 +1,11 @@
 <?php
 $activePage = 'create-test';
+date_default_timezone_set('Asia/Manila');
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 include('../shared/assets/database/connect.php');
-date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
 
 $errorMessages = [

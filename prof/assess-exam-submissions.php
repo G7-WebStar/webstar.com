@@ -1,10 +1,10 @@
 <?php
 $activePage = 'assess-exam-submissions';
 $activeTab = $_GET['tab'] ?? 'submissions';
-
+date_default_timezone_set('Asia/Manila');
 include('../shared/assets/database/connect.php');
 include("../shared/assets/processes/prof-session-process.php");
-date_default_timezone_set('Asia/Manila');
+
 
 if (!isset($_GET['assessmentID'])) {
     echo "Assessment ID is missing in the URL.";
