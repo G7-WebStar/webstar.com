@@ -1,11 +1,11 @@
 <?php $activePage = 'add-lesson'; ?>
 <?php
+date_default_timezone_set('Asia/Manila');
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 include('../shared/assets/database/connect.php');
-date_default_timezone_set('Asia/Manila');
 include("../shared/assets/processes/prof-session-process.php");
 
 $toastMessage = '';
@@ -318,7 +318,7 @@ if (isset($_POST['save_lesson'])) {
                             e.enrollmentID,
                             '$escapedNotificationMessage',
                             '$escapedNotifType',
-                            CONVERT_TZ(NOW(), '+00:00', '+08:00')
+                            NOW()
                         FROM
                             enrollments e
                         WHERE

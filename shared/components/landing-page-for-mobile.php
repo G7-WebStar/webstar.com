@@ -3,14 +3,15 @@
   aria-labelledby="sidebarOffcanvasLabel"
   style="background-color: var(--dirtyWhite); width: 250px;">
   
-  <div class="offcanvas-header">
-    <button type="button" class="mt-2 btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
+ <div class="offcanvas-header justify-content-end">
+  <button type="button" class="mt-2 btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+</div>
+
 
   <div class="offcanvas-body d-flex flex-column align-items-center p-0">
     <!-- Logo -->
     <a class="d-flex align-items-center text-decoration-none mb-3">
-      <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid w-100 py-3 px-2" alt="WebStar Logo">
+      <img src="shared/assets/img/webstar-logo-black.png" class="img-fluid w-100 py-3 px-5" alt="WebStar Logo">
     </a>
 
     <hr class="w-100">

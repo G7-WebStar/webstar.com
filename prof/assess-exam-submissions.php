@@ -1,10 +1,10 @@
 <?php
 $activePage = 'assess-exam-submissions';
 $activeTab = $_GET['tab'] ?? 'submissions';
-
+date_default_timezone_set('Asia/Manila');
 include('../shared/assets/database/connect.php');
 include("../shared/assets/processes/prof-session-process.php");
-date_default_timezone_set('Asia/Manila');
+
 
 if (!isset($_GET['assessmentID'])) {
     echo "Assessment ID is missing in the URL.";
@@ -126,7 +126,7 @@ if (isset($_POST['returnAll']) && isset($_POST['assessmentID'])) {
             enrollments.enrollmentID,
             CONCAT('\"', '$testTitleEscaped', '\" was returned by your instructor. You can now view the results.'),
             'Submissions Update',
-            CONVERT_TZ(NOW(), '+00:00', '+08:00')
+            NOW()
         FROM todo
         INNER JOIN enrollments ON todo.userID = enrollments.userID AND enrollments.courseID = $courseID
         WHERE todo.assessmentID = $assessmentID 
