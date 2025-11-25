@@ -154,9 +154,43 @@ if (isset($_POST['save_announcement'])) {
         } elseif ($mode === 'edit') {
             // --- UPDATE existing announcement ---
             $updateAnnouncement = "UPDATE announcements 
-        SET announcementContent='$content', announcementDate='$date', announcementTime='$time', isRequired='$isRequired'
-        WHERE announcementID='$announcementID'";
-            executeQuery($updateAnnouncement);
+            SET announcementContent='$content', 
+                announcementDate='$date', 
+                announcementTime='$time', 
+                isRequired='$isRequired'
+            WHERE announcementID='$announcementID'";
+                executeQuery($updateAnnouncement);
+
+            if (!empty($_POST['removeFiles'])) {
+                $removeFiles = $_POST['removeFiles'];
+                $removeFilesStr = implode("','", array_map(function ($f) use ($conn) {
+                    return mysqli_real_escape_string($conn, $f);
+                }, $removeFiles));
+
+                $deleteQuery = "DELETE FROM files 
+                WHERE announcementID='$announcementID'
+                AND fileAttachment IN ('$removeFilesStr')";
+                executeQuery($deleteQuery);
+
+                // Delete physical files
+                foreach ($removeFiles as $file) {
+                    $path = __DIR__ . "/../shared/assets/files/" . $file;
+                    if (file_exists($path))
+                        unlink($path);
+                }
+            }
+
+            if (!empty($_POST['removeLinks'])) {
+                $removeLinks = $_POST['removeLinks'];
+                $removeLinksStr = implode("','", array_map(function ($l) use ($conn) {
+                    return mysqli_real_escape_string($conn, $l);
+                }, $removeLinks));
+
+                $deleteQuery = "DELETE FROM files 
+            WHERE announcementID='$announcementID'
+            AND fileLink IN ('$removeLinksStr')";
+                executeQuery($deleteQuery);
+            }
 
         } elseif ($mode === 'reuse') {
             // Store old announcement ID
@@ -164,10 +198,10 @@ if (isset($_POST['save_announcement'])) {
 
             // --- CREATE new announcement based on old one ---
             $insertAnnouncement = "INSERT INTO announcements 
-        (courseID, userID, announcementContent, announcementDate, announcementTime, isRequired)
-        SELECT '$selectedCourseID', userID, announcementContent, announcementDate, announcementTime, isRequired
-        FROM announcements
-        WHERE announcementID='$oldAnnouncementID'";
+            (courseID, userID, announcementContent, announcementDate, announcementTime, isRequired)
+            SELECT '$selectedCourseID', userID, announcementContent, announcementDate, announcementTime, isRequired
+            FROM announcements
+            WHERE announcementID='$oldAnnouncementID'";
             executeQuery($insertAnnouncement);
             $announcementID = mysqli_insert_id($conn); // new announcement ID
 
