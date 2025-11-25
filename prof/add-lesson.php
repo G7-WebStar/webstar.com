@@ -138,11 +138,12 @@ if (isset($_POST['save_lesson'])) {
     $links = $_POST['links'] ?? [];
     $uploadedFiles = !empty($_FILES['materials']['name'][0]);
     $createdAt = date("Y-m-d H:i:s");
+    $existingFiles = $_POST['existingFiles'] ?? []; // files user kept
 
     if (!empty($_POST['courses'])) {
         foreach ($_POST['courses'] as $selectedCourseID) {
 
-            if ($mode === 'new' || $mode === 'reuse') {
+            if ($mode === 'new') {
                 // INSERT new lesson
                 $lessons = "INSERT INTO lessons 
                     (courseID, lessonTitle, lessonDescription, createdAt) 
@@ -150,16 +151,44 @@ if (isset($_POST['save_lesson'])) {
                     ('$selectedCourseID', '$title', '$content', '$createdAt')";
                 executeQuery($lessons);
                 $lessonID = mysqli_insert_id($conn);
-            } elseif ($mode === 'edit') {
+
+            } elseif ($mode === 'edit' || $mode === 'reuse') {
                 // UPDATE existing lesson
                 $updateLesson = "UPDATE lessons 
                     SET courseID='$selectedCourseID', lessonTitle='$title', lessonDescription='$content', createdAt='$createdAt'
                     WHERE lessonID='$lessonID'";
                 executeQuery($updateLesson);
 
-                // Delete old files only if new files or links are provided
-                if (!empty($_FILES['materials']['name'][0]) || !empty($_POST['links'])) {
-                    executeQuery("DELETE FROM files WHERE lessonID='$lessonID'");
+                // --- REMOVE FILES ---
+                if (!empty($_POST['removeFiles'])) {
+                    $removeFiles = $_POST['removeFiles'];
+                    $removeFilesStr = implode("','", array_map(function ($file) use ($conn) {
+                        return mysqli_real_escape_string($conn, $file);
+                    }, $removeFiles));
+
+                    $deleteQuery = "DELETE FROM files 
+                        WHERE lessonID='$lessonID' 
+                        AND fileAttachment IN ('$removeFilesStr')";
+                    executeQuery($deleteQuery);
+
+                    foreach ($removeFiles as $file) {
+                        $filePath = __DIR__ . "/../shared/assets/files/" . $file;
+                        if (file_exists($filePath))
+                            unlink($filePath);
+                    }
+                }
+
+                // --- REMOVE LINKS ---
+                if (!empty($_POST['removeLinks'])) {
+                    $removeLinks = $_POST['removeLinks'];
+                    $removeLinksStr = implode("','", array_map(function ($link) use ($conn) {
+                        return mysqli_real_escape_string($conn, $link);
+                    }, $removeLinks));
+
+                    $deleteQuery = "DELETE FROM files 
+                        WHERE lessonID='$lessonID' 
+                        AND fileLink IN ('$removeLinksStr')";
+                    executeQuery($deleteQuery);
                 }
             }
 
@@ -325,34 +354,34 @@ if (isset($_POST['save_lesson'])) {
                         $mail->SMTPSecure = 'tls';
                         $mail->Port = 587;
                         $mail->setFrom($smtpEmail, 'Webstar');
-                    $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
-                    if (file_exists($headerPath)) {
-                        $mail->AddEmbeddedImage($headerPath, 'emailHeader');
-                    }
-                    $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
-                    if (file_exists($footerPath)) {
-                        $mail->AddEmbeddedImage($footerPath, 'emailFooter');
-                    }
-
-                    $mail->isHTML(true);
-                    $mail->CharSet = 'UTF-8';
-                    $mail->Encoding = 'base64';
-                    $mail->Subject = "[NEW LESSON] " . $titleRaw . " for Course " . $courseCode;
-
-                    $recipientsFound = false;
-                    while ($student = mysqli_fetch_assoc($emailsResult)) {
-                        if ($student['courseUpdateEnabled'] == 1 && !empty($student['email'])) {
-                            $mail->addAddress($student['email']);
-                            $recipientsFound = true;
+                        $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
+                        if (file_exists($headerPath)) {
+                            $mail->AddEmbeddedImage($headerPath, 'emailHeader');
                         }
-                    }
+                        $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
+                        if (file_exists($footerPath)) {
+                            $mail->AddEmbeddedImage($footerPath, 'emailFooter');
+                        }
 
-                    if ($recipientsFound) {
-                        $emailTitleEsc = htmlspecialchars($titleRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                        $courseCodeEsc = htmlspecialchars($courseCode, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        $mail->isHTML(true);
+                        $mail->CharSet = 'UTF-8';
+                        $mail->Encoding = 'base64';
+                        $mail->Subject = "[NEW LESSON] " . $titleRaw . " for Course " . $courseCode;
 
-                        $contentHtml = nl2br(htmlspecialchars($contentRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-                        $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+                        $recipientsFound = false;
+                        while ($student = mysqli_fetch_assoc($emailsResult)) {
+                            if ($student['courseUpdateEnabled'] == 1 && !empty($student['email'])) {
+                                $mail->addAddress($student['email']);
+                                $recipientsFound = true;
+                            }
+                        }
+
+                        if ($recipientsFound) {
+                            $emailTitleEsc = htmlspecialchars($titleRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                            $courseCodeEsc = htmlspecialchars($courseCode, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+                            $contentHtml = nl2br(htmlspecialchars($contentRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                            $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
                             <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
                                 <tr>
                                     <td align="center">
@@ -395,8 +424,8 @@ if (isset($_POST['save_lesson'])) {
                             </table>
                         </div>';
 
-                        $mail->send();
-                    }
+                            $mail->send();
+                        }
 
                     } catch (Exception $e) {
                         $errorMsg = isset($mail) && is_object($mail) ? $mail->ErrorInfo : $e->getMessage();
@@ -408,13 +437,13 @@ if (isset($_POST['save_lesson'])) {
         }
 
     }
-    if ($lessons) {
+    // Determine toast message based on mode
+    if ($mode === 'new' || $mode === 'reuse') {
         $_SESSION['toast'] = [
             'type' => 'alert-success',
-            'message' => 'Lesson added successfully!'
+            'message' => 'Lesson added successfully!' // same as new
         ];
-    }
-    if ($updateLesson) {
+    } elseif ($mode === 'edit') {
         $_SESSION['toast'] = [
             'type' => 'alert-success',
             'message' => 'Lesson edited successfully!'
@@ -1148,8 +1177,13 @@ if (!empty($reusedData)) {
                 const maxAttachments = 10; // max total files/links
                 const toastContainer = document.getElementById("toastContainer");
 
+                // Create a new DataTransfer but preserve old files
                 let dt = new DataTransfer();
-                Array.from(allFiles).forEach(f => dt.items.add(f));
+
+                // --- Keep previously added files (so they don't disappear) ---
+                if (typeof allFiles !== "undefined" && allFiles.length > 0) {
+                    allFiles.forEach(f => dt.items.add(f));
+                }
 
                 let errorMessages = [];
                 let validFiles = [];
@@ -1189,8 +1223,8 @@ if (!empty($reusedData)) {
                 fileInput.files = dt.files;
                 allFiles = Array.from(fileInput.files);
 
-                // 🔹 Remove only file previews, keep links
-                container.querySelectorAll('.file-preview').forEach(el => el.remove());
+                // Only remove previews for previously uploaded new files, not DB files
+                container.querySelectorAll('.new-file-preview').forEach(el => el.remove());
 
                 function truncate(text, maxLength = 50) {
                     return text.length > maxLength ? text.slice(0, maxLength - 1) + '…' : text;
@@ -1202,7 +1236,7 @@ if (!empty($reusedData)) {
                     const truncatedName = truncate(file.name, 50);
 
                     const fileHTML = `
-                    <div class="col-12 my-1 file-preview">
+                    <div class="col-12 my-1 new-file-preview file-preview">
                         <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
                             <div class="d-flex w-100 align-items-center justify-content-between">
                                 <div class="d-flex align-items-center flex-grow-1">
@@ -1246,30 +1280,76 @@ if (!empty($reusedData)) {
                 const container = document.getElementById('filePreviewContainer');
                 if (!container) return;
 
-                <?php foreach ($files as $file): ?>
-                    <?php if (!empty($file['fileLink'])): ?>
-                            // Render Link Preview
-                            (function () {
-                                const linkValue = <?php echo json_encode($file['fileLink']); ?>;
-                                const uniqueID = Date.now() + Math.floor(Math.random() * 1000);
-                                try {
-                                    const urlObj = new URL(linkValue);
-                                    const domain = urlObj.hostname;
-                                    const faviconURL = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
-                                    const html = `
-                        <div class="col-12 my-1" data-id="${uniqueID}">
+                const existingLinksSet = new Set();
+
+                function truncate(text, maxLength = 50) {
+                    return text.length > maxLength ? text.slice(0, maxLength - 1) + '…' : text;
+                }
+                function renderFile(file, isNew = true) {
+                    const uniqueID = Date.now() + Math.floor(Math.random() * 1000);
+                    let html = '';
+
+                    // Link
+                    if (file.link && !file.attachment) {
+                        if (existingLinksSet.has(file.link)) return; // prevent duplicates
+                        existingLinksSet.add(file.link);
+
+                        try {
+                            const urlObj = new URL(file.link);
+                            const faviconURL = `https://www.google.com/s2/favicons?sz=64&domain=${urlObj.hostname}`;
+                            html = `
+                    <div class="col-12 my-1 file-preview" data-id="${uniqueID}">
+                        <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
+                            <div class="d-flex w-100 align-items-center justify-content-between">
+                                <div class="d-flex align-items-center flex-grow-1">
+                                    <div class="mx-3 d-flex align-items-center">
+                                        <img src="${faviconURL}" alt="${urlObj.hostname} Icon"
+                                            onerror="this.onerror=null;this.src='../shared/assets/img/web.png';"
+                                            style="width: 30px; height: 30px;">
+                                    </div>
+                                    <div>
+                                        <div class="text-sbold text-16" style="line-height:1.5;" id="title-${uniqueID}">${file.title}</div>
+                                        <div class="text-reg text-12 text-break" style="line-height:1.5;">
+                                            <a href="${file.link}" target="_blank">${truncate(file.link)}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">
+                                    <span class="material-symbols-outlined">close</span>
+                                </div>
+                            </div>
+                        </div>
+                        ${isNew
+                                ? `<input type="hidden" name="links[]" value="${file.link}" class="link-hidden">`
+                                : `<input type="hidden" name="existingLinks[]" value="${file.link}">`}
+                    </div>`;
+                            container.insertAdjacentHTML('beforeend', html);
+
+                            if (isNew) {
+                                const titleEl = document.getElementById(`title-${uniqueID}`);
+                                fetch("?fetchTitle=" + encodeURIComponent(file.link))
+                                    .then(res => res.json())
+                                    .then(data => { if (titleEl) titleEl.textContent = truncate(data.title || file.link, 50); })
+                                    .catch(() => { if (titleEl) titleEl.textContent = truncate(file.link.split('/').pop() || "Link", 50); });
+                            }
+                        } catch (e) { }
+                    }
+                    // File
+                    else if (file.attachment) {
+                        html = `
+                        <div class="col-12 my-1 file-preview" data-id="${uniqueID}">
                             <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
                                 <div class="d-flex w-100 align-items-center justify-content-between">
-                                    <div class="d-flex align-items-center flex-grow-1">
+                                    <div class="d-flex align-items-center flex-grow-1 overflow-hidden">
                                         <div class="mx-3 d-flex align-items-center">
-                                            <img src="${faviconURL}" alt="${domain} Icon"
-                                                onerror="this.onerror=null;this.src='../shared/assets/img/web.png';"
-                                                style="width: 30px; height: 30px;">
+                                            <span class="material-symbols-rounded">description</span>
                                         </div>
-                                        <div>
-                                            <div id="title-${uniqueID}" class="text-sbold text-16" style="line-height: 1.5;"><?= htmlspecialchars($file['fileTitle']) ?></div>
-                                            <div class="text-reg text-12 text-break" style="line-height: 1.5;">
-                                                <a href="${linkValue}" target="_blank">${linkValue}</a>
+                                        <div class="overflow-hidden">
+                                            <div class="text-sbold text-16 file-title" style="line-height:1.5; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                                ${file.title}
+                                            </div>
+                                            <div class="text-reg text-12" style="line-height:1.5;">
+                                                ${file.ext} · ${file.size}
                                             </div>
                                         </div>
                                     </div>
@@ -1278,58 +1358,76 @@ if (!empty($reusedData)) {
                                     </div>
                                 </div>
                             </div>
-                            <input type="hidden" name="links[]" value="${linkValue}" class="link-hidden">
+                            <input type="hidden" name="existingFiles[]" value="${file.attachment}">
                         </div>`;
-                                    container.insertAdjacentHTML('beforeend', html);
-                                } catch (e) { }
-                            })();
-                    <?php elseif (!empty($file['fileAttachment'])): ?>
-                            // Render File Preview
-                            (function () {
-                                const fileName = <?php echo json_encode($file['fileTitle'] ?: basename($file['fileAttachment'])); ?>;
-                                const ext = fileName.split('.').pop().toUpperCase();
-                                const uniqueID = Date.now() + Math.floor(Math.random() * 1000);
-                                <?php
-                                $filePath = "../shared/assets/files/" . $file['fileAttachment'];
-                                $fileExt = strtoupper(pathinfo($file['fileAttachment'], PATHINFO_EXTENSION));
-                                $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
-                                $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
-                                ?>
+                        container.insertAdjacentHTML('beforeend', html);
+                    }
 
-                                const html = `
-                    <div class="col-12 my-1 file-preview">
-                        <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
-                            <div class="d-flex w-100 align-items-center justify-content-between">
-                                <div class="d-flex align-items-center flex-grow-1">
-                                    <div class="mx-3 d-flex align-items-center">
-                                        <span class="material-symbols-rounded">description</span>
-                                    </div>
-                                    <div>
-                                        <div class="text-sbold text-16" style="line-height: 1.5;"><?= htmlspecialchars($file['fileTitle'] ?: basename($file['fileAttachment'])) ?></div>
-                                        <div class="text-reg text-12" style="line-height: 1.5;">
-    <?= $fileExt ?> · <?= $fileSizeMB ?>
-</div>
-
-                                    </div>
-                                </div>
-                                <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">
-                                    <span class="material-symbols-outlined">close</span>
-                                </div>
-                            </div>
-                        </div>
-                        <input type="hidden" name="existingFiles[]" value="<?php echo htmlspecialchars($file['fileAttachment']); ?>">
-                    </div>`;
-                                container.insertAdjacentHTML('beforeend', html);
-                            })();
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            });
-            //  Enable delete buttons for preloaded (reused) items
-            document.addEventListener('click', function (event) {
-                if (event.target.closest('.delete-file')) {
-                    const col = event.target.closest('.col-12');
-                    if (col) col.remove();
                 }
+
+                // Render all DB files and links
+                const files = <?php
+                $jsFiles = [];
+                foreach ($files as $file) {
+                    $filePath = "../shared/assets/files/" . $file['fileAttachment'];
+                    $jsFiles[] = [
+                        'title' => $file['fileTitle'] ?: basename($file['fileAttachment']),
+                        'attachment' => $file['fileAttachment'],
+                        'link' => $file['fileLink'],
+                        'ext' => strtoupper(pathinfo($file['fileAttachment'], PATHINFO_EXTENSION)),
+                        'size' => file_exists($filePath) ? round(filesize($filePath) / 1048576, 2) . ' MB' : 'Unknown size'
+                    ];
+                }
+                echo json_encode($jsFiles);
+                ?>;
+
+                files.forEach(file => renderFile(file, false));
+
+                // Event delegation for delete
+                container.addEventListener('click', function (event) {
+                    const deleteBtn = event.target.closest('.delete-file');
+                    if (!deleteBtn) return;
+
+                    const preview = deleteBtn.closest('.col-12');
+                    if (!preview) return;
+
+                    const input = preview.querySelector('input');
+                    if (!input) return;
+
+                    let removeContainer = document.getElementById('removeFilesContainer');
+                    if (!removeContainer) {
+                        removeContainer = document.createElement('div');
+                        removeContainer.id = 'removeFilesContainer';
+                        removeContainer.style.display = 'none';
+                        container.closest('form').appendChild(removeContainer);
+                    }
+
+                    if (input.name === 'existingFiles[]') {
+                        const removedInput = document.createElement('input');
+                        removedInput.type = 'hidden';
+                        removedInput.name = 'removeFiles[]';
+                        removedInput.value = input.value;
+                        removeContainer.appendChild(removedInput);
+                    } else if (input.name === 'existingLinks[]' || input.name === 'links[]') {
+                        const removedInput = document.createElement('input');
+                        removedInput.type = 'hidden';
+                        removedInput.name = 'removeLinks[]';
+                        removedInput.value = input.value;
+                        removeContainer.appendChild(removedInput);
+
+                        // Remove from Set to allow re-adding if deleted
+                        existingLinksSet.delete(input.value);
+                    }
+
+                    // Remove preview and input
+                    input.remove();
+                    preview.remove();
+                });
+
+                // Add new files/links dynamically
+                window.addNewFiles = function (newFiles) {
+                    newFiles.forEach(file => renderFile(file, true));
+                };
             });
 
         </script>

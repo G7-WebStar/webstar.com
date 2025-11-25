@@ -157,12 +157,13 @@ if (isset($_POST['saveAssignment'])) {
     $rubricID = !empty($_POST['selectedRubricID']) ? intval($_POST['selectedRubricID']) : null;
     $links = $_POST['links'] ?? [];
     $uploadedFiles = !empty($_FILES['materials']['name'][0]);
+    $existingFiles = $_POST['existingFiles'] ?? []; // files user kept
 
     foreach ($_POST['courses'] ?? [] as $selectedCourseID) {
         $deadlineEnabled = isset($_POST['stopSubmissions']) ? 1 : 0;
 
-        if ($mode === 'new' || $mode === 'reuse') {
-            // INSERT new assessment + assignment
+        if ($mode === 'new') {
+            // --- INSERT new assessment ---
             $insertAssessment = "INSERT INTO assessments 
                 (courseID, assessmentTitle, type, deadline, deadlineEnabled, createdAt)
                 VALUES 
@@ -170,32 +171,110 @@ if (isset($_POST['saveAssignment'])) {
             executeQuery($insertAssessment);
             $assessmentID = mysqli_insert_id($conn);
 
+            // --- INSERT new assignment ---
             $insertAssignment = "INSERT INTO assignments 
                 (assessmentID, assignmentDescription, assignmentPoints, rubricID)
                 VALUES 
                 ('$assessmentID', '$desc', '$points', '$rubricID')";
             executeQuery($insertAssignment);
-
             $assignmentID = mysqli_insert_id($conn);
 
         } elseif ($mode === 'edit') {
-            // UPDATE existing assessment + assignment
+            // --- UPDATE existing assessment ---
             $updateAssessment = "UPDATE assessments 
                 SET assessmentTitle='$title', deadline=" . ($deadline ? "'$deadline'" : "NULL") . " 
                 WHERE assessmentID='$taskID'";
             executeQuery($updateAssessment);
 
+            // --- FETCH correct assignmentID ---
+            $assignmentQuery = "SELECT assignmentID FROM assignments WHERE assessmentID='$taskID' LIMIT 1";
+            $assignmentResult = executeQuery($assignmentQuery);
+            $assignmentRow = mysqli_fetch_assoc($assignmentResult);
+            $assignmentID = $assignmentRow['assignmentID'];
+
+            // --- UPDATE assignment ---
             $updateAssignment = "UPDATE assignments 
                 SET assignmentDescription='$desc', assignmentPoints='$points', rubricID='$rubricID'
-                WHERE assessmentID='$taskID'";
+                WHERE assignmentID='$assignmentID'";
             executeQuery($updateAssignment);
 
-            $assignmentID = $taskID;
+        } elseif ($mode === 'reuse') {
+            // --- CREATE NEW ASSESSMENT ---
+            $insertAssessment = "INSERT INTO assessments
+                (courseID, assessmentTitle, type, deadline, deadlineEnabled, createdAt)
+                VALUES
+                ('$selectedCourseID', '$title', 'Task', " . ($deadline ? "'$deadline'" : "NULL") . ", '$deadlineEnabled', NOW())";
+            executeQuery($insertAssessment);
+            $assessmentID = mysqli_insert_id($conn);
 
-            // Delete old files **only if new files or links were provided**
-            if ($uploadedFiles || !empty($links)) {
-                executeQuery("DELETE FROM files WHERE assignmentID='$assignmentID'");
+            // --- CREATE NEW ASSIGNMENT LINKED TO NEW ASSESSMENT ---
+            $insertAssignment = "INSERT INTO assignments
+                (assessmentID, assignmentDescription, assignmentPoints, rubricID)
+                VALUES
+                ('$assessmentID', '$desc', '$points', '$rubricID')";
+            executeQuery($insertAssignment);
+            $assignmentID = mysqli_insert_id($conn);
+
+            // --- COPY FILES / LINKS FROM OLD ASSIGNMENT ---
+            $oldAssignmentQuery = "SELECT assignmentID FROM assignments WHERE assessmentID='$taskID' LIMIT 1";
+            $oldAssignmentResult = executeQuery($oldAssignmentQuery);
+            $oldAssignmentRow = mysqli_fetch_assoc($oldAssignmentResult);
+            $oldAssignmentID = $oldAssignmentRow['assignmentID'];
+
+            $filesQuery = "SELECT * FROM files WHERE assignmentID='$oldAssignmentID'";
+            $filesResult = executeQuery($filesQuery);
+            while ($file = mysqli_fetch_assoc($filesResult)) {
+                $fileAttachment = $file['fileAttachment'] ?? null;
+                $fileLink = $file['fileLink'] ?? null;
+                $fileTitle = $file['fileTitle'] ?? null;
+
+                $insertFile = "INSERT INTO files 
+                    (assignmentID, fileAttachment, fileLink, fileTitle)
+                    VALUES ('$assignmentID', '$fileAttachment', '$fileLink', '" . mysqli_real_escape_string($conn, $fileTitle) . "')";
+                executeQuery($insertFile);
             }
+
+            // --- INSERT TODOS FOR STUDENTS ENROLLED IN THE NEW COURSE ---
+            $studentsQuery = "SELECT userID FROM enrollments WHERE courseID = '$selectedCourseID'";
+            $studentsResult = executeQuery($studentsQuery);
+            while ($student = mysqli_fetch_assoc($studentsResult)) {
+                $studentUserID = $student['userID'];
+                $todoQuery = "INSERT INTO todo (userID, assessmentID, status, isRead)
+                      VALUES ('$studentUserID', '$assessmentID', 'Pending', 0)";
+                executeQuery($todoQuery);
+            }
+        }
+
+        // --- REMOVE FILES if requested ---
+        if (!empty($_POST['removeFiles'])) {
+            $removeFiles = $_POST['removeFiles'];
+            $removeFilesStr = implode("','", array_map(function ($file) use ($conn) {
+                return mysqli_real_escape_string($conn, $file);
+            }, $removeFiles));
+
+            $deleteQuery = "DELETE FROM files 
+                WHERE assignmentID='$assignmentID' 
+                AND fileAttachment IN ('$removeFilesStr')";
+            executeQuery($deleteQuery);
+
+            foreach ($removeFiles as $file) {
+                $filePath = __DIR__ . "/../shared/assets/files/" . $file;
+                if (file_exists($filePath))
+                    unlink($filePath);
+            }
+        }
+
+        // --- REMOVE LINKS if requested ---
+        if (!empty($_POST['removeLinks'])) {
+            $removeLinks = $_POST['removeLinks'];
+            $removeLinksStr = implode("','", array_map(function ($link) use ($conn) {
+                return mysqli_real_escape_string($conn, $link);
+            }, $removeLinks));
+
+            $deleteQuery = "DELETE FROM files 
+                WHERE assignmentID='$assignmentID' 
+                AND fileLink IN ('$removeLinksStr')";
+            executeQuery($deleteQuery);
         }
 
         // --- Handle uploaded files ---
@@ -458,19 +537,20 @@ if (isset($_POST['saveAssignment'])) {
             }
         }
     }
-    if ($insertAssignment) {
+    // --- Determine toast message based on mode ---
+    if ($mode === 'new' || $mode === 'reuse') {
         $_SESSION['toast'] = [
             'type' => 'alert-success',
             'message' => 'Assignment assigned successfully!'
         ];
-    }
-    if ($updateAssignment) {
+    } elseif ($mode === 'edit') {
         $_SESSION['toast'] = [
             'type' => 'alert-success',
             'message' => 'Assignment edited successfully!'
         ];
     }
-    ;
+
+    // --- Set active tab and redirect ---
     $_SESSION['activeTab'] = 'todo';
     header("Location: course-info.php?courseID=" . intval($_POST['courses'][0]));
     exit();
@@ -802,7 +882,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                         value="<?= isset($_GET['edit']) ? 'edit' : (isset($_GET['reuse']) ? 'reuse' : 'new') ?>">
                                     <input type="hidden" name="taskID"
                                         value="<?= $_GET['edit'] ?? $_GET['reuse'] ?? '' ?>">
-
+                                    <input type="hidden" name="activeTab" value="task">
                                     <div class="row">
                                         <div class="col-12 pt-3">
                                             <label for="taskInfo" class="form-label text-med text-16">Task
@@ -1535,8 +1615,13 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                 const maxAttachments = 10; // max total files/links
                 const toastContainer = document.getElementById("toastContainer");
 
+                // Create a new DataTransfer but preserve old files
                 let dt = new DataTransfer();
-                Array.from(allFiles).forEach(f => dt.items.add(f));
+
+                // --- Keep previously added files (so they don't disappear) ---
+                if (typeof allFiles !== "undefined" && allFiles.length > 0) {
+                    allFiles.forEach(f => dt.items.add(f));
+                }
 
                 let errorMessages = [];
                 let validFiles = [];
@@ -1576,8 +1661,8 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                 fileInput.files = dt.files;
                 allFiles = Array.from(fileInput.files);
 
-                // 🔹 Remove only file previews, keep links
-                container.querySelectorAll('.file-preview').forEach(el => el.remove());
+                // Only remove previews for previously uploaded new files, not DB files
+                container.querySelectorAll('.new-file-preview').forEach(el => el.remove());
 
                 function truncate(text, maxLength = 50) {
                     return text.length > maxLength ? text.slice(0, maxLength - 1) + '…' : text;
@@ -1589,7 +1674,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                     const truncatedName = truncate(file.name, 50);
 
                     const fileHTML = `
-                    <div class="col-12 my-1 file-preview">
+                    <div class="col-12 my-1 new-file-preview file-preview">
                         <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
                             <div class="d-flex w-100 align-items-center justify-content-between">
                                 <div class="d-flex align-items-center flex-grow-1">
@@ -1638,41 +1723,82 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script>
-        // Pass reused files from PHP to JavaScript
-        const reusedFiles = <?= json_encode($files) ?>;
-    </script>
-
     <?php if (!empty($files)): ?>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const container = document.getElementById('filePreviewContainer');
                 if (!container) return;
 
-                <?php foreach ($files as $file): ?>
-                    <?php if (!empty($file['fileLink'])): ?>
-                            // Render Link Preview
-                            (function () {
-                                const linkValue = <?php echo json_encode($file['fileLink']); ?>;
-                                const uniqueID = Date.now() + Math.floor(Math.random() * 1000);
-                                try {
-                                    const urlObj = new URL(linkValue);
-                                    const domain = urlObj.hostname;
-                                    const faviconURL = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
-                                    const html = `
-                        <div class="col-12 my-1" data-id="${uniqueID}">
+                const existingLinksSet = new Set();
+
+                function truncate(text, maxLength = 50) {
+                    return text.length > maxLength ? text.slice(0, maxLength - 1) + '…' : text;
+                }
+                function renderFile(file, isNew = true) {
+                    const uniqueID = Date.now() + Math.floor(Math.random() * 1000);
+                    let html = '';
+
+                    // Link
+                    if (file.link && !file.attachment) {
+                        if (existingLinksSet.has(file.link)) return; // prevent duplicates
+                        existingLinksSet.add(file.link);
+
+                        try {
+                            const urlObj = new URL(file.link);
+                            const faviconURL = `https://www.google.com/s2/favicons?sz=64&domain=${urlObj.hostname}`;
+                            html = `
+                    <div class="col-12 my-1 file-preview" data-id="${uniqueID}">
+                        <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
+                            <div class="d-flex w-100 align-items-center justify-content-between">
+                                <div class="d-flex align-items-center flex-grow-1">
+                                    <div class="mx-3 d-flex align-items-center">
+                                        <img src="${faviconURL}" alt="${urlObj.hostname} Icon"
+                                            onerror="this.onerror=null;this.src='../shared/assets/img/web.png';"
+                                            style="width: 30px; height: 30px;">
+                                    </div>
+                                    <div>
+                                        <div class="text-sbold text-16" style="line-height:1.5;" id="title-${uniqueID}">${file.title}</div>
+                                        <div class="text-reg text-12 text-break" style="line-height:1.5;">
+                                            <a href="${file.link}" target="_blank">${truncate(file.link)}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">
+                                    <span class="material-symbols-outlined">close</span>
+                                </div>
+                            </div>
+                        </div>
+                        ${isNew
+                                ? `<input type="hidden" name="links[]" value="${file.link}" class="link-hidden">`
+                                : `<input type="hidden" name="existingLinks[]" value="${file.link}">`}
+                    </div>`;
+                            container.insertAdjacentHTML('beforeend', html);
+
+                            if (isNew) {
+                                const titleEl = document.getElementById(`title-${uniqueID}`);
+                                fetch("?fetchTitle=" + encodeURIComponent(file.link))
+                                    .then(res => res.json())
+                                    .then(data => { if (titleEl) titleEl.textContent = truncate(data.title || file.link, 50); })
+                                    .catch(() => { if (titleEl) titleEl.textContent = truncate(file.link.split('/').pop() || "Link", 50); });
+                            }
+                        } catch (e) { }
+                    }
+                    // File
+                    else if (file.attachment) {
+                        html = `
+                        <div class="col-12 my-1 file-preview" data-id="${uniqueID}">
                             <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
                                 <div class="d-flex w-100 align-items-center justify-content-between">
-                                    <div class="d-flex align-items-center flex-grow-1">
+                                    <div class="d-flex align-items-center flex-grow-1 overflow-hidden">
                                         <div class="mx-3 d-flex align-items-center">
-                                            <img src="${faviconURL}" alt="${domain} Icon"
-                                                onerror="this.onerror=null;this.src='../shared/assets/img/web.png';"
-                                                style="width: 30px; height: 30px;">
+                                            <span class="material-symbols-rounded">description</span>
                                         </div>
-                                        <div>
-                                            <div id="title-${uniqueID}" class="text-sbold text-16" style="line-height: 1.5;"><?= htmlspecialchars($file['fileTitle']) ?></div>
-                                            <div class="text-reg text-12 text-break" style="line-height: 1.5;">
-                                                <a href="${linkValue}" target="_blank">${linkValue}</a>
+                                        <div class="overflow-hidden">
+                                            <div class="text-sbold text-16 file-title" style="line-height:1.5; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                                ${file.title}
+                                            </div>
+                                            <div class="text-reg text-12" style="line-height:1.5;">
+                                                ${file.ext} · ${file.size}
                                             </div>
                                         </div>
                                     </div>
@@ -1681,58 +1807,76 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                     </div>
                                 </div>
                             </div>
-                            <input type="hidden" name="links[]" value="${linkValue}" class="link-hidden">
+                            <input type="hidden" name="existingFiles[]" value="${file.attachment}">
                         </div>`;
-                                    container.insertAdjacentHTML('beforeend', html);
-                                } catch (e) { }
-                            })();
-                    <?php elseif (!empty($file['fileAttachment'])): ?>
-                            // Render File Preview
-                            (function () {
-                                const fileName = <?php echo json_encode($file['fileTitle'] ?: basename($file['fileAttachment'])); ?>;
-                                const ext = fileName.split('.').pop().toUpperCase();
-                                const uniqueID = Date.now() + Math.floor(Math.random() * 1000);
-                                <?php
-                                $filePath = "../shared/assets/files/" . $file['fileAttachment'];
-                                $fileExt = strtoupper(pathinfo($file['fileAttachment'], PATHINFO_EXTENSION));
-                                $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
-                                $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
-                                ?>
+                        container.insertAdjacentHTML('beforeend', html);
+                    }
 
-                                const html = `
-                    <div class="col-12 my-1 file-preview">
-                        <div class="materials-card d-flex align-items-stretch p-2 w-100 rounded-3">
-                            <div class="d-flex w-100 align-items-center justify-content-between">
-                                <div class="d-flex align-items-center flex-grow-1">
-                                    <div class="mx-3 d-flex align-items-center">
-                                        <span class="material-symbols-rounded">description</span>
-                                    </div>
-                                    <div>
-                                        <div class="text-sbold text-16" style="line-height: 1.5;"><?= htmlspecialchars($file['fileTitle'] ?: basename($file['fileAttachment'])) ?></div>
-                                        <div class="text-reg text-12" style="line-height: 1.5;">
-    <?= $fileExt ?> · <?= $fileSizeMB ?>
-</div>
-
-                                    </div>
-                                </div>
-                                <div class="mx-3 d-flex align-items-center delete-file" style="cursor:pointer;">
-                                    <span class="material-symbols-outlined">close</span>
-                                </div>
-                            </div>
-                        </div>
-                        <input type="hidden" name="existingFiles[]" value="<?php echo htmlspecialchars($file['fileAttachment']); ?>">
-                    </div>`;
-                                container.insertAdjacentHTML('beforeend', html);
-                            })();
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            });
-            //  Enable delete buttons for preloaded (reused) items
-            document.addEventListener('click', function (event) {
-                if (event.target.closest('.delete-file')) {
-                    const col = event.target.closest('.col-12');
-                    if (col) col.remove();
                 }
+
+                // Render all DB files and links
+                const files = <?php
+                $jsFiles = [];
+                foreach ($files as $file) {
+                    $filePath = "../shared/assets/files/" . $file['fileAttachment'];
+                    $jsFiles[] = [
+                        'title' => $file['fileTitle'] ?: basename($file['fileAttachment']),
+                        'attachment' => $file['fileAttachment'],
+                        'link' => $file['fileLink'],
+                        'ext' => strtoupper(pathinfo($file['fileAttachment'], PATHINFO_EXTENSION)),
+                        'size' => file_exists($filePath) ? round(filesize($filePath) / 1048576, 2) . ' MB' : 'Unknown size'
+                    ];
+                }
+                echo json_encode($jsFiles);
+                ?>;
+
+                files.forEach(file => renderFile(file, false));
+
+                // Event delegation for delete
+                container.addEventListener('click', function (event) {
+                    const deleteBtn = event.target.closest('.delete-file');
+                    if (!deleteBtn) return;
+
+                    const preview = deleteBtn.closest('.col-12');
+                    if (!preview) return;
+
+                    const input = preview.querySelector('input');
+                    if (!input) return;
+
+                    let removeContainer = document.getElementById('removeFilesContainer');
+                    if (!removeContainer) {
+                        removeContainer = document.createElement('div');
+                        removeContainer.id = 'removeFilesContainer';
+                        removeContainer.style.display = 'none';
+                        container.closest('form').appendChild(removeContainer);
+                    }
+
+                    if (input.name === 'existingFiles[]') {
+                        const removedInput = document.createElement('input');
+                        removedInput.type = 'hidden';
+                        removedInput.name = 'removeFiles[]';
+                        removedInput.value = input.value;
+                        removeContainer.appendChild(removedInput);
+                    } else if (input.name === 'existingLinks[]' || input.name === 'links[]') {
+                        const removedInput = document.createElement('input');
+                        removedInput.type = 'hidden';
+                        removedInput.name = 'removeLinks[]';
+                        removedInput.value = input.value;
+                        removeContainer.appendChild(removedInput);
+
+                        // Remove from Set to allow re-adding if deleted
+                        existingLinksSet.delete(input.value);
+                    }
+
+                    // Remove preview and input
+                    input.remove();
+                    preview.remove();
+                });
+
+                // Add new files/links dynamically
+                window.addNewFiles = function (newFiles) {
+                    newFiles.forEach(file => renderFile(file, true));
+                };
             });
 
         </script>

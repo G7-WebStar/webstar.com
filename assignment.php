@@ -359,15 +359,22 @@ if (
 
             if ($fileError === UPLOAD_ERR_OK) {
 
-                // Correct: Use original filename from upload
-                $originalName = sanitizeFileName(basename($fileName));
+                // Split filename into name + extension
+                $originalBase = pathinfo($fileName, PATHINFO_FILENAME);
+                $extension = pathinfo($fileName, PATHINFO_EXTENSION);
 
-                // Make safe for server-side storage → timestamped name
+                // Convert all symbols + spaces into underscores
+                $safeBase = preg_replace("/[^a-zA-Z0-9_]/", "_", $originalBase);
+
+                // Reattach extension
+                $originalName = $safeBase . '.' . $extension;
+
+                // Stored filename with timestamp
                 $fileTitle = date('Ymd_His') . "_" . $originalName;
 
                 $targetFilePath = $targetDir . $fileTitle;
 
-                // Check if this original filename is already submitted (avoid duplicates)
+                // Prevent duplicate original file uploads
                 $checkFile = executeQuery("
                 SELECT 1 FROM files
                 WHERE submissionID='$submissionID'
@@ -387,7 +394,6 @@ if (
             }
         }
     }
-
 
     // --- Handle link uploads ---
     if (isset($_POST['links']) && !empty($_POST['links'])) {
