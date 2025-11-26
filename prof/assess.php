@@ -398,10 +398,9 @@ $getCoursesResult = executeQuery($getCoursesQuery);
                                 } else {
                                     ?>
                                     <div
-                                        class="text-sbold text-center mt-5 text-25 d-flex flex-column align-items-center text-sm-20">
-                                        <img src="../shared/assets/img/empty/todo.png" alt="No Assessments"
-                                            class="mx-auto mt-5 img-fluid img-small" width="250px">
-                                        Nothing to assess here.
+                                        class="text-reg text-center mt-5 text-14 d-flex flex-column align-items-center text-sm-20">
+                                       <img src="../shared/assets/img/empty/todo.png" width="100" class="mb-1">
+                                                <div class="text-center text-14 text-reg mt-1">Nothing to assess here</div>
                                     </div>
                                     <?php
                                 }
@@ -591,8 +590,8 @@ $getCoursesResult = executeQuery($getCoursesQuery);
                         let empty = document.createElement('div');
                         empty.className = "empty-assessments text-sbold text-center mt-5 text-25 d-flex flex-column align-items-center text-sm-20";
                         empty.innerHTML = `
-                                              <img src="../shared/assets/img/empty/todo.png" alt="No Assessments" class="mx-auto mt-5 img-fluid img-small" width="250px">
-                                              Nothing to assess here.
+                                               <img src="../shared/assets/img/empty/todo.png" width="100" class="mb-1">
+                                                <div class="text-center text-14 text-reg mt-1">Nothing to assess here</div>
                                           `;
                         container.appendChild(empty);
                     }
