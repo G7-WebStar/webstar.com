@@ -429,12 +429,17 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                         <div class="px-4 pb-4 overflow-x-auto scroll-attachments"
                                                             style="padding-bottom:20px;scrollbar-width:none;-ms-overflow-style:none; white-space:nowrap;">
 
-                                                            <div style="display:inline-flex; gap:12px;">
+                                                            <div class="<?php echo ($totalCourses === 0) ? 'w-100' : 'w-auto'; ?>"
+                                                                style="display:inline-flex; gap:12px;">
 
                                                                 <?php if ($totalCourses === 0) { ?>
-                                                                    <div class="text-reg text-14"
-                                                                        style="color: var(--black); opacity: 0.85;">
-                                                                        No courses found.
+                                                                    <div
+                                                                        class="col-12 text-center text-14 d-flex flex-column align-items-center justify-content-center gap-0 h-100 w-100">
+                                                                        <img src="../shared/assets/img/empty/folder2.png"
+                                                                            alt="No Announcements" class="empty-state-img"
+                                                                            style="width: 100px;">
+                                                                        <p class="text-med mb-0">No courses yet.</p>
+                                                                        <p class="text-reg">Create a course to get started!</p>
                                                                     </div>
 
                                                                 <?php } else {
@@ -563,9 +568,14 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
 
                                                     <!-- Assessment Card -->
                                                     <?php if ($totalAssessments === 0) { ?>
-                                                        <div class="text-reg text-14"
-                                                            style="color: var(--black); opacity: 0.85;">No assessments
-                                                            found.</div>
+                                                        <div
+                                                            class="col-12 text-center text-14 d-flex flex-column align-items-center justify-content-center gap-0 h-100">
+                                                            <img src="../shared/assets/img/empty/todo.png"
+                                                                alt="No Announcements" class="empty-state-img"
+                                                                style="width: 100px;">
+                                                            <p class="text-med mb-0">Nothing new here.</p>
+                                                            <p class="text-reg">No active assessments found</p>
+                                                        </div>
                                                     <?php } else {
                                                         $chartsIDs = [];
                                                         $i = 1;
