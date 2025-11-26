@@ -538,8 +538,12 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                         <div class="div">
                                                             <div class="mb-2">
                                                                 <span class="text-med"
-                                                                    style="background-color: #ffffffbb; color: #2c2c2c; font-size: 0.75rem; 
-                                                             padding: 2px 8px; border-radius: 12px;"><span><?= ucfirst(strtolower($user['role'])) ?></span>
+                                                                    style="background-color: #ffffffbb; color: #2c2c2c; font-size: 0.75rem; padding: 2px 8px; border-radius: 12px;">
+                                                                    <span>
+                                                                        <?= ucfirst(strtolower($user['role']) == 'professor' ? 'Instructor' : ($user['role'] == 'student' ? 'Student' : ucfirst(strtolower($user['role'])))) ?>
+                                                                    </span>
+                                                                </span>
+
                                                             </div>
                                                             <div class="user-name text-bold">
                                                                 <?= htmlspecialchars($user['firstName'] . ' ' . $user['lastName']) ?>

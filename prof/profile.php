@@ -326,7 +326,7 @@ if (!$username && isset($_SESSION['userID'])) {
 
         if ($role === 'student') {
 
-        $enrollmentQuery = "
+            $enrollmentQuery = "
             SELECT e.enrollmentID
             FROM enrollments e
             JOIN profile p ON p.userID = e.userID
@@ -334,11 +334,11 @@ if (!$username && isset($_SESSION['userID'])) {
             AND e.courseID = p.starCard
             LIMIT 1;
         ";
-        $enrollmentResult = mysqli_query($conn, $enrollmentQuery);
-        $enrollmentRow = mysqli_fetch_assoc($enrollmentResult);
-        $enrollmentID = $enrollmentRow['enrollmentID'];
+            $enrollmentResult = mysqli_query($conn, $enrollmentQuery);
+            $enrollmentRow = mysqli_fetch_assoc($enrollmentResult);
+            $enrollmentID = $enrollmentRow['enrollmentID'];
 
-        $xpQuery = "
+            $xpQuery = "
             SELECT 
                 l.xpPoints,
                 x.xpLevelID,
@@ -350,15 +350,15 @@ if (!$username && isset($_SESSION['userID'])) {
             WHERE l.enrollmentID = '$enrollmentID'
             LIMIT 1
         ";
-        $xpResult = mysqli_query($conn, $xpQuery);
-        $xp = mysqli_fetch_assoc($xpResult);
+            $xpResult = mysqli_query($conn, $xpQuery);
+            $xp = mysqli_fetch_assoc($xpResult);
 
-        $totalXP = $xp['xpPoints'];
-        $currentLevel = $xp['xpLevelID'];
-        $currentTier = $xp['tierName'];
-        $currentThresh = $xp['xpThreshold'];
+            $totalXP = $xp['xpPoints'];
+            $currentLevel = $xp['xpLevelID'];
+            $currentTier = $xp['tierName'];
+            $currentThresh = $xp['xpThreshold'];
 
-        $rankQuery = "
+            $rankQuery = "
             SELECT r.ranking
             FROM (
             SELECT 
@@ -374,15 +374,15 @@ if (!$username && isset($_SESSION['userID'])) {
             WHERE r.userID = '$userID';
             ";
 
-        $rankResult = executeQuery($rankQuery);
+            $rankResult = executeQuery($rankQuery);
 
-        $rank = null;
+            $rank = null;
 
-        if ($rankResult && mysqli_num_rows($rankResult) > 0) {
-            $rankRow = mysqli_fetch_assoc($rankResult);
-            $rank = $rankRow['ranking'];
+            if ($rankResult && mysqli_num_rows($rankResult) > 0) {
+                $rankRow = mysqli_fetch_assoc($rankResult);
+                $rank = $rankRow['ranking'];
+            }
         }
-    }
 
     } else {
         // Username not found
@@ -533,8 +533,12 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                         <div class="div">
                                                             <div class="mb-2">
                                                                 <span class="text-med"
-                                                                    style="background-color: #ffffffbb; color: #2c2c2c; font-size: 0.75rem; 
-                                                             padding: 2px 8px; border-radius: 12px;"><span><?= ucfirst(strtolower($user['role'])) ?></span>
+                                                                    style="background-color: #ffffffbb; color: #2c2c2c; font-size: 0.75rem; padding: 2px 8px; border-radius: 12px;">
+                                                                    <span>
+                                                                        <?= ucfirst(strtolower($user['role']) == 'professor' ? 'Instructor' : ($user['role'] == 'student' ? 'Student' : ucfirst(strtolower($user['role'])))) ?>
+                                                                    </span>
+                                                                </span>
+
                                                             </div>
                                                             <div class="user-name text-bold">
                                                                 <?= htmlspecialchars($user['firstName'] . ' ' . $user['lastName']) ?>

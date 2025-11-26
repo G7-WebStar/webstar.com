@@ -462,7 +462,7 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                                                 <div
                                                                                     class="card-body border-top border-black px-3 py-2">
 
-                                                                                    <div class="text-sbold text-16 text-truncate mt-1"
+                                                                                    <div class="text-sbold text-truncate mt-1"
                                                                                         style="max-width: 200px;"
                                                                                         title="<?php echo $courseCode; ?>">
                                                                                         <?php echo $courseCode; ?>
@@ -591,7 +591,7 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                             }
 
                                                             ?>
-                                                            <div class="card"
+                                                            <div class="card me-2 me-md-0"
                                                                 style="border-radius: 10px; border: 1px solid var(--black); padding: 15px; margin-bottom:12px">
                                                                 <div
                                                                     class="d-flex align-items-center justify-content-between pb-1">
@@ -601,7 +601,7 @@ $pendingTodoResult = executeQuery($pendingTodoQuery);
                                                                             <span class="badge rounded-pill"
                                                                                 style="background: var(--highlight50); color: var(--black); font-size:12px;"><?php echo $assessmentType ?></span>
                                                                         </div>
-                                                                        <div class="text-sbold"
+                                                                        <div class="text-sbold text-truncate"
                                                                             style="display:block; width:100%; white-space:normal; overflow:hidden; text-overflow:ellipsis;">
                                                                             <?php echo $assessmentTitle ?>
                                                                         </div>

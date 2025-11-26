@@ -398,6 +398,16 @@ $user = mysqli_fetch_assoc($result);
                 font-size: 14px !important;
             }
         }
+
+        @media (max-width: 1270px) {
+
+            .left-side,
+            .right-side {
+                width: 100% !important;
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+            }
+        }
     </style>
 
 </head>
@@ -427,7 +437,7 @@ $user = mysqli_fetch_assoc($result);
                             <div class="row mt-0">
 
                                 <!-- LEFT: Course Card -->
-                                <div class="col-md-4">
+                                <div class="col-md-4 left-side">
                                     <?php
                                     if (mysqli_num_rows($selectCourseResult) > 0) {
                                         while ($courses = mysqli_fetch_assoc($selectCourseResult)) {
@@ -769,7 +779,7 @@ $user = mysqli_fetch_assoc($result);
                                     ?>
                                 </div>
                                 <!-- RIGHT: Tabs and Content -->
-                                <div class="col-md-8">
+                                <div class="col-md-8 right-side">
                                     <div class="tab-section">
                                         <div class="tab-carousel-wrapper">
                                             <div class="d-flex align-items-center position-relative"
