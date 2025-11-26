@@ -106,11 +106,11 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
                 <!-- Navigation -->
                 <ul class="nav flex-column">
 
-                    <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'profIndex') ? 'selected-box' : ''; ?>"
+                    <li class="nav-item my-1 d-flex align-items-center gap-2 m-3 p-2 rounded-3 <?php echo ($activePage == 'home') ? 'selected-box' : ''; ?>"
                         data-page="home">
                         <img src="../shared/assets/img/dashboard.png" class="img-fluid"
                             style="width: 30px; height: 30px;">
-                        <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'profIndex') ? 'selected' : ''; ?>"
+                        <a class="nav-link text-dark p-0 text-med text-18 ps-2 <?php echo ($activePage == 'home') ? 'selected' : ''; ?>"
                             href="index.php"><strong>Home</strong></a>
                     </li>
 
@@ -156,12 +156,12 @@ $userInformation = mysqli_fetch_assoc($usernameAndProfilePictureResult);
 
                     <div class="dropdown d-flex justify-content-center mt-2">
                         <button class="btn btn-custom text-sbold rounded-pill px-4 dropdown-toggle" type="button"
-                            id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="background: var(--primaryColor) !important;
+                            id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="background: var(--primaryColor) !important; width:auto!important;
                              border: 1px solid var(--black);">
                             + Create
                         </button>
                         <ul class="dropdown-menu shadow text-med" aria-labelledby="dropdownMenuButton"
-                            style="left: 50%; transform: translateX(-50%); width: auto; min-width: 0;">
+                            style="left: 50% !important; transform: translateX(-50%)!important; width: auto!important; min-width: 0!important;">
                             <li>
                                 <a class="dropdown-item d-flex align-items-center mt-1" href="create-course.php">
                                     <span class="material-symbols-rounded me-2"

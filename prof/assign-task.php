@@ -203,7 +203,6 @@ if (isset($_POST['saveAssignment'])) {
                 SET assignmentDescription='$desc', assignmentPoints='$points', rubricID='$rubricID'
                 WHERE assignmentID='$assignmentID'";
             executeQuery($updateAssignment);
-
         } elseif ($mode === 'reuse') {
             // --- CREATE NEW ASSESSMENT ---
             $insertAssessment = "INSERT INTO assessments
@@ -346,7 +345,7 @@ if (isset($_POST['saveAssignment'])) {
                 (courseID, userID, assignmentID, fileAttachment, fileTitle, fileLink) 
                 VALUES 
                 ('$selectedCourseID', '$userID', '$assignmentID', '', '" .
-                    mysqli_real_escape_string($conn, $fileTitle) . "', '$processedLink')";
+                mysqli_real_escape_string($conn, $fileTitle) . "', '$processedLink')";
                 executeQuery($insertLink);
             }
         }

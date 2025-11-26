@@ -136,7 +136,7 @@ $profilePic = !empty($test['profilePicture'])
             <?php include '../shared/components/prof-sidebar-for-desktop.php'; ?>
 
             <!-- Main Container -->
-            <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-md-4 overflow-y-auto">
+            <div class="col main-container m-0 p-0 mx-0 mx-md-2 p-md-4 ">
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
 
@@ -144,16 +144,15 @@ $profilePic = !empty($test['profilePicture'])
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
                     <!-- Fixed Header -->
-                    <div class="row mb-3">
+                    <div class="row mb-3 row-padding-top">
                         <div class="col-12 cardHeader p-3 mb-4">
 
                             <!-- DESKTOP VIEW -->
                             <div class="row desktop-header d-none d-sm-flex">
                                 <div class="col-auto me-2">
-                                    <a href="assess.php" class="text-decoration-none">
-                                        <i class="fa-solid fa-arrow-left text-reg text-16"
-                                            style="color: var(--black);"></i>
-                                    </a>
+                                    <button onclick="history.back()" class="btn p-0" style="background:none; border:none;tranform:none!important; box-shadow:none!important">
+                                        <i class="fa-solid fa-arrow-left text-reg text-16" style="color: var(--black);"></i>
+                                    </button>
                                 </div>
                                 <?php
                                 if (mysqli_num_rows($selectAssessmentResult) > 0) {
@@ -207,7 +206,7 @@ $profilePic = !empty($test['profilePicture'])
                                                 <div class="tab-scroll">
                                                     <ul class="nav nav-tabs custom-nav-tabs mb-3 flex-nowrap" id="myTab"
                                                         role="tablist">
-                                                        <li class="nav-item">
+                                                        <li class="nav-item text-14">
                                                             <a class="nav-link" id="announcements-tab" href="assess-task-details.php?assessmentID=<?php echo $assessmentID; ?>" role="tab">Task Details</a>
                                                         </li>
                                                         <li class="nav-item">
@@ -262,12 +261,10 @@ $profilePic = !empty($test['profilePicture'])
                                                                             </div>
                                                                             <span class="text-sbold text-16"><?php echo $studentsTodoRow['lastName'] . ", " . $studentsTodoRow['firstName'] . " " . $studentsTodoRow['middleName']; ?></span>
                                                                         </div>
-                                                                        <div class="flex-grow-1 d-flex justify-content-center">
+                                                                        <div class="flex-grow-1 d-flex justify-content-center text-sbold">
                                                                             <span class="badge badge-<?php echo strtolower($studentsTodoRow['status']) ?>"><?php echo $studentsTodoRow['status']; ?></span>
                                                                         </div>
-                                                                        <div class="d-flex align-items-center">
-                                                                            <img src="../shared/assets/img/assess/arrow.png" alt="Arrow" style="width: 20px; height: 20px;">
-                                                                        </div>
+                                                                        
                                                                     </div>
                                                                 </a>
                                                         <?php

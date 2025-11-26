@@ -100,6 +100,8 @@ if ($pendingCount < 0) $pendingCount = 0;
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
 
+    <style></style>
+
 </head>
 
 <body>
@@ -123,7 +125,7 @@ if ($pendingCount < 0) $pendingCount = 0;
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
                     <!-- Fixed Header -->
-                    <div class="row mb-3">
+                    <div class="row mb-3 row-padding-top">
                         <div class="col-12 cardHeader p-3 mb-4">
 
                             <!-- DESKTOP VIEW -->
@@ -187,8 +189,7 @@ if ($pendingCount < 0) $pendingCount = 0;
                                                 <div class="tab-pane fade show active" id="announcements"
                                                     role="tabpanel" aria-labelledby="announcements-tab">
                                                     <div class="text-sbold text-14 mt-5">Exam General Instructions</div>
-                                                    <p class="mb-5 mt-2 text-med text-14"><?php echo nl2br($testDescription) ?>
-                                                    </p>
+                                                    <p class="mb-5 mt-2 text-med text-14"><?php echo nl2br($testDescription) ?></p>
 
                                                     <hr>
 

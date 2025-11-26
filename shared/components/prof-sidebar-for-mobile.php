@@ -106,7 +106,12 @@
           border-radius: 16px; height: 350px; background-color: #fff; padding:10px;">
                     <div id="searchResultsMobile" class="scroll-content"
                         style="height: 100%; overflow-y: auto; border-radius: 12px;">
-                        <div class="text-center text-muted p-3">Type a name or username to search.</div>
+                        <div class="h-100 d-flex flex-column align-items-center justify-content-center">
+                            <div>
+                                <img src="../shared/assets/img/empty/search.png" width="80" class="mb-1">
+                            </div>
+                            <div class="text-center text-med text-14 p-3">Type a name or username to search</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -124,7 +129,14 @@
         const query = searchInputMobile.value.trim();
 
         if (query === '') {
-            searchResultsMobile.innerHTML = '<div class="text-center text-muted p-3">Type a name or username to search.</div>';
+            searchResultsMobile.innerHTML = `
+    <div class="h-100 d-flex flex-column align-items-center justify-content-center">
+        <div>
+            <img src="../shared/assets/img/empty/search.png" width="80" class="mb-1" alt="Search Icon">
+        </div>
+        <div class="text-center text-med text-14 p-3">Type a name or username to search</div>
+    </div>
+`;
             return;
         }
 

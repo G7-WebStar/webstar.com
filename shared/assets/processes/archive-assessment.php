@@ -14,3 +14,10 @@ if ($archiveStatus['isArchived'] == 0) {
     $archiveAssessmentQuery = "UPDATE assessments SET isArchived ='0' WHERE assessmentID = $assessmentID";
     $archiveAssessmentResult = executeQuery($archiveAssessmentQuery);
 }
+
+if ($archiveAssessmentQuery) {
+     $_SESSION['toast'] = [
+            'type' => 'alert-success',
+            'message' => 'Assignment assigned successfully!'
+        ];
+}

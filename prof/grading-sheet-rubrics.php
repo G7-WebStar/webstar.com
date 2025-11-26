@@ -45,7 +45,7 @@ $detailsQuery = $conn->prepare("
     SELECT 
         s.userID,
         a.assessmentID,
-        CONCAT(u.firstName, ' ', u.middleName, '. ', u.lastName) AS studentName,
+        CONCAT(u.firstName, ' ', u.middleName, ' ', u.lastName) AS studentName,
         p.programInitial,
         u.yearLevel,
         u.yearSection,
@@ -495,26 +495,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
         $enrollmentQuery->bind_param("ii", $studentUserID, $details['courseID']);
         $enrollmentQuery->execute();
         $enrollmentResult = $enrollmentQuery->get_result();
-        
+
         if ($enrollmentResult && $enrollmentResult->num_rows > 0) {
             $enrollmentData = $enrollmentResult->fetch_assoc();
             $enrollmentID = intval($enrollmentData['enrollmentID']);
-            
+
             // Prepare notification message
             $assessmentTitleEscaped = mysqli_real_escape_string($conn, $details['assessmentTitle']);
             $notificationMessage = "Your submission for \"" . $assessmentTitleEscaped . "\" has been graded.";
             $notifType = 'Submissions Update';
-            
+
             $escapedNotificationMessage = mysqli_real_escape_string($conn, $notificationMessage);
             $escapedNotifType = mysqli_real_escape_string($conn, $notifType);
-            
+
             // Insert notification into inbox
             $insertNotificationQuery = "
                 INSERT INTO inbox (enrollmentID, messageText, notifType, createdAt)
                 VALUES ('$enrollmentID', '$escapedNotificationMessage', '$escapedNotifType', NOW())
             ";
             executeQuery($insertNotificationQuery);
-            
+
             // Get student email and check if they have questDeadlineEnabled
             $selectEmailQuery = "
                 SELECT u.email, COALESCE(s.questDeadlineEnabled, 0) as questDeadlineEnabled
@@ -526,10 +526,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
             $emailStmt->bind_param("i", $studentUserID);
             $emailStmt->execute();
             $emailResult = $emailStmt->get_result();
-            
+
             if ($emailResult && $emailResult->num_rows > 0) {
                 $studentData = $emailResult->fetch_assoc();
-                
+
                 if ($studentData['questDeadlineEnabled'] == 1 && !empty($studentData['email'])) {
                     $credentialQuery = "SELECT email, password FROM emailcredentials WHERE credentialID = 1";
                     $credentialResult = executeQuery($credentialQuery);
@@ -542,12 +542,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                         try {
                             $mail = new PHPMailer(true);
                             $mail->isSMTP();
-                            $mail->Host       = 'smtp.gmail.com';
-                            $mail->SMTPAuth   = true;
-                            $mail->Username   = $smtpEmail;
-                            $mail->Password   = $smtpPassword;
+                            $mail->Host = 'smtp.gmail.com';
+                            $mail->SMTPAuth = true;
+                            $mail->Username = $smtpEmail;
+                            $mail->Password = $smtpPassword;
                             $mail->SMTPSecure = 'tls';
-                            $mail->Port       = 587;
+                            $mail->Port = 587;
                             $mail->setFrom($smtpEmail, 'Webstar');
                             $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
                             if (file_exists($headerPath)) {
@@ -557,20 +557,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                             if (file_exists($footerPath)) {
                                 $mail->AddEmbeddedImage($footerPath, 'emailFooter');
                             }
-                            
+
                             $mail->isHTML(true);
                             $mail->CharSet = 'UTF-8';
                             $mail->Encoding = 'base64';
                             $mail->Subject = "[GRADED] " . $details['assessmentTitle'] . " - " . $details['courseCode'];
                             $mail->addAddress($studentData['email']);
-                            
+
                             $assessmentTitleEsc = htmlspecialchars($details['assessmentTitle'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
                             $courseCodeEsc = htmlspecialchars($details['courseCode'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
                             $courseTitleEsc = htmlspecialchars($details['courseTitle'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
                             $scoreDisplay = number_format($score, 0);
                             $maxScoreDisplay = number_format((float) $totalPoints, 0);
                             $feedbackHtml = !empty($feedback) ? nl2br(htmlspecialchars($feedback, ENT_QUOTES | ENT_HTML5, 'UTF-8')) : '<em>No feedback provided.</em>';
-                            
+
                             $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
                             <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
                                 <tr>
@@ -617,7 +617,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                                 </tr>
                             </table>
                         </div>';
-                        
+
                             $mail->send();
                         } catch (Exception $e) {
                             $errorMsg = isset($mail) && is_object($mail) ? $mail->ErrorInfo : $e->getMessage();
@@ -718,7 +718,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
         }
         exit();
     }
-    
+
 
 }
 
@@ -769,17 +769,17 @@ if ($studentUserID > 0) {
         style="background-color: var(--black); overflow-y:auto;">
         <!-- Toast Container -->
         <div id="toastContainer"
-             class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+            class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
             style="z-index:1100; pointer-events:none;">
-           <?php if (isset($_SESSION['success'])): ?>
-               <div class="alert alert-success mb-2 shadow-lg text-med text-12
+            <?php if (isset($_SESSION['success'])): ?>
+                <div class="alert alert-success mb-2 shadow-lg text-med text-12
                            d-flex align-items-center justify-content-center gap-2 px-3 py-2" role="alert"
                     style="border-radius:8px; display:flex; align-items:center; gap:8px; padding:0.5rem 0.75rem; text-align:center; background-color:#d1e7dd; color:#0f5132;">
-                   <i class="bi bi-check-circle-fill fs-6" style="color: var(--black);"></i>
-                   <span style="color: var(--black);"><?= $_SESSION['success']; ?></span>
-               </div>
-               <?php unset($_SESSION['success']); ?>
-           <?php endif; ?>
+                    <i class="bi bi-check-circle-fill fs-6" style="color: var(--black);"></i>
+                    <span style="color: var(--black);"><?= $_SESSION['success']; ?></span>
+                </div>
+                <?php unset($_SESSION['success']); ?>
+            <?php endif; ?>
         </div>
 
         <div class="row w-100">
@@ -799,17 +799,19 @@ if ($studentUserID > 0) {
                                 <div
                                     class="row desktop-header d-none d-sm-flex align-items-center justify-content-between">
                                     <div class="col-auto d-flex align-items-center gap-3">
-                                        <button onclick="history.back()" class="p-0" style="background:none; border:none;">
+                                        <button onclick="history.back()" class="p-0"
+                                            style="background:none; border:none;">
                                             <span class="material-symbols-outlined"
-                                                  style="color: var(--black); font-size: 22px;">
+                                                style="color: var(--black); font-size: 22px;">
                                                 arrow_back
                                             </span>
                                         </button>
                                         <div class="d-flex align-items-center gap-3">
                                             <div class="rounded-circle overflow-hidden"
-                                                 style="width: 40px; height: 40px; background-color: var(--highlight75);">
-                                                <img src="<?php echo htmlspecialchars($profilePicturePath); ?>" 
-                                                     alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;">
+                                                style="width: 40px; height: 40px; background-color: var(--highlight75);">
+                                                <img src="<?php echo htmlspecialchars($profilePicturePath); ?>"
+                                                    alt="Profile Picture"
+                                                    style="width: 100%; height: 100%; object-fit: cover;">
                                             </div>
                                             <div>
                                                 <div class="text-sbold text-18" style="color: var(--black);">
@@ -823,7 +825,7 @@ if ($studentUserID > 0) {
                                         </div>
 
                                     </div>
-                                    <div class="col-auto text-end" style="line-height: 1.3;">
+                                    <div class="col-auto text-end d-none d-lg-block" style="line-height: 1.3;">
                                         <div class="text-sbold text-16" style="color: var(--black);">
                                             <?php echo htmlspecialchars($details['assessmentTitle']); ?>
                                         </div>
@@ -839,12 +841,15 @@ if ($studentUserID > 0) {
                                     <div class="mobile-top d-flex align-items-center gap-3">
                                         <div class="arrow">
                                             <a href="javascript:history.back()" class="text-decoration-none">
-                                                <i class="fa-solid fa-arrow-left text-reg text-16" style="color: var(--black);"></i>
+                                                <i class="fa-solid fa-arrow-left text-reg text-16"
+                                                    style="color: var(--black);"></i>
                                             </a>
                                         </div>
-                                        <div class="title text-sbold text-18">
-                                            <?php echo htmlspecialchars($details['assessmentTitle']); ?>
+                                        <div class="title text-sbold text-18"
+                                            style="display: block; width: 80%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                            <?php echo htmlspecialchars($studentDisplay); ?>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -872,7 +877,7 @@ if ($studentUserID > 0) {
                                     }
                                     ?>
 
-                                    <div class="text-sbold text-14 mt-4">Attachments</div>
+                                    <div class="text-sbold text-14 mt-4 mb-3">Attachments</div>
 
                                     <?php if (!empty($images) || !empty($pdfs) || !empty($others)): ?>
 
@@ -888,13 +893,13 @@ if ($studentUserID > 0) {
 
                                         <!-- IMAGE SECTION -->
                                         <?php if (!empty($images)): ?>
-                                            <div class="container mt-3">
+                                            <div class="container mt-3 w-100 m-0">
                                                 <div class="row g-4">
                                                     <?php foreach ($images as $index => $f):
                                                         $link = htmlspecialchars($f['path']);
                                                         $name = htmlspecialchars($f['name']);
                                                         ?>
-                                                        <div class="col-12 col-sm-6 col-md-4">
+                                                        <div class="col-12 col-sm-6 col-md-4 p-0 m-0 my-3">
                                                             <div class="pdf-preview-box text-center" data-bs-toggle="modal"
                                                                 data-bs-target="#imageModal<?php echo $index; ?>"
                                                                 style="cursor: zoom-in; overflow: hidden; border-radius: 10px; height: 180px; position: relative; border: 1px solid var(--black);">
@@ -932,7 +937,6 @@ if ($studentUserID > 0) {
 
                                         <!-- OTHER FILES & LINKS SECTION -->
                                         <?php if (!empty($linkFiles)): ?>
-                                            <p class="text-sbold text-14 mt-4">Link Attachments</p>
 
                                             <?php foreach ($linkFiles as $f): ?>
                                                 <div class="mt-4b">
@@ -942,9 +946,10 @@ if ($studentUserID > 0) {
                                                         loading="lazy" style="border-radius: 10px; border: 1px solid var(--black);">
                                                     </iframe>
 
-                                                    <div class="text-start mt-3">
+                                                    <div class="text-start mt-3 text-reg">
                                                         <a href="<?php echo htmlspecialchars($f['link']); ?>" target="_blank"
-                                                            rel="noopener noreferrer" class="btn custom-btn px-4 py-2">
+                                                            rel="noopener noreferrer" class="btn custom-btn px-4 py-2"
+                                                            style="border:1px solid var(--black)">
                                                             <i class="fa-solid fa-up-right-from-square me-2"></i> Open link in new
                                                             tab
                                                         </a>
@@ -963,7 +968,9 @@ if ($studentUserID > 0) {
 
                             <!-- RIGHT CONTENT -->
                             <div class="col-12 col-lg-4">
-                                <div class="cardSticky position-sticky" style="top: 20px;">
+                                <div class="cardSticky position-sticky"
+                                    style="top:20px; max-height:60vh; overflow-y:auto; ">
+
                                     <div class="ms-2 me-2">
 
                                         <!-- TOTAL GRADE -->
@@ -981,117 +988,126 @@ if ($studentUserID > 0) {
                                             <div class="d-flex align-items-center justify-content-center mb-2">
                                                 <div class="text-reg"><i>Grade</i></div>
                                             </div>
-                                            <div style="max-height: 450px; overflow-y: auto; padding-right: 10px;">
+                                            <div style="max-height: 450px; overflow-y: auto; ">
 
-                                            <?php while ($criterion = $criteriaQuery->fetch_assoc()): ?>
-                                                <?php
-                                                $criterionID = $criterion['criterionID'];
-                                                $criterionTitle = $criterion['criteriaTitle']; // removed htmlspecialchars as requested
-                                            
-                                                $levelsQuery = executeQuery("
+                                                <?php while ($criterion = $criteriaQuery->fetch_assoc()): ?>
+                                                    <?php
+                                                    $criterionID = $criterion['criterionID'];
+                                                    $criterionTitle = $criterion['criteriaTitle']; // removed htmlspecialchars as requested
+                                                
+                                                    $levelsQuery = executeQuery("
                                                 SELECT * FROM level
                                                 WHERE criterionID = $criterionID
                                                 ORDER BY points DESC
                                             ");
-                                                ?>
+                                                    ?>
 
+                                                    <div class="text-center mt-5">
+                                                        <div class="text-sbold text-15 mb-3" style="color: var(--black);">
+                                                            <?= $criterionTitle ?>
+                                                        </div>
+
+                                                        <div id="ratingAccordion<?= $criterionID ?>">
+                                                            <?php while ($level = $levelsQuery->fetch_assoc()): ?>
+                                                                <?php
+                                                                $levelID = $level['levelID'];
+                                                                $levelTitle = $level['levelTitle'];
+                                                                $levelDescription = $level['levelDescription'];
+                                                                $points = intval($level['points']);
+                                                                $collapseID = "level{$levelID}";
+                                                                ?>
+                                                                <div class="mb-2">
+                                                                    <button
+                                                                        class="btn w-100 d-flex align-items-center justify-content-center flex-column text-med text-14 level-btn"
+                                                                        type="button" data-bs-toggle="collapse"
+                                                                        data-bs-target="#<?= $collapseID ?>"
+                                                                        aria-expanded="false" aria-controls="<?= $collapseID ?>"
+                                                                        data-criterion="<?= $criterionID ?>"
+                                                                        data-points="<?= $points ?>"
+                                                                        data-level-id="<?= $levelID ?>"
+                                                                        style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black);">
+
+                                                                        <div
+                                                                            class="d-flex justify-content-between align-items-center w-100 px-3">
+                                                                            <span
+                                                                                class="flex-grow-1 text-center ps-3 level-select">
+                                                                                <?= $levelTitle ?> · <?= $points ?> pts
+                                                                            </span>
+                                                                            <span
+                                                                                class="material-symbols-rounded transition">expand_more</span>
+                                                                        </div>
+
+                                                                        <div class="collapse w-100 mt-2" id="<?= $collapseID ?>"
+                                                                            data-bs-parent="#ratingAccordion<?= $criterionID ?>">
+                                                                            <p class="mb-0 px-3 pb-2 text-reg text-14">
+                                                                                <?= $levelDescription ?>
+                                                                            </p>
+                                                                        </div>
+                                                                    </button>
+                                                                </div>
+                                                            <?php endwhile; ?>
+                                                        </div>
+                                                    </div>
+                                                <?php endwhile; ?>
+
+
+                                                <!-- optional action -->
                                                 <div class="text-center mt-5">
                                                     <div class="text-sbold text-15 mb-3" style="color: var(--black);">
-                                                        <?= $criterionTitle ?>
+                                                        Optional Actions
                                                     </div>
-
-                                                    <div id="ratingAccordion<?= $criterionID ?>">
-                                                        <?php while ($level = $levelsQuery->fetch_assoc()): ?>
-                                                            <?php
-                                                            $levelID = $level['levelID'];
-                                                            $levelTitle = $level['levelTitle'];
-                                                            $levelDescription = $level['levelDescription'];
-                                                            $points = intval($level['points']);
-                                                            $collapseID = "level{$levelID}";
-                                                            ?>
-                                                            <div class="mb-2">
-                                                                <button
-                                                                    class="btn w-100 d-flex align-items-center justify-content-center flex-column text-med text-14 level-btn"
-                                                                    type="button" data-bs-toggle="collapse"
-                                                                    data-bs-target="#<?= $collapseID ?>" aria-expanded="false"
-                                                                    aria-controls="<?= $collapseID ?>"
-                                                                    data-criterion="<?= $criterionID ?>"
-                                                                    data-points="<?= $points ?>" data-level-id="<?= $levelID ?>"
-                                                                    style="background-color: var(--pureWhite); border-radius: 10px; border: 1px solid var(--black);">
-
-                                                                    <div
-                                                                        class="d-flex justify-content-between align-items-center w-100 px-3">
-                                                                        <span class="flex-grow-1 text-center ps-3 level-select">
-                                                                            <?= $levelTitle ?> · <?= $points ?> pts
-                                                                        </span>
-                                                                        <span
-                                                                            class="material-symbols-rounded transition">expand_more</span>
-                                                                    </div>
-
-                                                                    <div class="collapse w-100 mt-2" id="<?= $collapseID ?>"
-                                                                        data-bs-parent="#ratingAccordion<?= $criterionID ?>">
-                                                                        <p class="mb-0 px-3 pb-2 text-reg text-14">
-                                                                            <?= $levelDescription ?>
-                                                                        </p>
-                                                                    </div>
-                                                                </button>
-                                                            </div>
-                                                        <?php endwhile; ?>
+                                                    <div class="d-flex flex-column align-items-center gap-2 mb-5">
+                                                        <!-- ADD AWARD BADGE BUTTON -->
+                                                        <button type="button"
+                                                            class="btn custom-btn d-flex align-items-center justify-content-center text-reg"
+                                                            data-bs-toggle="modal" data-bs-target="#awardBadgeModal">
+                                                            <span
+                                                                class="material-symbols-rounded me-2">emoji_events</span>
+                                                            Award badge
+                                                        </button>
+                                                        <!-- FEEDBACK INPUT (replacing modal button) -->
+                                                        <textarea name="feedback" id="feedbackInput" rows="3"
+                                                            class="form-control text-reg text-14 rounded-3 p-3 mt-3"
+                                                            style="resize: none; background-color: var(--pureWhite); border: 1px solid var(--black) !important;"
+                                                            placeholder="Write feedback that helps your student level up their learning journey!"><?= htmlspecialchars($existingFeedback ?? '') ?></textarea>
                                                     </div>
                                                 </div>
-                                            <?php endwhile; ?>
+                                                <!-- Buttons always below the card -->
+                                                <div class="text-center mt-4 text-reg">
+                                                    <div
+                                                        class="d-flex justify-content-center align-items-center gap-3 mb-2 stack-below-large">
+                                                        <button type="button" id="prevBtn"
+                                                            class="btn px-4 py-2 rounded-pill text-15 fw-semibold"
+                                                            data-current-index="<?php echo $currentIndex; ?>"
+                                                            style="background-color: var(--pureWhite); border: 1px solid var(--black); color: var(--black);">
+                                                            Previous
+                                                        </button>
+
+                                                        <button type="submit" name="submitGrade" id="submitRubricBtn"
+                                                            class="btn px-4 py-2 rounded-pill text-15 fw-semibold"
+                                                            style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);">
+                                                            Submit
+                                                        </button>
+
+                                                        <button type="button" id="nextBtn"
+                                                            class="btn px-4 py-2 rounded-pill text-15 fw-semibold"
+                                                            data-current-index="<?php echo $currentIndex; ?>"
+                                                            style="background-color: var(--pureWhite); border: 1px solid var(--black); color: var(--black);">
+                                                            Next
+                                                        </button>
+                                                    </div>
+
+                                                    <p class="text-14 fw-medium mt-3" style="color: var(--black);">
+                                                        <?php echo $leftToReview; ?> submissions left to review
+                                                    </p>
+
+                                                    <p class="text-14 fw-medium mt-3"
+                                                        style="color: var(--black); font-style: italic;">
+                                                        Note: Grades cannot be edited after submission.
+                                                    </p>
 
 
-                                            <!-- optional action -->
-                                            <div class="text-center mt-5">
-                                                <div class="text-sbold text-15 mb-3" style="color: var(--black);">
-                                                    Optional Actions
                                                 </div>
-                                                <div class="d-flex flex-column align-items-center gap-2 mb-5">
-                                                    <!-- ADD AWARD BADGE BUTTON -->
-                                                    <button type="button"
-                                                        class="btn custom-btn d-flex align-items-center justify-content-center"
-                                                        data-bs-toggle="modal" data-bs-target="#awardBadgeModal">
-                                                        <span class="material-symbols-rounded me-2">emoji_events</span>
-                                                        Award badge
-                                                    </button>
-                                                    <!-- FEEDBACK INPUT (replacing modal button) -->
-                                                    <textarea name="feedback" id="feedbackInput" rows="3"
-                                                        class="form-control text-reg text-15 rounded-3 p-3 mt-3"
-                                                        style="resize: none; background-color: var(--pureWhite); border: 1px solid var(--black) !important;"
-                                                        placeholder="Write feedback that helps your student level up their learning journey!"><?= htmlspecialchars($existingFeedback ?? '') ?></textarea>
-                                                </div>
-                                            </div>
-                                            <!-- Buttons always below the card -->
-                                            <div class="text-center mt-4">
-                                                <div
-                                                    class="d-flex justify-content-center align-items-center gap-3 mb-2 stack-below-large">
-                                                    <button type="button" id="prevBtn"
-                                                        class="btn px-4 py-2 rounded-pill text-15 fw-semibold"
-                                                        data-current-index="<?php echo $currentIndex; ?>"
-                                                        style="background-color: var(--pureWhite); border: 1px solid var(--black); color: var(--black);">
-                                                        Previous
-                                                    </button>
-
-                                                    <button type="submit" name="submitGrade" id="submitRubricBtn"
-                                                        class="btn px-4 py-2 rounded-pill text-15 fw-semibold"
-                                                        style="background-color: var(--primaryColor); border: 1px solid var(--black); color: var(--black);">
-                                                        Submit
-                                                    </button>
-
-                                                    <button type="button" id="nextBtn"
-                                                        class="btn px-4 py-2 rounded-pill text-15 fw-semibold"
-                                                        data-current-index="<?php echo $currentIndex; ?>"
-                                                        style="background-color: var(--pureWhite); border: 1px solid var(--black); color: var(--black);">
-                                                        Next
-                                                    </button>
-                                                </div>
-
-                                                <p class="text-15 fw-medium mt-2" style="color: var(--black);">
-                                                    <?php echo $leftToReview; ?> submissions left to review
-                                                </p>
-
-                                            </div>
                                             </div>
                                         </form>
                                     </div>
@@ -1130,10 +1146,11 @@ if ($studentUserID > 0) {
                                 <div class="card rounded-3 mb-2"
                                     style="background-color: var(--pureWhite); border: 1px solid var(--black);">
                                     <div class="card-body p-0">
-                                        <div class="badge-option rounded-4 d-flex align-items-center" style="cursor: pointer;">
+                                        <div class="badge-option rounded-4 d-flex align-items-center p-3"
+                                            style="cursor: pointer;">
                                             <img src="../shared/assets/img/badge/<?php echo htmlspecialchars($badge['badgeIcon']); ?>"
                                                 alt="<?php echo htmlspecialchars($badge['badgeName']); ?> Icon"
-                                                style="width: 33px; height: 38px;" class="mx-1 ms-2">
+                                                style="width: 33px; height: 33px;" class="mx-1 ms-2 me-2">
                                             <div>
                                                 <div style="line-height: 1.1;">
                                                     <div class="text-bold text-14 ms-1">
@@ -1153,9 +1170,7 @@ if ($studentUserID > 0) {
 
                 </div>
 
-                <!-- FOOTER -->
-                <div class="modal-footer border-top">
-                </div>
+
             </div>
         </div>
     </div>

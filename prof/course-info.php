@@ -17,6 +17,13 @@ if (isset($_POST['activeTab'])) {
 $toastMessage = '';
 $toastType = '';
 
+if (isset($_GET['copied'])) {
+    $_SESSION['toast'] = [
+        'type' => 'alert-success',
+        'message' => 'Access code copied to clipboard!'
+    ];
+}
+
 if (isset($_SESSION['toast'])) {
     $toastMessage = $_SESSION['toast']['message'];
     $toastType = $_SESSION['toast']['type'];
@@ -521,79 +528,41 @@ $user = mysqli_fetch_assoc($result);
                                                                 </div>
                                                             </div>
 
-                                                            <!-- Class Standing -->
-                                                            <div class="row mb-3 mt-3">
-                                                                <div class="col">
-                                                                    <label class="text-med text-12">Class Standing</label>
-                                                                    <div class="class-standing text-12 d-flex justify-content-between align-items-center rounded-3 mt-2"
-                                                                        style="background-color:white">
-                                                                        <span class="material-symbols-outlined"
-                                                                            style="font-size:20px">
-                                                                            leaderboard
-                                                                        </span>
-                                                                        <span class="text-sbold">
-                                                                            RANK 1
-                                                                        </span>
-                                                                        <?php
-                                                                        if (mysqli_num_rows($selectLeaderboardResult) > 0) {
-                                                                            mysqli_data_seek($selectLeaderboardResult, 0);
-                                                                            while ($points = mysqli_fetch_assoc($selectLeaderboardResult)) {
-                                                                                ?>
-                                                                                <div class="d-flex align-items-center">
-                                                                                    <img class="me-1" src="shared/assets/img/xp.png"
-                                                                                        alt="Description of Image" width="15">
-                                                                                    <span
-                                                                                        class="text-med"><?php echo $points['totalPoints']; ?>
-                                                                                        XPs</span>
-                                                                                </div>
-
-                                                                                <?php
-                                                                            }
-                                                                        }
-                                                                        ?>
-
-                                                                    </div>
+                                                            <!-- Section -->
+                                                            <div class="d-flex align-items-center text-decoration-none mt-2">
+                                                                <span
+                                                                    class="material-symbols-outlined me-1 text-center d-flex align-items-center"
+                                                                    style="width: 30px; height: 30px;">
+                                                                    label
+                                                                </span>
+                                                                <div class="d-flex flex-column justify-content-center">
+                                                                    <span class="text-reg text-12">
+                                                                        <?php echo $courses['section']; ?>
+                                                                    </span>
                                                                 </div>
                                                             </div>
 
-                                                            <!-- Level -->
-                                                            <div class="row mb-3 mt-3">
-                                                                <div class="col">
-                                                                    <label class="text-med text-12">Level</label>
-                                                                    <div class="class-standing text-12 align-items-center rounded-3 p-3 mt-2"
-                                                                        style="background-color:white">
-                                                                        <div class="d-flex justify-content-between py-1">
-                                                                            <span class="text-sbold">
-                                                                                LV. 1 · Mentor
-                                                                            </span>
-                                                                            <span class="text-sbold">
-                                                                                3160 / 4000 XP
-                                                                            </span>
-                                                                        </div>
+                                                            <!-- Access Code -->
+                                                            <div
+                                                                class="d-flex align-items-center justify-content-between text-decoration-none mt-3">
+                                                                <label class="text-med text-12">Access Code</label>
 
-                                                                        <div class="progress mt-2 mb-2" role="progressbar"
-                                                                            aria-label="Basic example" aria-valuenow="0"
-                                                                            aria-valuemin="0" aria-valuemax="100"
-                                                                            style="height: 10px; border: 1px solid var(--black);">
-                                                                            <div class="progress-bar"
-                                                                                style="width: 50%; background-color:var(--primaryColor); border-right: 1px solid var(--black);">
-                                                                            </div>
-                                                                        </div>
-
-                                                                    </div>
-                                                                </div>
+                                                                <span id="accessCode2" class="text-bold text-12"
+                                                                    style="letter-spacing:.5em; cursor:pointer;">
+                                                                    <?php echo $courses['code']; ?>
+                                                                </span>
                                                             </div>
 
                                                             <!-- Quests -->
                                                             <div class="row mb-3 mt-3">
                                                                 <div class="col">
-                                                                    <?php if (mysqli_num_rows($selectLimitAssessmentResult) > 0) {?>
+                                                                    <?php if (mysqli_num_rows($selectLimitAssessmentResult) > 0) { ?>
                                                                         <label class="text-med text-12">Active Assessments</label>
                                                                         <?php
                                                                         mysqli_data_seek($selectLimitAssessmentResult, 0);
                                                                         while ($activities = mysqli_fetch_assoc($selectLimitAssessmentResult)) {
                                                                             ?>
-                                                                            
+
                                                                             <div
                                                                                 class="todo-card-course-info d-flex align-items-stretch rounded-2 mt-2 w-100">
                                                                                 <div class="date-section text-sbold text-12 px-3"
@@ -713,16 +682,41 @@ $user = mysqli_fetch_assoc($result);
                                                         </div>
                                                     </div>
 
+                                                    <!-- Section -->
+                                                    <div class="d-flex align-items-center text-decoration-none mt-2">
+                                                        <span
+                                                            class="material-symbols-outlined me-1 text-center d-flex align-items-center"
+                                                            style="width: 30px; height: 30px;">
+                                                            label
+                                                        </span>
+                                                        <div class="d-flex flex-column justify-content-center">
+                                                            <span class="text-reg text-14">
+                                                                <?php echo $courses['section']; ?>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Access Code -->
+                                                    <div
+                                                        class="d-flex align-items-center justify-content-between text-decoration-none mt-3">
+                                                        <label class="text-med text-14">Access Code</label>
+
+                                                        <span id="accessCode" class="text-bold text-14"
+                                                            style="letter-spacing:.5em; cursor:pointer;">
+                                                            <?php echo $courses['code']; ?>
+                                                        </span>
+                                                    </div>
+
                                                     <!-- Quests -->
                                                     <div class="row mb-3 mt-3">
                                                         <div class="col">
-                                                            <?php if (mysqli_num_rows($selectLimitAssessmentResult) > 0) {?>
+                                                            <?php if (mysqli_num_rows($selectLimitAssessmentResult) > 0) { ?>
                                                                 <label class="text-med text-14 mb-1">Active Assessments</label>
                                                                 <?php
                                                                 mysqli_data_seek($selectLimitAssessmentResult, 0);
                                                                 while ($activities = mysqli_fetch_assoc($selectLimitAssessmentResult)) {
                                                                     ?>
-                                                                    
+
                                                                     <div
                                                                         class="todo-card-course-info d-flex align-items-stretch rounded-2 mt-2 w-100">
                                                                         <div class="date-section text-sbold text-14 px-1"
@@ -1111,6 +1105,30 @@ $user = mysqli_fetch_assoc($result);
             });
         })();
     </script>
+
+    <script>
+        document.getElementById("accessCode").addEventListener("click", () => {
+            const code = document.getElementById("accessCode").textContent.trim();
+
+            navigator.clipboard.writeText(code).then(() => {
+                const url = new URL(window.location.href);
+                url.searchParams.set("copied", "1");
+                window.location.href = url.toString();
+            });
+        });
+    </script>
+    <script>
+        document.getElementById("accessCode2").addEventListener("click", () => {
+            const code = document.getElementById("accessCode2").textContent.trim();
+
+            navigator.clipboard.writeText(code).then(() => {
+                const url = new URL(window.location.href);
+                url.searchParams.set("copied", "1");
+                window.location.href = url.toString();
+            });
+        });
+    </script>
+
 
 </body>
 

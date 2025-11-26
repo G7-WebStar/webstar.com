@@ -98,14 +98,14 @@ $inboxCount = mysqli_num_rows($selectInboxResult);
                                 <!-- Header Section -->
                                 <div class="row align-items-center mb-3 text-center text-md-start">
                                     <div class="col-12 col-md-auto text-center text-md-start position-relative">
-                                        <h1 class="text-sbold text-25 mb-0 mt-2" style="color: var(--black);">My Inbox
+                                        <h1 class="text-sbold text-25 mb-0 my-2" style="color: var(--black);">My Inbox
                                         </h1>
                                         <!-- Filter Icon (mobile only) -->
                                         <span id="filterToggle"
                                             class="position-absolute end-0 top-50 translate-middle-y d-md-none px-2"
                                             role="button" tabindex="0" aria-label="Show filters"
                                             style="cursor: pointer; user-select: none; ">
-                                            <span class="material-symbols-rounded"
+                                            <span class="material-symbols-rounded mt-2"
                                                 style="font-size: 30px; color: var(--black);">
                                                 tune
                                             </span>
