@@ -218,7 +218,7 @@ $ungradedCount = mysqli_fetch_assoc($ungradedResult)['ungradedCount'] ?? 0;
                     </div>
 
                     <!-- Fixed Header -->
-                    <div class="row mb-3">
+                    <div class="row mb-3 row-padding-top">
                         <div class="col-12 cardHeader p-3 mb-4">
 
                             <!-- DESKTOP VIEW -->
@@ -320,7 +320,7 @@ $ungradedCount = mysqli_fetch_assoc($ungradedResult)['ungradedCount'] ?? 0;
                                                         <form method="POST" class="ms-auto flex-shrink-0">
                                                             <input type="hidden" name="assessmentID" value="<?php echo $assessmentID; ?>">
                                                             <button type="submit" name="returnAll"
-                                                                class="btn btn-sm px-3 py-1 rounded-pill text-reg text-md-14 d-inline-flex align-items-center btn-return-all"
+                                                                class="btn btn-sm px-3 py-3 pe-3 rounded-pill text-reg text-md-14 d-inline-flex align-items-center btn-return-all"
                                                                 style="background-color: var(--primaryColor); border: 1px solid var(--black); margin-right: auto; height: 27px; pointer-events:auto;"
                                                                 <?php echo $buttonDisabled ? 'disabled title="Return All available after deadline or successful test completion"' : ''; ?>>
                                                                 <span class="material-symbols-outlined">assignment_return</span>

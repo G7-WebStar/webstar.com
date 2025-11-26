@@ -173,7 +173,7 @@ if (!empty($rubricID)) {
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
                     <!-- Fixed Header -->
-                    <div class="row mb-3">
+                    <div class="row mb-3 row-padding-top">
                         <div class="col-12 cardHeader p-3 mb-4">
 
                             <!-- DESKTOP VIEW -->

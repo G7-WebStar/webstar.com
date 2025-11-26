@@ -187,13 +187,13 @@ if (!empty($rubricID)) {
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
                     <!-- Fixed Header -->
-                    <div class="row mb-3">
+                    <div class="row mb-3 row-padding-top">
                         <div class="col-12 cardHeader p-3 mb-4">
 
                             <!-- DESKTOP VIEW -->
                             <div class="row desktop-header d-none d-sm-flex">
                                 <div class="col-auto me-2">
-                                    <button onclick="history.back()" class="btn p-0" style="background:none; border:none;">
+                                    <button onclick="history.back()" class="btn p-0" style="background:none; border:none;tranform:none!important; box-shadow:none!important">
                                         <i class="fa-solid fa-arrow-left text-reg text-16" style="color: var(--black);"></i>
                                     </button>
                                 </div>

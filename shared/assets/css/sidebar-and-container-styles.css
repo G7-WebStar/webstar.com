@@ -38,7 +38,7 @@ body {
   font-family: var(--SemiBold);
   text-decoration: none;
   letter-spacing: -0.03em;
-  font-size: 17px;
+  font-size: 14px;
 }
 
 /* Ensure label and badge alignment inside sidebar rows */

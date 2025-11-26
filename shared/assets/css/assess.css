@@ -5,7 +5,7 @@ h1.text-bold.text-25 {
 
 /* Dropdown spacing adjustments */
 .dropdown-container {
-    margin-right: 40px; /* Spacing between dropdowns */
+    margin-right: 20px; /* Spacing between dropdowns */
 }
 
 .dropdown-container:last-child {
@@ -21,8 +21,7 @@ h1.text-bold.text-25 {
     background-color: var(--pureWhite);
     padding: 20px;
     position: relative;
-    margin-top: 30px; 
-    margin-left: 10px;
+    margin-right: 10px;
 } 
 
 
@@ -58,7 +57,7 @@ h1.text-bold.text-25 {
 .btn-action {
     background: var(--primaryColor);
     border: 1px solid var(--black);
-    border-radius: 16px;
+    border-radius: 26px;
     color: var(--black);
     font-size: 13px;
     width: 150px; 
@@ -67,8 +66,9 @@ h1.text-bold.text-25 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Regular', 'Poppins', sans-serif;
+    font-family: 'Medium', 'Poppins', sans-serif;
     white-space: nowrap;
+    letter-spacing: -0.03em;
 }
 
 .btn-action:hover {
@@ -111,7 +111,6 @@ h1.text-bold.text-25 {
 
 .submission-stats {
     text-align: left;
-    margin-left: 100px;
     margin-top: 15px; 
     flex: 0 0 auto;
     align-self: flex-start;

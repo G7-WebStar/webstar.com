@@ -170,7 +170,7 @@ $_SESSION['InboxCount'] = $unreadInboxCount;
 
         <!-- Quests -->
         <a href="assess.php"
-            class="btn d-flex nav-btn-navbar flex-column align-items-center <?php echo ($activePage == 'todo') ? 'selected-nav-item' : ''; ?>"
+            class="btn d-flex nav-btn-navbar flex-column align-items-center <?php echo ($activePage == 'assess') ? 'selected-nav-item' : ''; ?>"
             style="border-color:transparent; text-decoration:none;">
             <span class="material-symbols-rounded" style="font-size:21px">
                 assignment

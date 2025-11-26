@@ -45,7 +45,7 @@ $detailsQuery = $conn->prepare("
     SELECT 
         s.userID,
         a.assessmentID,
-        CONCAT(u.firstName, ' ', u.middleName, '. ', u.lastName) AS studentName,
+        CONCAT(u.firstName, ' ', u.middleName, ' ', u.lastName) AS studentName,
         p.programInitial,
         u.yearLevel,
         u.yearSection,
@@ -677,7 +677,7 @@ if ($studentUserID > 0) {
                                         </div>
 
                                     </div>
-                                    <div class="col-auto text-end" style="line-height: 1.3;">
+                                    <div class="col-auto text-end d-none d-lg-block" style="line-height: 1.3;">
                                         <div class="text-sbold text-16" style="color: var(--black);">
                                             <?php echo htmlspecialchars($details['assessmentTitle']); ?>
                                         </div>
@@ -696,8 +696,9 @@ if ($studentUserID > 0) {
                                                 <i class="fa-solid fa-arrow-left text-reg text-16" style="color: var(--black);"></i>
                                             </a>
                                         </div>
-                                        <div class="title text-sbold text-18">
-                                            <?php echo htmlspecialchars($details['assessmentTitle']); ?>
+                                         <div class="title text-sbold text-18"
+                                            style="display: block; width: 80%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                            <?php echo htmlspecialchars($studentDisplay); ?>
                                         </div>
                                     </div>
                                 </div>
@@ -726,7 +727,7 @@ if ($studentUserID > 0) {
                                     }
                                     ?>
 
-                                    <div class="text-sbold text-14 mt-4">Attachments</div>
+                                    <div class="text-sbold text-14 mt-4 mb-3">Attachments</div>
 
                                     <?php if (!empty($images) || !empty($pdfs) || !empty($others)): ?>
 
@@ -742,13 +743,13 @@ if ($studentUserID > 0) {
 
                                         <!-- IMAGE SECTION -->
                                         <?php if (!empty($images)): ?>
-                                            <div class="container mt-3">
+                                            <div class="container mt-3 w-100 m-0">
                                                 <div class="row g-4">
                                                     <?php foreach ($images as $index => $f):
                                                         $link = htmlspecialchars($f['path']);
                                                         $name = htmlspecialchars($f['name']);
                                                         ?>
-                                                        <div class="col-12 col-sm-6 col-md-4">
+                                                        <div class="col-12 col-sm-6 col-md-4 p-0 m-0 my-3">
                                                             <div class="pdf-preview-box text-center" data-bs-toggle="modal"
                                                                 data-bs-target="#imageModal<?php echo $index; ?>"
                                                                 style="cursor: zoom-in; overflow: hidden; border-radius: 10px; height: 180px; position: relative; border: 1px solid var(--black);">
@@ -786,7 +787,6 @@ if ($studentUserID > 0) {
 
                                         <!-- OTHER FILES & LINKS SECTION -->
                                         <?php if (!empty($linkFiles)): ?>
-                                            <p class="text-sbold text-14 mt-4">Link Attachments</p>
 
                                             <?php foreach ($linkFiles as $f): ?>
                                                 <div class="mt-4b">
@@ -796,7 +796,7 @@ if ($studentUserID > 0) {
                                                         loading="lazy" style="border-radius: 10px; border: 1px solid var(--black);">
                                                     </iframe>
 
-                                                    <div class="text-start mt-3">
+                                                    <div class="text-start mt-3 text-reg">
                                                         <a href="<?php echo htmlspecialchars($f['link']); ?>" target="_blank"
                                                             rel="noopener noreferrer" class="btn custom-btn px-4 py-2">
                                                             <i class="fa-solid fa-up-right-from-square me-2"></i> Open link in new
@@ -818,7 +818,8 @@ if ($studentUserID > 0) {
                             <!-- Right Content -->
                             <div class="col-12 col-lg-4">
                                 <!-- Sticky Parent Container -->
-                                <div class="position-sticky" style="top: 20px;">
+                                <div class="cardSticky position-sticky"
+                                    style="top:20px; max-height:60vh; overflow-y:auto; ">
                                     <!-- Grade Submission Form -->
                                     <form method="POST" action="">
                                         <!-- Dynamically include the submissionID -->
@@ -827,11 +828,11 @@ if ($studentUserID > 0) {
                                         <input type="hidden" name="selectedBadgeIDs" id="selectedBadgeIDs">
 
                                         <!-- Card Section -->
-                                        <div class="cardSticky">
+                                        <div class="cardSticky border-0 p-0">
                                             <div class="ms-2 me-2">
                                                 <div class="d-flex align-items-center justify-content-center mb-5 mt-5">
                                                     <input type="number" name="score"
-                                                        class="form-control me-2 ms-1 text-16" placeholder="Grade"
+                                                        class="form-control me-2 ms-1 text-16 text-reg" placeholder="Grade"
                                                         style="width: 130px; border-radius: 10px; border: 1px solid var(--black);"
                                                         min="0" max="<?php echo htmlspecialchars($assignmentPoints); ?>" required>
                                                     <span class="text-sbold">/<?php echo htmlspecialchars($assignmentPoints); ?></span>
@@ -843,7 +844,7 @@ if ($studentUserID > 0) {
                                                     <div class="d-flex flex-column align-items-center gap-2 mb-5">
                                                         <!-- ADD AWARD BADGE BUTTON -->
                                                         <button type="button"
-                                                            class="btn custom-btn d-flex align-items-center justify-content-center"
+                                                            class="btn custom-btn d-flex align-items-center justify-content-center text-reg"
                                                             data-bs-toggle="modal" data-bs-target="#awardBadgeModal">
                                                             <span
                                                                 class="material-symbols-rounded me-2">emoji_events</span>
@@ -851,7 +852,7 @@ if ($studentUserID > 0) {
                                                         </button>
                                                         <!-- FEEDBACK INPUT (replacing modal button) -->
                                                         <textarea name="feedback" id="feedbackInput" rows="3"
-                                                            class="form-control text-reg text-15 rounded-3 p-3 mt-3"
+                                                            class="form-control text-reg text-14 rounded-3 p-3 mt-3"
                                                             style="resize: none; background-color: var(--pureWhite); border: 1px solid var(--black) !important;"
                                                             placeholder="Write feedback that helps your student level up their learning journey!"></textarea>
 
@@ -861,7 +862,7 @@ if ($studentUserID > 0) {
                                         </div>
 
                                         <!-- Buttons always below the card -->
-                                        <div class="text-center mt-4">
+                                        <div class="text-center mt-4  text-reg px-2">
                                             <div class="d-flex justify-content-center align-items-center gap-3 mb-2 stack-below-large">
                                                 <button type="button" id="prevBtn"
                                                     class="btn px-4 py-2 rounded-pill text-15 fw-semibold"
@@ -886,9 +887,14 @@ if ($studentUserID > 0) {
 
 
 
-                                            <p class="text-15 fw-medium mt-2" style="color: var(--black);">
+                                            <p class="text-14 fw-medium mt-3" style="color: var(--black);">
                                                 <?php echo $leftToReview; ?> submissions left to review
                                             </p>
+
+                                            <p class="text-14 fw-medium mt-3"
+                                                        style="color: var(--black); font-style: italic;">
+                                                        Note: Grades cannot be edited after submission.
+                                                    </p>
 
                                         </div>
                                     </form>

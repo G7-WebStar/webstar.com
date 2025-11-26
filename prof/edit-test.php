@@ -150,32 +150,60 @@ if (isset($_POST['save_exam'])) {
                         : '';
 
                     /* IMAGE UPLOAD */
-                    // Default: keep old image if editing
-                    $testQuestionImage = $question['existingImage'] ?? null; // existing image from DB
 
-                    // Replace only if user uploaded a new image
+                    // Default: keep old image if editing (existingImage should be the filename from DB)
+                    $testQuestionImage = !empty($question['existingImage']) ? $question['existingImage'] : null;
+                    // If user removed the image, drop it
+                    if (!empty($question['removeImage']) && $question['removeImage'] == "1") {
+                        $testQuestionImage = null;
+                    }
+
+
+                    // Check for a new upload using is_uploaded_file
                     if (
-                        isset($_FILES['fileUpload']['name'][$qIndex]) &&
-                        $_FILES['fileUpload']['error'][$qIndex] === UPLOAD_ERR_OK
+                        isset($_FILES['fileUpload']['tmp_name'][$qIndex]) &&
+                        is_uploaded_file($_FILES['fileUpload']['tmp_name'][$qIndex])
                     ) {
                         $file = $_FILES['fileUpload'];
                         $tmp = $file['tmp_name'][$qIndex];
                         $name = $file['name'][$qIndex];
 
                         $uploadDir = __DIR__ . "/../shared/assets/prof-uploads/";
-                        if (!is_dir($uploadDir))
+                        if (!is_dir($uploadDir)) {
                             mkdir($uploadDir, 0777, true);
+                        }
 
-                        $newName = time() . "_" . $name;
+                        $newName = time() . "_" . basename($name);
                         $dest = $uploadDir . $newName;
 
                         if (move_uploaded_file($tmp, $dest)) {
-                            $testQuestionImage = $newName; // only replace if uploaded
+                            $testQuestionImage = $newName;
+
+                            // Optionally: delete the old file from disk if it exists and is different
+                            // if (!empty($question['existingImage'])) {
+                            //     $oldPath = $uploadDir . $question['existingImage'];
+                            //     if (file_exists($oldPath) && $question['existingImage'] !== $newName) {
+                            //         unlink($oldPath);
+                            //     }
+                            // }
                         }
                     }
 
+
                     $testQuestion = mysqli_real_escape_string($conn, $question['testQuestion']);
                     $correctAnswer = mysqli_real_escape_string($conn, $question['correctAnswer']);
+
+                    /* FINAL SAFETY CHECK – prevent empty questions */
+                    if (
+                        trim($testQuestion) === "" &&
+                        empty($testQuestionImage) &&
+                        (
+                            !isset($question['questionType']) ||
+                            trim($question['questionType']) === ""
+                        )
+                    ) {
+                        continue;
+                    }
 
                     /* INSERT QUESTION*/
                     $insertQ = "INSERT INTO testquestions
@@ -293,24 +321,24 @@ if (isset($_POST['save_exam'])) {
                         }
 
                         if ($recipientsFound) {
-                        $deadlineDisplay = 'Not set';
-                        if (!empty($testDeadline)) {
-                            try {
-                                $deadlineDate = new DateTime($testDeadline);
-                                $deadlineDisplay = $deadlineDate->format('F j, Y \a\t g:i A');
-                            } catch (Exception $e) {
-                                $deadlineDisplay = $testDeadline;
+                            $deadlineDisplay = 'Not set';
+                            if (!empty($testDeadline)) {
+                                try {
+                                    $deadlineDate = new DateTime($testDeadline);
+                                    $deadlineDisplay = $deadlineDate->format('F j, Y \a\t g:i A');
+                                } catch (Exception $e) {
+                                    $deadlineDisplay = $testDeadline;
+                                }
                             }
-                        }
 
-                        $timeLimitDisplay = 'No time limit';
-                        if (!empty($testTimeLimit)) {
-                            $timeLimitDisplay = $testTimeLimitMinutes . ' minute' . ((int) $testTimeLimit === 1 ? '' : 's');
-                        }
+                            $timeLimitDisplay = 'No time limit';
+                            if (!empty($testTimeLimit)) {
+                                $timeLimitDisplay = $testTimeLimitMinutes . ' minute' . ((int) $testTimeLimit === 1 ? '' : 's');
+                            }
 
-                        $guidanceHtml = nl2br(htmlspecialchars($generalGuidanceRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-                        $emailTitleEsc = htmlspecialchars($titleRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                        $courseCodeEsc = htmlspecialchars($courseCode, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                            $guidanceHtml = nl2br(htmlspecialchars($generalGuidanceRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                            $emailTitleEsc = htmlspecialchars($titleRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                            $courseCodeEsc = htmlspecialchars($courseCode, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
                             $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
                                 <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
@@ -719,6 +747,8 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                     <input type="hidden" name="questions[0][questionType]"
                                                         value="identification">
 
+
+
                                                     <div class="input-group text-reg text-14 text-muted mb-3 mt-2">
                                                         <span
                                                             class="input-group-text text-bold rounded-left ms-3 p-3 question-number"
@@ -799,6 +829,9 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                     <!-- Hidden input for question type -->
                                                     <input type="hidden" name="questions[0][questionType]"
                                                         value="multipleChoice">
+
+
+
 
                                                     <!-- Question -->
                                                     <div class="input-group text-reg text-14 text-muted mb-4 mt-2">
@@ -1126,7 +1159,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                 e.preventDefault();
 
                 const container = document.getElementById("toastContainer");
-                container.innerHTML = ""; 
+                container.innerHTML = "";
 
                 // If more than 5 errors
                 if (errorMessages.length > 5) {
@@ -1173,37 +1206,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
             }
         });
 
-        // Image Upload
-        function bindImageUpload(img) {
-            const fileInput = img.nextElementSibling;
-            img.addEventListener("click", () => fileInput.click());
-            fileInput.addEventListener("change", () => {
-                const file = fileInput.files[0];
-                if (!file) return;
-
-                const allowed = ["image/jpeg", "image/png", "image/jpg"];
-                const maxSize = 5 * 1024 * 1024;
-
-                // validate before preview
-                if (!allowed.includes(file.type)) {
-                    showAlert("Only JPG, JPEG, and PNG image formats are allowed.");
-                    fileInput.value = "";
-                    return;
-                }
-
-                if (file.size > maxSize) {
-                    showAlert("Maximum file size is 5MB.");
-                    fileInput.value = "";
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = e => img.src = e.target.result;
-                reader.readAsDataURL(file);
-            });
-
-        }
-
+        
         document.addEventListener("click", function (e) {
             const delImgBtn = e.target.closest(".delete-image");
             if (!delImgBtn) return;
@@ -1218,8 +1221,16 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
             img.src = "../shared/assets/img/placeholder/placeholder.png";
             fileInput.value = "";
             container.style.display = "none";
-            container.style.display = "none";
+
+            // IMPORTANT: set remove flag and clear existing-image
+            const textbox = container.closest(".textbox");
+            const removeFlag = textbox.querySelector(".remove-flag");
+            if (removeFlag) removeFlag.value = "1";
+
+            const existingInput = textbox.querySelector(".existing-image");
+            if (existingInput) existingInput.value = "";
         });
+
 
         document.querySelectorAll(".question-image").forEach(img => bindImageUpload(img));
 
@@ -1356,8 +1367,8 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
 
         // Event delegation for Add Choice buttons
         document.querySelectorAll(".add-radio-btn").forEach(btn => {
-            if (btn.dataset.bound) return; 
-            btn.dataset.bound = "true";  
+            if (btn.dataset.bound) return;
+            btn.dataset.bound = "true";
 
             btn.addEventListener("click", e => {
                 const container = e.target.closest(".multiple-choice-item").querySelector(".radio-choices-container");
@@ -1392,6 +1403,52 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
             });
         });
 
+        function bindImageUpload(img) {
+            const container = img.closest(".image-container");
+            if (!container) return;
+
+            const fileInput = container.querySelector(".image-upload");
+            if (!fileInput) return;
+
+            img.addEventListener("click", () => fileInput.click());
+
+            fileInput.addEventListener("change", () => {
+                const file = fileInput.files[0];
+                if (!file) return;
+
+                const allowed = ["image/jpeg", "image/png", "image/jpg"];
+                const maxSize = 5 * 1024 * 1024;
+
+                if (!allowed.includes(file.type)) {
+                    showAlert("Only JPG, JPEG, and PNG images are allowed.");
+                    fileInput.value = "";
+                    return;
+                }
+
+                if (file.size > maxSize) {
+                    showAlert("Maximum file size is 5MB.");
+                    fileInput.value = "";
+                    return;
+                }
+
+                const textbox = container.closest(".textbox");
+
+                const removeFlag = textbox.querySelector(".remove-flag");
+                if (removeFlag) removeFlag.value = "0";
+
+                const existingInput = textbox.querySelector(".existing-image");
+                if (existingInput) existingInput.value = "";
+
+                const reader = new FileReader();
+                reader.onload = e => img.src = e.target.result;
+                reader.readAsDataURL(file);
+
+                container.style.display = "block";
+            });
+        }
+
+
+
 
         // Populate Existing Questions
         function populateExistingQuestions() {
@@ -1423,6 +1480,42 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                 const fileInput = clone.querySelector(".image-upload");
                 if (fileInput) fileInput.name = `fileUpload[${currentIndex}]`;
 
+                // --- handle existing image and remove flag for each populated question ---
+                const textbox = clone.querySelector(".textbox"); // question card
+
+                // existingImage hidden input (create or reuse)
+                let existingInput = textbox.querySelector("input[name*='existingImage']");
+                if (!existingInput) {
+                    existingInput = document.createElement("input");
+                    existingInput.type = "hidden";
+                    existingInput.classList.add("existing-image");
+                    textbox.appendChild(existingInput);
+                }
+                existingInput.name = `questions[${currentIndex}][existingImage]`;
+                existingInput.value = q.testQuestionImage || "";
+
+                // removeImage hidden input (create or reuse). default 0 = keep image
+                let removeInput = textbox.querySelector("input[name*='removeImage']");
+                if (!removeInput) {
+                    removeInput = document.createElement("input");
+                    removeInput.type = "hidden";
+                    removeInput.classList.add("remove-flag");
+                    textbox.appendChild(removeInput);
+                }
+                removeInput.name = `questions[${currentIndex}][removeImage]`;
+                removeInput.value = "0";
+
+                // if there is an image, show preview
+                if (q.testQuestionImage) {
+                    const img = clone.querySelector(".question-image");
+                    const container = clone.querySelector(".image-container");
+                    if (img && container) {
+                        img.src = "../shared/assets/prof-uploads/" + q.testQuestionImage;
+                        container.style.display = "block";
+                    }
+                }
+
+
                 // Question text
                 const questionInput = clone.querySelector("input[name*='testQuestion']");
                 if (questionInput) questionInput.value = q.testQuestion || '';
@@ -1431,12 +1524,9 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                 const pointsInput = clone.querySelector("input[name*='testQuestionPoints']");
                 if (pointsInput) pointsInput.value = q.testQuestionPoints || 0;
 
-                // Image
-                if (q.testQuestionImage) {
-                    const img = clone.querySelector(".question-image");
-                    const container = clone.querySelector(".image-container");
-                    if (img && container) { img.src = "../shared/assets/prof-uploads/" + q.testQuestionImage; container.style.display = "block"; }
-                }
+
+
+
 
                 // Identification Answer
                 if (!isMultipleChoice) {
@@ -1526,6 +1616,13 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                 });
 
                 mainContainer.appendChild(clone);
+                // Bind image click + upload validation for existing questions
+                const container = clone.querySelector(".image-container");
+                if (container) {
+                    const img = container.querySelector(".question-image");
+                    if (img) bindImageUpload(img);
+                }
+
                 questionCount++;
             });
 

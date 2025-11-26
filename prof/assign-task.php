@@ -180,9 +180,15 @@ if (isset($_POST['saveAssignment'])) {
             $assignmentID = mysqli_insert_id($conn);
 
         } elseif ($mode === 'edit') {
+
+            // --- Get deadlineEnabled (checkbox) ---
+            $deadlineEnabled = isset($_POST['stopSubmissions']) ? 1 : 0;
+
             // --- UPDATE existing assessment ---
             $updateAssessment = "UPDATE assessments 
-                SET assessmentTitle='$title', deadline=" . ($deadline ? "'$deadline'" : "NULL") . " 
+                SET assessmentTitle='$title',
+                    deadline=" . ($deadline ? "'$deadline'" : "NULL") . ",
+                    deadlineEnabled='$deadlineEnabled'
                 WHERE assessmentID='$taskID'";
             executeQuery($updateAssessment);
 
@@ -197,7 +203,6 @@ if (isset($_POST['saveAssignment'])) {
                 SET assignmentDescription='$desc', assignmentPoints='$points', rubricID='$rubricID'
                 WHERE assignmentID='$assignmentID'";
             executeQuery($updateAssignment);
-
         } elseif ($mode === 'reuse') {
             // --- CREATE NEW ASSESSMENT ---
             $insertAssessment = "INSERT INTO assessments
@@ -338,7 +343,7 @@ if (isset($_POST['saveAssignment'])) {
                 (courseID, userID, assignmentID, fileAttachment, fileTitle, fileLink) 
                 VALUES 
                 ('$selectedCourseID', '$userID', '$assignmentID', '', '" .
-                    mysqli_real_escape_string($conn, $fileTitle) . "', '$processedLink')";
+                mysqli_real_escape_string($conn, $fileTitle) . "', '$processedLink')";
                 executeQuery($insertLink);
             }
         }

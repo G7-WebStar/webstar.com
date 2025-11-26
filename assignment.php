@@ -1519,7 +1519,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
     <!-- Link Modal -->
     <div class="modal fade" id="linkModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered py-4" style="max-width: 400px;">
-            <div class="modal-content rounded-4">
+            <div class="modal-content rounded-3">
 
                 <!-- HEADER -->
                 <div class="modal-header border-bottom">
@@ -1531,7 +1531,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
 
                 <form id="LinkForm" action="" method="POST">
                     <div class="modal-body pb-2">
-                        <input type="url" name="link" id="linkInput" class="form-control" placeholder="Link" required
+                        <input type="url" name="link" id="linkInput" class="form-control text-reg" placeholder="Link" required
                             style="border: 1px solid var(--black); border-radius: 8px; padding: 8px;">
                     </div>
 

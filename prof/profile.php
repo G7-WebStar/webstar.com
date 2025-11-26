@@ -5,6 +5,7 @@ include("../shared/assets/processes/prof-session-process.php");
 // Get the username from the URL (e.g., profile.php?user=jamesdoe)
 $username = $_GET['user'] ?? null;
 
+
 // If not provided, show the logged-in user's profile
 if (!$username && isset($_SESSION['userID'])) {
     $userID = $_SESSION['userID'];
@@ -218,6 +219,20 @@ if (!$username && isset($_SESSION['userID'])) {
 $myItemsResult = mysqli_query($conn, $myItemsQuery);
 $profile = mysqli_fetch_assoc($myItemsResult);
 
+$role = null;
+if ($userID) {
+    $roleQuery = "
+        SELECT role 
+        FROM users 
+        WHERE userID = '$userID'
+        LIMIT 1
+    ";
+    $roleResult = mysqli_query($conn, $roleQuery);
+    $roleRow = mysqli_fetch_assoc($roleResult);
+    $role = $roleRow['role'] ?? null;
+}
+
+
 // For Star Card
 if (!$username && isset($_SESSION['userID'])) {
     // Use userID from session
@@ -231,62 +246,66 @@ if (!$username && isset($_SESSION['userID'])) {
     WHERE profile.userID = '$userID'
     ";
 
-    $enrollmentQuery = "
-    SELECT e.enrollmentID
-    FROM enrollments e
-    JOIN profile p ON p.userID = e.userID
-    WHERE e.userID = '$userID'
-    AND e.courseID = p.starCard
-    LIMIT 1;
-";
-    $enrollmentResult = mysqli_query($conn, $enrollmentQuery);
-    $enrollmentRow = mysqli_fetch_assoc($enrollmentResult);
-    $enrollmentID = $enrollmentRow['enrollmentID'];
+    if ($role === 'student') {
 
-    $xpQuery = "
-    SELECT 
-        l.xpPoints,
-        x.xpLevelID,
-        x.tierName,
-        x.xpThreshold
-    FROM leaderboard l
-    JOIN xplevel x
-        ON l.xpLevelID = x.xpLevelID
-    WHERE l.enrollmentID = '$enrollmentID'
-    LIMIT 1
-";
-    $xpResult = mysqli_query($conn, $xpQuery);
-    $xp = mysqli_fetch_assoc($xpResult);
+        $enrollmentQuery = "
+            SELECT e.enrollmentID
+            FROM enrollments e
+            JOIN profile p ON p.userID = e.userID
+            WHERE e.userID = '$userID'
+            AND e.courseID = p.starCard
+            LIMIT 1;
+        ";
+        $enrollmentResult = mysqli_query($conn, $enrollmentQuery);
+        $enrollmentRow = mysqli_fetch_assoc($enrollmentResult);
+        $enrollmentID = $enrollmentRow['enrollmentID'];
 
-    $totalXP = $xp['xpPoints'];
-    $currentLevel = $xp['xpLevelID'];
-    $currentTier = $xp['tierName'];
-    $currentThresh = $xp['xpThreshold'];
+        $xpQuery = "
+            SELECT 
+                l.xpPoints,
+                x.xpLevelID,
+                x.tierName,
+                x.xpThreshold
+            FROM leaderboard l
+            JOIN xplevel x
+                ON l.xpLevelID = x.xpLevelID
+            WHERE l.enrollmentID = '$enrollmentID'
+            LIMIT 1
+        ";
+        $xpResult = mysqli_query($conn, $xpQuery);
+        $xp = mysqli_fetch_assoc($xpResult);
 
-    $rankQuery = "
-    SELECT r.ranking
-    FROM (
-    SELECT 
-        e.userID,
-        RANK() OVER (ORDER BY l.xpPoints DESC) AS ranking
-    FROM enrollments e
-    INNER JOIN leaderboard l 
-        ON e.enrollmentID = l.enrollmentID
-    INNER JOIN profile p
-        ON p.userID = e.userID
-    WHERE e.courseID = p.starCard
-    ) AS r
-    WHERE r.userID = '$userID';
-";
+        $totalXP = $xp['xpPoints'];
+        $currentLevel = $xp['xpLevelID'];
+        $currentTier = $xp['tierName'];
+        $currentThresh = $xp['xpThreshold'];
 
-    $rankResult = executeQuery($rankQuery);
+        $rankQuery = "
+            SELECT r.ranking
+            FROM (
+            SELECT 
+                e.userID,
+                RANK() OVER (ORDER BY l.xpPoints DESC) AS ranking
+            FROM enrollments e
+            INNER JOIN leaderboard l 
+                ON e.enrollmentID = l.enrollmentID
+            INNER JOIN profile p
+                ON p.userID = e.userID
+            WHERE e.courseID = p.starCard
+            ) AS r
+            WHERE r.userID = '$userID';
+            ";
 
-    $rank = null;
+        $rankResult = executeQuery($rankQuery);
 
-    if ($rankResult && mysqli_num_rows($rankResult) > 0) {
-        $rankRow = mysqli_fetch_assoc($rankResult);
-        $rank = $rankRow['ranking'];
+        $rank = null;
+
+        if ($rankResult && mysqli_num_rows($rankResult) > 0) {
+            $rankRow = mysqli_fetch_assoc($rankResult);
+            $rank = $rankRow['ranking'];
+        }
     }
+
 
 
 } elseif ($username) {
@@ -305,30 +324,32 @@ if (!$username && isset($_SESSION['userID'])) {
     WHERE profile.userID = '$userID'
     ";
 
+        if ($role === 'student') {
+
         $enrollmentQuery = "
-    SELECT e.enrollmentID
-    FROM enrollments e
-    JOIN profile p ON p.userID = e.userID
-    WHERE e.userID = '$userID'
-    AND e.courseID = p.starCard
-    LIMIT 1;
-";
+            SELECT e.enrollmentID
+            FROM enrollments e
+            JOIN profile p ON p.userID = e.userID
+            WHERE e.userID = '$userID'
+            AND e.courseID = p.starCard
+            LIMIT 1;
+        ";
         $enrollmentResult = mysqli_query($conn, $enrollmentQuery);
         $enrollmentRow = mysqli_fetch_assoc($enrollmentResult);
         $enrollmentID = $enrollmentRow['enrollmentID'];
 
         $xpQuery = "
-    SELECT 
-        l.xpPoints,
-        x.xpLevelID,
-        x.tierName,
-        x.xpThreshold
-    FROM leaderboard l
-    JOIN xplevel x
-        ON l.xpLevelID = x.xpLevelID
-    WHERE l.enrollmentID = '$enrollmentID'
-    LIMIT 1
-";
+            SELECT 
+                l.xpPoints,
+                x.xpLevelID,
+                x.tierName,
+                x.xpThreshold
+            FROM leaderboard l
+            JOIN xplevel x
+                ON l.xpLevelID = x.xpLevelID
+            WHERE l.enrollmentID = '$enrollmentID'
+            LIMIT 1
+        ";
         $xpResult = mysqli_query($conn, $xpQuery);
         $xp = mysqli_fetch_assoc($xpResult);
 
@@ -338,20 +359,20 @@ if (!$username && isset($_SESSION['userID'])) {
         $currentThresh = $xp['xpThreshold'];
 
         $rankQuery = "
-    SELECT r.ranking
-    FROM (
-    SELECT 
-        e.userID,
-        RANK() OVER (ORDER BY l.xpPoints DESC) AS ranking
-    FROM enrollments e
-    INNER JOIN leaderboard l 
-        ON e.enrollmentID = l.enrollmentID
-    INNER JOIN profile p
-        ON p.userID = e.userID
-    WHERE e.courseID = p.starCard
-    ) AS r
-    WHERE r.userID = '$userID';
-";
+            SELECT r.ranking
+            FROM (
+            SELECT 
+                e.userID,
+                RANK() OVER (ORDER BY l.xpPoints DESC) AS ranking
+            FROM enrollments e
+            INNER JOIN leaderboard l 
+                ON e.enrollmentID = l.enrollmentID
+            INNER JOIN profile p
+                ON p.userID = e.userID
+            WHERE e.courseID = p.starCard
+            ) AS r
+            WHERE r.userID = '$userID';
+            ";
 
         $rankResult = executeQuery($rankQuery);
 
@@ -361,6 +382,7 @@ if (!$username && isset($_SESSION['userID'])) {
             $rankRow = mysqli_fetch_assoc($rankResult);
             $rank = $rankRow['ranking'];
         }
+    }
 
     } else {
         // Username not found
@@ -368,6 +390,8 @@ if (!$username && isset($_SESSION['userID'])) {
         exit;
     }
 }
+
+
 
 $starCardResult = mysqli_query($conn, $starCardQuery);
 $starCard = mysqli_fetch_assoc($starCardResult);
@@ -751,7 +775,7 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                         <div class="card rounded-3 mb-2"
                                                             style="border: 1px solid var(--black);">
                                                             <div class="card-body p-4">
-                                                                
+
                                                                 <!-- Course Info -->
                                                                 <div class="info-block">
                                                                     <div class="comp-code text-sbold text-16">

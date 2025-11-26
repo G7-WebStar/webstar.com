@@ -3,6 +3,15 @@
 include("../shared/assets/database/connect.php");
 include("../shared/assets/processes/prof-session-process.php");
 
+$toastMessage = '';
+$toastType = '';
+
+if (isset($_SESSION['toast'])) {
+    $toastMessage = $_SESSION['toast']['message'];
+    $toastType = $_SESSION['toast']['type'];
+    unset($_SESSION['toast']);
+}
+
 $assessments = [];
 $assessmentsQuery = "SELECT 
 assessments.type, 
@@ -136,7 +145,6 @@ $getCoursesResult = executeQuery($getCoursesQuery);
             }
 
             .mobile-view {
-                margin-top: 80px !important;
                 margin-bottom: 80px !important;
             }
 
@@ -164,23 +172,38 @@ $getCoursesResult = executeQuery($getCoursesQuery);
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
 
+                      <!-- Toast container -->
+                    <div id="toastContainer"
+                        class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+                        style="z-index: 1100;"></div>
+
                     <!-- Navbar for mobile -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-1 overflow-y-auto">
-                        <div class="row justify-content-center mobile-view">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
+                        <div class="row justify-content-center mobile-view ">
                             <!-- Header Section -->
-                            <div class="row align-items-center mb-3 text-center text-lg-start">
+                            <div class="row p-0 align-items-center mb-3 text-center text-lg-start">
                                 <!-- Title -->
-                                <div class="col-12 col-xl-2 mb-3 mb-lg-0">
-                                    <h1 class="text-bold text-25 mx-0 mb-0 mt-4" style="color: var(--black);">Assess
+                                <div class="col-12 col-md-auto mb-3 col-12 col-md-auto text-center text-md-start position-relative">
+                                    <h1 class="text-sbold text-25 mb-0 mt-2" style="color: var(--black);">Assess
                                     </h1>
+                                    <span id="filterToggle"
+                                            class="position-absolute end-0 top-50 translate-middle-y d-md-none px-2"
+                                            role="button" tabindex="0" aria-label="Show filters"
+                                            style="cursor: pointer; user-select: none; ">
+                                            <span class="material-symbols-rounded mt-2"
+                                                style="font-size: 30px; color: var(--black);">
+                                                tune
+                                            </span>
+                                        </span>
                                 </div>
 
                                 <!-- Dropdowns-->
-                                <div class="col-12 col-xl-10 mt-4">
+                                <div class="col-12 col-md-auto d-flex flex-wrap justify-content-center justify-content-md-start gap-3 mt-2 mt-md-0 d-none d-md-flex"
+                                        style="row-gap: 0!important;" id="mobileFilters">
                                     <div
-                                        class="d-flex flex-wrap flex-lg-nowrap justify-content-center justify-content-lg-start gap-3">
+                                        class="d-flex flex-wrap flex-lg-nowrap justify-content-center justify-content-lg-start text-reg">
 
                                         <!-- Course dropdown -->
                                         <div class="d-flex align-items-center flex-nowrap dropdown-container">
@@ -194,12 +217,13 @@ $getCoursesResult = executeQuery($getCoursesQuery);
                                                 <?php
                                                 if (mysqli_num_rows($getCoursesResult) > 0) {
                                                     while ($courseCodes = mysqli_fetch_assoc($getCoursesResult)) {
-                                                ?>
-                                                        <li><a class="dropdown-item text-reg" data-value="<?php echo $courseCodes['courseCode']; ?>">
+                                                        ?>
+                                                        <li><a class="dropdown-item text-reg"
+                                                                data-value="<?php echo $courseCodes['courseCode']; ?>">
                                                                 <?php echo $courseCodes['courseCode']; ?>
                                                             </a></li>
 
-                                                <?php
+                                                        <?php
                                                     }
                                                 }
                                                 ?>
@@ -267,91 +291,119 @@ $getCoursesResult = executeQuery($getCoursesQuery);
                                         $returned[] = $returnedCount;
                                         $missing[] = $missingCount;
                                         $isArchived[] = $archiveStatus;
-                                ?>
-                                        <div class="assessment-card mb-3"
-                                            data-course="<?php echo $courseCode; ?>"
-                                            data-sort="<?php echo $cardIndex; ?>"
-                                            data-status="<?php echo $archiveStatus; ?>">
-                                            <div class="card-content">
-                                                <!-- Top Row: Left Info and Submission Stats -->
-                                                <div class="top-row overflow-hidden">
-                                                    <!-- Left Info -->
-                                                    <div class="left-info">
-                                                        <div class="mb-2 text-reg">
-                                                            <span class="badge rounded-pill task-badge"><?php echo $type; ?></span>
+                                        ?>
+                                        <div class="row p-0 m-0 ps-3 ps-md-1 pe-3 pe-md-0 m-0 mt-3 pt-1">
+                                            <div class="assessment-card mb-3 ms-0 ms-lg-2 text-start" data-course="<?php echo $courseCode; ?>"
+                                                data-sort="<?php echo $cardIndex; ?>"
+                                                data-status="<?php echo $archiveStatus; ?>">
+                                                <div class="card-content">
+                                                    <!-- Top Row: Left Info and Submission Stats -->
+                                                    <div class="top-row overflow-hidden">
+                                                        <!-- Left Info -->
+                                                        <div class="left-info">
+                                                            <div class="mb-2 text-reg">
+                                                                <span
+                                                                    class="badge rounded-pill task-badge"><?php echo $type; ?></span>
+                                                            </div>
+                                                            <div class="text-sbold text-18 mb-2 text-truncate"
+                                                                title="<?php echo $assessmentTitle; ?>" style="width: 200px;">
+                                                                <?php echo $assessmentTitle; ?>
+                                                            </div>
+                                                            <div class="text-sbold text-14"><?php echo $courseCode; ?><br>
+                                                                <div class="text-reg text-14"><?php echo $courseTitle; ?></div>
+                                                            </div>
                                                         </div>
-                                                        <div class="text-bold text-18 mb-2 text-truncate" title="<?php echo $assessmentTitle; ?>" style="width: 200px;"><?php echo $assessmentTitle; ?></div>
-                                                        <div class="text-sbold text-14"><?php echo $courseCode; ?><br>
-                                                            <div class="text-reg text-14"><?php echo $courseTitle; ?></div>
+
+                                                        <!-- Submission Stats -->
+
+                                                        <div class="submission-stats">
+                                                            <div class="text-reg text-14 mb-1"><span
+                                                                    class="stat-value"><?php echo $submittedCount; ?></span>
+                                                                submitted</div>
+                                                            <div class="text-reg text-14 mb-1"><span
+                                                                    class="stat-value"><?php echo $pendingCount; ?></span>
+                                                                pending submission</div>
+                                                            <div class="text-reg text-14 mb-1"><span
+                                                                    class="stat-value"><?php echo $returnedCount; ?></span>
+                                                                returned</div>
+                                                            <div class="text-reg text-14">Due <?php echo $deadline; ?></div>
+                                                        </div>
+
+                                                        <!-- Right Side: Progress Chart and Options -->
+                                                        <div class="right-section">
+                                                            <div class="chart-container" id="chart-container<?php echo $i; ?>">
+                                                                <canvas id="chart<?php echo $i; ?>" width="120"
+                                                                    height="120"></canvas>
+                                                            </div>
                                                         </div>
                                                     </div>
 
-                                                    <!-- Submission Stats -->
-
-                                                    <div class="submission-stats">
-                                                        <div class="text-reg text-14 mb-1"><span class="stat-value"><?php echo $submittedCount; ?></span> submitted</div>
-                                                        <div class="text-reg text-14 mb-1"><span class="stat-value"><?php echo $pendingCount; ?></span> pending submission</div>
-                                                        <div class="text-reg text-14 mb-1"><span class="stat-value"><?php echo $returnedCount; ?></span> returned</div>
-                                                        <div class="text-reg text-14">Due <?php echo $deadline; ?></div>
-                                                    </div>
-
-                                                    <!-- Right Side: Progress Chart and Options -->
-                                                    <div class="right-section">
-                                                        <div class="chart-container" id="chart-container<?php echo $i; ?>">
-                                                            <canvas id="chart<?php echo $i; ?>" width="120" height="120"></canvas>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Bottom Row: Action Buttons -->
-                                                <div class="bottom-row">
-                                                    <div class="action-buttons">
-                                                        <a href="<?php echo ($type == 'Task') ? 'assess-task-details.php?assessmentID=' . $ID : 'assess-exam-details.php?assessmentID=' . $ID; ?>"><button class="btn btn-action">
-                                                                <img src="../shared/assets/img/assess/info.png"
-                                                                    alt="Assess Icon"
-                                                                    style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;"><?php echo ($type == 'Task') ? 'Task' : 'Test'; ?> Details
-                                                            </button></a>
-                                                        <?php if ($type == 'Task') { ?>
-                                                            <?php if ($cardSubmissionID != null) { ?><a href="<?php echo ($rubricIDs === null || $rubricIDs === 0) ? 'grading-sheet.php?' : 'grading-sheet-rubrics.php?'; ?>submissionID=<?php echo $cardSubmissionID; ?>"><?php } ?>
-                                                                <?php if ($cardSubmissionID == null) { ?><div title="No submissions in this assessment yet"><?php } ?>
-                                                                    <button class="btn btn-action" <?php echo ($cardSubmissionID == null) ? 'disabled' : '' ?>>
-                                                                        <img src="../shared/assets/img/assess/assess.png"
-                                                                            alt="Assess Icon"
-                                                                            style="width: 20px; height: 20px; margin-right: 5px; object-fit: contain;">Grading
-                                                                        Sheet
-                                                                    </button>
+                                                    <!-- Bottom Row: Action Buttons -->
+                                                    <div class="bottom-row">
+                                                        <div class="action-buttons">
+                                                            <a
+                                                                href="<?php echo ($type == 'Task') ? 'assess-task-details.php?assessmentID=' . $ID : 'assess-exam-details.php?assessmentID=' . $ID; ?>"><button
+                                                                    class="btn btn-action" style="background: var(--primaryColor); border-color: var(--black); color:var(--black)">
+                                                                    <span class="material-symbols-rounded me-2"
+                                                                        style="font-size: 15px; color: var(--black);">
+                                                                        info
+                                                                    </span><?php echo ($type == 'Task') ? 'Task' : 'Test'; ?>
+                                                                    Details
+                                                                </button></a>
+                                                            <?php if ($type == 'Task') { ?>
+                                                                <?php if ($cardSubmissionID != null) { ?><a
+                                                                        href="<?php echo ($rubricIDs == null || $rubricIDs == 0) ? 'grading-sheet.php?' : 'grading-sheet-rubrics.php?'; ?>submissionID=<?php echo $cardSubmissionID; ?>"><?php } ?>
                                                                     <?php if ($cardSubmissionID == null) { ?>
-                                                                    </div><?php } ?>
-                                                                <?php if ($cardSubmissionID != null) { ?></a><?php } ?>
-                                                        <?php
-                                                        }
-                                                        ?>
-                                                    </div>
-                                                    <!-- More Options aligned with buttons on the right -->
-                                                    <div class="options-container">
-                                                        <div class="dropdown dropend">
-                                                            <button class="btn btn-link more-options" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                <i class="fas fa-ellipsis-v"></i>
-                                                            </button>
-                                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                                <li><a class="dropdown-item" href="#" id="<?php echo $i; ?>" onclick="archive(this, <?php echo $ID; ?>);"><i class="fas fa-archive me-2"></i>
-                                                                        <?php echo ($archiveStatus == 0) ? 'Mark as Archived' : 'Unarchive'; ?></a></li>
-                                                            </ul>
+                                                                        <div title="No submissions in this assessment yet"><?php } ?>
+                                                                        <button class="btn btn-action" <?php echo ($cardSubmissionID == null) ? 'disabled' : 'style="background: var(--primaryColor); border-color: var(--black); color:var(--black)"' ?>>
+                                                                            <span class="material-symbols-rounded me-2"
+                                                                                style="font-size: 15px; color: var(--black);">
+                                                                                assignment
+                                                                            </span>Grading
+                                                                            Sheet
+                                                                        </button>
+                                                                        <?php if ($cardSubmissionID == null) { ?>
+                                                                        </div><?php } ?>
+                                                                    <?php if ($cardSubmissionID != null) { ?>
+                                                                    </a><?php } ?>
+                                                                <?php
+                                                            }
+                                                            ?>
+                                                        </div>
+                                                        <!-- More Options aligned with buttons on the right -->
+                                                        <div class="options-container">
+                                                            <div class="dropdown dropend text-reg">
+                                                                <button class="btn btn-link more-options" type="button"
+                                                                    data-bs-toggle="dropdown" aria-expanded="false"
+                                                                    style="transform: none !important; box-shadow: none !important; background-color: white!important; border:0px!important">
+                                                                    <i class="fas fa-ellipsis-v"></i>
+                                                                </button>
+                                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                                    <li><a class="dropdown-item" href="#" id="<?php echo $i; ?>"
+                                                                            onclick="archive(this, <?php echo $ID; ?>);"><i
+                                                                                class="fas fa-archive me-2"></i>
+                                                                            <?php echo ($archiveStatus == 0) ? 'Mark as Archived' : 'Unarchive'; ?></a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    <?php
+
+                                        <?php
                                         $i++;
                                     }
                                 } else {
                                     ?>
-                                    <div class="text-sbold text-center mt-5 text-25 d-flex flex-column align-items-center text-sm-20">
-                                        <img src="../shared/assets/img/empty/todo.png" alt="No Assessments" class="mx-auto mt-5 img-fluid img-small" width="250px">
+                                    <div
+                                        class="text-sbold text-center mt-5 text-25 d-flex flex-column align-items-center text-sm-20">
+                                        <img src="../shared/assets/img/empty/todo.png" alt="No Assessments"
+                                            class="mx-auto mt-5 img-fluid img-small" width="250px">
                                         Nothing to assess here.
                                     </div>
-                                <?php
+                                    <?php
                                 }
                                 ?>
                             </div>
@@ -360,39 +412,7 @@ $getCoursesResult = executeQuery($getCoursesQuery);
                 </div>
             </div>
         </div>
-        <!-- Toast Container -->
-        <div id="toastContainer"
-            class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center text-med text-14"
-            style="z-index:1100; pointer-events:none;">
-        </div>
-
-        <script>
-            //Function to show toast with icon
-            function showToast(message, type = 'success') {
-                const alert = document.createElement('div');
-                alert.className = `alert mb-2 shadow-lg d-flex align-items-center gap-2 px-3 py-2 
-                       ${type === 'success' ? 'alert-success' : 'alert-danger'}`;
-                alert.style.opacity = "0";
-                alert.style.transition = "opacity 0.3s ease";
-                alert.style.pointerEvents = "none";
-
-                alert.innerHTML = `
-                <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
-                <span>${message}</span>
-            `;
-
-                document.getElementById('toastContainer').appendChild(alert);
-
-                //Fade in
-                setTimeout(() => alert.style.opacity = "1", 10);
-
-                //Fade out & remove after 3s
-                setTimeout(() => {
-                    alert.style.opacity = "0";
-                    setTimeout(() => alert.remove(), 300);
-                }, 3000);
-            }
-        </script>
+    
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Chart.js -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -423,7 +443,7 @@ $getCoursesResult = executeQuery($getCoursesQuery);
             }
 
             function showDoughnut() {
-                document.addEventListener("DOMContentLoaded", function() {
+                document.addEventListener("DOMContentLoaded", function () {
                     const chartsIDs = <?php echo json_encode($chartsIDs); ?>;
                     const submitted = <?php echo json_encode($submitted); ?>;
                     const pending = <?php echo json_encode($pending); ?>;
@@ -431,7 +451,7 @@ $getCoursesResult = executeQuery($getCoursesQuery);
                     const missing = <?php echo json_encode($missing); ?>;
                     const isArchived = <?php echo json_encode($isArchived); ?>
 
-                    chartsIDs.forEach(function(id, index) {
+                    chartsIDs.forEach(function (id, index) {
                         if (isArchived[index] == 0) {
                             createDoughnutChart(id, submitted[index], pending[index], returned[index], missing[index])
                         } else {
@@ -461,22 +481,75 @@ $getCoursesResult = executeQuery($getCoursesQuery);
                 fetch('../shared/assets/processes/archive-assessment.php?assessmentID=' + assessmentID)
                     .then(response => {
                         if (!response.ok) {
-                            showToast("There was a problem with your request :(", "danger");
+                            
                         } else {
-                            showToast("Successful!", "success");
+                            
                             window.location.reload();
                         }
                     })
                     .catch(error => {
-                        showToast('Failed to archive. Please try again.', 'danger');
+                        
                     });
             }
 
             showDoughnut();
         </script>
 
+         <!-- Toggle JS -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const filterToggle = document.getElementById("filterToggle");
+            const mobileFilters = document.getElementById("mobileFilters");
+            const icon = filterToggle.querySelector(".material-symbols-rounded");
+
+            const storageKey = "filtersVisible_" + "<?php echo $activePage; ?>";
+
+            if (localStorage.getItem(storageKey) === "true") {
+                mobileFilters.classList.remove("d-none");
+                filterToggle.classList.add("active");
+                icon.textContent = "close";
+            }
+
+            filterToggle.addEventListener("click", () => {
+                const isVisible = !mobileFilters.classList.contains("d-none");
+
+                // Toggle panel
+                mobileFilters.classList.toggle("d-none");
+
+                // Toggle icon
+                filterToggle.classList.toggle("active");
+                icon.textContent = filterToggle.classList.contains("active") ? "close" : "tune";
+
+                // Save state
+                localStorage.setItem(storageKey, !isVisible);
+            });
+        });
+        
+    </script>
+
+    <!-- Toast Handling -->
+            <?php if (!empty($toastMessage)): ?>
+                <script>
+                    window.addEventListener('DOMContentLoaded', () => {
+                        const container = document.getElementById("toastContainer");
+                        if (!container) return;
+
+                        const alert = document.createElement("div");
+                        alert.className = `alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 <?= $toastType ?>`;
+                        alert.role = "alert";
+                        alert.innerHTML = `
+            <i class="bi <?= ($toastType === 'alert-success') ? 'bi-check-circle-fill' : 'bi-x-circle-fill'; ?> fs-6"></i>
+            <span><?= addslashes($toastMessage) ?></span>
+        `;
+                        container.appendChild(alert);
+
+                        setTimeout(() => alert.remove(), 3000);
+                    });
+                </script>
+            <?php endif; ?>
+
         <script>
-            document.addEventListener("DOMContentLoaded", function() {
+            document.addEventListener("DOMContentLoaded", function () {
                 //Get dropdown containers and all cards
                 const dropdownContainers = document.querySelectorAll('.dropdown-container');
                 const cards = document.querySelectorAll('.assessment-card');
@@ -533,7 +606,7 @@ $getCoursesResult = executeQuery($getCoursesQuery);
                     const dropdownLabel = container.querySelector('.dropdown-label').textContent.trim();
 
                     container.querySelectorAll('.dropdown-item').forEach(item => {
-                        item.addEventListener('click', function(e) {
+                        item.addEventListener('click', function (e) {
                             e.preventDefault();
                             const value = this.dataset.value;
 
