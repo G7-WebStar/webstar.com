@@ -603,7 +603,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                             <div class="comp-code text-sbold text-16">
                                                                                 <?php echo $leaderboards['courseCode']; ?>
                                                                             </div>
-                                                                            <div class="subj-code text-reg text-12 mb-0 text-truncate">
+                                                                            <div class="subj-code text-reg text-12 mb-0 text-truncate" style="max-width:120px">
                                                                                 <?php echo $leaderboards['courseTitle']; ?>
                                                                             </div>
 
