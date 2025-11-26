@@ -109,7 +109,7 @@ if (isset($_POST['saveChanges'])) {
         } else {
             $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
             $newFileName = "profile_{$userID}_" . time() . "." . $fileExt;
-            $uploadDir = "shared/assets/pfp-uploads/";
+            $uploadDir = "../shared/assets/pfp-uploads/";
 
             if (!is_dir($uploadDir))
                 mkdir($uploadDir, 0777, true);

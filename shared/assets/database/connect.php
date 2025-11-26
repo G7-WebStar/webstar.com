@@ -1,13 +1,13 @@
 <?php
-$dbhost = "localhost";
-$dbuser = "root";
-$dbpass = "";
-$db = "webstart";
-
 // $dbhost = "localhost";
-// $dbuser = "u977784600_webstar";
-// $dbpass = "WebstarTeamu977784600_";
-// $db = "u977784600_webstar";
+// $dbuser = "root";
+// $dbpass = "";
+// $db = "webstart";
+
+$dbhost = "localhost";
+$dbuser = "u977784600_webstar";
+$dbpass = "WebstarTeamu977784600_";
+$db = "u977784600_webstar";
 
 
 $conn = new mysqli($dbhost, $dbuser, $dbpass, $db) or die("Connect failed: %s\n" . $conn->error);
