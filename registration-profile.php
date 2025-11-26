@@ -68,7 +68,7 @@ include("shared/assets/processes/registration-profile-process.php");
                                 <div class="row mb-3 gx-3">
                                     <div class="col">
                                         <div class="form-floating">
-                                            <input type="text" name="firstName" class="form-control" id="firstName" placeholder="" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')">
+                                            <input type="text" name="firstName" class="form-control" id="firstName" placeholder="" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" required>
                                             <label for="firstName">First Name</label>
                                         </div>
                                     </div>
@@ -84,13 +84,13 @@ include("shared/assets/processes/registration-profile-process.php");
                                 <div class="row mb-3 gx-3">
                                     <div class="col">
                                         <div class="form-floating">
-                                            <input type="text" name="lastName" class="form-control" id="lastName" placeholder="Last Name" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')">
+                                            <input type="text" name="lastName" class="form-control" id="lastName" placeholder="Last Name" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" required>
                                             <label for="lastName">Last Name</label>
                                         </div>
                                     </div>
                                     <div class="col">
                                         <div class="form-floating">
-                                            <input type="text" name="userName" class="form-control" id="userName" placeholder="Username" maxlength="30" pattern="^[^\s.]+$">
+                                            <input type="text" name="userName" class="form-control" id="userName" placeholder="Username" maxlength="30" pattern="^[^\s.]+$" required>
                                             <label for="userName">Username</label>
                                         </div>
                                     </div>
@@ -99,7 +99,7 @@ include("shared/assets/processes/registration-profile-process.php");
                                 <!-- Student No. -->
                                 <div class="mb-3">
                                     <div class="form-floating">
-                                        <input type="text" name="studentID" class="form-control" id="studentID" placeholder="Student No.">
+                                        <input type="text" name="studentID" class="form-control" id="studentID" placeholder="Student No." required>
                                         <label for="studentNo">Student No.</label>
                                     </div>
                                 </div>
@@ -124,7 +124,7 @@ include("shared/assets/processes/registration-profile-process.php");
                                 <!-- Gender,Year, Section -->
                                 <div class="row gx-2 mb-3 align-dropdowns">
                                     <div class="col-4 col-sm-4 mb-3">
-                                        <select class="form-select" name="gender" id="gender">
+                                        <select class="form-select" name="gender" id="gender" required>
                                             <option selected disabled>Gender</option>
                                             <option value="Male">Male</option>
                                             <option value="Female">Female</option>
@@ -132,7 +132,7 @@ include("shared/assets/processes/registration-profile-process.php");
                                         </select>
                                     </div>
                                     <div class="col-4 col-sm-4 mb-3">
-                                        <select class="form-select" name="yearLevel" id="yearLevel">
+                                        <select class="form-select" name="yearLevel" id="yearLevel" required>
                                             <option selected disabled>Year Level</option>
                                             <option value="1">1</option>
                                             <option value="2">2</option>
@@ -268,6 +268,18 @@ include("shared/assets/processes/registration-profile-process.php");
                     showToast('Image uploaded successfully!', 'success');
                 };
                 reader.readAsDataURL(file);
+            }
+        });
+
+        // Prevent submission if first/last name contains only spaces
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            const firstName = document.getElementById('firstName').value.trim();
+            const middleName = document.getElementById('middleName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+
+            if (firstName === '' || lastName === '') {
+                e.preventDefault();
+                showToast('First and Last Name cannot be empty or only spaces.', 'danger');
             }
         });
     </script>
