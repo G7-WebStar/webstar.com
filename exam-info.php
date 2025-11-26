@@ -45,8 +45,17 @@ $selectTestResult = executeQuery($selectTestQuery);
 $assessmentIDRow = mysqli_fetch_assoc($selectTestResult);
 $assessmentID = $assessmentIDRow['assessmentID'];
 
-$scoreQuery = "SELECT COUNT(isCorrect) AS correct FROM testresponses WHERE isCorrect = '1' AND userID = '$userID' AND testID = '$testID'";
+$scoreQuery = "SELECT SUM(testquestions.testQuestionPoints) AS correctPoints
+               FROM testresponses
+               INNER JOIN testquestions
+                 ON testresponses.testQuestionID = testquestions.testQuestionID
+               WHERE testresponses.isCorrect = 1 
+                 AND testresponses.userID = '$userID' 
+                 AND testresponses.testID = '$testID'";
 $scoreResult = executeQuery($scoreQuery);
+$scoreRow = mysqli_fetch_assoc($scoreResult);
+$correctPoints = $scoreRow['correctPoints'] ?? 0;
+
 
 $checkPendingQuery = "SELECT todo.status FROM todo 
 INNER JOIN tests
@@ -56,8 +65,7 @@ $checkPendingResult = executeQuery($checkPendingQuery);
 $statusRow = mysqli_fetch_assoc($checkPendingResult);
 $status = $statusRow['status'];
 
-$scoreRow = mysqli_fetch_assoc($scoreResult);
-$score = ($status == 'Pending') ? '-' : $scoreRow['correct'];
+$score = ($status == 'Pending') ? '-' : $correctPoints;
 
 $btnText = 'Answer Now';
 $btnLink = 'test.php';
@@ -190,7 +198,7 @@ $profilePic = !empty($assignmentRow['profilePicture'])
                                             ?>
                                                 <div class="col-auto text-end text-reg">
                                                     Score <div class="text-sbold text-25">
-                                                        <?php echo $score; ?><span class="text-muted">/<?php echo $totalItems; ?>
+                                                        <?php echo $score; ?><span class="text-muted">/<?php echo $totalPoints; ?>
                                                     </div>
                                                 </div>
 
@@ -220,7 +228,7 @@ $profilePic = !empty($assignmentRow['profilePicture'])
                                     ?>
                                         <div class="graded text-reg text-18 mt-4">Score</div>
                                         <div class="score text-sbold text-25">
-                                            <?php echo $score; ?>/<span class="text-muted"><?php echo $totalItems; ?></span>
+                                            <?php echo $score; ?>/<span class="text-muted"><?php echo $totalPoints; ?></span>
                                         </div>
                                     <?php
                                             }
