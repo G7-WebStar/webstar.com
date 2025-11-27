@@ -30,72 +30,79 @@ function processGoogleLink($link)
 {
     $link = trim($link);
 
-    // Case 1: Google Drive folder
+    // Google Drive folder
     if (preg_match('/drive\.google\.com\/drive\/folders\/([a-zA-Z0-9_-]+)/', $link, $matches)) {
-        $folderId = $matches[1];
-        return "https://drive.google.com/embeddedfolderview?id={$folderId}#grid";
+        return "https://drive.google.com/embeddedfolderview?id={$matches[1]}#grid";
     }
 
-    // Case 2: Google Drive file
+    // Google Drive file
     if (preg_match('/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/', $link, $matches)) {
-        $fileId = $matches[1];
-        return "https://drive.google.com/file/d/{$fileId}/preview";
+        return "https://drive.google.com/file/d/{$matches[1]}/preview";
     }
 
-    // Case 3: Google Docs, Sheets, Slides, etc.
+    // Google Docs/Sheets/Slides
     if (preg_match('/(https:\/\/docs\.google\.com\/[a-z]+\/d\/[a-zA-Z0-9_-]+)/', $link, $matches)) {
-        $baseUrl = $matches[1];
-        if (str_contains($link, '/preview')) {
-            return preg_replace('/\?.*/', '', $link);
-        }
-        return "{$baseUrl}/preview";
+        return $matches[1] . "/preview";
     }
 
-    // Case 4: Already preview link
-    if (str_contains($link, '/preview')) {
-        return preg_replace('/\?.*/', '', $link);
+    // If the link already has /preview (Google only)
+    if (str_contains($link, 'google') && str_contains($link, '/preview')) {
+        return $link;
     }
 
-    // Fallback
-    return preg_replace('/\?.*/', '', $link);
+    // DO NOT strip query string for YouTube or others
+    return $link;
 }
 
-function fetchLinkTitle($link)
+function fetchLinkTitle($url)
 {
-    $link = trim($link);
-    $title = '';
+    $url = trim($url);
 
-    // Ensure the link has a scheme
-    if (!preg_match('/^https?:\/\//', $link)) {
-        $link = 'http://' . $link;
+    // Ensure URL protocol
+    if (!preg_match('/^https?:\/\//', $url)) {
+        $url = 'https://' . $url;
     }
 
-    // Set context for user-agent (some sites block default PHP requests)
-    $options = [
-        "http" => [
-            "header" => "User-Agent: Mozilla/5.0\r\n",
-            "timeout" => 5 // optional: prevent hanging
-        ]
-    ];
-    $context = stream_context_create($options);
+    // Check if it's a YouTube link
+    if (preg_match('/(youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $url, $matches)) {
+        // Use oEmbed API to fetch the title
+        $apiUrl = "https://www.youtube.com/oembed?url=" . urlencode($url) . "&format=json";
 
-    try {
-        $html = @file_get_contents($link, false, $context);
-        if ($html && preg_match("/<title>(.*?)<\/title>/is", $html, $matches)) {
-            $title = trim($matches[1]);
+        $json = @file_get_contents($apiUrl);
+        if ($json !== false) {
+            $data = json_decode($json, true);
+            if (isset($data['title'])) {
+                return $data['title'];
+            }
         }
-    } catch (Exception $e) {
-        $title = '';
     }
 
-    // Fallback to domain if title is empty
-    if (empty($title)) {
-        $parsedUrl = parse_url($link);
-        $title = isset($parsedUrl['host']) ? ucfirst(str_replace('www.', '', $parsedUrl['host'])) : 'Link';
+    // Normal HTML fetch if not YouTube
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0");
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    $html = curl_exec($ch);
+    curl_close($ch);
+
+    if ($html) {
+        // OG Title
+        if (preg_match('/<meta property="og:title" content="([^"]+)"/i', $html, $matches)) {
+            return trim($matches[1]);
+        }
+
+        // Page <title>
+        if (preg_match("/<title>(.*?)<\/title>/is", $html, $matches)) {
+            return trim($matches[1]);
+        }
     }
 
-    return $title;
+    // Fallback: Domain name
+    $parsedUrl = parse_url($url);
+    return isset($parsedUrl['host']) ? ucfirst(str_replace('www.', '', $parsedUrl['host'])) : 'Link';
 }
+
 
 // Handle AJAX request to update modalShown
 if (isset($_POST['updateModalShown']) && isset($_POST['submissionID'])) {
@@ -657,25 +664,61 @@ if ($submissionID) {
 
             // --- Fetch enrollmentID from enrollments table ---
             $enrollmentQuery = "
-                SELECT enrollmentID 
-                FROM enrollments 
-                WHERE userID = '$userID' AND courseID = '$courseID'
-                LIMIT 1
-            ";
+    SELECT enrollmentID 
+    FROM enrollments 
+    WHERE userID = '$userID' AND courseID = '$courseID'
+    LIMIT 1
+";
             $enrollmentResult = executeQuery($enrollmentQuery);
+
             if ($enrollmentResult && mysqli_num_rows($enrollmentResult) > 0) {
+
                 $enrollmentRow = mysqli_fetch_assoc($enrollmentResult);
                 $enrollmentID = $enrollmentRow['enrollmentID'];
 
                 if ($enrollmentID) {
-                    // --- Insert XP into leaderboard ---
-                    $insertLeaderboardQuery = "
-                        INSERT INTO leaderboard (enrollmentID, xpPoints, updatedAt)
-                        VALUES ('$enrollmentID', '$finalXP', NOW())
+
+                    // --- Check if enrollmentID already exists in leaderboard ---
+                    $checkLeaderboardQuery = "
+                        SELECT xpPoints 
+                        FROM leaderboard 
+                        WHERE enrollmentID = '$enrollmentID'
+                        LIMIT 1
                     ";
-                    $result = mysqli_query($conn, $insertLeaderboardQuery);
-                    if (!$result) {
-                        die("Leaderboard insert failed: " . mysqli_error($conn));
+                    $leaderboardResult = mysqli_query($conn, $checkLeaderboardQuery);
+
+                    if ($leaderboardResult && mysqli_num_rows($leaderboardResult) > 0) {
+
+                        // --- Enrollment already exists → Update XP ---
+                        $leaderboardRow = mysqli_fetch_assoc($leaderboardResult);
+                        $currentXP = $leaderboardRow['xpPoints'];
+
+                        // Add accumulated XP
+                        $newTotalXP = $currentXP + $finalXP;
+
+                        $updateLeaderboardQuery = "
+                            UPDATE leaderboard
+                            SET xpPoints = '$newTotalXP', updatedAt = NOW()
+                            WHERE enrollmentID = '$enrollmentID'
+                        ";
+                        $updateResult = mysqli_query($conn, $updateLeaderboardQuery);
+
+                        if (!$updateResult) {
+                            die("Leaderboard update failed: " . mysqli_error($conn));
+                        }
+
+                    } else {
+
+                        // --- Enrollment does not exist → Insert new XP row ---
+                        $insertLeaderboardQuery = "
+                            INSERT INTO leaderboard (enrollmentID, xpPoints, updatedAt)
+                            VALUES ('$enrollmentID', '$finalXP', NOW())
+                        ";
+                        $insertResult = mysqli_query($conn, $insertLeaderboardQuery);
+
+                        if (!$insertResult) {
+                            die("Leaderboard insert failed: " . mysqli_error($conn));
+                        }
                     }
                 }
             }
@@ -1083,7 +1126,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                             $fileExt = strtoupper(pathinfo($file['attachment'], PATHINFO_EXTENSION));
                                             $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
                                             $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
-                                        ?>
+                                            ?>
                                             <div class="rubricCard my-3 py-1 d-flex align-items-start justify-content-between cardFile"
                                                 data-type="file" data-file="<?php echo $file['attachment']; ?>"
                                                 data-title="<?php echo htmlspecialchars($file['title'], ENT_QUOTES); ?>"
@@ -1378,7 +1421,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                         class="btn btn-sm px-4 py-2 mb-4 rounded-pill text-reg text-md-14"
                                                         style="background-color: var(--primaryColor); margin-top: -25px;"
                                                         <?php if ($userWebstars >= 50): ?> data-bs-toggle="modal"
-                                                        data-bs-target="#unsubmitModal" <?php endif; ?>>
+                                                            data-bs-target="#unsubmitModal" <?php endif; ?>>
                                                         Unsubmit
                                                     </button>
                                                 <?php endif; ?>
@@ -1531,8 +1574,8 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
 
                 <form id="LinkForm" action="" method="POST">
                     <div class="modal-body pb-2">
-                        <input type="url" name="link" id="linkInput" class="form-control text-reg" placeholder="Link" required
-                            style="border: 1px solid var(--black); border-radius: 8px; padding: 8px;">
+                        <input type="url" name="link" id="linkInput" class="form-control text-reg" placeholder="Link"
+                            required style="border: 1px solid var(--black); border-radius: 8px; padding: 8px;">
                     </div>
 
                     <!-- FOOTER -->
@@ -1663,7 +1706,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                         $isSelected = in_array($level['levelID'], $selectedLevels);
                                         $bgColor = $isSelected ? 'var(--primaryColor)' : 'transparent';
                                         $borderColor = $isSelected ? 'var(--black)' : 'var(--black)';
-                                    ?>
+                                        ?>
                                         <div class="mb-2">
                                             <div class="w-100 d-flex flex-column text-med text-14"
                                                 style="background-color: <?= $bgColor ?>; color: <?= $textColor ?>; border-radius: 10px; border: 1px solid <?= $borderColor ?>; transition: 0.3s; overflow: hidden;">
@@ -1719,7 +1762,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             function sanitizeFileName(fileName) {
                 // Replace spaces & non-alphanumeric characters (except dot, dash, underscore) with underscore
                 fileName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
@@ -1734,7 +1777,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
             const unsubmitBtn = document.getElementById('unsubmitBtn');
 
             if (unsubmitBtn && userWebstars < requiredWebstars) {
-                unsubmitBtn.addEventListener('click', function(e) {
+                unsubmitBtn.addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopImmediatePropagation();
                     showToast(`You need at least ${requiredWebstars} Webstars to unsubmit.`);
@@ -1767,7 +1810,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
 
             // --- Success toast for downloads ---
             document.querySelectorAll('a[download]').forEach(downloadLink => {
-                downloadLink.addEventListener('click', function(e) {
+                downloadLink.addEventListener('click', function (e) {
                     const fileName = this.getAttribute('download');
                     showDownloadToast(`"${fileName}" downloaded successfully!`);
                 });
@@ -1871,7 +1914,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                     }, duration + 500);
                 });
 
-                submittedModalEl.addEventListener('hidden.bs.modal', function() {
+                submittedModalEl.addEventListener('hidden.bs.modal', function () {
                     fetch('', {
                         method: 'POST',
                         headers: {
@@ -1932,7 +1975,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
 
                 const turnInModal = document.getElementById('turnInModal');
                 if (turnInModal) {
-                    turnInModal.addEventListener('show.bs.modal', function(e) {
+                    turnInModal.addEventListener('show.bs.modal', function (e) {
                         if (getTotalFileSize() > MAX_TOTAL_SIZE) {
                             e.preventDefault();
                             showToast('Total file size exceeds 25 MB. Please remove some files.', 'bg-danger');
@@ -1947,7 +1990,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                 }
 
                 if (turnInModal) {
-                    turnInModal.addEventListener('show.bs.modal', function(e) {
+                    turnInModal.addEventListener('show.bs.modal', function (e) {
                         if (!hasUploadedWork()) {
                             e.preventDefault();
                             showToast('Please upload a file or add a link before turning in.', 'bg-danger');
@@ -1958,7 +2001,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                 const workList = document.querySelector('.uploadedFiles');
 
                 // --- Handle file selection (FIXED) ---
-                fileUpload.addEventListener('change', function() {
+                fileUpload.addEventListener('change', function () {
                     const newFiles = Array.from(this.files);
                     this.value = ''; // Reset input to allow re-selecting the same file
 
@@ -2061,6 +2104,13 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                     `;
                     workList.insertAdjacentHTML('beforeend', cardHTML);
 
+                    // FIX — show link immediately
+                    myWorkContainer.style.display = "block";
+                    document.getElementById("myWorkLabel").style.display = "block";
+
+                    updateLinksInput();
+                    linkInput.value = '';
+
                     function updateLinksInput() {
                         const allLinks = Array.from(workList.querySelectorAll('.cardFile'))
                             .filter(c => c.dataset.type === 'link')
@@ -2095,9 +2145,9 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                     formData.append('link', linkValue);
 
                     fetch('', { // empty string means current PHP file
-                            method: 'POST',
-                            body: formData
-                        })
+                        method: 'POST',
+                        body: formData
+                    })
                         .then(res => res.text())
                         .then(title => {
                             if (title) cardLink.textContent = title;
@@ -2139,7 +2189,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
             const filesToDelete = [];
             const deletedFilesInput = document.getElementById('deletedFiles');
             document.querySelectorAll('.remove-existing-file').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     const fileName = this.dataset.filename;
                     filesToDelete.push(fileName);
                     deletedFilesInput.value = JSON.stringify(filesToDelete);
@@ -2152,7 +2202,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
             });
             // --- Enable Bootstrap Tooltips (FOR BADGES) ---
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            tooltipTriggerList.map(function(tooltipTriggerEl) {
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl)
             });
         });
