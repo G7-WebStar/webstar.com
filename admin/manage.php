@@ -117,12 +117,6 @@ if (isset($_POST['deleteUserID'])) {
     ");
     executeQuery("DELETE FROM rubric WHERE userID = $userID");
 
-    // 6. Dependent tables that reference courses directly
-    executeQuery("
-        DELETE FROM studentbadges
-        WHERE courseID IN (SELECT courseID FROM courses WHERE userID = $userID)
-    ");
-
     // 7. Courses
     executeQuery("DELETE FROM courses WHERE userID = $userID");
 
@@ -130,7 +124,10 @@ if (isset($_POST['deleteUserID'])) {
     executeQuery("DELETE FROM myitems WHERE userID = $userID");
     executeQuery("DELETE FROM settings WHERE userID = $userID");
 
-    // 9. User info, Profile, Users
+    // 9 Activities (IMPORTANT)
+    executeQuery("DELETE FROM activities WHERE userID = $userID");
+
+    // 10. User info, Profile, Users
     executeQuery("DELETE FROM userinfo WHERE userID = $userID");
     executeQuery("DELETE FROM profile WHERE userID = $userID");
     executeQuery("DELETE FROM users WHERE userID = $userID");
