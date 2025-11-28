@@ -21,18 +21,52 @@ if (isset($_POST['deleteUserID'])) {
         WHERE testQuestionID IN (
             SELECT testQuestionID FROM testquestions
             WHERE testID IN (
-                SELECT testID FROM tests WHERE userID = $userID
+                SELECT testID FROM tests
+                WHERE assessmentID IN (
+                    SELECT assessmentID FROM assessments
+                    WHERE courseID IN (
+                        SELECT courseID FROM courses WHERE userID = $userID
+                    )
+                )
             )
         )
     ");
+
     executeQuery("
-        DELETE FROM testresponse
+        DELETE FROM testresponses
         WHERE testID IN (
-            SELECT testID FROM tests WHERE userID = $userID
+            SELECT testID FROM tests
+            WHERE assessmentID IN (
+                SELECT assessmentID FROM assessments
+                WHERE courseID IN (
+                    SELECT courseID FROM courses WHERE userID = $userID
+                )
+            )
         )
     ");
-    executeQuery("DELETE FROM testquestions WHERE testID IN (SELECT testID FROM tests WHERE userID = $userID)");
-    executeQuery("DELETE FROM tests WHERE userID = $userID");
+
+    executeQuery("
+        DELETE FROM testquestions
+        WHERE testID IN (
+            SELECT testID FROM tests
+            WHERE assessmentID IN (
+                SELECT assessmentID FROM assessments
+                WHERE courseID IN (
+                    SELECT courseID FROM courses WHERE userID = $userID
+                )
+            )
+        )
+    ");
+
+    executeQuery("
+        DELETE FROM tests
+        WHERE assessmentID IN (
+            SELECT assessmentID FROM assessments
+            WHERE courseID IN (
+                SELECT courseID FROM courses WHERE userID = $userID
+            )
+        )
+    ");
 
     // 3. Todo → Assessments → Courses
     executeQuery("
@@ -56,7 +90,7 @@ if (isset($_POST['deleteUserID'])) {
 
     // 4. Lessons, CourseSchedule, Files
     executeQuery("
-        DELETE FROM lesson
+        DELETE FROM lessons
         WHERE courseID IN (SELECT courseID FROM courses WHERE userID = $userID)
     ");
     executeQuery("
