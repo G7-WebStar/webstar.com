@@ -179,7 +179,9 @@ $assessmentID = $test['assessmentID'];
                                             <div class="tab-pane fade show active" id="announcements"
                                                 role="tabpanel" aria-labelledby="announcements-tab">
                                                 <div class="text-sbold text-14 mt-3">Exam General Instructions</div>
-                                                <p class="mb-5 mt-3 text-med text-14"><?php echo nl2br($testDescription) ?></p>
+                                                <div class="text-med text-14">
+                                                    <p class="mb-5 mt-3"><?php echo nl2br($testDescription) ?></p>
+                                                </div>
 
                                                 <hr>
 
