@@ -7,15 +7,6 @@ include('../shared/assets/database/connect.php');
 
 include("../shared/assets/processes/prof-session-process.php");
 
-$toastMessage = '';
-$toastType = '';
-
-if (isset($_SESSION['toast'])) {
-    $toastMessage = $_SESSION['toast']['message'];
-    $toastType = $_SESSION['toast']['type'];
-    unset($_SESSION['toast']);
-}
-
 $errorMessages = [
     "emailNoCredential" => "No email credentials found in the database!"
 ];
@@ -143,246 +134,265 @@ $course = "SELECT courseID, courseCode
            WHERE userID = '$userID'";
 $courses = executeQuery($course);
 
+$errors = [];
 // Save Assignment Query
 if (isset($_POST['saveAssignment'])) {
-    $mode = $_POST['mode'] ?? 'new';
-    $taskID = intval($_POST['taskID'] ?? 0);
 
-    $titleRaw = $_POST['assignmentTitle'] ?? '';
-    $title = mysqli_real_escape_string($conn, $titleRaw);
-    $descRaw = $_POST['assignmentContent'] ?? '';
-    $desc = mysqli_real_escape_string($conn, $descRaw);
-    $deadline = !empty($_POST['deadline']) ? $_POST['deadline'] : null;
-    $points = !empty($_POST['points']) ? $_POST['points'] : 0;
-    $rubricID = !empty($_POST['selectedRubricID']) ? intval($_POST['selectedRubricID']) : null;
-    $links = $_POST['links'] ?? [];
-    $uploadedFiles = !empty($_FILES['materials']['name'][0]);
-    $existingFiles = $_POST['existingFiles'] ?? []; // files user kept
+    if (empty(trim($_POST['assignmentTitle'] ?? ''))) {
+        $errors[] = 'Task title is required.';
+    }
 
-    foreach ($_POST['courses'] ?? [] as $selectedCourseID) {
-        $deadlineEnabled = isset($_POST['stopSubmissions']) ? 1 : 0;
+    if (empty(trim($_POST['deadline'] ?? ''))) {
+        $errors[] = 'Deadline is required.';
+    }
 
-        if ($mode === 'new') {
-            // --- INSERT new assessment ---
-            $insertAssessment = "INSERT INTO assessments 
+    if (empty(trim($_POST['points'] ?? ''))) {
+        $errors[] = 'Points is required.';
+    }
+
+    if (!empty($errors)) {
+        // Combine all validation errors into a single string
+        $toastMessage = 'Please fill up the required information.';
+        $toastType = 'alert-danger';
+    } else {
+        $mode = $_POST['mode'] ?? 'new';
+        $taskID = intval($_POST['taskID'] ?? 0);
+
+        $titleRaw = $_POST['assignmentTitle'] ?? '';
+        $title = mysqli_real_escape_string($conn, $titleRaw);
+        $descRaw = $_POST['assignmentContent'] ?? '';
+        $desc = mysqli_real_escape_string($conn, $descRaw);
+        $deadline = !empty($_POST['deadline']) ? $_POST['deadline'] : null;
+        $points = !empty($_POST['points']) ? $_POST['points'] : 0;
+        $rubricID = !empty($_POST['selectedRubricID']) ? intval($_POST['selectedRubricID']) : null;
+        $links = $_POST['links'] ?? [];
+        $uploadedFiles = !empty($_FILES['materials']['name'][0]);
+        $existingFiles = $_POST['existingFiles'] ?? []; // files user kept
+
+        foreach ($_POST['courses'] ?? [] as $selectedCourseID) {
+            $deadlineEnabled = isset($_POST['stopSubmissions']) ? 1 : 0;
+
+            if ($mode === 'new') {
+                // --- INSERT new assessment ---
+                $insertAssessment = "INSERT INTO assessments 
                 (courseID, assessmentTitle, type, deadline, deadlineEnabled, createdAt)
                 VALUES 
                 ('$selectedCourseID', '$title', 'Task', " . ($deadline ? "'$deadline'" : "NULL") . ", '$deadlineEnabled', NOW())";
-            executeQuery($insertAssessment);
-            $assessmentID = mysqli_insert_id($conn);
+                executeQuery($insertAssessment);
+                $assessmentID = mysqli_insert_id($conn);
 
-            // --- INSERT new assignment ---
-            $insertAssignment = "INSERT INTO assignments 
+                // --- INSERT new assignment ---
+                $insertAssignment = "INSERT INTO assignments 
                 (assessmentID, assignmentDescription, assignmentPoints, rubricID)
                 VALUES 
                 ('$assessmentID', '$desc', '$points', '$rubricID')";
-            executeQuery($insertAssignment);
-            $assignmentID = mysqli_insert_id($conn);
+                executeQuery($insertAssignment);
+                $assignmentID = mysqli_insert_id($conn);
 
-        } elseif ($mode === 'edit') {
+            } elseif ($mode === 'edit') {
 
-            // --- Get deadlineEnabled (checkbox) ---
-            $deadlineEnabled = isset($_POST['stopSubmissions']) ? 1 : 0;
+                // --- Get deadlineEnabled (checkbox) ---
+                $deadlineEnabled = isset($_POST['stopSubmissions']) ? 1 : 0;
 
-            // --- UPDATE existing assessment ---
-            $updateAssessment = "UPDATE assessments 
+                // --- UPDATE existing assessment ---
+                $updateAssessment = "UPDATE assessments 
                 SET assessmentTitle='$title',
                     deadline=" . ($deadline ? "'$deadline'" : "NULL") . ",
                     deadlineEnabled='$deadlineEnabled'
                 WHERE assessmentID='$taskID'";
-            executeQuery($updateAssessment);
+                executeQuery($updateAssessment);
 
-            // --- FETCH correct assignmentID ---
-            $assignmentQuery = "SELECT assignmentID FROM assignments WHERE assessmentID='$taskID' LIMIT 1";
-            $assignmentResult = executeQuery($assignmentQuery);
-            $assignmentRow = mysqli_fetch_assoc($assignmentResult);
-            $assignmentID = $assignmentRow['assignmentID'];
+                // --- FETCH correct assignmentID ---
+                $assignmentQuery = "SELECT assignmentID FROM assignments WHERE assessmentID='$taskID' LIMIT 1";
+                $assignmentResult = executeQuery($assignmentQuery);
+                $assignmentRow = mysqli_fetch_assoc($assignmentResult);
+                $assignmentID = $assignmentRow['assignmentID'];
 
-            // --- UPDATE assignment ---
-            $updateAssignment = "UPDATE assignments 
+                // --- UPDATE assignment ---
+                $updateAssignment = "UPDATE assignments 
                 SET assignmentDescription='$desc', assignmentPoints='$points', rubricID='$rubricID'
                 WHERE assignmentID='$assignmentID'";
-            executeQuery($updateAssignment);
-        } elseif ($mode === 'reuse') {
-            // --- CREATE NEW ASSESSMENT ---
-            $insertAssessment = "INSERT INTO assessments
-        (courseID, assessmentTitle, type, deadline, deadlineEnabled, createdAt)
-        VALUES
-        ('$selectedCourseID', '$title', 'Task', " . ($deadline ? "'$deadline'" : "NULL") . ", '$deadlineEnabled', NOW())";
-            executeQuery($insertAssessment);
-            $assessmentID = mysqli_insert_id($conn);
+                executeQuery($updateAssignment);
+            } elseif ($mode === 'reuse') {
+                // --- CREATE NEW ASSESSMENT ---
+                $insertAssessment = "INSERT INTO assessments
+                (courseID, assessmentTitle, type, deadline, deadlineEnabled, createdAt)
+                VALUES
+                ('$selectedCourseID', '$title', 'Task', " . ($deadline ? "'$deadline'" : "NULL") . ", '$deadlineEnabled', NOW())";
+                executeQuery($insertAssessment);
+                $assessmentID = mysqli_insert_id($conn);
 
-            // --- CREATE NEW ASSIGNMENT LINKED TO NEW ASSESSMENT ---
-            $insertAssignment = "INSERT INTO assignments
-        (assessmentID, assignmentDescription, assignmentPoints, rubricID)
-        VALUES
-        ('$assessmentID', '$desc', '$points', '$rubricID')";
-            executeQuery($insertAssignment);
-            $assignmentID = mysqli_insert_id($conn);
+                // --- CREATE NEW ASSIGNMENT LINKED TO NEW ASSESSMENT ---
+                $insertAssignment = "INSERT INTO assignments
+                (assessmentID, assignmentDescription, assignmentPoints, rubricID)
+                VALUES
+                ('$assessmentID', '$desc', '$points', '$rubricID')";
+                executeQuery($insertAssignment);
+                $assignmentID = mysqli_insert_id($conn);
 
-            // --- COPY FILES / LINKS FROM OLD ASSIGNMENT ---
-            $oldAssignmentQuery = "SELECT assignmentID FROM assignments WHERE assessmentID='$taskID' LIMIT 1";
-            $oldAssignmentResult = executeQuery($oldAssignmentQuery);
-            $oldAssignmentRow = mysqli_fetch_assoc($oldAssignmentResult);
-            $oldAssignmentID = $oldAssignmentRow['assignmentID'];
+                // --- COPY FILES / LINKS FROM OLD ASSIGNMENT ---
+                $oldAssignmentQuery = "SELECT assignmentID FROM assignments WHERE assessmentID='$taskID' LIMIT 1";
+                $oldAssignmentResult = executeQuery($oldAssignmentQuery);
+                $oldAssignmentRow = mysqli_fetch_assoc($oldAssignmentResult);
+                $oldAssignmentID = $oldAssignmentRow['assignmentID'];
 
-            $filesQuery = "SELECT * FROM files WHERE assignmentID='$oldAssignmentID'";
-            $filesResult = executeQuery($filesQuery);
-            while ($file = mysqli_fetch_assoc($filesResult)) {
-                $fileAttachment = $file['fileAttachment'] ?? null;
-                $fileLink = $file['fileLink'] ?? null;
-                $fileTitle = mysqli_real_escape_string($conn, $file['fileTitle'] ?? '');
+                $filesQuery = "SELECT * FROM files WHERE assignmentID='$oldAssignmentID'";
+                $filesResult = executeQuery($filesQuery);
+                while ($file = mysqli_fetch_assoc($filesResult)) {
+                    $fileAttachment = $file['fileAttachment'] ?? null;
+                    $fileLink = $file['fileLink'] ?? null;
+                    $fileTitle = mysqli_real_escape_string($conn, $file['fileTitle'] ?? '');
 
-                // INSERT with correct courseID and userID
-                $insertFile = "INSERT INTO files
-            (assignmentID, fileAttachment, fileLink, fileTitle, courseID, userID)
-            VALUES
-            ('$assignmentID', '$fileAttachment', '$fileLink', '$fileTitle', '$selectedCourseID', '$userID')";
-                executeQuery($insertFile);
-            }
+                    // INSERT with correct courseID and userID
+                    $insertFile = "INSERT INTO files
+                    (assignmentID, fileAttachment, fileLink, fileTitle, courseID, userID)
+                    VALUES
+                    ('$assignmentID', '$fileAttachment', '$fileLink', '$fileTitle', '$selectedCourseID', '$userID')";
+                    executeQuery($insertFile);
+                }
 
-            // --- INSERT TODOS FOR STUDENTS ENROLLED IN THE NEW COURSE ---
-            $studentsQuery = "SELECT userID FROM enrollments WHERE courseID = '$selectedCourseID'";
-            $studentsResult = executeQuery($studentsQuery);
-            while ($student = mysqli_fetch_assoc($studentsResult)) {
-                $studentUserID = $student['userID'];
-                $todoQuery = "INSERT INTO todo (userID, assessmentID, status, isRead)
+                // --- INSERT TODOS FOR STUDENTS ENROLLED IN THE NEW COURSE ---
+                $studentsQuery = "SELECT userID FROM enrollments WHERE courseID = '$selectedCourseID'";
+                $studentsResult = executeQuery($studentsQuery);
+                while ($student = mysqli_fetch_assoc($studentsResult)) {
+                    $studentUserID = $student['userID'];
+                    $todoQuery = "INSERT INTO todo (userID, assessmentID, status, isRead)
             VALUES ('$studentUserID', '$assessmentID', 'Pending', 0)";
-                executeQuery($todoQuery);
+                    executeQuery($todoQuery);
+                }
             }
-        }
 
-        // --- REMOVE FILES if requested ---
-        if (!empty($_POST['removeFiles'])) {
-            $removeFiles = $_POST['removeFiles'];
-            $removeFilesStr = implode("','", array_map(function ($file) use ($conn) {
-                return mysqli_real_escape_string($conn, $file);
-            }, $removeFiles));
+            // --- REMOVE FILES if requested ---
+            if (!empty($_POST['removeFiles'])) {
+                $removeFiles = $_POST['removeFiles'];
+                $removeFilesStr = implode("','", array_map(function ($file) use ($conn) {
+                    return mysqli_real_escape_string($conn, $file);
+                }, $removeFiles));
 
-            $deleteQuery = "DELETE FROM files 
+                $deleteQuery = "DELETE FROM files 
                 WHERE assignmentID='$assignmentID' 
                 AND fileAttachment IN ('$removeFilesStr')";
-            executeQuery($deleteQuery);
+                executeQuery($deleteQuery);
 
-            foreach ($removeFiles as $file) {
-                $filePath = __DIR__ . "/../shared/assets/files/" . $file;
-                if (file_exists($filePath))
-                    unlink($filePath);
+                foreach ($removeFiles as $file) {
+                    $filePath = __DIR__ . "/../shared/assets/files/" . $file;
+                    if (file_exists($filePath))
+                        unlink($filePath);
+                }
             }
-        }
 
-        // --- REMOVE LINKS if requested ---
-        if (!empty($_POST['removeLinks'])) {
-            $removeLinks = $_POST['removeLinks'];
-            $removeLinksStr = implode("','", array_map(function ($link) use ($conn) {
-                return mysqli_real_escape_string($conn, $link);
-            }, $removeLinks));
+            // --- REMOVE LINKS if requested ---
+            if (!empty($_POST['removeLinks'])) {
+                $removeLinks = $_POST['removeLinks'];
+                $removeLinksStr = implode("','", array_map(function ($link) use ($conn) {
+                    return mysqli_real_escape_string($conn, $link);
+                }, $removeLinks));
 
-            $deleteQuery = "DELETE FROM files 
+                $deleteQuery = "DELETE FROM files 
                 WHERE assignmentID='$assignmentID' 
                 AND fileLink IN ('$removeLinksStr')";
-            executeQuery($deleteQuery);
-        }
-
-        // --- Handle uploaded files ---
-        if (!empty($_FILES['materials']['name'][0])) {
-            $uploadDir = __DIR__ . "/../shared/assets/files/";
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
+                executeQuery($deleteQuery);
             }
 
-            foreach ($_FILES['materials']['name'] as $key => $fileName) {
-                $tmpName = $_FILES['materials']['tmp_name'][$key];
-                $fileError = $_FILES['materials']['error'][$key];
+            // --- Handle uploaded files ---
+            if (!empty($_FILES['materials']['name'][0])) {
+                $uploadDir = __DIR__ . "/../shared/assets/files/";
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
 
-                if ($fileError === UPLOAD_ERR_OK) {
+                foreach ($_FILES['materials']['name'] as $key => $fileName) {
+                    $tmpName = $_FILES['materials']['tmp_name'][$key];
+                    $fileError = $_FILES['materials']['error'][$key];
 
-                    // Get original filename and extension
-                    $originalName = pathinfo($fileName, PATHINFO_FILENAME);
-                    $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+                    if ($fileError === UPLOAD_ERR_OK) {
 
-                    // Replace symbols and spaces with underscores (keep letters, numbers, dash, underscore)
-                    $safeName = preg_replace('/[^a-zA-Z0-9-_]/', '_', $originalName);
+                        // Get original filename and extension
+                        $originalName = pathinfo($fileName, PATHINFO_FILENAME);
+                        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
 
-                    // Reattach the extension
-                    $fileTitle = $safeName . '.' . $extension;
+                        // Replace symbols and spaces with underscores (keep letters, numbers, dash, underscore)
+                        $safeName = preg_replace('/[^a-zA-Z0-9-_]/', '_', $originalName);
 
-                    // Stored filename on server (unique)
-                    $fileAttachment = date('Ymd_His') . '_' . $fileTitle;
+                        // Reattach the extension
+                        $fileTitle = $safeName . '.' . $extension;
 
-                    $targetPath = $uploadDir . $fileAttachment;
+                        // Stored filename on server (unique)
+                        $fileAttachment = date('Ymd_His') . '_' . $fileTitle;
 
-                    if (move_uploaded_file($tmpName, $targetPath)) {
+                        $targetPath = $uploadDir . $fileAttachment;
 
-                        executeQuery("
+                        if (move_uploaded_file($tmpName, $targetPath)) {
+
+                            executeQuery("
                         INSERT INTO files 
                         (courseID, userID, assignmentID, fileAttachment, fileTitle, fileLink) 
                         VALUES 
                         ('$selectedCourseID', '$userID', '$assignmentID', '$fileAttachment', '$fileTitle', '')
                     ");
+                        }
                     }
                 }
             }
-        }
 
-        // --- Handle link files ---
-        if (!empty($links)) {
-            foreach ($links as $link) {
-                $link = trim($link);
-                if ($link === '')
-                    continue;
+            // --- Handle link files ---
+            if (!empty($links)) {
+                foreach ($links as $link) {
+                    $link = trim($link);
+                    if ($link === '')
+                        continue;
 
-                $fileTitle = fetchLinkTitle($link);
+                    $fileTitle = fetchLinkTitle($link);
 
-                // Skip Google Drive conversion for YouTube links
-                if (preg_match('/(youtube\.com|youtu\.be)/i', $link)) {
-                    $processedLink = $link;
-                } else {
-                    $processedLink = processGoogleLink($link);
-                }
+                    // Skip Google Drive conversion for YouTube links
+                    if (preg_match('/(youtube\.com|youtu\.be)/i', $link)) {
+                        $processedLink = $link;
+                    } else {
+                        $processedLink = processGoogleLink($link);
+                    }
 
-                $insertLink = "INSERT INTO files 
+                    $insertLink = "INSERT INTO files 
                 (courseID, userID, assignmentID, fileAttachment, fileTitle, fileLink) 
                 VALUES 
                 ('$selectedCourseID', '$userID', '$assignmentID', '', '" .
-                mysqli_real_escape_string($conn, $fileTitle) . "', '$processedLink')";
-                executeQuery($insertLink);
-            }
-        }
-
-        if ($mode === 'new' || $mode === 'reuse') {
-            // Insert todos for each student enrolled in the course
-            $studentsQuery = "SELECT userID, enrollmentID FROM enrollments WHERE courseID = '$selectedCourseID'";
-            $studentsResult = executeQuery($studentsQuery);
-            if ($studentsResult) {
-                while ($student = mysqli_fetch_assoc($studentsResult)) {
-                    $studentUserID = $student['userID'];
-                    $todoQuery = "INSERT INTO todo (userID, assessmentID, status, isRead)
-                        VALUES ('$studentUserID', '$assessmentID', 'Pending', 0)";
-                    executeQuery($todoQuery);
+                        mysqli_real_escape_string($conn, $fileTitle) . "', '$processedLink')";
+                    executeQuery($insertLink);
                 }
             }
 
-            // --- Notifications & Email ---
-            $notificationMessage = "A new task has been assigned: " . $titleRaw;
-            $notifType = 'Course Update';
-            $courseCode = "";
+            if ($mode === 'new' || $mode === 'reuse') {
+                // Insert todos for each student enrolled in the course
+                $studentsQuery = "SELECT userID, enrollmentID FROM enrollments WHERE courseID = '$selectedCourseID'";
+                $studentsResult = executeQuery($studentsQuery);
+                if ($studentsResult) {
+                    while ($student = mysqli_fetch_assoc($studentsResult)) {
+                        $studentUserID = $student['userID'];
+                        $todoQuery = "INSERT INTO todo (userID, assessmentID, status, isRead)
+                        VALUES ('$studentUserID', '$assessmentID', 'Pending', 0)";
+                        executeQuery($todoQuery);
+                    }
+                }
 
-            // Fetch course code for email
-            $selectCourseDetailsQuery = "SELECT courseCode FROM courses WHERE courseID = '$selectedCourseID'";
-            $courseDetailsResult = executeQuery($selectCourseDetailsQuery);
-            if ($courseDetailsResult && mysqli_num_rows($courseDetailsResult) > 0) {
-                $courseData = mysqli_fetch_assoc($courseDetailsResult);
-                $courseCode = $courseData['courseCode'];
-            }
+                // --- Notifications & Email ---
+                $notificationMessage = "A new task has been assigned: " . $titleRaw;
+                $notifType = 'Course Update';
+                $courseCode = "";
 
-            $escapedNotificationMessage = mysqli_real_escape_string($conn, $notificationMessage);
-            $escapedNotifType = mysqli_real_escape_string($conn, $notifType);
+                // Fetch course code for email
+                $selectCourseDetailsQuery = "SELECT courseCode FROM courses WHERE courseID = '$selectedCourseID'";
+                $courseDetailsResult = executeQuery($selectCourseDetailsQuery);
+                if ($courseDetailsResult && mysqli_num_rows($courseDetailsResult) > 0) {
+                    $courseData = mysqli_fetch_assoc($courseDetailsResult);
+                    $courseCode = $courseData['courseCode'];
+                }
 
-            // For 'new' mode: prevent duplicates within 5 minutes
-            if ($mode === 'reuse') {
-                // Always insert for reuse - it's a new posting event
-                $insertNotificationQuery = "
+                $escapedNotificationMessage = mysqli_real_escape_string($conn, $notificationMessage);
+                $escapedNotifType = mysqli_real_escape_string($conn, $notifType);
+
+                // For 'new' mode: prevent duplicates within 5 minutes
+                if ($mode === 'reuse') {
+                    // Always insert for reuse - it's a new posting event
+                    $insertNotificationQuery = "
                     INSERT INTO inbox 
                     (enrollmentID, messageText, notifType, createdAt)
                     SELECT
@@ -395,9 +405,9 @@ if (isset($_POST['saveAssignment'])) {
                     WHERE
                         e.courseID = '$selectedCourseID'
                 ";
-            } else {
-                // For 'new' mode, prevent duplicates within 5 minutes
-                $insertNotificationQuery = "
+                } else {
+                    // For 'new' mode, prevent duplicates within 5 minutes
+                    $insertNotificationQuery = "
                     INSERT INTO inbox 
                     (enrollmentID, messageText, notifType, createdAt)
                     SELECT
@@ -418,11 +428,11 @@ if (isset($_POST['saveAssignment'])) {
                                 AND i2.createdAt > DATE_SUB(NOW(), INTERVAL 5 MINUTE)
                         )
                 ";
-            }
-            executeQuery($insertNotificationQuery);
+                }
+                executeQuery($insertNotificationQuery);
 
-            // Email enrolled students who opted-in
-            $selectEmailsQuery = "
+                // Email enrolled students who opted-in
+                $selectEmailsQuery = "
                 SELECT u.email, u.userID,
                        COALESCE(s.questDeadlineEnabled, 0) as questDeadlineEnabled
                 FROM users u
@@ -430,65 +440,65 @@ if (isset($_POST['saveAssignment'])) {
                 LEFT JOIN settings s ON u.userID = s.userID
                 WHERE e.courseID = '$selectedCourseID'
             ";
-            $emailsResult = executeQuery($selectEmailsQuery);
+                $emailsResult = executeQuery($selectEmailsQuery);
 
-            $credentialQuery = "SELECT email, password FROM emailcredentials WHERE credentialID = 1";
-            $credentialResult = executeQuery($credentialQuery);
-            $credentialRow = $credentialResult ? mysqli_fetch_assoc($credentialResult) : null;
+                $credentialQuery = "SELECT email, password FROM emailcredentials WHERE credentialID = 1";
+                $credentialResult = executeQuery($credentialQuery);
+                $credentialRow = $credentialResult ? mysqli_fetch_assoc($credentialResult) : null;
 
-            if ($credentialRow) {
-                $smtpEmail = $credentialRow['email'];
-                $smtpPassword = $credentialRow['password'];
+                if ($credentialRow) {
+                    $smtpEmail = $credentialRow['email'];
+                    $smtpPassword = $credentialRow['password'];
 
-                try {
-                    $mail = new PHPMailer(true);
-                    $mail->isSMTP();
-                    $mail->Host = 'smtp.gmail.com';
-                    $mail->SMTPAuth = true;
-                    $mail->Username = $smtpEmail;
-                    $mail->Password = $smtpPassword;
-                    $mail->SMTPSecure = 'tls';
-                    $mail->Port = 587;
-                    $mail->setFrom($smtpEmail, 'Webstar');
-                    $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
-                    if (file_exists($headerPath)) {
-                        $mail->AddEmbeddedImage($headerPath, 'emailHeader');
-                    }
-                    $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
-                    if (file_exists($footerPath)) {
-                        $mail->AddEmbeddedImage($footerPath, 'emailFooter');
-                    }
-
-                    $mail->isHTML(true);
-                    $mail->CharSet = 'UTF-8';
-                    $mail->Encoding = 'base64';
-                    $mail->Subject = "[NEW TASK] " . $titleRaw . " for Course " . $courseCode;
-
-                    $recipientsFound = false;
-                    while ($student = mysqli_fetch_assoc($emailsResult)) {
-                        if ($student['questDeadlineEnabled'] == 1 && !empty($student['email'])) {
-                            $mail->addAddress($student['email']);
-                            $recipientsFound = true;
+                    try {
+                        $mail = new PHPMailer(true);
+                        $mail->isSMTP();
+                        $mail->Host = 'smtp.gmail.com';
+                        $mail->SMTPAuth = true;
+                        $mail->Username = $smtpEmail;
+                        $mail->Password = $smtpPassword;
+                        $mail->SMTPSecure = 'tls';
+                        $mail->Port = 587;
+                        $mail->setFrom($smtpEmail, 'Webstar');
+                        $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
+                        if (file_exists($headerPath)) {
+                            $mail->AddEmbeddedImage($headerPath, 'emailHeader');
                         }
-                    }
+                        $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
+                        if (file_exists($footerPath)) {
+                            $mail->AddEmbeddedImage($footerPath, 'emailFooter');
+                        }
 
-                    if ($recipientsFound) {
-                        $deadlineDisplay = 'Not set';
-                        if (!empty($deadline)) {
-                            try {
-                                $deadlineDate = new DateTime($deadline);
-                                $deadlineDisplay = $deadlineDate->format('F j, Y \\a\\t g:i A');
-                            } catch (Exception $e) {
-                                $deadlineDisplay = $deadline;
+                        $mail->isHTML(true);
+                        $mail->CharSet = 'UTF-8';
+                        $mail->Encoding = 'base64';
+                        $mail->Subject = "[NEW TASK] " . $titleRaw . " for Course " . $courseCode;
+
+                        $recipientsFound = false;
+                        while ($student = mysqli_fetch_assoc($emailsResult)) {
+                            if ($student['questDeadlineEnabled'] == 1 && !empty($student['email'])) {
+                                $mail->addAddress($student['email']);
+                                $recipientsFound = true;
                             }
                         }
 
-                        $pointsDisplay = ($points !== '' && $points !== null) ? $points : 'Ungraded';
-                        $descHtml = nl2br(htmlspecialchars($descRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-                        $emailTitleEsc = htmlspecialchars($titleRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                        $courseCodeEsc = htmlspecialchars($courseCode, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        if ($recipientsFound) {
+                            $deadlineDisplay = 'Not set';
+                            if (!empty($deadline)) {
+                                try {
+                                    $deadlineDate = new DateTime($deadline);
+                                    $deadlineDisplay = $deadlineDate->format('F j, Y \\a\\t g:i A');
+                                } catch (Exception $e) {
+                                    $deadlineDisplay = $deadline;
+                                }
+                            }
 
-                        $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+                            $pointsDisplay = ($points !== '' && $points !== null) ? $points : 'Ungraded';
+                            $descHtml = nl2br(htmlspecialchars($descRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                            $emailTitleEsc = htmlspecialchars($titleRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                            $courseCodeEsc = htmlspecialchars($courseCode, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+                            $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
                             <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
                                 <tr>
                                     <td align="center">
@@ -535,32 +545,33 @@ if (isset($_POST['saveAssignment'])) {
                             </table>
                         </div>';
 
-                        $mail->send();
+                            $mail->send();
+                        }
+                    } catch (Exception $e) {
+                        $errorMsg = isset($mail) && is_object($mail) ? $mail->ErrorInfo : $e->getMessage();
+                        error_log("PHPMailer failed for Course ID $selectedCourseID: " . $errorMsg);
                     }
-                } catch (Exception $e) {
-                    $errorMsg = isset($mail) && is_object($mail) ? $mail->ErrorInfo : $e->getMessage();
-                    error_log("PHPMailer failed for Course ID $selectedCourseID: " . $errorMsg);
                 }
             }
         }
-    }
-    // --- Determine toast message based on mode ---
-    if ($mode === 'new' || $mode === 'reuse') {
-        $_SESSION['toast'] = [
-            'type' => 'alert-success',
-            'message' => 'Assignment assigned successfully!'
-        ];
-    } elseif ($mode === 'edit') {
-        $_SESSION['toast'] = [
-            'type' => 'alert-success',
-            'message' => 'Assignment edited successfully!'
-        ];
-    }
+        // --- Determine toast message based on mode ---
+        if ($mode === 'new' || $mode === 'reuse') {
+            $_SESSION['toast'] = [
+                'type' => 'alert-success',
+                'message' => 'Assignment assigned successfully!'
+            ];
+        } elseif ($mode === 'edit') {
+            $_SESSION['toast'] = [
+                'type' => 'alert-success',
+                'message' => 'Assignment edited successfully!'
+            ];
+        }
 
-    // --- Set active tab and redirect ---
-    $_SESSION['activeTab'] = 'todo';
-    header("Location: course-info.php?courseID=" . intval($_POST['courses'][0]));
-    exit();
+        // --- Set active tab and redirect ---
+        $_SESSION['activeTab'] = 'todo';
+        header("Location: course-info.php?courseID=" . intval($_POST['courses'][0]));
+        exit();
+    }
 }
 
 //Fetch the Title of link
@@ -1615,6 +1626,20 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                     });
                 });
             });
+
+            <?php if (!empty($toastMessage)): ?>
+                const phpToastMessage = "<?= addslashes($toastMessage) ?>";
+                const phpToastType = "<?= $toastType ?>";
+
+                const toastContainer = document.getElementById("toastContainer");
+                toastContainer.innerHTML = `
+                    <div class="alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 ${phpToastType}">
+                        <i class="bi bi-x-circle-fill fs-6"></i>
+                        <span>${phpToastMessage}</span>
+                    </div>
+                `;
+                setTimeout(() => toastContainer.innerHTML = '', 3000);
+            <?php endif; ?>
 
             // File input change
             fileInput.addEventListener('change', function (event) {
