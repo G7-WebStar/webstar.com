@@ -139,15 +139,15 @@ $errors = [];
 if (isset($_POST['saveAssignment'])) {
 
     if (empty(trim($_POST['assignmentTitle'] ?? ''))) {
-        $errors[] = 'Course Title is required.';
+        $errors[] = 'Task title is required.';
     }
 
     if (empty(trim($_POST['deadline'] ?? ''))) {
-        $errors[] = 'Course Code is required.';
+        $errors[] = 'Deadline is required.';
     }
 
     if (empty(trim($_POST['points'] ?? ''))) {
-        $errors[] = 'Section is required.';
+        $errors[] = 'Points is required.';
     }
 
     if (!empty($errors)) {
