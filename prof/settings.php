@@ -66,106 +66,135 @@ if (isset($_POST['selectedCourse'])) {
 }
 
 if (isset($_POST['saveChanges'])) {
-    $firstName = $_POST['firstName'] ?? '';
-    $middleName = $_POST['middleName'] ?? '';
-    $lastName = $_POST['lastName'] ?? '';
-    $userName = strtolower($_POST['userName']) ?? '';
-    $studentID = strtoupper($_POST['studentID']) ?? '';
+    $firstName = trim($_POST['firstName'] ?? '');
+    $middleName = trim($_POST['middleName'] ?? '');
+    $lastName = trim($_POST['lastName'] ?? '');
+    $userName = trim(strtolower($_POST['userName'] ?? ''));
+    $studentID = strtoupper(trim($_POST['studentID'] ?? ''));
     $programID = $_POST['program'] ?? '';
     $gender = $_POST['gender'] ?? '';
     $yearLevel = $_POST['yearLevel'] ?? '';
     $yearSection = $_POST['yearSection'] ?? '';
-    $schoolEmail = $_POST['schoolEmail'] ?? '';
-    $fbLink = $_POST['fbLink'] ?? '';
-    $linkedInLink = $_POST['linkedInLink'] ?? '';
-    $githubLink = $_POST['githubLink'] ?? '';
+    $schoolEmail = trim($_POST['schoolEmail'] ?? '');
+    $fbLink = trim($_POST['fbLink'] ?? '');
+    $linkedInLink = trim($_POST['linkedInLink'] ?? '');
+    $githubLink = trim($_POST['githubLink'] ?? '');
 
-    // Handle profile picture upload
-    $uploadField = null;
-    if (!empty($_FILES['fileUpload']['name'])) {
-        $uploadField = 'fileUpload';
-    } elseif (!empty($_FILES['fileUploadMobile']['name'])) {
-        $uploadField = 'fileUploadMobile';
+    // Server-side validation for required fields
+    $validationErrors = [];
+    
+    if (empty($firstName)) {
+        $validationErrors[] = 'First Name is required.';
     }
-
-    if ($uploadField !== null) {
-
-        $file = $_FILES[$uploadField];
-
-        $fileTmp = $file['tmp_name'];
-        $fileName = $file['name'];
-        $fileSize = $file['size'];
-        $fileType = mime_content_type($fileTmp);
-
-        $allowedTypes = ['image/jpeg', 'image/png'];
-        $maxSize = 5 * 1024 * 1024; // 5MB
-
-        if (!in_array($fileType, $allowedTypes)) {
-            $toastMessage = "Invalid file type. Only JPG/PNG allowed.";
-            $toastType = "alert-danger";
-        } elseif ($fileSize > $maxSize) {
-            $toastMessage = "File too large. Max 5MB.";
-            $toastType = "alert-danger";
-        } else {
-            $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-            $newFileName = "profile_{$userID}_" . time() . "." . $fileExt;
-            $uploadDir = "../shared/assets/pfp-uploads/";
-
-            if (!is_dir($uploadDir))
-                mkdir($uploadDir, 0777, true);
-
-            $uploadPath = $uploadDir . $newFileName;
-
-            if (move_uploaded_file($fileTmp, $uploadPath)) {
-                $profilePicture = $newFileName;
-            } else {
-                $toastMessage = "Upload failed!";
-                $toastType = "alert-danger";
-            }
-        }
+    
+    if (empty($lastName)) {
+        $validationErrors[] = 'Last Name is required.';
     }
-
-    // Check if username is taken by another user
-    $userNameEscaped = mysqli_real_escape_string($conn, $userName);
-    $userIDInt = intval($userID);
-    $checkQuery = "SELECT userID FROM users WHERE username='$userNameEscaped' AND userID != $userIDInt";
-    $checkResult = mysqli_query($conn, $checkQuery);
-
-    if ($checkResult && mysqli_num_rows($checkResult) > 0) {
-        $usernameTaken = true;
-        $usernameTakenMessage = "Username has already been taken";
-        $toastMessage = 'Username has already been taken.';
+    
+    if (empty($userName)) {
+        $validationErrors[] = 'Username is required.';
+    } elseif (preg_match('/[\s.]/', $userName)) {
+        $validationErrors[] = 'Username cannot contain spaces or dots.';
+    }
+    
+    if (empty($schoolEmail)) {
+        $validationErrors[] = 'School Email is required.';
+    } elseif (!filter_var($schoolEmail, FILTER_VALIDATE_EMAIL)) {
+        $validationErrors[] = 'Please enter a valid email address.';
+    }
+    
+    // If validation fails, show error and stop processing
+    if (!empty($validationErrors)) {
+        $toastMessage = implode(' ', $validationErrors);
         $toastType = 'alert-danger';
     } else {
-        // Update users table
-        executeQuery("UPDATE users SET username='$userName' WHERE userID='$userID'");
+        // Handle profile picture upload
+        $uploadField = null;
+        if (!empty($_FILES['fileUpload']['name'])) {
+            $uploadField = 'fileUpload';
+        } elseif (!empty($_FILES['fileUploadMobile']['name'])) {
+            $uploadField = 'fileUploadMobile';
+        }
 
-        // Update userinfo table
-        $updateInfoQuery = "
-            UPDATE userinfo SET
-                firstName='$firstName',
-                middleName='$middleName',
-                lastName='$lastName',
-                studentID='$studentID',
-                gender='$gender',
-                yearLevel='$yearLevel',
-                yearSection='$yearSection',
-                schoolEmail='$schoolEmail',
-                facebookLink='$fbLink',
-                linkedInLink='$linkedInLink',
-                githubLink='$githubLink',
-                programID='$programID'
-        ";
-        if (!empty($profilePicture))
-            $updateInfoQuery .= ", profilePicture='$profilePicture'";
-        $updateInfoQuery .= " WHERE userID='$userID'";
+        if ($uploadField !== null) {
 
-        $result = executeQuery($updateInfoQuery);
+            $file = $_FILES[$uploadField];
 
-        if ($result) {
-            $profileUpdated = true;
-            $toastMessage = 'Profile updated successfully!';
-            $toastType = 'alert-success';
+            $fileTmp = $file['tmp_name'];
+            $fileName = $file['name'];
+            $fileSize = $file['size'];
+            $fileType = mime_content_type($fileTmp);
+
+            $allowedTypes = ['image/jpeg', 'image/png'];
+            $maxSize = 5 * 1024 * 1024; // 5MB
+
+            if (!in_array($fileType, $allowedTypes)) {
+                $toastMessage = "Invalid file type. Only JPG/PNG allowed.";
+                $toastType = "alert-danger";
+            } elseif ($fileSize > $maxSize) {
+                $toastMessage = "File too large. Max 5MB.";
+                $toastType = "alert-danger";
+            } else {
+                $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                $newFileName = "profile_{$userID}_" . time() . "." . $fileExt;
+                $uploadDir = "../shared/assets/pfp-uploads/";
+
+                if (!is_dir($uploadDir))
+                    mkdir($uploadDir, 0777, true);
+
+                $uploadPath = $uploadDir . $newFileName;
+
+                if (move_uploaded_file($fileTmp, $uploadPath)) {
+                    $profilePicture = $newFileName;
+                } else {
+                    $toastMessage = "Upload failed!";
+                    $toastType = "alert-danger";
+                }
+            }
+        }
+
+        // Check if username is taken by another user
+        $userNameEscaped = mysqli_real_escape_string($conn, $userName);
+        $userIDInt = intval($userID);
+        $checkQuery = "SELECT userID FROM users WHERE username='$userNameEscaped' AND userID != $userIDInt";
+        $checkResult = mysqli_query($conn, $checkQuery);
+
+        if ($checkResult && mysqli_num_rows($checkResult) > 0) {
+            $usernameTaken = true;
+            $usernameTakenMessage = "Username has already been taken";
+            $toastMessage = 'Username has already been taken.';
+            $toastType = 'alert-danger';
+        } else {
+            // Update users table
+            executeQuery("UPDATE users SET username='$userName' WHERE userID='$userID'");
+
+            // Update userinfo table
+            $updateInfoQuery = "
+                UPDATE userinfo SET
+                    firstName='$firstName',
+                    middleName='$middleName',
+                    lastName='$lastName',
+                    studentID='$studentID',
+                    gender='$gender',
+                    yearLevel='$yearLevel',
+                    yearSection='$yearSection',
+                    schoolEmail='$schoolEmail',
+                    facebookLink='$fbLink',
+                    linkedInLink='$linkedInLink',
+                    githubLink='$githubLink',
+                    programID='$programID'
+            ";
+            if (!empty($profilePicture))
+                $updateInfoQuery .= ", profilePicture='$profilePicture'";
+            $updateInfoQuery .= " WHERE userID='$userID'";
+
+            $result = executeQuery($updateInfoQuery);
+
+            if ($result) {
+                $profileUpdated = true;
+                $toastMessage = 'Profile updated successfully!';
+                $toastType = 'alert-success';
+            }
         }
     }
 }

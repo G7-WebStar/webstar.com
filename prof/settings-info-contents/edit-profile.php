@@ -455,6 +455,71 @@ if (isset($_POST['deleteAccount'])) {
         el.addEventListener('change', showSaveButton);
     });
 
+    const registrationForm = document.getElementById('registrationForm');
+    registrationForm.addEventListener('submit', function(e) {
+        let hasError = false;
+        const errors = [];
+
+        const requiredFields = ['firstName', 'lastName', 'userName', 'schoolEmail'];
+        requiredFields.forEach(id => {
+            const field = document.getElementById(id);
+            if (!field) return;
+            
+            const value = field.value.trim();
+            if (value === '' || value === null || (field.tagName === 'SELECT' && value === '')) {
+                field.style.border = '1px solid red';
+                hasError = true;
+            } else {
+                field.style.border = '';
+            }
+        });
+
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const userName = document.getElementById('userName').value.trim();
+        const schoolEmail = document.getElementById('schoolEmail').value.trim();
+        
+        if (!firstName) {
+            errors.push('First Name is required.');
+        }
+        
+        if (!lastName) {
+            errors.push('Last Name is required.');
+        }
+        
+        if (!userName) {
+            errors.push('Username is required.');
+        } else if (/[\s.]/.test(userName)) {
+            errors.push('Username cannot contain spaces or dots.');
+        }
+        
+        if (!schoolEmail) {
+            errors.push('School Email is required.');
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(schoolEmail)) {
+            errors.push('Please enter a valid email address.');
+        }
+        
+        if (hasError || errors.length > 0) {
+            e.preventDefault();
+            showToast(errors.length > 0 ? errors.join(' ') : 'Please fill in all required fields.', 'danger');
+            return false;
+        }
+    });
+
+    const requiredFields = ['firstName', 'lastName', 'userName', 'schoolEmail'];
+    requiredFields.forEach(id => {
+        const field = document.getElementById(id);
+        if (!field) return;
+
+        field.addEventListener('input', () => {
+            if (field.value.trim() !== '') field.style.border = '';
+        });
+
+        field.addEventListener('change', () => {
+            if (field.value.trim() !== '') field.style.border = '';
+        });
+    });
+
     function showToast(message, type = 'success') {
         const toastContainer = document.getElementById('toastContainer');
 
