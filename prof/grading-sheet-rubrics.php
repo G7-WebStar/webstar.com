@@ -37,7 +37,6 @@ if ($row = $result->fetch_assoc()) {
 } else {
     header("Location: 404.html");
     exit();
-
 }
 
 // ✅ Fetch student, program, course, and assessment details
@@ -99,7 +98,6 @@ if ($detailsResult && $detailsResult->num_rows > 0) {
         exit();
     }
     $ownerCheck->close();
-
 } else {
     $details = [
         'userID' => 0,
@@ -467,7 +465,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                 WHERE scoreID = ?");
             $update->bind_param("dsi", $score, $feedback, $scoreID);
             $update->execute();
-        } else {
+        } else if (!empty($score)) {
             // ✅ Insert new record if none exists
             $insert = $conn->prepare("INSERT INTO scores (userID, submissionID, score, feedback, gradedAt) 
                 VALUES (?, ?, ?, ?, NOW())");
@@ -718,8 +716,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
         }
         exit();
     }
-
-
 }
 
 // getting of student profile
@@ -898,7 +894,7 @@ if ($studentUserID > 0) {
                                                     <?php foreach ($images as $index => $f):
                                                         $link = htmlspecialchars($f['path']);
                                                         $name = htmlspecialchars($f['name']);
-                                                        ?>
+                                                    ?>
                                                         <div class="col-12 col-sm-6 col-md-4 p-0 m-0 my-3">
                                                             <div class="pdf-preview-box text-center" data-bs-toggle="modal"
                                                                 data-bs-target="#imageModal<?php echo $index; ?>"
@@ -994,7 +990,7 @@ if ($studentUserID > 0) {
                                                     <?php
                                                     $criterionID = $criterion['criterionID'];
                                                     $criterionTitle = $criterion['criteriaTitle']; // removed htmlspecialchars as requested
-                                                
+
                                                     $levelsQuery = executeQuery("
                                                 SELECT * FROM level
                                                 WHERE criterionID = $criterionID
@@ -1242,7 +1238,7 @@ if ($studentUserID > 0) {
         });
 
         // Modal image zoom/scroll/drag logic
-        (function () {
+        (function() {
             // initialize for each modal image present
             const modalImages = document.querySelectorAll('.modal-zoomable');
 
@@ -1405,7 +1401,7 @@ if ($studentUserID > 0) {
             });
         });
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const buttons = document.querySelectorAll('.level-btn');
             const gradeDisplay = document.getElementById('gradeDisplay');
             const maxPoints = 100; // fixed max points
@@ -1416,7 +1412,7 @@ if ($studentUserID > 0) {
             buttons.forEach(button => {
                 const points = parseInt(button.getAttribute('data-points'), 10);
 
-                button.addEventListener('click', function (e) {
+                button.addEventListener('click', function(e) {
                     if (e.target.closest('.collapse')) return;
 
                     if (button.classList.contains('selected')) {
@@ -1454,7 +1450,7 @@ if ($studentUserID > 0) {
 
 
         // award badge
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const badgeOptions = document.querySelectorAll(".badge-option");
             const selectedInput = document.getElementById("selectedBadgeIDs");
 
@@ -1469,7 +1465,7 @@ if ($studentUserID > 0) {
                 badge.dataset.badgeId = badgeId;
 
                 // Toggle selection on click
-                badge.addEventListener("click", function () {
+                badge.addEventListener("click", function() {
                     const id = this.dataset.badgeId;
                     const index = selectedBadges.indexOf(id);
 
@@ -1546,12 +1542,12 @@ if ($studentUserID > 0) {
             });
         });
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const form = document.querySelector('form'); // your grading form
             const gradeDisplay = document.getElementById('gradeDisplay');
             const scoreInput = document.getElementById('scoreInput');
 
-            form.addEventListener('submit', function () {
+            form.addEventListener('submit', function() {
                 // Extract only the numeric part from "xx/100"
                 const scoreText = gradeDisplay.textContent.trim();
                 const scoreValue = parseFloat(scoreText.split('/')[0]) || 0;
@@ -1563,12 +1559,12 @@ if ($studentUserID > 0) {
         // Rubric level selection and total score
         const levelButtons = document.querySelectorAll(".level-btn");
         const totalGradeEl = document.getElementById("totalGrade"); // top display
-        const totalScoreEl = document.getElementById("totalScore");   // bottom display
+        const totalScoreEl = document.getElementById("totalScore"); // bottom display
         const totalPossible = <?= $totalPoints ?>;
         const criterionSelections = {}; // store selected points per criterion
 
         levelButtons.forEach(btn => {
-            btn.addEventListener("click", function (e) {
+            btn.addEventListener("click", function(e) {
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -1595,7 +1591,10 @@ if ($studentUserID > 0) {
                     this.style.border = "1px solid var(--black)";
 
                     // Save selection
-                    criterionSelections[criterionID] = { points: points, levelID: levelID };
+                    criterionSelections[criterionID] = {
+                        points: points,
+                        levelID: levelID
+                    };
                 } else {
                     // If unselected, remove from criterionSelections
                     delete criterionSelections[criterionID];
@@ -1614,7 +1613,7 @@ if ($studentUserID > 0) {
         const rubricForm = document.getElementById("rubricForm");
         const selectedLevelsInput = document.getElementById("selectedLevelsInput");
 
-        submitBtn.addEventListener("click", function () {
+        submitBtn.addEventListener("click", function() {
             // collect selected levelIDs
             const selectedLevelIDs = Object.values(criterionSelections).map(v => v.levelID);
 
@@ -1630,7 +1629,7 @@ if ($studentUserID > 0) {
             rubricForm.submit();
         });
 
-        submitBtn.addEventListener("click", function () {
+        submitBtn.addEventListener("click", function() {
             const selectedLevelIDs = Object.values(criterionSelections).map(v => v.levelID);
             // if (selectedLevelIDs.length === 0) {
             //     alert("Please select at least one level before submitting.");
@@ -1646,7 +1645,7 @@ if ($studentUserID > 0) {
             rubricForm.submit();
         });
 
-        submitBtn.addEventListener("click", function () {
+        submitBtn.addEventListener("click", function() {
             // Collect selected badge IDs
             const badgeOptions = document.querySelectorAll(".badge-option");
             const selectedBadges = [];
@@ -1665,7 +1664,7 @@ if ($studentUserID > 0) {
         });
 
         // Prevent form submission if no level is selected
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const submitBtn = document.getElementById("submitRubricBtn");
             const rubricForm = document.getElementById("rubricForm");
 
@@ -1677,8 +1676,6 @@ if ($studentUserID > 0) {
                 }
             });
         });
-
-
     </script>
 
     <script>

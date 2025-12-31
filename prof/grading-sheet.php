@@ -37,7 +37,6 @@ if ($row = $result->fetch_assoc()) {
 } else {
     header("Location: 404.html");
     exit();
-
 }
 
 // Fetch student, program, course, and assessment details
@@ -99,7 +98,6 @@ if ($detailsResult && $detailsResult->num_rows > 0) {
         exit();
     }
     $ownerCheck->close();
-
 } else {
     $details = [
         'userID' => 0,
@@ -209,7 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                 WHERE scoreID = ?");
             $update->bind_param("dsi", $score, $feedback, $scoreID);
             $update->execute();
-        } else {
+        } else if (!empty($score)) {
             // ✅ Insert new record if none exists
             $insert = $conn->prepare("INSERT INTO scores (userID, submissionID, score, feedback, gradedAt) 
                 VALUES (?, ?, ?, ?, NOW())");
@@ -237,26 +235,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
         $enrollmentQuery->bind_param("ii", $studentUserID, $details['courseID']);
         $enrollmentQuery->execute();
         $enrollmentResult = $enrollmentQuery->get_result();
-        
+
         if ($enrollmentResult && $enrollmentResult->num_rows > 0) {
             $enrollmentData = $enrollmentResult->fetch_assoc();
             $enrollmentID = intval($enrollmentData['enrollmentID']);
-            
+
             // Prepare notification message
             $assessmentTitleEscaped = mysqli_real_escape_string($conn, $details['assessmentTitle']);
             $notificationMessage = "Your submission for \"" . $assessmentTitleEscaped . "\" has been graded.";
             $notifType = 'Submissions Update';
-            
+
             $escapedNotificationMessage = mysqli_real_escape_string($conn, $notificationMessage);
             $escapedNotifType = mysqli_real_escape_string($conn, $notifType);
-            
+
             // Insert notification into inbox
             $insertNotificationQuery = "
                 INSERT INTO inbox (enrollmentID, messageText, notifType, createdAt)
                 VALUES ('$enrollmentID', '$escapedNotificationMessage', '$escapedNotifType', NOW())
             ";
             executeQuery($insertNotificationQuery);
-            
+
             // Get student email and check if they have questDeadlineEnabled
             $selectEmailQuery = "
                 SELECT u.email, COALESCE(s.questDeadlineEnabled, 0) as questDeadlineEnabled
@@ -268,10 +266,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
             $emailStmt->bind_param("i", $studentUserID);
             $emailStmt->execute();
             $emailResult = $emailStmt->get_result();
-            
+
             if ($emailResult && $emailResult->num_rows > 0) {
                 $studentData = $emailResult->fetch_assoc();
-                
+
                 if ($studentData['questDeadlineEnabled'] == 1 && !empty($studentData['email'])) {
                     $credentialQuery = "SELECT email, password FROM emailcredentials WHERE credentialID = 1";
                     $credentialResult = executeQuery($credentialQuery);
@@ -299,20 +297,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                             if (file_exists($footerPath)) {
                                 $mail->AddEmbeddedImage($footerPath, 'emailFooter');
                             }
-                            
+
                             $mail->isHTML(true);
                             $mail->CharSet = 'UTF-8';
                             $mail->Encoding = 'base64';
                             $mail->Subject = "[GRADED] " . $details['assessmentTitle'] . " - " . $details['courseCode'];
                             $mail->addAddress($studentData['email']);
-                            
+
                             $assessmentTitleEsc = htmlspecialchars($details['assessmentTitle'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
                             $courseCodeEsc = htmlspecialchars($details['courseCode'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
                             $courseTitleEsc = htmlspecialchars($details['courseTitle'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
                             $scoreDisplay = number_format($score, 0);
                             $maxScoreDisplay = number_format((float) $assignmentPoints, 0);
                             $feedbackHtml = !empty($feedback) ? nl2br(htmlspecialchars($feedback, ENT_QUOTES | ENT_HTML5, 'UTF-8')) : '<em>No feedback provided.</em>';
-                            
+
                             $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
                             <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
                                 <tr>
@@ -359,7 +357,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
                                 </tr>
                             </table>
                         </div>';
-                            
+
                             $mail->send();
                         } catch (Exception $e) {
                             $errorMsg = isset($mail) && is_object($mail) ? $mail->ErrorInfo : $e->getMessage();
@@ -449,7 +447,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submitGrade'])) {
             exit();
         }
     }
-
 }
 
 // Fetch all ungraded submissions for this assessment
@@ -620,17 +617,17 @@ if ($studentUserID > 0) {
         style="background-color: var(--black); overflow-y:auto;">
         <!-- Toast Container -->
         <div id="toastContainer"
-             class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+            class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
             style="z-index:1100; pointer-events:none;">
-           <?php if (isset($_SESSION['success'])): ?>
-               <div class="alert alert-success mb-2 shadow-lg text-med text-12
+            <?php if (isset($_SESSION['success'])): ?>
+                <div class="alert alert-success mb-2 shadow-lg text-med text-12
                            d-flex align-items-center justify-content-center gap-2 px-3 py-2" role="alert"
                     style="border-radius:8px; display:flex; align-items:center; gap:8px; padding:0.5rem 0.75rem; text-align:center; background-color:#d1e7dd; color:#0f5132;">
-                   <i class="bi bi-check-circle-fill fs-6" style="color: var(--black);"></i>
-                   <span style="color: var(--black);"><?= $_SESSION['success']; ?></span>
-               </div>
-               <?php unset($_SESSION['success']); ?>
-           <?php endif; ?>
+                    <i class="bi bi-check-circle-fill fs-6" style="color: var(--black);"></i>
+                    <span style="color: var(--black);"><?= $_SESSION['success']; ?></span>
+                </div>
+                <?php unset($_SESSION['success']); ?>
+            <?php endif; ?>
         </div>
 
 
@@ -653,16 +650,16 @@ if ($studentUserID > 0) {
                                     <div class="col-auto d-flex align-items-center gap-3">
                                         <button onclick="history.back()" class="p-0" style="background:none; border:none;">
                                             <span class="material-symbols-outlined"
-                                                  style="color: var(--black); font-size: 22px;">
+                                                style="color: var(--black); font-size: 22px;">
                                                 arrow_back
                                             </span>
                                         </button>
 
                                         <div class="d-flex align-items-center gap-3">
                                             <div class="rounded-circle overflow-hidden"
-                                                 style="width: 40px; height: 40px; background-color: var(--highlight75);">
-                                                <img src="<?php echo htmlspecialchars($profilePicturePath); ?>" 
-                                                     alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;">
+                                                style="width: 40px; height: 40px; background-color: var(--highlight75);">
+                                                <img src="<?php echo htmlspecialchars($profilePicturePath); ?>"
+                                                    alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;">
                                             </div>
 
                                             <div>
@@ -696,7 +693,7 @@ if ($studentUserID > 0) {
                                                 <i class="fa-solid fa-arrow-left text-reg text-16" style="color: var(--black);"></i>
                                             </a>
                                         </div>
-                                         <div class="title text-sbold text-18"
+                                        <div class="title text-sbold text-18"
                                             style="display: block; width: 80%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                             <?php echo htmlspecialchars($studentDisplay); ?>
                                         </div>
@@ -748,7 +745,7 @@ if ($studentUserID > 0) {
                                                     <?php foreach ($images as $index => $f):
                                                         $link = htmlspecialchars($f['path']);
                                                         $name = htmlspecialchars($f['name']);
-                                                        ?>
+                                                    ?>
                                                         <div class="col-12 col-sm-6 col-md-4 p-0 m-0 my-3">
                                                             <div class="pdf-preview-box text-center" data-bs-toggle="modal"
                                                                 data-bs-target="#imageModal<?php echo $index; ?>"
@@ -892,9 +889,9 @@ if ($studentUserID > 0) {
                                             </p>
 
                                             <p class="text-14 fw-medium mt-3"
-                                                        style="color: var(--black); font-style: italic;">
-                                                        Note: Grades cannot be edited after submission.
-                                                    </p>
+                                                style="color: var(--black); font-style: italic;">
+                                                Note: Grades cannot be edited after submission.
+                                            </p>
 
                                         </div>
                                     </form>
@@ -978,7 +975,7 @@ if ($studentUserID > 0) {
         const maxWords = 120;
         const counter = document.getElementById("word-counter");
 
-        quill.on('text-change', function () {
+        quill.on('text-change', function() {
             let text = quill.getText().trim();
             let words = text.length > 0 ? text.split(/\s+/).length : 0;
 
@@ -991,7 +988,7 @@ if ($studentUserID > 0) {
             counter.textContent = `${Math.min(words, maxWords)}/${maxWords}`;
         });
 
-        document.getElementById("feedbackForm").addEventListener("submit", function () {
+        document.getElementById("feedbackForm").addEventListener("submit", function() {
             document.getElementById("feedbackContent").value = quill.root.innerHTML;
         });
     </script>
@@ -1060,7 +1057,7 @@ if ($studentUserID > 0) {
         });
 
         // Modal image zoom/scroll/drag logic
-        (function () {
+        (function() {
             // initialize for each modal image present
             const modalImages = document.querySelectorAll('.modal-zoomable');
 
@@ -1224,7 +1221,7 @@ if ($studentUserID > 0) {
         });
 
         // award badge
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const badgeOptions = document.querySelectorAll(".badge-option");
             const selectedInput = document.getElementById("selectedBadgeIDs");
 
@@ -1239,7 +1236,7 @@ if ($studentUserID > 0) {
                 badge.dataset.badgeId = badgeId;
 
                 // Toggle selection on click
-                badge.addEventListener("click", function () {
+                badge.addEventListener("click", function() {
                     const id = this.dataset.badgeId;
                     const index = selectedBadges.indexOf(id);
 
@@ -1314,20 +1311,19 @@ if ($studentUserID > 0) {
                 goToSubmission(currentIndex + 1);
             });
         });
-
     </script>
 
     <script>
-     document.addEventListener('DOMContentLoaded', () => {
-         const alertEl = document.querySelector('.alert.alert-success');
-         if (alertEl) {
-             setTimeout(() => {
-                 alertEl.style.transition = "opacity 0.5s ease-out";
-                 alertEl.style.opacity = 0;
-                 setTimeout(() => alertEl.remove(), 500);
-             }, 3000); // auto hide after 3s
-         }
-     });
+        document.addEventListener('DOMContentLoaded', () => {
+            const alertEl = document.querySelector('.alert.alert-success');
+            if (alertEl) {
+                setTimeout(() => {
+                    alertEl.style.transition = "opacity 0.5s ease-out";
+                    alertEl.style.opacity = 0;
+                    setTimeout(() => alertEl.remove(), 500);
+                }, 3000); // auto hide after 3s
+            }
+        });
     </script>
 
 
