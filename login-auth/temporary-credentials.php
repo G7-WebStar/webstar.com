@@ -159,6 +159,7 @@ if (isset($_POST['sendCode'])) {
     <link rel="stylesheet" href="../shared/assets/css/temporary-credentials.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="../shared/assets/img/webstar-icon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
@@ -238,6 +239,65 @@ if (isset($_POST['sendCode'])) {
             </div>
         </div>
     </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"
+        class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center text-med text-14"
+        style="z-index:1100; pointer-events:none;">
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.querySelector('form');
+            const emailInput = document.querySelector('input[name="email"]');
+            const toastContainer = document.getElementById('toastContainer');
+
+            function showToast(message, type = 'success') {
+                const alert = document.createElement('div');
+                alert.className = `alert mb-2 shadow-lg d-flex align-items-center gap-2 px-3 py-2 ${type === 'success' ? 'alert-success' : 'alert-danger'}`;
+                alert.style.transition = "opacity 0.5s ease";
+                alert.style.opacity = "1";
+
+                const icon = document.createElement('i');
+                icon.className = `bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'} fs-6`;
+                icon.setAttribute('role', 'img');
+                icon.style.color = 'black';
+
+                const text = document.createElement('div');
+                text.className = 'text-med text-12';
+                text.innerText = message;
+
+                alert.appendChild(icon);
+                alert.appendChild(text);
+                toastContainer.appendChild(alert);
+
+                setTimeout(() => {
+                    alert.style.opacity = "0";
+                    setTimeout(() => alert.remove(), 500);
+                }, 3000);
+            }
+
+            form.addEventListener("submit", function(e) {
+                const emailValue = (emailInput.value || "").trim();
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                if (!emailValue || !emailPattern.test(emailValue)) {
+                    e.preventDefault(); // stop form submission
+                    emailInput.style.border = '1px solid red';
+                    showToast("Please enter a valid email address.", "danger");
+                } else {
+                    emailInput.style.border = '';
+                }
+            });
+
+            // Remove red border when user types
+            emailInput.addEventListener('input', () => {
+                if (emailInput.value !== '') emailInput.style.border = '';
+            });
+        });
+    </script>
 </body>
 
 </html>

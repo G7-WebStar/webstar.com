@@ -18,12 +18,14 @@ include("shared/assets/processes/registration-next-process.php");
     <link rel="stylesheet" href="shared/assets/css/global-styles.css">
     <link rel="stylesheet" href="shared/assets/css/registration-profile.css">
     <link rel="icon" type="image/png" href="shared/assets/img/webstar-icon.png">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" />
-    
+
 </head>
 
 <body>
@@ -55,7 +57,7 @@ include("shared/assets/processes/registration-next-process.php");
 
             <!-- Registration Form -->
             <div class="container p-4 d-flex justify-content-center">
-                <form method="POST" action="" class="text-reg row justify-content-center" style="width: 100%; max-width: 900px;">
+                <form method="POST" action="" id="registrationForm" class="text-reg row justify-content-center" style="width: 100%; max-width: 900px;">
 
                     <!-- Left: Registration Form -->
                     <div class="col-md-7 ps-md-5 ps-3 d-flex flex-column form-col">
@@ -66,7 +68,8 @@ include("shared/assets/processes/registration-next-process.php");
 
                             <!-- School Email -->
                             <div class="form-floating mb-3">
-                                <input type="email" class="form-control custom-input" id="schoolEmail" name="schoolEmail" placeholder="School Email" required>
+                                <input type="email" class="form-control custom-input" id="schoolEmail" name="schoolEmail" placeholder="School Email"
+                                    value="<?= isset($_SESSION['prevSchoolEmail']) ? htmlspecialchars($_SESSION['prevSchoolEmail']) : '' ?>" required>
                                 <label for="schoolEmail">School Email</label>
                             </div>
 
@@ -99,7 +102,7 @@ include("shared/assets/processes/registration-next-process.php");
                             Finish
                         </button>
                     </div>
-                    
+
                     <!-- Modal (outside form) -->
                     <div class="modal fade" id="finishModal" tabindex="-1" aria-labelledby="finishModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
@@ -131,6 +134,68 @@ include("shared/assets/processes/registration-next-process.php");
 
         </div>
     </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"
+        class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center text-med text-14"
+        style="z-index:1100; pointer-events:none;">
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const registrationForm = document.getElementById('registrationForm');
+        const schoolEmailInput = document.getElementById('schoolEmail');
+        const toastContainer = document.getElementById('toastContainer');
+
+        function showToast(message, type = 'danger') {
+            const alert = document.createElement('div');
+            alert.className = `alert mb-2 shadow-lg d-flex align-items-center gap-2 px-3 py-2 ${type === 'success' ? 'alert-success' : 'alert-danger'}`;
+            alert.style.transition = "opacity 0.5s ease";
+            alert.style.opacity = "1";
+
+            const icon = document.createElement('i');
+            icon.className = `bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'} fs-6`;
+            icon.style.color = 'black';
+
+            const text = document.createElement('div');
+            text.className = 'text-med text-12';
+            text.innerText = message;
+
+            alert.appendChild(icon);
+            alert.appendChild(text);
+            toastContainer.appendChild(alert);
+
+            setTimeout(() => {
+                alert.style.opacity = "0";
+                setTimeout(() => alert.remove(), 500);
+            }, 3000);
+        }
+
+        // Check school email on submit
+        registrationForm.addEventListener('submit', function(e) {
+            if (schoolEmailInput.value.trim() === "") {
+                e.preventDefault(); // stop form submission
+                schoolEmailInput.style.border = '1px solid red';
+                showToast("School Email is required.", "danger");
+            } else {
+                schoolEmailInput.style.border = ''; // remove border if filled
+            }
+        });
+
+        // Remove red border when user types
+        schoolEmailInput.addEventListener('input', () => {
+            if (schoolEmailInput.value.trim() !== '') {
+                schoolEmailInput.style.border = '';
+            }
+        });
+
+        <?php if (!empty($toastMessage)) : ?>
+            document.addEventListener("DOMContentLoaded", function() {
+                showToast("<?= htmlspecialchars($toastMessage) ?>", "danger");
+            });
+        <?php endif; ?>
+    </script>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>

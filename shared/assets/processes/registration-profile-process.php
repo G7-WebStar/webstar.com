@@ -5,16 +5,46 @@ session_start();
 $programQuery = "SELECT programID, programName FROM program ORDER BY programName ASC";
 $programResult = executeQuery($programQuery);
 
+$errorMessages = [
+    "fieldsRequired" => "Please fill in all required fields."
+];
+
+$error = "";
+$formData = []; // to store previous input
+
+if (isset($_SESSION['alert'])) {
+    $error = $_SESSION['alert'];
+    unset($_SESSION['alert']);
+}
+
+// Check if there’s old form data
+if (isset($_SESSION['formData'])) {
+    $formData = $_SESSION['formData'];
+    unset($_SESSION['formData']);
+}
+
 if (isset($_POST['nextBtn'])) {
-    $firstName = $_POST['firstName'];
-    $middleName = $_POST['middleName'];
-    $lastName = $_POST['lastName'];
+    $firstName = trim($_POST['firstName']);
+    $middleName = trim($_POST['middleName']);
+    $lastName = trim($_POST['lastName']);
     $userName = strtolower($_POST['userName']);
     $studentID = strtoupper($_POST['studentID']);
     $programID = $_POST['program'];
     $gender = $_POST['gender'];
     $yearLevel = $_POST['yearLevel'];
     $yearSection = $_POST['yearSection'];
+
+    // check required fields
+    if (
+        empty($firstName) || empty($lastName) || empty($userName) ||
+        empty($studentID) || empty($programID) || empty($gender) ||
+        empty($yearLevel) || empty($yearSection)
+    ) {
+        $_SESSION['alert'] = 'fieldsRequired';
+        $_SESSION['formData'] = $_POST; // store previous input
+        header("Location: registration-profile.php");
+        exit;
+    }
 
     if (!empty($_FILES['fileUpload']['name'])) {
         $htmlfileupload = $_FILES['fileUpload']['name'];
@@ -32,7 +62,6 @@ if (isset($_POST['nextBtn'])) {
 
         $profilePictureValue = "'$newFileName'";
     } else {
-        // use database default
         $profilePictureValue = "DEFAULT";
     }
 
@@ -43,7 +72,7 @@ if (isset($_POST['nextBtn'])) {
 
     $userID = $_SESSION['userID'];
 
-    // insert user info gamit ang programID (wala nang SELECT)
+    // insert user info gamit ang programID
     $nextQuery = "INSERT INTO userinfo 
         (userID, firstName, middleName, lastName, studentID, programID, gender, yearLevel, yearSection, profilePicture, createdAt) 
         VALUES 
@@ -58,6 +87,8 @@ if (isset($_POST['nextBtn'])) {
         exit();
     }
 
+    // formData
+    $_SESSION['formData'] = $_POST;
     header("Location: registration-profile.php");
     exit();
 }

@@ -1,5 +1,5 @@
-<?php $activePage = 'signUp'; ?>
-<?php
+<?php $activePage = 'signUp';
+
 include("shared/assets/database/connect.php");
 include("shared/assets/processes/registration-process.php");
 ?>
@@ -66,6 +66,7 @@ include("shared/assets/processes/registration-process.php");
                         <div class="password-wrapper mb-3 form-floating ">
                             <input type="password" name="password" id="password" class="form-control"
                                 placeholder="Password"
+                                oncopy="return false" onpaste="return false" oncut="return false" 
                                 value="<?php echo isset($_POST['password']) ? htmlspecialchars($_POST['password']) : ''; ?>"
                                 required>
                             <label for="password">Password</label>
@@ -76,6 +77,7 @@ include("shared/assets/processes/registration-process.php");
                         <div class="password-wrapper mb-3 form-floating">
                             <input type="password" name="confirmPassword" id="confirmPassword" class="form-control"
                                 placeholder="Confirm password"
+                                oncopy="return false" onpaste="return false" oncut="return false"
                                 value="<?php echo isset($_POST['confirmPassword']) ? htmlspecialchars($_POST['confirmPassword']) : ''; ?>"
                                 required>
                             <label for="confirm password">Confirm password</label>
