@@ -276,6 +276,12 @@ if (isset($_POST['resend'])) {
         </div>
     </div>
 
+    <!-- Toast Container -->
+    <div id="toastContainer"
+        class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center text-med text-14"
+        style="z-index:1100; pointer-events:none;">
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -288,6 +294,59 @@ if (isset($_POST['resend'])) {
             }
         });
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const verificationForm = document.querySelector('form');
+            const codeInput = document.querySelector('input[name="code"]');
+            const toastContainer = document.getElementById('toastContainer');
+
+            function showToast(message, type = 'success') {
+                const alert = document.createElement('div');
+                alert.className = `alert mb-2 shadow-lg d-flex align-items-center gap-2 px-3 py-2 ${type === 'success' ? 'alert-success' : 'alert-danger'}`;
+                alert.style.transition = "opacity 0.5s ease";
+                alert.style.opacity = "1";
+
+                const icon = document.createElement('i');
+                icon.className = `bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'} fs-6`;
+                icon.setAttribute('role', 'img');
+                icon.style.color = 'black';
+
+                const text = document.createElement('div');
+                text.className = 'text-med text-12';
+                text.innerText = message;
+
+                alert.appendChild(icon);
+                alert.appendChild(text);
+                toastContainer.appendChild(alert);
+
+                setTimeout(() => {
+                    alert.style.opacity = "0";
+                    setTimeout(() => alert.remove(), 500);
+                }, 3000);
+            }
+
+            verificationForm.addEventListener("submit", function(e) {
+                const codeValue = (codeInput.value || "").trim();
+
+                // Check if code is empty or not 6 digits
+                if (!/^[0-9]{6}$/.test(codeValue)) {
+                    e.preventDefault(); // stop form submission
+                    codeInput.style.border = '1px solid red';
+                    showToast("Please enter a valid 6-digit code.", "danger");
+                } else {
+                    codeInput.style.border = '';
+                }
+            });
+
+            // Remove red border when user types
+            codeInput.addEventListener('input', () => {
+                if (codeInput.value !== '') codeInput.style.border = '';
+            });
+        });
+    </script>
+
+
 </body>
 
 </html>
