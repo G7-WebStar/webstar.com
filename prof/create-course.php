@@ -6,6 +6,7 @@ include("../shared/assets/processes/prof-session-process.php");
 
 $mode = '';
 $courseID = 0;
+$errors = [];
 
 if (isset($_GET['edit'])) {
     $mode = 'edit';
@@ -40,23 +41,51 @@ if ($mode === 'edit') {
 }
 
 if (isset($_POST['createCourse'])) {
-    $courseTitle = $_POST['courseTitle'];
-    $courseCode = strtoupper($_POST['courseCode']);
-    $section = strtoupper($_POST['section']);
-    $userID = $_SESSION['userID'];
 
-    $courseImage = $_FILES['fileUpload']['error'] === 0 ? $_FILES['fileUpload']['name'] : 'default.png';
-    if (isset($_FILES['fileUpload']) && $_FILES['fileUpload']['error'] === 0) {
-        $courseImage = $_FILES['fileUpload']['name'];
-        $tmpFile = $_FILES['fileUpload']['tmp_name'];
-        $folder = "../shared/assets/img/course-images/";
-        move_uploaded_file($tmpFile, $folder . $courseImage);
-    } elseif ($mode === 'edit') {
-        $courseImage = $courseData['courseImage'];
+    if (empty(trim($_POST['courseTitle'] ?? ''))) {
+        $errors[] = 'Course Title is required.';
     }
 
-    if ($mode === 'edit') {
-        $updateQuery = "
+    if (empty(trim($_POST['courseCode'] ?? ''))) {
+        $errors[] = 'Course Code is required.';
+    }
+
+    if (empty(trim($_POST['section'] ?? ''))) {
+        $errors[] = 'Section is required.';
+    }
+
+    if (
+        empty($_POST['selectedDay']) ||
+        empty($_POST['startTime']) ||
+        empty($_POST['endTime'])
+    ) {
+        $errors[] = 'Class schedule is required.';
+    }
+
+    if (!empty($errors)) {
+        // Combine all validation errors into a single string
+        $toastMessage = 'Please fill up the required information.';
+        $toastType = 'alert-danger';
+    } else {
+
+        $courseTitle = $_POST['courseTitle'];
+        $courseCode = strtoupper($_POST['courseCode']);
+        $section = strtoupper($_POST['section']);
+        $userID = $_SESSION['userID'];
+
+        $courseImage = $_FILES['fileUpload']['error'] === 0 ? $_FILES['fileUpload']['name'] : 'default.png';
+        if (isset($_FILES['fileUpload']) && $_FILES['fileUpload']['error'] === 0) {
+            $courseImage = $_FILES['fileUpload']['name'];
+            $tmpFile = $_FILES['fileUpload']['tmp_name'];
+            $folder = "../shared/assets/img/course-images/";
+            move_uploaded_file($tmpFile, $folder . $courseImage);
+        } elseif ($mode === 'edit') {
+            $courseImage = $courseData['courseImage'];
+        }
+
+
+        if ($mode === 'edit') {
+            $updateQuery = "
             UPDATE courses 
             SET courseTitle = '$courseTitle',
                 courseCode = '$courseCode',
@@ -64,91 +93,87 @@ if (isset($_POST['createCourse'])) {
                 courseImage = '$courseImage'
             WHERE courseID = $courseID
         ";
-        $result = executeQuery($updateQuery);
+            $result = executeQuery($updateQuery);
 
-        if ($result) {
-            $deleteSchedule = "DELETE FROM courseschedule WHERE courseID = $courseID";
-            executeQuery($deleteSchedule);
+            if ($result) {
+                $deleteSchedule = "DELETE FROM courseschedule WHERE courseID = $courseID";
+                executeQuery($deleteSchedule);
 
-            $days = $_POST['selectedDay'] ?? [];
-            $startTimes = $_POST['startTime'] ?? [];
-            $endTimes = $_POST['endTime'] ?? [];
+                $days = $_POST['selectedDay'] ?? [];
+                $startTimes = $_POST['startTime'] ?? [];
+                $endTimes = $_POST['endTime'] ?? [];
 
-            for ($i = 0; $i < count($days); $i++) {
-                $day = mysqli_real_escape_string($conn, $days[$i]);
-                $start = mysqli_real_escape_string($conn, $startTimes[$i]);
-                $end = mysqli_real_escape_string($conn, $endTimes[$i]);
-                if (!empty($day) && !empty($start) && !empty($end)) {
-                    $insertSchedule = "
+                for ($i = 0; $i < count($days); $i++) {
+                    $day = mysqli_real_escape_string($conn, $days[$i]);
+                    $start = mysqli_real_escape_string($conn, $startTimes[$i]);
+                    $end = mysqli_real_escape_string($conn, $endTimes[$i]);
+                    if (!empty($day) && !empty($start) && !empty($end)) {
+                        $insertSchedule = "
                         INSERT INTO courseschedule (courseID, day, startTime, endTime, createdAt)
                         VALUES ('$courseID', '$day', '$start', '$end', NOW())
                     ";
-                    executeQuery($insertSchedule);
+                        executeQuery($insertSchedule);
+                    }
+                }
+                if ($result) {
+                    $_SESSION['toast'] = [
+                        'type' => 'alert-success',
+                        'message' => 'Course edited successfully!'
+                    ];
+                    header("Location: course.php");
+                    exit();
                 }
             }
-            if ($result) { 
-                $_SESSION['toast'] = [
-                    'type' => 'alert-success',
-                    'message' => 'Course edited successfully!'
-                ];
-                header("Location: course.php");
-                exit();
-            }
-
         } else {
-            echo "<script>alert('Error updating course.');</script>";
-        }
-    } else {
-        function generateAccessCode($length = 6)
-        {
-            $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            $randomCode = '';
-            for ($i = 0; $i < $length; $i++) {
-                $randomCode .= $characters[rand(0, strlen($characters) - 1)];
+            function generateAccessCode($length = 6)
+            {
+                $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                $randomCode = '';
+                for ($i = 0; $i < $length; $i++) {
+                    $randomCode .= $characters[rand(0, strlen($characters) - 1)];
+                }
+                return $randomCode;
             }
-            return $randomCode;
-        }
 
-        do {
-            $accessCode = generateAccessCode(6);
-            $checkCodeQuery = "SELECT * FROM courses WHERE code = '$accessCode'";
-            $codeExists = executeQuery($checkCodeQuery);
-        } while (mysqli_num_rows($codeExists) > 0);
+            do {
+                $accessCode = generateAccessCode(6);
+                $checkCodeQuery = "SELECT * FROM courses WHERE code = '$accessCode'";
+                $codeExists = executeQuery($checkCodeQuery);
+            } while (mysqli_num_rows($codeExists) > 0);
 
-        $insertCourse = "
+            $insertCourse = "
             INSERT INTO courses (userID, courseTitle, courseCode, section, courseImage, code)
             VALUES ('$userID', '$courseTitle', '$courseCode', '$section', '$courseImage', '$accessCode')
         ";
-        $courseResult = executeQuery($insertCourse);
+            $courseResult = executeQuery($insertCourse);
 
-        if ($courseResult) {
-            $courseID = mysqli_insert_id($conn);
-            $days = $_POST['selectedDay'] ?? [];
-            $startTimes = $_POST['startTime'] ?? [];
-            $endTimes = $_POST['endTime'] ?? [];
+            if ($courseResult) {
+                $courseID = mysqli_insert_id($conn);
+                $days = $_POST['selectedDay'] ?? [];
+                $startTimes = $_POST['startTime'] ?? [];
+                $endTimes = $_POST['endTime'] ?? [];
 
-            for ($i = 0; $i < count($days); $i++) {
-                $day = mysqli_real_escape_string($conn, $days[$i]);
-                $start = mysqli_real_escape_string($conn, $startTimes[$i]);
-                $end = mysqli_real_escape_string($conn, $endTimes[$i]);
-                if (!empty($day) && !empty($start) && !empty($end)) {
-                    $insertSchedule = "
+                for ($i = 0; $i < count($days); $i++) {
+                    $day = mysqli_real_escape_string($conn, $days[$i]);
+                    $start = mysqli_real_escape_string($conn, $startTimes[$i]);
+                    $end = mysqli_real_escape_string($conn, $endTimes[$i]);
+                    if (!empty($day) && !empty($start) && !empty($end)) {
+                        $insertSchedule = "
                         INSERT INTO courseschedule (courseID, day, startTime, endTime, createdAt)
                         VALUES ('$courseID', '$day', '$start', '$end', NOW())
                     ";
-                    executeQuery($insertSchedule);
+                        executeQuery($insertSchedule);
+                    }
+                }
+                if ($courseResult) {
+                    $_SESSION['toast'] = [
+                        'type' => 'alert-success',
+                        'message' => 'Course created successfully!'
+                    ];
+                    header("Location: course.php");
+                    exit();
                 }
             }
-            if ($courseResult) { 
-                $_SESSION['toast'] = [
-                    'type' => 'alert-success',
-                    'message' => 'Course created successfully!'
-                ];
-                header("Location: course.php");
-                exit();
-            }
-        } else {
-            echo "<script>alert('Error creating course.');</script>";
         }
     }
 }
@@ -392,6 +417,11 @@ if (isset($_POST['createCourse'])) {
                 <div class="card border-0 px-3 pt-3 m-0 h-100 w-100 rounded-0 shadow-none"
                     style="background-color: transparent;">
 
+                    <div id="toastContainer"
+                        class="position-absolute top-0 start-50 translate-middle-x pt-5 pt-md-1 d-flex flex-column align-items-center"
+                        style="z-index: 1100;">
+                    </div>
+
                     <!-- Navbar (mobile) -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
@@ -611,13 +641,12 @@ if (isset($_POST['createCourse'])) {
             function initDropdown(dropdown) {
                 const dropdownBtn = dropdown.querySelector('.dropdown-btn');
 
-                // Ensure a hidden input exists for this dropdown
                 let hiddenInput = dropdown.querySelector('input[name="selectedDay[]"]');
                 if (!hiddenInput) {
                     hiddenInput = document.createElement('input');
                     hiddenInput.type = 'hidden';
                     hiddenInput.name = 'selectedDay[]';
-                    hiddenInput.value = dropdownBtn.textContent.trim(); // default value
+                    hiddenInput.value = dropdownBtn.textContent.trim();
                     dropdown.appendChild(hiddenInput);
                 }
 
@@ -631,7 +660,7 @@ if (isset($_POST['createCourse'])) {
                     item.addEventListener('click', () => {
                         const selectedValue = item.getAttribute('data-value');
                         dropdownBtn.textContent = selectedValue;
-                        hiddenInput.value = selectedValue; // update hidden input
+                        hiddenInput.value = selectedValue;
                         dropdown.querySelector('.dropdown-list').style.display = 'none';
                     });
                 });
@@ -652,10 +681,8 @@ if (isset($_POST['createCourse'])) {
                 }
             }
 
-            // Initialize existing dropdowns
             document.querySelectorAll('.custom-dropdown').forEach(initDropdown);
 
-            // Add new schedule row
             addBtn.addEventListener('click', () => {
                 const currentRows = wrapper.querySelectorAll('.schedule-row').length;
                 if (currentRows >= maxRows) return;
@@ -666,11 +693,9 @@ if (isset($_POST['createCourse'])) {
                 const dropdownBtn = newRow.querySelector('.dropdown-btn');
                 dropdownBtn.textContent = 'Monday';
 
-                // Remove old input if exists
                 const oldInput = newRow.querySelector('input[name="selectedDay[]"]');
                 if (oldInput) oldInput.remove();
 
-                // Add new hidden input with default value
                 const input = document.createElement('input');
                 input.type = 'hidden';
                 input.name = 'selectedDay[]';
@@ -680,7 +705,6 @@ if (isset($_POST['createCourse'])) {
                 newRow.querySelector('.start-time').value = '';
                 newRow.querySelector('.end-time').value = '';
 
-                // Remove old remove button if exists
                 const oldRemove = newRow.querySelector('.remove-row');
                 if (oldRemove) oldRemove.parentElement.remove();
 
@@ -698,50 +722,66 @@ if (isset($_POST['createCourse'])) {
                 initDropdown(newRow.querySelector('.custom-dropdown'));
                 attachRemove(newRow);
             });
-        });
 
-    </script>
+            const fileInput = document.getElementById('fileInput');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const profilePreview = document.getElementById('profilePreview');
 
-    <script>
-        // File validation and preview
-        const fileInput = document.getElementById('fileInput');
-        const uploadBtn = document.getElementById('uploadBtn');
-        const profilePreview = document.getElementById('profilePreview');
+            // Reusable toast function
+            function showToast(message, type = 'alert-danger') {
+                const container = document.getElementById("toastContainer");
+                if (!container) return;
 
-        // Trigger file input when button is clicked
-        uploadBtn.addEventListener('click', () => {
-            fileInput.click();
-        });
-
-        fileInput.addEventListener('change', () => {
-            const file = fileInput.files[0];
-            if (file) {
-                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-                const maxSize = 10 * 1024 * 1024; // 10 MB
-
-                if (!allowedTypes.includes(file.type)) {
-                    alert('Invalid file type. Only JPG, JPEG, and PNG are allowed.');
-                    fileInput.value = '';
-                    profilePreview.src = 'https://via.placeholder.com/150';
-                    return;
-                }
-
-                if (file.size > maxSize) {
-                    alert('File is too large. Maximum size is 10 MB.');
-                    fileInput.value = '';
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = e => {
-                    // Append timestamp to force browser to reload
-                    profilePreview.src = e.target.result;
-                }
-                reader.readAsDataURL(file);
+                const alert = document.createElement("div");
+                alert.className = `alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 ${type}`;
+                alert.role = "alert";
+                alert.innerHTML = `
+                    <i class="bi ${type === 'alert-success' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'} fs-6"></i>
+                    <span>${message}</span>
+                `;
+                container.appendChild(alert);
+                setTimeout(() => alert.remove(), 3000);
             }
-        });
 
+            uploadBtn.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', () => {
+                const file = fileInput.files[0];
+                if (file) {
+                    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                    const maxSize = 10 * 1024 * 1024; // 10 MB
+
+                    if (!allowedTypes.includes(file.type)) {
+                        showToast('Invalid file type. Only JPG, JPEG, and PNG are allowed.');
+                        fileInput.value = '';
+                        profilePreview.src = 'https://via.placeholder.com/150';
+                        return;
+                    }
+
+                    if (file.size > maxSize) {
+                        showToast('File is too large. Maximum size is 10 MB.');
+                        fileInput.value = '';
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        profilePreview.src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            <?php if (!empty($toastMessage)): ?>
+                const phpToastMessage = "<?= addslashes($toastMessage) ?>";
+                const phpToastType = "<?= $toastType ?>";
+                showToast(phpToastMessage, phpToastType);
+            <?php endif; ?>
+        });
     </script>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
