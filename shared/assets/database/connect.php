@@ -1,13 +1,13 @@
 <?php
-// $dbhost = "localhost";
-// $dbuser = "root";
-// $dbpass = "";
-// $db = "webstart";
-
 $dbhost = "localhost";
-$dbuser = "";
+$dbuser = "root";
 $dbpass = "";
-$db = "";
+$db = "webstar";
+
+//$dbhost = "localhost";
+//$dbuser = "";
+//$dbpass = "";
+//$db = "";
 
 
 $conn = new mysqli($dbhost, $dbuser, $dbpass, $db) or die("Connect failed: %s\n" . $conn->error);
