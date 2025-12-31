@@ -1029,27 +1029,30 @@ if (!empty($reusedData)) {
         });
 
         // Sync Quill content to hidden input before form submit
-        const form = document.querySelector('#addLessonForm'); // form ID
+        const form = document.querySelector('#addLessonForm');
         form.addEventListener('submit', function (e) {
             const hiddenInput = document.querySelector('#lesson');
+            const lessonTitleInput = document.querySelector('#lessonInfo');
             const text = quill.getText().trim();
 
-            // Validate Quill editor
-            if (text.length === 0) {
-                e.preventDefault();
-                quill.root.focus();
-                hiddenInput.setCustomValidity('Please fill out this field.');
-                hiddenInput.reportValidity();
-                return false;
-            } else {
-                hiddenInput.setCustomValidity('');
-            }
-
-            // Validation
             let valid = true;
             let errorMessages = [];
 
-            // Validate at least one course selected (only in NEW mode)
+            // 1. Quill editor validation
+            if (text.length === 0) {
+                valid = false;
+                errorMessages.push("Please fill out the lesson description.");
+                quill.root.focus();
+            }
+
+            // 2. Lesson title validation
+            if (!lessonTitleInput.value.trim()) {
+                valid = false;
+                errorMessages.push("Please enter a Lesson Title.");
+                lessonTitleInput.focus();
+            }
+
+            // 3. Course selection validation (only for new lessons)
             let checkboxes = form.querySelectorAll(".course-checkbox");
             let checked = Array.from(checkboxes).some(cb => cb.checked);
             if (!checked && !window.location.search.includes("edit")) {
@@ -1057,24 +1060,24 @@ if (!empty($reusedData)) {
                 errorMessages.push("Please select at least one course before submitting.");
             }
 
-            if (!valid) {
-                e.preventDefault();
+            const container = document.getElementById("toastContainer");
+            container.innerHTML = "";
 
-                const container = document.getElementById("toastContainer");
-                container.innerHTML = "";
+            if (!valid) {
+                e.preventDefault(); // prevent submission only if there are errors
 
                 errorMessages.forEach(msg => {
                     const alert = document.createElement("div");
                     alert.className = "alert mb-2 shadow-lg text-med text-12 d-flex align-items-center justify-content-center gap-2 px-3 py-2 alert-danger";
                     alert.role = "alert";
                     alert.innerHTML = `
-                        <i class="bi bi-x-circle-fill fs-6"></i>
-                        <span>${msg}</span>
-                        `;
+                <i class="bi bi-x-circle-fill fs-6"></i>
+                <span>${msg}</span>
+            `;
                     container.appendChild(alert);
                     setTimeout(() => alert.remove(), 3000);
                 });
-
+                return false;
             }
 
             // Sync Quill content to hidden input
