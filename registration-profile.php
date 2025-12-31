@@ -68,13 +68,15 @@ include("shared/assets/processes/registration-profile-process.php");
                                 <div class="row mb-3 gx-3">
                                     <div class="col">
                                         <div class="form-floating">
-                                            <input type="text" name="firstName" class="form-control" id="firstName" placeholder="" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" required>
+                                            <input type="text" name="firstName" class="form-control" id="firstName" placeholder="" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')"
+                                                value="<?php echo isset($formData['firstName']) ? htmlspecialchars($formData['firstName']) : ''; ?>" required>
                                             <label for="firstName">First Name</label>
                                         </div>
                                     </div>
                                     <div class="col">
                                         <div class="form-floating">
-                                            <input type="text" name="middleName" class="form-control" id="middleName" placeholder="" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')">
+                                            <input type="text" name="middleName" class="form-control" id="middleName" placeholder="" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')"
+                                                value="<?php echo isset($formData['middleName']) ? htmlspecialchars($formData['middleName']) : ''; ?>">
                                             <label for="middleName">Middle Name</label>
                                         </div>
                                     </div>
@@ -84,13 +86,15 @@ include("shared/assets/processes/registration-profile-process.php");
                                 <div class="row mb-3 gx-3">
                                     <div class="col">
                                         <div class="form-floating">
-                                            <input type="text" name="lastName" class="form-control" id="lastName" placeholder="Last Name" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" required>
+                                            <input type="text" name="lastName" class="form-control" id="lastName" placeholder="Last Name" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')"
+                                                value="<?php echo isset($formData['lastName']) ? htmlspecialchars($formData['lastName']) : ''; ?>" required>
                                             <label for="lastName">Last Name</label>
                                         </div>
                                     </div>
                                     <div class="col">
                                         <div class="form-floating">
-                                            <input type="text" name="userName" class="form-control" id="userName" placeholder="Username" maxlength="30" pattern="^[^\s.]+$" required>
+                                            <input type="text" name="userName" class="form-control" id="userName" placeholder="Username" maxlength="30" pattern="^[^\s.]+$"
+                                                value="<?php echo isset($formData['userName']) ? htmlspecialchars($formData['userName']) : ''; ?>" required>
                                             <label for="userName">Username</label>
                                         </div>
                                     </div>
@@ -99,7 +103,8 @@ include("shared/assets/processes/registration-profile-process.php");
                                 <!-- Student No. -->
                                 <div class="mb-3">
                                     <div class="form-floating">
-                                        <input type="text" name="studentID" class="form-control" id="studentID" placeholder="Student No." required>
+                                        <input type="text" name="studentID" class="form-control" id="studentID" placeholder="Student No."
+                                            value="<?php echo isset($formData['studentID']) ? htmlspecialchars($formData['studentID']) : ''; ?>" required>
                                         <label for="studentNo">Student No.</label>
                                     </div>
                                 </div>
@@ -108,11 +113,12 @@ include("shared/assets/processes/registration-profile-process.php");
                                 <div class="mb-3">
                                     <div class="form-floating">
                                         <select class="form-select" name="program" id="program" required>
-                                            <option selected disabled>Program</option>
+                                            <option value="" disabled <?= empty($formData['program']) ? 'selected' : '' ?>>Program</option>
                                             <?php
                                             if ($programResult && mysqli_num_rows($programResult) > 0) {
                                                 while ($row = mysqli_fetch_assoc($programResult)) {
-                                                    echo '<option value="' . $row['programID'] . '">' . $row['programName'] . '</option>';
+                                                    $selected = (isset($formData['program']) && $formData['program'] == $row['programID']) ? 'selected' : '';
+                                                    echo '<option value="' . $row['programID'] . '" ' . $selected . '>' . $row['programName'] . '</option>';
                                                 }
                                             }
                                             ?>
@@ -121,36 +127,33 @@ include("shared/assets/processes/registration-profile-process.php");
                                     </div>
                                 </div>
 
-                                <!-- Gender,Year, Section -->
+                                <!-- Gender, Year, Section -->
                                 <div class="row gx-2 mb-3 align-dropdowns">
-                                    <div class="col-4 col-sm-4 mb-3">
+                                    <div class="col-4 col-sm-4">
                                         <select class="form-select" name="gender" id="gender" required>
-                                            <option selected disabled>Gender</option>
-                                            <option value="Male">Male</option>
-                                            <option value="Female">Female</option>
-                                            <option value="Other">Other</option>
+                                            <option value="" disabled <?= empty($formData['gender']) ? 'selected' : '' ?>>Gender</option>
+                                            <option value="Male" <?= (isset($formData['gender']) && $formData['gender'] == 'Male') ? 'selected' : '' ?>>Male</option>
+                                            <option value="Female" <?= (isset($formData['gender']) && $formData['gender'] == 'Female') ? 'selected' : '' ?>>Female</option>
+                                            <option value="Other" <?= (isset($formData['gender']) && $formData['gender'] == 'Other') ? 'selected' : '' ?>>Other</option>
                                         </select>
                                     </div>
-                                    <div class="col-4 col-sm-4 mb-3">
+                                    <div class="col-4 col-sm-4">
                                         <select class="form-select" name="yearLevel" id="yearLevel" required>
-                                            <option selected disabled>Year Level</option>
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>
-                                            <option value="3">3</option>
-                                            <option value="4">4</option>
+                                            <option value="" disabled <?= empty($formData['yearLevel']) ? 'selected' : '' ?>>Year Level</option>
+                                            <?php for ($i = 1; $i <= 4; $i++): ?>
+                                                <option value="<?= $i ?>" <?= (isset($formData['yearLevel']) && $formData['yearLevel'] == $i) ? 'selected' : '' ?>><?= $i ?></option>
+                                            <?php endfor; ?>
                                         </select>
                                     </div>
-                                    <div class="col-4 col-sm-4 mb-3">
-                                        <select class="form-select" name="yearSection" id="yearSection">
-                                            <option selected disabled>Section</option>
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>
-                                            <option value="3">3</option>
-                                            <option value="4">4</option>
+                                    <div class="col-4 col-sm-4">
+                                        <select class="form-select" name="yearSection" id="yearSection" required>
+                                            <option value="" disabled <?= empty($formData['yearSection']) ? 'selected' : '' ?>>Section</option>
+                                            <?php for ($i = 1; $i <= 4; $i++): ?>
+                                                <option value="<?= $i ?>" <?= (isset($formData['yearSection']) && $formData['yearSection'] == $i) ? 'selected' : '' ?>><?= $i ?></option>
+                                            <?php endfor; ?>
                                         </select>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
 
@@ -199,29 +202,26 @@ include("shared/assets/processes/registration-profile-process.php");
         const usernameInput = document.getElementById('userName');
         const toastContainer = document.getElementById('toastContainer');
         const studentIDInput = document.getElementById('studentID');
+        const registrationForm = document.getElementById('registrationForm');
 
         studentIDInput.addEventListener('input', () => {
             studentIDInput.value = studentIDInput.value.toUpperCase();
         });
 
-        // Auto-lowercase username and remove spaces
         usernameInput.addEventListener('input', () => {
             usernameInput.value = usernameInput.value.toLowerCase().replace(/[^a-z0-9._]/g, '');
         });
 
-        // Trigger file input
         uploadBtn.addEventListener('click', () => {
             fileInput.click();
         });
 
-        // Function to show toast with icon
         function showToast(message, type = 'success') {
             const alert = document.createElement('div');
             alert.className = `alert mb-2 shadow-lg d-flex align-items-center gap-2 px-3 py-2 ${type === 'success' ? 'alert-success' : 'alert-danger'}`;
             alert.style.transition = "opacity 0.5s ease";
             alert.style.opacity = "1";
 
-            // Add icon using Bootstrap icons
             const icon = document.createElement('i');
             icon.className = `bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'} fs-6`;
             icon.setAttribute('role', 'img');
@@ -241,12 +241,11 @@ include("shared/assets/processes/registration-profile-process.php");
             }, 3000);
         }
 
-        // File validation and preview
         fileInput.addEventListener('change', () => {
             const file = fileInput.files[0];
             if (file) {
                 const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-                const maxSize = 5 * 1024 * 1024; // 5 MB
+                const maxSize = 5 * 1024 * 1024;
 
                 if (!allowedTypes.includes(file.type)) {
                     fileInput.value = '';
@@ -271,18 +270,51 @@ include("shared/assets/processes/registration-profile-process.php");
             }
         });
 
-        // Prevent submission if first/last name contains only spaces
-        document.getElementById('registrationForm').addEventListener('submit', function(e) {
-            const firstName = document.getElementById('firstName').value.trim();
-            const middleName = document.getElementById('middleName').value.trim();
-            const lastName = document.getElementById('lastName').value.trim();
+        // Red border if empty
+        registrationForm.addEventListener('submit', function(e) {
+            let hasError = false;
 
-            if (firstName === '' || lastName === '') {
+            const requiredFields = ['firstName', 'lastName', 'userName', 'studentID', 'program', 'gender', 'yearLevel', 'yearSection'];
+            requiredFields.forEach(id => {
+                const field = document.getElementById(id);
+                if (!field || field.value === '' || field.value.trim() === '') {
+                    field.style.border = '1px solid red';
+                    hasError = true;
+                } else {
+                    field.style.border = '';
+                }
+            });
+
+            if (hasError) {
                 e.preventDefault();
-                showToast('First and Last Name cannot be empty or only spaces.', 'danger');
+                showToast('Please fill in all required fields.', 'danger');
             }
         });
+
+        // Removed the red border
+        const requiredFields = ['firstName', 'lastName', 'userName', 'studentID', 'program', 'gender', 'yearLevel', 'yearSection'];
+
+        requiredFields.forEach(id => {
+            const field = document.getElementById(id);
+            if (!field) return;
+
+            field.addEventListener('input', () => {
+                if (field.value !== '') field.style.border = '';
+            });
+
+            field.addEventListener('change', () => {
+                if (field.value !== '') field.style.border = '';
+            });
+        });
     </script>
+
+    <?php if (!empty($error) && isset($errorMessages[$error])): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                showToast('<?= addslashes($errorMessages[$error]); ?>', 'danger');
+            });
+        </script>
+    <?php endif; ?>
 </body>
 
 </html>

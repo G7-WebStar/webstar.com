@@ -17,35 +17,42 @@ if (isset($_GET['logout'])) {
     exit();
 }
 
+// Retrieve alert if any
+if (isset($_SESSION['alert'])) {
+    $error = $_SESSION['alert'];
+    unset($_SESSION['alert']);
+}
+
 // Define error messages
 $errorMessages = [
     "mismatch" => "Passwords do not match. Please try again.",
     "emptyFields" => "Please fill in both password fields.",
+    "invalidPasswordFormat" => "Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and special characters.",
     "updateFail" => "Something went wrong while updating your password. Please try again.",
     "emailNoCredential" => "No email credentials found in the database!"
 ];
 
-// For alert handling
-if (isset($_SESSION['alert'])) {
-    $error = $_SESSION['alert'];
-    unset($_SESSION['alert']); // one-time only
-}
-
 if (isset($_POST['reset'])) { // Reset password button
     $email = $_SESSION['email'] ?? null;
     $newPassword = trim($_POST['password']);
-    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
     $confirm = trim($_POST['confirmPassword']);
+    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
 
+    // --- VALIDATION ---
     if (empty($newPassword) || empty($confirm)) {
         $_SESSION['alert'] = "emptyFields";
-        header("Location: reset-password.php");
-        exit();
+        $error = $_SESSION['alert'];
+        unset($_SESSION['alert']);
     } elseif ($newPassword !== $confirm) {
         $_SESSION['alert'] = "mismatch";
-        header("Location: reset-password.php");
-        exit();
+        $error = $_SESSION['alert'];
+        unset($_SESSION['alert']);
+    } elseif (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{8,}$/', $newPassword)) {
+        $_SESSION['alert'] = "invalidPasswordFormat";
+        $error = $_SESSION['alert'];
+        unset($_SESSION['alert']);
     } else {
+        // --- GET USER ROLE ---
         $roleQuery = "SELECT role FROM users WHERE email = '$email'";
         $roleResult = executeQuery($roleQuery);
         $roleRow = mysqli_fetch_assoc($roleResult);
@@ -53,6 +60,7 @@ if (isset($_POST['reset'])) { // Reset password button
 
         $_SESSION['role'] = $role;
 
+        // --- UPDATE PASSWORD ---
         if ($role === 'professor') {
             $update = "UPDATE users SET password = '$hashedPassword', status = 'Active' WHERE email = '$email'";
         } else {
@@ -61,14 +69,16 @@ if (isset($_POST['reset'])) { // Reset password button
 
         $result = executeQuery($update);
 
-        $credentialQuery = "SELECT email, password FROM emailcredentials WHERE credentialID = 1";
-        $credentialResult = executeQuery($credentialQuery);
+        // --- FIX: Only redirect to updated page if email credentials exist ---
+        if ($email && $result) { // Ensure email exists and password updated
+            $credentialQuery = "SELECT email, password FROM emailcredentials WHERE credentialID = 1";
+            $credentialResult = executeQuery($credentialQuery);
+            $credentialRow = mysqli_fetch_assoc($credentialResult);
 
-        if ($credentialRow = mysqli_fetch_assoc($credentialResult)) {
-            $smtpEmail = $credentialRow['email'];
-            $smtpPassword = $credentialRow['password'];
+            if ($credentialRow) { // Email credentials exist → send email
+                $smtpEmail = $credentialRow['email'];
+                $smtpPassword = $credentialRow['password'];
 
-            if ($result) {
                 $mail = new PHPMailer(true);
                 try {
                     $mail->isSMTP();
@@ -79,83 +89,78 @@ if (isset($_POST['reset'])) { // Reset password button
                     $mail->SMTPSecure = 'tls';
                     $mail->Port = 587;
                     $mail->setFrom($smtpEmail, 'Webstar');
+
                     $headerPath = __DIR__ . '/../shared/assets/img/email/email-header.png';
                     if (file_exists($headerPath)) {
                         $mail->AddEmbeddedImage($headerPath, 'emailHeader');
                     }
+
                     $footerPath = __DIR__ . '/../shared/assets/img/email/email-footer.png';
                     if (file_exists($footerPath)) {
                         $mail->AddEmbeddedImage($footerPath, 'emailFooter');
                     }
+
                     $mail->addAddress($email);
                     $mail->isHTML(true);
                     $mail->Subject = "Password Reset Successful";
-                    $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
-                    <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
-                        <tr>
-                            <td align="center">
-                                <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-                                    <tr>
-                                        <td align="center" style="padding: 0;">
-                                            <img src="cid:emailHeader" alt="Webstar Header" style="width:600px; height:auto; display:block;">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 30px;">
-                                            <p style="font-size:15px; color:#333;">Hi <strong>user</strong>,</p>
-
-                                            <p style="font-size:15px; color:#333;">
-                                                Your password has been successfully reset for <strong>Webstar</strong>.
-                                            </p>
-
-                                            <p style="font-size:15px; color:#333;">
-                                                Your new password has been successfully changed.
-                                            </p>
-
-                                            <p style="font-size:15px; color:#333;">
-                                                If you didn’t request this change, please contact our support team immediately.
-                                            </p>
-
-                                            <p style="font-size:15px; color:#333;">Thank you for keeping your account secure!</p>
-
-                                            <p style="margin-top:30px; color:#333;">
-                                                Warm regards,<br>
-                                                <strong>The Webstar Team</strong><br>
-                                            </p>
-
-                                            <div style="text-align:center; font-size:13px; color:#888; margin-top:20px;">
-                                                Telefax: (043) 784-3812 | learn.webstar@gmail.com
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td align="center" style="padding: 0;">
-                                            <img src="cid:emailFooter" alt="Webstar Footer" style="width:600px; height:auto; display:block; border:0; outline:none; text-decoration:none;" />
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                </div>';
+                    $mail->Body = '
+                        <div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
+                                <tr>
+                                    <td align="center">
+                                        <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                                            <tr>
+                                                <td align="center" style="padding: 0;">
+                                                    <img src="cid:emailHeader" alt="Webstar Header" style="width:600px; height:auto; display:block;">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 30px;">
+                                                    <p style="font-size:15px; color:#333;">Hi <strong>user</strong>,</p>
+                                                    <p style="font-size:15px; color:#333;">
+                                                        Your password has been successfully reset for <strong>Webstar</strong>.
+                                                    </p>
+                                                    <p style="font-size:15px; color:#333;">
+                                                        If you didn’t request this change, please contact our support team immediately.
+                                                    </p>
+                                                    <p style="margin-top:30px; color:#333;">
+                                                        Warm regards,<br>
+                                                        <strong>The Webstar Team</strong><br>
+                                                    </p>
+                                                    <div style="text-align:center; font-size:13px; color:#888; margin-top:20px;">
+                                                        Telefax: (043) 784-3812 | learn.webstar@gmail.com
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="center" style="padding: 0;">
+                                                    <img src="cid:emailFooter" alt="Webstar Footer" style="width:600px; height:auto; display:block; border:0; outline:none; text-decoration:none;" />
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>';
                     $mail->send();
                 } catch (Exception $e) {
-                    // skip email error
+                    // Email failed → still proceed
                 }
+
                 header("Location: reset-password-updated.php");
                 exit();
-            } else {
-                $_SESSION['alert'] = "updateFail";
-                header("Location: reset-password.php");
+            } else { // Password updated but no email → redirect to login
+                header("Location: ../login.php");
                 exit();
             }
-        } else {
-            $error = "emailNoCredential";
+        } else { // Password update failed
+            $_SESSION['alert'] = "updateFail";
+            header("Location: reset-password.php");
+            exit();
         }
     }
 }
 ?>
-
 
 <!doctype html>
 <html lang="en">
@@ -217,7 +222,9 @@ if (isset($_POST['reset'])) { // Reset password button
                     <div class="container login-form">
                         <div class="form-floating pt-1 pt-md-3 pb-1 position-relative">
                             <input type="password" name="password" class="form-control rounded-4 border-blue"
-                                id="newPassword" style="padding-left: 20px;" placeholder="Password" required>
+                                id="newPassword" style="padding-left: 20px;" placeholder="Password" required
+                                oncopy="return false" onpaste="return false"
+                                value="<?= isset($_POST['password']) ? htmlspecialchars($_POST['password']) : '' ?>">
                             <label for="newPassword">
                                 <div class="pt-2 pt-md-3 px-2">New Password</div>
                             </label>
@@ -228,7 +235,9 @@ if (isset($_POST['reset'])) { // Reset password button
                         </div>
                         <div class="form-floating pt-1 pt-md-2 pb-1 position-relative">
                             <input type="password" name="confirmPassword" class="form-control rounded-4 border-blue"
-                                id="confirmPassword" style="padding-left: 20px;" placeholder="Password" required>
+                                id="confirmPassword" style="padding-left: 20px;" placeholder="Password" required
+                                oncopy="return false" onpaste="return false"
+                                value="<?= isset($_POST['confirmPassword']) ? htmlspecialchars($_POST['confirmPassword']) : '' ?>">
                             <label for="confirmPassword">
                                 <div class="pt-2 pt-md-2 px-2">Confirm Password</div>
                             </label>
@@ -306,6 +315,18 @@ if (isset($_POST['reset'])) { // Reset password button
             }
         }
     </script>
+    <script>
+        // Prevent spaces in password fields
+        const passwordFields = ['newPassword', 'confirmPassword'];
+        passwordFields.forEach(id => {
+            const field = document.getElementById(id);
+            field.addEventListener('input', (e) => {
+                // Remove spaces as user types
+                field.value = field.value.replace(/\s/g, '');
+            });
+        });
+    </script>
+
 </body>
 
 </html>
