@@ -688,8 +688,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                 </label>
                                                 <input type="number" name="testTimeLimit"
                                                     class="form-control textbox text-reg text-16"
-                                                    placeholder="in minutes" min="1" required
-                                                    value="<?php
+                                                    placeholder="in minutes" min="1" required value="<?php
                                                     if (isset($mainData['testTimeLimit'])) {
                                                         echo htmlspecialchars(intval($mainData['testTimeLimit']) / 60);
                                                     }
@@ -1137,6 +1136,48 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                 e.preventDefault();
                 showAlert("Please add at least one question before submitting.");
                 return; // stop submission
+            }
+
+            // --- Test Title Validation ---
+            const testTitleInput = document.getElementById("lessonInfo");
+
+            if (!testTitleInput || testTitleInput.value.trim() === "") {
+                e.preventDefault();
+                showAlert("Please enter a test title.");
+                testTitleInput.focus();
+                return;
+            }
+
+            // --- Deadline Validation ---
+            const deadlineInput = document.querySelector('input[name="deadline"]');
+
+            if (!deadlineInput || deadlineInput.value.trim() === "") {
+                e.preventDefault();
+                showAlert("Please set a deadline.");
+                deadlineInput.focus();
+                return;
+            }
+
+            // --- Time Limit Validation ---
+            const timeLimitInput = document.querySelector('input[name="testTimeLimit"]');
+
+            if (!timeLimitInput || timeLimitInput.value.trim() === "") {
+                e.preventDefault();
+                showAlert("Please set a time limit.");
+                timeLimitInput.focus();
+                return;
+            }
+
+            // --- Question Points Validation ---
+            const pointsInputs = document.querySelectorAll('input[name*="[testQuestionPoints]"]');
+
+            for (let i = 0; i < pointsInputs.length; i++) {
+                if (pointsInputs[i].value.trim() === "") {
+                    e.preventDefault();
+                    showAlert("Please set points for all questions.");
+                    pointsInputs[i].focus();
+                    return; 
+                }
             }
 
             // --- Course Selection Validation ---
