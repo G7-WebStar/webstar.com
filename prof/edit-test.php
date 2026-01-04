@@ -48,6 +48,46 @@ $courses = executeQuery($course);
 
 // Save exam query
 if (isset($_POST['save_exam'])) {
+
+    $errors = [];
+
+    /* Test Title */
+    $titleRaw = trim($_POST['taskTitle'] ?? '');
+    if ($titleRaw === '') {
+        $errors[] = 'Test title is required.';
+    }
+
+    /* Deadline */
+    $deadlineEnabled = isset($_POST['stopSubmissions']) ? 1 : 0;
+    $testDeadline = $_POST['deadline'] ?? null;
+
+    if ($deadlineEnabled) {
+        if (empty($testDeadline)) {
+            $errors[] = 'Deadline is required when stop submissions is enabled.';
+        } elseif (!strtotime($testDeadline)) {
+            $errors[] = 'Invalid deadline format.';
+        }
+    }
+
+    /* Time Limit must be positive */
+    $testTimeLimitMinutes = $_POST['testTimeLimit'] ?? null;
+
+    if ($testTimeLimitMinutes !== null && $testTimeLimitMinutes !== '') {
+        if (!ctype_digit($testTimeLimitMinutes) || intval($testTimeLimitMinutes) < 1) {
+            $errors[] = 'Time limit must be a positive number.';
+        }
+    }
+
+    /* Toast Handling*/
+    if (!empty($errors)) {
+        $_SESSION['toast'] = [
+            'type' => 'alert-danger',
+            'message' => implode('<br>', $errors)
+        ];
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+        exit();
+    }
+
     $mode = $_POST['mode'] ?? 'new';
     $existingTestID = intval($_POST['testID'] ?? 0);
 
@@ -1114,6 +1154,36 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                 errorMessages.push("The test must have at least one question.");
             }
 
+            // --- Test Title Validation ---
+            const testTitleInput = document.getElementById("lessonInfo");
+            if (!testTitleInput || testTitleInput.value.trim() === "") {
+                valid = false;
+                errorMessages.push("Please enter a test title.");
+            }
+
+            // --- Deadline Validation ---
+            const deadlineInput = document.querySelector('input[name="deadline"]');
+            if (!deadlineInput || deadlineInput.value.trim() === "") {
+                valid = false;
+                errorMessages.push("Please set a deadline.");
+            }
+
+            // --- Time Limit Validation ---
+            const timeLimitInput = document.querySelector('input[name="testTimeLimit"]');
+            if (!timeLimitInput || timeLimitInput.value.trim() === "") {
+                valid = false;
+                errorMessages.push("Please set a time limit.");
+            }
+
+            // --- Question Points Validation ---
+            const pointsInputs = document.querySelectorAll('input[name*="[testQuestionPoints]"]');
+            pointsInputs.forEach((input, index) => {
+                if (input.value.trim() === "") {
+                    valid = false;
+                    errorMessages.push(`Question #${index + 1} must have points.`);
+                }
+            });
+
             questionBoxes.forEach((box, index) => {
                 const questionType = box.querySelector("input[type='hidden'][name*='questionType']").value;
 
@@ -1206,7 +1276,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
             }
         });
 
-        
+
         document.addEventListener("click", function (e) {
             const delImgBtn = e.target.closest(".delete-image");
             if (!delImgBtn) return;

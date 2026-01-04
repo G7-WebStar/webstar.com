@@ -37,6 +37,46 @@ $courses = executeQuery($course);
 
 // Save exam query
 if (isset($_POST['save_exam'])) {
+
+    $errors = [];
+
+    /* Test Title */
+    $titleRaw = trim($_POST['taskTitle'] ?? '');
+    if ($titleRaw === '') {
+        $errors[] = 'Test title is required.';
+    }
+
+    /* Deadline */
+    $deadlineEnabled = isset($_POST['stopSubmissions']) ? 1 : 0;
+    $testDeadline = $_POST['deadline'] ?? null;
+
+    if ($deadlineEnabled) {
+        if (empty($testDeadline)) {
+            $errors[] = 'Deadline is required when stop submissions is enabled.';
+        } elseif (!strtotime($testDeadline)) {
+            $errors[] = 'Invalid deadline format.';
+        }
+    }
+
+    /* Time Limit must be positive */
+    $testTimeLimitMinutes = $_POST['testTimeLimit'] ?? null;
+
+    if ($testTimeLimitMinutes !== null && $testTimeLimitMinutes !== '') {
+        if (!ctype_digit($testTimeLimitMinutes) || intval($testTimeLimitMinutes) < 1) {
+            $errors[] = 'Time limit must be a positive number.';
+        }
+    }
+
+    /* Toast Handling*/
+    if (!empty($errors)) {
+        $_SESSION['toast'] = [
+            'type' => 'alert-danger',
+            'message' => implode('<br>', $errors)
+        ];
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+        exit();
+    }
+
     $mode = $_POST['mode'] ?? 'new';
     $existingTestID = intval($_POST['testID'] ?? 0);
 
@@ -357,7 +397,7 @@ if (isset($_POST['save_exam'])) {
                 }
             }
         }
-         if ($testInsert) {
+        if ($testInsert) {
             $_SESSION['toast'] = [
                 'type' => 'alert-success',
                 'message' => 'Test created successfully!'
@@ -557,14 +597,14 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                     <!-- Page Title -->
                                     <div class="col text-center text-md-start">
                                         <span class="text-sbold text-20"><?php
-                                                                            if (isset($_GET['edit'])) {
-                                                                                echo 'Edit Test';
-                                                                            } elseif (isset($_GET['reuse'])) {
-                                                                                echo 'Recreate Test';
-                                                                            } else {
-                                                                                echo 'Create Test';
-                                                                            }
-                                                                            ?>
+                                        if (isset($_GET['edit'])) {
+                                            echo 'Edit Test';
+                                        } elseif (isset($_GET['reuse'])) {
+                                            echo 'Recreate Test';
+                                        } else {
+                                            echo 'Create Test';
+                                        }
+                                        ?>
                                     </div>
 
                                     <!-- Assign Existing Task Button -->
@@ -636,7 +676,8 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                     <input type="datetime-local" name="deadline"
                                                         class="form-control textbox text-reg text-16 me-0 me-md-2"
                                                         value="<?php echo isset($mainData['deadline']) ? date('Y-m-d\TH:i', strtotime($mainData['deadline'])) : ''; ?>"
-                                                        min="<?php echo date('Y-m-d\T00:00', strtotime('+1 day')); ?>" required>
+                                                        min="<?php echo date('Y-m-d\T00:00', strtotime('+1 day')); ?>"
+                                                        required>
                                                 </div>
                                             </div>
 
@@ -648,17 +689,17 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                 <input type="number" name="testTimeLimit"
                                                     class="form-control textbox text-reg text-16"
                                                     placeholder="in minutes" min="1" required value="<?php
-                                                                                                                        if (isset($mainData['testTimeLimit'])) {
-                                                                                                                            echo htmlspecialchars(intval($mainData['testTimeLimit']) / 60);
-                                                                                                                        }
-                                                                                                                        ?>" />
+                                                    if (isset($mainData['testTimeLimit'])) {
+                                                        echo htmlspecialchars(intval($mainData['testTimeLimit']) / 60);
+                                                    }
+                                                    ?>" />
                                             </div>
                                         </div>
                                         <!-- wala pa to -->
                                         <div class="form-check mt-2 col d-flex align-items-center">
                                             <input class="form-check-input" type="checkbox" id="stopSubmissions"
                                                 name="stopSubmissions" style="border: 1px solid var(--black);" <?php if (!empty($mainData['deadlineEnabled']) && $mainData['deadlineEnabled'] == 1)
-                                                                                                                    echo 'checked'; ?> />
+                                                    echo 'checked'; ?> />
                                             <label class="form-check-label text-reg text-14 ms-2"
                                                 style="margin-top: 4.5px;" for="stopSubmissions">
                                                 Stop accepting submissions after the deadline.
@@ -890,7 +931,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
 
                                                         while ($course = $courses->fetch_assoc()) {
                                                             $checked = in_array($course['courseID'], $assignedCourseIDs) ? 'checked' : '';
-                                                    ?>
+                                                            ?>
                                                             <li>
                                                                 <div class="form-check">
                                                                     <input class="form-check-input course-checkbox"
@@ -904,7 +945,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                                                     </label>
                                                                 </div>
                                                             </li>
-                                                        <?php
+                                                            <?php
                                                         }
                                                     } else { ?>
                                                         <li><span class="dropdown-item-text text-muted">No courses
@@ -1020,7 +1061,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
         const maxWords = 200;
         const counter = document.getElementById("word-counter");
 
-        quill.on('text-change', function() {
+        quill.on('text-change', function () {
             let text = quill.getText().trim();
             let words = text.length > 0 ? text.split(/\s+/).length : 0;
 
@@ -1036,7 +1077,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
 
         const form = document.querySelector('#guidedanceForm');
 
-        form.addEventListener("submit", function(e) {
+        form.addEventListener("submit", function (e) {
             // --- Quill ---
             const guidelinesInput = document.getElementById("generalGuidance");
             const plainText = quill.getText().trim();
@@ -1095,6 +1136,48 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                 e.preventDefault();
                 showAlert("Please add at least one question before submitting.");
                 return; // stop submission
+            }
+
+            // --- Test Title Validation ---
+            const testTitleInput = document.getElementById("lessonInfo");
+
+            if (!testTitleInput || testTitleInput.value.trim() === "") {
+                e.preventDefault();
+                showAlert("Please enter a test title.");
+                testTitleInput.focus();
+                return;
+            }
+
+            // --- Deadline Validation ---
+            const deadlineInput = document.querySelector('input[name="deadline"]');
+
+            if (!deadlineInput || deadlineInput.value.trim() === "") {
+                e.preventDefault();
+                showAlert("Please set a deadline.");
+                deadlineInput.focus();
+                return;
+            }
+
+            // --- Time Limit Validation ---
+            const timeLimitInput = document.querySelector('input[name="testTimeLimit"]');
+
+            if (!timeLimitInput || timeLimitInput.value.trim() === "") {
+                e.preventDefault();
+                showAlert("Please set a time limit.");
+                timeLimitInput.focus();
+                return;
+            }
+
+            // --- Question Points Validation ---
+            const pointsInputs = document.querySelectorAll('input[name*="[testQuestionPoints]"]');
+
+            for (let i = 0; i < pointsInputs.length; i++) {
+                if (pointsInputs[i].value.trim() === "") {
+                    e.preventDefault();
+                    showAlert("Please set points for all questions.");
+                    pointsInputs[i].focus();
+                    return; 
+                }
             }
 
             // --- Course Selection Validation ---
@@ -1204,7 +1287,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
 
 
         // Single Delete Handler for All Blocks
-        document.addEventListener("click", function(e) {
+        document.addEventListener("click", function (e) {
             const delBtn = e.target.closest(".delete-template");
             if (!delBtn) return;
 
@@ -1247,7 +1330,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
         });
 
         // Add Multiple Choice Choices
-        document.getElementById("allQuestionsContainer").addEventListener("click", function(e) {
+        document.getElementById("allQuestionsContainer").addEventListener("click", function (e) {
             if (e.target.closest(".add-radio-btn")) {
                 const button = e.target.closest(".add-radio-btn");
                 const container = button.closest(".multiple-choice-item").querySelector(".radio-choices-container");
@@ -1301,7 +1384,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
         });
 
         // Toggle Image Container
-        document.addEventListener("click", function(e) {
+        document.addEventListener("click", function (e) {
             if (e.target.closest(".image-icon")) {
                 const card = e.target.closest(".textbox");
                 const imageContainer = card.querySelector(".image-container");
@@ -1344,7 +1427,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
 
         }
 
-        document.addEventListener("click", function(e) {
+        document.addEventListener("click", function (e) {
             const delImgBtn = e.target.closest(".delete-image");
             if (!delImgBtn) return;
 
@@ -1390,7 +1473,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
             });
         }
 
-        mainContainer.addEventListener('input', function(e) {
+        mainContainer.addEventListener('input', function (e) {
             if (e.target.type === "number") updateTotalPoints();
         });
 
