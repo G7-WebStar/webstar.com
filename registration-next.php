@@ -69,7 +69,7 @@ include("shared/assets/processes/registration-next-process.php");
                             <!-- School Email -->
                             <div class="form-floating mb-3">
                                 <input type="email" class="form-control custom-input" id="schoolEmail" name="schoolEmail" placeholder="School Email"
-                                    value="<?= isset($_SESSION['prevSchoolEmail']) ? htmlspecialchars($_SESSION['prevSchoolEmail']) : '' ?>" required>
+                                    value="<?= htmlspecialchars($schoolEmail) ?>" required>
                                 <label for="schoolEmail">School Email</label>
                             </div>
 
@@ -79,18 +79,18 @@ include("shared/assets/processes/registration-next-process.php");
 
                             <!-- Social Links -->
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control custom-input" id="facebookLink" name="facebookLink" placeholder="Facebook Profile Link">
+                                <input type="text" class="form-control custom-input" value="<?= htmlspecialchars($facebookLink) ?>" id="facebookLink" name="facebookLink" placeholder="Facebook Profile Link">
                                 <label for="facebookLink">Facebook Profile Link</label>
                             </div>
 
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control custom-input" id="linkedinLink" name="linkedinLink" placeholder="Linkedin Profile Link">
+                                <input type="text" class="form-control custom-input" value="<?= htmlspecialchars($linkedinLink) ?>" id="linkedinLink" name="linkedinLink" placeholder="Linkedin Profile Link">
                                 <label for="linkedinLink">Linkedin Profile Link</label>
                             </div>
 
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control custom-input" id="githubLink" name="githubLink" placeholder="Github Profile Link">
-                                <label for="instagramLink">Github Portfolio Link</label>
+                                <input type="text" class="form-control custom-input" value="<?= htmlspecialchars($githubLink) ?>" id="githubLink" name="githubLink" placeholder="Github Profile Link">
+                                <label for="githubLink">Github Portfolio Link</label>
                             </div>
                         </div>
                     </div>

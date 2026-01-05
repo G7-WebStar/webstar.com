@@ -1,6 +1,11 @@
 <?php
 session_start();
 
+$schoolEmail   = '';
+$facebookLink  = '';
+$linkedinLink  = '';
+$githubLink    = '';
+
 $toastMessage = "";
 if (isset($_SESSION['alert'])) {
     $toastMessage = $_SESSION['alert'];
@@ -9,11 +14,11 @@ if (isset($_SESSION['alert'])) {
 
 // kapag submit ng finish button
 if (isset($_POST['nextBtn'])) {
-    $schoolEmail   = $_POST['schoolEmail'];
-    $facebookLink  = $_POST['facebookLink'];
-    $linkedinLink  = $_POST['linkedinLink'];
-    $githubLink = $_POST['githubLink'];
-
+    $schoolEmail   = $_POST['schoolEmail'] ?? '';
+    $facebookLink  = $_POST['facebookLink'] ?? '';
+    $linkedinLink  = $_POST['linkedinLink'] ?? '';
+    $githubLink = $_POST['githubLink'] ?? '';
+    
     if (empty($schoolEmail)) {
         $_SESSION['alert'] = "School Email is required.";
         $_SESSION['prevSchoolEmail'] = $schoolEmail;
@@ -28,6 +33,25 @@ if (isset($_POST['nextBtn'])) {
 
     $userID = $_SESSION['userID'];
 
+    $_SESSION['schoolEmail'] = $schoolEmail;
+    $_SESSION['facebookLink'] = $facebookLink;
+    $_SESSION['linkedinLink'] = $linkedinLink;
+    $_SESSION['githubLink'] = $githubLink;
+
+    $_SESSION['userID'] = $userID;
+
+    $_SESSION['profile_setup_success'] = true;
+
+}
+
+if (isset($_POST['letsGo'])) {
+    $userID = $_SESSION['userID'];
+
+    $schoolEmail   = $_SESSION['schoolEmail'];
+    $facebookLink  = $_SESSION['facebookLink'];
+    $linkedinLink  = $_SESSION['linkedinLink'];
+    $githubLink = $_SESSION['githubLink'];
+
     // save sa DB
     $nextQuery = "UPDATE userinfo SET 
                     schoolEmail   = '$schoolEmail',
@@ -37,16 +61,6 @@ if (isset($_POST['nextBtn'])) {
                   WHERE userID = '$userID'";
 
     $nextResult = executeQuery($nextQuery);
-
-    $_SESSION['userID'] = $userID;
-
-    if ($nextResult) {
-        $_SESSION['profile_setup_success'] = true;
-    }
-}
-
-if (isset($_POST['letsGo'])) {
-    $userID = $_SESSION['userID'];
 
     $userQuery = "SELECT * FROM users WHERE userID = $userID";
     $userResult = executeQuery($userQuery);
