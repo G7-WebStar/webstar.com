@@ -1,5 +1,7 @@
-<?php $activePage = 'assign-task';
+<?php 
 date_default_timezone_set('Asia/Manila');
+
+$activePage = 'assign-task';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -822,6 +824,11 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
             opacity: 1;
             /* ensure visibility */
         }
+        @media screen and (max-width: 767px) {
+            .mobile-view {
+                margin-bottom: 80px !important;
+            }
+        }
     </style>
 
 </head>
@@ -851,7 +858,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                     <!-- Navbar (mobile) -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top mobile-view">
                         <div class="create-prof-row">
                             <div class="col-12">
                                 <!-- Header -->
@@ -958,7 +965,7 @@ if ($rubricsRes && $rubricsRes->num_rows > 0) {
                                             <!-- Points -->
                                             <div class="col-md-6 m-0 p-0">
                                                 <label class="form-label text-med text-16">
-                                                    Points
+                                                    Points *
                                                 </label>
                                                 <input type="number" id="rubricPointsInput"
                                                     class="form-control textbox text-reg text-16" name="points"

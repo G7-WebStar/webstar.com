@@ -330,7 +330,7 @@ if (isset($_POST['save_announcement'])) {
                         e.enrollmentID,
                         '$escapedNotificationMessage',
                         '$escapedNotifType',
-                        NOW()
+                        CONVERT_TZ(NOW(), '+00:00', '+08:00')
                     FROM
                         enrollments e
                     WHERE
@@ -345,7 +345,7 @@ if (isset($_POST['save_announcement'])) {
                         e.enrollmentID,
                         '$escapedNotificationMessage',
                         '$escapedNotifType',
-                        NOW()
+                        CONVERT_TZ(NOW(), '+00:00', '+08:00')
                     FROM
                         enrollments e
                     WHERE
@@ -655,6 +655,11 @@ if (!empty($reusedData)) {
             opacity: 1;
             /* ensure visibility */
         }
+        @media screen and (max-width: 767px) {
+            .mobile-view {
+                margin-bottom: 80px !important;
+            }
+        }
     </style>
 
 
@@ -685,7 +690,7 @@ if (!empty($reusedData)) {
                     <!-- Navbar (mobile) -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top mobile-view">
                         <div class="create-prof-row">
                             <div class="col-12">
                                 <!-- Header -->

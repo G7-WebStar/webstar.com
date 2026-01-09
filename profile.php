@@ -2,7 +2,7 @@
 include('shared/assets/database/connect.php');
 include("shared/assets/processes/session-process.php");
 
-// Get the username from the URL (e.g., profile.php?user=jamesdoe)
+// Get the username from the URL 
 $username = $_GET['user'] ?? null;
 
 // If not provided, show the logged-in user's profile
@@ -66,6 +66,12 @@ if (!$username && isset($_SESSION['userID'])) {
     GROUP BY courses.courseID, courses.courseCode, courses.courseTitle;
 ";
     $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
+    
+     $selectMyCoursesQuery = "SELECT *
+        FROM courses
+        WHERE userID = '$userID' AND isActive = '1';
+";
+    $selectMyCoursesResult = executeQuery($selectMyCoursesQuery);
 
     $activitiesQuery = "
     SELECT 
@@ -143,6 +149,14 @@ if (!$username && isset($_SESSION['userID'])) {
     GROUP BY c.courseID, c.courseCode, c.courseTitle
 ";
     $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
+
+    $selectMyCoursesQuery = "SELECT *
+        FROM courses AS c
+        INNER JOIN users AS u
+        ON c.userID = u.userID
+        WHERE u.userName = '$escaped' AND isActive = '1';
+";
+    $selectMyCoursesResult = executeQuery($selectMyCoursesQuery);
 
     $activitiesQuery = "
     SELECT 
@@ -773,60 +787,81 @@ function getRelativeTime($datetime, $fullDateFallback = true)
                                                     </span>
                                                     <span class="text-sbold">My Courses</span>
                                                 </div>
-                                                <div class="count-badge text-bold text-med">
-                                                    <?= htmlspecialchars($user['totalEnrollments']) ?>
+                                               <div class="count-badge text-bold text-med">
+                                                    <?php
+                                                    if ($user['role'] === 'student') {
+                                                        echo htmlspecialchars($user['totalEnrollments']);
+                                                    } elseif ($user['role'] === 'professor') {
+                                                        // Count the professor's active courses
+                                                        echo htmlspecialchars(mysqli_num_rows($selectMyCoursesResult));
+                                                    }
+                                                    ?>
                                                 </div>
                                             </div>
                                             <!-- Course Card -->
-                                            <div class="w-100 m-0 p-0 mb-1 "
+                                            <div class="w-100 m-0 p-0 mb-1"
                                                 style="max-height:1500px; overflow-y: auto; margin-right: -10px;">
                                                 <?php
-                                                if (mysqli_num_rows($selectLeaderboardResult) > 0) {
-                                                    while ($leaderboards = mysqli_fetch_assoc($selectLeaderboardResult)) {
-                                                        ?>
-                                                        <div class="card rounded-3 mb-2"
-                                                            style="border: 1px solid var(--black);">
-                                                            <div class="card-body p-4">
-
-                                                                <!-- Course Info -->
-                                                                <div class="info-block">
-                                                                    <div class="comp-code text-sbold text-16">
-                                                                        <?php echo $leaderboards['courseCode']; ?>
-                                                                    </div>
-                                                                    <div class="subj-code text-reg text-12 mb-0 text-truncate">
-                                                                        <?php echo $leaderboards['courseTitle']; ?>
-                                                                    </div>
-
-                                                                    <div class="xp-container">
-                                                                        <div class="xp-block text-reg text-12 mb-0">
-                                                                            <?php echo $leaderboards['totalPoints']; ?> XPs
+                                                if ($user['role'] === 'student') {
+                                                    // Student: show leaderboard / enrolled courses
+                                                    if (mysqli_num_rows($selectLeaderboardResult) > 0) {
+                                                        while ($leaderboards = mysqli_fetch_assoc($selectLeaderboardResult)) {
+                                                            ?>
+                                                            <div class="card rounded-3 mb-2"
+                                                                style="border: 1px solid var(--black);">
+                                                                <div class="card-body p-4">
+                                                                    <div class="info-block">
+                                                                        <div class="comp-code text-sbold text-16">
+                                                                            <?= $leaderboards['courseCode']; ?>
+                                                                        </div>
+                                                                        <div class="subj-code text-reg text-12 mb-0 text-truncate">
+                                                                            <?= $leaderboards['courseTitle']; ?>
+                                                                        </div>
+                                                                        <div class="xp-container">
+                                                                            <div class="xp-block text-reg text-12 mb-0">
+                                                                                <?= $leaderboards['totalPoints']; ?> XPs
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                        <?php
-                                                    }
-                                                } else
-
-                                                    if (empty($courses)) {
-                                                        if ($user['role'] === 'student') {
-                                                            echo '
-                                                            <div class="text-center mb-2">
-                                                                <img src="shared/assets/img/empty/folder2.png" width="100" class="mb-1">
-                                                                <div class="text-med text-14 mt-2">This student is not enrolled <br>in any courses yet.</div>
-                                                            </div>';
-                                                        } elseif ($user['role'] === 'professor') {
-                                                            echo '
-                                                            <div class="text-center mb-2">
-                                                                <img src="shared/assets/img/empty/folder2.png" width="100" class="mb-1">
-                                                                <div class="text-med text-14 mt-2">This intructor has not created <br>any courses yet.</div>
-                                                            </div>';
+                                                            <?php
                                                         }
+                                                    } else {
+                                                        echo '
+                                                    <div class="text-center mb-2">
+                                                        <img src="shared/assets/img/empty/folder2.png" width="100" class="mb-1">
+                                                        <div class="text-med text-14 mt-2">This student is not enrolled <br>in any courses yet.</div>
+                                                    </div>';
                                                     }
-
+                                                } elseif ($user['role'] === 'professor') {
+                                                    if (mysqli_num_rows($selectMyCoursesResult) > 0) {
+                                                        while ($course = mysqli_fetch_assoc($selectMyCoursesResult)) {
+                                                            ?>
+                                                            <div class="card rounded-3 mb-2"
+                                                                style="border: 1px solid var(--black);">
+                                                                <div class="card-body p-4">
+                                                                    <div class="info-block">
+                                                                        <div class="comp-code text-sbold text-16">
+                                                                            <?= $course['courseCode']; ?>
+                                                                        </div>
+                                                                        <div class="subj-code text-reg text-12 mb-0 text-truncate">
+                                                                            <?= $course['courseTitle']; ?>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <?php
+                                                        }
+                                                    } else {
+                                                        echo '
+            <div class="text-center mb-2">
+                <img src="shared/assets/img/empty/folder2.png" width="100" class="mb-1">
+                <div class="text-med text-14 mt-2">This instructor has not created <br>any courses yet.</div>
+            </div>';
+                                                    }
+                                                }
                                                 ?>
-
                                             </div>
                                         </div>
                                     </div>

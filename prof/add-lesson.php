@@ -658,6 +658,11 @@ if (!empty($reusedData)) {
             opacity: 1;
             /* ensure visibility */
         }
+        @media screen and (max-width: 767px) {
+            .mobile-view {
+                margin-bottom: 80px !important;
+            }
+        }
     </style>
 </head>
 
@@ -686,7 +691,7 @@ if (!empty($reusedData)) {
                     <!-- Navbar (mobile) -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top mobile-view">
                         <div class="create-prof-row">
                             <div class="col-12">
                                 <!-- Header -->

@@ -397,6 +397,12 @@ if (isset($_POST['createCourse'])) {
             user-select: none;
             cursor: pointer;
         }
+
+        @media screen and (max-width: 767px) {
+            .mobile-view {
+                margin-bottom: 80px !important;
+            }
+        }
     </style>
 </head>
 
@@ -425,7 +431,7 @@ if (isset($_POST['createCourse'])) {
                     <!-- Navbar (mobile) -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top mobile-view">
                         <div class="create-prof-row" style="margin-bottom: 100px;">
                             <div class="col-12">
                                 <!-- Header -->
