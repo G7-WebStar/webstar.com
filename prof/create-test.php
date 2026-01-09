@@ -1,6 +1,7 @@
 <?php
+date_default_timezone_set(timezoneId: 'Asia/Manila');
+
 $activePage = 'create-test';
-date_default_timezone_set('Asia/Manila');
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -550,6 +551,12 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
             opacity: 1;
             /* ensure visibility */
         }
+        
+        @media screen and (max-width: 767px) {
+            .mobile-view {
+                margin-bottom: 80px !important;
+            }
+        }
     </style>
 
 </head>
@@ -580,7 +587,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                     <!-- Navbar (mobile) -->
                     <?php include '../shared/components/prof-navbar-for-mobile.php'; ?>
 
-                    <div class="container-fluid py-3 overflow-y-auto row-padding-top">
+                    <div class="container-fluid py-3 overflow-y-auto row-padding-top mobile-view">
                         <div class="create-prof-row">
                             <div class="col-12">
                                 <!-- Header -->
@@ -637,7 +644,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                             <input type="text"
                                                 class="form-control textbox mb-2 px-3 py-2 text-reg text-16"
                                                 id="lessonInfo" name="taskTitle" aria-describedby="lessonInfo"
-                                                placeholder="Test Title"
+                                                placeholder="Test Title *"
                                                 value="<?php echo isset($mainData) ? htmlspecialchars($mainData['assessmentTitle']) : ''; ?>"
                                                 required>
                                         </div>
@@ -669,7 +676,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                             <!-- Deadline -->
                                             <div class="col-md-6 m-0 p-0 mb-3 mb-md-0">
                                                 <label class="form-label text-med text-16">
-                                                    Deadline
+                                                    Deadline *
                                                 </label>
 
                                                 <div class="input-group">
@@ -684,7 +691,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                             <!-- Time limit -->
                                             <div class="col-md-6 m-0 p-0">
                                                 <label class="form-label text-med text-16">
-                                                    Time Limit
+                                                    Time Limit *
                                                 </label>
                                                 <input type="number" name="testTimeLimit"
                                                     class="form-control textbox text-reg text-16"
@@ -711,7 +718,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
                                     <div class="row align-items-center">
                                         <div class="col-6">
                                             <div class="learning-materials">
-                                                <label class="text-med text-16 mt-5 mb-3">Exam Items</label>
+                                                <label class="text-med text-16 mt-5 mb-3">Exam Items *</label>
                                             </div>
                                         </div>
                                         <div class="col-6 text-end">
@@ -1048,7 +1055,7 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
         // Quill Editor
         var quill = new Quill('#editor', {
             theme: 'snow',
-            placeholder: 'Test General Guidelines',
+            placeholder: 'Test General Guidelines *',
             modules: {
                 toolbar: '#toolbar'
             }
