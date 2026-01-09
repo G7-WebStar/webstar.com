@@ -1,6 +1,6 @@
 <?php
 $activePage = 'assignment';
-
+date_default_timezone_set('Asia/Manila');
 include('shared/assets/database/connect.php');
 include("shared/assets/processes/session-process.php");
 
@@ -1133,15 +1133,18 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                 style="max-width:100%; min-width:310px; cursor:pointer;"
                                                 onclick="openViewerModal('<?php echo $file['attachment'] ?>', '<?php echo $filePath ?>')">
 
-                                                <div class="d-flex align-items-start">
+                                                <div class="d-flex align-items-start" style="flex: 1; min-width: 0;">
                                                     <span class="material-symbols-rounded p-2 pe-2 mt-1 ms-1"
                                                         style="font-variation-settings:'FILL' 1;">draft</span>
 
-                                                    <div class="ms-2">
-                                                        <!-- Title shows here -->
-                                                        <div class="text-sbold text-16 mt-1"><?php echo $file['title']; ?></div>
-                                                        <div class="due text-reg text-14 mb-1"><?php echo $fileExt ?> ·
-                                                            <?php echo $fileSizeMB ?>
+                                                    <div class="ms-2" style="flex: 1; min-width: 0;">
+                                                        <div class="text-sbold text-16 mt-1"
+                                                            title="<?= htmlspecialchars($file['title']); ?>"
+                                                            style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                            <?= htmlspecialchars($file['title']); ?>
+                                                        </div>
+                                                        <div class="due text-reg text-14 mb-1">
+                                                            <?= $fileExt ?> · <?= $fileSizeMB ?>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1214,7 +1217,9 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                         </div>
                                         <div>
                                             <div class="text-sbold text-14"><?php echo $profName ?></div>
-                                            <div class="text-med text-12">January 12, 2024 8:00AM</div>
+                                            <div class="text-med text-12">
+                                                <?= date("F j, Y g:iA", strtotime($assignmentCreated)); ?>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2081,7 +2086,7 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                 const linkInput = document.getElementById('linkInput');
                 const linksInput = document.getElementById('linksInput');
 
-                addLinkBtn.addEventListener('click', function() {
+                addLinkBtn.addEventListener('click', function () {
                     const linkValue = linkInput.value.trim();
                     if (!linkValue) return;
 
