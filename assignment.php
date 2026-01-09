@@ -1324,7 +1324,9 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                                 <div class="text-reg text-16">Your assignment has been
                                                                     submitted.</div>
                                                                 <div class="text-reg text-12">
-                                                                    <?= date("M j, Y, g:iA", strtotime($submissionDate)); ?>
+                                                                    <?= !empty($submissionDate)
+                                                                        ? date("M j, Y, g:i A", strtotime($submissionDate))
+                                                                        : "Just now"; ?>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -1337,7 +1339,9 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                                 <div class="text-reg text-16">Assignment has been submitted
                                                                     late.</div>
                                                                 <div class="text-reg text-12">
-                                                                    <?= date("M j, Y, g:iA", strtotime($submissionDate)); ?>
+                                                                    <?= !empty($submissionDate)
+                                                                        ? date("M j, Y, g:i A", strtotime($submissionDate))
+                                                                        : "Just now"; ?>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -1349,7 +1353,9 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                             <div class="timeline-content">
                                                                 <div class="text-reg text-16">This task is missing.</div>
                                                                 <div class="text-reg text-12">
-                                                                    <?= date("M j, Y, g:iA", strtotime($deadline)); ?>
+                                                                    <?= !empty($submissionDate)
+                                                                        ? date("M j, Y, g:i A", strtotime($submissionDate))
+                                                                        : "Just now"; ?>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -1362,7 +1368,9 @@ while ($row = mysqli_fetch_assoc($badgeResult)) {
                                                                     <?= $isLate ? "Assignment has been submitted late." : "Your assignment has been submitted."; ?>
                                                                 </div>
                                                                 <div class="text-reg text-12">
-                                                                    <?= date("M j, Y, g:iA", strtotime($submissionDate)); ?>
+                                                                    <?= !empty($submissionDate)
+                                                                        ? date("M j, Y, g:i A", strtotime($submissionDate))
+                                                                        : "Just now"; ?>
                                                                 </div>
                                                             </div>
                                                         </li>
