@@ -118,30 +118,30 @@ $assessmentCount = mysqli_num_rows($selectAssessmentResult);
     <?php unset($_SESSION['success']); ?>
 <?php endif; ?>
 
-    <div class="d-flex align-items-center flex-nowrap mb-2" id="header">
-        <!-- Sort by -->
-        <div class="d-flex align-items-center flex-nowrap me-4">
-            <span class="dropdown-label me-2 text-reg text-14">Sort by</span>
-            <form method="POST">
-                <input type="hidden" name="activeTab" value="todo">
-                <select class="select-modern text-reg text-14" name="sortTodo" onchange="this.form.submit()">
-                    <option value="Newest" <?php echo ($sortTodo == 'Newest') ? 'selected' : ''; ?>>Newest</option>
-                    <option value="Oldest" <?php echo ($sortTodo == 'Oldest') ? 'selected' : ''; ?>>Oldest</option>
-                </select>
-            </form>
-        </div>
-        <!-- Status -->
-        <div class="d-flex align-items-center flex-nowrap">
-            <span class="dropdown-label me-2 text-reg text-14">Status</span>
-            <form method="POST">
-                <input type="hidden" name="activeTab" value="todo">
-                <select class="select-modern text-reg text-14" name="statusFilter" onchange="this.form.submit()">
-                    <option value="Active" <?php echo ($statusFilter == 'Active') ? 'selected' : ''; ?>>Active</option>
-                    <option value="Done" <?php echo ($statusFilter == 'Done') ? 'selected' : ''; ?>>Done</option>
-                </select>
-            </form>
-        </div>
+<div class="d-flex align-items-center flex-nowrap mb-2" id="header">
+    <!-- Sort by -->
+    <div class="d-flex align-items-center flex-nowrap me-4">
+        <span class="dropdown-label me-2 text-reg text-14">Sort by</span>
+        <form method="POST">
+            <input type="hidden" name="activeTab" value="todo">
+            <select class="select-modern text-reg text-14" name="sortTodo" onchange="this.form.submit()">
+                <option value="Newest" <?php echo ($sortTodo == 'Newest') ? 'selected' : ''; ?>>Newest</option>
+                <option value="Oldest" <?php echo ($sortTodo == 'Oldest') ? 'selected' : ''; ?>>Oldest</option>
+            </select>
+        </form>
     </div>
+    <!-- Status -->
+    <div class="d-flex align-items-center flex-nowrap">
+        <span class="dropdown-label me-2 text-reg text-14">Status</span>
+        <form method="POST">
+            <input type="hidden" name="activeTab" value="todo">
+            <select class="select-modern text-reg text-14" name="statusFilter" onchange="this.form.submit()">
+                <option value="Active" <?php echo ($statusFilter == 'Active') ? 'selected' : ''; ?>>Active</option>
+                <option value="Done" <?php echo ($statusFilter == 'Done') ? 'selected' : ''; ?>>Done</option>
+            </select>
+        </form>
+    </div>
+</div>
 
 <?php if ($assessmentCount > 0): ?>
     <!-- To-Do List -->
@@ -175,6 +175,19 @@ $assessmentCount = mysqli_num_rows($selectAssessmentResult);
                     } elseif ($type === 'test') {
                         $editlink = "edit-test.php?edit=" . $assessmentID;
                     }
+
+                    $isEditable = true; // default is editable
+            
+                    if ($type === 'test') {
+                        $testID = intval($todo['testID']);
+                        $checkResponsesQuery = "SELECT COUNT(*) as responseCount FROM testresponses WHERE testID = '$testID'";
+                        $checkResponsesResult = executeQuery($checkResponsesQuery);
+                        $row = mysqli_fetch_assoc($checkResponsesResult);
+                        if ($row['responseCount'] > 0) {
+                            $isEditable = false; // disable if responses exist
+                        }
+                    }
+
                     ?>
                     <div class="todo-card d-flex align-items-stretch" data-link="<?php echo htmlspecialchars($link); ?>">
                         <!-- Date -->
@@ -211,8 +224,19 @@ $assessmentCount = mysqli_num_rows($selectAssessmentResult);
 
                                     <ul class="dropdown-menu dropdown-menu-end"
                                         aria-labelledby="dropdownMenuButton<?php echo $todoID; ?>" style="margin-top: 0.25rem;">
-                                        <li><a class="dropdown-item text-reg text-14" href="<?php echo $editlink; ?>">Edit</a>
+                                        <li><a 
+                                                class="dropdown-item text-reg text-14" 
+                                                href="<?php echo ($isEditable) ? $editlink : '#'; ?>"
+                                                <?php if (!$isEditable): ?>
+                                                    onclick="return false;" title="Cannot edit after responses have been submitted"
+                                                    style="color: #6c757d; cursor: not-allowed; text-decoration: none;"
+                                                    onmouseover="this.style.background='none';" 
+                                                    onmouseout="this.style.background='none';"
+                                                <?php endif; ?> >
+                                                Edit
+                                            </a>
                                         </li>
+
                                         <li>
                                             <button type="button" class="dropdown-item text-reg text-14 text-danger"
                                                 data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $todoID; ?>"
@@ -266,12 +290,12 @@ $assessmentCount = mysqli_num_rows($selectAssessmentResult);
         <?php endwhile; ?>
     </div>
 
-<?php elseif (empty($statusFilter) && $statusFilter != 'Active' ): ?>
+<?php elseif (empty($statusFilter) && $statusFilter != 'Active'): ?>
     <div class="empty-state text-center">
         <?php if ($statusFilter == 'Active'): ?>
             <img src="../shared/assets/img/empty/todo.png" alt="No Pending Quests" class="empty-state-img">
             <div class="empty-state-text text-reg text-14 d-flex flex-column align-items-center">
-               <p class="text-med mb-0">No assessments here.</p>
+                <p class="text-med mb-0">No assessments here.</p>
             </div>
 
         <?php elseif ($statusFilter == 'Done'): ?>

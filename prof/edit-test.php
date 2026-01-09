@@ -507,6 +507,17 @@ if (isset($_GET['edit']) || isset($_GET['reuse'])) {
         $mainData['deadlineEnabled'] = $row['deadlineEnabled'];
         $mainData['testType'] = $row['testType'];
         $testID = $row['testID'];
+        // Check if this test already has responses
+        $checkResponsesQuery = "SELECT 1 
+                            FROM todo 
+                            WHERE assessmentID = '$reuseID' AND status = 'Submitted' 
+                            LIMIT 1";
+        $responseResult = executeQuery($checkResponsesQuery);
+        if ($responseResult && mysqli_num_rows($responseResult) > 0) {
+            // Redirect 
+            header("Location: create-test.php");
+            exit();
+        }
     } else {
         // Invalid or unauthorized reuse/edit attempt
         header("Location: create-test.php");
