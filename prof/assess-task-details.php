@@ -419,7 +419,7 @@ if (!empty($rubricID)) {
                                                 </div>
 
                                                 <div class="d-flex justify-content-center pt-3">
-                                                    <?php if ($submissionID != null) { ?><a class="text-decoration-none" href="<?php echo ($rubricID == null) ? 'grading-sheet.php?submissionID=' . $submissionID : 'grading-sheet-rubrics.php?submissionID=' . $submissionID; ?>"><?php } ?>
+                                                    <?php if ($submissionID != null) { ?><a class="text-decoration-none" href="<?php echo ($rubricID == null || $rubricID == 0) ? 'grading-sheet.php?submissionID=' . $submissionID : 'grading-sheet-rubrics.php?submissionID=' . $submissionID; ?>"><?php } ?>
                                                         <?php if ($submissionID == null) { ?><div title="No submissions in this assessment yet"><?php } ?>
                                                             <button class="btn btn-action" <?php echo ($submissionID == null) ? 'disabled' : '' ?>>
                                                                 <img src="../shared/assets/img/assess/assess.png"

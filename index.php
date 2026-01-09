@@ -221,7 +221,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                             <?php
                             if (mysqli_num_rows($selectEnrolledResult) > 0) {
                                 while ($studentEnrolled = mysqli_fetch_assoc($selectEnrolledResult)) {
-                                    ?>
+                            ?>
                                     <!-- left side -->
                                     <div class="col-12 col-sm-12 col-md-7 left-side">
                                         <div class="row align-items-center ps-0 ps-md-4">
@@ -282,7 +282,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                 if (mysqli_num_rows($selectEnrolledResult) > 0) {
                                                                     mysqli_data_seek($selectEnrolledResult, 0);
                                                                     while ($enrolledSubjects = mysqli_fetch_assoc($selectEnrolledResult)) {
-                                                                        ?>
+                                                                ?>
                                                                         <!-- Card 1 -->
                                                                         <div class="card custom-course-card">
                                                                             <a href="course-info.php?courseID=<?php echo $enrolledSubjects['courseID']; ?>"
@@ -304,7 +304,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                                 </div>
                                                                             </a>
                                                                         </div>
-                                                                        <?php
+                                                                <?php
                                                                     }
                                                                 }
                                                                 ?>
@@ -351,7 +351,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                         <?php
                                                         if (mysqli_num_rows($selectAnnouncementsResult) > 0) {
                                                             while ($announcements = mysqli_fetch_assoc($selectAnnouncementsResult)) {
-                                                                ?>
+                                                        ?>
                                                                 <!-- Card 1 -->
                                                                 <div class="card mb-3"
                                                                     style="border-radius: 12px; border: 1px solid rgba(44, 44, 44, 1); padding: 15px;">
@@ -395,7 +395,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                         </a>
                                                                     </div>
                                                                 </div>
-                                                                <?php
+                                                            <?php
                                                             }
                                                         } else {
                                                             ?>
@@ -406,7 +406,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                 <p class="text-med mt-1 mb-0">Nothing new here.</p>
                                                                 <p class="text-reg mt-1">Announcements are all caught up.</p>
                                                             </div>
-                                                            <?php
+                                                        <?php
                                                         }
                                                         ?>
                                                     </div>
@@ -439,10 +439,10 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                             if ($totalAssessmentsCount > 0) {
                                                                 $emptyAssessment = false;
                                                                 $totalAssessments = mysqli_fetch_assoc($selectAssessmentResult);
-                                                                ?>
+                                                            ?>
                                                                 <span
                                                                     class="count-badge ms-2 text-sbold text-16"><?php echo $totalAssessments['totalAssessments']; ?></span>
-                                                                <?php
+                                                            <?php
                                                             } else {
                                                                 $emptyAssessment = true;
                                                             }
@@ -464,7 +464,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                 } elseif ($type === 'test') {
                                                                     $link = "test.php?testID=" . $activities['testID'];
                                                                 }
-                                                                ?>
+                                                        ?>
                                                                 <div class="todo-card d-flex align-items-stretch mb-2" style="max-width:100%!important">
                                                                     <!-- Date -->
                                                                     <div class="date d-flex align-items-center justify-content-center text-sbold text-20"
@@ -502,7 +502,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <?php
+                                                            <?php
                                                             }
                                                         } else {
                                                             ?>
@@ -512,7 +512,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                 <p class="text-med mt-1 mb-0">You're on track.</p>
                                                                 <p class="text-reg mt-1">No new assessments ahead.</p>
                                                             </div>
-                                                            <?php
+                                                        <?php
                                                         }
                                                         ?>
 
@@ -581,45 +581,47 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                         $i++;
                                                                     }
                                                                 }
-                                                                ?>
+                                                        ?>
                                                                 <div class="card custom-leaderboard-card">
-                                                                    <div class="card-body p-4">
-                                                                        <div style="display: inline-flex; align-items: center;">
-                                                                            <span
-                                                                                class="rank-number text-bold text-18"><?php echo $rank; ?></span>
-                                                                            <?php
-                                                                            if ($rank == 1) {
-                                                                                echo '<img src="shared/assets/img/badge/1st.png" alt="1st" class="img-fluid float-end d-flex flex-row d-xxs-none ms-auto" width="30px">';
-                                                                            } else if ($rank == 2) {
-                                                                                echo '<img src="shared/assets/img/badge/2nd.png" alt="2nd" class="img-fluid float-end d-flex flex-row d-xxs-none ms-auto" width="30px">';
-                                                                            } else if ($rank == 3) {
-                                                                                echo '<img src="shared/assets/img/badge/3rd.png" alt="3rd" class="img-fluid float-end d-flex flex-row d-xxs-none ms-auto" width="30px">';
-                                                                            }
-                                                                            ?>
-                                                                        </div>
-
-                                                                        <!-- NEW WRAPPER -->
-                                                                        <div class="info-block">
-                                                                            <div class="comp-code text-sbold text-16">
-                                                                                <?php echo $leaderboards['courseCode']; ?>
-                                                                            </div>
-                                                                            <div class="subj-code text-reg text-12 mb-0 text-truncate" style="max-width:120px">
-                                                                                <?php echo $leaderboards['courseTitle']; ?>
+                                                                    <a class="text-decoration-none" href="course-info.php?courseID=<?php echo $courseID; ?>">
+                                                                        <div class="card-body p-4">
+                                                                            <div style="display: inline-flex; align-items: center;">
+                                                                                <span
+                                                                                    class="rank-number text-bold text-18"><?php echo $rank; ?></span>
+                                                                                <?php
+                                                                                if ($rank == 1) {
+                                                                                    echo '<img src="shared/assets/img/badge/1st.png" alt="1st" class="img-fluid float-end d-flex flex-row d-xxs-none ms-auto" width="30px">';
+                                                                                } else if ($rank == 2) {
+                                                                                    echo '<img src="shared/assets/img/badge/2nd.png" alt="2nd" class="img-fluid float-end d-flex flex-row d-xxs-none ms-auto" width="30px">';
+                                                                                } else if ($rank == 3) {
+                                                                                    echo '<img src="shared/assets/img/badge/3rd.png" alt="3rd" class="img-fluid float-end d-flex flex-row d-xxs-none ms-auto" width="30px">';
+                                                                                }
+                                                                                ?>
                                                                             </div>
 
-                                                                            <div class="xp-container">
-                                                                                <div class="xp-block text-reg text-12 mb-0">
-                                                                                    <?php echo $leaderboards['totalPoints']; ?> XPs
+                                                                            <!-- NEW WRAPPER -->
+                                                                            <div class="info-block">
+                                                                                <div class="comp-code text-sbold text-16">
+                                                                                    <?php echo $leaderboards['courseCode']; ?>
                                                                                 </div>
-                                                                                <div class="xp-arrow">
-                                                                                    <i class="fa-solid fa-arrow-right text-reg text-12"
-                                                                                        style="color: var(--black);"></i>
+                                                                                <div class="subj-code text-reg text-12 mb-0 text-truncate" style="max-width:120px">
+                                                                                    <?php echo $leaderboards['courseTitle']; ?>
+                                                                                </div>
+
+                                                                                <div class="xp-container">
+                                                                                    <div class="xp-block text-reg text-12 mb-0">
+                                                                                        <?php echo $leaderboards['totalPoints']; ?> XPs
+                                                                                    </div>
+                                                                                    <div class="xp-arrow">
+                                                                                        <i class="fa-solid fa-arrow-right text-reg text-12"
+                                                                                            style="color: var(--black);"></i>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                    </div>
+                                                                    </a>
                                                                 </div>
-                                                                <?php
+                                                            <?php
                                                             }
                                                         } else {
                                                             ?>
@@ -630,7 +632,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                                                 <p class="text-med mt-1 mb-0">Leaderboard is empty.</p>
                                                                 <p class="text-reg mt-1">Start submitting tasks to earn scores.</p>
                                                             </div>
-                                                            <?php
+                                                        <?php
                                                         }
                                                         ?>
                                                     </div>
@@ -638,7 +640,7 @@ $selectLeaderboardResult = executeQuery($selectLeaderboardQuery);
                                             </div>
                                         </div>
                                     </div>
-                                    <?php
+                            <?php
                                 }
                             } else {
                                 echo "<script>window.location.href = 'course-join.php';</script>";
