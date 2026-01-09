@@ -200,7 +200,7 @@ if (!empty($_FILES['fileAttachment']['name'][0])) {
     } else {
         executeQuery("
             INSERT INTO submissions (assessmentID, userID, scoreID, submittedAt, isSubmitted)
-            VALUES ('$assessmentID', '$userID', NULL, NOW(), 1)
+            VALUES ('$assessmentID', '$userID', NULL, '$now', 1)
         ");
         $submissionID = mysqli_insert_id($conn);
     }
@@ -220,7 +220,7 @@ if (isset($_POST['links']) && !empty($_POST['links'])) {
             if (!$submissionID) {
                 executeQuery("
                     INSERT INTO submissions (assessmentID, userID, scoreID, submittedAt, isSubmitted)
-                    VALUES ('$assessmentID', '$userID', NULL, NOW(), 1)
+                    VALUES ('$assessmentID', '$userID', NULL, '$now', 1)
                 ");
                 $submissionID = mysqli_insert_id($conn);
             }
@@ -238,14 +238,14 @@ if (isset($_POST['assessmentID']) && empty($_FILES['fileAttachment']['name'][0])
     if ($submissionID) {
         executeQuery("
             UPDATE submissions 
-            SET submittedAt = NOW(), isSubmitted = 1 
+            SET submittedAt = '$now', isSubmitted = 1 
             WHERE submissionID = '$submissionID' AND userID = '$userID'
         ");
         $isSubmitted = 1;
     } else {
         executeQuery("
             INSERT INTO submissions (assessmentID, userID, scoreID, submittedAt, isSubmitted)
-            VALUES ('$assessmentID', '$userID', NULL, NOW(), 1)
+            VALUES ('$assessmentID', '$userID', NULL, '$now', 1)
         ");
         $submissionID = mysqli_insert_id($conn);
         $isSubmitted = 1;
@@ -291,13 +291,13 @@ if (
     if (!$submissionID) {
         executeQuery("
             INSERT INTO submissions (assessmentID, userID, scoreID, submittedAt, isSubmitted)
-            VALUES ('$assessmentID', '$userID', NULL, NOW(), 1)
+            VALUES ('$assessmentID', '$userID', NULL, '$now', 1)
         ");
         $submissionID = mysqli_insert_id($conn);
     } else {
         executeQuery("
             UPDATE submissions 
-            SET submittedAt = NOW(), isSubmitted = 1 
+            SET submittedAt = '$now', isSubmitted = 1 
             WHERE submissionID = '$submissionID'
         ");
     }
@@ -325,14 +325,14 @@ if (
             // First-time submission
             executeQuery("
             INSERT INTO submissions (assessmentID, userID, scoreID, submittedAt, isSubmitted)
-            VALUES ('$assessmentID', '$userID', NULL, NOW(), 1)
+            VALUES ('$assessmentID', '$userID', NULL, '$now', 1)
         ");
             $submissionID = mysqli_insert_id($conn);
         } else {
             // Resubmit even with no changes
             executeQuery("
             UPDATE submissions
-            SET submittedAt = NOW(), isSubmitted = 1
+            SET submittedAt = '$now', isSubmitted = 1
             WHERE submissionID = '$submissionID' AND userID = '$userID'
         ");
         }
@@ -465,13 +465,13 @@ if ($isSubmitted) {
         if ($hasTodo) {
             executeQuery("
                 UPDATE todo 
-                SET status = '$newStatus', updatedAt = NOW()
+                SET status = '$newStatus', updatedAt = '$now'
                 WHERE userID = '$userID' AND assessmentID = '$assessmentID'
             ");
         } else {
             executeQuery("
                 INSERT INTO todo (userID, assessmentID, status, updatedAt)
-                VALUES ('$userID', '$assessmentID', '$newStatus', NOW())
+                VALUES ('$userID', '$assessmentID', '$newStatus', '$now')
             ");
         }
     } else {
@@ -480,13 +480,13 @@ if ($isSubmitted) {
         if ($hasTodo) {
             executeQuery("
                 UPDATE todo 
-                SET status = '$newStatus', updatedAt = NOW()
+                SET status = '$newStatus', updatedAt = '$now'
                 WHERE userID = '$userID' AND assessmentID = '$assessmentID'
             ");
         } else {
             executeQuery("
                 INSERT INTO todo (userID, assessmentID, status, updatedAt)
-                VALUES ('$userID', '$assessmentID', '$newStatus', NOW())
+                VALUES ('$userID', '$assessmentID', '$newStatus', '$now')
             ");
         }
     }
@@ -496,13 +496,13 @@ if (isset($_POST['unsubmit'])) {
     if ($hasTodo) {
         executeQuery("
             UPDATE todo 
-            SET status = 'Pending', updatedAt = NOW()
+            SET status = 'Pending', updatedAt = '$now'
             WHERE userID = '$userID' AND assessmentID = '$assessmentID'
         ");
     } else {
         executeQuery("
             INSERT INTO todo (userID, assessmentID, status, updatedAt)
-            VALUES ('$userID', '$assessmentID', 'Pending', NOW())
+            VALUES ('$userID', '$assessmentID', 'Pending', '$now')
         ");
     }
 }
@@ -518,13 +518,13 @@ if ($isSubmitted) {
         if ($hasTodo) {
             executeQuery("
                 UPDATE todo 
-                SET status = 'Missing', updatedAt = NOW()
+                SET status = 'Missing', updatedAt = '$now'
                 WHERE userID = '$userID' AND assessmentID = '$assessmentID'
             ");
         } else {
             executeQuery("
                 INSERT INTO todo (userID, assessmentID, status, updatedAt)
-                VALUES ('$userID', '$assessmentID', 'Missing', NOW())
+                VALUES ('$userID', '$assessmentID', 'Missing', '$now')
             ");
         }
         $todoStatus = 'Missing';
@@ -533,13 +533,13 @@ if ($isSubmitted) {
         if ($hasTodo) {
             executeQuery("
                 UPDATE todo 
-                SET status = 'Pending', updatedAt = NOW()
+                SET status = 'Pending', updatedAt = '$now'
                 WHERE userID = '$userID' AND assessmentID = '$assessmentID'
             ");
         } else {
             executeQuery("
                 INSERT INTO todo (userID, assessmentID, status, updatedAt)
-                VALUES ('$userID', '$assessmentID', 'Pending', NOW())
+                VALUES ('$userID', '$assessmentID', 'Pending', '$now')
             ");
         }
         $todoStatus = 'Pending';
@@ -651,7 +651,7 @@ if ($submissionID) {
             // --- Insert reward into webstars table ---
             $insertWebstarQuery = "
                 INSERT INTO webstars (userID, sourceType, assessmentID, pointsChanged, dateEarned)
-                VALUES ('$userID', 'Submission', '$assessmentID', '$finalWebstars', NOW())
+                VALUES ('$userID', 'Submission', '$assessmentID', '$finalWebstars', '$now')
             ";
             mysqli_query($conn, $insertWebstarQuery) or die("Insert failed: " . mysqli_error($conn));
 
@@ -698,7 +698,7 @@ if ($submissionID) {
 
                         $updateLeaderboardQuery = "
                             UPDATE leaderboard
-                            SET xpPoints = '$newTotalXP', updatedAt = NOW()
+                            SET xpPoints = '$newTotalXP', updatedAt = '$now'
                             WHERE enrollmentID = '$enrollmentID'
                         ";
                         $updateResult = mysqli_query($conn, $updateLeaderboardQuery);
@@ -712,7 +712,7 @@ if ($submissionID) {
                         // --- Enrollment does not exist → Insert new XP row ---
                         $insertLeaderboardQuery = "
                             INSERT INTO leaderboard (enrollmentID, xpPoints, updatedAt)
-                            VALUES ('$enrollmentID', '$finalXP', NOW())
+                            VALUES ('$enrollmentID', '$finalXP', '$now')
                         ";
                         $insertResult = mysqli_query($conn, $insertLeaderboardQuery);
 
@@ -730,7 +730,7 @@ if ($submissionID) {
         // Insert negative record into webstars table
         mysqli_query($conn, "
             INSERT INTO webstars (userID, sourceType, assessmentID, pointsChanged, dateEarned)
-            VALUES ('$userID', 'Unsubmit', '$assessmentID', -$deductWebstars, NOW())
+            VALUES ('$userID', 'Unsubmit', '$assessmentID', -$deductWebstars, '$now')
         ") or die("Insert failed: " . mysqli_error($conn));
 
         // Subtract from profile total
