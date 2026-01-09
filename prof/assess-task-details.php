@@ -279,47 +279,47 @@ if (!empty($rubricID)) {
                                                             <?php endif; ?>
 
                                                             <?php if (!empty($attachmentsArray) || !empty($linksArray)): ?>
-                                                               <div class="text-sbold text-14 mt-3">Task Materials</div>
-                                                               <!-- FILES -->
-                                                               <?php foreach ($attachmentsArray as $file): 
-                                                                   $filePath = "../shared/assets/files/" . $file;
-                                                                   $fileExt = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
-                                                                   $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
-                                                                   $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
-                                                                   $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
-                                                               ?>
-                                                                   <div onclick="openViewerModal('<?php echo addslashes($file); ?>', '<?php echo $filePath; ?>')"
+                                                                <div class="text-sbold text-14 mt-3">Task Materials</div>
+                                                                <!-- FILES -->
+                                                                <?php foreach ($attachmentsArray as $file):
+                                                                    $filePath = "../shared/assets/files/" . $file;
+                                                                    $fileExt = strtoupper(pathinfo($file, PATHINFO_EXTENSION));
+                                                                    $fileSize = (file_exists($filePath)) ? filesize($filePath) : 0;
+                                                                    $fileSizeMB = $fileSize > 0 ? round($fileSize / 1048576, 2) . " MB" : "Unknown size";
+                                                                    $fileNameOnly = pathinfo($file, PATHINFO_FILENAME);
+                                                                ?>
+                                                                    <div onclick="openViewerModal('<?php echo addslashes($file); ?>', '<?php echo $filePath; ?>')"
                                                                         style="cursor:pointer;">
-                                                                       <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
-                                                                            style="width:400px; max-width:100%; min-width:310px;">
-                                                                           <span class="px-3 py-3 material-symbols-outlined">draft</span>
-                                                                           <div class="ms-2">
-                                                                               <div class="text-sbold text-16 mt-1 text-truncate" style="max-width:320px;"><?php echo $fileNameOnly ?></div>
-                                                                               <div class="due text-reg text-14 mb-1">
-                                                                                   <?php echo $fileExt ?> · <?php echo $fileSizeMB ?>
-                                                                               </div>
-                                                                           </div>
-                                                                       </div>
-                                                                   </div>
-                                                               <?php endforeach; ?>
-
-                                                               <!-- LINKS -->
-                                                               <?php foreach ($linksArray as $link): ?>
-                                                                   <?php 
-                                                                       $linkTitle = htmlspecialchars($link);
-                                                                   ?>
-                                                                      <div onclick="openLinkViewerModal('<?php echo $linkTitle; ?>', '<?php echo $linkTitle; ?>')"
-                                                                        style="cursor:pointer;">
-                                                                       <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
-                                                                            style="width:400px; max-width:100%; min-width:310px;">
-                                                                           <span class="px-3 py-3 material-symbols-outlined">public</span>
-                                                                           <div class="ms-2">
-                                                                               <div class="text-sbold text-16 mt-1 text-truncate" style="max-width:320px;"><?php echo $linkTitle ?></div>
-                                                                                <div class="text-reg link text-12 mt-0 text-truncate"
-                                                                                     style="color: var(--black); max-width: 320px;"><?php echo $linkTitle ?></div>
+                                                                        <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
+                                                                            style="width:100%; max-width:400px;">
+                                                                            <span class="px-3 py-3 material-symbols-outlined">draft</span>
+                                                                            <div class="ms-2">
+                                                                                <div class="text-sbold text-16 mt-1 text-truncate" style="max-width:320px;"><?php echo $fileNameOnly ?></div>
+                                                                                <div class="due text-reg text-14 mb-1">
+                                                                                    <?php echo $fileExt ?> · <?php echo $fileSizeMB ?>
+                                                                                </div>
                                                                             </div>
                                                                         </div>
-                                                                   </div>
+                                                                    </div>
+                                                                <?php endforeach; ?>
+
+                                                                <!-- LINKS -->
+                                                                <?php foreach ($linksArray as $link): ?>
+                                                                    <?php
+                                                                    $linkTitle = htmlspecialchars($link);
+                                                                    ?>
+                                                                    <div onclick="openLinkViewerModal('<?php echo $linkTitle; ?>', '<?php echo $linkTitle; ?>')"
+                                                                        style="cursor:pointer;">
+                                                                        <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
+                                                                            style="width:100%; max-width:400px;">
+                                                                            <span class="px-3 py-3 material-symbols-outlined">public</span>
+                                                                            <div class="ms-2 overflow-hidden" style="flex:1;">
+                                                                                <div class="text-sbold text-16 mt-1 text-truncate" style="max-width:320px;"><?php echo $linkTitle ?></div>
+                                                                                <div class="text-reg link text-12 mt-0 text-truncate"
+                                                                                    style="color: var(--black); max-width: 320px;"><?php echo $linkTitle ?></div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                 <?php endforeach; ?>
                                                                 <hr>
                                                             <?php endif; ?>
@@ -349,8 +349,8 @@ if (!empty($rubricID)) {
                                                             <?php
                                                             if (mysqli_num_rows($profInfoResult) > 0) {
                                                                 while ($prof = mysqli_fetch_assoc($profInfoResult)) {
-                                                                    $profilePic = !empty($test['profilePicture'])
-                                                                        ? '../shared/assets/pfp-uploads/' . $test['profilePicture']
+                                                                    $profilePic = !empty($prof['profilePicture'])
+                                                                        ? '../shared/assets/pfp-uploads/' . $prof['profilePicture']
                                                                         : '../shared/assets/pfp-uploads/defaultProfile.png';
                                                             ?>
                                                                     <div class="text-sbold text-14 pb-3">Prepared by</div>
@@ -520,37 +520,37 @@ if (!empty($rubricID)) {
     </div>
     <!-- FILE VIEWER MODAL -->
     <div class="modal fade" id="viewerModal" tabindex="-1">
-           <div class="modal-dialog modal-xl modal-dialog-centered">
-               <div class="modal-content" style="border-radius:12px; overflow:hidden;">
-                   <div class="modal-header d-flex justify-content-between align-items-center">
-                       <div class="d-flex align-items-center gap-2">
-                           <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;" id="viewerModalLabel">File Viewer</h5>
-                           <a id="modalDownloadBtn" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
-                              style="background-color: var(--primaryColor); border: 1px solid var(--black);" download>
-                               <span class="" style="display:flex;align-items:center;gap:4px;">
-                                   <span class="material-symbols-outlined" style="font-size:18px;">download_2</span>
-                                   Download
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content" style="border-radius:12px; overflow:hidden;">
+                <div class="modal-header d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;" id="viewerModalLabel">File Viewer</h5>
+                        <a id="modalDownloadBtn" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
+                            style="background-color: var(--primaryColor); border: 1px solid var(--black);" download>
+                            <span class="" style="display:flex;align-items:center;gap:4px;">
+                                <span class="material-symbols-outlined" style="font-size:18px;">download_2</span>
+                                Download
                             </span>
-                           </a>
-                       </div>
-                       <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                   </div>
-                   <div class="modal-body p-0" style="background:#2e2e2e; height:75vh;">
-                       <div id="viewerContainer" style="width:100%; height:100%;"></div>
-                   </div>
-               </div>
-           </div>
+                        </a>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0" style="background:#2e2e2e; height:75vh;">
+                    <div id="viewerContainer" style="width:100%; height:100%;"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- LINK VIEWER MODAL -->
     <div class="modal fade" id="linkViewerModal" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-centered">
-               <div class="modal-content" style="border-radius:12px; overflow:hidden;">
+            <div class="modal-content" style="border-radius:12px; overflow:hidden;">
                 <div class="modal-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-2">
                         <h5 class="modal-title text-sbold text-16 mb-0 text-truncate" style="max-width:150px;" id="linkViewerModalLabel">Link Viewer</h5>
                         <a id="modalOpenInNewTab" class="btn py-1 px-3 rounded-pill text-sbold text-md-14 ms-1"
-                           style="background-color: var(--primaryColor); border: 1px solid var(--black);" target="_blank">
+                            style="background-color: var(--primaryColor); border: 1px solid var(--black);" target="_blank">
                             <span class="" style="display:flex;align-items:center;gap:4px;">
                                 <span class="material-symbols-outlined" style="font-size:18px;">open_in_new</span>
                                 Open
@@ -561,10 +561,10 @@ if (!empty($rubricID)) {
                 </div>
                 <div class="modal-body p-0" style="background:#2e2e2e; height:75vh;">
                     <iframe id="linkViewerIframe"
-                            style="width:100%; height:100%; border:none; border-radius:10px;"></iframe>
-                   </div>
-               </div>
-           </div>
+                        style="width:100%; height:100%; border:none; border-radius:10px;"></iframe>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
@@ -594,7 +594,7 @@ if (!empty($rubricID)) {
                 }
             });
         }
-           createDoughnutChart('taskChart', <?php echo $submitted['submittedTodo']; ?>, <?php echo $pending['pending']; ?>, <?php echo $returned['returned']; ?>, <?php echo $missing['missing']; ?>);
+        createDoughnutChart('taskChart', <?php echo $submitted['submittedTodo']; ?>, <?php echo $pending['pending']; ?>, <?php echo $returned['returned']; ?>, <?php echo $missing['missing']; ?>);
     </script>
     <script>
         function openViewerModal(fileName, filePath) {
@@ -603,7 +603,7 @@ if (!empty($rubricID)) {
             let viewer = document.getElementById("viewerContainer");
             viewer.innerHTML = "";
             let ext = fileName.split(".").pop().toLowerCase();
-            if (["jpg","jpeg","png","gif","webp","bmp","svg"].includes(ext)) {
+            if (["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"].includes(ext)) {
                 viewer.innerHTML = `<img src="${filePath}" style="width:100%; height:100%; object-fit:contain; background:#333;">`;
             } else if (ext === "pdf") {
                 viewer.innerHTML = `<iframe src="${filePath}" width="100%" height="100%" style="border:none; border-radius:10px;"></iframe>`;

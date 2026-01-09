@@ -50,7 +50,7 @@ $countMissingResult = executeQuery($countMissingQuery);
 $missing = mysqli_fetch_assoc($countMissingResult);
 
 $studentIDs = [];
-$studentTodoStatusQuery = "SELECT todo.userID, userinfo.firstName, userinfo.middleName, userinfo.lastName, todo.status, submissions.submissionID FROM todo
+$studentTodoStatusQuery = "SELECT todo.userID, userinfo.firstName, userinfo.middleName, userinfo.lastName, userinfo.profilePicture, todo.status, submissions.submissionID FROM todo
 INNER JOIN userinfo
 	ON todo.userID = userinfo.userID
 INNER JOIN assessments
@@ -95,9 +95,6 @@ $checkRubricResult = executeQuery($checkRubricQuery);
 $rubricIDRow = (mysqli_num_rows($checkRubricResult) > 0) ? mysqli_fetch_assoc($checkRubricResult) : null;
 $rubricID = ($rubricIDRow == null) ? null : $rubricIDRow['rubricID'];
 
-$profilePic = !empty($test['profilePicture'])
-    ? '../shared/assets/pfp-uploads/' . $test['profilePicture']
-    : '../shared/assets/pfp-uploads/defaultProfile.png';
 ?>
 
 <!doctype html>
@@ -249,6 +246,9 @@ $profilePic = !empty($test['profilePicture'])
                                                         if (mysqli_num_rows($studentTodoStatusResult) > 0) {
                                                             mysqli_data_seek($studentTodoStatusResult, 0);
                                                             while ($studentsTodoRow = mysqli_fetch_assoc($studentTodoStatusResult)) {
+                                                                $profilePic = !empty($studentsTodoRow['profilePicture'])
+                                                                    ? '../shared/assets/pfp-uploads/' . $studentsTodoRow['profilePicture']
+                                                                    : '../shared/assets/pfp-uploads/defaultProfile.png';
                                                         ?>
                                                                 <?php
                                                                 $gradingLink = ($rubricID == null) ? 'grading-sheet.php?submissionID=' : 'grading-sheet-rubrics.php?submissionID=';
@@ -264,7 +264,7 @@ $profilePic = !empty($test['profilePicture'])
                                                                         <div class="flex-grow-1 d-flex justify-content-center text-sbold">
                                                                             <span class="badge badge-<?php echo strtolower($studentsTodoRow['status']) ?>"><?php echo $studentsTodoRow['status']; ?></span>
                                                                         </div>
-                                                                        
+
                                                                     </div>
                                                                 </a>
                                                         <?php

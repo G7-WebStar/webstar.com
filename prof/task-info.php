@@ -270,9 +270,9 @@ if (!empty($rubricID)) {
                                                         <div onclick="openViewerModal('<?php echo $f['name']; ?>', '<?php echo $f['path']; ?>')"
                                                             style="cursor:pointer;">
                                                             <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
-                                                                style="width:400px; max-width:100%; min-width:310px;">
+                                                                style="width:100%; max-width:400px;">
                                                                 <span class="px-3 py-3 material-symbols-outlined">draft</span>
-                                                                <div class="ms-2 flex-grow-1">
+                                                                <div class="ms-2 overflow-hidden" style="flex:1;">
                                                                     <!-- Truncated title -->
                                                                     <div class="text-sbold text-16 mt-1 text-truncate"
                                                                         style="max-width:320px;">
@@ -291,9 +291,9 @@ if (!empty($rubricID)) {
                                                         <div onclick="openLinkViewerModal('<?php echo htmlspecialchars($linkItem['title']); ?>', '<?php echo htmlspecialchars($linkItem['url']); ?>')"
                                                             style="cursor:pointer;">
                                                             <div class="cardFile my-3 w-lg-25 d-flex align-items-start"
-                                                                style="width:400px; max-width:100%; min-width:310px;">
+                                                                style="width:100%; max-width:400px;">
                                                                 <span class="px-3 py-3 material-symbols-outlined">public</span>
-                                                                <div class="ms-2 flex-grow-1">
+                                                                <div class="ms-2 overflow-hidden" style="flex:1;">
                                                                     <!-- Truncated link title -->
                                                                     <div class="text-sbold text-16 mt-1 text-truncate"
                                                                         style="max-width:320px;">
