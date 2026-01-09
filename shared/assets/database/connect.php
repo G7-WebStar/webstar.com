@@ -1,8 +1,8 @@
 <?php
 $dbhost = "localhost";
-$dbuser = "root";
-$dbpass = "";
-$db = "webstar";
+$dbuser = "u977784600_webstar";
+$dbpass = "WebstarTeamu977784600_";
+$db = "u977784600_webstar";
 
 //$dbhost = "localhost";
 //$dbuser = "";
