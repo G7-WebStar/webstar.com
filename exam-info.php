@@ -119,12 +119,6 @@ $assessmentCreationDateResult = executeQuery($assessmentCreationDateQuery);
 $assessmentCreationDateRow = mysqli_fetch_assoc($assessmentCreationDateResult);
 $assessmentCreationDate = $assessmentCreationDateRow['creationDate'];
 
-$profilePic = !empty($assignmentRow['profilePicture'])
-    ? 'shared/assets/pfp-uploads/' . $assignmentRow['profilePicture']
-    : 'shared/assets/pfp-uploads/defaultProfile.png';
-
-
-
 ?>
 
 <!doctype html>
@@ -255,6 +249,9 @@ $profilePic = !empty($assignmentRow['profilePicture'])
                                     <?php
                                     if (mysqli_num_rows($profInfoResult) > 0) {
                                         while ($prof = mysqli_fetch_assoc($profInfoResult)) {
+                                            $profilePic = !empty($prof['profilePicture'])
+                                                ? 'shared/assets/pfp-uploads/' . $prof['profilePicture']
+                                                : 'shared/assets/pfp-uploads/defaultProfile.png';
                                     ?>
                                             <div class="d-flex align-items-center pb-5">
                                                 <div class="rounded-circle me-2"
